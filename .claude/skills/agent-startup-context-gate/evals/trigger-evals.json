@@ -1,0 +1,35 @@
+{
+  "skill": "agent-startup-context-gate",
+  "description": "Trigger discrimination for the Phase 1 operating-discipline pack, context/truth cluster. Pins which skill fires when startup-context and conflict-reconciliation prompts look similar.",
+  "overlaps_with": ["source-of-truth-reconciler", "change-classification-gate", "human-approval-boundary"],
+  "cases": [
+    {
+      "id": "task-start-wins-here",
+      "prompt": "Start work in the repo at ~/code/shop-api: add rate limiting to the public endpoints.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": ["source-of-truth-reconciler"],
+      "reason": "Task start in a repo — the context gate fires; no conflict between sources exists yet."
+    },
+    {
+      "id": "explicit-conflict-goes-to-reconciler",
+      "prompt": "The README says tests run with `npm test` but package.json has no test script — which is right?",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": ["agent-startup-context-gate"],
+      "reason": "An explicit conflict between two sources is reconciliation, not startup context loading."
+    },
+    {
+      "id": "risk-question-goes-to-approval-boundary",
+      "prompt": "Is it safe to drop the legacy_sessions table today?",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["agent-startup-context-gate"],
+      "reason": "A risky-boundary question, not startup context."
+    },
+    {
+      "id": "resume-after-compaction-wins-here",
+      "prompt": "We got cut off yesterday — pick the refactor back up where we left it.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": ["source-of-truth-reconciler"],
+      "reason": "Resuming with possibly stale context re-runs the gate before work continues."
+    }
+  ]
+}

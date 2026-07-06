@@ -1,0 +1,35 @@
+{
+  "skill": "source-of-truth-reconciler",
+  "description": "Trigger discrimination for the Phase 1 operating-discipline pack, context/truth cluster. Pins reconciliation apart from startup context loading and approval stops.",
+  "overlaps_with": ["agent-startup-context-gate", "human-approval-boundary"],
+  "cases": [
+    {
+      "id": "conflict-wins-here",
+      "prompt": "CLAUDE.md says use pnpm but every CI job runs npm ci — which do I follow?",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": ["agent-startup-context-gate"],
+      "reason": "Two sources in explicit conflict — reconciliation, not startup context."
+    },
+    {
+      "id": "task-start-goes-to-context-gate",
+      "prompt": "cd into ~/code/report-service and start on the CSV export feature.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": ["source-of-truth-reconciler"],
+      "reason": "Task start with no named conflict — the startup gate runs first and hands off here only if it finds one."
+    },
+    {
+      "id": "security-conflict-still-triggers-then-routes",
+      "prompt": "The RLS doc and the support runbook disagree about service-role access — resolve it.",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": [],
+      "reason": "Reconciler triggers to enumerate the conflict, then must route the DECISION to human-approval-boundary per its stop conditions."
+    },
+    {
+      "id": "may-i-proceed-goes-to-approval",
+      "prompt": "Docs disagree on whether we can wipe the staging database weekly — can I just go ahead and do it?",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["source-of-truth-reconciler"],
+      "reason": "The ask is permission for a destructive action; the boundary owns that stop even though sources disagree."
+    }
+  ]
+}

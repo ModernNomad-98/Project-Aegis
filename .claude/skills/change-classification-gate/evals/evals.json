@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "change-classification-gate",
+  "description": "Trigger and behavior cases for pre-work change classification, mixed-class handling, and the mid-task scope lock.",
+  "cases": [
+    {
+      "id": "positive-schema-change-classified",
+      "type": "should_trigger",
+      "prompt": "Add a nullable `preferred_locale` column to the users table and backfill it from the profiles table.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the work as schema-migration (not backend-api) after inspecting the migration surface.",
+          "Names the validation floor: migration plan, rollback, data-loss statement.",
+          "Routes to human-approval-boundary before writing the migration.",
+          "States a scope contract with the expected file set."
+        ]
+      }
+    },
+    {
+      "id": "edge-mixed-docs-and-rls",
+      "type": "should_trigger",
+      "prompt": "Fix the typo in README.md and tighten the RLS policy on the invoices table so members of one org can't read another org's invoices.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not treat the task as docs-only; classifies both deliverables.",
+          "The rls-security class governs the approval path for the task.",
+          "Requires negative tests for the RLS change; the README part keeps only the docs floor."
+        ]
+      }
+    },
+    {
+      "id": "negative-conceptual-question",
+      "type": "should_not_trigger",
+      "prompt": "What's the difference between a frontend change and a backend change in a typical web app?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Conceptual question — answered plainly, no classification ritual."
+        ]
+      }
+    },
+    {
+      "id": "stop-mid-task-scope-growth",
+      "type": "should_trigger",
+      "prompt": "You are mid-way through an approved bug fix in the login handler when you discover the real fix requires adding a column to the sessions table. Continue.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops instead of continuing into the new class.",
+          "Reclassifies the task to include schema-migration and states the new validation floor.",
+          "Seeks fresh approval via human-approval-boundary before touching the schema — the original bug-fix approval does not transfer."
+        ]
+      }
+    }
+  ]
+}

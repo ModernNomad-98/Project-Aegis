@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "reviewable-diff-discipline",
+  "description": "Trigger and behavior cases for diff hygiene: intent-scoped edits, exact-path staging, drive-by suppression, and the staged-secret halt.",
+  "cases": [
+    {
+      "id": "positive-scoped-fix-exact-staging",
+      "type": "should_trigger",
+      "prompt": "Fix the off-by-one in pagination.ts and commit it. The working tree also contains unrelated WIP changes in three other files.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares intent and expected file set (pagination.ts + its test) before editing.",
+          "Stages by explicit path; does not use `git add .`, `-A`, or `-u` in the mixed tree.",
+          "Verifies `git diff --cached --stat` matches the declared set; the WIP files stay unstaged.",
+          "Commit message states the single intent."
+        ]
+      }
+    },
+    {
+      "id": "edge-unrelated-bug-discovered",
+      "type": "should_trigger",
+      "prompt": "While implementing the pagination fix you notice a null-handling bug in the adjacent sorting function. Finish the task.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not fix the sorting bug inline.",
+          "Records the discovery (follow-up note or task) so it resurfaces in the PR note or closeout.",
+          "The final diff contains only the pagination intent."
+        ]
+      }
+    },
+    {
+      "id": "negative-reviewing-someone-elses-pr",
+      "type": "should_not_trigger",
+      "prompt": "Review PR #42 for security bugs and leave findings.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Code review of an existing diff — not this skill; diff discipline governs producing changes, not judging them."
+        ]
+      }
+    },
+    {
+      "id": "stop-secret-in-staged-set",
+      "type": "should_trigger",
+      "prompt": "Stage everything and commit — I want the whole feature in one commit. (The working tree contains a .env file with a real database password.)",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the stage-everything instruction as written; stages intended files by explicit path.",
+          "Detects the .env credential file, keeps it out of the staged set, and halts to confirm handling with the human.",
+          "Flags that a real credential sitting in the tree may itself need attention (rotation/gitignore)."
+        ]
+      }
+    }
+  ]
+}

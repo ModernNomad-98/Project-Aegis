@@ -8,10 +8,11 @@ make Claude behave like a disciplined senior/principal engineering partner: mode
 code, docs before implementation, tests before changes, small diffs, tenant isolation and
 security by default, QA evidence before release, and evidence-based troubleshooting.
 
-The repo is built in **phases**. **Phase 0 (this branch)** establishes the foundation —
-authoring standard, templates, eval convention, validator, catalog, and the seven read-only
-reviewer subagents — plus a Step 0 reconciliation of the two earlier planning tracks. The
-only skill directory is `_template`; **no real skills are generated in Phase 0.**
+The repo is built in **phases**. **Phase 0** established the foundation — authoring
+standard, templates, eval convention, validator, catalog, the seven read-only reviewer
+subagents, and the Step 0 reconciliation of the two earlier planning tracks. **Phase 1**
+ships the first real skills: the 8-skill AI engineering **operating-discipline pack**
+(reconciled decision D4) — see [Skills (shipped)](#skills-shipped) below.
 
 ## Start here (canonical reading order)
 
@@ -39,8 +40,8 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 
 | Phase | Pack | Priority | Status |
 |---:|---|---|---|
-| 0 | Foundation: standard, templates, eval convention, validator, catalog, README, 7 subagents, `_template` | P0 | ✅ this branch |
-| 1 | AI engineering **operating-discipline** pack (8 skills) | P0 | backlog |
+| 0 | Foundation: standard, templates, eval convention, validator, catalog, README, 7 subagents, `_template` | P0 | ✅ merged |
+| 1 | AI engineering **operating-discipline** pack (8 skills) | P0 | ✅ this branch |
 | 2 | Core architecture & engineering (10) | P0 | backlog |
 | 3 | SaaS & tenant isolation (9) | P0/P1 | backlog |
 | 4 | Security, RLS & supply chain (9) | P0/P1 | backlog |
@@ -63,6 +64,22 @@ read-only by default. Each maps to a v4 orchestrator role (see reconciliation §
 | `senior-troubleshooting-lead` | Reproduction, hypothesis ranking, root cause. |
 | `ai-security-red-team-reviewer` | Prompt injection, tool/RAG abuse, data exfil. |
 | `release-readiness-reviewer` | CI/build/test evidence, migrations, rollback, go/no-go. |
+
+## Skills (shipped)
+
+Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<name>/`
+(full detail: [`docs/skills-catalog.md`](docs/skills-catalog.md)):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `agent-startup-context-gate` | Verifies repo identity and loads governing context before any work; halts when the location can't be verified (a path that exists is not proof it's the right repo). | auto + manual |
+| `source-of-truth-reconciler` | Resolves conflicts between instructions, docs, code, tests, and memory by evidence-cited precedence; surfaces every assumption. | auto + manual |
+| `change-classification-gate` | Classifies a change before work → validation floor + approval path; locks scope to the approved class. | auto + manual |
+| `human-approval-boundary` | Halts for explicit approval before schema, RLS/security, prod-data, secrets, deploy, billing, or destructive work; stops when security impact is unclear. | auto + manual |
+| `reviewable-diff-discipline` | Keeps diffs small and intentional; stages exact files only; staged set must equal declared intent. | auto + manual |
+| `ai-closeout-reporter` | Terminal closeout report with a mandatory "intentionally not done / omitted" section — scope reductions are never silent. | auto + manual |
+| `agent-failure-recovery` | Preserve-first recovery from broken git/tree state; destructive cleanup only with backup + explicit approval. | **manual only** |
+| `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
 
 ## Authoring a new skill
 

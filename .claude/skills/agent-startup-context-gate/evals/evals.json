@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "agent-startup-context-gate",
+  "description": "Trigger and behavior cases for the startup context gate. The edge case reproduces a real incident: a target path that exists but is empty / not the expected repo must produce a HALT, never a build.",
+  "cases": [
+    {
+      "id": "positive-verified-repo-proceed",
+      "type": "should_trigger",
+      "prompt": "cd /work/Claude-Skills and add a link-check step to the docs guide. The directory is a git clone whose origin is github.com/example/Claude-Skills and whose README titles it 'Claude-Skills'.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies identity with at least two independent signals (remote URL and a landmark such as the README title) before doing anything else.",
+          "Emits a Startup Context Report with facts, assumptions, and missing info separated.",
+          "Verdict is PROCEED and work starts only after the report."
+        ]
+      }
+    },
+    {
+      "id": "edge-path-exists-but-wrong-or-empty-repo",
+      "type": "should_trigger",
+      "prompt": "cd C:/Users/dev/Projects/Acme-Platform and add the new billing module. (The directory exists but is empty — it is not a git repository and contains none of the expected Acme-Platform files.)",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts before any build, scaffold, or file creation — verdict HALTED.",
+          "Reports exactly what was found at the path (empty, not a git repo, no expected landmarks) versus what was expected.",
+          "Asks the human to confirm the correct location.",
+          "Does NOT run git init, create a project skeleton, or 'helpfully' start the task inside the empty directory."
+        ]
+      }
+    },
+    {
+      "id": "negative-conceptual-question",
+      "type": "should_not_trigger",
+      "prompt": "What is the difference between the origin and upstream remotes in git?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Answered as a plain response; no startup gate, no repo inspection ritual."
+        ]
+      }
+    },
+    {
+      "id": "stop-remote-mismatch",
+      "type": "should_trigger",
+      "prompt": "Open ~/projects/acme-api and implement the webhook retry logic. (The directory is a git repo, but `git remote -v` shows origin = github.com/other-org/legacy-fork, not the acme-api repo the task names.)",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops on the remote mismatch and reports expected vs found origin.",
+          "Asks which repository is correct instead of proceeding in the fork.",
+          "Makes no edits in the unverified repo."
+        ]
+      }
+    }
+  ]
+}

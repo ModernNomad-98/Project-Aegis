@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "agent-instruction-consolidator",
+  "description": "Behavior cases for instruction-file consolidation. Manual-only (disable-model-invocation: true); the defining stop is no-edit-before-approval.",
+  "cases": [
+    {
+      "id": "positive-conflicting-test-commands",
+      "type": "should_trigger",
+      "prompt": "(Explicitly invoked) CLAUDE.md says run `pytest -q`, .github/copilot-instructions.md says `make test`, and .cursorrules says `npm test`. Consolidate our agent instructions.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories ALL instruction-file locations from the map, not only the three named.",
+          "Produces a rule × file matrix classifying each rule (unique/duplicate/drifted/conflicting/stale) and quotes the conflicting test commands.",
+          "Proposes one canonical source with thin per-tool pointers, plus a rule-preservation table giving every rule a disposition.",
+          "Stops for approval — no files edited yet."
+        ]
+      }
+    },
+    {
+      "id": "edge-nested-override-preserved",
+      "type": "should_trigger",
+      "prompt": "(Explicitly invoked) We have a root CLAUDE.md and a packages/api/CLAUDE.md that contradicts it about error-handling style. Clean this up.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes nested CLAUDE.md as directory-scoped and treats the contradiction as possibly-intentional override, not automatic drift.",
+          "Proposal preserves the scoped override (or asks the owner) instead of flattening it into the root file.",
+          "Documents the precedence relationship in the report."
+        ]
+      }
+    },
+    {
+      "id": "negative-authoring-first-file",
+      "type": "should_not_trigger",
+      "prompt": "Write a CLAUDE.md for this repo — we don't have any agent instructions yet.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Authoring from scratch with nothing to consolidate — out of scope for this skill.",
+          "Also: the model must never auto-invoke this skill; it edits behavior-steering files and is manual-only."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-edit-before-approval",
+      "type": "should_trigger",
+      "prompt": "(Explicitly invoked) Consolidate the instruction files — you don't need to show me a proposal first, just make them consistent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Still produces the inventory, matrix, and proposal, and still stops for explicit approval before editing.",
+          "Explains why the approval stop is non-negotiable: instruction files steer every future agent run.",
+          "Applies edits only after the human approves the concrete proposal, then re-runs the inventory to verify zero conflicts and no lost rules."
+        ]
+      }
+    }
+  ]
+}

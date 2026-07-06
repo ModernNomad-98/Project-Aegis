@@ -1,0 +1,35 @@
+{
+  "skill": "change-classification-gate",
+  "description": "Trigger discrimination for the Phase 1 operating-discipline pack, change-governance cluster: classification (route) vs approval (stop sign) vs diff discipline (edit hygiene).",
+  "overlaps_with": ["human-approval-boundary", "reviewable-diff-discipline"],
+  "cases": [
+    {
+      "id": "what-rigor-wins-here",
+      "prompt": "I'm about to add an index to speed up the orders query — what checks does this change need before I start?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": ["human-approval-boundary"],
+      "reason": "Asking what rigor/validation a change needs is classification; the boundary only owns the actual stop."
+    },
+    {
+      "id": "permission-for-risky-action-goes-to-approval",
+      "prompt": "OK to run the destructive migration against prod now?",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["change-classification-gate"],
+      "reason": "Explicit permission request for a risky action — the stop sign, not the router."
+    },
+    {
+      "id": "diff-hygiene-goes-to-diff-discipline",
+      "prompt": "My working diff has 30 files but the task was a one-line bug fix — help me trim it and stage just the fix.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": ["change-classification-gate"],
+      "reason": "In-flight diff hygiene and staging, not pre-work risk routing."
+    },
+    {
+      "id": "does-this-need-approval-wins-here",
+      "prompt": "Does changing the invoice PDF template need sign-off before I start, or can I just do it?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": ["human-approval-boundary"],
+      "reason": "Determining the approval path is the gate's job; the boundary fires only when a risky step is actually imminent."
+    }
+  ]
+}

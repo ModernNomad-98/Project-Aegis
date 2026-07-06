@@ -1,0 +1,35 @@
+{
+  "skill": "reviewable-diff-discipline",
+  "description": "Trigger discrimination for the Phase 1 operating-discipline pack, change-governance cluster: diff/staging hygiene vs classification vs approval vs closeout.",
+  "overlaps_with": ["change-classification-gate", "human-approval-boundary", "ai-closeout-reporter"],
+  "cases": [
+    {
+      "id": "staging-hygiene-wins-here",
+      "prompt": "Help me stage exactly the files for this fix — the tree has a bunch of unrelated changes too.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": ["change-classification-gate", "human-approval-boundary"],
+      "reason": "Exact-path staging in a mixed tree is the core of diff discipline."
+    },
+    {
+      "id": "pre-work-rigor-goes-to-classification",
+      "prompt": "Before I start this change, what class of change is it and what validation will it need?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": ["reviewable-diff-discipline"],
+      "reason": "Pre-work routing, not in-flight diff hygiene."
+    },
+    {
+      "id": "terminal-report-goes-to-closeout",
+      "prompt": "The work is done and committed — write up what changed, what wasn't done, and what was tested.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["reviewable-diff-discipline"],
+      "reason": "Terminal reporting belongs to the closeout reporter; diff discipline only feeds it parked items."
+    },
+    {
+      "id": "diff-outgrew-task-wins-here",
+      "prompt": "This PR was supposed to be a one-line fix and now it touches 14 files — trim it back to the intent.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Diff-drift correction while the change is still being shaped."
+    }
+  ]
+}

@@ -6,9 +6,9 @@ differ. The backlog below is derived from the **reconciled phase lists**
 and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate-skills.py`
 checks that every *implemented* skill is listed here and in `README.md`.
 
-> **Phase 0 status:** no real skills are implemented yet. The only skill directory is
-> `_template` (a reference template, ignored by the validator). Everything under "Backlog"
-> is planned, not built.
+> **Status:** Phase 0 (foundation) and Phase 1 (the 8-skill operating-discipline pack,
+> decision D4) are implemented. `_template` remains a reference template ignored by the
+> validator. Everything under "Backlog" is planned, not built.
 
 ---
 
@@ -37,9 +37,9 @@ in the reconciliation doc §5.
 
 ---
 
-## Implemented (Phase 0 — this branch)
+## Implemented (Phases 0–1)
 
-### Foundation
+### Foundation (Phase 0)
 
 | Item | Type | Status |
 | --- | --- | --- |
@@ -63,9 +63,26 @@ in the reconciliation doc §5.
 | `ai-security-red-team-reviewer` | AI Security & LLM Systems | ✅ |
 | `release-readiness-reviewer` | Release Captain | ✅ |
 
-### Skills
+### Skills (Phase 1 — operating-discipline pack)
 
-_None implemented yet._ Phase 1 (operating-discipline pack) is next.
+All under `.claude/skills/<name>/`; every one ships `evals/evals.json` (structural
+convention, decision D3 — present and well-formed, not "passing").
+
+| Skill | Roadmap ref (cat 08) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `agent-startup-context-gate` | #262 | yes | Verify repo identity + load governing context before any work; halt when the location can't be verified. |
+| `source-of-truth-reconciler` | #269 (+#270 assumption-surfacing) | yes | Resolve doc/code/instruction conflicts by evidence-cited precedence; surface all assumptions. |
+| `change-classification-gate` | #264 (+#263 scope lock) | yes | Classify a change → validation floor + approval path; lock scope to the approved class. |
+| `human-approval-boundary` | #265 (+#270 stop-when-unclear) | yes | Halt for explicit approval at high-risk boundaries with a structured approval request. |
+| `reviewable-diff-discipline` | #271 (+#272 exact-file staging) | yes | Small intentional diffs; exact-path staging; staged set must equal declared intent. |
+| `ai-closeout-reporter` | #274 | yes | Terminal closeout with a mandatory "intentionally not done / omitted" section. |
+| `agent-failure-recovery` | #275 | **no** (manual-only; mutates git state) | Preserve-first recovery of broken git/tree state; destructive cleanup needs backup + approval. |
+| `agent-instruction-consolidator` | #276 | **no** (manual-only; edits behavior-steering files) | Align agent instruction files to one canonical source with rule-preservation proof. |
+
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two overlap clusters:
+context/truth (`agent-startup-context-gate`, `source-of-truth-reconciler`) and
+change governance (`change-classification-gate`, `human-approval-boundary`,
+`reviewable-diff-discipline`).
 
 ---
 
@@ -75,9 +92,7 @@ The v4 phase structure is canonical. Each phase's first-pass skills are listed; 
 reconciliation doc §3 for merge/move notes and the per-phase "expansion backlog."
 
 ### Phase 1 — AI operating-discipline pack (P0)
-`agent-startup-context-gate`, `source-of-truth-reconciler`, `change-classification-gate`,
-`human-approval-boundary`, `reviewable-diff-discipline`, `ai-closeout-reporter`,
-`agent-failure-recovery`, `agent-instruction-consolidator`.
+✅ **Implemented** — all 8 skills moved to [Implemented → Skills](#skills-phase-1--operating-discipline-pack) above.
 Source: [`docs/skills/08-ai-era-sdlc-agent-ops.md`](skills/08-ai-era-sdlc-agent-ops.md).
 
 ### Phase 2 — Core architecture & engineering (P0)
