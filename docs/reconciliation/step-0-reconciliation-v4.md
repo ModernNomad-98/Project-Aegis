@@ -194,8 +194,8 @@ performance/load headline):
 | `performance-test-harness` + `load-test-planner` | #205 (P1) + #206 (P2) | **Headline gap:** load/render/query/API/edge-function/background-job performance measurement plus realistic traffic/tenant/data-volume load planning — the largest uncovered risk for a multi-tenant SaaS (noisy neighbors, per-tenant degradation). May merge into ONE skill at build time; decide at the §4.2 pre-generation plan table. Pre-release counterpart to Phase 6 `slo-reliability-architect` (targets/alerting). |
 | `regression-first-bug-fixer` | #190 (P0) | Failing test that reproduces the bug BEFORE the fix. `regression-suite-curator` cites #190 but owns suite membership, not the fix workflow; `tdd-engineer` owns new behavior, not bug reproduction. |
 | `negative-path-test-mapper` | #192 (P0) | Systematic unauthorized/invalid/expired/missing/duplicated/conflicting/out-of-order enumeration per surface. `test-plan-designer`/`test-coverage-mapper` cite #192 as a source but own planning/audit; security negatives stay with Phase 4 `multi-tenant-security-tester`. |
-| `test-tenant-provisioner` | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. |
-| `ci-failure-classifier` | #214 + #215 (merged; both P0) | ONE skill: hidden runtime-marker scan (console errors, unhandled rejections, skipped tests, auth failures) + failure classification (product bug / test bug / missing secret / timeout-only / infra / skipped runtime). `flaky-test-detective` owns intermittence root-cause; this owns the every-run CI verdict. |
+| `test-tenant-provisioner` | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. (broadened per report P12: test-row marker convention with never-mutate-unmarked rule, validate-only vs apply modes, env-var-name-only credentials, backup-gated capability grants with inline rollback, prod-safe static lint of QA automation) |
+| `ci-failure-classifier` | #214 + #215 (merged; both P0) | ONE skill: hidden runtime-marker scan (console errors, unhandled rejections, skipped tests, auth failures) + failure classification (product bug / test bug / missing secret / timeout-only / infra / skipped runtime). `flaky-test-detective` owns intermittence root-cause; this owns the every-run CI verdict. (per report P14: duration as first-class evidence; TIMEOUT_FAILURE as a distinct class never conflated with regressions; resume-don't-rerun after timeout-only interruptions; no masking real failures by raising timeouts) |
 | `acceptance-criteria-tester` | #226 + #227 (merged; both P0) | Testability/completeness/ambiguity review of acceptance criteria + definition-of-done check. **Already deferred once** (execution-plan extra → this backlog, note above); the deferral stands — it builds in this tier, not before. |
 
 **Tier 2 — second wave** (roadmap P1 hardening, plus #203 promoted because UI drift is
@@ -433,10 +433,64 @@ pack is pulled forward.
 | **D12.1 Data engineering (P1)** | `schema-evolution-planner`, `streaming-event-architect`, `data-quality-monitor-designer`, `operational-vs-analytical-splitter`, `warehouse-lake-architect`, `pii-lifecycle-designer`, `data-migration-runbook-author` | Multi-tenant SaaS operational + analytical data as a first-class discipline. |
 | **D12.2 Product engineering craft (P1)** | `pagination-cursor-designer`, `error-taxonomy-designer`, `edge-state-ux-designer`, `notification-webhook-ux-designer`, `mobile-viewport-craft` | API/UX craft distinct from contract design (Phase 3 `api-event-architect` owns the contract; these own the craft inside it). |
 | **D12.3 Performance engineering (P1)** | `profiling-methodology-designer`, `query-plan-reader`, `n-plus-one-detector`, `caching-strategy-designer`, `latency-budget-architect`, `frontend-perf-engineer` | Performance as an engineering discipline — distinct from the load-testing VALIDATION banked in D10 Tier 1 (`performance-test-harness` + `load-test-planner`): D12.3 designs for performance, D10 measures it. |
-| **D12.4 Technical writing / docs engineering (P1)** | `readme-craftsman`, `adr-sequencer` (extends shipped `adr-writer` with longitudinal ADR management), `diataxis-doc-organizer`, `docs-as-code-architect`, `api-doc-generator-designer`, `contribution-guide-author`, `onboarding-doc-designer` | Durable documentation as its own discipline. |
+| **D12.4 Technical writing / docs engineering (P1)** | `readme-craftsman`, `adr-sequencer` (extends shipped `adr-writer` with longitudinal ADR management), `diataxis-doc-organizer`, `docs-as-code-architect`, `api-doc-generator-designer`, `contribution-guide-author`, `onboarding-doc-designer`, `docs-retention-index` (report P1, added by D15: numbered index governing every workflow doc's lifecycle — retention category, reason-to-keep, superseded-by, cleanup rule — mirrored by per-doc retention frontmatter; documentation retirement as an approvable operation) | Durable documentation as its own discipline. |
 | **D12.5 PM / product engineering interface (P2)** | `requirements-gathering-facilitator`, `product-spec-writer` (a product spec, distinct from an ADR), `roadmap-under-uncertainty-planner`, `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `sunset-deprecation-communicator` | The engineering/PM boundary. |
 | **D12.6 Growth / analytics engineering (P2)** | `event-schema-architect` (analytics counterpart to `api-event-architect`), `funnel-definition-designer`, `ab-test-designer` (design AND reading of results), `product-analytics-instrumenter` | User-facing product analytics, distinct from system-facing observability (Phase 6 `observability-operator` / `slo-reliability-architect`). |
-| **D12.7 Staff+ IC craft (P2)** | `tech-spec-writer` (broader than an ADR), `design-review-facilitator`, `cross-team-dependency-negotiator`, `roadmap-to-commitments-translator`, `staff-scope-selector`, `promotion-packet-writer`, `phased-work-handoff-designer` (multi-stage sequenced work with binding decisions carried forward as evidence — distinct from `ai-closeout-reporter`, which reports ONE turn, and from `ai-sdlc-operating-model`, which frames the whole lifecycle) | Technical leadership without management authority. |
+| **D12.7 Staff+ IC craft (P2)** | `tech-spec-writer` (broader than an ADR), `design-review-facilitator`, `cross-team-dependency-negotiator`, `roadmap-to-commitments-translator`, `staff-scope-selector`, `promotion-packet-writer`, `phased-work-handoff-designer` (multi-stage sequenced work with binding decisions carried forward as evidence — distinct from `ai-closeout-reporter`, which reports ONE turn, and from `ai-sdlc-operating-model`, which frames the whole lifecycle) (build spec substantiated by report P9: decision-ID register carried across stages, changed-files + explicit not-touched lists, proven-invocation-command sections with tell-tale output, deviation flags) | Technical leadership without management authority. |
+
+**D12.8 Operational workflow patterns — evidence-extracted (P1)** *(pack added by D15,
+2026-07-07)*: patterns extracted from a read-only audit of two production multi-agent
+repositories ([`docs/research/aegis-workflow-extraction-report.md`](../research/aegis-workflow-extraction-report.md));
+all HIGH confidence (multiple concrete artifacts each); product content stripped at
+extraction. Candidates (each *(candidate — not built)*, with the report pattern ID):
+
+- `scoped-approval-register` (P2) — durable approval records with Status/Reason/Scope
+  allowed/Scope FORBIDDEN/Evidence; the record format complementing `human-approval-boundary`
+- `standing-approval-and-auto-advance` (P3) — governed anti-approval-fatigue layer: documented
+  standing approval for the mechanical delivery loop within named scope, default-on merge
+  after green with explicit opt-out phrase (as practiced in the source repos), phase-advance
+  rule, reviewer-block path. MUST compose `agent-authorization-matrix` +
+  `human-agent-trust-reviewer`; scope limit (house rule): standing approval may thin low-risk
+  approvals (phase advance, the pre-merge mechanical loop) but never covers protected-branch
+  merge or arming auto-merge — that authority stays human-only per
+  `agent-authorization-matrix`, so a built skill must template default-on merge as an explicit
+  opt-in deployment-profile choice, never its default; rationale cites the
+  ungoverned-auto-merge incident already encoded in `agent-authorization-matrix` evals — the
+  governance elements are what separate this pattern from that incident
+- `local-ci-mirror-preflight` (P4) — derive local equivalents of every PR-triggered CI check,
+  verify on clean mainline first, classify failures (PR-caused / pre-existing / infra /
+  cannot-determine); per-commit, distinct from release-scoped review
+- `risk-tiered-validation-selector` (P5) — machine classification of changes to VALIDATION
+  depth with fail-closed-to-full default; routes validation cost where
+  `change-classification-gate` routes approval
+- `sharded-validation-with-resume` (P6) — named functional shards, persisted status,
+  resume-after-timeout, uncategorized catch-shard, one aggregate required CI check
+- `merge-is-deploy-governance` (P7) — standing pipeline governance when the platform
+  auto-deploys on merge: PR validation as authoritative gate, branch-protection config
+  recorded in-repo, accepted-risk window, revert-PR rollback
+- `context-co-update-ci-gate` (P8) — CI fails PRs touching important paths without
+  context-map updates; the write-back half of `agent-startup-context-gate`'s read loop
+- `lane-authoring-guide` (P10) — pre-work evidence-cited authoring guide per parallel agent
+  lane; planner-to-implementer knowledge transfer BEFORE work begins, distinct from handoffs
+- `gated-deployment-prompt-template` (P11) — reusable operator prompt for risky operations
+  with placeholders, stop conditions, backup-then-verify gating, and ETA ranges calibrated
+  from a deployment-history index; uncited operational claims labeled unverified
+- `chat-backlog-reconciliation` (P13) — cadenced extraction of chat-only decisions/backlog
+  into dated repo docs, then audited against PR/source evidence per item
+
+**Enrichment deltas for shipped skills** (recorded, to apply when each skill is next
+touched — report §4 end + P15):
+
+- `ai-closeout-reporter` — per-surface pass/fail + negative-path tables, skip decomposition,
+  unqualified-complete only after every gap closed, preflight-evidence block; P15
+  completion-baseline anchors — immutable PR/SHA/migration evidence pinned so finished work
+  is never re-litigated
+- `adr-writer` — certainty labels, status-column index
+- `agent-memory-governance` — P15 anchors as memory content rule
+- `ai-sdlc-operating-model` — hub-and-spoke vs per-tool-spoke topologies as documented
+  options; one-tool-per-surface-per-phase collision rule
+- cross-cutting certainty-label convention (confirmed / inferred / unknown /
+  unverified-recommend-confirming) as a candidate shared writing rule
 
 ### Library meta / self-application (D13) — candidate skills
 
@@ -685,6 +739,16 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   first new edition drops. D14 governs how the library stays current with EXTERNAL truth;
   distinct from D12 (breadth) and D13 (self-quality). Docs-only banking: no skills built
   now; validator skill-count target unchanged (95). Detail in §3.
+- **D15 (2026-07-07) — Evidence-extracted operational workflow patterns banked:** 10 new
+  candidates as pack D12.8, `docs-retention-index` added to D12.4, and enrichment notes
+  recorded against 3 banked candidates and 5 shipped skills. Source: read-only audit of two
+  production multi-agent repositories, report committed at
+  [`docs/research/aegis-workflow-extraction-report.md`](../research/aegis-workflow-extraction-report.md);
+  all extractions HIGH confidence except P15 (MEDIUM, recorded as enrichment not skill);
+  product content stripped at extraction; live identifiers in source docs must be templated
+  as placeholders in any derived skill (report §6.3). These patterns carry a stronger
+  evidence tier than practice-from-memory: each cites concrete repo artifacts. No skills
+  built; no shipped skill modified; validator target unchanged.
 
 ---
 

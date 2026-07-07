@@ -51,7 +51,7 @@ top — see [Skills (shipped)](#skills-shipped) below.
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).
 2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — canonical architecture audit.
 3. [`docs/prompts/claude-skills-master-generation-prompts-v4.md`](docs/prompts/claude-skills-master-generation-prompts-v4.md) — canonical master + phase prompts.
-4. [`docs/300-repeatable-software-saas-skills-roadmap.md`](docs/300-repeatable-software-saas-skills-roadmap.md) — the 300-skill backlog / capability map.
+4. [`docs/300-repeatable-software-saas-skills-roadmap.md`](docs/300-repeatable-software-saas-skills-roadmap.md) — the strategic backlog / capability map (the original 300; per the D12 standing rule a 300+ target backlog — ship on demand and framework coverage, not count).
 5. [`docs/skills/`](docs/skills/) — category-level backlogs.
 6. [`docs/skills-catalog.md`](docs/skills-catalog.md) — implemented vs. backlog, priorities, skills-vs-agents.
 7. [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) — the authoring standard the validator enforces.
@@ -63,7 +63,7 @@ top — see [Skills (shipped)](#skills-shipped) below.
 - `docs/prompts/master-claude-skills-and-agents-development-prompt.md`
 - `docs/prompts/phased-claude-skills-prompts.md`
 - `docs/roadmaps/product-agnostic-skill-and-agent-roadmap.md`
-- `docs/150-claude-skills-roadmap.md` (superseded by the 300-skill roadmap)
+- `docs/150-claude-skills-roadmap.md` (superseded by the original 300-skill roadmap — per the D12 standing rule a 300+ target backlog, not a cap)
 
 ## Reconciled phase plan (single source of truth)
 
@@ -358,7 +358,7 @@ scripts/
 ## Core rules
 
 - Skills are reusable procedures, not essays. Agents are isolated read-only specialists.
-- Build in waves. Do not create all 300 skills at once (roadmap = backlog, not a batch command).
+- Build in waves. Do not create the backlog at once (the original 300-skill roadmap, per the D12 standing rule a 300+ target backlog — ship on demand and framework coverage, not count; roadmap = backlog, not a batch command).
 - Start with standards, templates, eval convention, and validators (Phase 0).
 - Every skill needs `SKILL.md` with clear frontmatter, concise workflow, output format,
   validation checklist, gotchas, stop conditions, and `evals/evals.json`.
