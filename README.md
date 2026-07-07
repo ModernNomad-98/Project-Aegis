@@ -4,10 +4,11 @@
 
 *Discipline before code. Evidence before merge.*
 
-Project Aegis is a reusable Claude engineering shield: a library of skills, subagents,
-validation gates, and safety patterns that turns Claude into a disciplined
-senior/principal engineering partner for architecture, SaaS, security, QA, audit,
-troubleshooting, and AI safety.
+Project Aegis is an operating system for engineering software with AI — a reusable
+Claude engineering shield: a library of skills, subagents, validation gates, and
+safety patterns, governed by Zero-Trust Engineering Discipline, that turns Claude
+into a disciplined senior/principal engineering partner for architecture, SaaS,
+security, QA, audit, troubleshooting, and AI safety.
 
 ## About
 
@@ -45,6 +46,82 @@ Governance batch** (D9) ships the 9-skill **compliance pack** — ISO
 shared control foundation + framework projections + a crosswalk, mapping
 controls that largely already exist and producing auditor-grade evidence on
 top — see [Skills (shipped)](#skills-shipped) below.
+
+## What this is
+
+Aegis is not just a collection of skills; it is an **operating system for engineering
+software with AI**. It combines (a) a library of ready-to-use skills an AI coding
+assistant follows, (b) read-only specialist reviewers that give independent second
+opinions, (c) validation gates and eval conventions that check the work mechanically,
+and (d) — governing all of it — **Zero-Trust Engineering Discipline**, the doctrine
+that decides how everything above is allowed to operate.
+
+The discipline's essence in one line: **"Never trust, always verify — every step of the
+lifecycle. Assume drift. Demand evidence. Track everything."** It is documented at
+[docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md)
+and deliberately extends the Zero Trust security principle from network access to the
+whole development lifecycle. The problem it solves: AI assistants confidently act on
+stale memory, claim done-when-not-done, and let docs drift away from the code — this
+system replaces that risk with enforced evidence at every step.
+
+## How to use this
+
+**Point an AI coding assistant at the repo.** The skills live under
+[`.claude/skills/`](.claude/skills/); point the assistant at this repository (or copy
+the skill directories into your own project) and it picks them up from there. Skills
+are invoked by their trigger descriptions — each skill's frontmatter states when it
+applies, so the assistant selects the right procedure from the task itself.
+[`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
+format.
+
+**Run the core loop.** Every change, large or small, follows the same rhythm:
+
+1. **Classify the change** — what kind of change is this, and what validation and
+   approval path does that class require?
+2. **Verify against evidence** — run the checks; never assume state from memory.
+3. **Keep the diff small and reviewable** — one intent, exact files, nothing smuggled in.
+4. **A human approves the merge** — the assistant proposes; a person decides.
+5. **Record the decision** — a dated entry in the planning record, so history never
+   drifts.
+
+This loop is not overhead layered on top of the discipline; it **is** the discipline in
+practice.
+
+**Follow the non-negotiable operating rules** (full text with rationales in
+[CONTRIBUTING.md](CONTRIBUTING.md)): evidence before merge; one session per repo at a
+time; no auto-merge — the human is the gate; and every decision tracked as a dated
+entry in the reconciliation doc.
+
+**What a change looks like.** One realistic pass through the loop:
+
+> A developer asks for a new feature. The assistant classifies the change and locks the
+> scope, then composes the relevant shipped skills — say, domain modeling, test-first
+> implementation, and a security review matching the change class. It produces a small
+> diff with passing tests as evidence and opens a pull request, which the validator
+> gates in CI. A human reviews and merges. The decision lands as a dated entry in the
+> planning record.
+
+## Map of the system
+
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~95 shipped procedures,
+  grouped by the phase categories in the catalog: operating discipline, AI-SDLC
+  governance, core architecture & engineering, SaaS & tenant isolation, security &
+  supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
+  AI security, and compliance & governance. Full list in
+  [Skills (shipped)](#skills-shipped) below.
+- **Subagents** — seven read-only specialist reviewers, one per lens; see
+  [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
+- **The planning record**
+  ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
+  — the dated decisions (D1–D17) in §5 are the project's immutable decision log; the
+  D12/D13/D14/D12.8 candidate scopes recorded there are banked-but-not-built future
+  work.
+- **The doctrine**
+  ([docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md))
+  and **the operating rules** ([CONTRIBUTING.md](CONTRIBUTING.md)) — why the system
+  works this way, and the eight enforceable rules every session follows.
+- **Validation + CI** — the local structural gate ([Validation](#validation)) and the
+  merge gate ([CI (merge gate)](#ci-merge-gate)).
 
 ## Start here (canonical reading order)
 

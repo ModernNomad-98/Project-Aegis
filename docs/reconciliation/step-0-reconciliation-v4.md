@@ -756,6 +756,11 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   "never trust, always verify" to the whole SDLC to prevent drift and rot; its concrete rules
   are the D12.8 patterns; it is the doctrine Aegis itself operates under. Distinct from
   classic network Zero Trust. No skills built; this is doctrine, not a skill.
+- **D17 (2026-07-07) — README reframed to present Aegis as an operating system for
+  engineering software with AI, governed by Zero-Trust Engineering Discipline,** with a
+  "How to use this" operator guide and a "Map of the system" navigation section. Additive
+  only; all prior README content (skill catalog, phase plan, validation, CI) preserved.
+  No skills built.
 
 ---
 
