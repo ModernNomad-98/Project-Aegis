@@ -749,6 +749,13 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   as placeholders in any derived skill (report §6.3). These patterns carry a stronger
   evidence tier than practice-from-memory: each cites concrete repo artifacts. No skills
   built; no shipped skill modified; validator target unchanged.
+- **D16 (2026-07-07) — Zero-Trust Engineering Discipline coined and documented** at
+  [`docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md`](../ZERO_TRUST_ENGINEERING_DISCIPLINE.md).
+  Tagline "Never trust, always verify — every step of the lifecycle. / Assume drift. Demand
+  evidence. Track everything.", deliberately mirroring the Zero Trust security motto. Applies
+  "never trust, always verify" to the whole SDLC to prevent drift and rot; its concrete rules
+  are the D12.8 patterns; it is the doctrine Aegis itself operates under. Distinct from
+  classic network Zero Trust. No skills built; this is doctrine, not a skill.
 
 ---
 
