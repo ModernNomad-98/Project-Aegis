@@ -448,8 +448,13 @@ extraction. Candidates (each *(candidate — not built)*, with the report patter
   allowed/Scope FORBIDDEN/Evidence; the record format complementing `human-approval-boundary`
 - `standing-approval-and-auto-advance` (P3) — governed anti-approval-fatigue layer: documented
   standing approval for the mechanical delivery loop within named scope, default-on merge
-  after green with explicit opt-out phrase, phase-advance rule, reviewer-block path. MUST
-  compose `agent-authorization-matrix` + `human-agent-trust-reviewer`; rationale cites the
+  after green with explicit opt-out phrase (as practiced in the source repos), phase-advance
+  rule, reviewer-block path. MUST compose `agent-authorization-matrix` +
+  `human-agent-trust-reviewer`; scope limit (house rule): standing approval may thin low-risk
+  approvals (phase advance, the pre-merge mechanical loop) but never covers protected-branch
+  merge or arming auto-merge — that authority stays human-only per
+  `agent-authorization-matrix`, so a built skill must template default-on merge as an explicit
+  opt-in deployment-profile choice, never its default; rationale cites the
   ungoverned-auto-merge incident already encoded in `agent-authorization-matrix` evals — the
   governance elements are what separate this pattern from that incident
 - `local-ci-mirror-preflight` (P4) — derive local equivalents of every PR-triggered CI check,
