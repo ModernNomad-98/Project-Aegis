@@ -584,6 +584,20 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   not re-listed as candidates; `acceptance-criteria-tester` keeps its existing deferral note.
   Docs-only: no skills created, no phases renumbered, validator skill-count targets
   unchanged. Backlog + coverage mapping in §3 Phase 5.
+- **D11 (2026-07-07) — Project identity adopted: "Project Aegis", identity line "Project
+  Aegis — Shield of the agent fleet", tagline "Discipline before code. Evidence before
+  merge."** The name carries three layers: the divine shield of Zeus and Athena; the Navy's
+  Aegis, shield of the fleet — fitting for a veteran-founded project whose operating model
+  is a fleet of agents; and a shield proven in use. Several skills' eval cases are drawn
+  from real incidents this project absorbed during its own construction (an unauthorized
+  auto-merge, stale-memory session collisions, an empty-directory build). Docs-only rebrand:
+  README title/intro block, catalog header, and this entry; no skills created or changed; no
+  phases renumbered; validator skill count unchanged (86). The GitHub repo rename
+  (Claude-Skills → Project-Aegis) is a manual Settings action outside this change; the
+  rename was observed already live during this pass (push to the old URL returned "This
+  repository moved … Project-Aegis.git" and redirected automatically). README/catalog carry
+  no badges or absolute repo URLs (verified); local git remotes still pointing at the old
+  URL keep working via redirect but should be updated in a follow-up.
 
 ---
 
