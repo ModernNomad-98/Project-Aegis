@@ -593,9 +593,11 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   auto-merge, stale-memory session collisions, an empty-directory build). Docs-only rebrand:
   README title/intro block, catalog header, and this entry; no skills created or changed; no
   phases renumbered; validator skill count unchanged (86). The GitHub repo rename
-  (Claude-Skills → project-aegis) is a separate manual Settings action — git remotes
-  redirect automatically after rename, but README badge/clone URLs must be re-checked in a
-  follow-up.
+  (Claude-Skills → Project-Aegis) is a manual Settings action outside this change; the
+  rename was observed already live during this pass (push to the old URL returned "This
+  repository moved … Project-Aegis.git" and redirected automatically). README/catalog carry
+  no badges or absolute repo URLs (verified); local git remotes still pointing at the old
+  URL keep working via redirect but should be updated in a follow-up.
 
 ---
 
