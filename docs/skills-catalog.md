@@ -19,7 +19,8 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > existing skills — OWASP Agentic Top 10, D7), and the Compliance &
 > Governance batch (the 9-skill ISO 27001 + ISO 42001 + SOC 2 pack with
 > NIST AI RMF as companion — one shared control foundation, framework
-> projections, and a crosswalk, D9) are implemented. `_template`
+> projections, and a crosswalk, D9) are implemented, plus the first pull
+> from the D13 library-meta scope (`skill-quality-reviewer`, D18). `_template`
 > remains a reference template ignored by the validator. Everything under
 > "Backlog" is planned, not built.
 
@@ -494,6 +495,26 @@ feature's governance posture vs org-level certification readiness),
 `ai-evaluation-harness`, `slo-reliability-architect`,
 `incident-response-runbook`, and `full-codebase-auditor`.
 
+### Skills (D13 pull 1 — library meta / self-application)
+
+First pull from the banked D13 scope (reconciliation §3 D13 subsection;
+decision D18): the library starts applying its own discipline to itself.
+Ships `evals/evals.json` **and** `evals/trigger-evals.json`. Pure review
+skill — produces a verdict report, edits nothing — so it is
+**model-invocable**. It COMPOSES `scripts/validate-skills.py` (runs it
+first as the entry gate; never re-implements or re-scores its mechanical
+checks) and is discriminated from `agent-governance-audit` (a change's
+process trail vs a skill definition's quality). The other four D13
+candidates (`eval-runner-designer`, `skill-usage-instrumenter`,
+`skill-deprecation-planner`, `library-diff-reviewer`) remain banked —
+candidate, not built; the trigger-evals pin the `library-diff-reviewer`
+seam now (whole skill-adding PR vs ONE skill's quality) so neither skill
+absorbs the other's scope when both exist.
+
+| Skill | Source (D13) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `skill-quality-reviewer` | reconciliation §3 D13 — highest-leverage candidate, pulled first per the D13 standing rule | yes | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the FULL shipped corpus (colliders NAMED), duplication/extension (LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. |
+
 ---
 
 ## Backlog by phase (reconciled)
@@ -619,6 +640,14 @@ candidates, already merged, NOT split into per-framework variants. The
 batch maps controls that largely already exist (Phases 3/4, the Phase 5
 evidence pack, Phase 1.5 + Phase 7 AI governance) and produces
 auditor-grade evidence on top.
+
+### D13 — Library meta / self-application (banked; first pull implemented)
+`skill-quality-reviewer` ✅ **implemented** (D18) — moved to
+[Implemented → Skills (D13 pull 1)](#skills-d13-pull-1--library-meta--self-application)
+above. The remaining four D13 candidates (`eval-runner-designer`,
+`skill-usage-instrumenter`, `skill-deprecation-planner`,
+`library-diff-reviewer`) stay banked — candidate, not built. Source: the
+reconciliation doc §3 D13 subsection + D13/D18 in §5.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).

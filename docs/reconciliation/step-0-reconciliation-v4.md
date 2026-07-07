@@ -494,16 +494,18 @@ touched — report §4 end + P15):
 
 ### Library meta / self-application (D13) — candidate skills
 
-**BANKED scope (D13, 2026-07-07) — 5 candidate skills; nothing in it is built now.** The
-library validates its own structure (`scripts/validate-skills.py`) but has no skills that
+**BANKED scope (D13, 2026-07-07) — 5 candidate skills; `skill-quality-reviewer` built
+2026-07-07 (first pull, D18); the other 4 remain candidates — not built.** The
+library validates its own structure (`scripts/validate-skills.py`) but had no skills that
 apply its own discipline to itself. These candidates turn the generation standard, the eval
 convention (D3), and today's manual PR review flow into reusable skills.
 `skill-quality-reviewer` is the highest-leverage candidate: **if any D12 pack is later pulled
-forward, `skill-quality-reviewer` builds FIRST** so subsequent additions audit themselves.
+forward, `skill-quality-reviewer` builds FIRST** so subsequent additions audit themselves —
+satisfied ahead of any D12 pull (built 2026-07-07, D18).
 
-| Candidate skill *(all: candidate — not built)* | One-line rationale |
+| Candidate skill *(status per row)* | One-line rationale |
 |---|---|
-| `skill-quality-reviewer` | Audits a skill against [`docs/skill-generation-standard.md`](../skill-generation-standard.md) — required sections, description length, trigger discrimination, overlap detection, evals presence — so every future addition gets the review the standard demands. |
+| `skill-quality-reviewer` — **✅ built (D18, 2026-07-07)** | Audits a skill against [`docs/skill-generation-standard.md`](../skill-generation-standard.md) as the JUDGMENT layer above the validator (which keeps the mechanical checks: sections, lengths, registration, name collisions): trigger quality, overlap/collision with colliders named, duplication/extension, eval integrity, section substance, scope, invocation posture — so every future addition gets the review the standard demands. |
 | `eval-runner-designer` | Specs what an eval runner should do (inputs, pass criteria, reporting); it does NOT build the runner — closes the design gap D3 left open ("there is no eval runner yet"). |
 | `skill-usage-instrumenter` | Telemetry design: which skills are invoked vs unused, trigger-match rate, false-positive-rate estimation — evidence for pruning and trigger fixes. |
 | `skill-deprecation-planner` | Safe skill sunset — mark deprecated, redirect triggers, remove from catalog — so the library can shrink as deliberately as it grows. |
@@ -761,6 +763,16 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   "How to use this" operator guide and a "Map of the system" navigation section. Additive
   only; all prior README content (skill catalog, phase plan, validation, CI) preserved.
   No skills built.
+- **D18 (2026-07-07) — `skill-quality-reviewer` built (first pull from the D13
+  library-meta scope);** the judgment layer atop `scripts/validate-skills.py`, auditing
+  trigger quality, overlap/collision, duplication, eval integrity, and section substance
+  that the mechanical validator cannot check. Composes the manual skill-review discipline
+  used across this project into an invocable skill. Pure review skill (verdict report only,
+  edits nothing) → model-invocable. The other four D13 candidates
+  (`eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`,
+  `library-diff-reviewer`) remain candidate — not built; the `library-diff-reviewer` seam
+  (whole skill-adding PR vs ONE skill's quality) is pinned in the new skill's
+  trigger-evals. 95→96 skills.
 
 ---
 

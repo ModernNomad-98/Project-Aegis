@@ -45,7 +45,9 @@ Governance batch** (D9) ships the 9-skill **compliance pack** — ISO
 27001:2022 + ISO 42001:2023 + SOC 2 with NIST AI RMF as companion: one
 shared control foundation + framework projections + a crosswalk, mapping
 controls that largely already exist and producing auditor-grade evidence on
-top — see [Skills (shipped)](#skills-shipped) below.
+top. The first **D13 library-meta pull** (D18) ships `skill-quality-reviewer`
+— the judgment layer atop the mechanical validator, so the library now
+reviews its own additions — see [Skills (shipped)](#skills-shipped) below.
 
 ## What this is
 
@@ -103,17 +105,17 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~95 shipped procedures,
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~96 shipped procedures,
   grouped by the phase categories in the catalog: operating discipline, AI-SDLC
   governance, core architecture & engineering, SaaS & tenant isolation, security &
   supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
-  AI security, and compliance & governance. Full list in
-  [Skills (shipped)](#skills-shipped) below.
+  AI security, compliance & governance, and library meta (self-application). Full
+  list in [Skills (shipped)](#skills-shipped) below.
 - **Subagents** — seven read-only specialist reviewers, one per lens; see
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions (D1–D17) in §5 are the project's immutable decision log; the
+  — the dated decisions (D1–D18) in §5 are the project's immutable decision log; the
   D12/D13/D14/D12.8 candidate scopes recorded there are banked-but-not-built future
   work.
 - **The doctrine**
@@ -160,6 +162,7 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
 | 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ merged |
 | D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ this branch |
+| D13 (pull 1) | Library meta / self-application: `skill-quality-reviewer` — the judgment layer atop the mechanical validator (D18); other 4 D13 candidates stay banked | P1 | ✅ shipped (D18) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -353,6 +356,19 @@ Rules section:
 | `multi-framework-crosswalk` | One control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function): edition-pinned, text-in-hand cells only, FULL/PARTIAL(residue) honesty, explicit joint sets — the do-the-work-once engine. | auto + manual |
 | `compliance-gap-auditor` | ONE parameterized gap audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order; readiness assessment, never an audit opinion. | auto + manual |
 | `ai-lifecycle-risk-manager` | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized across the AI lifecycle with owners, triggers, and a risk register; voluntary and under revision — never a certification target; companion to `iso-42001-aims-architect`. | auto + manual |
+
+D13 pull 1 — library meta / self-application (D18): the library starts
+applying its own discipline to itself. Pure review skill (verdict report
+only, edits nothing) → model-invocable. It **composes**
+`scripts/validate-skills.py` — runs it first as the entry gate, never
+re-implements its mechanical checks — and leaves the whole
+skill-adding-PR audit to `library-diff-reviewer` (D13 candidate, not
+built; the seam is pinned in trigger-evals). The other four D13
+candidates remain banked in the reconciliation doc §3:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `skill-quality-reviewer` | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the full shipped corpus (colliding skills NAMED), duplication/extension (the LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. | auto + manual |
 
 ## Authoring a new skill
 

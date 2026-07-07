@@ -1,0 +1,48 @@
+{
+  "skill": "skill-quality-reviewer",
+  "description": "Trigger discrimination: ONE skill definition's quality (this skill) vs an agent change's process compliance (agent-governance-audit), product-code repo health (full-codebase-auditor), code-diff correctness (code-reviewer), and the whole skill-adding PR end-to-end (library-diff-reviewer — D13 candidate, NOT built; this skill is its single-skill inner loop).",
+  "overlaps_with": [
+    "agent-governance-audit",
+    "full-codebase-auditor",
+    "code-reviewer",
+    "library-diff-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "one-skills-quality-wins-here",
+      "prompt": "Before this new skill enters the library, check it properly: is its description something a model would actually trigger on, does it collide with anything we already ship, and are its evals real or filler?",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": ["agent-governance-audit", "code-reviewer", "full-codebase-auditor"],
+      "reason": "Trigger quality, collision against the shipped corpus, and eval integrity of ONE skill definition are exactly the judgment layer this skill owns — no process trail, no product code, no diff verdict involved."
+    },
+    {
+      "id": "change-process-compliance-goes-to-governance-audit",
+      "prompt": "Did the agent that shipped yesterday's skill follow discipline — classification declared, human approval on the merge, auto-merge not armed by the agent, closeout complete?",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["skill-quality-reviewer"],
+      "reason": "The target is the CHANGE's governance evidence (PR timeline, approvals, merge authority), not the skill definition's quality. A skill can be excellent and its shipping process non-compliant, or vice versa — different verdicts on different evidence."
+    },
+    {
+      "id": "product-repo-health-goes-to-full-codebase-auditor",
+      "prompt": "Audit this repository's overall health — dead code, duplicated logic, dependency hygiene, config drift, and a prioritized debt map.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": ["skill-quality-reviewer"],
+      "reason": "Whole-repo product-code health is the codebase audit. skill-quality-reviewer reads only skill definitions under .claude/skills/ — 'audit' plus 'repository' does not make library-skill quality the question."
+    },
+    {
+      "id": "diff-correctness-goes-to-code-reviewer",
+      "prompt": "Review this PR's diff for correctness, security, and test adequacy before merge.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["skill-quality-reviewer"],
+      "reason": "A code diff gets severity-ranked correctness review. Even when the diff happens to touch a SKILL.md, 'is this change correct' is code review; 'is this skill well-designed' must be asked for this skill to fire."
+    },
+    {
+      "id": "whole-skill-adding-pr-is-the-library-diff-reviewer-seam",
+      "prompt": "Audit this skill-adding PR end-to-end: the validator run in CI, catalog and README integrity, branch discipline, AND the quality of the skill it adds.",
+      "expected_skill": "library-diff-reviewer",
+      "should_not_trigger": [],
+      "note": "SEAM CASE — library-diff-reviewer is a D13 candidate, NOT built. Until it ships, skill-quality-reviewer legitimately handles the single-skill-quality slice of this request and must say the PR-level mechanics (CI evidence, catalog integrity, branch/merge discipline) are out of its scope and reviewed manually. Once library-diff-reviewer ships, it owns this prompt end-to-end and composes skill-quality-reviewer as its inner loop.",
+      "reason": "The PR-level audit (validator-in-CI, catalog integrity, merge discipline) is library-diff-reviewer's job; skill-quality-reviewer judges ONE skill's quality. This case pins the seam so neither skill absorbs the other's scope when both exist."
+    }
+  ]
+}

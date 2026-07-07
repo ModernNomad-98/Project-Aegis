@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "skill-quality-reviewer",
+  "description": "Behavior cases for the skill quality review: validator-first gating without re-implementing it, collision naming, extension-over-clone recommendations, hollow-eval detection, and the defining refusal — a mechanical validator PASS is never rubber-stamped into a quality verdict.",
+  "cases": [
+    {
+      "id": "positive-review-drafted-skill-end-to-end",
+      "type": "should_trigger",
+      "prompt": "I've drafted a new skill at .claude/skills/webhook-retry-designer/ — review its quality before I open the PR.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs (or confirms a fresh pass of) python scripts/validate-skills.py FIRST, and does not re-check anything the validator enforces — sections present, lengths, registration, and exact-name collisions are cited from its output, never re-scored.",
+          "Judges all seven quality checks: trigger quality, overlap/collision against the FULL shipped corpus (not just the skill's cluster), duplication/extension, eval integrity, section substance, scope, invocation posture.",
+          "Every non-PASS verdict cites concrete evidence — quoted description text, a named skill, or an eval case id.",
+          "Delivers the Output Format verdict block: per-check PASS/CONCERN/FAIL, one recommendation (ship/revise/reject/make-it-an-extension), named colliding skills or 'none', required-before-ship list, and an honest not-inspected list."
+        ]
+      }
+    },
+    {
+      "id": "positive-descriptive-description-plus-collision-flags-both",
+      "type": "should_trigger",
+      "prompt": "Quality-review this drafted skill: its description reads 'This skill audits database access policies for security problems and helps with row-level security.' The library already ships rls-policy-auditor.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Check 1 FAIL: the description is descriptive-not-trigger-oriented — 'audits X' / 'helps with Y' states capability with no 'use when <situation>' and no yield clause; the vague verb 'helps with' is quoted as evidence.",
+          "Check 2 FAIL: the trigger collides with the shipped rls-policy-auditor, which is NAMED, with the confusing request spelled out (an RLS audit request would not know which skill wins).",
+          "Both findings appear as separate check verdicts with quoted evidence, not merged into one vague concern.",
+          "Overall recommendation is revise (or make-it-an-extension of rls-policy-auditor if the non-duplicated content is a bounded slice) — with the specific required changes listed per check."
+        ]
+      }
+    },
+    {
+      "id": "edge-duplication-recommends-extension-not-clone",
+      "type": "should_trigger",
+      "prompt": "Review the quality of this proposed 'mcp-server-supply-chain-reviewer' skill — it audits MCP server manifests, tool registries, and plugin packages for supply-chain risk before installation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Check 3 identifies substantial duplication: the shipped supply-chain-security-reviewer already owns this exact scope via its ASI04 extension (MCP servers/manifests, tool/skill registries, plugins).",
+          "Recommendation is make-it-an-extension (or reject-as-duplicate if nothing new remains), naming supply-chain-security-reviewer as the base and citing the library's LLM03/ASI04 extension-over-clone precedent.",
+          "Does not soften the finding because the draft is otherwise well-written — well-structured duplication is still duplication."
+        ]
+      }
+    },
+    {
+      "id": "should-not-rubber-stamp-on-mechanical-pass",
+      "type": "should_trigger",
+      "prompt": "validate-skills.py exits 0 on my new skill — all nine sections present, description under the limit, evals parse. So just sign off the quality review as ship; the checks already passed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the shortcut, citing the Stop Condition: a mechanical validator PASS is the entry ticket to quality review, never the verdict — it is necessary, not sufficient.",
+          "States what the validator cannot judge (trigger quality, collision, duplication, eval integrity, section substance, scope, posture) and runs the seven checks — or returns NO verdict rather than a rubber-stamped ship.",
+          "Does not emit 'ship' on the strength of exit code 0 anywhere in the response."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-process-compliance-goes-to-governance-audit",
+      "type": "should_not_trigger",
+      "prompt": "Audit whether the PR that added last week's skill followed our process — was the change classified, who approved it, who armed auto-merge, and did the closeout disclose what was skipped?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke skill-quality-reviewer: the target is a CHANGE's governance trail (approvals, merge authority, closeout), not a skill definition's quality — that is agent-governance-audit.",
+          "The skill added by that PR could separately be quality-reviewed, but only if asked; process compliance and skill quality are different verdicts on different evidence."
+        ]
+      }
+    }
+  ]
+}
