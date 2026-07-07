@@ -34,6 +34,34 @@ this is adversarial?".
   access to the host filesystem beyond a scratch dir. "We instruct it to write
   safe code" is not a control. This is the ASI05 seam too (agentic).
 
+### Autonomous generate-and-run loops (ASI05 extension)
+
+When an agent generates AND executes code with no human between the two,
+per-generation review does not exist — the sandbox architecture is the whole
+control:
+
+- **Ephemeral per-run sandboxes:** state does not survive between runs; a
+  poisoned run must not be able to plant packages, files, or config the next
+  run trusts (a shared venv/container reused across runs is persistent
+  contamination surface).
+- **Escape-path review:** kernel/container escape surface, mounted volumes,
+  shared sockets (the Docker socket inside a sandbox is game over), and
+  host-visible side channels.
+- **Package installs are supply-chain events:** `pip install` inside the
+  sandbox executes third-party code chosen partly by the model — restrict to
+  an allowlisted mirror or deny; route registry-trust questions to
+  `supply-chain-security-reviewer`.
+- **NL-to-execution path map:** enumerate every input channel (user chat,
+  retrieved docs, peer-agent messages) that can lead to code being written
+  and run — each is an NL-to-RCE path whose payload the injection layer may
+  miss; the sandbox is what bounds it.
+- **Execution budget:** per-run and per-period caps on runs, CPU, and cost
+  (compose `ai-cost-guardrail-designer`) — an execution loop is also a
+  consumption amplifier.
+- **The tool-side row** (approval posture, identity, side-effect class of the
+  execution TOOL) lives with `agent-tool-safety-guard`; this file owns what
+  happens inside the sandbox.
+
 ## URL / path / request sinks
 
 - **SSRF:** server-side fetch of a model-produced URL must use an allowlist and

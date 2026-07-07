@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "agent-identity-privilege-reviewer",
+  "description": "Trigger and behavior cases for agent identity/privilege review: identity inventory, privilege vs need, delegation attenuation, confused-deputy hunting, dual attribution, custody handoff.",
+  "cases": [
+    {
+      "id": "positive-shared-service-account",
+      "type": "should_trigger",
+      "prompt": "All five of our agents (support triage, billing helper, data-export, code assistant, admin-ops) authenticate to our API with the same 'agents-prod' service account that has admin scope. Review the identity setup.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the shared admin-scope service account as the headline finding: every agent is as powerful as the strongest one, a single compromise is fleet-wide, and attribution collapses to the service account.",
+          "Prescribes identity-per-agent with least-privilege scopes derived from each agent's actual tasks, preferring short-lived task-scoped issuance over standing keys.",
+          "Ranks findings by concrete escalation path (e.g. support-triage agent manipulated into admin actions or cross-tenant reach) rather than 'scope too broad' labels.",
+          "Routes credential storage/rotation mechanics to secrets-identity-hardener and per-tool authority enforcement to agent-tool-safety-guard instead of re-solving them."
+        ]
+      }
+    },
+    {
+      "id": "edge-subagent-spawning",
+      "type": "should_trigger",
+      "prompt": "Our orchestrator agent spawns worker sub-agents and passes them its own API token so they can complete subtasks. Is that a problem?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies token pass-down as an attenuation failure: each spawn must mint a narrower, shorter-lived credential scoped to the subtask, never inherit the parent's full authority.",
+          "Traces the delegation chain hop-by-hop (user → orchestrator → worker → tool) and requires authority to narrow at every hop.",
+          "Requires the spawn chain to be recorded so actions attribute to principal, orchestrator, and worker — not just the shared token."
+        ]
+      }
+    },
+    {
+      "id": "negative-secret-rotation",
+      "type": "should_not_trigger",
+      "prompt": "We found the agents' API key committed in the repo — move it to a secret manager and rotate it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Committed-secret remediation, storage, and rotation are secrets-identity-hardener's custody work; this skill reviews what identities and scopes should exist, not where the material lives."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-god-account-convenience",
+      "type": "should_trigger",
+      "prompt": "Splitting identities per agent is a lot of IAM work. Just document that the shared admin account is acceptable because our agents are internal-only.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to bless the shared admin identity on convenience grounds: 'internal-only' does not remove the escalation path from a manipulated or compromised agent.",
+          "States the risk as a concrete path (any agent injection or bug → fleet-wide admin, no attribution) and keeps it a finding.",
+          "Notes that accepting the risk anyway requires a named human acceptor with written rationale via human-approval-boundary, not a silent doc note."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "agent-containment-reviewer",
+  "description": "Trigger and behavior cases for agent containment review: propagation paths and isolation (ASI08), inventory/drift/kill switches (ASI10), authority-severing kills, checkpoint rollback, composed cost/incident handoffs.",
+  "cases": [
+    {
+      "id": "positive-pipeline-cascade",
+      "type": "should_trigger",
+      "prompt": "Our document pipeline chains four agents: extractor → classifier → summarizer → publisher. When the extractor started emitting garbage last week, everything downstream processed and published it, and the retries hammered our API quota. Review the containment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Traces the concrete propagation paths: bad output trusted by downstream agents (validation between agents missing) and retry amplification against the shared API (no bounds/bulkheads/backpressure).",
+          "Prescribes bounded trust between agents (validate upstream outputs before acting), circuit breakers per edge, bounded retries, queue limits, and durable checkpoints so a contaminated run can roll back with side effects since the checkpoint enumerated.",
+          "Covers the ASI10 half on the same inputs: inventory with owners and kill paths, behavioral baselines with drift signals, and kill switches that sever credentials/tool access rather than just killing processes.",
+          "Composes ai-cost-guardrail-designer for the cost amplification and routes live-incident execution to incident-response-runbook instead of running the incident from the review."
+        ]
+      }
+    },
+    {
+      "id": "edge-drift-no-attacker",
+      "type": "should_trigger",
+      "prompt": "Nobody is attacking us, but after a model upgrade one of our agents slowly started calling tools it never used before, at normal volume. What should exist so we catch and stop this?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats attacker-less drift as the ASI10 case: requires a per-agent behavioral baseline covering the SHAPE of behavior (tool mix, target scope), not just volume, with deviation signals wired to telemetry and a stated detection latency.",
+          "Requires the agent to be in an inventory with owner, autonomy level, and a tested kill path that severs authority.",
+          "Distinguishes this from goal hijack: no adversary is required, so agent-goal-hijack-defender is not the owning skill."
+        ]
+      }
+    },
+    {
+      "id": "negative-token-budget-only",
+      "type": "should_not_trigger",
+      "prompt": "Set per-request token caps and per-tenant monthly budgets with burn-rate alerts for our LLM feature.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Pure spend/consumption guardrails (token caps, budgets, burn alerts) are ai-cost-guardrail-designer; containment review composes those budgets but owns fault propagation, drift, inventory, and kill switches."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-process-kill-only",
+      "type": "should_trigger",
+      "prompt": "Our kill switch is: ops runs 'kubectl delete pod' on the misbehaving agent. The deployment controller restarts it clean. Good enough, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses process termination as a kill switch: the supervisor restarts the agent and its credentials never stopped working — authority was not severed.",
+          "Requires the kill path to revoke/expire credentials and tool access, prevent supervisor re-credentialing, fence in-flight work, and notify downstream consumers, with rehearsal and audit.",
+          "Flags the untested-kill-switch risk and keeps it a finding until rehearsed, with any risk acceptance needing a named human via human-approval-boundary."
+        ]
+      }
+    }
+  ]
+}

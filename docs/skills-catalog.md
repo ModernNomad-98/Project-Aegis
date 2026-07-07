@@ -13,11 +13,12 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > security, RLS & supply-chain pack), Phase 5 (the 16-skill QA, E2E, manual QA
 > & evidence pack — the 13 canonical skills plus 3 pulled forward from the QA
 > backlog, roadmap #184/#185/#204), and Phase 6 (the 10-skill cloud, DevOps,
-> reliability & release pack), and Phase 7 (the 14-skill AI security &
-> LLM systems pack — v4's 10 plus 4 OWASP LLM Top 10 gap additions, D6)
-> are implemented. `_template` remains a
-> reference template ignored by the validator. Everything under "Backlog" is
-> planned, not built.
+> reliability & release pack), Phase 7 (the 14-skill AI security &
+> LLM systems pack — v4's 10 plus 4 OWASP LLM Top 10 gap additions, D6),
+> and Phase 7.5 (the 6-skill agentic AI security pack plus 3 extensions of
+> existing skills — OWASP Agentic Top 10, D7) are implemented. `_template`
+> remains a reference template ignored by the validator. Everything under
+> "Backlog" is planned, not built.
 
 ---
 
@@ -385,6 +386,60 @@ discrimination against the shipped `threat-modeler`, `security-pr-reviewer`,
 `api-contract-test-designer`, and the `ai-security-red-team-reviewer` **subagent**
 (which composes these skills — design/predict here vs hands-on adversarial probing there).
 
+### Skills (Phase 7.5 — agentic AI security pack)
+
+All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
+`evals/trigger-evals.json` (the agentic cluster overlaps internally and with
+Phase 7). Anchored to the **OWASP Top 10 for Agentic Applications (2026)**,
+ASI01–ASI10, per reconciliation §3 (D7): **6 new skills + 3 extensions of
+existing skills**. The Agentic Top 10 **extends, not replaces, the LLM Top 10
+(D6)** — agent systems inherit every Phase 7 LLM-side risk; this pack adds
+the autonomy, tool, identity, memory, and multi-agent risks on top. Per D7,
+**ASI08 and ASI10 merge into ONE `agent-containment-reviewer`** (fault
+propagation and the containment-gap-once-drift-begins are two halves of the
+same review — same inputs: agent topology, autonomy boundaries, kill/rollback
+paths; it also covers the agentic slice of the backlog candidate
+`ai-feature-kill-switch-designer`). Nothing else collapses: ASI01 vs ASI06 vs
+ASI10 stay distinct (direct goal alteration vs stored-memory corruption vs
+autonomous drift). One skill has side effects and is **manual-only**
+(`disable-model-invocation: true`): `agent-goal-hijack-defender` (edits agent
+loop/planner code and prompts). The other five are pure review/design skills
+and stay model-invocable.
+
+**Extensions (scoped additive diffs, not new skills):** ASI02 + the tool-side
+slice of ASI05 extend Phase 7 `agent-tool-safety-guard` (tool misuse through
+legitimate grants, side-effect limits, NL-driven execution paths,
+code-execution tools as a maximal-blast-radius class); ASI05 extends Phase 7
+`llm-output-safety-reviewer` (autonomous generate-and-run loops, per-run
+ephemeral sandboxes, sandbox escape/persistence, NL-to-execution path maps);
+ASI04 extends Phase 4 `supply-chain-security-reviewer` AGAIN (after D6/LLM03)
+to the agentic supply chain (MCP servers and manifests, tool/skill
+registries, plugin packages, A2A dependencies — install-vs-runtime seam with
+`inter-agent-comms-reviewer`).
+
+| Skill | OWASP Agentic Top 10 | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `agent-goal-hijack-defender` | ASI01 | **no** (manual-only; edits agent loop/planner code + prompts) | Goal/plan integrity across multi-step runs: pinned goal record outside the model context, principal-only mutation channel, per-step tracing with deviation signals, drift response, per-channel hijack red-team suite; builds on `prompt-injection-defender` (LLM01 owns the vector). |
+| `agent-identity-privilege-reviewer` | ASI03 | yes | Agent identity architecture: distinct least-privilege identity per agent, task/time-scoped credentials, delegation chains that attenuate (never amplify), confused-deputy closure, dual attribution (principal + agent); complements `secrets-identity-hardener` (custody fixer). |
+| `memory-context-poisoning-reviewer` | ASI06 | yes | Persistent memory/stored-context poisoning: write-path trust classes, validation-before-write, per-entry provenance, tenant/user/session scoping at write AND recall, TTL + purge with derived-state rollback, recalled memory as data never instructions; distinct from `model-poisoning-reviewer` (LLM04) and `rag-security-architect` (LLM08). |
+| `inter-agent-comms-reviewer` | ASI07 | yes | A2A/MCP message security: per-edge mutual authn, end-to-end integrity, replay bounds, confidentiality, topology allowlists, spoofed-result handling; enforces authenticated ≠ trusted — peer messages never re-task, change permissions, or assert approvals. |
+| `agent-containment-reviewer` | ASI08 + ASI10 (merged) | yes | One containment review: cascade half (blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm/fan-out limits) + rogue half (drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY — credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. |
+| `human-agent-trust-reviewer` | ASI09 | yes | Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling/salami-slicing, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary` (that skill places the gates; this attacks their resilience). |
+
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all six as one
+**agentic cluster**: internal discrimination (goal hijack vs memory poisoning
+vs drift/containment vs identity vs comms vs approval-trust) plus cross-phase
+discrimination against the shipped `prompt-injection-defender` (LLM01 vs
+ASI01), `model-poisoning-reviewer` (LLM04 vs ASI06), `rag-security-architect`
+(LLM08 vs ASI06), `agent-tool-safety-guard`, `llm-output-safety-reviewer`,
+`agent-authorization-matrix`, `human-approval-boundary`,
+`secrets-identity-hardener`, `agent-memory-governance`,
+`authorization-matrix-designer`, `api-event-architect`,
+`ai-cost-guardrail-designer`, `incident-response-runbook`,
+`observability-operator`, `agent-governance-audit`, `ai-misinformation-guard`,
+`ai-governance-risk-reviewer`, and the `ai-security-red-team-reviewer`
+**subagent**.
+
 ---
 
 ## Backlog by phase (reconciled)
@@ -478,9 +533,22 @@ is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
 the AI security test harness (no separate `ai-security-test-harness`). The
 Phase 7 **expansion backlog** (`ai-provider-adapter-designer`,
 `prompt-contract-designer`, `ai-human-in-the-loop-designer`,
-`ai-autonomy-boundary-designer`, `ai-feature-kill-switch-designer`) remains
-backlog, built in Phase 8 batches. Phase 7.5 (agentic AI security, D7) and the
-Compliance & Governance batch (D9) follow it.
+`ai-autonomy-boundary-designer`, `ai-feature-kill-switch-designer` — whose
+agentic slice is now covered by `agent-containment-reviewer`) remains
+backlog, built in Phase 8 batches. Phase 7.5 (agentic AI security, D7) is
+implemented below; the Compliance & Governance batch (D9) follows it.
+
+### Phase 7.5 — Agentic AI security (P1)
+✅ **Implemented** — all 6 new skills + 3 extensions (OWASP Agentic Top 10,
+D7) moved to
+[Implemented → Skills (Phase 7.5)](#skills-phase-75--agentic-ai-security-pack)
+above. Source: the reconciliation doc §3 Phase 7.5 coverage map (D7),
+anchored to the OWASP Top 10 for Agentic Applications (2026), ASI01–ASI10.
+Per D7: **ASI08 + ASI10 merged** into `agent-containment-reviewer`;
+**ASI02/ASI05** extend Phase 7 `agent-tool-safety-guard` and
+`llm-output-safety-reviewer` (scoped diffs); **ASI04** extends Phase 4
+`supply-chain-security-reviewer` again after the D6/LLM03 extension. The
+Compliance & Governance batch (D9) is banked to follow.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).

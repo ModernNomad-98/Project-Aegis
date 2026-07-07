@@ -1,0 +1,49 @@
+{
+  "skill": "human-agent-trust-reviewer",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: approval-layer exploitation (ASI09) vs gate placement, retrospective governance audit, content overreliance, and oversight tiering.",
+  "overlaps_with": ["human-approval-boundary", "agent-governance-audit", "ai-misinformation-guard", "ai-governance-risk-reviewer", "agent-tool-safety-guard"],
+  "cases": [
+    {
+      "id": "approval-exploitation-wins-here",
+      "prompt": "Review whether our agent's approval prompts could be rubber-stamped or gamed — the operators mostly just read the agent's own explanation and click approve.",
+      "expected_skill": "human-agent-trust-reviewer",
+      "should_not_trigger": ["human-approval-boundary", "agent-governance-audit"],
+      "reason": "Attacking the approval layer's resilience (fatigue, self-report gap, deception) is ASI09; human-approval-boundary places the gates and agent-governance-audit checks compliance after the fact."
+    },
+    {
+      "id": "gate-placement-goes-to-approval-boundary",
+      "prompt": "Which agent actions must stop for explicit human approval — schema changes, production data, deploys, billing?",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "reason": "Defining the high-risk boundaries where work halts for approval is the Phase 1 gate skill; the trust reviewer assumes gates exist and tests whether they hold against manipulation."
+    },
+    {
+      "id": "retrospective-audit-goes-to-governance-audit",
+      "prompt": "For last week's agent-driven change, verify from the PR timeline and approval records whether every required human approval actually happened.",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "reason": "Evidence-based post-hoc verification of process compliance is the governance audit; ASI09 is the design-time review of whether the approval mechanism resists exploitation."
+    },
+    {
+      "id": "content-overreliance-goes-to-misinformation-guard",
+      "prompt": "Users take our AI's confident answers at face value and act on them without verification — design controls against that overreliance.",
+      "expected_skill": "ai-misinformation-guard",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "reason": "Overreliance on AI CONTENT (grounding, citations, calibrated uncertainty, UX trust signals) is LLM09; ASI09 covers humans authorizing agent ACTIONS being fatigued or deceived."
+    },
+    {
+      "id": "oversight-tiering-goes-to-governance-risk",
+      "prompt": "Classify this AI feature's risk tier and decide whether it needs human-in-the-loop or human-on-the-loop oversight.",
+      "expected_skill": "ai-governance-risk-reviewer",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "reason": "Matching oversight level to impact tier is governance/risk posture; the trust reviewer hardens whatever oversight tier was chosen against fatigue and deception."
+    },
+    {
+      "id": "which-tools-gate-goes-to-tool-guard",
+      "prompt": "Build the per-tool permission matrix and decide which tool calls are irreversible enough to need an approval trigger.",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "reason": "Per-tool blast radius and approval triggers are the LLM06/ASI02 tool boundary; the trust reviewer tests the human side of the gates those triggers fire."
+    }
+  ]
+}

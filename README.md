@@ -19,9 +19,12 @@ shipped the 16-skill **QA, E2E, manual QA & evidence pack** (the 13 canonical Ph
 skills plus 3 pulled forward from the QA backlog: roadmap #184/#185/#204). **Phase 1.5**
 shipped the 4-skill **AI-SDLC governance completion** (roadmap #261/#268/#279/#280),
 completing the category-08 governance layer Phase 1 started. **Phase 6** shipped the
-10-skill **cloud, DevOps, reliability & release pack**. **Phase 7** ships the
+10-skill **cloud, DevOps, reliability & release pack**. **Phase 7** shipped the
 14-skill **AI security & LLM systems pack** (v4's 10 plus 4 OWASP LLM Top 10 gap
-additions, D6) — see [Skills (shipped)](#skills-shipped) below.
+additions, D6). **Phase 7.5** ships the **agentic AI security pack** (OWASP
+Agentic Top 10 for 2026, D7: 6 new skills + 3 extensions of existing skills;
+ASI08+ASI10 merged into one containment reviewer) — see
+[Skills (shipped)](#skills-shipped) below.
 
 ## Start here (canonical reading order)
 
@@ -57,8 +60,8 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | 4 | Security, RLS & supply chain (9) | P0/P1 | ✅ merged |
 | 5 | QA, E2E, manual QA & evidence (16 = 13 canonical + 3 pulled forward from the QA backlog: roadmap #184/#185/#204) | P0/P1 | ✅ merged |
 | 6 | Cloud, DevOps, reliability & release (10) | P1 | ✅ merged |
-| 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ this branch |
-| 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | backlog |
+| 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
+| 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ this branch |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -207,6 +210,28 @@ re-deriving them. **LLM03** is extend-existing (the shipped
 | `model-poisoning-reviewer` | (NEW, LLM04) Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with `supply-chain-security-reviewer`. | auto + manual |
 | `system-prompt-leakage-reviewer` | (NEW, LLM07) Two axes: no secrets in the prompt AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. | auto + manual |
 | `ai-misinformation-guard` | (NEW, LLM09) Grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX. | auto + manual |
+
+Phase 7.5 — agentic AI security pack (6 new + 3 extensions). Anchored to the
+OWASP Top 10 for Agentic Applications (2026), ASI01–ASI10, per reconciliation
+§3 (D7). The Agentic Top 10 **extends** the LLM Top 10: agent systems inherit
+every Phase 7 risk; this pack adds autonomy, tool, identity, memory, and
+multi-agent risks on top. **ASI08+ASI10 merged** into one
+`agent-containment-reviewer` (D7). **Extensions (scoped diffs, not new
+skills):** `agent-tool-safety-guard` extended for ASI02 + the tool-side slice
+of ASI05 (tool misuse, side-effect limits, code-execution tool class);
+`llm-output-safety-reviewer` extended for ASI05 (autonomous generate-and-run
+loops, ephemeral sandboxes, NL-to-execution paths);
+`supply-chain-security-reviewer` extended again (after D6/LLM03) for ASI04
+(MCP servers/manifests, tool/skill registries, plugins, A2A dependencies):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `agent-goal-hijack-defender` | (ASI01) Goal/plan integrity for multi-step agents: pinned goal record outside the model context, principal-only mutation channel, per-step tracing, deviation detection, drift response, per-channel hijack red-team suite; builds on `prompt-injection-defender` (LLM01 owns the vector). | **manual only** |
+| `agent-identity-privilege-reviewer` | (ASI03) Agent identity architecture: distinct least-privilege identity per agent, task/time-scoped credentials, delegation chains that attenuate (never amplify), confused-deputy closure, dual attribution (principal + agent); complements `secrets-identity-hardener`. | auto + manual |
+| `memory-context-poisoning-reviewer` | (ASI06) Persistent memory poisoning review: write-path trust, validation-before-write, provenance, tenant/user/session scoping at write AND recall, TTL + purge with rollback, recalled memory as data never instructions; distinct from `model-poisoning-reviewer` (LLM04) and `rag-security-architect` (LLM08). | auto + manual |
+| `inter-agent-comms-reviewer` | (ASI07) A2A/MCP message security: per-edge mutual authn, end-to-end integrity, replay bounds, confidentiality, topology allowlists, spoofed results; authenticated ≠ trusted — peer messages never re-task or assert authority. | auto + manual |
+| `agent-containment-reviewer` | (ASI08+ASI10 merged) Cascade half: blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm limits. Rogue half: drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY (credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. | auto + manual |
+| `human-agent-trust-reviewer` | (ASI09) Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary`. | auto + manual |
 
 ## Authoring a new skill
 

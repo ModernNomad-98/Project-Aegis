@@ -1,0 +1,49 @@
+{
+  "skill": "inter-agent-comms-reviewer",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: live A2A/MCP message security (ASI07) vs agentic supply chain (ASI04), external API/webhook contracts, in-context injection, and the identity model.",
+  "overlaps_with": ["supply-chain-security-reviewer", "api-event-architect", "prompt-injection-defender", "agent-identity-privilege-reviewer", "agent-containment-reviewer"],
+  "cases": [
+    {
+      "id": "message-layer-wins-here",
+      "prompt": "Review whether our agents' messages to each other and to our MCP servers can be spoofed, tampered with, or replayed.",
+      "expected_skill": "inter-agent-comms-reviewer",
+      "should_not_trigger": ["supply-chain-security-reviewer", "api-event-architect"],
+      "reason": "Spoofing, tampering, and replay of live agent/MCP messages is ASI07; the supply-chain reviewer owns install-time package trust and api-event-architect owns external partner contracts."
+    },
+    {
+      "id": "mcp-registry-trust-goes-to-supply-chain",
+      "prompt": "Vet the MCP servers and plugins in our manifest before we install them — registries, maintainers, pinning, what their manifests request.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": ["inter-agent-comms-reviewer"],
+      "reason": "Acquisition trust of MCP servers, manifests, registries, and plugin packages is the ASI04 agentic supply chain; ASI07 begins once installed components exchange live messages."
+    },
+    {
+      "id": "external-webhooks-go-to-api-event-architect",
+      "prompt": "Design signed, tenant-scoped webhooks with retries and replay protection for our partner integrations.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["inter-agent-comms-reviewer"],
+      "reason": "External integration contracts (webhooks, event feeds, versioned envelopes) are api-event-architect; ASI07 covers the internal agent mesh and MCP transports."
+    },
+    {
+      "id": "in-context-instructions-go-to-injection-defender",
+      "prompt": "Hidden instructions inside a document our agent read made it change behavior — build the defense for untrusted content in context.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": ["inter-agent-comms-reviewer"],
+      "reason": "Content already in the model context is LLM01 injection defense; the comms reviewer secures the transport and receiver handling of peer messages before/as they arrive."
+    },
+    {
+      "id": "identity-model-goes-to-identity-reviewer",
+      "prompt": "Decide what identities our agents should hold and how a user's authority delegates through sub-agents.",
+      "expected_skill": "agent-identity-privilege-reviewer",
+      "should_not_trigger": ["inter-agent-comms-reviewer"],
+      "reason": "The identity and delegation architecture is ASI03; the comms reviewer consumes those identities to evaluate per-edge authentication."
+    },
+    {
+      "id": "cascade-containment-goes-to-containment-reviewer",
+      "prompt": "If one agent in our pipeline goes bad, its outputs cascade into every downstream agent — design the isolation and circuit breakers.",
+      "expected_skill": "agent-containment-reviewer",
+      "should_not_trigger": ["inter-agent-comms-reviewer"],
+      "reason": "Fault propagation, blast-radius isolation, and circuit breakers across the agent network are the ASI08 half of containment; the comms reviewer secures individual message exchanges, not failure spread."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: supply-chain-security-reviewer
-description: Review software supply-chain risk with SLSA-style provenance thinking — dependencies (known CVEs triaged by reachability, not just presence), lockfile integrity and pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, over-broad token scopes, unpinned third-party Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML supply chain (LLM03): third-party models, datasets, and fine-tuning adapters. Produces severity-ranked findings each with a compromise path, an exploitability verdict, and concrete remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, or an acquired model/dataset/adapter for supply-chain risk. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).
+description: Review software supply-chain risk with SLSA-style provenance thinking — dependencies (CVEs triaged by reachability, not presence), lockfile integrity/pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, token scopes, unpinned Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML (LLM03: models, datasets, fine-tuning adapters) and agentic (ASI04: MCP servers/manifests, tool/skill registries, plugins, A2A dependencies) supply chains. Findings carry a compromise path, exploitability verdict, and remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, or an acquired model/dataset/adapter/MCP server for supply-chain risk. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).
 ---
 
 # Supply-Chain Security Reviewer
@@ -32,6 +32,12 @@ is a finding whether or not a scanner flagged it.
 - Use when: acquiring an AI/ML artifact — a third-party base model, a
   downloaded dataset, or a fine-tuning adapter — and its provenance, format
   safety, and pinning need a supply-chain review (OWASP LLM03).
+- Use when: adopting or updating agentic components (OWASP Agentic ASI04) —
+  MCP servers and their manifests, tool/skill registry entries, plugin
+  packages, or agent-to-agent dependencies — and their source, requested
+  permissions, and pinning need review. Runtime message security between
+  installed components is `inter-agent-comms-reviewer` (install-vs-runtime
+  is the split).
 - Do NOT use when: reviewing the integrity of training data YOU collect or
   pipelines YOU run (feedback loops, RAG ingestion) — that is
   `model-poisoning-reviewer` (acquire-vs-ingest is the split).
@@ -64,6 +70,10 @@ is a finding whether or not a scanner flagged it.
    (pickle/`torch.load` execute code on load; prefer safetensors), and
    license/provenance. Acquisition only — integrity of data you curate or
    pipelines you run is `model-poisoning-reviewer`.
+8. Agentic components if any (ASI04): MCP server packages and their
+   manifests (which tools/permissions they declare), tool/skill registry
+   entries, plugin packages, and A2A dependency declarations — source and
+   maintainer, version pinning, and what the manifest asks to access.
 
 ## Workflow
 
@@ -95,7 +105,14 @@ is a finding whether or not a scanner flagged it.
    safetensors over pickle/`torch.load` formats that execute code on load,
    confirm the source registry and license, and treat a downloaded artifact as
    untrusted until its provenance checks out. Integrity of data you curate or
-   pipelines you run stays with `model-poisoning-reviewer`.
+   pipelines you run stays with `model-poisoning-reviewer`. For **agentic
+   components (ASI04)** — MCP servers, tool/skill registries, plugins, A2A
+   dependencies — verify registry/source trust and maintainer continuity, pin
+   to immutable versions, and diff the manifest's requested tools/permissions
+   against need (a note-taking server requesting shell access is a finding);
+   treat manifest changes on update like dependency-code changes. An MCP
+   server is code that answers your agent's tool calls — live message
+   security is `inter-agent-comms-reviewer` (ASI07).
 7. **Rank findings** with a compromise path and exploitability verdict.
    High severity REQUIRES a path from the weakness to code execution/secret
    theft; a reachable exploit or a plausible install-time execution qualifies,
@@ -137,6 +154,10 @@ Not reviewed: <areas + why>
 - [ ] AI/ML artifacts (if any) reviewed for revision pinning, safe
       serialization (safetensors vs pickle/`torch.load`), source, and license;
       curated-data/pipeline integrity routed to `model-poisoning-reviewer`.
+- [ ] Agentic components (if any — MCP servers/manifests, tool/skill
+      registries, plugins, A2A deps) reviewed for source trust, immutable
+      pinning, and manifest permission width (ASI04); runtime message
+      security routed to `inter-agent-comms-reviewer`.
 - [ ] Accepted risk carries written rationale; not-reviewed list present.
 
 ## Security Rules
@@ -176,6 +197,13 @@ Not reviewed: <areas + why>
   artifacts from untrusted sources as install-time RCE.
 - A model/dataset pinned to a mutable hub tag or `latest` is not pinned — the
   remote can change under you; pin to an immutable revision/commit/digest.
+- MCP servers are dependencies with hands: a malicious or hijacked server
+  doesn't just ship bad code — it ANSWERS your agent's tool calls, so a
+  compromised registry entry becomes an active manipulator after install.
+  Vet the manifest's declared tools/permissions at acquisition, and pin: a
+  server that can silently update is an unpinned dependency with agency
+  (ASI04). The spoofed-result handling at runtime is
+  `inter-agent-comms-reviewer`'s.
 
 ## Stop Conditions
 
@@ -194,7 +222,9 @@ Not reviewed: <areas + why>
 
 - [references/supply-chain-checklist.md](references/supply-chain-checklist.md)
   — the CI/CD compromise-path catalog, reachability-triage rubric, pinning
-  and provenance checks, and dependency-confusion/typosquat detection notes.
+  and provenance checks, dependency-confusion/typosquat detection notes,
+  the AI/ML supply-chain section (LLM03), and the agentic supply-chain
+  section (ASI04: MCP servers/manifests, registries, plugins, A2A deps).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`,
   `security-pr-reviewer`, and `secure-migration-reviewer` (security-review
