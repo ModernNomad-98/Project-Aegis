@@ -1,0 +1,42 @@
+{
+  "skill": "slo-reliability-architect",
+  "description": "Trigger discrimination for the Phase 6 reliability cluster: reliability design vs observability implementation vs incident procedures, and against the shipped qa-strategy-architect and saas-cost-architect.",
+  "overlaps_with": ["observability-operator", "incident-response-runbook", "qa-strategy-architect", "saas-cost-architect"],
+  "cases": [
+    {
+      "id": "slo-design-wins-here",
+      "prompt": "Set reliability targets and error budgets for our core journeys, and rationalize what pages versus what tickets.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": ["observability-operator", "incident-response-runbook"],
+      "reason": "Journey-derived targets, budgets, and the paging policy are reliability design — the spec the operator implements and the runbook's procedures hang off."
+    },
+    {
+      "id": "wiring-goes-to-operator",
+      "prompt": "Implement the alert rules from the reliability doc and verify the SLI queries return data.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["slo-reliability-architect"],
+      "reason": "Implementing rules and executing verification queries is the operator's manual-only work; the design already exists."
+    },
+    {
+      "id": "test-risk-goes-to-qa-strategy",
+      "prompt": "Which product risks should drive our testing investment, and what layers should cover them before release?",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": ["slo-reliability-architect"],
+      "reason": "Pre-release test-layer investment is QA strategy; SLOs govern the running system's reliability promise — related risk thinking, different artifact."
+    },
+    {
+      "id": "cost-guardrails-go-to-cost-architect",
+      "prompt": "Define budgets and alerts for our per-tenant AI spend so a runaway tenant can't blow up the bill.",
+      "expected_skill": "saas-cost-architect",
+      "should_not_trigger": ["slo-reliability-architect"],
+      "reason": "Cost guardrails and per-tenant spend budgets are the cost model's territory — 'budget' there is dollars, not error budget."
+    },
+    {
+      "id": "paged-now-what-goes-to-incident-runbook",
+      "prompt": "When the fast-burn alert pages someone at 3am, what exactly should they do? Write that up.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": ["slo-reliability-architect"],
+      "reason": "The human procedure behind the page is the incident runbook; this skill only defines when the page fires."
+    }
+  ]
+}

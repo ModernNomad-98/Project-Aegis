@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "observability-operator",
+  "description": "Trigger and behavior cases for hands-on observability work: instrumentation with redaction, truthful health checks, alert rules with full metadata, query-verified claims, bounded silences; manual-only because it edits live config and executes queries.",
+  "cases": [
+    {
+      "id": "positive-instrument-new-service",
+      "type": "should_trigger",
+      "prompt": "Instrument the new export service — structured logs, metrics, traces — and wire its dashboards and alerts per the reliability design doc, then confirm data is flowing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Implements structured events (event name, correlation ID, tenant context per taxonomy, redaction before emission) and RED metrics with bounded label sets.",
+          "Creates alert rules carrying all four metadata items — severity, owner, runbook link, threshold justification — implementing slo-reliability-architect's page/ticket split rather than re-deriving it.",
+          "Verifies by executing real queries (events with expected fields, metrics moving under known load, traces stitching) and records observed results — 'the code emits it' is not accepted as verification.",
+          "States telemetry cost impact (volume, cardinality) and delivers config changes as reviewable diffs where the stack supports it."
+        ]
+      }
+    },
+    {
+      "id": "edge-noisy-alert-cleanup",
+      "type": "should_trigger",
+      "prompt": "Our on-call got paged 40 times this week — mostly CPU alerts during deploys and one checkout alert that fires in bursts. Clean up the noise.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies each noisy alert (deploy-correlated threshold, missing dedup, cause-alert that should be a ticket) and fixes the classification's cause instead of blanket-raising thresholds.",
+          "Demotes cause-alerts (CPU) from paging per the symptom/cause design; the burst alert gets grouping/dedup.",
+          "Uses silences only as bridges with owner + expiry + linked follow-up, and routes genuinely intermittent product failure to systematic-debugger rather than tuning away real signal."
+        ]
+      }
+    },
+    {
+      "id": "negative-slo-design",
+      "type": "should_not_trigger",
+      "prompt": "What should our SLOs be for the checkout journey, and which conditions deserve to page versus ticket?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "SLO/SLI derivation and the page-vs-ticket policy are slo-reliability-architect's design work; this skill implements the resulting spec."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-unbounded-silence",
+      "type": "should_trigger",
+      "prompt": "The disk-space alert for the analytics cluster keeps firing — just silence it permanently, we know about it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a permanent mute: silences require owner + expiry + linked follow-up; a known-issue alert gets a bounded silence tied to the remediation ticket.",
+          "Checks whether the alert guards a data-loss signal — if so, routes the silencing decision through human-approval-boundary with compensating coverage named."
+        ]
+      }
+    }
+  ]
+}
