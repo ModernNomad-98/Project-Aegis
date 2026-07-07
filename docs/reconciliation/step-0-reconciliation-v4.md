@@ -197,3 +197,9 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   architecture-heavy Phase 1. Architecture skills move to Phase 2.
 - **D5 — 300-skill roadmap is the backlog/capability map, not a batch command.** Executable skills
   are built phase-by-phase; the remainder flows through Phase 8 batches.
+
+---
+
+## 6. Post-merge corrections
+
+- **2026-07-07 — Phase 4 headline correction.** Squash commit `ee6515c` (PR #7) is titled "Phase 4: security & RLS pack (4 skills)" but actually delivered **all 9** canonical Phase 4 skills (`threat-modeler`, `appsec-implementer`, `multi-tenant-security-tester`, `rls-policy-auditor`, `secrets-identity-hardener`, `supply-chain-security-reviewer`, `security-pr-reviewer`, `secure-migration-reviewer`, `static-analysis-reviewer`); the stale "(4 skills)" headline was captured when auto-merge was armed on the 4-skill branch state, and the remaining 5 skills were pushed before the merge fired. `main` contains all 9 — validator reports 36 skills, exit 0.
