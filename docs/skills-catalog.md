@@ -15,8 +15,11 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > backlog, roadmap #184/#185/#204), and Phase 6 (the 10-skill cloud, DevOps,
 > reliability & release pack), Phase 7 (the 14-skill AI security &
 > LLM systems pack — v4's 10 plus 4 OWASP LLM Top 10 gap additions, D6),
-> and Phase 7.5 (the 6-skill agentic AI security pack plus 3 extensions of
-> existing skills — OWASP Agentic Top 10, D7) are implemented. `_template`
+> Phase 7.5 (the 6-skill agentic AI security pack plus 3 extensions of
+> existing skills — OWASP Agentic Top 10, D7), and the Compliance &
+> Governance batch (the 9-skill ISO 27001 + ISO 42001 + SOC 2 pack with
+> NIST AI RMF as companion — one shared control foundation, framework
+> projections, and a crosswalk, D9) are implemented. `_template`
 > remains a reference template ignored by the validator. Everything under
 > "Backlog" is planned, not built.
 
@@ -440,6 +443,57 @@ ASI01), `model-poisoning-reviewer` (LLM04 vs ASI06), `rag-security-architect`
 `ai-governance-risk-reviewer`, and the `ai-security-red-team-reviewer`
 **subagent**.
 
+### Skills (Compliance & Governance batch — D9)
+
+All under `.claude/skills/<name>/`; every one ships `evals/evals.json`
+**and** `evals/trigger-evals.json` (all nine form one compliance cluster).
+Anchored to reconciliation §3's "Compliance & Governance batch" subsection
+and D9, **including every per-source verification flag**: SOC 2 is an AICPA
+**attestation** (a CPA's examination), never a certification — 27001/42001
+are the certifiable management-system standards; 27001 Annex A counts
+(93 = 37/8/14/34) are secondary-sourced and 42001 Annex A counts conflict
+across sources (deliberately unstated); the SOC 2 Type 1/Type 2 definitions
+and Security-as-required-baseline are CPA-firm-sourced; the ~60–80%
+cross-framework overlap is an industry estimate; the vendor-market
+rationale is positioning, not a standards claim — every skill carries these
+in a **Compliance Precision Rules** section as
+verify-against-the-standard-before-citing items. Architecture per D9:
+**ONE shared control foundation + framework projections + a crosswalk**,
+NOT three parallel skill sets. The batch **MAPS controls that largely
+already exist** (Phase 3/4 technical controls, the Phase 5 evidence pack,
+Phase 1.5 + Phase 7 AI governance) and produces auditor-grade evidence on
+top — net-new is mostly ISO management-system artifacts (SoA, internal
+audit, management review) and evidence plumbing. Invocability was evaluated
+explicitly: all nine are mapping/documentation/design skills producing
+proposal artifacts — none edits live governance artifacts or evidence
+stores (store mutation and controlled-document rewrites are excluded via
+Stop Conditions), so **all nine are model-invocable**.
+
+| Skill | Layer (D9) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `compliance-control-foundation` | Shared foundation | yes | One framework-agnostic catalog (7 domains + AI governance): each control ONCE with objective/owner/mechanism/evidence hook, mapped by name to shipped Phase 3/4 artifacts; framework-neutral text; honest implemented/partial/missing status incl. the D8 residues. |
+| `compliance-evidence-collector` | Shared foundation | yes | Evidence OVER TIME (SOC 2 Type 2's core demand, reused for ISO surveillance): per-control type, cadence matched to operating frequency, population for sampling, collector, retention, integrity; window-coverage matrix with recover-or-except holes; reuses the Phase 5 evidence pack; never mutates a live evidence store. |
+| `statement-of-applicability-author` | Shared foundation | yes | The ISO-mandatory SoA serving BOTH 27001 and 42001: per-control include/exclude with 6.1.3 risk-treatment traces, verifiable exclusions, status mapped to foundation mechanisms, controlled-document diffs; requires the licensed Annex A table — never reconstructs entries or counts from memory. |
+| `iso-27001-isms-architect` | Framework projection | yes | ISMS clauses 4–10 (incl. the Amd 1:2024 climate-relevance check), four-theme Annex A selection via the foundation; headline net-new = risk register, internal audit program, management review; theme counts flagged secondary-verify-before-citing; readiness plan, never a certification claim. |
+| `iso-42001-aims-architect` | Framework projection | yes | AIMS clauses 4–10 + the three assessments (AI risk 6.1.2/8.2, AI risk treatment 6.1.3/8.3, AI system impact 6.1.4/8.4 on individuals/societies); maps the Phase 1.5 pack + `ai-governance-risk-reviewer` as operational mechanisms; Annex A counts never stated (sources conflict); ISMS-delta design when 27001 exists. |
+| `soc2-trust-criteria-mapper` | Framework projection | yes | ATTESTATION-not-certification scoping: system boundary, commitment-driven category selection (Security baseline + optional four), Type 1 vs Type 2 with window feasibility, subservice-organization carve-outs; Type definitions flagged CPA-firm-sourced — verify against the AICPA guide. |
+| `multi-framework-crosswalk` | Cross-cutting | yes | One row per control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function); edition-pinned, text-in-hand cells only, FULL/PARTIAL(residue) honesty, explicit joint sets; the 60–80% overlap cited only as flagged industry estimate. |
+| `compliance-gap-auditor` | Cross-cutting | yes | ONE parameterized audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order, shared-gap dividend; readiness assessment, never an audit opinion. |
+| `ai-lifecycle-risk-manager` | Cross-cutting | yes | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized per lifecycle stage with owners, triggers, and a register; voluntary + under-revision flags encoded; composes feature reviews, threat models, evals, incident machinery; companion to the AIMS — never presented as certifiable. |
+
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all nine as
+one **compliance cluster**: internal discrimination (foundation vs evidence
+program vs SoA vs the three projections vs crosswalk vs gap audit vs
+lifecycle program) plus cross-phase discrimination against the shipped
+`agent-governance-audit` (process compliance of ONE agent change vs
+framework compliance of the org), `ai-governance-risk-reviewer` (one AI
+feature's governance posture vs org-level certification readiness),
+`ai-sdlc-operating-model`, `audit-log-architect`,
+`screenshot-evidence-planner`, `manual-test-case-creator`,
+`authorization-matrix-designer`, `threat-modeler`, `ai-threat-modeler`,
+`ai-evaluation-harness`, `slo-reliability-architect`,
+`incident-response-runbook`, and `full-codebase-auditor`.
+
 ---
 
 ## Backlog by phase (reconciled)
@@ -548,7 +602,23 @@ Per D7: **ASI08 + ASI10 merged** into `agent-containment-reviewer`;
 **ASI02/ASI05** extend Phase 7 `agent-tool-safety-guard` and
 `llm-output-safety-reviewer` (scoped diffs); **ASI04** extends Phase 4
 `supply-chain-security-reviewer` again after the D6/LLM03 extension. The
-Compliance & Governance batch (D9) is banked to follow.
+Compliance & Governance batch (D9) is implemented below.
+
+### Compliance & Governance batch (D9)
+✅ **Implemented** — all 9 skills moved to
+[Implemented → Skills (Compliance & Governance batch)](#skills-compliance--governance-batch--d9)
+above. Source: the reconciliation doc §3 "Compliance & Governance batch"
+subsection + D9 in §5, including every per-source verification flag.
+Architecture per D9: one shared control foundation
+(`compliance-control-foundation`, `compliance-evidence-collector`,
+`statement-of-applicability-author`) + framework projections
+(`iso-27001-isms-architect`, `iso-42001-aims-architect`,
+`soc2-trust-criteria-mapper`) + cross-cutting (`multi-framework-crosswalk`,
+`compliance-gap-auditor`, `ai-lifecycle-risk-manager`) — the 9 reconciled
+candidates, already merged, NOT split into per-framework variants. The
+batch maps controls that largely already exist (Phases 3/4, the Phase 5
+evidence pack, Phase 1.5 + Phase 7 AI governance) and produces
+auditor-grade evidence on top.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "compliance-evidence-collector",
+  "description": "Trigger and behavior cases for the evidence-over-time program: cadence vs operating frequency, population enumeration, window coverage holes, no-backfill, no live-store mutation.",
+  "cases": [
+    {
+      "id": "positive-type2-window-program",
+      "type": "should_trigger",
+      "prompt": "Our SOC 2 Type 2 audit window runs January through June. Define what evidence we collect for each control, how often, and how we prove the whole window is covered.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds per-control evidence specs (type, source, cadence, population, collector, retention, integrity) traced to the compliance-control-foundation catalog.",
+          "Matches cadence to each control's operating frequency and defines complete population enumeration for auditor sampling.",
+          "Produces a control-by-interval coverage matrix and lists holes with recover-at-source or carried-exception disposition.",
+          "Reuses existing artifacts (screenshot policy, audit-log extracts, CI runs, governance-audit reports) before inventing net-new collection."
+        ]
+      }
+    },
+    {
+      "id": "edge-mid-window-hole",
+      "type": "should_trigger",
+      "prompt": "We're four months into our audit period and just realized nobody saved the access-review records for the first quarter. What now?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Checks whether the source system still holds the artifacts for honest dated extraction; otherwise records a carried exception with an owner.",
+          "Explicitly refuses backdated or reconstructed-from-memory evidence as fabrication.",
+          "Adjusts the program (cadence, collector, integrity posture) so the hole class cannot recur silently."
+        ]
+      }
+    },
+    {
+      "id": "negative-screenshot-policy",
+      "type": "should_not_trigger",
+      "prompt": "Define our screenshot naming convention, masking rules, and where QA evidence screenshots get stored.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "QA screenshot policy (naming, masking, metadata, storage) is screenshot-evidence-planner; the collector consumes that policy inside a compliance evidence program."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-reorganize-live-store",
+      "type": "should_trigger",
+      "prompt": "Our evidence folder is a mess — go ahead and restructure it, delete the duplicates, and move everything into per-control subfolders.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to mutate the live evidence store directly; produces the target structure and migration steps as a proposal for a human operator.",
+          "Flags that deleting 'duplicates' inside an audit window is an integrity risk requiring human review of what is discarded.",
+          "Routes execution approval through human-approval-boundary."
+        ]
+      }
+    }
+  ]
+}

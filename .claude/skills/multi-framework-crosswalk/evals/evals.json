@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "multi-framework-crosswalk",
+  "description": "Trigger and behavior cases for the crosswalk engine: text-in-hand cell filling, satisfaction honesty, edition pinning, joint-set explicitness, overlap-estimate flagging.",
+  "cases": [
+    {
+      "id": "positive-three-framework-mapping",
+      "type": "should_trigger",
+      "prompt": "We have our common control set and licensed copies of ISO 27001, ISO 42001, and the TSC. Map every control to all three frameworks so we do the work once.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds one row per foundation control with per-framework reference, FULL/PARTIAL(residue)/NONE satisfaction, and verified/unverified status, under a pinned-editions header.",
+          "Fills cells only from the provided framework texts and marks joint satisfactions (several controls jointly covering one criterion) explicitly.",
+          "Computes the coverage summary from the table itself rather than quoting the 60–80% industry estimate as fact.",
+          "Routes PARTIAL residues to compliance-gap-auditor and reference columns to the SoA author and projections."
+        ]
+      }
+    },
+    {
+      "id": "edge-missing-framework-text",
+      "type": "should_trigger",
+      "prompt": "Start the crosswalk now — we have the TSC text, but our ISO 27001 and 42001 copies are still on order.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Fills the TSC column from the text in hand and leaves both ISO columns as unverified scaffolding with an explicit 'text not in hand' status.",
+          "Refuses to populate ISO cells from memory, vendor matrices, or blog crosswalks; records them as the verification backlog.",
+          "Keeps the crosswalk usable by consumers with unverified cells clearly rendered as such."
+        ]
+      }
+    },
+    {
+      "id": "negative-applicability-decision",
+      "type": "should_not_trigger",
+      "prompt": "Decide which Annex A controls apply to us and justify the exclusions for the auditor.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Per-control applicability judgment with risk-treatment traces is statement-of-applicability-author; the crosswalk records references, not applicability decisions."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-memory-ids",
+      "type": "should_not_trigger",
+      "prompt": "You know the standards well enough — just fill in the Annex A control numbers for each of our controls from memory and we'll double-check someday.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines memory-recalled control IDs even under a we'll-check-later framing: unverified cells stay marked unverified; filled cells come only from framework text in hand.",
+          "Explains the failure mode: confident wrong references survive review and fail at audit against the real Annex A table."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "compliance-evidence-collector",
+  "description": "Trigger discrimination for the compliance cluster: evidence-over-time program vs QA evidence policy, audit-trail design, one-change process audit, gap assessment, and TSC scoping.",
+  "overlaps_with": ["screenshot-evidence-planner", "audit-log-architect", "agent-governance-audit", "compliance-gap-auditor", "compliance-control-foundation", "soc2-trust-criteria-mapper", "manual-test-case-creator"],
+  "cases": [
+    {
+      "id": "evidence-over-time-wins-here",
+      "prompt": "Plan how we'll prove our controls operated for the entire audit period — what artifacts, how often, retention, and where the coverage holes are.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": ["screenshot-evidence-planner", "compliance-gap-auditor"],
+      "reason": "Operating-effectiveness evidence across a window (cadence, populations, coverage) is the collector; QA screenshot policy and overall readiness gaps are other skills."
+    },
+    {
+      "id": "qa-evidence-policy-goes-to-planner",
+      "prompt": "What screenshots should we capture during release testing, how do we mask customer data in them, and how are they named?",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": ["compliance-evidence-collector"],
+      "reason": "Screenshot checkpoints, masking, naming, and storage classes are the Phase 5 evidence policy; the collector reuses it as raw material for compliance windows."
+    },
+    {
+      "id": "audit-trail-design-goes-to-architect",
+      "prompt": "Design our audit log — event taxonomy, record schema, append-only integrity, and tenant-scoped access.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": ["compliance-evidence-collector"],
+      "reason": "Building the trail is the Phase 3 architect; the collector extracts from that trail as one evidence source among several."
+    },
+    {
+      "id": "one-change-process-goes-to-governance-audit",
+      "prompt": "Verify this PR actually followed our process — approval before merge, CI green on the merged SHA, closeout complete.",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["compliance-evidence-collector"],
+      "reason": "Per-change process compliance from primary evidence is the governance audit; the collector aggregates such reports as change-management evidence across the window."
+    },
+    {
+      "id": "readiness-gaps-go-to-gap-auditor",
+      "prompt": "Assess our current state against ISO 27001 and tell us what's missing before we book the certification audit.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["compliance-evidence-collector"],
+      "reason": "Framework readiness assessment with remediation order is the gap auditor; it consumes the collector's coverage map as one input."
+    },
+    {
+      "id": "window-choice-goes-to-soc2-mapper",
+      "prompt": "Should we do a SOC 2 Type 1 first or go straight to Type 2, and how long should the review period be?",
+      "expected_skill": "soc2-trust-criteria-mapper",
+      "should_not_trigger": ["compliance-evidence-collector"],
+      "reason": "Type 1 vs Type 2 and window planning are TSC scoping decisions; the collector takes the decided window and builds the evidence program for it."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "soc2-trust-criteria-mapper",
+  "description": "Trigger discrimination for the compliance cluster: SOC 2 attestation scoping vs ISO projections, evidence program, gap assessment, crosswalk, and reliability design.",
+  "overlaps_with": ["iso-27001-isms-architect", "iso-42001-aims-architect", "compliance-evidence-collector", "compliance-gap-auditor", "multi-framework-crosswalk", "slo-reliability-architect"],
+  "cases": [
+    {
+      "id": "soc2-scoping-wins-here",
+      "prompt": "Which SOC 2 trust categories should our report cover, and should we start with Type 1 or go straight to Type 2 with a six-month window?",
+      "expected_skill": "soc2-trust-criteria-mapper",
+      "should_not_trigger": ["compliance-evidence-collector", "compliance-gap-auditor"],
+      "reason": "Category selection and the Type/window decision are SOC 2 scoping; the collector covers the decided window and the gap auditor assesses readiness."
+    },
+    {
+      "id": "iso-goes-to-projections",
+      "prompt": "We need ISO 27001 for EU deals — build the management system.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["soc2-trust-criteria-mapper"],
+      "reason": "Certifiable ISMS design is the 27001 projection; SOC 2 scoping is a different regime (attestation vs certification)."
+    },
+    {
+      "id": "window-evidence-goes-to-collector",
+      "prompt": "Our Type 2 window is set for July through December — define the evidence we capture per control across it and the retention rules.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": ["soc2-trust-criteria-mapper"],
+      "reason": "Once the window is decided, evidence-over-time design is the collector; the mapper only plans the window."
+    },
+    {
+      "id": "criteria-references-go-to-crosswalk",
+      "prompt": "Map each control in our catalog to its SOC 2 criterion and ISO Annex A reference in one table.",
+      "expected_skill": "multi-framework-crosswalk",
+      "should_not_trigger": ["soc2-trust-criteria-mapper"],
+      "reason": "Multi-framework reference rows are the crosswalk engine; the mapper scopes the SOC 2 engagement and consumes crosswalk rows for its criteria map."
+    },
+    {
+      "id": "readiness-goes-to-gap-auditor",
+      "prompt": "Are we actually ready for a SOC 2 audit? List what's missing and in what order to fix it.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["soc2-trust-criteria-mapper"],
+      "reason": "Current-state-vs-framework assessment with remediation order is the parameterized gap audit, not scoping."
+    },
+    {
+      "id": "slo-design-goes-to-reliability",
+      "prompt": "Define SLOs and error budgets for our checkout journey with burn-rate alerting.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": ["soc2-trust-criteria-mapper"],
+      "reason": "Reliability target design is the Phase 6 skill; the SOC 2 mapper only maps such mechanisms to the Availability category when SLAs put it in scope."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "compliance-gap-auditor",
+  "description": "Trigger discrimination for the compliance cluster: org-level framework readiness vs one-change process audit, whole-repo code audit, system design, evidence program, and crosswalk mapping.",
+  "overlaps_with": ["agent-governance-audit", "full-codebase-auditor", "iso-27001-isms-architect", "iso-42001-aims-architect", "soc2-trust-criteria-mapper", "compliance-evidence-collector", "multi-framework-crosswalk"],
+  "cases": [
+    {
+      "id": "framework-readiness-wins-here",
+      "prompt": "How ready are we for ISO 42001, honestly? What's missing, what's partial, and what order do we fix it in before the certification audit?",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["iso-42001-aims-architect", "agent-governance-audit"],
+      "reason": "Current-state-vs-framework verdicts with remediation order are the parameterized gap audit; the AIMS architect designs the target and the governance audit checks one change."
+    },
+    {
+      "id": "one-change-goes-to-governance-audit",
+      "prompt": "Audit whether this agent-authored PR followed process: who approved, who merged, was auto-merge armed, does the closeout match reality?",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["compliance-gap-auditor"],
+      "reason": "Process compliance of ONE AI-assisted change from PR-timeline evidence is the Phase 1.5 audit; the gap auditor works at org/framework level."
+    },
+    {
+      "id": "repo-health-goes-to-codebase-auditor",
+      "prompt": "Audit the whole repository — dead code, duplicated logic, dependency hygiene, and a prioritized technical-debt map.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": ["compliance-gap-auditor"],
+      "reason": "Code-health auditing is the Phase 2 skill; the compliance gap audit measures framework requirements, not code quality."
+    },
+    {
+      "id": "target-design-goes-to-projection",
+      "prompt": "Design the internal audit program and management review cadence our ISMS needs.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["compliance-gap-auditor"],
+      "reason": "Designing management-system machinery is the projection; the gap auditor only reports its absence as a blocker."
+    },
+    {
+      "id": "evidence-holes-go-to-collector",
+      "prompt": "Build the per-control evidence plan for our audit window so there are no coverage holes.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": ["compliance-gap-auditor"],
+      "reason": "Designing evidence cadence/coverage is the collector; the gap auditor consumes its coverage matrix and reports evidence gaps."
+    },
+    {
+      "id": "reference-mapping-goes-to-crosswalk",
+      "prompt": "Produce the table mapping each control to its 27001, SOC 2, and 42001 references.",
+      "expected_skill": "multi-framework-crosswalk",
+      "should_not_trigger": ["compliance-gap-auditor"],
+      "reason": "Reference rows are the crosswalk; the gap auditor uses their satisfaction levels as input for verdicts."
+    }
+  ]
+}

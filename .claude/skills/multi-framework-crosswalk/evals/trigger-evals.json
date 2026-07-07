@@ -1,0 +1,49 @@
+{
+  "skill": "multi-framework-crosswalk",
+  "description": "Trigger discrimination for the compliance cluster: the reference-mapping engine vs the control catalog, the SoA, engagement scoping, gap assessment, and the RMF program.",
+  "overlaps_with": ["compliance-control-foundation", "statement-of-applicability-author", "soc2-trust-criteria-mapper", "compliance-gap-auditor", "iso-27001-isms-architect", "ai-lifecycle-risk-manager"],
+  "cases": [
+    {
+      "id": "crosswalk-wins-here",
+      "prompt": "Map our control catalog to ISO 27001 Annex A, the SOC 2 criteria, and ISO 42001 objectives in one maintained table so one control satisfies all three.",
+      "expected_skill": "multi-framework-crosswalk",
+      "should_not_trigger": ["compliance-control-foundation", "compliance-gap-auditor"],
+      "reason": "Per-control multi-framework reference rows are the crosswalk engine; the foundation defines the controls and the gap auditor judges readiness."
+    },
+    {
+      "id": "control-definition-goes-to-foundation",
+      "prompt": "Write the actual control set — objectives, owners, and mechanisms — before we worry about frameworks.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": ["multi-framework-crosswalk"],
+      "reason": "Catalog authoring is the foundation; the crosswalk keys off its IDs and deliberately contains no control definitions."
+    },
+    {
+      "id": "applicability-goes-to-soa",
+      "prompt": "Produce the ISO document that justifies, control by control, what we include and exclude.",
+      "expected_skill": "statement-of-applicability-author",
+      "should_not_trigger": ["multi-framework-crosswalk"],
+      "reason": "Inclusion/exclusion with 6.1.3 traces is the SoA; the crosswalk supplies its reference column but makes no applicability judgments."
+    },
+    {
+      "id": "engagement-scope-goes-to-mapper",
+      "prompt": "Decide which trust categories our SOC 2 report should include and the audit window.",
+      "expected_skill": "soc2-trust-criteria-mapper",
+      "should_not_trigger": ["multi-framework-crosswalk"],
+      "reason": "Engagement scoping (categories, Type, window) is the SOC 2 projection; the crosswalk just holds control→criteria references it consumes."
+    },
+    {
+      "id": "thin-coverage-goes-to-gap-auditor",
+      "prompt": "Given our mappings, where are we actually thin against ISO 42001, and what do we fix first?",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["multi-framework-crosswalk"],
+      "reason": "Prioritized readiness gaps and remediation order are the gap audit; the crosswalk exposes PARTIAL residues as its input."
+    },
+    {
+      "id": "rmf-operationalization-goes-to-lifecycle",
+      "prompt": "Stand up the NIST AI RMF functions as our AI risk program across the lifecycle.",
+      "expected_skill": "ai-lifecycle-risk-manager",
+      "should_not_trigger": ["multi-framework-crosswalk"],
+      "reason": "Operationalizing GOVERN/MAP/MEASURE/MANAGE is the lifecycle manager; the crosswalk only tags which function a control serves."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "iso-27001-isms-architect",
+  "description": "Trigger discrimination for the compliance cluster: the 27001 ISMS projection vs the AIMS, SOC 2 scoping, the SoA document, the control catalog, gap assessment, and technical threat modeling.",
+  "overlaps_with": ["iso-42001-aims-architect", "soc2-trust-criteria-mapper", "statement-of-applicability-author", "compliance-control-foundation", "compliance-gap-auditor", "threat-modeler"],
+  "cases": [
+    {
+      "id": "isms-wins-here",
+      "prompt": "Prepare us for ISO 27001 — management system design, internal audit program, management review, and how our existing controls slot into Annex A.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["iso-42001-aims-architect", "compliance-gap-auditor"],
+      "reason": "Clause 4–10 ISMS design with Annex A selection is the 27001 projection; the AIMS is a different standard and where-do-we-stand is the gap auditor."
+    },
+    {
+      "id": "aims-goes-to-42001",
+      "prompt": "Stand up the management system for our AI systems specifically — AI risk assessments and AI impact assessments included.",
+      "expected_skill": "iso-42001-aims-architect",
+      "should_not_trigger": ["iso-27001-isms-architect"],
+      "reason": "The AIMS with 6.1.2/6.1.4 AI machinery is ISO 42001's projection, even though the clause skeleton is harmonized with 27001."
+    },
+    {
+      "id": "soc2-goes-to-mapper",
+      "prompt": "US enterprise customers keep asking for our SOC 2 report — plan what it takes.",
+      "expected_skill": "soc2-trust-criteria-mapper",
+      "should_not_trigger": ["iso-27001-isms-architect"],
+      "reason": "SOC 2 is an AICPA attestation scoped by TSC categories and Type — no ISMS, no SoA; it has its own projection skill."
+    },
+    {
+      "id": "soa-goes-to-author",
+      "prompt": "Write the Statement of Applicability from our completed risk treatment plan.",
+      "expected_skill": "statement-of-applicability-author",
+      "should_not_trigger": ["iso-27001-isms-architect"],
+      "reason": "The SoA document is authored by its own skill; the ISMS architect designs the 6.1 machinery that feeds it."
+    },
+    {
+      "id": "gaps-go-to-auditor",
+      "prompt": "Audit our current state against ISO 27001 and rank what's missing.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["iso-27001-isms-architect"],
+      "reason": "Current-state assessment with prioritized gaps is the parameterized gap audit; the architect designs the target system."
+    },
+    {
+      "id": "threats-go-to-threat-modeler",
+      "prompt": "Model the threats against our file-upload pipeline so we know what risks to register.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": ["iso-27001-isms-architect"],
+      "reason": "Technical threat enumeration is the Phase 4 skill; the ISMS consumes it as clause 6 risk-assessment input."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "compliance-control-foundation",
+  "description": "Trigger and behavior cases for the framework-agnostic common control set: map-don't-rebuild, seven domains, framework-neutral text, honest status, controlled-document handling.",
+  "cases": [
+    {
+      "id": "positive-common-control-set",
+      "type": "should_trigger",
+      "prompt": "We're going for SOC 2 and ISO 27001 next year, and ISO 42001 after that. Build us a common control set so we don't maintain three separate control lists.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces ONE framework-agnostic catalog across the seven domains (plus AI governance for 42001), not per-framework lists.",
+          "Maps existing mechanisms to shipped artifacts by name (authorization matrix, RLS audit, audit log, incident runbook, supply-chain review) instead of re-specifying them.",
+          "Gives every control an ID, objective, named owner, mechanism or MISSING, evidence hook, and implemented/partial/missing status.",
+          "Keeps framework clause/criteria citations out of the catalog, deferring them to multi-framework-crosswalk."
+        ]
+      }
+    },
+    {
+      "id": "edge-existing-partial-coverage",
+      "type": "should_trigger",
+      "prompt": "We already have solid security engineering — RLS audits, an authorization matrix, incident runbooks — but no compliance program. What does our control baseline actually look like?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories the existing artifacts first and maps them as implemented controls rather than starting from a blank framework template.",
+          "Carries known residue honestly (e.g. encryption design review, security-event alerting, access recertification) as partial/missing instead of claiming full coverage.",
+          "Marks net-new needs (risk register, access reviews, vendor assessments) as missing controls with owners to assign."
+        ]
+      }
+    },
+    {
+      "id": "negative-single-framework-isms",
+      "type": "should_not_trigger",
+      "prompt": "Design our ISO 27001 ISMS — clauses 4 through 10, internal audit program, and management review cadence.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Management-system design for one framework is iso-27001-isms-architect; the foundation only supplies the control catalog it consumes."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-invent-annex-numbers",
+      "type": "should_trigger",
+      "prompt": "Write the common control set and annotate each control with its ISO 27001 Annex A number and SOC 2 criteria reference so it's all in one file.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to embed framework clause/criteria citations in the catalog and routes reference mapping to multi-framework-crosswalk.",
+          "Explains the drift risk: edition changes would rewrite the catalog, and Annex A identifiers must be verified against the licensed standard text, not asserted from memory.",
+          "Still delivers the framework-neutral catalog itself."
+        ]
+      }
+    }
+  ]
+}

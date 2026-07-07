@@ -1,0 +1,49 @@
+{
+  "skill": "ai-lifecycle-risk-manager",
+  "description": "Trigger discrimination for the compliance cluster: the org-level voluntary RMF program vs per-feature review, the certifiable AIMS, feature threat modeling, eval execution, and the SDLC contract.",
+  "overlaps_with": ["ai-governance-risk-reviewer", "iso-42001-aims-architect", "ai-threat-modeler", "ai-evaluation-harness", "ai-sdlc-operating-model", "compliance-gap-auditor"],
+  "cases": [
+    {
+      "id": "rmf-program-wins-here",
+      "prompt": "Operationalize GOVERN, MAP, MEASURE, and MANAGE across our AI systems' lifecycle — owners, triggers, and a risk register.",
+      "expected_skill": "ai-lifecycle-risk-manager",
+      "should_not_trigger": ["ai-governance-risk-reviewer", "iso-42001-aims-architect"],
+      "reason": "Standing up the RMF functions as an org-level lifecycle program is the lifecycle manager; feature reviews feed it and the AIMS wraps it."
+    },
+    {
+      "id": "feature-review-goes-to-governance-reviewer",
+      "prompt": "Before this AI feature ships, determine its risk tier and whether it needs human-in-the-loop oversight.",
+      "expected_skill": "ai-governance-risk-reviewer",
+      "should_not_trigger": ["ai-lifecycle-risk-manager"],
+      "reason": "Per-feature tiering and oversight matching is the Phase 7 reviewer; the program aggregates such reviews as MAP intake."
+    },
+    {
+      "id": "certification-goes-to-aims",
+      "prompt": "We want to be certified for how we manage AI — build the management system an auditor can certify.",
+      "expected_skill": "iso-42001-aims-architect",
+      "should_not_trigger": ["ai-lifecycle-risk-manager"],
+      "reason": "Certification is ISO 42001's AIMS; the RMF is a voluntary method that cannot be certified against."
+    },
+    {
+      "id": "feature-threats-go-to-ai-threat-modeler",
+      "prompt": "Enumerate the injection, disclosure, and tool-abuse threats for our RAG assistant and rank them by exploit path.",
+      "expected_skill": "ai-threat-modeler",
+      "should_not_trigger": ["ai-lifecycle-risk-manager"],
+      "reason": "Feature-level AI threat enumeration is the Phase 7 modeler; the program consumes its output during MAP."
+    },
+    {
+      "id": "eval-execution-goes-to-harness",
+      "prompt": "Build and run the eval suite with safety and grounding thresholds gating our releases.",
+      "expected_skill": "ai-evaluation-harness",
+      "should_not_trigger": ["ai-lifecycle-risk-manager"],
+      "reason": "Designing/running evals is the manual-only harness; the program only wires its thresholds into MEASURE."
+    },
+    {
+      "id": "sdlc-contract-goes-to-operating-model",
+      "prompt": "Write the operating model for how humans and agents move work through stages with gates and authority.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": ["ai-lifecycle-risk-manager"],
+      "reason": "The SDLC stage/authority contract is the Phase 1.5 skill; the RMF program maps it as GOVERN machinery."
+    }
+  ]
+}

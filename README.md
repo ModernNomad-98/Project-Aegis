@@ -37,10 +37,14 @@ shipped the 4-skill **AI-SDLC governance completion** (roadmap #261/#268/#279/#2
 completing the category-08 governance layer Phase 1 started. **Phase 6** shipped the
 10-skill **cloud, DevOps, reliability & release pack**. **Phase 7** shipped the
 14-skill **AI security & LLM systems pack** (v4's 10 plus 4 OWASP LLM Top 10 gap
-additions, D6). **Phase 7.5** ships the **agentic AI security pack** (OWASP
+additions, D6). **Phase 7.5** shipped the **agentic AI security pack** (OWASP
 Agentic Top 10 for 2026, D7: 6 new skills + 3 extensions of existing skills;
-ASI08+ASI10 merged into one containment reviewer) — see
-[Skills (shipped)](#skills-shipped) below.
+ASI08+ASI10 merged into one containment reviewer). The **Compliance &
+Governance batch** (D9) ships the 9-skill **compliance pack** — ISO
+27001:2022 + ISO 42001:2023 + SOC 2 with NIST AI RMF as companion: one
+shared control foundation + framework projections + a crosswalk, mapping
+controls that largely already exist and producing auditor-grade evidence on
+top — see [Skills (shipped)](#skills-shipped) below.
 
 ## Start here (canonical reading order)
 
@@ -77,7 +81,8 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | 5 | QA, E2E, manual QA & evidence (16 = 13 canonical + 3 pulled forward from the QA backlog: roadmap #184/#185/#204) | P0/P1 | ✅ merged |
 | 6 | Cloud, DevOps, reliability & release (10) | P1 | ✅ merged |
 | 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
-| 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ this branch |
+| 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ merged |
+| D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ this branch |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -248,6 +253,29 @@ loops, ephemeral sandboxes, NL-to-execution paths);
 | `inter-agent-comms-reviewer` | (ASI07) A2A/MCP message security: per-edge mutual authn, end-to-end integrity, replay bounds, confidentiality, topology allowlists, spoofed results; authenticated ≠ trusted — peer messages never re-task or assert authority. | auto + manual |
 | `agent-containment-reviewer` | (ASI08+ASI10 merged) Cascade half: blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm limits. Rogue half: drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY (credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. | auto + manual |
 | `human-agent-trust-reviewer` | (ASI09) Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary`. | auto + manual |
+
+Compliance & Governance batch (D9) — ISO 27001:2022 + ISO 42001:2023 + SOC 2,
+with NIST AI RMF 1.0 as voluntary companion. Architecture: **one shared
+control foundation + framework projections + a crosswalk** — not three
+parallel skill sets. The batch **maps controls that largely already exist**
+(Phases 3/4 technical controls, the Phase 5 evidence pack, Phase 1.5 +
+Phase 7 AI governance) and produces auditor-grade evidence on top. Every
+skill encodes the D9 precision flags (SOC 2 = AICPA **attestation**, never
+certification; Annex A counts secondary-sourced/conflicting — verify before
+citing; ~60–80% overlap = industry estimate) in a Compliance Precision
+Rules section:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `compliance-control-foundation` | One framework-agnostic control catalog (access control, crypto, change mgmt, logging/monitoring, incident response, vendor mgmt, risk assessment + AI governance): each control written once with objective, owner, mechanism mapped by name to shipped skills, evidence hook, honest status. | auto + manual |
+| `compliance-evidence-collector` | Operating-effectiveness evidence OVER TIME (SOC 2 Type 2's core demand, reused for ISO surveillance): per-control cadence matched to operating frequency, populations for sampling, retention/integrity, window-coverage matrix with holes; never mutates a live evidence store. | auto + manual |
+| `statement-of-applicability-author` | The ISO-mandatory SoA serving both 27001 and 42001: per-control include/exclude justified by 6.1.3 risk-treatment traces, controlled-document diffs, licensed-Annex-A-only rows — never reconstructed from memory. | auto + manual |
+| `iso-27001-isms-architect` | ISMS clauses 4–10 (incl. Amd 1:2024 climate-relevance check), four-theme Annex A selection via the foundation; headline net-new = risk register, internal audit program, management review cadence; readiness plan, never a certification claim. | auto + manual |
+| `iso-42001-aims-architect` | AIMS clauses 4–10 + AI risk assessment (6.1.2/8.2), AI risk treatment (6.1.3/8.3), AI system impact assessment (6.1.4/8.4 — individuals/societies); maps the Phase 1.5 governance pack as operational mechanisms; Annex A counts never stated (sources conflict). | auto + manual |
+| `soc2-trust-criteria-mapper` | SOC 2 scoping as ATTESTATION (never certification): system boundary, commitment-driven TSC category selection (Security baseline + optional four), Type 1 vs Type 2 with window feasibility, subservice carve-outs; Type definitions flagged CPA-firm-sourced. | auto + manual |
+| `multi-framework-crosswalk` | One control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function): edition-pinned, text-in-hand cells only, FULL/PARTIAL(residue) honesty, explicit joint sets — the do-the-work-once engine. | auto + manual |
+| `compliance-gap-auditor` | ONE parameterized gap audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order; readiness assessment, never an audit opinion. | auto + manual |
+| `ai-lifecycle-risk-manager` | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized across the AI lifecycle with owners, triggers, and a risk register; voluntary and under revision — never a certification target; companion to `iso-42001-aims-architect`. | auto + manual |
 
 ## Authoring a new skill
 

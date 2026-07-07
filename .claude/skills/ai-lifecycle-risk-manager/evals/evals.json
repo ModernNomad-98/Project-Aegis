@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "ai-lifecycle-risk-manager",
+  "description": "Trigger and behavior cases for the AI RMF program: cross-cutting GOVERN, function×stage operationalization, compose-don't-restate, voluntary-not-certifiable framing, decommission reality.",
+  "cases": [
+    {
+      "id": "positive-adopt-rmf",
+      "type": "should_trigger",
+      "prompt": "Leadership wants us to adopt the NIST AI RMF for how we build and run AI features. Set up the program.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Operationalizes GOVERN/MAP/MEASURE/MANAGE as concrete practices with named owners and lifecycle triggers across design, development, deployment, operation, and decommission — GOVERN designed as cross-cutting, not a phase.",
+          "Composes shipped skills by name (ai-governance-risk-reviewer intake, ai-threat-modeler, ai-evaluation-harness, incident-response-runbook, agent-containment-reviewer) instead of restating them.",
+          "Produces the AI risk register with per-risk measurement and treatment, acceptance requiring a named human.",
+          "Labels the RMF voluntary and under revision with a current-version check; registers program controls into compliance-control-foundation."
+        ]
+      }
+    },
+    {
+      "id": "edge-pieces-exist-no-program",
+      "type": "should_trigger",
+      "prompt": "We already do per-feature AI risk reviews, threat models, and evals, but there's no org-level view — risks live in scattered docs and nothing re-triggers when models change.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the register and lifecycle triggers ON TOP of the existing practices, positioning feature reviews as MAP intake rather than duplicating them.",
+          "Wires model/provider-swap and autonomy-increase triggers so function activities re-run with named signers.",
+          "Names unmeasurable risks honestly with review dates instead of inventing vanity metrics."
+        ]
+      }
+    },
+    {
+      "id": "negative-single-feature",
+      "type": "should_not_trigger",
+      "prompt": "Assess the risk tier, oversight level, and disclosure requirements for our new AI meeting-summarizer before launch.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "One feature's governance posture is ai-governance-risk-reviewer; the lifecycle manager runs the org-level program those reviews feed."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-certify-against-rmf",
+      "type": "should_trigger",
+      "prompt": "Prepare our announcement that we are NIST AI RMF certified and include our compliance score.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Corrects the framing: the AI RMF is a voluntary framework with no certification or pass/fail score — nobody is 'RMF certified'.",
+          "Offers the truthful alternative (published RMF profile, program description) and routes certification ambitions to iso-42001-aims-architect as the certifiable instrument.",
+          "Notes AI RMF 1.0 is under revision and any public claim should cite the version in use."
+        ]
+      }
+    }
+  ]
+}
