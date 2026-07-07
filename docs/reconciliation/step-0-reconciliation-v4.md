@@ -248,6 +248,100 @@ target (52 skills) is unchanged.
   systems inherit every Phase 7 LLM-side risk; Phase 7.5 adds the autonomy, tool, identity,
   memory, and multi-agent risks layered on top.
 
+### Compliance & Governance batch (ISO 27001:2022 + ISO 42001:2023 + SOC 2 Type 2)
+
+**BANKED batch (D9) — targeted AFTER Phase 7; nothing in it is built now.** This is
+certification/attestation readiness for an AI SaaS vendor selling into US enterprise and EU
+markets: SOC 2 is the de-facto US enterprise procurement ask, ISO 27001 is pulled through EU
+supply chains by NIS2 obligations on customers, and ISO 42001 is emerging in EU public
+procurement for AI vendors (vendor-market rationale, not a standards claim). **Distinct from
+Phase 1.5** (operational agent governance — how agents behave inside the SDLC) **and from the
+OWASP maps (D6/D7/D8)** (technical attack-surface coverage): this batch maps controls that
+largely already exist and produces auditor-grade evidence on top of them.
+
+**The frameworks, from fetched sources (fetched 2026-07-06; full source list + per-item
+verification status in D9):**
+
+- **ISO/IEC 27001:2022** — *Information security, cybersecurity and privacy protection —
+  Information security management systems — Requirements*, third edition, 2022-10. A
+  **certifiable ISMS** standard: management-system clauses 4–10 (Context of the organization,
+  Leadership, Planning, Support, Operation, Performance evaluation, Improvement — verified
+  against the standard's own TOC) plus **Annex A (normative) "Information security controls
+  reference"**, applied through the 6.1.3 risk-treatment process (Statement of Applicability).
+  Annex A groups controls into four themes — **A.5 Organizational, A.6 People, A.7 Physical,
+  A.8 Technological** — totalling **93 controls (37/8/14/34)**; *counts are from secondary
+  controls references, NOT verified against the paywalled Annex A table itself — verify before
+  citing.* **ISO/IEC 27001:2022/Amd 1:2024 "Climate action changes"** amends clauses 4.1/4.2
+  (the organization must determine whether climate change is relevant; interested parties can
+  have climate-related requirements); *amendment existence and title verified from the ISO
+  catalog entry; the exact inserted sentences are from secondary summaries.*
+- **ISO/IEC 42001:2023** — *Information technology — Artificial intelligence — Management
+  system*, first edition, 2023-12. A **certifiable AIMS** standard with the same harmonized
+  clauses 4–10 (verified against the standard's TOC), adding AI-specific machinery: AI risk
+  assessment (6.1.2/8.2), AI risk treatment (6.1.3/8.3), and **AI system impact assessment
+  (6.1.4/8.4)** — plus **Annex A (normative) "Reference control objectives and controls"**,
+  Annex B (normative, implementation guidance for AI controls), Annex C/D (informative).
+  *Annex A control counts are deliberately NOT stated here: secondary sources conflict ("38
+  controls / 9 objectives" vs "42 objectives"); verify against the standard text before using
+  any number.*
+- **SOC 2** — an **AICPA attestation (a CPA's examination), NOT a certification** — 27001/42001
+  certify; SOC 2 attests. It reports on controls at a service organization under the **Trust
+  Services Criteria** (2017 TSC with revised Points of Focus 2022, issued by the AICPA
+  Assurance Services Executive Committee) across five categories: **Security, Availability,
+  Processing Integrity, Confidentiality, Privacy**. **Type 1** = fairness of the system
+  description + suitability of control **design as of a specified date**; **Type 2** = the same
+  **plus operating effectiveness over a period**. *The five categories, ASEC authorship, and
+  "examination" language are verified on AICPA pages; the Type 1/Type 2 definitions and
+  "Security is the required common-criteria baseline, the other four are scoped per engagement"
+  come from CPA-firm sources — AICPA's fetchable pages do not define them; the defining text is
+  the paywalled AICPA SOC 2 guide.*
+- **Companion, not a certification target: NIST AI RMF 1.0** (released 2023-01-26; voluntary;
+  under revision per NIST). Core = **four functions: GOVERN, MAP, MEASURE, MANAGE**, with
+  GOVERN "a cross-cutting function that is infused throughout AI risk management" (verified on
+  NIST AIRC). Generative AI Profile NIST-AI-600-1 (2024-07-26). Pairs with 42001 as the risk
+  method underneath the management system.
+
+**Architecture (D9): ONE shared control foundation + framework projections + a crosswalk — NOT
+three parallel skill sets.** Published crosswalks put cross-framework control overlap at
+roughly **60–80%** (industry estimate, not a standard-derived figure): the same access-control,
+crypto, change-management, logging, incident-response, vendor-management, and risk-assessment
+controls satisfy 27001 Annex A, SOC 2 TSC, and much of 42001's non-AI-specific surface.
+Consequence: **build TSC criteria and Annex A mapping together, not sequentially** — the
+foundation is written once and projected per framework. The 9 candidates below are already the
+merged set: evidence collection is ONE skill across all three frameworks (not per-framework),
+gap auditing is ONE parameterized skill, and the SoA author serves both ISO standards.
+
+| Candidate skill *(all: candidate — not built)* | Layer | Purpose |
+|---|---|---|
+| `compliance-control-foundation` | Shared foundation | One framework-agnostic common control set — access control, cryptography, change management, logging/monitoring, incident response, vendor management, risk assessment — written once, consumed by the projections |
+| `compliance-evidence-collector` | Shared foundation | Operating-effectiveness evidence **over time** (cadence, retention, audit-window coverage) — SOC 2 Type 2's core demand, reused for ISO surveillance audits |
+| `statement-of-applicability-author` | Shared foundation | The ISO-mandatory SoA — per-control inclusion/exclusion justification tied to the 6.1.3 risk-treatment process; the largest net-new ISO artifact SOC 2 lacks |
+| `iso-27001-isms-architect` | Framework projection | ISMS per clauses 4–10; four-theme Annex A control selection; internal audit + management review cadence; Amd 1:2024 climate-context check |
+| `iso-42001-aims-architect` | Framework projection | AIMS per clauses 4–10; AI risk assessment / treatment and AI system impact assessment; Annex A control-objective selection |
+| `soc2-trust-criteria-mapper` | Framework projection | TSC scoping — Security baseline plus which optional categories to attest; Type 1 vs Type 2 decision and audit-window planning |
+| `multi-framework-crosswalk` | Cross-cutting | One control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function) — the do-the-work-once engine between foundation and projections |
+| `compliance-gap-auditor` | Cross-cutting | Current state vs chosen framework(s) → prioritized gap list with remediation order and evidence gaps |
+| `ai-lifecycle-risk-manager` | Cross-cutting | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE across the AI lifecycle; pairs with `iso-42001-aims-architect` |
+
+**Already covered — the batch MAPS, it does not rebuild:** much of 27001's A.8 Technological
+theme and SOC 2's Security category is already implemented by shipped skills — Phase 3
+`tenant-isolation-reviewer`, `authorization-matrix-designer`, `audit-log-architect` (access
+control, authz, logging substrate); Phase 4 `rls-policy-auditor`,
+`multi-tenant-security-tester`, `secrets-identity-hardener` (access control and credential
+custody), `secure-migration-reviewer` (change management), `supply-chain-security-reviewer`
+(vendor/supply chain), `threat-modeler` (risk-assessment input), `static-analysis-reviewer` +
+`security-pr-reviewer` (secure development). Phase 5's evidence pack is the raw material
+`compliance-evidence-collector` formalizes into audit-window evidence; Phase 7's planned
+`ai-governance-risk-reviewer` and the shipped Phase 1.5 governance pack are what a 42001 / AI
+RMF audit points at for AI-specific operational control. The compliance skills produce the
+mapping and auditor-consumable evidence on top of these; net-new implementation is mostly
+limited to ISO management-system artifacts (SoA, internal audit, management review) and
+evidence plumbing.
+
+**Status: banked only (D9).** No skills built now, no phases renumbered, validator skill-count
+targets unchanged; exact sequencing relative to Phase 7.5 and Phase 8 batches is left open.
+This banks scope the same way the D6/D7 coverage maps did.
+
 ### Phase 8 — Backlog expansion (NEW in v4, ported from execution plan §8)
 Convert the remaining 300-skill roadmap into executable skills **in validated batches** under
 the batch rules in §4 below. Run only after Phases 0–7.5 validate cleanly.
@@ -349,6 +443,62 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   in §3 Phase 4. This is a gap audit of shipped work: no skills created or changed, no phases
   renumbered, validator target unchanged. Third distinct framework: separate from the OWASP
   Top 10 for LLM Applications (D6) and from the OWASP Agentic Top 10 for 2026 (D7, Phase 7.5).
+- **D9 (2026-07-06) — A Compliance & Governance batch (ISO 27001:2022 + ISO 42001:2023 + SOC 2
+  Type 2, with NIST AI RMF 1.0 as companion) is banked as a future batch targeted AFTER
+  Phase 7.** Subsection in §3, after Phase 7.5. Rationale: as an AI SaaS vendor selling into US
+  enterprise and EU markets, these converge into procurement requirements (SOC 2 in US
+  enterprise sales; 27001 via EU NIS2 supply-chain demand on customers; 42001 emerging in EU
+  public procurement) — vendor-market rationale, not a standards claim. Architecture: **one
+  shared control foundation + framework-specific projections + a crosswalk** (9 candidate
+  skills, already merged — one evidence collector, one gap auditor, one SoA author across
+  frameworks), NOT three parallel skill sets; published crosswalks put cross-framework control
+  overlap at ~60–80% (industry estimate, not a standard-derived number). The batch is
+  substantially a **mapping + evidence layer** over controls already shipped in Phases 3/4
+  (and the Phase 5 evidence pack) — it does not rebuild them. Precision: SOC 2 is an AICPA
+  **attestation** (CPA examination); 27001/42001 are **certifiable** management-system
+  standards. Distinct from Phase 1.5 (operational agent governance) and the OWASP maps
+  (D6/D7/D8). No skills built now; no phases renumbered; validator skill-count targets
+  unchanged. Sources fetched 2026-07-06 (<https://www.iso.org/standard/27001> and
+  <https://www.iso.org/standard/42001> returned HTTP 403 to automated fetch, so standard
+  structure was verified from official-distributor preview PDFs of the standards themselves):
+  - **ISO/IEC 27001:2022 preview PDF** (title page, TOC, Foreword/Introduction):
+    <https://cdn.standards.iteh.ai/samples/82875/726bcf58250e43d9a666b4d929c8fbdb/ISO-IEC-27001-2022.pdf>
+    — **verified:** third edition 2022-10; ISMS requirements; clauses 4–10; "Annex A
+    (normative) Information security controls reference"; third edition replaces 27001:2013.
+  - **ISO/IEC 42001:2023 preview PDF**:
+    <https://cdn.standards.iteh.ai/samples/81230/4c1911ebc9a641fcb6ee21aa09c28ad3/ISO-IEC-42001-2023.pdf>
+    — **verified:** first edition 2023-12; AIMS requirements ("requirements for establishing,
+    implementing, maintaining and continually improving an AI management system"); clauses
+    4–10 incl. 6.1.2–6.1.4 (AI risk assessment / AI risk treatment / AI system impact
+    assessment); "Annex A (normative) Reference control objectives and controls"; Annex B
+    (normative) / C, D (informative); drafted by ISO/IEC JTC 1/SC 42.
+  - **Amd 1:2024:** ISO catalog entry "ISO/IEC 27001:2022/Amd 1:2024 — … Amendment 1: Climate
+    action changes" <https://www.iso.org/standard/88435.html> — **title/existence verified via
+    search listing (page itself 403); the exact 4.1/4.2 inserted text is from secondary
+    summaries (CompliancePoint, High Table, Iseo Blue) — flagged, not fetched from ISO.**
+  - **27001 Annex A counts** (93 = A.5×37 + A.6×8 + A.7×14 + A.8×34):
+    <https://www.isms.online/iso-27001/annex-a-2022/> plus corroborating vendor references —
+    **flagged: secondary sources; verify against the Annex A table before citing.**
+  - **42001 Annex A counts:** secondary sources conflict (38 controls / 9 objectives vs 42
+    objectives) — **deliberately not stated; unverified.**
+  - **SOC 2 / TSC (AICPA):**
+    <https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services>,
+    <https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022>,
+    <https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2>
+    — **verified:** five categories (Security, Availability, Processing Integrity,
+    Confidentiality, Privacy); TSC issued by the Assurance Services Executive Committee (2017
+    TSC with revised Points of Focus 2022); use in "attestation or consulting engagements";
+    SOC 2 titled "Reporting on an Examination of Controls at a Service Organization…".
+    **Flagged:** Type 1 vs Type 2 definitions and "Security = required common-criteria
+    baseline" are NOT on AICPA's fetchable pages — corroborated via CPA-firm sources
+    (Schellman, Linford & Co); the defining text is the paywalled AICPA SOC 2 guide.
+  - **NIST AI RMF:** <https://www.nist.gov/itl/ai-risk-management-framework> and
+    <https://airc.nist.gov/airmf-resources/airmf/5-sec-core/> — **verified:** AI RMF 1.0
+    released 2023-01-26, voluntary; "The Core is composed of four functions: govern, map,
+    measure, and manage"; govern is cross-cutting; Generative AI Profile NIST-AI-600-1
+    (2024-07-26); NIST notes AI RMF 1.0 is being revised.
+  - The **~60–80% overlap** figure is an industry crosswalk estimate — **not a
+    standard-derived number.**
 
 ---
 
