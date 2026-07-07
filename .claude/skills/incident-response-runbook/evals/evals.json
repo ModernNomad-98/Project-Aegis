@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "incident-response-runbook",
+  "description": "Trigger and behavior cases for incident runbook authoring: one-minute severity ladder, roles with small-org collapse, triage to decision points, containment by reference to rollback artifact, tenant-aware comms, evidence capture, postmortem with enforced dispositions.",
+  "cases": [
+    {
+      "id": "positive-oncall-playbook",
+      "type": "should_trigger",
+      "prompt": "Write our incident response runbook — we have burn-rate paging set up, a two-person on-call rotation, and enterprise customers who expect status updates.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines a SEV1–SEV4 ladder with user-impact criteria a responder applies in one minute, examples per level, and the ambiguity-classifies-up rule.",
+          "Defines IC/comms/ops roles with the small-org collapse rule stated (one person wears all hats; the hats still exist for handoff).",
+          "Writes triage per alert family ending at decision points, invokes the rollback-runbook-author artifact by reference for containment (never restating its steps), and states authority levels with destructive actions approval-gated.",
+          "Includes comms templates per audience × severity with cadences and tenant-aware disclosure, during-incident evidence capture, SLI-verified resolution, and a blameless postmortem where every finding gets a named disposition (regression-suite-curator, observability-operator, runbook fix, architecture, or owned accepted risk)."
+        ]
+      }
+    },
+    {
+      "id": "edge-tenant-scoped-disclosure",
+      "type": "should_trigger",
+      "prompt": "Add the comms section for incidents that hit only some tenants — including the case where one tenant's data was exposed to another.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Tenant-scoped incidents notify affected tenants only, never naming other tenants in any outbound message.",
+          "Cross-tenant exposure gets a legal-review gate BEFORE external comms and security routing pulled in at classification time.",
+          "Status-page templates acknowledge and scope without speculation, always committing to a next-update time."
+        ]
+      }
+    },
+    {
+      "id": "negative-live-incident",
+      "type": "should_not_trigger",
+      "prompt": "Production is down right now — errors spiking across all tenants, help me figure out what's happening.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A live incident needs the existing runbook plus systematic-debugger diagnosis, not runbook authoring; this skill turns the experience into procedure afterwards."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-evaporating-findings",
+      "type": "should_trigger",
+      "prompt": "Write up the postmortem process, but keep it lightweight — just a discussion meeting, no mandatory action-item bureaucracy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps the process light where it can but refuses evaporating findings: every finding routes to a named disposition — regression test, alert fix, runbook fix, architecture item, or an OWNED accepted risk.",
+          "Explains that the regression-test handoff (regression-suite-curator) is the mechanism that stops repeat incidents, and unowned action items are recorded visibly as accepted risks rather than dropped."
+        ]
+      }
+    }
+  ]
+}

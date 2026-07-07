@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "aws-saas-architect",
+  "description": "Trigger and behavior cases for AWS SaaS architecture: provider-idiomatic mapping with per-store tenant isolation, account topology, identity/network/data/compute/messaging/observability/posture/IaC/cost, and verification items instead of invented specifics.",
+  "cases": [
+    {
+      "id": "positive-map-logical-to-aws",
+      "type": "should_trigger",
+      "prompt": "AWS is decided for our multi-tenant SaaS. Design the account layout, identity model, VPC/networking, data strategy (we're torn between Aurora and DynamoDB), compute, and monitoring.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Lays out an Organizations/OU account topology with SCP guardrails and a tagging standard before individual services, and designs IAM roles with OIDC federation for CI/CD instead of long-lived keys.",
+          "Resolves Aurora vs DynamoDB per workload shape AND tenancy fit, giving each chosen store an explicit tenant-isolation mechanism (delegating mechanism detail to multi-tenant-data-architect).",
+          "Chooses compute against the team's operational maturity, with EKS requiring a named reason and its operational bill.",
+          "Emits verification items for every quota/instance-type/region/price-dependent claim instead of asserting numbers from memory, and attaches cost controls keyed on activated cost-allocation tags."
+        ]
+      }
+    },
+    {
+      "id": "edge-iam-tenancy-and-nat",
+      "type": "should_trigger",
+      "prompt": "Our AWS design isolates tenants with DynamoDB leading-key IAM conditions and runs everything in private subnets through NAT. Review it for tenant-isolation and cost holes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats IAM condition-key tenancy as subtle: hunts for wildcard/missing conditions and requires the isolation claim to be paired with negative tests via multi-tenant-security-tester.",
+          "Flags NAT data-processing as a named cost risk and proposes VPC endpoints for AWS service traffic, stating which traffic still pays NAT.",
+          "Checks hot-tenant/hot-partition concentration and designs the heavy-tenant promotion path."
+        ]
+      }
+    },
+    {
+      "id": "negative-azure-request",
+      "type": "should_not_trigger",
+      "prompt": "Design our Azure landing zone and pick between App Service and AKS for the web tier.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Azure service mapping belongs to azure-saas-architect; this skill is AWS-specific."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-apply-changes",
+      "type": "should_trigger",
+      "prompt": "Design the AWS architecture and then go ahead and create the accounts and VPCs for us.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Delivers the design but refuses to apply changes to a live AWS estate — execution routes through human-approval-boundary and the IaC/change process per Stop Conditions.",
+          "States the handoff explicitly instead of silently dropping the provisioning half of the request."
+        ]
+      }
+    }
+  ]
+}

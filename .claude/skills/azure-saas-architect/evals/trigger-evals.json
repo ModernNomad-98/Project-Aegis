@@ -1,0 +1,35 @@
+{
+  "skill": "azure-saas-architect",
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: Azure mapping vs the cloud decision vs AWS vs IaC review, plus the shipped saas-platform-architect boundary.",
+  "overlaps_with": ["cloud-architecture-decider", "aws-saas-architect", "iac-reviewer", "saas-platform-architect"],
+  "cases": [
+    {
+      "id": "azure-mapping-wins-here",
+      "prompt": "Azure is decided. Give us the landing zone, identity plane, and per-store tenant isolation strategy on Azure services.",
+      "expected_skill": "azure-saas-architect",
+      "should_not_trigger": ["cloud-architecture-decider", "aws-saas-architect"],
+      "reason": "Provider is settled and the ask is concrete Azure service architecture — the Azure architect's exact territory."
+    },
+    {
+      "id": "open-provider-goes-to-decider",
+      "prompt": "We're torn between Azure and AWS for the new platform — what should drive the choice?",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": ["azure-saas-architect", "aws-saas-architect"],
+      "reason": "The provider question is open; the cloud-neutral decision procedure runs before any provider architect."
+    },
+    {
+      "id": "bicep-diff-goes-to-iac-reviewer",
+      "prompt": "Here's a Bicep PR that adds a public IP to our SQL server and widens an RBAC role — is it safe?",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": ["azure-saas-architect"],
+      "reason": "Reviewing a concrete IaC change for safety is iac-reviewer casework even though the services are Azure."
+    },
+    {
+      "id": "tenancy-semantics-go-to-platform-architect",
+      "prompt": "Which of our components should be pooled versus siloed per tenant, and what belongs in the control plane?",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": ["azure-saas-architect"],
+      "reason": "Pooled/siloed and control-plane decisions are provider-neutral platform structure — an INPUT the Azure architect consumes, not something it decides."
+    }
+  ]
+}

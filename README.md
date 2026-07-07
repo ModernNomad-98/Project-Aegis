@@ -17,8 +17,9 @@ engineering pack**. **Phase 3** shipped the 9-skill **SaaS & tenant isolation pa
 **Phase 4** shipped the 9-skill **security, RLS & supply-chain pack**. **Phase 5**
 shipped the 16-skill **QA, E2E, manual QA & evidence pack** (the 13 canonical Phase 5
 skills plus 3 pulled forward from the QA backlog: roadmap #184/#185/#204). **Phase 1.5**
-ships the 4-skill **AI-SDLC governance completion** (roadmap #261/#268/#279/#280),
-completing the category-08 governance layer Phase 1 started — see
+shipped the 4-skill **AI-SDLC governance completion** (roadmap #261/#268/#279/#280),
+completing the category-08 governance layer Phase 1 started. **Phase 6** ships the
+10-skill **cloud, DevOps, reliability & release pack** — see
 [Skills (shipped)](#skills-shipped) below.
 
 ## Start here (canonical reading order)
@@ -49,13 +50,13 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 |---:|---|---|---|
 | 0 | Foundation: standard, templates, eval convention, validator, catalog, README, 7 subagents, `_template` | P0 | ✅ merged |
 | 1 | AI engineering **operating-discipline** pack (8 skills) | P0 | ✅ merged |
-| 1.5 | AI-SDLC **governance completion** (4 skills: roadmap #261/#268/#279/#280) | P0/P1 | ✅ this branch |
+| 1.5 | AI-SDLC **governance completion** (4 skills: roadmap #261/#268/#279/#280) | P0/P1 | ✅ merged |
 | 2 | Core architecture & engineering (10) | P0 | ✅ merged |
 | 3 | SaaS & tenant isolation (9) | P0/P1 | ✅ merged |
 | 4 | Security, RLS & supply chain (9) | P0/P1 | ✅ merged |
 | 5 | QA, E2E, manual QA & evidence (16 = 13 canonical + 3 pulled forward from the QA backlog: roadmap #184/#185/#204) | P0/P1 | ✅ merged |
-| 6 | Cloud, DevOps, reliability & release (10) | P1 | backlog |
-| 7 | AI security & LLM systems (10) | P1 | backlog |
+| 6 | Cloud, DevOps, reliability & release (10) | P1 | ✅ this branch |
+| 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | backlog |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -163,6 +164,22 @@ QA backlog, roadmap #184/#185/#204):
 | `integration-test-designer` | (pulled forward, #184) The layer between unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams, persisted-state assertions, no browser. | auto + manual |
 | `api-contract-test-designer` | (pulled forward, #185) Contract verification: provider/consumer roles, schema + error-envelope validation, additive-vs-breaking CI gate, version coverage; design stays with `api-event-architect`. | auto + manual |
 | `accessibility-test-harness` | (pulled forward, #204) WCAG-pinned a11y harness: automated scans (baseline+ratchet) AND manual keyboard/focus/contrast/screen-reader checklists; honest about automation limits. | auto + manual |
+
+Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
+merged into `rollback-runbook-author` per reconciliation §3):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `cloud-architecture-decider` | Cloud-neutral platform decision: nine-axis requirements record, provider-neutral logical architecture, isolation/compliance hard filters before scoring, managed-vs-self-hosted with the operational bill, exit costs and reopen triggers. | auto + manual |
+| `azure-saas-architect` | Maps a decided logical architecture to provider-idiomatic Azure: Entra ID/managed identities/OIDC, VNets + Private Link, per-store tenant isolation, compute by team maturity, Azure Policy/Defender posture, Bicep/Terraform, tag-keyed cost controls; SKU/limit/price claims become verification items. | auto + manual |
+| `aws-saas-architect` | Maps a decided logical architecture to provider-idiomatic AWS: Organizations/SCPs, IAM roles + OIDC, VPC/PrivateLink, per-store tenant isolation, compute by team maturity, Security Hub/GuardDuty posture, Terraform/CDK, cost-allocation tags; quota/type/price claims become verification items. | auto + manual |
+| `iac-reviewer` | Review-only IaC audit with blast radius first: destructive replaces, public exposure, IAM width deltas, secrets in code and state, tenant-isolation impact, drift, pinning, cost flags; never applies or runs plan against live backends. | auto + manual |
+| `ci-pipeline-architect` | Pipeline stage graph with blocking semantics and a latency budget, CI secret governance (OIDC over stored keys, fork-PR posture), artifact provenance, promotion gates with named humans, branch-protection alignment; composes qa-automation-architect tiers. | **manual only** |
+| `release-readiness-reviewer` | Evidence-based ship/no-ship gate: every dimension cites a verifiable artifact or is MISSING; CI evidence pinned to the release SHA; unknown = No-Go with the evidence that flips it. (Skill = procedure; same-named subagent composes it.) | auto + manual |
+| `rollback-runbook-author` | Rollback strategy + stranger-executable runbook in one artifact: decision criteria with time-box, per-layer primitives in order, bad-window data repair, rehearsal log and staleness triggers; authors only, never executes. | auto + manual |
+| `observability-operator` | Hands-on observability: structured redacted instrumentation, truthful health checks, alerts with severity/owner/runbook-link/justified threshold, query-verified claims, silences only with owner+expiry. | **manual only** |
+| `slo-reliability-architect` | Journey-derived SLOs: symptom-based SLIs with measurement points, error budgets in user units, burn-rate paging with cause-alert demotion, budget policy with consequences, per-tenant reliability views. | auto + manual |
+| `incident-response-runbook` | Incident machinery: one-minute severity ladder, IC/comms/ops roles, triage to decision points, containment invoking the rollback artifact by reference, tenant-aware comms, blameless postmortem where every finding lands as a test/alert/fix or owned risk. | auto + manual |
 
 ## Authoring a new skill
 

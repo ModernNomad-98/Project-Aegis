@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "cloud-architecture-decider",
+  "description": "Trigger and behavior cases for the cloud-neutral platform decision: requirements record, logical architecture before products, hard filters from isolation/compliance, scored options, managed-vs-self-hosted, exit costs.",
+  "cases": [
+    {
+      "id": "positive-greenfield-cloud-choice",
+      "type": "should_trigger",
+      "prompt": "We're building a B2B SaaS from scratch — should we go with Azure or AWS, and should we run Kubernetes or stick to PaaS?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the nine-axis requirements-and-constraints record first, marking each entry verified (with source) or assumed, before naming any provider service.",
+          "Shapes a provider-neutral logical architecture in capability language with zero product names.",
+          "Derives hard filters from tenant isolation and compliance before scoring, and scores operational maturity against what the team has actually run in production.",
+          "Answers managed-vs-self-hosted (the Kubernetes question) per capability with a named reason and the accepted operational bill, and hands the decision record to adr-writer and service mapping to azure-saas-architect or aws-saas-architect."
+        ]
+      }
+    },
+    {
+      "id": "edge-committed-spend-conflict",
+      "type": "should_trigger",
+      "prompt": "Our tenancy design needs database-per-tenant for enterprise customers, but we have $200k of committed spend left on a provider whose per-database pricing makes that brutal. What's the right cloud posture?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the tenancy model's per-database economics as a hard filter or explicit scoring axis, not a footnote, using saas-platform-architect's isolation decisions as input.",
+          "Surfaces the committed-spend contract in the cost axis explicitly (with expiry) instead of letting it operate invisibly.",
+          "Presents honest options (e.g., mixed posture, renegotiation, schema-per-tenant compromise) with exit costs and reopen triggers rather than manufacturing a clean winner — and stops for the human if scores land within noise."
+        ]
+      }
+    },
+    {
+      "id": "negative-map-decided-provider",
+      "type": "should_not_trigger",
+      "prompt": "We've already committed to Azure. Design our identity, networking, and data architecture on it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Provider already decided — mapping the logical architecture to concrete Azure services is azure-saas-architect, not the decider."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-brochure-first",
+      "type": "should_trigger",
+      "prompt": "Pick a cloud for us — just tell me the best provider and list the services we'd use.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to name provider services before the requirements record and logical architecture exist — decision-before-services is the core discipline.",
+          "If compliance, residency, or availability cannot be verified from any source, halts per Stop Conditions instead of guessing.",
+          "Delivers the decision with tradeoffs, lock-in, and exit costs; the service list is handed off to the provider architect skill, not improvised here."
+        ]
+      }
+    }
+  ]
+}

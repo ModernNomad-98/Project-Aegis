@@ -1,0 +1,42 @@
+{
+  "skill": "observability-operator",
+  "description": "Trigger discrimination for the Phase 6 reliability cluster: hands-on observability operation vs SLO design vs incident procedures, and against the shipped audit-log-architect and systematic-debugger.",
+  "overlaps_with": ["slo-reliability-architect", "incident-response-runbook", "audit-log-architect", "systematic-debugger"],
+  "cases": [
+    {
+      "id": "hands-on-wiring-wins-here",
+      "prompt": "Add tracing across the payment path, fix the readiness probe that always returns 200, and wire the new latency dashboard with its alert.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["slo-reliability-architect", "systematic-debugger"],
+      "reason": "Instrumenting, fixing health checks, and wiring dashboards/alerts is the operator's hands-on territory — implementation, not reliability design or live diagnosis."
+    },
+    {
+      "id": "what-pages-goes-to-slo-architect",
+      "prompt": "Derive error budgets for our three core user journeys and define which burn rates should page.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": ["observability-operator"],
+      "reason": "Error budgets and paging policy are the reliability DESIGN; the operator implements the resulting alert spec."
+    },
+    {
+      "id": "audit-trail-goes-to-audit-log-architect",
+      "prompt": "We need tamper-evident, tenant-scoped logging of every admin action and data export for compliance.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": ["observability-operator"],
+      "reason": "Audit events carry integrity/retention/access semantics telemetry does not — audit-log-architect designs that trail; the operator keeps telemetry and audit separate."
+    },
+    {
+      "id": "live-failure-goes-to-systematic-debugger",
+      "prompt": "The export service started failing intermittently an hour ago — figure out why.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": ["observability-operator"],
+      "reason": "Diagnosing an active failure is the debugger's reproduce→isolate casework; the operator builds the visibility that diagnosis uses."
+    },
+    {
+      "id": "incident-procedure-goes-to-incident-runbook",
+      "prompt": "Document what on-call should do when the paging alert fires — triage, escalation, comms.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": ["observability-operator"],
+      "reason": "The human procedure behind the page is the incident runbook; the operator wires the alert and links to that runbook."
+    }
+  ]
+}

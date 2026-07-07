@@ -10,9 +10,10 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > decision D4), Phase 1.5 (the 4-skill AI-SDLC governance completion, roadmap
 > #261/#268/#279/#280), Phase 2 (the 10-skill core architecture & engineering pack),
 > Phase 3 (the 9-skill SaaS & tenant isolation pack), Phase 4 (the 9-skill
-> security, RLS & supply-chain pack), and Phase 5 (the 16-skill QA, E2E, manual QA
+> security, RLS & supply-chain pack), Phase 5 (the 16-skill QA, E2E, manual QA
 > & evidence pack — the 13 canonical skills plus 3 pulled forward from the QA
-> backlog, roadmap #184/#185/#204) are implemented. `_template` remains a
+> backlog, roadmap #184/#185/#204), and Phase 6 (the 10-skill cloud, DevOps,
+> reliability & release pack) are implemented. `_template` remains a
 > reference template ignored by the validator. Everything under "Backlog" is
 > planned, not built.
 
@@ -267,6 +268,54 @@ against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-archite
 `multi-tenant-security-tester`, `tdd-engineer`, `systematic-debugger`,
 `secrets-identity-hardener`, and `ai-closeout-reporter`.
 
+### Skills (Phase 6 — cloud, DevOps, reliability & release pack)
+
+All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
+`evals/trigger-evals.json` (all ten sit in one of three overlap clusters). Per
+master-prompt §8: cloud work starts cloud-neutral (requirements, constraints,
+compliance, latency, regions, availability, cost, operability, risk BEFORE
+service mapping); provider skills stay provider-idiomatic without inventing
+product specifics (SKU/quota/price claims become verification items); release
+skills demand evidence (CI checks on the release commit, artifacts, rollback
+path), not vibes; runbooks meet the stranger-executability bar
+(`manual-test-case-creator` discipline); SLOs derive from user journeys with
+error budgets, and paging fires on symptoms, not causes. Two skills have side
+effects and are **manual-only** (`disable-model-invocation: true`):
+`ci-pipeline-architect` (edits pipeline definitions — behavior-steering,
+secret-adjacent files that execute on push) and `observability-operator`
+(edits live alert/dashboard config, executes operational queries).
+
+Per reconciliation §3, the execution-plan `rollback-strategy-designer` is
+**merged into `rollback-runbook-author`** (strategy + runbook are one
+artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below).
+
+| Skill | Source (category doc) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `cloud-architecture-decider` | master §8 (cloud) | yes | Cloud-neutral decision: nine-axis requirements record (verified/assumed per entry), provider-neutral logical architecture, isolation/compliance hard filters BEFORE scoring, managed-vs-self-hosted per capability with the operational bill, exit costs + reopen triggers; ADR handoff. |
+| `azure-saas-architect` | master §8 (cloud) | yes | Decided-Azure mapping: Entra ID + managed identities + OIDC federation, VNets/Private Link, per-store tenant-isolation mechanism (elastic pools, Cosmos partition keys, Blob prefixes), compute by team maturity, Azure Policy/Defender posture, Bicep/Terraform, tag-keyed cost controls; SKU/limit/price claims → verification items. |
+| `aws-saas-architect` | master §8 (cloud) | yes | Decided-AWS mapping: Organizations/OU + SCPs, IAM roles + OIDC federation, VPC/PrivateLink, per-store tenant-isolation mechanism (Aurora silos, DynamoDB leading keys, S3 prefixes), compute by team maturity, Security Hub/GuardDuty posture, Terraform/CDK, activated cost-allocation tags; quota/type/price claims → verification items. |
+| `iac-reviewer` | cat 07 #245 (+#257/#258 adjacent) | yes | Review-only IaC audit, blast radius FIRST (replace/delete of stateful resources), public exposure, IAM width deltas, secrets in code AND state, tenant-isolation impact, drift, pinning, cost flags; apply-safety verdict; never applies, never runs plan against live backends. |
+| `ci-pipeline-architect` | cat 07 #238 (+#237/#239/#240) | **no** (manual-only; edits pipeline definitions) | Stage graph with blocking semantics + latency budget, CI secret governance (OIDC over stored keys, fork-PR posture, job→secret map), cache/artifact governance with provenance, environment promotion with named-human gates, branch-protection alignment; composes qa-automation-architect tiers, vite-build-qa-engineer, supply-chain pinning rules. |
+| `release-readiness-reviewer` | cat 07 #241 (+#242) | yes | Evidence-based ship/no-ship gate: every dimension cites a verifiable artifact or is MISSING (CI on the release SHA, artifact provenance, test-signal fit, migration review, rollback path + rehearsal, flags, docs, observability, approvals); unknown = No-Go with the evidence that flips it; the same-named SUBAGENT composes this skill. |
+| `rollback-runbook-author` | cat 07 #243 (+#242; absorbs rollback-strategy-designer) | yes | Rollback strategy + stranger-executable runbook in one artifact: roll-back-vs-fix-forward criteria with time-box, per-layer primitives in stated order, previous-good artifact by id, bad-window data repair, freeze step, rehearsal log + staleness triggers; authors only, never executes. |
+| `observability-operator` | cat 07 #246/#247/#248/#252 | **no** (manual-only; edits live alert/dashboard config, runs operational queries) | Hands-on instrumentation (structured, correlated, redacted-at-emission), truthful health checks with timeouts, alerts with severity/owner/runbook-link/justified-threshold, query-verified claims, silences only with owner+expiry; implements slo-reliability-architect's design. |
+| `slo-reliability-architect` | cat 07 #251 (+#247 design side) | yes | Journey-derived SLOs: symptom-based SLIs with measurement points + blind spots, targets with error budgets in user units, burn-rate paging with cause-alert demotions, failure-mode analysis, budget policy with consequences + decider, per-tenant/noisy-neighbor views. |
+| `incident-response-runbook` | cat 07 #249 (+#250) | yes | One-minute severity ladder (ambiguity classifies up), IC/comms/ops roles with small-org collapse rule, triage to decision points, containment by REFERENCE to the rollback artifact, tenant-aware comms with legal gate on exposure, during-incident evidence capture, blameless postmortem where every finding lands (regression-suite-curator, observability-operator, runbook fix, architecture, or owned accepted risk). |
+
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 6
+clusters: **cloud-architecture** (`cloud-architecture-decider`,
+`azure-saas-architect`, `aws-saas-architect`, `iac-reviewer`), **delivery**
+(`ci-pipeline-architect`, `release-readiness-reviewer`, `rollback-runbook-author`),
+and **reliability** (`observability-operator`, `slo-reliability-architect`,
+`incident-response-runbook`) — with cross-phase discrimination against the shipped
+`architecture-designer`, `saas-platform-architect`, `secure-migration-reviewer`,
+`supply-chain-security-reviewer`, `security-pr-reviewer`, `qa-automation-architect`,
+`vite-build-qa-engineer`, `code-reviewer`, `audit-log-architect`,
+`systematic-debugger`, `regression-suite-curator`, `qa-strategy-architect`,
+`saas-cost-architect`, and the `release-readiness-reviewer` **subagent**
+(delegated review lens vs this skill's procedure — the `full-codebase-auditor`
+namespace pattern).
+
 ---
 
 ## Backlog by phase (reconciled)
@@ -332,22 +381,31 @@ Per reconciliation §3, the Phase 5 **expansion backlog** (`acceptance-criteria-
 remains backlog, built in Phase 8 batches.
 
 ### Phase 6 — Cloud, DevOps, reliability & release (P1)
-`cloud-architecture-decider`, `azure-saas-architect`, `aws-saas-architect`, `iac-reviewer`,
-`ci-pipeline-architect`, `release-readiness-reviewer`, `rollback-runbook-author`,
-`observability-operator`, `slo-reliability-architect`, `incident-response-runbook`.
-Source: [`docs/skills/07-devops-release-reliability.md`](skills/07-devops-release-reliability.md).
+✅ **Implemented** — all 10 first-pass skills moved to
+[Implemented → Skills (Phase 6)](#skills-phase-6--cloud-devops-reliability--release-pack) above.
+Source: [`docs/skills/07-devops-release-reliability.md`](skills/07-devops-release-reliability.md)
+plus master-prompt §8 for the three cloud skills.
+Reconciliation §3 merge: `rollback-strategy-designer` is merged into
+`rollback-runbook-author` (no separate skill). The Phase 6 **expansion backlog**
+(`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
+`migration-deployment-runbook`, `environment-parity-reviewer`,
+`database-backup-verifier`) remains backlog, built in Phase 8 batches.
 
 > Note: `release-readiness-reviewer` and `full-codebase-auditor` exist as **subagents**
 > (review lens) and also as **skills** (procedure) — `full-codebase-auditor` skill shipped
-> in Phase 2; `release-readiness-reviewer` skill is planned here. Different namespaces
-> (`.claude/agents/` vs `.claude/skills/`); the agent composes the skill.
+> in Phase 2; `release-readiness-reviewer` skill shipped here in Phase 6. Different
+> namespaces (`.claude/agents/` vs `.claude/skills/`); the agent composes the skill.
 
 ### Phase 7 — AI security & LLM systems (P1)
+**14 skills per D6** (v4's 10 + 4 OWASP LLM Top 10 gap additions):
 `ai-threat-modeler`, `prompt-injection-defender`, `rag-security-architect`,
 `agent-tool-safety-guard`, `llm-output-safety-reviewer`, `ai-evaluation-harness`,
 `ai-cost-guardrail-designer`, `ai-governance-risk-reviewer`, `ai-router-architect`,
-`structured-output-validator`.
-Source: [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-software-engineering.md).
+`structured-output-validator`, `sensitive-disclosure-guard`, `model-poisoning-reviewer`,
+`system-prompt-leakage-reviewer`, `ai-misinformation-guard`.
+Source: [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-software-engineering.md)
+and the reconciliation doc §3 Phase 7 coverage map (D6). Phase 7.5 (agentic AI
+security, D7) and the Compliance & Governance batch (D9) follow it.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).

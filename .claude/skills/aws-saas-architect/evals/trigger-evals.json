@@ -1,0 +1,35 @@
+{
+  "skill": "aws-saas-architect",
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: AWS mapping vs the cloud decision vs Azure vs IaC review, plus the shipped architecture-designer boundary.",
+  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "iac-reviewer", "architecture-designer"],
+  "cases": [
+    {
+      "id": "aws-mapping-wins-here",
+      "prompt": "AWS is settled. Design our account structure, IAM model, and the DynamoDB tenant-isolation approach.",
+      "expected_skill": "aws-saas-architect",
+      "should_not_trigger": ["cloud-architecture-decider", "azure-saas-architect"],
+      "reason": "Provider is decided and the ask is concrete AWS service architecture — the AWS architect's exact territory."
+    },
+    {
+      "id": "open-provider-goes-to-decider",
+      "prompt": "Is AWS actually the right home for this product, or should we reconsider given our EU data-residency contracts?",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": ["aws-saas-architect"],
+      "reason": "Reopening the provider question on compliance grounds is the cloud-neutral decision procedure, not AWS mapping."
+    },
+    {
+      "id": "terraform-diff-goes-to-iac-reviewer",
+      "prompt": "Review this Terraform change that opens a security group to 0.0.0.0/0 and swaps our S3 bucket policy.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": ["aws-saas-architect"],
+      "reason": "A concrete IaC change review is iac-reviewer casework even though the resources are AWS."
+    },
+    {
+      "id": "system-structure-goes-to-architecture-designer",
+      "prompt": "Should ingestion and reporting be separate services, and who owns the events table?",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": ["aws-saas-architect"],
+      "reason": "Component boundaries and data ownership are provider-neutral system architecture — the input the AWS architect maps, not a service-selection question."
+    }
+  ]
+}

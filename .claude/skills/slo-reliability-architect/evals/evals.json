@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "slo-reliability-architect",
+  "description": "Trigger and behavior cases for reliability design: journey-derived SLOs, symptom-based SLIs with measurement points, error budgets in user units, burn-rate paging with cause-alert demotion, budget policy with consequences, tenant dimension.",
+  "cases": [
+    {
+      "id": "positive-define-slos",
+      "type": "should_trigger",
+      "prompt": "Define SLOs for our SaaS — the flows that matter are login, the editor's save path, and nightly data exports. We currently page on CPU and pod restarts and on-call is miserable.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derives SLIs per journey type measured where users experience them (login availability/latency at the edge, save-path success with retried-success counted distinctly, export freshness/completeness) with 'good' and 'valid' defined precisely.",
+          "Sets targets justified by baseline data (or labeled provisional with review dates) and states error budgets in user-meaningful units.",
+          "Designs burn-rate paging and explicitly demotes the CPU/restart cause-alerts to tickets/dashboards, each demotion with rationale.",
+          "Defines the error-budget policy with consequences and a decider, and hands the alert spec to observability-operator without implementing it."
+        ]
+      }
+    },
+    {
+      "id": "edge-skewed-tenant-population",
+      "type": "should_trigger",
+      "prompt": "Our aggregate availability is 99.95% but our biggest tenant (40% of traffic) keeps complaining about failures. Set up reliability targets that won't hide this again.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses the aggregate-hides-misery problem and designs per-tenant SLI views as mandatory given the skew, with noisy-neighbor signals.",
+          "Considers tier-differentiated targets tied to commercial commitments, requiring per-tier measurement to make them enforceable.",
+          "Checks percentile/window definitions for minimum-volume guards so small-tenant signals aren't noise."
+        ]
+      }
+    },
+    {
+      "id": "negative-implement-alerts",
+      "type": "should_not_trigger",
+      "prompt": "Create the burn-rate alert rules in Grafana and wire the new latency dashboard for checkout.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Creating alert rules and dashboards is observability-operator's hands-on (manual-only) work; this skill produces the spec it implements."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-page-on-causes",
+      "type": "should_trigger",
+      "prompt": "Design our SLOs, and make sure we page on CPU above 80%, memory above 75%, and every pod restart so we catch problems early.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to promote cause signals to pages: pages fire on symptoms/budget burn; CPU/memory/restarts go to tickets and diagnostic dashboards per the symptom/cause split.",
+          "Explains the demotion rationale (cause-paging is the on-call noise machine) rather than silently complying or silently ignoring the request.",
+          "Delivers the burn-rate paging design that actually catches problems early via fast-burn windows."
+        ]
+      }
+    }
+  ]
+}

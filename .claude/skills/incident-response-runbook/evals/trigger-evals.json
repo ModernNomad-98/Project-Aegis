@@ -1,0 +1,42 @@
+{
+  "skill": "incident-response-runbook",
+  "description": "Trigger discrimination for the Phase 6 reliability cluster: incident procedure authoring vs paging design vs alert wiring vs rollback authoring, and against the shipped systematic-debugger and regression-suite-curator.",
+  "overlaps_with": ["slo-reliability-architect", "observability-operator", "rollback-runbook-author", "systematic-debugger", "regression-suite-curator"],
+  "cases": [
+    {
+      "id": "incident-procedure-wins-here",
+      "prompt": "Define our severity levels, who runs incidents, the status-page templates, and the postmortem process.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": ["slo-reliability-architect", "observability-operator"],
+      "reason": "Severity ladder, roles, comms, and postmortem machinery are the incident runbook's exact scope — the human procedures behind the pages others design and wire."
+    },
+    {
+      "id": "what-pages-goes-to-slo-architect",
+      "prompt": "Decide which conditions deserve to wake someone at night versus land as tickets.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": ["incident-response-runbook"],
+      "reason": "The paging policy (symptom/budget-burn design) is reliability design; the runbook answers the page after that policy fires it."
+    },
+    {
+      "id": "rollback-steps-go-to-rollback-author",
+      "prompt": "Write the exact backout steps for reverting the release — artifact IDs, command sequence, verification.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["incident-response-runbook"],
+      "reason": "The rollback procedure itself is rollback-runbook-author's artifact; the incident runbook only states WHEN to invoke it and with what authority."
+    },
+    {
+      "id": "live-diagnosis-goes-to-debugger",
+      "prompt": "The alert fired and the dashboard shows errors climbing — walk me through finding the cause right now.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": ["incident-response-runbook"],
+      "reason": "Live root-cause work is the debugger's reproduce→isolate method; the runbook's triage hands off to it at the decision point."
+    },
+    {
+      "id": "regression-promotion-goes-to-curator",
+      "prompt": "Last week's incident produced three bug fixes — get them into the regression suite at the right tier.",
+      "expected_skill": "regression-suite-curator",
+      "should_not_trigger": ["incident-response-runbook"],
+      "reason": "Executing the promotion of incident findings into suite tiers is the curator's casework; the runbook's postmortem only mandates that handoff."
+    }
+  ]
+}
