@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "azure-saas-architect",
+  "description": "Trigger and behavior cases for Azure SaaS architecture: provider-idiomatic mapping with per-store tenant isolation, identity/network/data/compute/messaging/observability/CI-CD/posture/IaC/cost, and verification items instead of invented specifics.",
+  "cases": [
+    {
+      "id": "positive-map-logical-to-azure",
+      "type": "should_trigger",
+      "prompt": "We've decided on Azure for our multi-tenant SaaS. Design the service architecture — identity, networking, database strategy for pooled small tenants plus siloed enterprise tenants, compute, and monitoring.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps every capability to a named Azure service with rationale: Entra ID with managed identities and OIDC federation, VNets with Private Link for data services, Front Door or Application Gateway ingress with the traffic-shape reason.",
+          "Gives each data store an explicit tenant-isolation mechanism tied to the pooled/siloed model (e.g., elastic pools for enterprise silo databases, tenant-keyed scoping for pooled), delegating mechanism detail to multi-tenant-data-architect.",
+          "Chooses compute against the team's operational maturity, with AKS requiring a named reason and its operational bill.",
+          "Emits verification items for every SKU/limit/region/price-dependent claim instead of asserting numbers from memory, and attaches cost controls keyed on a tagging standard."
+        ]
+      }
+    },
+    {
+      "id": "edge-limit-dependent-design",
+      "type": "should_trigger",
+      "prompt": "Our Azure design assumes we can put 5,000 tenant databases in elastic pools and stream 1TB/day of telemetry into Log Analytics without blowing the budget. Sanity-check the architecture.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to confirm pool capacity or ingestion pricing from memory — marks both as blocking verification items against current Azure docs.",
+          "Flags Log Analytics ingestion as a known top-cost line and designs caps/retention posture as part of the architecture.",
+          "Reviews the tenancy-to-service fit (pool sharing as noisy-neighbor risk, promotion path for heavy tenants) rather than only the arithmetic."
+        ]
+      }
+    },
+    {
+      "id": "negative-aws-request",
+      "type": "should_not_trigger",
+      "prompt": "Lay out our SaaS architecture on AWS — Cognito or something else, VPC design, Aurora vs DynamoDB.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "AWS service mapping belongs to aws-saas-architect; this skill is Azure-specific."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-invent-specifics",
+      "type": "should_trigger",
+      "prompt": "Design our Azure architecture and include the exact SKUs, their monthly prices, and the regional quotas we'll get.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Delivers the architecture with capability-level service selections but declines to state SKU tiers, prices, or quotas from memory — provider-idiomatic without inventing product specifics.",
+          "Routes every such request into the Verification items list against current Azure docs, and says which claims the design depends on.",
+          "Does not stall the whole design: everything not SKU-dependent is still delivered."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "skill": "cloud-architecture-decider",
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: cloud-neutral decision vs provider mapping vs IaC review, plus the shipped architecture-designer and saas-platform-architect boundaries.",
+  "overlaps_with": ["azure-saas-architect", "aws-saas-architect", "iac-reviewer", "architecture-designer", "saas-platform-architect"],
+  "cases": [
+    {
+      "id": "which-cloud-wins-here",
+      "prompt": "Should we run our new multi-tenant product on AWS or Azure, or split across both?",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": ["azure-saas-architect", "aws-saas-architect", "architecture-designer"],
+      "reason": "Provider selection and deployment posture is the decider's job — the provider architects only run after this decision exists."
+    },
+    {
+      "id": "decided-azure-goes-to-azure-architect",
+      "prompt": "We're on Azure, that's settled. Lay out the service architecture for identity, data, and compute.",
+      "expected_skill": "azure-saas-architect",
+      "should_not_trigger": ["cloud-architecture-decider"],
+      "reason": "The decision is made; mapping logical architecture to provider-idiomatic services is the provider architect's territory."
+    },
+    {
+      "id": "component-structure-goes-to-architecture-designer",
+      "prompt": "How should we structure the billing subsystem — separate service or module inside the monolith?",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": ["cloud-architecture-decider"],
+      "reason": "Component boundaries and data ownership are system architecture, an INPUT to the cloud decision — not a cloud-platform question."
+    },
+    {
+      "id": "tenancy-structure-goes-to-saas-platform-architect",
+      "prompt": "Should enterprise tenants get their own database while smaller ones pool, and how do we split control plane from data plane?",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": ["cloud-architecture-decider"],
+      "reason": "Pooled/siloed tenancy and control-plane/data-plane structure are platform decisions that CONSTRAIN the cloud decision; the decider consumes them as hard filters."
+    },
+    {
+      "id": "terraform-diff-goes-to-iac-reviewer",
+      "prompt": "Review this Terraform PR that moves our database subnet and changes IAM roles.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": ["cloud-architecture-decider"],
+      "reason": "A concrete IaC change review is iac-reviewer casework, not a platform decision."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "skill": "iac-reviewer",
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: IaC change review vs cloud design skills, and against the shipped secure-migration-reviewer, security-pr-reviewer, and supply-chain-security-reviewer.",
+  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "aws-saas-architect", "secure-migration-reviewer", "security-pr-reviewer", "supply-chain-security-reviewer"],
+  "cases": [
+    {
+      "id": "iac-diff-wins-here",
+      "prompt": "Is this Terraform change safe to apply? It touches subnets, an IAM role, and deletes an S3 lifecycle rule.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": ["aws-saas-architect", "security-pr-reviewer"],
+      "reason": "A concrete infrastructure-code diff reviewed for apply safety is iac-reviewer's core case — not architecture design, and IaC blast-radius/exposure semantics are its specialization rather than the general security diff lens."
+    },
+    {
+      "id": "schema-migration-goes-to-secure-migration-reviewer",
+      "prompt": "Check this migration file: it drops a column, rewrites a policy, and grants SELECT to a role.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": ["iac-reviewer"],
+      "reason": "DDL/DML deploy safety, grants, and RLS policy changes are database-migration review; iac-reviewer owns the infrastructure layer the database runs on."
+    },
+    {
+      "id": "app-code-diff-goes-to-security-pr-reviewer",
+      "prompt": "Security-review this PR — it changes our API authorization middleware and adds a file-upload endpoint.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": ["iac-reviewer"],
+      "reason": "Application-code diffs (authz, injection, SSRF surfaces) are security-pr-reviewer; iac-reviewer only reviews infrastructure-as-code."
+    },
+    {
+      "id": "dependency-risk-goes-to-supply-chain",
+      "prompt": "Audit our third-party Terraform modules and GitHub Actions for supply-chain risk — pinning, sources, install scripts.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": ["iac-reviewer"],
+      "reason": "A dedicated supply-chain audit of module/action provenance and pinning is supply-chain-security-reviewer's job; iac-reviewer flags unpinned modules in a diff and routes the systemic audit there."
+    },
+    {
+      "id": "design-request-goes-to-provider-architect",
+      "prompt": "Design the network and data architecture our Terraform should implement on Azure.",
+      "expected_skill": "azure-saas-architect",
+      "should_not_trigger": ["iac-reviewer"],
+      "reason": "Designing the target architecture is the provider architect; iac-reviewer reviews changes against that design after it exists."
+    }
+  ]
+}
