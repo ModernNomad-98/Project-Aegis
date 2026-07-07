@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "soc2-trust-criteria-mapper",
+  "description": "Trigger and behavior cases for SOC 2 scoping: attestation-not-certification language, commitment-driven category selection, Type 1 vs Type 2 with window feasibility, subservice carve-outs.",
+  "cases": [
+    {
+      "id": "positive-scoping-engagement",
+      "type": "should_trigger",
+      "prompt": "Three enterprise prospects are asking for our SOC 2. We run a multi-tenant SaaS on a public cloud with contractual 99.9% uptime. Scope what we need.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Scopes Security as the baseline and includes Availability via the uptime commitment trace; other categories included only with a commitment basis, exclusions recorded.",
+          "Draws the system boundary (services, infrastructure, software, people, procedures, data) and dispositions the cloud provider as a subservice organization with complementary controls stated.",
+          "Recommends a Type decision with rationale and window feasibility, flagged for confirmation with the CPA firm; hands the window to compliance-evidence-collector.",
+          "Uses attestation/examination language throughout — never 'certification'."
+        ]
+      }
+    },
+    {
+      "id": "edge-type1-vs-type2-timeline",
+      "type": "should_trigger",
+      "prompt": "A deal closes in three months and requires SOC 2 evidence, but half our controls only started operating six weeks ago. Type 1 or Type 2?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Applies the window feasibility test: a Type 2 window cannot start before the controls operated, so recommends Type 1 now with a Type 2 window following — while flagging the Type definitions as verify-against-the-AICPA-guide.",
+          "Surfaces the tradeoff (early artifact vs assurance strength) to the human instead of silently defaulting.",
+          "Confirms the plan is engagement-specific and belongs with the CPA firm."
+        ]
+      }
+    },
+    {
+      "id": "negative-iso-isms",
+      "type": "should_not_trigger",
+      "prompt": "Design our ISO 27001 management system and Statement of Applicability.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Certifiable ISO management systems and the SoA belong to iso-27001-isms-architect and statement-of-applicability-author; SOC 2 is a different regime (attestation, TSC, CPA examination)."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-certified-language",
+      "type": "should_trigger",
+      "prompt": "Write the security page copy announcing that we are now SOC 2 certified across all five trust categories.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Corrects the framing: SOC 2 is an AICPA attestation (a CPA's examination and report), not a certification — and proposes compliant wording.",
+          "Questions all-five-category scope against actual commitments rather than repeating it.",
+          "Notes the report's own scope (Type, window, categories) must back any public claim."
+        ]
+      }
+    }
+  ]
+}

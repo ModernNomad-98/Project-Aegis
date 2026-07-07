@@ -1,0 +1,49 @@
+{
+  "skill": "iso-42001-aims-architect",
+  "description": "Trigger discrimination for the compliance cluster: the certifiable AIMS vs per-feature AI review, the voluntary RMF program, the security ISMS, the SoA, the SDLC operating model, and gap assessment.",
+  "overlaps_with": ["ai-governance-risk-reviewer", "ai-lifecycle-risk-manager", "iso-27001-isms-architect", "statement-of-applicability-author", "ai-sdlc-operating-model", "compliance-gap-auditor"],
+  "cases": [
+    {
+      "id": "aims-wins-here",
+      "prompt": "Build our ISO 42001 management system — AI policy, AI risk assessments, AI system impact assessments, internal audit, the works.",
+      "expected_skill": "iso-42001-aims-architect",
+      "should_not_trigger": ["ai-governance-risk-reviewer", "ai-lifecycle-risk-manager"],
+      "reason": "The certifiable AIMS with clauses 4–10 and the 6.1.2/6.1.3/6.1.4 machinery is the 42001 projection; feature reviews and the RMF method are inputs it composes."
+    },
+    {
+      "id": "feature-posture-goes-to-governance-reviewer",
+      "prompt": "Assess the risk tier and required human oversight for our AI support-ticket auto-responder before it ships.",
+      "expected_skill": "ai-governance-risk-reviewer",
+      "should_not_trigger": ["iso-42001-aims-architect"],
+      "reason": "One AI feature's tiering/oversight/disclosure go/no-go is the Phase 7 reviewer; the AIMS is the org-level system aggregating such reviews."
+    },
+    {
+      "id": "rmf-program-goes-to-lifecycle-manager",
+      "prompt": "Adopt the NIST AI RMF — set up GOVERN, MAP, MEASURE, and MANAGE across how we build and run AI.",
+      "expected_skill": "ai-lifecycle-risk-manager",
+      "should_not_trigger": ["iso-42001-aims-architect"],
+      "reason": "Operationalizing the voluntary RMF functions is the lifecycle manager; the AIMS is the certifiable wrapper that can sit on top of it."
+    },
+    {
+      "id": "isms-goes-to-27001",
+      "prompt": "Design our information security management system for certification — risk register, SoA, internal audits.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["iso-42001-aims-architect"],
+      "reason": "The information-security ISMS is 27001's projection; the AIMS governs AI systems specifically, sharing the harmonized skeleton."
+    },
+    {
+      "id": "soa-goes-to-author",
+      "prompt": "Write the 42001 Statement of Applicability from our AI risk treatment decisions.",
+      "expected_skill": "statement-of-applicability-author",
+      "should_not_trigger": ["iso-42001-aims-architect"],
+      "reason": "The SoA document serves both ISO standards from its own skill; the AIMS architect designs the treatment process feeding it."
+    },
+    {
+      "id": "sdlc-contract-goes-to-operating-model",
+      "prompt": "Define how humans and coding agents plan, implement, review, and merge work together — stages, gates, and authority.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": ["iso-42001-aims-architect"],
+      "reason": "The human+agent SDLC contract is the Phase 1.5 operating model; the AIMS maps it as an operational mechanism inside clause 8."
+    }
+  ]
+}

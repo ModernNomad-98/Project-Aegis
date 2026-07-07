@@ -1,0 +1,49 @@
+{
+  "skill": "statement-of-applicability-author",
+  "description": "Trigger discrimination for the compliance cluster: the SoA document vs the management systems that mandate it, the control catalog, the crosswalk, and SOC 2 scoping.",
+  "overlaps_with": ["iso-27001-isms-architect", "iso-42001-aims-architect", "compliance-control-foundation", "multi-framework-crosswalk", "soc2-trust-criteria-mapper", "compliance-gap-auditor"],
+  "cases": [
+    {
+      "id": "soa-wins-here",
+      "prompt": "Draft the per-control applicability document for our ISO 27001 certification — which Annex A controls apply, why, and which we exclude.",
+      "expected_skill": "statement-of-applicability-author",
+      "should_not_trigger": ["iso-27001-isms-architect", "compliance-control-foundation"],
+      "reason": "Per-control inclusion/exclusion justification tied to risk treatment IS the SoA; the ISMS architect mandates and consumes it, the foundation supplies mechanisms."
+    },
+    {
+      "id": "isms-design-goes-to-projection",
+      "prompt": "Design the whole ISO 27001 management system for us — scope, leadership, risk process, internal audit, management review.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["statement-of-applicability-author"],
+      "reason": "Clauses 4–10 machinery is the projection; the SoA author writes one (mandatory) artifact inside that system."
+    },
+    {
+      "id": "aims-design-goes-to-projection",
+      "prompt": "Build our ISO 42001 AI management system, including the AI risk and impact assessment processes.",
+      "expected_skill": "iso-42001-aims-architect",
+      "should_not_trigger": ["statement-of-applicability-author"],
+      "reason": "AIMS clauses 4–10 with 6.1.2/6.1.4 machinery is the 42001 projection; the SoA author only writes the applicability document it mandates."
+    },
+    {
+      "id": "catalog-goes-to-foundation",
+      "prompt": "Write the underlying control set — objectives, owners, mechanisms — that our compliance work will draw from.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": ["statement-of-applicability-author"],
+      "reason": "The framework-agnostic catalog is the foundation; the SoA maps Annex A applicability onto those mechanisms."
+    },
+    {
+      "id": "cross-references-go-to-crosswalk",
+      "prompt": "Map each of our controls to its ISO 27001 Annex A reference, SOC 2 criterion, and ISO 42001 objective.",
+      "expected_skill": "multi-framework-crosswalk",
+      "should_not_trigger": ["statement-of-applicability-author"],
+      "reason": "Multi-framework reference mapping is the crosswalk; the SoA is a single-standard applicability judgment document, not a reference table."
+    },
+    {
+      "id": "soc2-scope-goes-to-mapper",
+      "prompt": "Scope our SOC 2 — Security plus which optional categories, and Type 1 or Type 2?",
+      "expected_skill": "soc2-trust-criteria-mapper",
+      "should_not_trigger": ["statement-of-applicability-author"],
+      "reason": "SOC 2 is an attestation with no SoA; category and Type/window scoping belongs to the SOC 2 mapper."
+    }
+  ]
+}

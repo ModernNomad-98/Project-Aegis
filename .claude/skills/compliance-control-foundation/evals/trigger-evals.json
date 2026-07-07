@@ -1,0 +1,56 @@
+{
+  "skill": "compliance-control-foundation",
+  "description": "Trigger discrimination for the compliance cluster: the shared framework-agnostic control catalog vs framework projections, crosswalk references, gap assessment, evidence program, and the shipped security/risk skills it maps.",
+  "overlaps_with": ["iso-27001-isms-architect", "iso-42001-aims-architect", "soc2-trust-criteria-mapper", "multi-framework-crosswalk", "compliance-gap-auditor", "compliance-evidence-collector", "authorization-matrix-designer", "threat-modeler"],
+  "cases": [
+    {
+      "id": "common-control-set-wins-here",
+      "prompt": "Write one baseline control set covering access control, crypto, change management, logging, incident response, vendors, and risk — something all our compliance frameworks can share.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": ["iso-27001-isms-architect", "soc2-trust-criteria-mapper", "multi-framework-crosswalk"],
+      "reason": "One shared framework-agnostic catalog is the foundation; projections select from it and the crosswalk attaches framework references to it."
+    },
+    {
+      "id": "isms-goes-to-projection",
+      "prompt": "Stand up the ISO 27001 management system — context, leadership, planning, internal audits, management reviews.",
+      "expected_skill": "iso-27001-isms-architect",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Clauses 4–10 management-system machinery is the 27001 projection; the foundation only holds the control catalog it consumes."
+    },
+    {
+      "id": "references-go-to-crosswalk",
+      "prompt": "For each control we already have, tell me which ISO 27001 Annex A control, SOC 2 criterion, and ISO 42001 objective it satisfies.",
+      "expected_skill": "multi-framework-crosswalk",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Attaching per-framework references to existing controls is the crosswalk engine; the foundation deliberately excludes framework citations."
+    },
+    {
+      "id": "where-do-we-stand-goes-to-gap-auditor",
+      "prompt": "How far are we from being SOC 2 ready? List what's missing and in what order to fix it.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Current-state-vs-framework assessment with remediation order is the parameterized gap audit, not catalog authoring."
+    },
+    {
+      "id": "evidence-goes-to-collector",
+      "prompt": "Define what evidence each control produces, how often we capture it, and how we retain it across the audit window.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Evidence-over-time design is the collector; the foundation only names each control's evidence hook."
+    },
+    {
+      "id": "rbac-design-goes-to-matrix-designer",
+      "prompt": "Design the roles and permissions matrix for our tenants' users across our resources.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Designing the actual access-control mechanism is the Phase 3 skill; the foundation maps that shipped artifact as a control, it never designs RBAC."
+    },
+    {
+      "id": "threat-enumeration-goes-to-threat-modeler",
+      "prompt": "Enumerate the threats and abuse cases for our new file-sharing feature and rank them.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": ["compliance-control-foundation"],
+      "reason": "Technical threat enumeration feeds the risk-assessment domain as an input; the foundation catalogs the control, not the threats."
+    }
+  ]
+}

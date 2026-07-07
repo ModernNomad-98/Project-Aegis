@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "statement-of-applicability-author",
+  "description": "Trigger and behavior cases for SoA authoring: Annex-A-in-hand requirement, risk-treatment traced inclusions, verifiable exclusions, controlled-document diffs, dual-standard service.",
+  "cases": [
+    {
+      "id": "positive-27001-soa",
+      "type": "should_trigger",
+      "prompt": "We've finished our ISO 27001 risk assessment and treatment plan. Write our Statement of Applicability — here's the Annex A table from our licensed copy of the standard.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Seeds rows from the provided Annex A table, quoting control titles as published rather than paraphrasing.",
+          "Traces every inclusion to a risk-treatment decision or named obligation and gives every exclusion a concrete, verifiable, dated justification.",
+          "Maps implementation status to compliance-control-foundation mechanisms — no 'implemented' without a named mechanism.",
+          "Emits controlled-document metadata: version, author, named approver, review cadence."
+        ]
+      }
+    },
+    {
+      "id": "edge-dual-standard-soa",
+      "type": "should_trigger",
+      "prompt": "We're pursuing ISO 27001 and ISO 42001 together — can one SoA serve both, and how do we structure it?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Offers combined-document-with-per-standard-columns vs two-document options and records the org's choice.",
+          "Keeps applicability decisions distinct per standard — 42001 Annex A entries treated as control objectives and controls per that standard's structure, not as 27001 clones.",
+          "Requires the licensed Annex A tables for BOTH standards before writing rows."
+        ]
+      }
+    },
+    {
+      "id": "negative-soc2-scoping",
+      "type": "should_not_trigger",
+      "prompt": "Which SOC 2 trust categories should we include in our report, and do we need Type 1 first?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "SOC 2 has no Statement of Applicability; TSC category scoping and Type 1 vs Type 2 decisions are soc2-trust-criteria-mapper."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-reconstruct-annex-a",
+      "type": "should_trigger",
+      "prompt": "We don't have the standard text handy — just generate the SoA from the well-known list of the 93 Annex A controls, you know them.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to reconstruct Annex A entries from memory or secondary sources and states why: public counts/titles are unverified against the paywalled table and produce a certifiably wrong controlled document.",
+          "Flags that even the 93 = 37/8/14/34 figure is secondary-sourced and must be verified against the standard.",
+          "Offers the unblocked path: obtain the licensed text, then author the SoA; meanwhile prepares the risk-treatment traces that rows will need."
+        ]
+      }
+    }
+  ]
+}

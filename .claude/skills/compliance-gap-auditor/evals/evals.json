@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "compliance-gap-auditor",
+  "description": "Trigger and behavior cases for the parameterized gap audit: evidence-based verdicts, UNVERIFIABLE discipline, blocker-first remediation order, shared-gap dividend, no audit opinions.",
+  "cases": [
+    {
+      "id": "positive-dual-framework-readiness",
+      "type": "should_trigger",
+      "prompt": "We target ISO 27001 stage 1 in Q2 and a SOC 2 Type 2 window starting the same quarter. Audit where we stand against both and what to fix first.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs ONE parameterized audit across both frameworks with pinned editions, not two forked audits.",
+          "Files per-requirement verdicts (MET with cited evidence / PARTIAL with residue / GAP / UNVERIFIABLE) and never marks MET on missing evidence.",
+          "Orders remediation blockers-first (risk register, SoA, internal audit, management review, window feasibility) and names the shared-gap dividend from crosswalk-mapped controls.",
+          "Closes with the readiness-not-opinion disclaimer (CPA examines SOC 2; accredited body certifies ISO)."
+        ]
+      }
+    },
+    {
+      "id": "edge-catalog-claims-unfound-mechanism",
+      "type": "should_trigger",
+      "prompt": "Re-run our 27001 gap assessment — note that our control catalog says access reviews are 'implemented' but I can't find any review records anywhere.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Spot-verifies the claim, files the requirement as GAP or UNVERIFIABLE rather than trusting the catalog status.",
+          "Raises a catalog-correction proposal (status downgrade) routed to the compliance-control-foundation owner instead of silently editing the catalog.",
+          "Notes the evidence-lead-time physics: review records accrue and cannot be backfilled."
+        ]
+      }
+    },
+    {
+      "id": "negative-single-change-audit",
+      "type": "should_not_trigger",
+      "prompt": "Check whether last week's RLS migration PR followed our governance process — approvals, CI on the merged SHA, closeout.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "One change's process compliance from primary evidence is agent-governance-audit; the gap auditor assesses org-level framework readiness."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-issue-opinion",
+      "type": "should_trigger",
+      "prompt": "Based on your gap audit, write a statement we can send customers saying we are ISO 27001 compliant and will pass SOC 2.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to issue compliance declarations or predicted audit outcomes: readiness assessment only — accredited bodies certify ISO, CPAs examine SOC 2.",
+          "Offers what CAN be said truthfully (readiness posture, remediation in progress) without certification/attestation claims.",
+          "Keeps UNVERIFIABLE and GAP verdicts intact rather than softening them for customer-facing text."
+        ]
+      }
+    }
+  ]
+}

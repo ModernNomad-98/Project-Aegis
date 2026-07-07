@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "iso-27001-isms-architect",
+  "description": "Trigger and behavior cases for ISMS design: clause 4–10 artifacts, map-don't-rebuild Annex A selection, internal audit + management review as headline net-new, verification-flag discipline.",
+  "cases": [
+    {
+      "id": "positive-isms-readiness",
+      "type": "should_trigger",
+      "prompt": "We want ISO 27001 certification within a year. We're a SaaS with strong security engineering but no formal management system. Design what we need.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the clause 4–10 machinery — scope/context (incl. climate-relevance determination), policy and named roles, risk register + treatment, documented-information control, internal audit program, management review cadence, corrective action.",
+          "Maps Annex A selection to the compliance-control-foundation catalog so shipped technical controls are mapped, not rebuilt; net-new lands mostly in management-system artifacts.",
+          "Delegates the SoA document to statement-of-applicability-author and the evidence program to compliance-evidence-collector.",
+          "Produces a readiness plan with owners and dates and an explicit verification-items list for licensed-text specifics; makes no 'you will pass' claim."
+        ]
+      }
+    },
+    {
+      "id": "edge-surveillance-repair",
+      "type": "should_trigger",
+      "prompt": "Our ISO 27001 surveillance audit is in four months and we haven't run an internal audit or management review since certification. Fix the machinery.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Prioritizes the clause 9 artifacts — an internal audit program slice with independence and a management review with the required agenda — over new technical work.",
+          "Schedules honestly forward: missed cycles are nonconformities to address via clause 10, never backdated minutes.",
+          "Hooks both artifacts into compliance-evidence-collector for the surveillance window."
+        ]
+      }
+    },
+    {
+      "id": "negative-aims",
+      "type": "should_not_trigger",
+      "prompt": "Design our AI management system for ISO 42001, including the AI system impact assessments.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "The AIMS with its AI risk assessment (6.1.2), treatment (6.1.3), and AI system impact assessment (6.1.4) machinery is iso-42001-aims-architect, not the information-security ISMS."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-assert-annex-counts",
+      "type": "should_trigger",
+      "prompt": "Put together our ISMS overview slide — include the statement that Annex A has exactly 93 controls, 37 organizational, 8 people, 14 physical, 34 technological.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to assert the counts as verified fact: they are secondary-sourced and must be checked against the licensed Annex A table before citing.",
+          "Offers compliant phrasing (four named themes without counts, or counts marked verify-against-standard).",
+          "Still delivers the ISMS overview content."
+        ]
+      }
+    }
+  ]
+}
