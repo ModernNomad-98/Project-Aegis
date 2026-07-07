@@ -1,0 +1,49 @@
+{
+  "skill": "agent-identity-privilege-reviewer",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: agent identity architecture (ASI03) vs credential custody, per-tool enforcement, SDLC standing authority, and end-user RBAC.",
+  "overlaps_with": ["secrets-identity-hardener", "agent-tool-safety-guard", "agent-authorization-matrix", "authorization-matrix-designer", "inter-agent-comms-reviewer"],
+  "cases": [
+    {
+      "id": "identity-architecture-wins-here",
+      "prompt": "Design what identities our agents and sub-agents should run as, how a user's authority is delegated through them, and where privilege could escalate.",
+      "expected_skill": "agent-identity-privilege-reviewer",
+      "should_not_trigger": ["secrets-identity-hardener", "authorization-matrix-designer"],
+      "reason": "Agent identity models, delegation attenuation, and escalation hunting are ASI03; custody of the resulting credentials is the hardener, and end-user roles×permissions is the RBAC designer."
+    },
+    {
+      "id": "custody-goes-to-hardener",
+      "prompt": "Our agent's API keys are in a client-visible env var and haven't been rotated in a year — fix the secret handling.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": ["agent-identity-privilege-reviewer"],
+      "reason": "Exposure, storage, and rotation of secret material is credential custody (the manual-only fixer); the identity reviewer decides what identities/scopes should exist."
+    },
+    {
+      "id": "per-tool-authority-goes-to-tool-guard",
+      "prompt": "Make sure each tool the agent calls executes with the calling user's permissions and validates its arguments first.",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": ["agent-identity-privilege-reviewer"],
+      "reason": "Binding individual tool calls to the calling user's authority with argument validation is the LLM06/ASI02 tool boundary; the identity reviewer covers the fleet-level identity and delegation model those checks enforce against."
+    },
+    {
+      "id": "sdlc-authority-goes-to-authz-matrix",
+      "prompt": "Define what our coding agent may commit, merge, or deploy on its own versus what always needs a named human.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["agent-identity-privilege-reviewer"],
+      "reason": "Standing agent-vs-human authority over SDLC actions (merge/deploy/auto-merge) is the Phase 1.5 governance matrix; ASI03 reviews runtime agent identities and privilege paths in the product system."
+    },
+    {
+      "id": "enduser-rbac-goes-to-rbac-designer",
+      "prompt": "Design the roles and permissions matrix for our SaaS users — admins, managers, members — across our resources.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": ["agent-identity-privilege-reviewer"],
+      "reason": "Human end-user RBAC is the Phase 3 matrix designer; the agent identity reviewer consumes it as the ceiling that delegated agent authority must respect."
+    },
+    {
+      "id": "message-authn-goes-to-comms-reviewer",
+      "prompt": "Verify that our agents actually authenticate each other's messages and that a rogue process can't spoof agent-to-agent traffic.",
+      "expected_skill": "inter-agent-comms-reviewer",
+      "should_not_trigger": ["agent-identity-privilege-reviewer"],
+      "reason": "Message-layer authentication, integrity, and replay are ASI07 comms review; the identity reviewer defines the identities that authentication uses, not the transport security itself."
+    }
+  ]
+}

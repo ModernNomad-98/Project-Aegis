@@ -1,6 +1,6 @@
 ---
 name: llm-output-safety-reviewer
-description: Review how an application consumes LLM output for improper output handling (OWASP LLM05) — treat every model output as untrusted data and trace it to each sink: HTML/markdown rendering (XSS), SQL/NoSQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool/function arguments, and stored-then-re-consumed content (second-order). Verify context-correct encoding/escaping, sandboxing for any executed generated code, and that output is validated/typed before it drives an action. Use when model output is rendered, executed, stored, or used to build a command, query, path, or request. Do NOT use for schema-shape validation of structured output (structured-output-validator), the injection that produced the output (prompt-injection-defender), factual correctness (ai-misinformation-guard), or tool-permission scope (agent-tool-safety-guard).
+description: Review how an application consumes LLM output for improper output handling (OWASP LLM05) — treat every model output as untrusted data and trace it to each sink: HTML/markdown rendering (XSS), SQL/NoSQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool/function arguments, and stored-then-re-consumed content (second-order). Verify context-correct encoding/escaping, sandboxing for executed generated code — incl. autonomous generate-and-run loops, sandbox escape, in-sandbox persistence, and natural-language-driven execution (agentic ASI05) — and validate-before-act discipline. Use when model output is rendered, executed, stored, or used to build a command, query, path, or request. Do NOT use for schema-shape validation of structured output (structured-output-validator), the injection that produced the output (prompt-injection-defender), factual correctness (ai-misinformation-guard), or tool-permission scope (agent-tool-safety-guard).
 ---
 
 # LLM Output Safety Reviewer
@@ -24,6 +24,10 @@ the flow from model output to impact.
 - Use when: reviewing an AI feature's output path for XSS, injection, RCE,
   SSRF, path traversal, or second-order (stored-output) issues.
 - Use when: an agent generates code that the system then runs.
+- Use when: an AUTONOMOUS agent loop generates and executes code with no
+  human between generate and run (ASI05) — sandbox boundaries and escape
+  paths, in-sandbox persistence between runs, package installs inside the
+  sandbox, and which natural-language inputs can reach an execution path.
 - Do NOT use when: the concern is the SHAPE/type of structured output —
   `structured-output-validator` (this skill is the injection/exec sink review;
   they compose).
@@ -41,7 +45,10 @@ the flow from model output to impact.
    on; is `dangerouslySetInnerHTML`/`v-html`/`innerHTML` or a markdown renderer
    with raw-HTML enabled in play.
 3. Execution paths: any `eval`, dynamic SQL, shell-out, code interpreter, or
-   generated-code runner; the sandbox (or absence) around it.
+   generated-code runner; the sandbox (or absence) around it. For agent
+   loops (ASI05): what natural-language input can trigger execution, what
+   persists in the sandbox between runs, and whether executed code can
+   install packages or reach the network.
 4. URL/path construction from output: SSRF (model-chosen URL fetched
    server-side), path traversal (model-chosen filename).
 5. Storage-and-reuse: output persisted then later rendered/executed as if
@@ -66,7 +73,13 @@ the flow from model output to impact.
    generated code that runs: require parameterization/allowlisting, and for
    generated-code execution require a real sandbox (isolated, no secrets, no
    network unless required, resource-limited). Unsandboxed execution of
-   generated code is RCE-class.
+   generated code is RCE-class. For AUTONOMOUS generate-and-run loops
+   (ASI05): require per-run ephemeral sandboxes (no cross-run persistence a
+   poisoned run can plant into), package installs treated as untrusted
+   supply-chain events, an execution budget, and a map of every
+   natural-language path that reaches execution — "user asks a question" →
+   "agent writes and runs code" is an NL-to-RCE path to enumerate, not a
+   feature to assume safe.
 5. **Review URL/path/request sinks.** Server-side fetch of a model-chosen URL
    is SSRF — require an allowlist and block internal ranges/metadata
    endpoints. Model-chosen file paths need traversal-safe resolution.
@@ -103,6 +116,9 @@ Not reviewed: <areas + why>
       sanitized with an allowlist or flagged.
 - [ ] Execution sinks are parameterized/allowlisted; generated-code execution
       runs in a real sandbox or is flagged as RCE-class.
+- [ ] Autonomous generate-and-run loops (if any) use per-run ephemeral
+      sandboxes with no default secrets/network, and every natural-language
+      path that reaches execution is mapped (ASI05).
 - [ ] URL sinks checked for SSRF (allowlist, internal-range block); path sinks
       checked for traversal.
 - [ ] Tool-argument sinks validate before the side effect (composed with
@@ -137,6 +153,12 @@ Not reviewed: <areas + why>
   admin console tomorrow by code that assumes internal data is safe.
 - Don't conflate with shape validation: JSON that parses cleanly can still
   carry an XSS payload in a string field — shape-valid ≠ safe-to-render.
+- Agent loops normalize execution (ASI05): when generate→run fires dozens of
+  times an hour autonomously, one hijacked generation is RCE with nobody
+  watching — and a sandbox that persists state between runs lets a poisoned
+  run plant what the next run trusts (pip install into a shared venv is the
+  classic). Ephemeral per-run sandboxes and NL-path mapping are the
+  controls, not human review of each generation.
 
 ## Stop Conditions
 
@@ -154,7 +176,8 @@ Not reviewed: <areas + why>
 
 - [references/output-sink-catalog.md](references/output-sink-catalog.md) —
   per-sink review checklist (render/execute/URL/path/tool-arg/store),
-  context-correct encoding rules, the generated-code sandbox rubric, and
+  context-correct encoding rules, the generated-code sandbox rubric
+  (including the ASI05 autonomous-loop and sandbox-escape extension), and
   second-order injection patterns.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the output & agency

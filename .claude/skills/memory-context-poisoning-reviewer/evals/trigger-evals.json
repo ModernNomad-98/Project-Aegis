@@ -1,0 +1,49 @@
+{
+  "skill": "memory-context-poisoning-reviewer",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: agent memory poisoning (ASI06) vs training-time poisoning (LLM04), retrieval authorization (LLM08), in-context injection (LLM01), and the dev-agent's own memory governance.",
+  "overlaps_with": ["model-poisoning-reviewer", "rag-security-architect", "prompt-injection-defender", "agent-memory-governance", "agent-goal-hijack-defender"],
+  "cases": [
+    {
+      "id": "agent-memory-wins-here",
+      "prompt": "Review whether attackers can plant entries in our assistant's long-term memory that persist across sessions and steer its later behavior.",
+      "expected_skill": "memory-context-poisoning-reviewer",
+      "should_not_trigger": ["model-poisoning-reviewer", "prompt-injection-defender"],
+      "reason": "Persistent corruption of the agent's own stored context/memory is ASI06; model-poisoning-reviewer owns training-time weights and prompt-injection-defender owns the current context window."
+    },
+    {
+      "id": "training-time-goes-to-model-poisoning",
+      "prompt": "Assess whether our fine-tuning dataset and RLHF feedback pipeline can be poisoned to change the model's behavior.",
+      "expected_skill": "model-poisoning-reviewer",
+      "should_not_trigger": ["memory-context-poisoning-reviewer"],
+      "reason": "Training/fine-tuning/feedback integrity is LLM04 (weights-shaping pipelines); ASI06 is the runtime state store the deployed agent reads and writes."
+    },
+    {
+      "id": "retrieval-authz-goes-to-rag-architect",
+      "prompt": "Make sure our vector store queries can only ever return documents the calling user and tenant are authorized to see.",
+      "expected_skill": "rag-security-architect",
+      "should_not_trigger": ["memory-context-poisoning-reviewer"],
+      "reason": "Who-may-retrieve enforcement at query time is LLM08 retrieval authorization; the memory reviewer covers integrity of what gets WRITTEN into the agent's own memory and how it is trusted at recall."
+    },
+    {
+      "id": "in-context-payload-goes-to-injection-defender",
+      "prompt": "A document our agent read this session contained hidden instructions and it followed them immediately — design the defense.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": ["memory-context-poisoning-reviewer"],
+      "reason": "A payload acting within the current context window is LLM01 injection; ASI06 begins when the payload PERSISTS into stored memory and fires in later sessions."
+    },
+    {
+      "id": "dev-agent-memory-goes-to-governance",
+      "prompt": "Define when our coding agent may update its own persistent MEMORY.md files and how remembered repo facts get verified before use.",
+      "expected_skill": "agent-memory-governance",
+      "should_not_trigger": ["memory-context-poisoning-reviewer"],
+      "reason": "The development agent's own memory-file write/trust/hygiene discipline is Phase 1.5 operational governance; ASI06 is a security review of a product agent's memory subsystem against attackers."
+    },
+    {
+      "id": "run-level-objective-goes-to-goal-hijack",
+      "prompt": "Mid-run, content our agent read changed what it was trying to accomplish — keep its objective pinned for the rest of the run.",
+      "expected_skill": "agent-goal-hijack-defender",
+      "should_not_trigger": ["memory-context-poisoning-reviewer"],
+      "reason": "Run-level goal/plan integrity is ASI01; the memory reviewer owns the persistent store a hijack might write to, not the live run's objective."
+    }
+  ]
+}

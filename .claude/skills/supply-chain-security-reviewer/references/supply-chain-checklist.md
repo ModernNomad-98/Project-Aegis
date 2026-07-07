@@ -90,6 +90,37 @@ package. Scope: ACQUISITION. Integrity of data you curate or pipelines you run
 Boundary: a backdoored/poisoned artifact you DOWNLOADED is this skill; poisoning
 of data you COLLECT or a model you TRAIN is `model-poisoning-reviewer`.
 
+## Agentic supply chain (OWASP Agentic ASI04)
+
+Agentic components are dependencies whose compromise grants AGENCY, not just
+code execution — an installed MCP server answers your agent's tool calls.
+Scope: ACQUISITION and update. Live message security between installed
+components is `inter-agent-comms-reviewer` (ASI07).
+
+- **MCP servers & manifests:** which registry/source, which maintainer, is
+  it the official upstream or a look-alike (server-name squatting on
+  registries)? Diff the manifest's declared tools/permissions against what
+  the use case needs — permission width is the blast radius your agent
+  inherits; a note-taking server declaring shell/filesystem/network tools is
+  a finding at install time. Local-stdio servers execute on your host with
+  your privileges: treat like any install-script risk above.
+- **Pinning & update path:** pin servers/plugins to immutable versions
+  (digest/SHA); a registry entry that can silently update is an unpinned
+  dependency WITH AGENCY. Manifest changes on update are reviewed like
+  dependency-code changes — a benign v1 that adds `exec` in v1.1 is the
+  agentic version of a maintainer-change attack.
+- **Tool/skill registries:** registry entries (skills, tool definitions,
+  agent templates) are behavior-steering artifacts — review who can publish,
+  whether entries are signed/attested, and pin what you consume. A poisoned
+  skill/tool DESCRIPTION steers the model's tool choice even when the code
+  is clean (the description is part of the attack surface).
+- **A2A dependencies:** external agents your agents delegate to are
+  supply-chain endpoints — source/operator trust, contract pinning, and the
+  attenuated-authority rules of `agent-identity-privilege-reviewer` apply at
+  acquisition; runtime authn/integrity is ASI07.
+- **Transitive agentic deps:** an MCP server's own dependency tree (and the
+  packages a plugin pulls) go through the ordinary dependency review above.
+
 ## HIGH-severity gate
 
 A HIGH/CRITICAL finding must state a compromise path: weakness → attacker
@@ -103,4 +134,6 @@ unreachable CVE does not — rank it low and say why.
 - First-party SAST/CodeQL findings → `static-analysis-reviewer`.
 - Integrity of curated training data / feedback loops / RAG ingestion →
   `model-poisoning-reviewer` (acquire-vs-ingest split).
+- Live agent/MCP message security (authn, integrity, replay) →
+  `inter-agent-comms-reviewer` (install-vs-runtime split, ASI04 vs ASI07).
 - Applying an upgrade/CI change → separate classified, approved change.

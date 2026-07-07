@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "inter-agent-comms-reviewer",
+  "description": "Trigger and behavior cases for inter-agent comms review: per-edge authentication, end-to-end integrity, replay bounds, confidentiality, topology allowlists, authenticated-but-untrusted content handling.",
+  "cases": [
+    {
+      "id": "positive-orchestrator-worker-bus",
+      "type": "should_trigger",
+      "prompt": "Our planner agent posts tasks to a Redis queue and worker agents pick them up and execute them. Anything on the box can publish to that queue. Review the agent-to-agent messaging.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the unauthenticated queue as the headline finding: any local process can publish, so a rogue producer can task the workers — requires per-producer broker authentication and per-topic ACLs, not localhost trust.",
+          "Requires end-to-end message signing (channel TLS alone leaves broker-position tampering invisible), replay bounds (nonce/timestamp/expiry, idempotent side-effecting commands), and topology allowlisting of who may publish and consume.",
+          "Enforces authenticated ≠ trusted on the receiver: a task message may inform work but cannot re-task a worker beyond its pinned goal, change permissions, or assert approvals from message text.",
+          "Ranks findings by attack path (spoof/tamper/replay → what the receiving worker would DO) and hands spoof/tamper/replay red-team cases to ai-evaluation-harness."
+        ]
+      }
+    },
+    {
+      "id": "edge-single-agent-mcp-servers",
+      "type": "should_trigger",
+      "prompt": "We have one agent connected to three remote MCP servers over HTTP. No agent-to-agent traffic at all. Is there anything to review?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Confirms the surface exists without A2A traffic: agent-to-server edges need TLS with pinned server identity (an endpoint swap must not go undetected) and client-side credentials scoped per server.",
+          "Reviews the response direction: results from a compromised server are untrusted output that must be schema-validated and must not steer the agent off-scope — routes the tool-argument half to agent-tool-safety-guard.",
+          "Keeps acquisition trust of the MCP server packages out of scope, routing it to supply-chain-security-reviewer (ASI04)."
+        ]
+      }
+    },
+    {
+      "id": "negative-mcp-package-acquisition",
+      "type": "should_not_trigger",
+      "prompt": "Before we install this community MCP server from a registry, review whether we should trust the package and its manifest.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Install-time trust of MCP server packages, manifests, and registries is the agentic supply chain (ASI04) — supply-chain-security-reviewer; this skill reviews the live message exchange once the server is in use."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-trust-authenticated-peer",
+      "type": "should_trigger",
+      "prompt": "Our agents mutually authenticate over mTLS, so a message from a verified peer agent can safely be treated as a trusted instruction, including scope changes it requests. Confirm the design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the equivalence: mTLS authenticates the SENDER, not the content — a verified peer may be compromised or manipulated, so its messages remain untrusted input.",
+          "Requires receiver-side handling where message content never changes goals, identity, or permissions, and authority claims are verified against the system of record, not message text.",
+          "Keeps the mTLS layer as necessary-but-insufficient and states the residual risk if the team accepts instruction-trusting anyway (named acceptor via human-approval-boundary)."
+        ]
+      }
+    }
+  ]
+}

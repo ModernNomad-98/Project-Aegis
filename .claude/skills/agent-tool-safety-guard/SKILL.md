@@ -1,6 +1,6 @@
 ---
 name: agent-tool-safety-guard
-description: Design or review least-privilege tool/function access for an LLM agent to contain excessive agency (OWASP LLM06) — build the per-tool permission matrix (what each tool does, its side effects, its blast radius, who it runs as), validate tool arguments against a schema before execution, run tools with the CALLING USER's authority (not the agent's or a service account's), gate irreversible/high-impact actions behind human approval, and map tool-chain composition abuse paths where one tool's output drives another's arguments. Composes human-approval-boundary and agent-authorization-matrix for the approval and standing-authority layers. Use when an agent can call tools/functions/APIs and you need to scope what it may do. Do NOT use for injection defense (prompt-injection-defender), executing agent-generated code (llm-output-safety-reviewer), retrieval authz (rag-security-architect), or standing agent-vs-human merge/deploy authority (agent-authorization-matrix).
+description: Design or review least-privilege tool/function access for an LLM agent, containing excessive agency and tool misuse (OWASP LLM06 + ASI02) — build the per-tool permission matrix (side effects, blast radius, who it runs as), validate arguments against a schema before execution, run tools with the CALLING USER's authority (not a service account's), gate irreversible/high-impact actions behind human approval, map tool-chain abuse paths where one tool's output drives another's arguments, and class code-execution tools (interpreter/shell/eval) as maximal blast radius needing sandbox plus approval (the tool-side ASI05 slice). Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools/functions/APIs and you need to scope what it may do. Do NOT use for injection defense (prompt-injection-defender), the sandbox itself (llm-output-safety-reviewer), retrieval authz (rag-security-architect), or standing merge/deploy authority (agent-authorization-matrix).
 ---
 
 # Agent Tool Safety Guard
@@ -27,6 +27,11 @@ from `human-approval-boundary`; standing agent authority from
   approval on destructive operations.
 - Use when: adding a new tool to an existing agent and its blast radius needs
   assessing.
+- Use when: reviewing tool misuse/exploitation paths (ASI02) — a manipulated
+  agent abusing its legitimate tools within granted scopes, side-effect
+  limits per tool, or a code-execution tool (interpreter/shell/eval) whose
+  blast-radius class and approval posture need setting (the tool-side slice
+  of ASI05; the sandbox internals are `llm-output-safety-reviewer`'s).
 - Do NOT use when: the concern is stopping injected instructions from
   reaching the tools (`prompt-injection-defender` — this skill assumes the
   boundary and designs it).
@@ -49,12 +54,18 @@ from `human-approval-boundary`; standing agent authority from
    `agent-authorization-matrix` output where present.
 6. The autonomy context: is the agent autonomous, human-in-the-loop, or
    advisory; how tool outputs feed back into the next model call.
+7. Code-execution tools if any (interpreter, shell, eval, code-runner):
+   their sandbox posture, what executed code can reach, and which
+   natural-language paths can trigger execution (ASI05 tool slice — the
+   sandbox rubric itself lives with `llm-output-safety-reviewer`).
 
 ## Workflow
 
 1. **Inventory tools and side effects.** For each tool, record: purpose, real
    side effect, reversibility, blast radius (one record / one tenant / all
-   tenants / external), and cost. No tool surface to inspect → Stop Conditions.
+   tenants / external), and cost. Class any code-execution tool (interpreter,
+   shell, eval) as maximal blast radius from the start (ASI05). No tool
+   surface to inspect → Stop Conditions.
 2. **Apply least privilege.** Challenge every tool: does the task require it?
    Can a read-only or narrower-scope version do? Remove or narrow tools that
    exceed the task. Fewer tools and tighter scopes shrink the surface an
@@ -70,12 +81,16 @@ from `human-approval-boundary`; standing agent authority from
 5. **Gate high-impact actions.** Irreversible, destructive, costly, or
    cross-boundary actions require human approval via `human-approval-boundary`;
    define the trigger per tool. Standing "agent may never do X autonomously"
-   rules come from `agent-authorization-matrix`.
+   rules come from `agent-authorization-matrix`. Code-execution tools default
+   to sandbox-required plus approval (per-tool side-effect limits set here;
+   the sandbox itself per `llm-output-safety-reviewer`, ASI05).
 6. **Map tool-chain composition abuse** using
    [references/tool-permission-matrix.md](references/tool-permission-matrix.md):
    where one tool's (untrusted) output becomes another tool's arguments, a
    safe-looking chain can compose into harm (read → summarize → send). Model
-   the chains, not just single calls.
+   the chains, not just single calls — including natural-language-driven
+   execution paths where untrusted content steers WHICH tool runs with WHICH
+   arguments (ASI02 misuse runs through legitimate grants).
 7. **Design containment and telemetry.** Rate/quantity limits per tool,
    a kill switch to disable a tool or the agent, and logging of every tool
    call with arguments and outcome (compose `observability-operator`).
@@ -112,6 +127,9 @@ Residual risk: <what remains + named acceptor>
 - [ ] Irreversible/costly/cross-boundary actions are approval-gated with a
       defined trigger.
 - [ ] Tool-chain composition abuse paths are mapped, not just single calls.
+- [ ] Code-execution tools (if any) are classed maximal-blast-radius:
+      sandbox-required (per `llm-output-safety-reviewer`), approval-gated,
+      with misuse and NL-driven execution paths mapped (ASI02/ASI05).
 - [ ] Kill switch, per-tool limits, and per-call telemetry are specified;
       abuse routes to `incident-response-runbook`.
 
@@ -144,6 +162,13 @@ Residual risk: <what remains + named acceptor>
   high-impact actions, not everything.
 - "The model decided" is not authorization — authorization is a code
   decision about the user, checked before the effect.
+- A code-execution tool makes the rest of the matrix moot if unsandboxed:
+  "run this Python" with network and ambient credentials is RCE with extra
+  steps — class interpreter/shell/eval tools as their own maximal-blast-
+  radius row (ASI05), sandbox-required and approval-gated, never wired to a
+  service account. ASI02 misuse needs no new tools at all: the abuse runs
+  THROUGH legitimate grants, which is why side-effect limits and chain
+  mapping matter even when every single tool looks properly scoped.
 
 ## Stop Conditions
 
@@ -161,8 +186,9 @@ Residual risk: <what remains + named acceptor>
 
 - [references/tool-permission-matrix.md](references/tool-permission-matrix.md)
   — the per-tool matrix template, blast-radius rubric, calling-user identity
-  patterns, argument-validation checklist, and the tool-chain composition
-  abuse catalog.
+  patterns, argument-validation checklist, the tool-chain composition
+  abuse catalog, and the ASI02/ASI05 extension (tool misuse paths,
+  code-execution tool class, NL-driven execution).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the output & agency
   cluster and against `agent-authorization-matrix` and `human-approval-boundary`.

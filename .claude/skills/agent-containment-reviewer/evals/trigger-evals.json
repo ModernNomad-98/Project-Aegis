@@ -1,0 +1,49 @@
+{
+  "skill": "agent-containment-reviewer",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: containment (ASI08 cascade + ASI10 rogue/drift) vs cost guardrails, incident execution, goal hijack, telemetry implementation, and the generated-code sandbox.",
+  "overlaps_with": ["ai-cost-guardrail-designer", "incident-response-runbook", "agent-goal-hijack-defender", "observability-operator", "llm-output-safety-reviewer"],
+  "cases": [
+    {
+      "id": "containment-wins-here",
+      "prompt": "Design the blast-radius isolation, drift detection, and kill switches for our fleet of autonomous agents so one bad agent can't take the rest down.",
+      "expected_skill": "agent-containment-reviewer",
+      "should_not_trigger": ["ai-cost-guardrail-designer", "incident-response-runbook"],
+      "reason": "Fault propagation, drift detection, inventory, and authority-severing kill switches are the merged ASI08+ASI10 containment review; cost caps are composed from the guardrail designer and incident execution belongs to the runbook."
+    },
+    {
+      "id": "spend-caps-go-to-cost-guardrails",
+      "prompt": "Add token caps, per-tenant AI budgets, and burn-rate alerts before our LLM bill gets away from us.",
+      "expected_skill": "ai-cost-guardrail-designer",
+      "should_not_trigger": ["agent-containment-reviewer"],
+      "reason": "Consumption/spend guardrails (LLM10) are the cost designer's; containment composes those budgets into cascade control but owns fault and drift, not the caps themselves."
+    },
+    {
+      "id": "live-incident-goes-to-runbook",
+      "prompt": "One of our agents is actively spamming customers right now — walk us through severity, roles, containment, and comms.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": ["agent-containment-reviewer"],
+      "reason": "Running a live incident (severity ladder, roles, containment execution, comms) is the incident runbook, which invokes the kill-switch design this skill produced; the review does not run incidents."
+    },
+    {
+      "id": "attacker-redirection-goes-to-goal-hijack",
+      "prompt": "Attackers are redirecting what our agent works on via content it ingests — keep its objective from being altered.",
+      "expected_skill": "agent-goal-hijack-defender",
+      "should_not_trigger": ["agent-containment-reviewer"],
+      "reason": "Adversary-directed objective alteration is ASI01; containment's ASI10 half covers deviation without active attacker control, plus the detection/kill machinery either case needs."
+    },
+    {
+      "id": "alert-implementation-goes-to-observability",
+      "prompt": "Wire up the dashboards and alert rules for our agents' error rates and latency in our monitoring stack.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["agent-containment-reviewer"],
+      "reason": "Hands-on implementation of alerts/dashboards is the observability operator (manual-only); containment defines WHAT baselines and drift signals must exist and hands the wiring over."
+    },
+    {
+      "id": "generated-code-sandbox-goes-to-output-safety",
+      "prompt": "Review the sandbox around the Python our agent writes and executes so generated code can't escape or reach secrets.",
+      "expected_skill": "llm-output-safety-reviewer",
+      "should_not_trigger": ["agent-containment-reviewer"],
+      "reason": "The execution sandbox for agent-generated code is the LLM05/ASI05 output-handling surface; containment bounds failure spread BETWEEN agents, not the code-exec sink inside one."
+    }
+  ]
+}

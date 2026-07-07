@@ -1,0 +1,49 @@
+{
+  "skill": "agent-goal-hijack-defender",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM06/ASI02), and hands-on probing (subagent).",
+  "overlaps_with": ["prompt-injection-defender", "memory-context-poisoning-reviewer", "agent-containment-reviewer", "agent-tool-safety-guard", "ai-security-red-team-reviewer (subagent)"],
+  "cases": [
+    {
+      "id": "goal-plan-integrity-wins-here",
+      "prompt": "Our multi-step agent keeps getting re-tasked by content it encounters mid-run — design the controls that keep its objective fixed to what the user actually asked.",
+      "expected_skill": "agent-goal-hijack-defender",
+      "should_not_trigger": ["prompt-injection-defender", "agent-containment-reviewer"],
+      "reason": "Keeping the run's objective pinned against mid-run content is ASI01 goal/plan integrity; prompt-injection-defender owns the context-layer vector, and containment owns drift without an attacker."
+    },
+    {
+      "id": "injection-vector-goes-to-defender",
+      "prompt": "Set up trust zones and deterministic action authorization so instructions hidden in documents can't drive our LLM's behavior.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": ["agent-goal-hijack-defender"],
+      "reason": "Trust zones, content/instruction separation, and the deterministic action boundary are LLM01 defense-in-depth; this skill composes that layer and adds goal pinning above it only for multi-step agents."
+    },
+    {
+      "id": "persistent-corruption-goes-to-memory-reviewer",
+      "prompt": "An attacker got our agent to store a fake 'user preference' that keeps steering its behavior in every later session — review the memory system.",
+      "expected_skill": "memory-context-poisoning-reviewer",
+      "should_not_trigger": ["agent-goal-hijack-defender"],
+      "reason": "Cross-session corruption of stored memory is ASI06; goal hijack is the run-level objective alteration. The two compose (a poisoned memory can feed a hijack) but the memory system review belongs to the memory skill."
+    },
+    {
+      "id": "attackerless-drift-goes-to-containment",
+      "prompt": "No one is attacking us, but one of our agents has slowly started behaving outside its intended pattern and we have no way to detect or stop it.",
+      "expected_skill": "agent-containment-reviewer",
+      "should_not_trigger": ["agent-goal-hijack-defender"],
+      "reason": "Behavioral drift without attacker control, plus detection and kill switches, is the ASI10 half of agent-containment-reviewer; hijack defense assumes an adversary redirecting the goal."
+    },
+    {
+      "id": "tool-scope-goes-to-tool-guard",
+      "prompt": "Scope which tools our agent may call and validate their arguments so a manipulated step can't do damage.",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": ["agent-goal-hijack-defender"],
+      "reason": "Per-tool least privilege and argument validation are the action boundary (LLM06/ASI02); goal integrity sits above it and composes it."
+    },
+    {
+      "id": "live-probing-goes-to-red-team-subagent",
+      "prompt": "Actually try to hijack our deployed agent's goal with hostile documents and tell me which payloads succeed.",
+      "expected_skill": "ai-security-red-team-reviewer (subagent)",
+      "should_not_trigger": ["agent-goal-hijack-defender"],
+      "reason": "Hands-on adversarial probing of a live system is the red-team subagent; this skill designs the defense and the suite, it doesn't execute the attack."
+    }
+  ]
+}
