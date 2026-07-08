@@ -1,0 +1,41 @@
+{
+  "skill": "pagination-cursor-designer",
+  "description": "Trigger discrimination for the pagination MECHANISM (this skill) vs the endpoint CONTRACT it rides on (api-event-architect), vs one query's plan (query-plan-reader), and vs list caching (caching-strategy-designer).",
+  "overlaps_with": [
+    "api-event-architect",
+    "query-plan-reader",
+    "caching-strategy-designer"
+  ],
+  "cases": [
+    {
+      "id": "pagination-mechanism-wins-here",
+      "prompt": "Design how clients page through a large, frequently-updated list without seeing duplicates or gaps — the cursor format, ordering, page-size limits, and how we signal the last page.",
+      "expected_skill": "pagination-cursor-designer",
+      "should_not_trigger": ["api-event-architect", "query-plan-reader"],
+      "note": "SEAM CASE (primary) — cursor contents, stable ordering, page-size bounds, and end signaling are pagination mechanics. No route conventions, versioning policy, or rate-limit tiers are being designed.",
+      "reason": "Drift-free traversal via a keyset cursor is this skill's core deliverable. api-event-architect owns the surrounding contract, not the cursor's stability rules."
+    },
+    {
+      "id": "api-contract-goes-to-api-event-architect",
+      "prompt": "Design our public list APIs: resource routes, the response envelope, version negotiation and a deprecation window, and per-plan rate limits on the collection endpoints.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["pagination-cursor-designer"],
+      "note": "SEAM CASE (reverse) — routes, envelope, versioning/deprecation, and rate limits are the external contract. Pagination is one field inside it, not what is being designed here.",
+      "reason": "The contract surface for external consumers belongs to api-event-architect. This skill designs the pagination mechanism that lives inside such a contract."
+    },
+    {
+      "id": "one-slow-query-goes-to-query-plan-reader",
+      "prompt": "The keyset query behind our list is still slow at 2M rows — here's the EXPLAIN ANALYZE, tell me what index or rewrite fixes it.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["pagination-cursor-designer"],
+      "reason": "Analyzing one query's execution plan and prescribing an index/sargability change is query-plan-reader. This skill defines the pagination model; it hands the resulting keyset query to query-plan-reader when the query itself needs tuning."
+    },
+    {
+      "id": "list-caching-goes-to-caching-strategy-designer",
+      "prompt": "Should we cache these list responses to cut database load, and how do we keep them fresh when items change?",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["pagination-cursor-designer"],
+      "reason": "Deciding what to cache, where, and how it stays correct (TTL/invalidation) is caching-strategy-designer. This skill only defines the cursor that such a cache's key must include; it does not design the cache."
+    }
+  ]
+}

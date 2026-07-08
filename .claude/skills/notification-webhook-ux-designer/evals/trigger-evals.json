@@ -1,0 +1,42 @@
+{
+  "skill": "notification-webhook-ux-designer",
+  "description": "Trigger discrimination for the human-facing UX of notifications/webhooks (this skill) vs the webhook DELIVERY CONTRACT (api-event-architect), vs generic state rendering (edge-state-ux-designer), vs internal on-call alerting (observability-operator).",
+  "overlaps_with": [
+    "api-event-architect",
+    "edge-state-ux-designer",
+    "observability-operator"
+  ],
+  "cases": [
+    {
+      "id": "notification-webhook-ux-wins-here",
+      "prompt": "Design the notification preferences center and the developer webhook dashboard — per-category channel controls, a delivery log with replay, and secret rotation.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": ["api-event-architect", "observability-operator"],
+      "note": "SEAM CASE (primary) — preference controls, a delivery-log/replay dashboard, and secret-rotation UX are the human/developer experience. No envelope schema, signing algorithm, or retry policy is being defined.",
+      "reason": "How a person configures notifications and how a developer observes and manages webhook deliveries is this skill's core scope, sitting on top of the delivery contract."
+    },
+    {
+      "id": "delivery-contract-goes-to-api-event-architect",
+      "prompt": "Design the webhook delivery contract: versioned envelope schema, HMAC signature scheme, at-least-once delivery with exponential backoff and a dead-letter, event versioning, and tenant-scoped subscriptions.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["notification-webhook-ux-designer"],
+      "note": "SEAM CASE (primary, reverse) — envelope, signing, retry/at-least-once, versioning, and subscription semantics are the wire contract. The management UI that surfaces them is downstream.",
+      "reason": "api-event-architect owns the delivery contract for external consumers. This skill designs the UX over that contract and displays (never redefines) its retry/auto-disable policy."
+    },
+    {
+      "id": "generic-state-rendering-goes-to-edge-state-ux-designer",
+      "prompt": "For the delivery-log screen, design the empty state, the loading skeleton, and the error toast when the log fails to load.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": ["notification-webhook-ux-designer"],
+      "note": "SEAM CASE (within pack) — empty/loading/error rendering of any screen is edge-state-ux-designer, even when the screen happens to be a webhook log.",
+      "reason": "edge-state-ux-designer owns generic non-happy-path state rendering. This skill designs the notification/webhook information architecture and affordances, not the loading skeleton."
+    },
+    {
+      "id": "internal-alerting-goes-to-observability-operator",
+      "prompt": "When our webhook delivery workers back up or error rates spike, page the on-call engineer with severity and a runbook link.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["notification-webhook-ux-designer"],
+      "reason": "Internal alerts to on-call engineers (severity, owner, runbook, thresholds) are observability-operator / slo-reliability-architect. This skill designs the integrator-facing failing-endpoint notice, not the internal page."
+    }
+  ]
+}

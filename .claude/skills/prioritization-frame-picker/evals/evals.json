@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "prioritization-frame-picker",
+  "description": "Behavior cases for prioritization: matching the frame to the decision, marking input reliability, refusing false rigor, and pulling must-dos out of the value formula.",
+  "cases": [
+    {
+      "id": "positive-pick-the-frame",
+      "type": "should_trigger",
+      "prompt": "We have 25 candidate features and everyone ranks them differently. What prioritization framework should we use and how do we apply it?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Frames the decision first (what's ranked, toward what outcome, input quality, time horizon) before choosing a framework.",
+          "Selects a frame matched to the situation (e.g. RICE for many comparable features, or WSJF if timing dominates) and states its fit AND limits rather than defaulting.",
+          "Lists the inputs the frame needs and marks each evidence vs guess.",
+          "Produces a ranking with buckets/ranges and a sensitivity check, and hands sequencing over time to roadmap-under-uncertainty-planner."
+        ]
+      }
+    },
+    {
+      "id": "positive-timing-dominates",
+      "type": "should_trigger",
+      "prompt": "Several of these initiatives lose value fast if they're late — a seasonal launch, a partner deadline. Our value-vs-effort matrix ignores that. Help us prioritize.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes that cost-of-delay/timing dominates and recommends a frame that captures it (WSJF / cost-of-delay) over a time-blind value/effort matrix.",
+          "Surfaces the inputs cost-of-delay needs and their reliability.",
+          "Explains why the current frame mis-ranks time-sensitive work.",
+          "Produces the ranking with assumptions explicit."
+        ]
+      }
+    },
+    {
+      "id": "edge-must-do-lane",
+      "type": "should_trigger",
+      "prompt": "A required security remediation and a legal-compliance change keep scoring low on our RICE model and getting pushed down. How do we prioritize with these in the mix?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pulls the compliance/security must-dos into a protected lane above the value score rather than forcing them through the formula.",
+          "Refuses to value-score required work in a way that buries it (a Stop Condition if pressed to).",
+          "Keeps the RICE ranking for the genuinely discretionary items.",
+          "Notes that gaming inputs to make must-dos 'win' the formula is not the fix — a lane is."
+        ]
+      }
+    },
+    {
+      "id": "should-not-launder-guesses-into-precision",
+      "type": "should_trigger",
+      "prompt": "Just give me the exact RICE scores to two decimals and rank the list definitively so we can stop arguing — reach and impact are our best guesses but treat them as final.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to present two-decimal precision on guessed inputs — that launders guesses into false authority.",
+          "Uses buckets/ranges and applies a confidence discount to guess-based scores.",
+          "Runs a sensitivity check and reports where the order flips if a soft input moves within its plausible range.",
+          "Routes the residual trade-off to human judgment rather than manufacturing a decisive number."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-sequence-the-roadmap",
+      "type": "should_not_trigger",
+      "prompt": "The backlog is already ranked. Now lay it out as a roadmap across now/next/later with confidence levels and a re-plan cadence.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke prioritization-frame-picker: sequencing an already-ranked set over horizons with confidence and re-planning is roadmap-under-uncertainty-planner.",
+          "The ranking is done; the task is time-sequencing, not method selection."
+        ]
+      }
+    }
+  ]
+}

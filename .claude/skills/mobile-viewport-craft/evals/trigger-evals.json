@@ -1,0 +1,42 @@
+{
+  "skill": "mobile-viewport-craft",
+  "description": "Trigger discrimination for mobile layout/touch/viewport CRAFT (this skill) vs mobile page WEIGHT/performance (frontend-perf-engineer), vs non-happy-path STATES (edge-state-ux-designer), vs a11y VERIFICATION (accessibility-test-harness).",
+  "overlaps_with": [
+    "frontend-perf-engineer",
+    "edge-state-ux-designer",
+    "accessibility-test-harness"
+  ],
+  "cases": [
+    {
+      "id": "viewport-craft-wins-here",
+      "prompt": "Make this UI work on phones: pick breakpoints, size the tap targets, fix the full-height panel that gets clipped by the browser bar, and reflow the wide table.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": ["frontend-perf-engineer", "edge-state-ux-designer"],
+      "note": "SEAM CASE (primary) — breakpoints, touch sizing, the 100vh/viewport-unit fix, and table reflow are viewport/touch craft. No bundle-weight target and no empty/loading/error state design appears.",
+      "reason": "Layout, touch, and viewport correctness on small screens is this skill's core scope, distinct from performance and from state design."
+    },
+    {
+      "id": "mobile-weight-goes-to-frontend-perf-engineer",
+      "prompt": "The mobile bundle is too heavy and Largest Contentful Paint is 5s on a cheap phone. Cut weight, split code, and set metric budgets.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": ["mobile-viewport-craft"],
+      "note": "SEAM CASE (primary, reverse) — bundle weight, code splitting, and load-metric budgets are frontend performance, measured on a device/network class. Layout/touch craft is a different axis.",
+      "reason": "frontend-perf-engineer owns kilobytes, execution cost, and metric budgets. This skill owns how the layout and touch targets behave, independent of payload size."
+    },
+    {
+      "id": "state-design-goes-to-edge-state-ux-designer",
+      "prompt": "Design the empty, loading, and error states for this list — first-run vs filtered-empty, skeletons, and the fetch-failure view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": ["mobile-viewport-craft"],
+      "note": "SEAM CASE (within pack) — empty/loading/error state design is edge-state-ux-designer. Those states still need mobile craft, but the state model itself is separate.",
+      "reason": "edge-state-ux-designer owns the non-happy-path state matrix. This skill owns the responsive/touch presentation of any state, not which states exist."
+    },
+    {
+      "id": "a11y-verification-goes-to-accessibility-test-harness",
+      "prompt": "Set up the accessibility test pass: axe scans in CI, keyboard traversal checks, contrast, and verify layout holds at 200% zoom.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": ["mobile-viewport-craft"],
+      "reason": "Designing the a11y verification harness (scans, keyboard/contrast/zoom checks in CI) is accessibility-test-harness. This skill designs touch-target and zoom-safe craft and records the a11y intent that harness verifies."
+    }
+  ]
+}

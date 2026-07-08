@@ -1,0 +1,43 @@
+{
+  "skill": "product-spec-writer",
+  "description": "Trigger discrimination for the PRODUCT SPEC (this skill: what user-facing thing, and how we know it's done) vs the ARCHITECTURE DECISION RECORD (adr-writer: which technical option and why) — the hard seam — plus requirements elicitation (requirements-gathering-facilitator) and rollout mechanics (feature-flag-rollout-strategist).",
+  "overlaps_with": [
+    "adr-writer",
+    "requirements-gathering-facilitator",
+    "feature-flag-rollout-strategist"
+  ],
+  "cases": [
+    {
+      "id": "product-spec-wins-here",
+      "prompt": "Requirements are agreed. Write the feature spec: the user problem, goals and non-goals, scenarios, functional requirements with testable acceptance criteria, and success metrics.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": ["adr-writer", "requirements-gathering-facilitator"],
+      "note": "SEAM CASE (primary) — problem, scope, scenarios, requirements, acceptance criteria, and success metrics for a user-facing feature are a product spec. No single technical decision is being chosen or recorded.",
+      "reason": "The user-facing what-and-why with verifiable acceptance is this skill's core deliverable, distinct from an architecture decision."
+    },
+    {
+      "id": "architecture-decision-goes-to-adr-writer",
+      "prompt": "We chose to move the ledger to event sourcing over a CRUD schema. Record it: context, the decision, the alternatives we weighed, consequences good and bad, and the rollback plan.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": ["product-spec-writer"],
+      "note": "SEAM CASE (primary, reverse — THE hard seam) — one technical choice with context, alternatives, consequences, and rollback is an ADR. It is not a user-facing feature spec.",
+      "reason": "adr-writer records a specific architecture/technical decision and its rejected alternatives. A product spec may cite that ADR but never makes the decision. Different object, different intent."
+    },
+    {
+      "id": "still-eliciting-goes-to-requirements-gathering-facilitator",
+      "prompt": "We don't actually agree on the problem yet and stakeholders want different things. Help us get to clear requirements first.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": ["product-spec-writer"],
+      "note": "SEAM CASE (within pack) — unresolved, contested requirements are the elicitation phase, upstream of any spec.",
+      "reason": "requirements-gathering-facilitator resolves the need before a spec exists. Writing a spec over contested requirements invents agreement; this skill refuses that."
+    },
+    {
+      "id": "rollout-mechanics-go-to-feature-flag-rollout-strategist",
+      "prompt": "Design how we ship this behind a flag: internal → 5% → cohort → GA, the guardrail metrics that auto-roll-back, targeting rules, and the kill switch.",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": ["product-spec-writer"],
+      "note": "SEAM CASE (within pack) — progressive %s, guardrail auto-rollback, targeting, and a kill switch are rollout mechanics. The spec states rollout INTENT and success only.",
+      "reason": "feature-flag-rollout-strategist owns the flag-gated delivery plan. The product spec names the rollout intent and success metrics, not the flag plumbing."
+    }
+  ]
+}

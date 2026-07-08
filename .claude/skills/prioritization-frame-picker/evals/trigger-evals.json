@@ -1,0 +1,42 @@
+{
+  "skill": "prioritization-frame-picker",
+  "description": "Trigger discrimination for RANKING method selection/application (this skill) vs SEQUENCING the ranked set over time (roadmap-under-uncertainty-planner), vs specifying one item (product-spec-writer), vs eliciting the underlying need (requirements-gathering-facilitator).",
+  "overlaps_with": [
+    "roadmap-under-uncertainty-planner",
+    "product-spec-writer",
+    "requirements-gathering-facilitator"
+  ],
+  "cases": [
+    {
+      "id": "ranking-method-wins-here",
+      "prompt": "Pick the right prioritization framework for our backlog and apply it — surface the inputs, mark which are guesses, and rank the items honestly.",
+      "expected_skill": "prioritization-frame-picker",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner", "product-spec-writer"],
+      "note": "SEAM CASE (primary) — choosing and applying a scoring frame to rank items is prioritization. No time-sequencing over horizons and no single-item spec is being produced.",
+      "reason": "Selecting the fitting frame and producing an honest ranking is this skill's core scope; it hands the ranked set off for time-sequencing."
+    },
+    {
+      "id": "sequencing-goes-to-roadmap-under-uncertainty-planner",
+      "prompt": "Items are ranked. Now sequence them into a roadmap across now/next/later with confidence and a re-plan cadence.",
+      "expected_skill": "roadmap-under-uncertainty-planner",
+      "should_not_trigger": ["prioritization-frame-picker"],
+      "note": "SEAM CASE (within pack, reverse) — placing an already-ranked set over horizons with confidence is roadmap planning. The ranking method is upstream and done.",
+      "reason": "roadmap-under-uncertainty-planner sequences and communicates over time. This skill produced the ranking it consumes."
+    },
+    {
+      "id": "one-item-spec-goes-to-product-spec-writer",
+      "prompt": "The top-ranked item is chosen. Write its product spec: problem, scope, scenarios, acceptance criteria.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": ["prioritization-frame-picker"],
+      "reason": "product-spec-writer specifies one selected item. This skill ranks candidates; it does not detail any one of them."
+    },
+    {
+      "id": "unknown-value-goes-to-requirements-gathering-facilitator",
+      "prompt": "Honestly we don't know what most of these items are even worth or who needs them — we're guessing at everything.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": ["prioritization-frame-picker"],
+      "note": "SEAM CASE (within pack) — when the value/need is genuinely unknown, elicitation comes before ranking. Ranking unknowns is confident nonsense.",
+      "reason": "requirements-gathering-facilitator establishes the need and value. This skill ranks candidates whose value is at least estimable; it refuses to rank pure unknowns."
+    }
+  ]
+}

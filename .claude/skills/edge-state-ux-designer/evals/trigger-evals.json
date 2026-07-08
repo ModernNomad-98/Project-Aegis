@@ -1,0 +1,42 @@
+{
+  "skill": "edge-state-ux-designer",
+  "description": "Trigger discrimination for RENDERING non-happy-path states (this skill) vs the error MODEL behind them (error-taxonomy-designer), vs mobile viewport/touch craft (mobile-viewport-craft), vs VERIFYING state accessibility (accessibility-test-harness).",
+  "overlaps_with": [
+    "error-taxonomy-designer",
+    "mobile-viewport-craft",
+    "accessibility-test-harness"
+  ],
+  "cases": [
+    {
+      "id": "state-rendering-wins-here",
+      "prompt": "Design the empty, loading, and error states for this screen — including the first-run vs filtered-empty difference, skeletons, and what shows when a fetch fails.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": ["error-taxonomy-designer", "mobile-viewport-craft"],
+      "note": "SEAM CASE (primary) — empties, loading visuals, and error presentation are UI state design. No error codes/retryable model and no breakpoint/touch craft are being designed.",
+      "reason": "The per-view state matrix (empty/loading/error/partial/offline) is this skill's core deliverable, distinct from the error model and from responsive craft."
+    },
+    {
+      "id": "error-model-goes-to-error-taxonomy-designer",
+      "prompt": "Define our error categories and stable machine codes, which errors are retryable, the envelope shape, and a rule that messages never leak internals.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": ["edge-state-ux-designer"],
+      "note": "SEAM CASE (reverse, within pack) — a code taxonomy, retryability, envelope, and disclosure rule are the error model. Rendering it is downstream.",
+      "reason": "error-taxonomy-designer owns the codes/messages/retryability. This skill consumes them to render error states."
+    },
+    {
+      "id": "viewport-craft-goes-to-mobile-viewport-craft",
+      "prompt": "On phones our layout overflows, tap targets are tiny, and 100vh hides content behind the browser bar. Fix the responsive/touch behavior.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": ["edge-state-ux-designer"],
+      "note": "SEAM CASE (within pack) — breakpoints, touch-target sizing, and viewport-unit handling are mobile craft, not empty/loading/error state design.",
+      "reason": "mobile-viewport-craft owns responsive/touch/viewport correctness. This skill designs the states a view can be in, independent of screen size."
+    },
+    {
+      "id": "a11y-verification-goes-to-accessibility-test-harness",
+      "prompt": "Set up a test pass that verifies our loading and error states are announced to screen readers and keyboard-operable, with axe scans in CI.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": ["edge-state-ux-designer"],
+      "reason": "Designing the verification harness (axe scans, keyboard/screen-reader checks, CI wiring) is accessibility-test-harness. This skill designs the states and records a11y intent; it does not run the verification."
+    }
+  ]
+}

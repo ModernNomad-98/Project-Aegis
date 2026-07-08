@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "error-taxonomy-designer",
+  "description": "Behavior cases for the error model: a finite taxonomy with stable codes, one envelope, honest fault/retryable classification, actionable messages, a single mapping boundary, and the disclosure rule.",
+  "cases": [
+    {
+      "id": "positive-unify-inconsistent-errors",
+      "type": "should_trigger",
+      "prompt": "Our API returns errors every which way — some 400s, some 500s, sometimes a plain string, sometimes {error: '...'}. Integrators are confused. Design a consistent error model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories and clusters current failures into a finite taxonomy of categories, each with a stable, namespaced machine code distinct from the human message.",
+          "Defines ONE envelope (code, message, structured details, correlationId, retryable) used by every error.",
+          "Classifies each category as client vs server/dependency fault with the correct status class, and marks retryability with its condition.",
+          "Pins a single mapping boundary where exceptions become taxonomy errors, with unmapped failures falling through to a generic internal error plus a correlation id.",
+          "Names the handoffs: rendering to edge-state-ux-designer, wire-contract/versioning to api-event-architect."
+        ]
+      }
+    },
+    {
+      "id": "positive-retryability-and-idempotency",
+      "type": "should_trigger",
+      "prompt": "Clients don't know when it's safe to retry after an error, so they either give up or hammer us. Design the retry semantics into our errors.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Marks retryability per category, not per hunch: validation/conflict as non-retryable-as-is, transient dependency/timeout as retryable with backoff.",
+          "Adds an explicit retryable flag (and retryAfter where relevant) to the envelope so clients branch on a field, not on message text.",
+          "Ties safe retry of mutations to idempotency and names api-event-architect as the owner of the idempotency-key contract.",
+          "Distinguishes a 429 rate-limit (retry after a delay) from a quota/entitlement error (retry will not help until the plan changes)."
+        ]
+      }
+    },
+    {
+      "id": "edge-cross-surface-consistency",
+      "type": "should_trigger",
+      "prompt": "The same failure looks different depending on whether it happens in a synchronous request, a background job, or a webhook we send. Make it consistent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Requires the same logical failure to yield the same taxonomy code and envelope across sync, job, and webhook surfaces.",
+          "Handles the transport difference honestly (a background job cannot return an HTTP status) and states how the code carries in each medium.",
+          "Keeps the single mapping boundary as the mechanism that makes cross-surface consistency enforceable.",
+          "Does not invent per-surface bespoke error shapes."
+        ]
+      }
+    },
+    {
+      "id": "should-not-leak-internals",
+      "type": "should_trigger",
+      "prompt": "To help partners self-diagnose, let's just put the full exception message and stack trace, including the failing database host and query, into the error response.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to place stack traces, SQL, internal hostnames/paths, or PII into the caller-visible message — that is an information-disclosure security risk, not a debugging nicety.",
+          "Offers the safe alternative: a stable code plus an opaque correlation id the partner can quote to support, with full detail logged server-side only.",
+          "Escalates any insistence on exposing internal detail as a Stop Condition for human sign-off, not a silent weakening of the disclosure rule.",
+          "Keeps the generic internal error for anything unmapped rather than surfacing the raw exception."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-error-ui-rendering",
+      "type": "should_not_trigger",
+      "prompt": "When a save fails, should we show an inline message under the field, a toast, or a full-page error, and where does the retry button go?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke error-taxonomy-designer: choosing inline vs toast vs full-page rendering and retry-affordance placement is edge-state-ux-designer.",
+          "This skill would supply the codes/messages that rendering consumes, but the question is about presentation, not the error model."
+        ]
+      }
+    }
+  ]
+}

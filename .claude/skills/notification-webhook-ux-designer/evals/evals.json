@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "notification-webhook-ux-designer",
+  "description": "Behavior cases for the human-facing UX of notifications and webhooks: preference granularity, noise control, opt-out integrity, and the developer webhook management surface (delivery log, replay, secret rotation).",
+  "cases": [
+    {
+      "id": "positive-notification-noise-control",
+      "type": "should_trigger",
+      "prompt": "Users say we send way too many notifications and there's no good way to control them. Design the notification preferences and how we cut the noise.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs a granular preference model (per-category × per-channel) in one center, effective immediately, not a single master toggle.",
+          "Adds noise control: batching/digest cadence, collapse/dedup of similar events, frequency caps, and timezone-aware quiet hours.",
+          "Separates transactional/security notices (non-optional, labeled) from informational/marketing (opt-out) and keeps time-critical alerts out of digests.",
+          "Designs read-state (seen/read/dismiss), badges, and cross-device sync.",
+          "Hands generic empty/loading rendering of the preference screens to edge-state-ux-designer."
+        ]
+      }
+    },
+    {
+      "id": "positive-webhook-management-surface",
+      "type": "should_trigger",
+      "prompt": "Integrators keep opening tickets asking whether their webhook fired and how to retry. Design the developer webhook management UI.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs endpoint management (register/edit/disable, event-type selection, test vs live) that surfaces api-event-architect's subscription model rather than inventing a new one.",
+          "Designs a per-endpoint delivery log (event, timestamp, status, latency, attempts, payload inspection, filtering).",
+          "Adds self-service reliability tools: test-send/ping and manual replay of a failed delivery, explicitly noting replay is safe only because the consumer is idempotent (a contract requirement).",
+          "Designs signing-secret rotation with an overlap window so in-flight deliveries verifying the old secret don't break.",
+          "Displays (not redefines) any auto-disable-after-N-failures policy set by api-event-architect and alerts the integrator on failing endpoints."
+        ]
+      }
+    },
+    {
+      "id": "edge-critical-alert-not-digested",
+      "type": "should_trigger",
+      "prompt": "To reduce email, let's roll ALL notifications — including failed-payment and new-login-from-unknown-device — into a single daily digest.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to digest time-critical/security notices: criticality overrides batching, and a failed payment or new-device login in tomorrow's summary is worse than no digest.",
+          "Keeps digesting for genuinely low-urgency informational events while routing critical ones to realtime channels.",
+          "Ties the decision to a per-category urgency classification, not a blanket policy.",
+          "Preserves the transactional/security exemption from opt-out for these categories."
+        ]
+      }
+    },
+    {
+      "id": "should-not-break-opt-out-integrity",
+      "type": "should_trigger",
+      "prompt": "Marketing wants the 'unsubscribe' link to just reduce frequency instead of actually stopping emails, and to keep sending product tips to people who unsubscribed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses an unsubscribe that doesn't actually stop the messages: opt-out must be honored immediately and per-category, one-click where legally required.",
+          "Flags continuing to send marketing to unsubscribed users as a compliance and trust failure (a Stop Condition), not a growth tactic.",
+          "Distinguishes genuinely transactional/security notices (still deliverable, labeled) from marketing (must stop on opt-out).",
+          "Records consent/opt-out state so the choice is auditable."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-webhook-contract",
+      "type": "should_not_trigger",
+      "prompt": "Design our webhook delivery contract: the versioned envelope schema, HMAC signing scheme, at-least-once retry with exponential backoff, and per-tenant subscription scoping.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke notification-webhook-ux-designer: envelope schema, signing algorithm, retry/at-least-once policy, and subscription scoping are the delivery contract owned by api-event-architect.",
+          "This skill would design the UX that surfaces and controls that contract, but the request is the contract itself."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "skill": "error-taxonomy-designer",
+  "description": "Trigger discrimination for the error MODEL (this skill: codes, envelope, retryable, disclosure) vs the API CONTRACT that carries it (api-event-architect) vs how the UI RENDERS the error state (edge-state-ux-designer).",
+  "overlaps_with": [
+    "api-event-architect",
+    "edge-state-ux-designer"
+  ],
+  "cases": [
+    {
+      "id": "error-model-wins-here",
+      "prompt": "Define our error codes and envelope: the set of error categories, a stable machine-readable code per category, which are retryable, and a rule so we never leak internals in messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": ["api-event-architect", "edge-state-ux-designer"],
+      "note": "SEAM CASE (primary) — a category set, stable codes, retryability, and a disclosure rule are the error model. No routes/versioning/rate-limits and no UI rendering are being designed.",
+      "reason": "The taxonomy, envelope, retry classification, and message-disclosure discipline are this skill's core deliverable, independent of the transport contract and of presentation."
+    },
+    {
+      "id": "api-contract-goes-to-api-event-architect",
+      "prompt": "Design our public API contract: resource routes, request/response envelopes, version negotiation and deprecation windows, idempotency keys, and per-plan rate limits.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["error-taxonomy-designer"],
+      "note": "SEAM CASE (reverse) — routes, versioning, idempotency, and rate limits are the contract surface. The error model is one part inside it, not what is being designed here.",
+      "reason": "api-event-architect owns the external contract. This skill designs the error taxonomy that lives inside it and hands code versioning/deprecation to that contract process."
+    },
+    {
+      "id": "error-rendering-goes-to-edge-state-ux-designer",
+      "prompt": "When these errors happen in the app, decide how to show them — inline field messages vs a toast vs a full-page error, the retry affordance, and the empty vs error distinction on the list view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": ["error-taxonomy-designer"],
+      "note": "SEAM CASE (within pack) — inline vs toast vs full-page, retry affordance, and empty-vs-error rendering are UI state design. The codes/messages being rendered come FROM this skill but are not what is asked.",
+      "reason": "edge-state-ux-designer owns how non-happy-path states are presented. This skill supplies the machine codes and message patterns that rendering consumes."
+    }
+  ]
+}

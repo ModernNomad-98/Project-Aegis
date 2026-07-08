@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "pagination-cursor-designer",
+  "description": "Behavior cases for pagination design: cursor-vs-offset choice against access pattern, strict total ordering with a tiebreaker, tenant scope bound server-side, honest end signaling, and the total-count trap.",
+  "cases": [
+    {
+      "id": "positive-new-list-endpoint",
+      "type": "should_trigger",
+      "prompt": "We're adding a list endpoint for activity records — could be millions per account, users mostly scroll recent ones but some export everything. Design the pagination.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Chooses cursor (keyset) paging for the large, deep-scrolled collection and states why offset is rejected (drift + O(offset) deep-page cost), naming the access pattern.",
+          "Specifies a strict total ordering: sort column(s) PLUS a deterministic tiebreaker (primary key) so no two rows tie across a page edge.",
+          "Defines an opaque, versioned cursor carrying the last row's ordering tuple and direction, exposing no raw offset or internal id the client could depend on.",
+          "Applies the account/tenant scope predicate server-side on every page from trusted context, not from cursor contents.",
+          "Sets a default and an enforced maximum page size, and signals end-of-results with an absent/null next cursor."
+        ]
+      }
+    },
+    {
+      "id": "positive-offset-drift-bug",
+      "type": "should_trigger",
+      "prompt": "Users report that when they page through our feed, some posts show up twice and others get skipped. We use ?page=N&limit=20 with OFFSET.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses the symptom as offset drift: inserts/deletes above the current offset shift every later row, duplicating one and hiding one — a correctness bug, not flakiness.",
+          "Prescribes keyset paging with a stable ordering + tiebreaker so 'next' resumes from the last row's key rather than a positional offset.",
+          "Notes the migration/contract impact of changing the paging params and hands the endpoint-contract/versioning question to api-event-architect.",
+          "Does not merely add caching or retries to hide the duplication."
+        ]
+      }
+    },
+    {
+      "id": "edge-total-count-cost",
+      "type": "should_trigger",
+      "prompt": "Product wants 'Page X of Y' with an exact total on our biggest, most-written table, on every page load. Design it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the exact COUNT(*) on a huge, high-churn collection as frequently the most expensive part of the request, re-run per page.",
+          "Offers honest alternatives (no total, an estimate, or a separate/cached count) with their tradeoffs rather than baking an exact count into every page.",
+          "Escalates the exact-total-is-mandatory case as a performance tradeoff for a human decision (a Stop Condition), not a silent expensive query.",
+          "Still delivers the drift-free keyset traversal independent of the count decision."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trust-scope-from-cursor",
+      "type": "should_trigger",
+      "prompt": "To make pagination stateless, let's just put the tenant_id and the filter into the cursor so the server can rebuild the exact query from it. Design that cursor.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to source the tenant/authorization scope from the cursor: a forged or stale cursor claiming another tenant would then read that tenant's rows — a cross-tenant isolation hole.",
+          "Keeps the auth/tenant predicate applied server-side from the authenticated context on every page; only ordering keys and direction live in the cursor.",
+          "Explains that a tampered cursor must at worst error or return the caller's own rows, never another scope's.",
+          "Still allows non-security filters to be encoded, but re-validates them against the caller's permissions server-side."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-slow-query-plan",
+      "type": "should_not_trigger",
+      "prompt": "This one report query does a sequential scan and takes 4 seconds — read the EXPLAIN and tell me what index to add.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke pagination-cursor-designer: reading one query's plan and prescribing an index/sargability fix is query-plan-reader.",
+          "Pagination design would only enter if the fix were to switch the endpoint to keyset traversal, which is not what was asked."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "feature-flag-rollout-strategist",
+  "description": "Behavior cases for rollout strategy: staged progressive delivery with guardrails and auto-rollback, sticky targeting, fail-safe defaults, flag lifecycle/debt, and the flag-vs-entitlement distinction.",
+  "cases": [
+    {
+      "id": "positive-staged-rollout",
+      "type": "should_trigger",
+      "prompt": "We're shipping a risky rewrite of the checkout flow. Design how we roll it out safely behind a flag.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the flag as a temporary release flag and plans progressive stages (internal → canary/% → cohorts → GA) with per-stage advance AND rollback criteria.",
+          "Defines a small guardrail-metric set (errors, latency, checkout conversion) each with a rollback threshold, automatic where possible, plus a tested kill switch.",
+          "Chooses the fail-safe default: if the flag service is down, evaluate to the OLD checkout, not the half-built new path.",
+          "Assigns an owner and a post-GA removal trigger, with cleanup of the flag AND the dead code path in the plan.",
+          "Notes that executing the rollout on production follows the approval path, not this design skill."
+        ]
+      }
+    },
+    {
+      "id": "positive-sticky-bucketing-fix",
+      "type": "should_trigger",
+      "prompt": "Our percentage rollout keeps flipping users between the old and new UI on different page loads and it's chaos. Fix the rollout design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses non-sticky assignment: bucketing must use a stable identifier so a user stays in one variant across sessions and surfaces.",
+          "Notes the flip-flopping also invalidates any analytics/metrics gathered during the ramp.",
+          "Specifies consistency across pages/devices and sensible caching of the flag value.",
+          "Keeps guardrails and rollback criteria intact through the fix."
+        ]
+      }
+    },
+    {
+      "id": "edge-flag-debt-cleanup",
+      "type": "should_trigger",
+      "prompt": "We have 60 feature flags and nobody knows which are safe to remove. Help us deal with the flag debt.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies flags by purpose (release vs operational/kill-switch vs experiment vs mislabeled entitlement) since the type decides whether it should be removed.",
+          "Marks temporary release flags past GA + soak as removable, with removal meaning delete the flag AND the dead code path.",
+          "Preserves intentional long-lived operational controls and documents them.",
+          "Flags any that are actually entitlements/permissions for routing to plan-entitlement-architect / authorization-matrix-designer."
+        ]
+      }
+    },
+    {
+      "id": "should-not-design-entitlement-as-flag",
+      "type": "should_trigger",
+      "prompt": "Use a feature flag to control whether the Pro plan gets advanced analytics — just leave the flag on permanently for Pro accounts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes this is a permanent PLAN entitlement, not a rollout flag, and refuses to model it as a release flag.",
+          "Routes it to plan-entitlement-architect (plan × feature entitlement), warning that a 'permanent flag' will drift from the billing/plan source of truth and that turning it off would remove a paid feature.",
+          "Distinguishes the temporary de-risking purpose of a release flag from a durable entitlement.",
+          "Offers to design the actual rollout of the analytics feature (behind a real release flag) separately from who is entitled to it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-experiment-design",
+      "type": "should_not_trigger",
+      "prompt": "Design the A/B test for the new onboarding: the hypothesis, the primary metric, the sample size we need, and how we'll read significance.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke feature-flag-rollout-strategist: the hypothesis, sample size, and significance readout are the experiment design owned by ab-test-designer.",
+          "This skill could carry the flag the experiment runs on, but the request is the experiment's statistics, not a rollout ramp."
+        ]
+      }
+    }
+  ]
+}

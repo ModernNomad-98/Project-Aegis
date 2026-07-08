@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "edge-state-ux-designer",
+  "description": "Behavior cases for non-happy-path UI state design: the three distinct empties, honest loading, error placement by blast radius, partial failure, refetch/offline, and the forbidden-not-empty distinction.",
+  "cases": [
+    {
+      "id": "positive-list-view-states",
+      "type": "should_trigger",
+      "prompt": "Our main list view just renders a blank area when there's nothing, and a spinner that spins forever if the fetch fails. Design all the states properly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates the view's states (uninitialized, loading-first, empty variants, loaded-partial, refetching, error, offline, forbidden) and marks each IN or OUT with a reason.",
+          "Splits the empties into first-run (onboarding CTA), filtered-to-nothing (clear-filters affordance), and error-emptied (retry) with distinct copy and actions.",
+          "Chooses skeleton vs spinner vs inline for loading with a delay threshold to avoid flashing a loader on fast responses.",
+          "Designs the fetch-failure as a full-view error with retry and a correlation id, not an eternal spinner.",
+          "Keys the error copy to error-taxonomy-designer codes and hands a11y verification to accessibility-test-harness."
+        ]
+      }
+    },
+    {
+      "id": "positive-optimistic-update-rollback",
+      "type": "should_trigger",
+      "prompt": "We want toggling a setting to feel instant (optimistic), but sometimes the save fails. Design the UX for that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the optimistic update AND its rollback: what the UI shows if the write fails and how the user is told the change reverted.",
+          "Chooses an appropriate failure surface (inline/toast) with retry when the underlying error is retryable.",
+          "Avoids leaving the user believing a failed write succeeded — the revert is visible, not silent.",
+          "Does not treat optimistic UI as safe without a failure path."
+        ]
+      }
+    },
+    {
+      "id": "edge-partial-failure",
+      "type": "should_trigger",
+      "prompt": "Our dashboard makes several independent calls. Right now if one widget's call fails, the whole page shows an error. Fix the state design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs partial failure as a first-class state: working widgets render, the failed widget shows its own scoped error, and one failed call does not blank the page.",
+          "Gives the failed region its own retry rather than forcing a full-page reload.",
+          "Distinguishes a whole-view failure (all calls fail / auth lost) from a partial one.",
+          "Keeps last-good data visible on background-refetch errors rather than flashing to skeletons."
+        ]
+      }
+    },
+    {
+      "id": "should-not-collapse-forbidden-into-empty",
+      "type": "should_trigger",
+      "prompt": "For a resource the current user can't access, let's just show the same empty 'Nothing here' state we use for lists with no items.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to collapse permission-denied into the empty state: 403 'you don't have access', 404 'doesn't exist', and 'nothing here yet' are three different messages.",
+          "Flags that a wrong forbidden/empty/not-found choice can leak whether a resource exists to someone not allowed to see it, and coordinates wording with the authorization owner.",
+          "Renders forbidden with its own copy and (where appropriate) a path to request access, not a cheerful empty illustration.",
+          "Keeps the distinction consistent across views via shared components."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-error-taxonomy",
+      "type": "should_not_trigger",
+      "prompt": "Define the set of error codes our API returns and which ones are retryable, plus a rule that we never leak stack traces in messages.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke edge-state-ux-designer: defining error categories, machine codes, retryable flags, and a disclosure rule is error-taxonomy-designer.",
+          "This skill would render those errors as states, but the request is about the error model, not its presentation."
+        ]
+      }
+    }
+  ]
+}

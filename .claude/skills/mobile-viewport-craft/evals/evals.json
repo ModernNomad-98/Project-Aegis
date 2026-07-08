@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "mobile-viewport-craft",
+  "description": "Behavior cases for mobile/responsive viewport craft: content-driven breakpoints, touch-target sizing, the 100vh/dynamic-viewport-unit fix, hover-absence handling, keyboard behavior, and wide-table reflow.",
+  "cases": [
+    {
+      "id": "positive-desktop-first-to-mobile",
+      "type": "should_trigger",
+      "prompt": "Our app was built desktop-first and it's rough on phones — things overflow sideways and buttons are hard to tap. Design the responsive/touch craft.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Adopts a mobile-first approach with a stated minimum width and content-driven breakpoints (where the layout breaks), not a list of device widths.",
+          "Sets touch-target minimums (~44px) with spacing and ensures the tappable area matches the visual, placing primaries in the thumb zone.",
+          "Diagnoses horizontal overflow and prescribes reflow patterns rather than horizontal scrolling of the whole page.",
+          "Names the boundary: page weight/network cost is handed to frontend-perf-engineer."
+        ]
+      }
+    },
+    {
+      "id": "positive-100vh-and-safe-area",
+      "type": "should_trigger",
+      "prompt": "On mobile our full-height drawer gets cut off at the bottom and the sticky footer sits under the phone's home bar. Fix it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the 100vh trap: 100vh includes the space the collapsing URL bar reclaims, so the bottom is clipped — prescribes dynamic viewport units (dvh/svh/lvh).",
+          "Applies safe-area-inset for the notch and home indicator so fixed elements clear system UI.",
+          "Checks that fixed headers/footers don't collide with the on-screen keyboard.",
+          "Treats this as a correctness bug, not a cosmetic tweak."
+        ]
+      }
+    },
+    {
+      "id": "edge-hover-only-affordances",
+      "type": "should_trigger",
+      "prompt": "Our table row actions and tooltips only appear on hover. They're completely inaccessible on touch devices. Redesign the interactions.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes touch has no hover event, so hover-only affordances simply don't exist for touch users.",
+          "Provides touch-reachable equivalents (visible action buttons, tap-to-disclose, an explicit menu) rather than relying on hover.",
+          "Ensures any custom gestures are discoverable and don't conflict with browser gestures (back-swipe, pull-to-refresh).",
+          "Notes a11y intent for the new controls and hands verification to accessibility-test-harness."
+        ]
+      }
+    },
+    {
+      "id": "edge-wide-table-reflow",
+      "type": "should_trigger",
+      "prompt": "We have a 12-column data table that's unusable on a phone. How should it work on small screens?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Chooses a deliberate wide-table pattern (stack-to-cards, horizontal scroll with a frozen key column, or priority-column collapse) and states the tradeoff.",
+          "Avoids hiding critical columns/actions purely to fit the width.",
+          "Keeps the tappable controls within touch-size guidelines in the chosen layout.",
+          "Does not simply shrink the desktop table to illegibility."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-mobile-performance",
+      "type": "should_not_trigger",
+      "prompt": "Our mobile bundle is 2.5MB and takes 6 seconds to become interactive on a mid-range Android. Cut the weight and improve the load metrics.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke mobile-viewport-craft: bundle weight, time-to-interactive, and load metrics on low-end devices are frontend-perf-engineer.",
+          "Viewport craft concerns layout/touch/viewport correctness, not payload size or JS execution cost."
+        ]
+      }
+    }
+  ]
+}

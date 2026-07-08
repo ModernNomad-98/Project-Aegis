@@ -1,0 +1,43 @@
+{
+  "skill": "feature-flag-rollout-strategist",
+  "description": "Trigger discrimination for the ROLLOUT strategy of a change (this skill: temporary de-risking) vs the permanent ENTITLEMENT model (plan-entitlement-architect), vs role PERMISSIONS (authorization-matrix-designer), vs the EXPERIMENT design a flag may host (ab-test-designer).",
+  "overlaps_with": [
+    "plan-entitlement-architect",
+    "authorization-matrix-designer",
+    "ab-test-designer"
+  ],
+  "cases": [
+    {
+      "id": "rollout-strategy-wins-here",
+      "prompt": "Roll out this risky change safely: staged from internal to a percentage to GA, guardrail metrics that auto-roll-back, a kill switch, and a plan to remove the flag afterward.",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": ["plan-entitlement-architect", "authorization-matrix-designer"],
+      "note": "SEAM CASE (primary) — staged delivery, guardrails, kill switch, and flag removal are a temporary rollout strategy. Nothing about permanent plan/role gating appears.",
+      "reason": "De-risking a change into production via a temporary release flag is this skill's core scope, distinct from any permanent entitlement or permission."
+    },
+    {
+      "id": "plan-entitlement-goes-to-plan-entitlement-architect",
+      "prompt": "Decide which features and usage limits each pricing plan includes and how that's enforced consistently across UI, API, and jobs.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": ["feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (primary, reverse — hard seam) — plan × feature × limit is a permanent entitlement model, not a temporary rollout. A flag here would drift from the billing source of truth.",
+      "reason": "plan-entitlement-architect owns durable plan gating. A release flag is meant to be removed; an entitlement is meant to persist. Different lifetime, different owner."
+    },
+    {
+      "id": "role-permission-goes-to-authorization-matrix-designer",
+      "prompt": "Define which roles can perform which actions on which resources — the roles × permissions matrix with deny-by-default.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": ["feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (reverse, hard seam) — who MAY do what by role is authorization, a permanent security model, not a rollout gate.",
+      "reason": "authorization-matrix-designer owns role/permission design. A rollout flag controls exposure of a change over time, not standing authority."
+    },
+    {
+      "id": "experiment-design-goes-to-ab-test-designer",
+      "prompt": "Design the experiment behind this flag: hypothesis, primary and guardrail metrics, sample size and duration, and how we read significance without peeking.",
+      "expected_skill": "ab-test-designer",
+      "should_not_trigger": ["feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (cross-pack, D12.6) — hypothesis, sample size, and significance readout are experiment design. The flag may host the experiment, but the statistics belong to ab-test-designer.",
+      "reason": "ab-test-designer owns experiment design and analysis. This skill carries the rollout mechanics of the flag, not the experiment's validity."
+    }
+  ]
+}
