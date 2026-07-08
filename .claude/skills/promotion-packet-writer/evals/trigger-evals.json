@@ -1,0 +1,41 @@
+{
+  "skill": "promotion-packet-writer",
+  "description": "Trigger discrimination for documenting PAST impact for promotion (this skill) vs choosing FUTURE scope (staff-scope-selector), one task/PR closeout (ai-closeout-reporter), and carrying evidence across stages of one effort (phased-work-handoff-designer).",
+  "overlaps_with": [
+    "staff-scope-selector",
+    "ai-closeout-reporter",
+    "phased-work-handoff-designer"
+  ],
+  "cases": [
+    {
+      "id": "promotion-packet-wins-here",
+      "prompt": "Assemble my promotion case: my accomplishments as impact, mapped to the target level's rubric, with a sustained pattern and an honest gap analysis.",
+      "expected_skill": "promotion-packet-writer",
+      "should_not_trigger": ["staff-scope-selector", "ai-closeout-reporter"],
+      "note": "SEAM CASE (primary) — evidencing past impact against a leveling rubric is a promotion packet. Not future scope and not a single task's report.",
+      "reason": "Documenting delivered impact as a leveling case is this skill's core scope."
+    },
+    {
+      "id": "future-scope-goes-to-staff-scope-selector",
+      "prompt": "Help me pick the highest-leverage thing to work on next as a staff engineer.",
+      "expected_skill": "staff-scope-selector",
+      "should_not_trigger": ["promotion-packet-writer"],
+      "note": "SEAM CASE (within pack, reverse — pin both ways) — choosing future scope is staff-scope-selector; this documents past impact.",
+      "reason": "staff-scope-selector chooses what to work on next. This skill evidences what was already delivered — opposite ends of the timeline."
+    },
+    {
+      "id": "one-task-closeout-goes-to-ai-closeout-reporter",
+      "prompt": "Write the closeout for the PR I just finished: what changed, what wasn't done, tests run, and next steps.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["promotion-packet-writer"],
+      "reason": "ai-closeout-reporter reports one task/PR's outcome. This skill assembles a career-level impact case across many pieces of work."
+    },
+    {
+      "id": "cross-stage-evidence-goes-to-phased-work-handoff-designer",
+      "prompt": "Design how each stage of this multi-stage effort carries its decisions and evidence forward to the next.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": ["promotion-packet-writer"],
+      "reason": "phased-work-handoff-designer carries decisions/evidence across stages of one effort for continuation. This skill assembles a promotion case, a different purpose and timescale."
+    }
+  ]
+}

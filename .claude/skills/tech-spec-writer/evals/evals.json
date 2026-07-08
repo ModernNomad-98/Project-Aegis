@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "tech-spec-writer",
+  "description": "Behavior cases for technical design docs: problem/goals/non-goals, a concrete proposed design, alternatives, cross-cutting concerns, risks/open questions, and composing ADRs rather than re-arguing them.",
+  "cases": [
+    {
+      "id": "positive-write-tech-spec",
+      "type": "should_trigger",
+      "prompt": "We're about to rebuild our notifications subsystem — a big change touching several services. Write the tech spec before we start.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Opens with problem/why-now, goals, and explicit non-goals.",
+          "Presents a concrete proposed design (components, data model, interfaces) grounded in the current system, pulling structural change from architecture-designer where relevant.",
+          "Shows alternatives with why the proposal wins, and cites binding decisions as ADRs rather than re-arguing them.",
+          "Designs the cross-cutting concerns: security/privacy, performance, observability, migration/rollout, testing.",
+          "States risks with mitigations, open questions with owners, and a review/sign-off path."
+        ]
+      }
+    },
+    {
+      "id": "positive-cross-cutting-focus",
+      "type": "should_trigger",
+      "prompt": "Our design docs always skip the boring parts and then rollout and monitoring bite us. Make the spec cover them.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats migration/rollout, observability, security/privacy, performance, and testing as first-class spec sections, not afterthoughts.",
+          "Designs a staged, reversible rollout and what will be logged/metered.",
+          "Frames these as where specs earn their keep.",
+          "Ties performance/observability to the owning skills (budgets, instrumentation) rather than inventing numbers."
+        ]
+      }
+    },
+    {
+      "id": "edge-cite-adr-not-reargue",
+      "type": "should_trigger",
+      "prompt": "The spec keeps re-litigating the datastore choice we already decided. How should we handle that in the doc?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Cites the existing ADR for the datastore decision rather than re-arguing it inline.",
+          "Keeps the spec focused on the whole design; individual binding decisions live in ADRs (adr-writer).",
+          "Notes any decision NOT yet made as an open question routed to adr-writer.",
+          "Avoids bloating the spec with settled debates."
+        ]
+      }
+    },
+    {
+      "id": "should-not-spec-over-fuzzy-requirement",
+      "type": "should_trigger",
+      "prompt": "We don't really know what the product needs here yet, but write the technical design anyway so engineering can start.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to write a technical design over an unclear/contested product requirement — it builds the right thing wrong.",
+          "Routes the what/why to product-spec-writer / requirements-gathering-facilitator first (a Stop Condition).",
+          "Offers to capture the technical open questions that the requirement must resolve.",
+          "Does not fabricate goals to fill the gap."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-one-adr",
+      "type": "should_not_trigger",
+      "prompt": "Just record our decision to use event sourcing: context, decision, alternatives, consequences, rollback.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke tech-spec-writer: recording ONE decision with context/alternatives/consequences/rollback is adr-writer.",
+          "A tech spec may cite that ADR but is a broader whole-design document."
+        ]
+      }
+    }
+  ]
+}

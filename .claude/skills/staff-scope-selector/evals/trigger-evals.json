@@ -1,0 +1,42 @@
+{
+  "skill": "staff-scope-selector",
+  "description": "Trigger discrimination for choosing an individual's high-leverage SCOPE (this skill) vs ranking a team backlog (prioritization-frame-picker), planning the team roadmap (roadmap-under-uncertainty-planner), and documenting past impact for promotion (promotion-packet-writer).",
+  "overlaps_with": [
+    "prioritization-frame-picker",
+    "roadmap-under-uncertainty-planner",
+    "promotion-packet-writer"
+  ],
+  "cases": [
+    {
+      "id": "scope-selection-wins-here",
+      "prompt": "As a staff engineer, help me choose what to work on for maximum leverage — the under-owned problems, matched to my strengths, with a clear rationale and what I'll say no to.",
+      "expected_skill": "staff-scope-selector",
+      "should_not_trigger": ["prioritization-frame-picker", "promotion-packet-writer"],
+      "note": "SEAM CASE (primary) — choosing one person's highest-leverage scope is this skill. Not ranking a backlog and not documenting past impact.",
+      "reason": "Selecting a staff+ IC's future scope for leverage is this skill's core scope."
+    },
+    {
+      "id": "rank-backlog-goes-to-prioritization-frame-picker",
+      "prompt": "Rank the team's backlog with an appropriate prioritization framework.",
+      "expected_skill": "prioritization-frame-picker",
+      "should_not_trigger": ["staff-scope-selector"],
+      "note": "SEAM CASE — ranking a shared backlog is prioritization, not personal scope selection.",
+      "reason": "prioritization-frame-picker ranks a given backlog. This skill selects an individual's leverage scope, including under-owned problems not on any backlog."
+    },
+    {
+      "id": "team-roadmap-goes-to-roadmap-under-uncertainty-planner",
+      "prompt": "Plan the team's roadmap across now/next/later with confidence levels.",
+      "expected_skill": "roadmap-under-uncertainty-planner",
+      "should_not_trigger": ["staff-scope-selector"],
+      "reason": "roadmap-under-uncertainty-planner plans the team's roadmap. This skill selects one person's scope, which may or may not be on that roadmap."
+    },
+    {
+      "id": "past-impact-goes-to-promotion-packet-writer",
+      "prompt": "Help me write up the impact I've already delivered this year to make my staff promotion case.",
+      "expected_skill": "promotion-packet-writer",
+      "should_not_trigger": ["staff-scope-selector"],
+      "note": "SEAM CASE (within pack) — documenting impact ALREADY delivered is promotion-packet-writer; this chooses FUTURE scope.",
+      "reason": "promotion-packet-writer evidences past impact. This skill chooses what to work on next; the two are opposite ends of the timeline."
+    }
+  ]
+}

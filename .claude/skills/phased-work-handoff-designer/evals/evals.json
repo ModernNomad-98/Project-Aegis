@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "phased-work-handoff-designer",
+  "description": "Behavior cases for cross-stage handoff design: decision-ID register carry-forward, changed/NOT-touched lists, proven-invocation evidence, deviation flags, and a cold-start continuation contract.",
+  "cases": [
+    {
+      "id": "positive-design-handoff",
+      "type": "should_trigger",
+      "prompt": "We're doing a big change in sequenced stages across multiple sessions. Design the handoff so each stage's decisions carry forward and nothing gets re-derived or contradicted.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs a decision-ID register carried across stages, with each stage declaring which prior decisions still bind.",
+          "Requires per-stage changed-files AND explicit NOT-touched lists.",
+          "Requires proven-invocation sections (command + tell-tale output) rather than bare claims.",
+          "Adds deviation flags for departures from the plan/prior decisions and a continuation contract for cold pickup.",
+          "Distinguishes this from a single-turn closeout (ai-closeout-reporter) and the lifecycle model (ai-sdlc-operating-model)."
+        ]
+      }
+    },
+    {
+      "id": "positive-not-touched-guard",
+      "type": "should_trigger",
+      "prompt": "In our staged work, a later stage keeps 'cleaning up' files that an earlier stage deliberately left alone. How do we prevent that in the handoff?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Adds an explicit NOT-touched list per stage so the untouched surface reads as intentional, not forgotten.",
+          "Ties the not-touched list into the continuation contract so the next stage honors it.",
+          "Uses the decision register to record WHY those files were left alone.",
+          "Frames silent cleanup as the failure mode the not-touched list prevents."
+        ]
+      }
+    },
+    {
+      "id": "edge-proven-invocation",
+      "type": "should_trigger",
+      "prompt": "Stages keep saying 'validation passed' but later we find it never ran. Fix the handoff so we can trust that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Requires proven-invocation sections: the actual command run plus tell-tale output (counts/IDs/timestamps/distinctive line) proving it ran.",
+          "Rejects bare 'passed' claims as the crack fabrication slips through.",
+          "Makes each claim checkable against its proof.",
+          "Flags any step that can't be evidenced rather than carrying it forward as fact."
+        ]
+      }
+    },
+    {
+      "id": "should-not-carry-unproven-claim",
+      "type": "should_trigger",
+      "prompt": "Just have each stage assert what it did in prose — we trust the team, no need for command output or evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a narrative-only handoff: unverifiable claims become a later stage's foundation and compound.",
+          "Requires evidence (proven invocation) for consequential claims and flags unprovable ones (a Stop Condition).",
+          "Keeps the handoff as checkable evidence, not a story.",
+          "Explains that trust across stages is established by receipts, not assertions."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-single-turn-closeout",
+      "type": "should_not_trigger",
+      "prompt": "Write the closeout for the task I just finished: what changed, what wasn't done, tests run, and the recommended next step.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke phased-work-handoff-designer: reporting ONE turn/task's outcome is ai-closeout-reporter.",
+          "This skill designs the cross-stage carry-forward for multi-stage work, not a single closeout."
+        ]
+      }
+    }
+  ]
+}

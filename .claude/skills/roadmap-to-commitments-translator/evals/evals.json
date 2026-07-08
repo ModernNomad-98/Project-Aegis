@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "roadmap-to-commitments-translator",
+  "description": "Behavior cases for extracting commitments from a roadmap: separating commit-able from aspirational, capacity-grounding, dependency-gating, honest date ranges, gap management, and refusing over-commitment.",
+  "cases": [
+    {
+      "id": "positive-extract-commitments",
+      "type": "should_trigger",
+      "prompt": "We have a roadmap and leadership wants to know what we're actually committing to this quarter. Translate it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates commit-able items (high-confidence, capacity-backed, dependency-clear) from aspirational, keeping the committed subset visibly smaller than the roadmap.",
+          "Grounds commitments in velocity evidence minus maintenance/interrupts with a buffer, not aspiration.",
+          "Translates roadmap outcomes into concrete deliverables with honest date RANGES.",
+          "States the not-committed gap explicitly with reasons.",
+          "Routes roadmap-building to roadmap-under-uncertainty-planner and specific dependencies to cross-team-dependency-negotiator."
+        ]
+      }
+    },
+    {
+      "id": "positive-dependency-gated-commitment",
+      "type": "should_trigger",
+      "prompt": "One of the things we want to commit to depends on the platform team shipping something they haven't committed to. Can we commit to it?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to treat a commitment resting on an uncommitted external deliverable as firm — it's borrowed confidence.",
+          "Routes the dependency to cross-team-dependency-negotiator to secure it, and only commits once secured or de-risked.",
+          "Keeps the item directional until the dependency is real.",
+          "Shows the dependency alongside the commitment."
+        ]
+      }
+    },
+    {
+      "id": "edge-honest-ranges",
+      "type": "should_trigger",
+      "prompt": "Leadership wants exact ship dates for each committed item so they can put them on a slide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Commits with honest date ranges rather than false-precise single dates on multi-week uncertain work.",
+          "Explains that false-precise dates invite the miss and ranges commit honestly to what's knowable.",
+          "Keeps the commitments capacity-backed and buffered.",
+          "Offers precision only where confidence genuinely supports it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-over-commit",
+      "type": "should_trigger",
+      "prompt": "We only have capacity for about five of these but leadership wants us to commit to all eight. Just make the estimates work so it fits.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to pad estimates until an over-ask 'fits' — that hides over-commitment and surfaces worse later.",
+          "Presents the explicit tradeoff: commit to fewer, add capacity, or explicitly accept lower confidence.",
+          "Escalates the decision rather than manufacturing a commitment (a Stop Condition).",
+          "Grounds the honest committable set in real capacity."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-build-the-roadmap",
+      "type": "should_not_trigger",
+      "prompt": "Build our roadmap: organize it into now/next/later with confidence levels and sequence the uncertain bets first.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke roadmap-to-commitments-translator: building and sequencing the roadmap by horizon/confidence is roadmap-under-uncertainty-planner.",
+          "This skill extracts commitments FROM a roadmap; it doesn't build one."
+        ]
+      }
+    }
+  ]
+}

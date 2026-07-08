@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "design-review-facilitator",
+  "description": "Behavior cases for design-review facilitation: preparation with pre-read and the right reviewers, importance-first discussion, dissent elicitation, HiPPO countering, and forcing an explicit outcome.",
+  "cases": [
+    {
+      "id": "positive-run-design-review",
+      "type": "should_trigger",
+      "prompt": "We have a tech spec for a big change and need to run a proper design review on it. Facilitate it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Prepares the review: circulates the design with a required pre-read, states the decision it must reach, invites skeptics and cross-cutting owners.",
+          "Structures discussion around assumptions, risks, and cross-cutting concerns rather than trivia.",
+          "Actively elicits the strongest objection and keeps critique about the design, not the author.",
+          "Drives to an explicit outcome (approved / approved-with-changes / needs-rework / blocked-on-X) and captures decisions, action items with owners, and open questions.",
+          "Routes binding decisions to adr-writer and does not write the design itself."
+        ]
+      }
+    },
+    {
+      "id": "positive-fix-dysfunctional-reviews",
+      "type": "should_trigger",
+      "prompt": "Our design reviews rubber-stamp whatever a senior engineer proposes and never really scrutinize anything. Help.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Counters the rubber-stamp/HiPPO pattern by deciding on reasoning ('what's the argument?') not rank.",
+          "Requires pre-reads and invites skeptics/domain owners to create real scrutiny.",
+          "Deliberately elicits dissent and makes disagreement safe.",
+          "Forces an explicit outcome with captured decisions."
+        ]
+      }
+    },
+    {
+      "id": "edge-anti-bikeshed-and-outcome",
+      "type": "should_trigger",
+      "prompt": "Our reviews spend an hour on naming and formatting and then run out of time before the risky data-migration part, and nothing gets decided.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Steers time toward the expensive-to-reverse parts (the data migration) and away from bikeshed trivia.",
+          "Ensures the risky cross-cutting concern is probed before time runs out.",
+          "Forces an explicit outcome rather than 'circle back', or names a concrete blocker.",
+          "Captures action items with owners and dates."
+        ]
+      }
+    },
+    {
+      "id": "should-not-review-incomplete-design",
+      "type": "should_trigger",
+      "prompt": "The 'design' is two paragraphs with no alternatives and no mention of rollout or security. Run the review anyway.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to run a meaningful review on a design too incomplete to scrutinize (no proposal detail, no alternatives, no cross-cutting).",
+          "Sends it back to tech-spec-writer to reach reviewable completeness (a Stop Condition).",
+          "Explains that reviewing an incomplete design can only bikeshed.",
+          "Offers the pre-read/preparation criteria the design must meet first."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-write-the-spec",
+      "type": "should_not_trigger",
+      "prompt": "Write the tech spec for the notifications rebuild: proposed design, alternatives, cross-cutting concerns, and risks.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke design-review-facilitator: authoring the design document is tech-spec-writer.",
+          "Facilitation reviews a design; it doesn't write one."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "skill": "roadmap-to-commitments-translator",
+  "description": "Trigger discrimination for EXTRACTING commitments from a roadmap (this skill) vs BUILDING/sequencing the roadmap (roadmap-under-uncertainty-planner), negotiating a specific cross-team dependency (cross-team-dependency-negotiator), and ranking the backlog (prioritization-frame-picker).",
+  "overlaps_with": [
+    "roadmap-under-uncertainty-planner",
+    "cross-team-dependency-negotiator",
+    "prioritization-frame-picker"
+  ],
+  "cases": [
+    {
+      "id": "commitment-extraction-wins-here",
+      "prompt": "Translate our roadmap into firm commitments for the quarter — what we can actually promise given capacity and dependencies, and what stays directional.",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner", "prioritization-frame-picker"],
+      "note": "SEAM CASE (primary) — separating the commit-able subset with capacity/dependency backing is commitment translation. Not building the roadmap and not ranking.",
+      "reason": "Extracting firm promises from a directional roadmap is this skill's core scope."
+    },
+    {
+      "id": "build-roadmap-goes-to-roadmap-under-uncertainty-planner",
+      "prompt": "Build and sequence our roadmap: now/next/later horizons, confidence that fades with distance, and uncertainty-reducing bets first.",
+      "expected_skill": "roadmap-under-uncertainty-planner",
+      "should_not_trigger": ["roadmap-to-commitments-translator"],
+      "note": "SEAM CASE (primary, reverse — cross-batch) — building/sequencing the uncertain roadmap is the inverse discipline; this skill consumes its output.",
+      "reason": "roadmap-under-uncertainty-planner keeps the roadmap honestly uncertain. This skill extracts the firm-promise subset from it."
+    },
+    {
+      "id": "specific-dependency-goes-to-cross-team-dependency-negotiator",
+      "prompt": "Negotiate the specific deliverable, date, and owner we need from the platform team for this commitment.",
+      "expected_skill": "cross-team-dependency-negotiator",
+      "should_not_trigger": ["roadmap-to-commitments-translator"],
+      "reason": "cross-team-dependency-negotiator secures a specific dependency. This skill folds secured dependencies into commitments; it doesn't run the negotiation."
+    },
+    {
+      "id": "ranking-goes-to-prioritization-frame-picker",
+      "prompt": "We can't agree how to rank these items — pick a prioritization framework and score them.",
+      "expected_skill": "prioritization-frame-picker",
+      "should_not_trigger": ["roadmap-to-commitments-translator"],
+      "reason": "prioritization-frame-picker ranks the backlog. This skill translates an already-shaped roadmap into commitments; it doesn't rank."
+    }
+  ]
+}

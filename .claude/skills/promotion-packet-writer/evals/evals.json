@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "promotion-packet-writer",
+  "description": "Behavior cases for promotion packets: impact-not-activity, rubric-dimension coverage, sustained pattern, honest gap analysis, corroboration, and no inflation.",
+  "cases": [
+    {
+      "id": "positive-assemble-packet",
+      "type": "should_trigger",
+      "prompt": "Help me put together my promotion packet to senior staff — I have a lot of work but don't know how to frame it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Anchors on the target level's rubric dimensions (scope, technical, leadership/influence, impact) and covers each.",
+          "Reframes accomplishments as impact (outcome + measurable effect + scope of influence), not activity.",
+          "Maps each accomplishment to rubric dimensions and flags any thin dimension.",
+          "Demonstrates a sustained pattern of operating at the level and gathers corroboration.",
+          "Provides an honest gap analysis and does not inflate impact."
+        ]
+      }
+    },
+    {
+      "id": "positive-activity-to-impact",
+      "type": "should_trigger",
+      "prompt": "My draft is a bullet list like 'refactored auth', 'led migration', 'mentored juniors'. Make it a real case.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rewrites each activity bullet into its outcome and measurable impact with scope of influence.",
+          "Maps the rewritten accomplishments to rubric dimensions.",
+          "Cuts activity that doesn't demonstrate a dimension.",
+          "Leads with outcomes in committee language, evidence-first."
+        ]
+      }
+    },
+    {
+      "id": "edge-dimension-coverage",
+      "type": "should_trigger",
+      "prompt": "My case is really strong technically but I'm going for a level where influence matters and I don't have much there.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the influence dimension as thin against a level where influence IS the level.",
+          "Surfaces it in the gap analysis rather than hiding it.",
+          "Looks for existing influence evidence (cross-team impact, mentorship outcomes, direction-setting) and corroboration.",
+          "Recommends strengthening the influence evidence or timing the case, not papering over the gap."
+        ]
+      }
+    },
+    {
+      "id": "should-not-inflate-weak-case",
+      "type": "should_trigger",
+      "prompt": "I'm probably not quite at the level yet but just write the packet to make it look like I am so I can submit this cycle.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to inflate impact beyond what the evidence supports — committees find hidden gaps and the credibility hit outlasts the cycle.",
+          "Delivers the honest gap analysis with a not-yet / strengthen-then-submit recommendation and what's missing (a Stop Condition).",
+          "Documents the genuine impact accurately.",
+          "Frames the path to readiness rather than fabricating a case."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-choose-future-scope",
+      "type": "should_not_trigger",
+      "prompt": "As a staff engineer, help me choose what high-leverage work to focus on next quarter.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke promotion-packet-writer: choosing FUTURE high-leverage scope is staff-scope-selector.",
+          "This skill documents impact already delivered, the opposite end of the timeline."
+        ]
+      }
+    }
+  ]
+}

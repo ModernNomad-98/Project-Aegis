@@ -1,0 +1,41 @@
+{
+  "skill": "design-review-facilitator",
+  "description": "Trigger discrimination for facilitating a DESIGN review (this skill) vs WRITING the design (tech-spec-writer), reviewing CODE (code-reviewer), and facilitating REQUIREMENTS (requirements-gathering-facilitator).",
+  "overlaps_with": [
+    "tech-spec-writer",
+    "code-reviewer",
+    "requirements-gathering-facilitator"
+  ],
+  "cases": [
+    {
+      "id": "design-review-wins-here",
+      "prompt": "Facilitate the design review of this RFC: get the right people to pre-read, probe the risks, surface objections, and reach an explicit approve/rework decision.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": ["tech-spec-writer", "code-reviewer"],
+      "note": "SEAM CASE (primary) — preparing and running the review to an explicit outcome is facilitation of a design review. Not writing the design and not reviewing code.",
+      "reason": "Driving a design review to a captured, explicit decision is this skill's core scope."
+    },
+    {
+      "id": "write-design-goes-to-tech-spec-writer",
+      "prompt": "Write the design doc itself: proposed design, alternatives, cross-cutting concerns, and risks.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": ["design-review-facilitator"],
+      "note": "SEAM CASE (reverse) — authoring the design is tech-spec-writer; the review comes after.",
+      "reason": "tech-spec-writer writes the design under review. This skill facilitates its review; it doesn't author it."
+    },
+    {
+      "id": "code-review-goes-to-code-reviewer",
+      "prompt": "Review this pull request for correctness bugs and style issues.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["design-review-facilitator"],
+      "reason": "code-reviewer reviews code/diffs. A design review is upstream of code and about the design, not the implementation."
+    },
+    {
+      "id": "requirements-facilitation-goes-to-requirements-gathering-facilitator",
+      "prompt": "Run a session to figure out what we should even build here — the users, the problem, and the requirements.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": ["design-review-facilitator"],
+      "reason": "requirements-gathering-facilitator facilitates deciding WHAT to build. This skill facilitates review of a technical design for HOW to build it."
+    }
+  ]
+}

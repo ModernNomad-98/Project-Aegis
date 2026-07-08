@@ -1,0 +1,41 @@
+{
+  "skill": "tech-spec-writer",
+  "description": "Trigger discrimination for the WHOLE-design tech spec (this skill) vs ONE decision (adr-writer), the user-facing PRODUCT spec (product-spec-writer), and deciding the system STRUCTURE (architecture-designer).",
+  "overlaps_with": [
+    "adr-writer",
+    "product-spec-writer",
+    "architecture-designer"
+  ],
+  "cases": [
+    {
+      "id": "tech-spec-wins-here",
+      "prompt": "Write the design doc for this substantial change: proposed design, data model, APIs, alternatives, migration, observability, testing, and risks — for review before we build.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": ["adr-writer", "product-spec-writer"],
+      "note": "SEAM CASE (primary) — a whole-design document with cross-cutting concerns for review is a tech spec. Not one decision and not the user-facing product spec.",
+      "reason": "Integrating the full technical design of a change into one reviewable doc is this skill's core scope; it composes ADRs and architecture output."
+    },
+    {
+      "id": "one-decision-goes-to-adr-writer",
+      "prompt": "Record the decision to adopt gRPC over REST for internal calls: context, decision, alternatives, consequences, rollback.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": ["tech-spec-writer"],
+      "note": "SEAM CASE (reverse) — one decision with alternatives/consequences/rollback is an ADR, narrower than a tech spec.",
+      "reason": "adr-writer records one decision. A tech spec embeds/cites several; it doesn't replace the single-decision record."
+    },
+    {
+      "id": "user-facing-goes-to-product-spec-writer",
+      "prompt": "Write the product spec: the user problem, goals and non-goals, scenarios, and testable acceptance criteria.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": ["tech-spec-writer"],
+      "reason": "product-spec-writer captures the user-facing what/why and acceptance. The tech spec is the engineering design that satisfies it."
+    },
+    {
+      "id": "structure-goes-to-architecture-designer",
+      "prompt": "Decide how this system should be structured: the components, their dependencies, data ownership, and the tradeoffs.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": ["tech-spec-writer"],
+      "reason": "architecture-designer decides the system structure and tradeoffs. The tech spec presents/consumes that result; it doesn't re-derive the structure."
+    }
+  ]
+}

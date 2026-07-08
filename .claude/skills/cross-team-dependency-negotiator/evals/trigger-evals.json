@@ -1,0 +1,41 @@
+{
+  "skill": "cross-team-dependency-negotiator",
+  "description": "Trigger discrimination for negotiating specific cross-team DEPENDENCIES (this skill) vs turning a roadmap into commitments broadly (roadmap-to-commitments-translator), the integration BOUNDARY (architecture-designer), and the interface CONTRACT (api-event-architect).",
+  "overlaps_with": [
+    "roadmap-to-commitments-translator",
+    "architecture-designer",
+    "api-event-architect"
+  ],
+  "cases": [
+    {
+      "id": "dependency-negotiation-wins-here",
+      "prompt": "We depend on two other teams' deliverables. Surface those dependencies, negotiate concrete commitments with dates and owners, and set up escalation if they slip.",
+      "expected_skill": "cross-team-dependency-negotiator",
+      "should_not_trigger": ["roadmap-to-commitments-translator", "architecture-designer"],
+      "note": "SEAM CASE (primary) — mapping, committing, de-risking, and escalating specific cross-team dependencies is this skill. Not a whole roadmap and not the technical boundary.",
+      "reason": "The org/human negotiation of specific dependencies is this skill's core scope."
+    },
+    {
+      "id": "roadmap-commitments-goes-to-roadmap-to-commitments-translator",
+      "prompt": "Turn our whole roadmap into what we can actually commit to this quarter, with confidence and dates.",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": ["cross-team-dependency-negotiator"],
+      "note": "SEAM CASE (within pack) — converting a roadmap into delivery commitments broadly is roadmap-to-commitments-translator; cross-team deps are one input to it.",
+      "reason": "roadmap-to-commitments-translator handles the whole roadmap→commitment translation. This skill negotiates the specific cross-team dependencies within an effort."
+    },
+    {
+      "id": "integration-boundary-goes-to-architecture-designer",
+      "prompt": "Decide where the boundary between our two systems should be and who owns which component.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": ["cross-team-dependency-negotiator"],
+      "reason": "architecture-designer decides the technical integration boundary and ownership. This skill negotiates delivery across whatever boundary exists."
+    },
+    {
+      "id": "interface-contract-goes-to-api-event-architect",
+      "prompt": "Design the contract at the boundary: routes, envelope, versioning, and rate limits.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["cross-team-dependency-negotiator"],
+      "reason": "api-event-architect designs the interface contract. This skill negotiates who delivers it and when, against that contract."
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "staff-scope-selector",
+  "description": "Behavior cases for staff+ scope selection: level-relative leverage, under-owned problems, matching archetypes to strengths, screening the traps, and an explicit rationale + NOT-doing list.",
+  "cases": [
+    {
+      "id": "positive-choose-staff-scope",
+      "type": "should_trigger",
+      "prompt": "I'm a staff engineer and I'm not sure what to focus on next. Help me pick high-leverage scope.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines leverage relative to the staff level (multiplies others / sets direction), not more individual output.",
+          "Surfaces important UNDER-OWNED problems as candidates, not just assigned work.",
+          "Matches candidates to leverage archetypes and the person's strengths, choosing deliberately with a rationale.",
+          "Provides an explicit NOT-doing list and screens against the traps.",
+          "Ensures the chosen scope is visible/attributable and hands past-impact documentation to promotion-packet-writer."
+        ]
+      }
+    },
+    {
+      "id": "positive-firefighting-to-leverage",
+      "type": "should_trigger",
+      "prompt": "I've spent the whole quarter firefighting incidents. I work constantly but feel like I'm not having staff-level impact.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names firefighting as reactive senior execution, not staff-level leverage.",
+          "Redirects toward direction-setting or multiplier work (e.g. fixing the systemic cause of the fires so the team stops firefighting).",
+          "Chooses scope with an explicit rationale and a NOT-doing list to protect focus.",
+          "Distinguishes working hard from having leverage."
+        ]
+      }
+    },
+    {
+      "id": "edge-invisible-glue",
+      "type": "should_trigger",
+      "prompt": "The most useful thing I could do is a bunch of cross-team coordination and integration glue, but nobody ever notices that work.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes glue work as often the highest real leverage AND the most invisible.",
+          "Keeps the scope but builds in visibility/attribution so it advances the engineer, not just the org.",
+          "Avoids the trap of high-value-but-uncredited work with no attribution path.",
+          "States how the impact will be made legible."
+        ]
+      }
+    },
+    {
+      "id": "should-not-over-reach",
+      "type": "should_trigger",
+      "prompt": "The biggest problem is squarely in another staff engineer's owned area, but I want to just take it over since I'd do it better.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags taking over someone's owned scope as over-reach that creates conflict and undermines them.",
+          "Recommends aligning first (with the owner and management) rather than unilaterally claiming it (a Stop Condition).",
+          "Redirects toward genuine gaps or shared-area collaboration.",
+          "Does not endorse colonizing another's scope."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-rank-backlog",
+      "type": "should_not_trigger",
+      "prompt": "We have 25 backlog items for the team — pick a prioritization framework and rank them.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke staff-scope-selector: ranking a given team backlog is prioritization-frame-picker.",
+          "This skill selects an individual's high-leverage scope, not a team backlog ordering."
+        ]
+      }
+    }
+  ]
+}

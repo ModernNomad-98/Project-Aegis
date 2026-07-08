@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "cross-team-dependency-negotiator",
+  "description": "Behavior cases for cross-team dependency negotiation: two-way mapping, early surfacing, concrete commitments, de-risking, accounting for competing priorities, and pre-agreed escalation.",
+  "cases": [
+    {
+      "id": "positive-plan-cross-team-deps",
+      "type": "should_trigger",
+      "prompt": "Our launch depends on three other teams delivering pieces. Plan and negotiate those dependencies.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps dependencies both ways (what we need and what we owe) and marks the critical-path ones.",
+          "Turns each into a concrete commitment: deliverable, interface/contract, date, and owner on both sides, written down.",
+          "De-risks critical dependencies (fallback, decoupling via stub/flag, parallel paths, SPOFs named).",
+          "Accounts for the other teams' priorities and sets a visible status plus a pre-agreed escalation trigger.",
+          "Leaves the interface contract to api-event-architect and the integration boundary to architecture-designer."
+        ]
+      }
+    },
+    {
+      "id": "positive-vague-goodwill-to-commitment",
+      "type": "should_trigger",
+      "prompt": "The platform team said they'll 'help us out when they can'. That's all we have. Firm it up.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to treat 'help when they can' as a plan: no deliverable, date, or owner.",
+          "Negotiates a specific deliverable against a defined interface, a date, and a named owner both ways, written down.",
+          "Adds a fallback in case it slips and a status/escalation trigger.",
+          "Surfaces the dependency early rather than at integration time."
+        ]
+      }
+    },
+    {
+      "id": "edge-decoupling-derisk",
+      "type": "should_trigger",
+      "prompt": "We're blocked because we can't start until another team finishes their API. Is there any way to not be fully blocked?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Proposes decoupling: build against the agreed contract with a stub/mock, feature-flag the integration off, and parallelize.",
+          "Turns the hard blocker into a soft one so a slip is a setback, not a stop.",
+          "Still negotiates the concrete commitment and date for the real deliverable.",
+          "Notes the contract itself is api-event-architect's; this coordinates delivery."
+        ]
+      }
+    },
+    {
+      "id": "should-not-assume-goodwill-on-deprioritized-ask",
+      "type": "should_trigger",
+      "prompt": "Our ask is low on the other team's backlog but they're nice people, so let's just assume they'll get to it in time.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume goodwill delivers a deprioritized ask: they're not hostile, you're just fourth on their list.",
+          "Aligns incentives, offers a trade, or escalates to shared management for an explicit prioritization decision (a Stop Condition if they can't commit).",
+          "Sets a fallback in case the ask stays deprioritized.",
+          "Does not record an uncommitted dependency as handled."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-design-the-contract",
+      "type": "should_not_trigger",
+      "prompt": "Design the API contract at the boundary between our services: routes, the envelope, versioning, and rate limits.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke cross-team-dependency-negotiator: designing the interface contract (routes/envelope/versioning) is api-event-architect.",
+          "This skill negotiates who delivers the dependency and when, not the contract's shape."
+        ]
+      }
+    }
+  ]
+}

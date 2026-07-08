@@ -1,0 +1,41 @@
+{
+  "skill": "phased-work-handoff-designer",
+  "description": "Trigger discrimination for the CROSS-STAGE handoff of multi-stage work (this skill) vs a single-turn closeout (ai-closeout-reporter), the SDLC operating model (ai-sdlc-operating-model), and a parallel-lane pre-work guide (lane-authoring-guide).",
+  "overlaps_with": [
+    "ai-closeout-reporter",
+    "ai-sdlc-operating-model",
+    "lane-authoring-guide"
+  ],
+  "cases": [
+    {
+      "id": "cross-stage-handoff-wins-here",
+      "prompt": "Design the handoff for our sequenced multi-stage effort: a decision register carried forward, changed/not-touched lists, proven-invocation evidence per stage, and deviation flags.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": ["ai-closeout-reporter", "ai-sdlc-operating-model"],
+      "note": "SEAM CASE (primary) — carrying decisions and evidence across STAGES of one effort is this skill. Not a single closeout and not the lifecycle model.",
+      "reason": "Designing the cross-stage handoff artifact/protocol is this skill's core scope."
+    },
+    {
+      "id": "single-turn-goes-to-ai-closeout-reporter",
+      "prompt": "Produce the end-of-task closeout: what changed, what was intentionally not done, tests run, and the next action.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["phased-work-handoff-designer"],
+      "note": "SEAM CASE (primary, reverse) — reporting ONE turn/task's outcome is a closeout, not a cross-stage register.",
+      "reason": "ai-closeout-reporter reports one turn. This skill carries a decision register and evidence across many stages of one effort."
+    },
+    {
+      "id": "lifecycle-model-goes-to-ai-sdlc-operating-model",
+      "prompt": "Define how humans and agents plan, build, review, merge, and close work together — the stages, who holds authority at each, and the gates.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": ["phased-work-handoff-designer"],
+      "reason": "ai-sdlc-operating-model frames the whole lifecycle and authority. This skill designs the handoff artifact that rides between stages within such a model."
+    },
+    {
+      "id": "parallel-lanes-goes-to-lane-authoring-guide",
+      "prompt": "Write the pre-work guide for each parallel agent lane: its slice, contracts, per-unit recipe, and the must-not-do boundary.",
+      "expected_skill": "lane-authoring-guide",
+      "should_not_trigger": ["phased-work-handoff-designer"],
+      "reason": "lane-authoring-guide guides PARALLEL lanes at work's start. This skill handles SEQUENTIAL stages carrying decisions forward — a different axis."
+    }
+  ]
+}
