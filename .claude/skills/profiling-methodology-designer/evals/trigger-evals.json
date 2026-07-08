@@ -1,0 +1,50 @@
+{
+  "skill": "profiling-methodology-designer",
+  "description": "Trigger discrimination: unattributed time/memory investigation design (this skill) vs functional root-cause (systematic-debugger), an evidenced single query (query-plan-reader), chatty data access (n-plus-one-detector), standing telemetry (observability-operator), and pass/fail measurement (performance-test-harness).",
+  "overlaps_with": [
+    "systematic-debugger",
+    "query-plan-reader",
+    "n-plus-one-detector",
+    "observability-operator",
+    "performance-test-harness"
+  ],
+  "cases": [
+    {
+      "id": "unattributed-investigation-wins-here",
+      "prompt": "Everything about the export job feels slow but nobody can say whether it's the queries, the transformation code, or writing the output — design how we find out where the time goes.",
+      "expected_skill": "profiling-methodology-designer",
+      "should_not_trigger": ["systematic-debugger", "query-plan-reader", "observability-operator"],
+      "reason": "No evidenced suspect exists — the ask is the attribution methodology itself: profiler class per layer, measurement conditions, narrowing loop. Nothing is functionally broken, no single query is named, and no standing telemetry is requested."
+    },
+    {
+      "id": "functional-root-cause-goes-to-systematic-debugger",
+      "prompt": "The nightly job produces wrong totals about once a week — walk the evidence and find the root cause.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": ["profiling-methodology-designer"],
+      "note": "SEAM CASE — 'find the root cause' with a BEHAVIOR defect (wrong output) is functional debugging. The profiling skill owns resource/time attribution only; wrong totals are not a where-does-time-go question.",
+      "reason": "Correctness defects take the hypothesis/reproduction loop of systematic-debugger; no time or memory attribution is involved."
+    },
+    {
+      "id": "evidenced-query-goes-to-query-plan-reader",
+      "prompt": "We already know it's this one report query — here's its EXPLAIN ANALYZE output. Tell us what's wrong and how to fix it.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["profiling-methodology-designer"],
+      "reason": "The suspect is evidenced and singular with plan output in hand. Profiling methodology first would be ceremony — the profiling skill's own stop condition routes evidenced suspects directly to the owning skill."
+    },
+    {
+      "id": "query-count-explosion-goes-to-n-plus-one-detector",
+      "prompt": "The dashboard page fires about 600 nearly identical queries per load according to the query log. Diagnose and design the fix.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": ["profiling-methodology-designer", "query-plan-reader"],
+      "reason": "Hundreds of near-identical queries per request is the chatty-data-access signature — pattern diagnosis and batching/eager-load design, not time attribution and not single-plan reading."
+    },
+    {
+      "id": "standing-telemetry-goes-to-observability-operator",
+      "prompt": "Instrument the checkout service with latency histograms and traces, and build the dashboard so we can watch performance continuously.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["profiling-methodology-designer"],
+      "note": "SEAM CASE — continuous instrumentation and dashboards are STANDING telemetry (observability-operator, manual-invocation). Profiling is a bounded, targeted investigation that may CONSUME that telemetry as input.",
+      "reason": "The deliverable is permanent instrumentation and dashboards, not a bounded attribution investigation with a stop rule."
+    }
+  ]
+}

@@ -191,7 +191,7 @@ performance/load headline):
 
 | Candidate *(all: candidate — not built)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
-| `performance-test-harness` + `load-test-planner` | #205 (P1) + #206 (P2) | **Headline gap:** load/render/query/API/edge-function/background-job performance measurement plus realistic traffic/tenant/data-volume load planning — the largest uncovered risk for a multi-tenant SaaS (noisy neighbors, per-tenant degradation). May merge into ONE skill at build time; decide at the §4.2 pre-generation plan table. Pre-release counterpart to Phase 6 `slo-reliability-architect` (targets/alerting). |
+| `performance-test-harness` + `load-test-planner` — **✅ both built (D23, 2026-07-07)** | #205 (P1) + #206 (P2) | **Headline gap — now closed:** load/render/query/API/edge-function/background-job performance measurement plus realistic traffic/tenant/data-volume load planning — the largest uncovered risk for a multi-tenant SaaS (noisy neighbors, per-tenant degradation). Built as TWO skills per the D23 pre-generation plan table (instrument vs traffic plan — the sibling seam is pinned in both trigger-evals). Pre-release counterpart to Phase 6 `slo-reliability-architect` (targets/alerting); the designs-vs-measures seam against D12.3 is pinned from both sides. |
 | `regression-first-bug-fixer` | #190 (P0) | Failing test that reproduces the bug BEFORE the fix. `regression-suite-curator` cites #190 but owns suite membership, not the fix workflow; `tdd-engineer` owns new behavior, not bug reproduction. |
 | `negative-path-test-mapper` | #192 (P0) | Systematic unauthorized/invalid/expired/missing/duplicated/conflicting/out-of-order enumeration per surface. `test-plan-designer`/`test-coverage-mapper` cite #192 as a source but own planning/audit; security negatives stay with Phase 4 `multi-tenant-security-tester`. |
 | `test-tenant-provisioner` | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. (broadened per report P12: test-row marker convention with never-mutate-unmarked rule, validate-only vs apply modes, env-var-name-only credentials, backup-gated capability grants with inline rollback, prod-safe static lint of QA automation) |
@@ -417,8 +417,9 @@ before any Phase 8 batch.
 
 ### Engineering discipline expansion (D12) — candidate packs
 
-**BANKED scope (D12, 2026-07-07) — 7 candidate packs, 42 named candidates; nothing in it is
-built now; all on-demand.** At 95 shipped skills the library covers the technical,
+**BANKED scope (D12, 2026-07-07) — 7 candidate packs, 42 named candidates; banked on-demand.
+Built since banking: D12.1 (7 skills) and D12.3 (6 skills), both 2026-07-07 (D23); the
+remaining packs stay candidates.** At 95 shipped skills the library covers the technical,
 governance, and compliance stacks; this banks the engineering disciplines a senior/principal
 engineer would compose alongside them that remain uncovered. **Standing rule recorded here
 (D12): the library is NOT capped at 300 skills** — the 300-skill roadmap (D5) is the
@@ -430,9 +431,9 @@ pack is pulled forward.
 
 | Pack | Candidate skills *(all: candidate — not built)* | Pack rationale |
 |---|---|---|
-| **D12.1 Data engineering (P1)** | `schema-evolution-planner`, `streaming-event-architect`, `data-quality-monitor-designer`, `operational-vs-analytical-splitter`, `warehouse-lake-architect`, `pii-lifecycle-designer`, `data-migration-runbook-author` | Multi-tenant SaaS operational + analytical data as a first-class discipline. |
+| **D12.1 Data engineering (P1) — ✅ all 7 built (D23, 2026-07-07)** | `schema-evolution-planner`, `streaming-event-architect`, `data-quality-monitor-designer`, `operational-vs-analytical-splitter`, `warehouse-lake-architect`, `pii-lifecycle-designer`, `data-migration-runbook-author` | Multi-tenant SaaS operational + analytical data as a first-class discipline. The `streaming-event-architect` ↔ `api-event-architect` internal-pipeline-vs-external-contract seam is pinned in trigger-evals on both directions. |
 | **D12.2 Product engineering craft (P1)** | `pagination-cursor-designer`, `error-taxonomy-designer`, `edge-state-ux-designer`, `notification-webhook-ux-designer`, `mobile-viewport-craft` | API/UX craft distinct from contract design (Phase 3 `api-event-architect` owns the contract; these own the craft inside it). |
-| **D12.3 Performance engineering (P1)** | `profiling-methodology-designer`, `query-plan-reader`, `n-plus-one-detector`, `caching-strategy-designer`, `latency-budget-architect`, `frontend-perf-engineer` | Performance as an engineering discipline — distinct from the load-testing VALIDATION banked in D10 Tier 1 (`performance-test-harness` + `load-test-planner`): D12.3 designs for performance, D10 measures it. |
+| **D12.3 Performance engineering (P1) — ✅ all 6 built (D23, 2026-07-07)** | `profiling-methodology-designer`, `query-plan-reader`, `n-plus-one-detector`, `caching-strategy-designer`, `latency-budget-architect`, `frontend-perf-engineer` | Performance as an engineering discipline — distinct from the load-testing VALIDATION in D10 Tier 1 (`performance-test-harness` + `load-test-planner`, built in the same D23 batch): D12.3 designs for performance, D10 measures it — the seam is pinned in trigger-evals on BOTH sides. `latency-budget-architect` consumes (never sets) `slo-reliability-architect` targets. |
 | **D12.4 Technical writing / docs engineering (P1)** | `readme-craftsman`, `adr-sequencer` (extends shipped `adr-writer` with longitudinal ADR management), `diataxis-doc-organizer`, `docs-as-code-architect`, `api-doc-generator-designer`, `contribution-guide-author`, `onboarding-doc-designer`, `docs-retention-index` (report P1, added by D15: numbered index governing every workflow doc's lifecycle — retention category, reason-to-keep, superseded-by, cleanup rule — mirrored by per-doc retention frontmatter; documentation retirement as an approvable operation) | Durable documentation as its own discipline. |
 | **D12.5 PM / product engineering interface (P2)** | `requirements-gathering-facilitator`, `product-spec-writer` (a product spec, distinct from an ADR), `roadmap-under-uncertainty-planner`, `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `sunset-deprecation-communicator` | The engineering/PM boundary. |
 | **D12.6 Growth / analytics engineering (P2)** | `event-schema-architect` (analytics counterpart to `api-event-architect`), `funnel-definition-designer`, `ab-test-designer` (design AND reading of results), `product-analytics-instrumenter` | User-facing product analytics, distinct from system-facing observability (Phase 6 `observability-operator` / `slo-reliability-architect`). |
@@ -869,6 +870,29 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   `skill-quality-reviewer`'s own description/trigger-evals annotations updated in the same
   change ("library-diff-reviewer — not built" would have become false on merge). To be
   checked by `skill-quality-reviewer` before final trust.
+- **D23 (2026-07-07) — Data engineering (D12.1, 7 skills), Performance engineering
+  (D12.3, 6 skills), and QA Tier 1 performance/load validation (D10, 2 skills) built.**
+  110→125 skills, one PR (three pack commits: D12.1, D12.3, D10 — clean split boundaries;
+  the batch was NOT split into multiple PRs). D12.1: `schema-evolution-planner`,
+  `streaming-event-architect`, `data-quality-monitor-designer`,
+  `operational-vs-analytical-splitter`, `warehouse-lake-architect`,
+  `pii-lifecycle-designer`, `data-migration-runbook-author`. D12.3:
+  `profiling-methodology-designer`, `query-plan-reader`, `n-plus-one-detector`,
+  `caching-strategy-designer`, `latency-budget-architect`, `frontend-perf-engineer`.
+  D10 Tier 1: `performance-test-harness`, `load-test-planner` — built as TWO skills
+  (the §3 row's may-merge option declined at the pre-generation plan table: instrument
+  vs traffic plan are different deliverables with a pinned sibling seam). **D12.3
+  designs FOR performance; D10 MEASURES it — seam pinned in trigger-evals both sides**
+  (harness thresholds are CONSUMED from `latency-budget-architect` /
+  `slo-reliability-architect`, never invented). The highest external-collision seam —
+  `streaming-event-architect` (internal pipeline) vs `api-event-architect` (external
+  contract) — is pinned hard in both skills' trigger-evals. Product-agnostic (perf/data
+  tool references kept generic/illustrative — EXPLAIN-style plans, stream platforms,
+  load drivers by class, never one product's CLI). All 15 are design/analysis skills
+  producing specs/plans/verdicts and editing nothing → model-invocable; the three that
+  could touch live systems (profiling, harness, load) carry Stop Conditions forbidding
+  execution against production without human approval. Embedded commands follow the D19
+  corrections. To be checked by `skill-quality-reviewer` before final trust.
 
 ---
 

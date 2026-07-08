@@ -1,0 +1,49 @@
+{
+  "skill": "query-plan-reader",
+  "description": "Trigger discrimination: ONE query's plan verdict (this skill) vs chatty many-query patterns (n-plus-one-detector), unattributed slowness (profiling-methodology-designer), workload placement (operational-vs-analytical-splitter), and structural tenant indexing/partitioning (multi-tenant-data-architect).",
+  "overlaps_with": [
+    "n-plus-one-detector",
+    "profiling-methodology-designer",
+    "operational-vs-analytical-splitter",
+    "multi-tenant-data-architect"
+  ],
+  "cases": [
+    {
+      "id": "single-plan-verdict-wins-here",
+      "prompt": "One search query is timing out since the data grew. I've got its EXPLAIN ANALYZE — find the dominant cost and tell me the cheapest real fix.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["n-plus-one-detector", "profiling-methodology-designer", "operational-vs-analytical-splitter"],
+      "reason": "One named query with plan output in hand is the narrowest tool's home case: dominant node, divergence check, ranked priced fixes. No query-count pattern, no unattributed symptom, no placement question."
+    },
+    {
+      "id": "chatty-pattern-goes-to-n-plus-one-detector",
+      "prompt": "The order list endpoint issues one query per order to fetch its customer — 300 orders, 300 extra queries. Design the fix.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": ["query-plan-reader"],
+      "note": "SEAM CASE — the sibling boundary: every individual query here is healthy; the defect is the per-row access PATTERN. Plan-reading one of the 300 would find nothing; batching/eager-loading design is the fix.",
+      "reason": "Query-count explosion at the data-access layer, not a single plan's cost structure."
+    },
+    {
+      "id": "unattributed-slowness-goes-to-profiling",
+      "prompt": "The API got slower across the board this quarter — could be the database, could be the app tier, nobody has evidence. Figure out how we find where the time goes.",
+      "expected_skill": "profiling-methodology-designer",
+      "should_not_trigger": ["query-plan-reader"],
+      "reason": "No query is named and no attribution exists — designing the investigation (attribution level, conditions, narrowing loop) precedes plan-reading. The plan reader starts where a query has been evidenced."
+    },
+    {
+      "id": "workload-placement-goes-to-splitter",
+      "prompt": "Even after tuning, the month-end analytics aggregation fundamentally doesn't fit the transactional database — decide whether that workload should move and to what.",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": ["query-plan-reader"],
+      "note": "SEAM CASE — the tuning-headroom boundary: 'after tuning' concedes the plan-level work is done and an order-of-magnitude gap remains. Placement (replica/CDC/materialization) is the splitter's verdict; plan-reading has no 100x to give.",
+      "reason": "The question is workload placement, not a plan's dominant node."
+    },
+    {
+      "id": "tenant-partitioning-strategy-goes-to-multi-tenant-data-architect",
+      "prompt": "Design our indexing and partitioning strategy by tenant across the core tables — hot tenants, shared reference data, the works.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": ["query-plan-reader"],
+      "reason": "Store-wide tenant indexing/partitioning is structural data-layer design. The plan reader reads how ONE query interacts with existing structures — including tenant predicates — but never designs the tenant strategy itself."
+    }
+  ]
+}

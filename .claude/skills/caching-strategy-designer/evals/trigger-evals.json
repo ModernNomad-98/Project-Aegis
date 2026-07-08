@@ -1,0 +1,49 @@
+{
+  "skill": "caching-strategy-designer",
+  "description": "Trigger discrimination: cache design with envelopes/invalidation/keys (this skill) vs chatty-pattern repair (n-plus-one-detector), new-store tenant isolation (multi-tenant-data-architect), browser asset caching (frontend-perf-engineer), and workload offload (operational-vs-analytical-splitter).",
+  "overlaps_with": [
+    "n-plus-one-detector",
+    "multi-tenant-data-architect",
+    "frontend-perf-engineer",
+    "operational-vs-analytical-splitter"
+  ],
+  "cases": [
+    {
+      "id": "cache-design-wins-here",
+      "prompt": "Design caching for our exchange-rate and plan-limits lookups: what layer, what keys, what TTLs, how invalidation works when rates update, and what happens when the cache is down.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["n-plus-one-detector", "multi-tenant-data-architect", "frontend-perf-engineer"],
+      "reason": "Layer, keys, TTL, invalidation, and failure semantics for qualified read-path candidates is the cache designer's whole surface. No chatty pattern needs fixing first, no new store's isolation is in question, no browser assets involved."
+    },
+    {
+      "id": "chatty-pattern-goes-to-n-plus-one-detector-first",
+      "prompt": "The dashboard fires ~350 queries per load. Rather than untangle the ORM, we want to cache the assembled dashboard response — design the cache.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "note": "SEAM CASE — cache vocabulary, chatty subject: the 350-query storm is the defect, and caching hides it while every miss replays it. The detector triggers, refuses the reflex, fixes the pattern; surviving cache candidates come back here afterwards on their own merits.",
+      "reason": "Pattern repair precedes cache design by both skills' explicit rules; the request's substance is the chatty page, not a qualified cache candidate."
+    },
+    {
+      "id": "new-store-isolation-goes-to-multi-tenant-data-architect",
+      "prompt": "We're introducing a distributed cache cluster to the platform. Should it be one shared cluster with tenant-keyed entries or per-tenant separation, and how does tenant context reach it?",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "note": "SEAM CASE — pinned from the cache side too: a NEW store's tenant-isolation posture (shared vs separated, context propagation) is explicitly multi-tenant-data-architect's decision ('where a new store — cache, search index — gets its tenant scoping'). Key/TTL/invalidation design WITHIN that posture is what the cache designer owns.",
+      "reason": "Store-level isolation strategy, not entry-level cache design."
+    },
+    {
+      "id": "asset-pipeline-goes-to-frontend-perf-engineer",
+      "prompt": "Our JS bundles re-download on every visit. Set up content-hashed filenames with immutable cache headers and decide what the service worker should cache.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "reason": "Content-hashed bundles, immutable headers, and service-worker strategies are the frontend asset pipeline — frontend-perf-engineer's loading-path craft, not shared data-cache design."
+    },
+    {
+      "id": "workload-offload-goes-to-splitter",
+      "prompt": "The reporting aggregations are crushing the primary database. Should we materialize them somewhere, move them to a replica, or pipe them to an analytical store?",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "reason": "Replica-vs-materialization-vs-analytical-store for a workload hurting the primary is the splitter's placement decision. 'Cache' may be its prescription for a specific item — only then does the cache designer take over."
+    }
+  ]
+}

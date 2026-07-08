@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "latency-budget-architect",
+  "description": "Behavior cases for latency budgeting: closing arithmetic with overhead rows, honest tail math on fan-out, budget-derived timeouts/retries, the budget-claim review rule, and the refuse-to-invent-the-SLO case.",
+  "cases": [
+    {
+      "id": "positive-decompose-journey-target",
+      "type": "should_trigger",
+      "prompt": "Our SLO says search results in 400ms at p95. The path is edge → gateway → auth → search service → database, plus a ranking call. Allocate the budget across the hops.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
+          "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
+          "Derives per-hop timeouts from budgets (≈ budget + tolerance) and runs the cascade check (upstream ≥ downstream × retries + ε).",
+          "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
+          "Installs the budget-claim review rule for new dependencies on the path."
+        ]
+      }
+    },
+    {
+      "id": "positive-timeout-folklore-cleanup",
+      "type": "should_trigger",
+      "prompt": "Our services all use 30-second default timeouts and retry twice at both the gateway and the client library. The checkout path promises 500ms. Fix the timeout and retry configuration.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
+          "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
+          "Runs the cascade check so no upstream abandons work its downstream completes.",
+          "Prices each permitted retry as spend from a named allocation rather than a free action."
+        ]
+      }
+    },
+    {
+      "id": "edge-fan-out-tail-math",
+      "type": "should_trigger",
+      "prompt": "The dashboard fans out to 12 services in parallel and joins on all of them. Each service is 'fine at p99'. Why do users keep hitting slow loads, and how should the budget handle it?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does the tail math explicitly: with 12 parallel branches, 1-(0.99)^12 ≈ 11% of requests experience at least one branch's p99 — 'fine at p99' per branch is not fine at the join.",
+          "Budgets branches at a stricter percentile than the end-to-end promise (p99.5-class), or funds hedging from headroom, or recommends narrowing the fan-out — with the tradeoffs stated.",
+          "Shows that parallel composition takes the max of branches, so the slowest branch owns the join's budget.",
+          "Anchors the fix in the budget table rather than telling individual services to 'be faster'."
+        ]
+      }
+    },
+    {
+      "id": "should-not-invent-the-slo",
+      "type": "should_trigger",
+      "prompt": "We don't have any latency SLO yet. Just pick a good end-to-end number yourself — say whatever seems right — and while you're at it define the error budget and what should page, then split it into per-service budgets.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to SET the SLO, error budget, and paging design — that is slo-reliability-architect's scope, and doing it here forks the reliability source of truth.",
+          "Offers the legitimate paths: run slo-reliability-architect for the journey target, or proceed with an ASSUMED target flagged loudly in the budget header as requiring ratification.",
+          "If proceeding on the assumption, produces a real budget whose foundation is explicitly marked provisional — never silently authoritative.",
+          "Does not design alerting or error-budget policy in any branch."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-slo-definition",
+      "type": "should_not_trigger",
+      "prompt": "Define SLOs for our top user journeys — pick the SLIs, set targets with error budgets, and design the burn-rate alerting so the right things page.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke latency-budget-architect: journey selection, SLI choice, targets, error budgets, and paging are slo-reliability-architect's catalog work.",
+          "No decomposition of an existing target into per-hop engineering budgets is requested."
+        ]
+      }
+    }
+  ]
+}

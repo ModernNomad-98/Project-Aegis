@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "n-plus-one-detector",
+  "description": "Behavior cases for chatty-access detection and fix design: evidence-table-first discipline, pattern-matched fixes with prices, request-scope correctness, the regression guard, and the cache-reflex refusal.",
+  "cases": [
+    {
+      "id": "positive-classic-lazy-load-storm",
+      "type": "should_trigger",
+      "prompt": "The projects list page takes 3 seconds. The query log shows one query for the projects and then ~200 more, each fetching a single owner or status record. Diagnose and design the fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the evidence table first: statement shapes × repetitions × per-query time, identifying the 1-parent + N-children N+1 signature.",
+          "Locates the injection site at file/path level (the serializer/template/loop touching the lazy relation) — the fix lands at the touch point.",
+          "Designs scoped eager/preload for the known-ahead relations (NOT global eager loading), or a batched IN-key load where relations are conditional, with each fix's price stated.",
+          "Verifies by re-measuring: statement count drops to the designed number (2–3), and the replacement query's plan is sanity-checked at realistic volume.",
+          "Installs a query-count budget assertion for the endpoint wired to a real counter hook, and lists sibling paths with the same pattern as residual."
+        ]
+      }
+    },
+    {
+      "id": "positive-resolver-field-storm",
+      "type": "should_trigger",
+      "prompt": "Our GraphQL-style API fires one database query per author field across every post in the response — 50 posts means 50 author lookups. Design the standing fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes the resolver N+1 as architectural (per-field independent fetching) and prescribes batched loaders per entity type — collect keys per resolution tick, one IN-key query, memoized per request.",
+          "Scopes the loader cache to the REQUEST, flagging process-global scope as a cross-tenant data-leak hazard, not just staleness.",
+          "Addresses IN-list chunking with a stated size and a plan sanity check at worst-case key volume.",
+          "Treats this as the standing fix for the API layer rather than patching one query."
+        ]
+      }
+    },
+    {
+      "id": "edge-latency-scales-with-page-size",
+      "type": "should_trigger",
+      "prompt": "The exports endpoint is fine for 10 rows, 10x slower for 100 rows, and times out at 1000. Individual queries in the trace all look fast. What's going on and what's the design fix?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads latency-scales-with-result-size as the arithmetic signature of per-row access and confirms with a count table from the trace rather than theorizing.",
+          "Distinguishes which chatty class is present (N+1, serial awaits, per-row aggregates) since the timeout shape suggests serialized round trips.",
+          "Pairs the pattern fix with pagination discipline — an unpaginated 50,000-row export stays slow after every fix.",
+          "Does not route to single-query plan reading: fast individual queries are exactly why the plan finds nothing."
+        ]
+      }
+    },
+    {
+      "id": "should-not-cache-the-storm",
+      "type": "should_trigger",
+      "prompt": "Easiest fix for the 400-query dashboard: slap a 5-minute cache on the whole response so users don't feel it. Design that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the cache reflex: caching a chatty pattern hides it, adds invalidation debt, and every cache miss replays the 400-query storm.",
+          "Fixes the access pattern first (batching/eager loading) so the underlying count is sane.",
+          "States that a genuine staleness-tolerant cache candidate may then route to caching-strategy-designer on its own merits — after the pattern fix.",
+          "Does not design the 5-minute response cache as the solution in any branch."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-single-heavy-query",
+      "type": "should_not_trigger",
+      "prompt": "One aggregation query dominates the trace at 12 seconds — everything else is milliseconds. Here's its plan; what do we do?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke n-plus-one-detector: one heavy query with its plan in hand is query-plan-reader's case — dominant node, divergence, ranked fixes.",
+          "No query-count explosion or per-row access pattern exists; restructuring access would miss the actual problem."
+        ]
+      }
+    }
+  ]
+}

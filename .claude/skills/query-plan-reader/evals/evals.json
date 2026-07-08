@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "query-plan-reader",
+  "description": "Behavior cases for single-query plan reading: dominant-node discipline, estimate-divergence-first diagnostics, priced fix ranking, representative-volume capture, and the index-everything refusal.",
+  "cases": [
+    {
+      "id": "positive-explain-interpretation",
+      "type": "should_trigger",
+      "prompt": "This report query takes 90 seconds. Here's the EXPLAIN ANALYZE output — walk me through what's wrong and what to do about it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies ONE dominant cost node with its share of total time, explaining WHY the planner chose that path.",
+          "Reads estimate-vs-actual divergence at the key nodes and checks statistics state before designing any index.",
+          "Ranks fixes by cheapness (statistics refresh, rewrite, index, schema) with each fix's price stated — write amplification and storage for indexes, semantics preservation for rewrites.",
+          "States the expected plan-shape change per fix and the re-verification method: re-plan under the same parameters and representative volume plus a surface-level timing check.",
+          "Notes any tenant/row-security predicates visible in the plan and their cost."
+        ]
+      }
+    },
+    {
+      "id": "positive-index-decision-evidence",
+      "type": "should_trigger",
+      "prompt": "The team is debating adding an index on (status, created_at) for the queue-polling query. Settle it with evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Captures the current plan with actual statistics at representative volume and with the SYMPTOMATIC parameter values, noting parameter sensitivity.",
+          "Evaluates the proposal against the composite worksheet: equality-then-range column order, whether an existing index is a prefix (extend, don't stack), and the tenant-key question where row security filters the table.",
+          "Prices the index in write amplification against the table's write rate — the queue table is write-hot, so the price is material and stated.",
+          "Delivers a verdict with the predicted plan change, not a shrug — including the possibility that a rewrite or statistics refresh beats the index."
+        ]
+      }
+    },
+    {
+      "id": "edge-estimate-divergence-stale-stats",
+      "type": "should_trigger",
+      "prompt": "A query that was fine last month now picks a terrible plan — a nested loop over millions of rows. The estimates in the plan say 40 rows but it's actually 400,000. Why, and what's the fix?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads the 40-vs-400,000 divergence as the diagnostic core: the planner chose the nested loop because it believed the estimate.",
+          "Works the cause list in likelihood order — stale statistics first (cheapest fix in the catalog), then correlated predicates, skew, and parameter sensitivity.",
+          "Recommends the statistics refresh BEFORE any index or rewrite, with re-plan verification that estimates now track actuals.",
+          "Does not propose new indexes while the planner's inputs are known to be wrong."
+        ]
+      }
+    },
+    {
+      "id": "should-not-index-everything",
+      "type": "should_trigger",
+      "prompt": "Just give me indexes on every column this slow query touches — all the WHERE columns, the JOIN keys, the ORDER BY — so we cover every possibility.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the index-everything approach: each index is a standing write-amplification and storage price, and single-column shotgun indexes rarely serve the actual composite access path.",
+          "Reads the plan first and designs at most the composite index the dominant node needs, with column-order rationale.",
+          "Checks existing indexes for prefixes/duplicates before adding anything.",
+          "States the prices explicitly so the human sees what blanket indexing would cost on this table's write rate."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-query-count-explosion",
+      "type": "should_not_trigger",
+      "prompt": "Our page load runs 800 small queries — one per row of the list, each fetching a related record. Each query is fast individually. Fix the pattern.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke query-plan-reader: many fast small queries per request is the N+1/chatty-access pattern — n-plus-one-detector owns the diagnosis and the batching/eager-load fix design.",
+          "Reading any single query's plan would show a healthy plan; the defect lives in the access pattern, not in one plan."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "latency-budget-architect",
+  "description": "Trigger discrimination for the targets-vs-allocation seam: per-hop budget engineering (this skill) vs SLO/error-budget/alerting definition (slo-reliability-architect), measurement instruments (performance-test-harness), trace wiring (observability-operator), and per-hop reduction work (query-plan-reader).",
+  "overlaps_with": [
+    "slo-reliability-architect",
+    "performance-test-harness",
+    "observability-operator",
+    "query-plan-reader"
+  ],
+  "cases": [
+    {
+      "id": "budget-allocation-wins-here",
+      "prompt": "The 300ms p95 target for checkout is agreed. Now split it across gateway, auth, order service, payment call, and the database — with timeouts derived from the split and rules for anyone adding a new call to the path.",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": ["slo-reliability-architect", "performance-test-harness", "observability-operator"],
+      "reason": "The target EXISTS ('agreed'); the ask is allocation — per-hop budgets, derived timeouts, and the budget-claim rule. That is the spend plan, not target-setting, measuring, or wiring."
+    },
+    {
+      "id": "target-setting-goes-to-slo-reliability-architect",
+      "prompt": "What latency should we actually promise users on checkout, how much error budget do we get, and at what burn rate does someone get paged?",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": ["latency-budget-architect"],
+      "note": "SEAM CASE (primary) — what-users-must-experience, error budgets, and paging are the SLO catalog. The budget architect CONSUMES the resulting target and allocates milliseconds to components; it never chooses the promise, the error budget, or what pages.",
+      "reason": "Target, error budget, and alerting design are reliability-target work — the seam's other side."
+    },
+    {
+      "id": "measurement-goes-to-performance-test-harness",
+      "prompt": "Build the pre-release check that measures checkout latency percentiles against our numbers on every release candidate and fails the build on regression.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": ["latency-budget-architect"],
+      "note": "SEAM CASE (designs-vs-measures) — the ask is the measurement INSTRUMENT: baselines, percentile comparison, regression gates in CI. Budgets are the thresholds it asserts; designing the instrument is D10 measurement work, not allocation.",
+      "reason": "Measurement harness construction, not deciding which hop may spend which milliseconds."
+    },
+    {
+      "id": "trace-wiring-goes-to-observability-operator",
+      "prompt": "Instrument the request path with spans on every hop and build the dashboard that shows where checkout time goes in production.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["latency-budget-architect"],
+      "reason": "Span instrumentation and dashboards are live telemetry implementation — observability-operator's manual-invocation surface. The budget design specifies the annotation convention; the wiring is not its work."
+    },
+    {
+      "id": "hop-reduction-goes-to-owning-skill",
+      "prompt": "The database hop is spending 180ms of its 60ms allowance — here's the dominant query's plan. Get that hop back under its number.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["latency-budget-architect"],
+      "reason": "A hop over budget with a plan in hand is reduction work owned by the layer skill (query-plan-reader here; caching or frontend skills for their layers). The budget architect decides how much the hop MAY spend — never how it gets there."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "data-migration-runbook-author",
+  "description": "Trigger discrimination: the operator-executable DATA-move runbook (this skill) vs the change sequence (schema-evolution-planner), DDL safety review (secure-migration-reviewer), general release rollback (rollback-runbook-author), and the reusable gated-op prompt template (gated-deployment-prompt-template).",
+  "overlaps_with": [
+    "schema-evolution-planner",
+    "secure-migration-reviewer",
+    "rollback-runbook-author",
+    "gated-deployment-prompt-template"
+  ],
+  "cases": [
+    {
+      "id": "data-move-runbook-wins-here",
+      "prompt": "Turn the approved re-shard plan into the step-by-step operator procedure: batch sizes with throttling, the verification queries after each batch, abort thresholds, and where the human sign-offs go.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": ["schema-evolution-planner", "secure-migration-reviewer", "gated-deployment-prompt-template"],
+      "reason": "An APPROVED plan needing operational HOW — batching, per-batch verification, aborts, approval markers — is exactly the runbook layer. The sequence is decided, no DDL review is requested, and this is one specific move, not a reusable template."
+    },
+    {
+      "id": "sequence-design-goes-to-schema-evolution-planner",
+      "prompt": "We want to move the address fields out of the users table into their own table without breaking deploys — figure out the staged sequence and compatibility windows.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "note": "SEAM CASE — plan vs runbook, seen from the runbook side: no approved plan exists yet, so there is nothing to operationalize. Expand/migrate/contract staging and compatibility guarantees come first; this runbook skill is its downstream consumer.",
+      "reason": "The ask is the change sequence itself. The runbook author's Stop Conditions require an approved plan as a prerequisite — invoking it here would fail its own gate."
+    },
+    {
+      "id": "ddl-safety-review-goes-to-secure-migration-reviewer",
+      "prompt": "Before this backfill migration ships, check it: lock and downtime risk, whether the new table has RLS, and if the backfill bypasses tenant scope.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "reason": "Lock risk, RLS enablement gaps, and tenant-scope bypass in a written migration are the safety REVIEW — whose verdict the runbook later cites as a prerequisite. Review and runbook are different layers on purpose."
+    },
+    {
+      "id": "release-rollback-goes-to-rollback-runbook-author",
+      "prompt": "Author the backout runbook for the release: blue/green flip back, flag kill, comms steps, and the decision time-box for rollback versus fix-forward.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "note": "SEAM CASE — runbook vs runbook: the subject is a RELEASE (artifact/flag/traffic primitives), not a data move. The data-move runbook COMPOSES rollback-runbook-author's conventions for its rollback sections; a pure release backout belongs to that skill wholesale.",
+      "reason": "Blue/green flips, flag kills, and release backout criteria are release-rollback craft with no batching, parity, or data-cutover content."
+    },
+    {
+      "id": "reusable-template-goes-to-gated-deployment-prompt-template",
+      "prompt": "We run roughly the same risky data-sync operation monthly. Build the reusable operator prompt template with placeholders, hard rules, stop conditions, and the required per-run report.",
+      "expected_skill": "gated-deployment-prompt-template",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "reason": "A RECURRING operation needing a placeholder-driven prompt template with per-run reporting is the template skill's form. A one-off move gets this skill's full runbook; the two compose when a rehearsed runbook graduates into a monthly template."
+    }
+  ]
+}

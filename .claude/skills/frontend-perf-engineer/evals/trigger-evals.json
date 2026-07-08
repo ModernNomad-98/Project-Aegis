@@ -1,0 +1,50 @@
+{
+  "skill": "frontend-perf-engineer",
+  "description": "Trigger discrimination: frontend perf DESIGN (this skill) vs measurement mechanics (performance-test-harness), build correctness (vite-build-qa-engineer), shared data caching (caching-strategy-designer), the end-to-end split (latency-budget-architect), and functional E2E (playwright-e2e-engineer).",
+  "overlaps_with": [
+    "performance-test-harness",
+    "vite-build-qa-engineer",
+    "caching-strategy-designer",
+    "latency-budget-architect",
+    "playwright-e2e-engineer"
+  ],
+  "cases": [
+    {
+      "id": "frontend-perf-design-wins-here",
+      "prompt": "The product feels heavy in the browser: big bundle, slow first load on phones, janky lists. Produce the optimization plan and the budgets that keep it fixed.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": ["performance-test-harness", "vite-build-qa-engineer", "playwright-e2e-engineer"],
+      "reason": "Bundle strategy, rendering path, runtime patterns, and budget values are the frontend perf DESIGN surface. The harness later measures; the build QA later verifies chunks; no functional tests are requested."
+    },
+    {
+      "id": "measurement-mechanics-go-to-performance-test-harness",
+      "prompt": "Set up the lab measurement that runs our key pages on a throttled mobile profile every release, keeps percentile baselines, and fails CI on regression.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": ["frontend-perf-engineer"],
+      "note": "SEAM CASE (designs-vs-measures) — running pages under a profile, baselines, and CI regression gates are the measurement INSTRUMENT. The perf engineer defines what to measure and the budget numbers; the harness owns how measurement executes and gates.",
+      "reason": "Instrument construction and gate mechanics, not optimization design."
+    },
+    {
+      "id": "build-correctness-goes-to-vite-build-qa-engineer",
+      "prompt": "After our chunk-splitting change, the staging build 404s on a lazy chunk and an env-specific import breaks. Verify and fix the build pipeline behavior.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": ["frontend-perf-engineer"],
+      "reason": "Broken chunks and env-specific build failures are build CORRECTNESS QA — vite-build-qa-engineer's scope. The perf engineer reshapes the bundle for speed and composes that skill to keep the reshaped build verified."
+    },
+    {
+      "id": "api-response-caching-goes-to-caching-strategy-designer",
+      "prompt": "Design caching for our API responses at the CDN edge — which endpoints, what keys and TTLs, and how invalidation works on updates.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["frontend-perf-engineer"],
+      "note": "SEAM CASE — caching split: shared HTTP/data response caching (keys, TTLs, invalidation, envelopes) is the cache designer's; the frontend skill's caching scope is the browser ASSET path (hashed immutable bundles, service-worker strategy).",
+      "reason": "API response caching with invalidation design is data-cache craft, not asset-pipeline work."
+    },
+    {
+      "id": "endtoend-split-goes-to-latency-budget-architect",
+      "prompt": "Page load is 3 seconds total — how many milliseconds belong to the API, the gateway, and the browser respectively, and who owns what share of the 3 seconds?",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": ["frontend-perf-engineer"],
+      "reason": "Allocating an end-to-end number across hops — including the frontend's SHARE — is the budget architect's table. The frontend engineer takes its allocated share and designs how the browser meets it."
+    }
+  ]
+}

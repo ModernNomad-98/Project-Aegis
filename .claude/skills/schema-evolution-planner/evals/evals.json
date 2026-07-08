@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "schema-evolution-planner",
+  "description": "Behavior cases for staged schema evolution: expand/migrate/contract discipline, consumer enumeration beyond app code, live-rename decomposition, and the one-deploy-breaking-change refusal.",
+  "cases": [
+    {
+      "id": "positive-column-split-on-live-table",
+      "type": "should_trigger",
+      "prompt": "We need to split the single `full_name` column on our users table into `given_name` and `family_name` without downtime — the app deploys rolling, and the warehouse syncs this table nightly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the three-stage plan: expand adds the two new nullable columns; migrate dual-writes and backfills with a parity gate; contract stops dual-writes, registers `full_name` in the deprecation register, and schedules (not executes) the drop behind zero-reader evidence.",
+          "States the compatibility guarantee per stage in both directions (old code x new schema, new code x old schema) for the rolling-deploy overlap.",
+          "Enumerates consumers beyond app code — explicitly dispositions the nightly warehouse sync as a reader that must move before contract.",
+          "Hands the backfill's operational execution to data-migration-runbook-author and routes each stage's migration file to secure-migration-reviewer rather than embedding either."
+        ]
+      }
+    },
+    {
+      "id": "positive-multi-release-deprecation-sequence",
+      "type": "should_trigger",
+      "prompt": "Plan the retirement of our legacy `status` integer column in favor of the new `state` enum over the next three releases — old clients still write the integer today.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps stages to release boundaries: which release carries expand, which carries the read-switch, which is allowed to drop.",
+          "Requires dual-write while any deployed writer still produces the integer form, with a stated end condition rather than an open-ended window.",
+          "Creates a deprecation-register entry with replaced-by, earliest-drop release, required evidence, and an owner.",
+          "States rollback per stage and identifies the physical drop as the point of no return."
+        ]
+      }
+    },
+    {
+      "id": "edge-rename-is-never-a-rename",
+      "type": "should_trigger",
+      "prompt": "Our migration tool supports RENAME COLUMN in one line — can we just rename `org_id` to `tenant_id` on the live table in tonight's deploy?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains that an in-place rename breaks whichever side deploys second during the rolling overlap — the one-line tooling support does not change the distributed-systems problem.",
+          "Decomposes the rename into add-new / dual-write / switch-reads / drop-old stages with gates.",
+          "Checks for non-app consumers of the old column name (events, analytics, raw queries) before any contract stage.",
+          "Does not simply refuse: presents the staged alternative and notes that accepting downtime instead is a human choice to be recorded."
+        ]
+      }
+    },
+    {
+      "id": "should-not-plan-drop-first",
+      "type": "should_trigger",
+      "prompt": "Just plan the DROP of the old columns first so the schema is clean, and we'll fix whatever code still reads them as errors come in.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses destructive-first sequencing: a drop is only ever the final stage behind a zero-reader gate, because data loss cannot be staged around after the fact.",
+          "Re-sequences the request into expand/migrate/contract order instead of merely declining.",
+          "Cites the missing evidence (no zero-reader proof) as the blocking condition, not stylistic preference.",
+          "Does not produce any plan variant in which the drop precedes consumer disposition."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-migration-safety-review",
+      "type": "should_not_trigger",
+      "prompt": "Here's the migration file adding the new orders table with its grants and RLS policy — review it for safety before it ships.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke schema-evolution-planner: a written migration needing privilege/RLS/lock/destructive-risk review is secure-migration-reviewer's job.",
+          "No evolution sequencing is requested — the change is a single additive migration already authored."
+        ]
+      }
+    }
+  ]
+}

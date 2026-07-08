@@ -1,0 +1,49 @@
+{
+  "skill": "schema-evolution-planner",
+  "description": "Trigger discrimination: staged schema-change SEQUENCING (this skill) vs safety review of a written migration (secure-migration-reviewer), the operator runbook for the data move (data-migration-runbook-author), tenant-scoping data-model design (multi-tenant-data-architect), and event/stream payload compatibility (streaming-event-architect / api-event-architect).",
+  "overlaps_with": [
+    "secure-migration-reviewer",
+    "data-migration-runbook-author",
+    "multi-tenant-data-architect",
+    "streaming-event-architect"
+  ],
+  "cases": [
+    {
+      "id": "staged-evolution-wins-here",
+      "prompt": "We have to retype the amounts column from float to a decimal type on a table that's written every second, across rolling deploys — sequence the change so nothing breaks.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": ["secure-migration-reviewer", "data-migration-runbook-author", "multi-tenant-data-architect"],
+      "reason": "The ask is the multi-stage compatibility sequence itself — expand/migrate/contract with per-stage guarantees across the deploy overlap. No migration file exists yet to review, and the operator runbook comes after the plan."
+    },
+    {
+      "id": "written-migration-review-goes-to-secure-migration-reviewer",
+      "prompt": "Review this migration diff before deploy — it adds a column, backfills it in the same transaction, and tightens a constraint. Anything unsafe?",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": ["schema-evolution-planner"],
+      "reason": "A concrete written migration needs the safety review: lock/downtime risk, destructive operations, RLS/privilege gaps. The planner sequences future stages; it does not audit an authored diff — though the reviewer may well conclude the change needs staging."
+    },
+    {
+      "id": "operator-runbook-goes-to-data-migration-runbook-author",
+      "prompt": "The evolution plan is approved. Now write the step-by-step runbook for the backfill: batch sizes, throttling, the verification queries per batch, and the abort procedure.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": ["schema-evolution-planner"],
+      "note": "SEAM CASE — plan vs runbook. The planner states WHAT must be true (parity definition, gates, read-switch condition); the runbook author owns the operator-executable HOW (batching, throttle, per-batch verification, abort). An approved plan as input is the handoff signal.",
+      "reason": "Everything requested is operational execution detail for a data move whose sequence is already decided. That is the runbook author's whole scope."
+    },
+    {
+      "id": "tenant-scoping-design-goes-to-multi-tenant-data-architect",
+      "prompt": "Should this new attachments store be shared tables with a tenant key or schema-per-tenant, and how does tenant context reach its queries?",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": ["schema-evolution-planner"],
+      "reason": "Choosing the isolation strategy and tenant-context propagation is tenant data-model DESIGN. The planner sequences changes to an agreed model; it does not decide scoping strategy."
+    },
+    {
+      "id": "event-payload-compatibility-goes-to-streaming-event-architect",
+      "prompt": "Consumers of our internal order-events stream keep breaking when we add fields — define the compatibility rules for evolving those event schemas.",
+      "expected_skill": "streaming-event-architect",
+      "should_not_trigger": ["schema-evolution-planner"],
+      "note": "SEAM CASE — this planner owns the operational DATABASE schema lifecycle; event/stream payload compatibility (registry rules, additive-only policies for consumers) is the streaming backbone's contract surface. External partner-facing payloads would be api-event-architect.",
+      "reason": "The evolving artifact is a stream event schema consumed via the event backbone, not a database object with readers/writers overlapping across deploys."
+    }
+  ]
+}

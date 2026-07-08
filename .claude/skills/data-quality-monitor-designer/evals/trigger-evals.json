@@ -1,0 +1,49 @@
+{
+  "skill": "data-quality-monitor-designer",
+  "description": "Trigger discrimination: checks on production DATA CONTENT (this skill) vs system telemetry implementation (observability-operator), test-data design (test-data-architect), LLM output shape validation (structured-output-validator), and one-time migration verification (data-migration-runbook-author).",
+  "overlaps_with": [
+    "observability-operator",
+    "test-data-architect",
+    "structured-output-validator",
+    "data-migration-runbook-author"
+  ],
+  "cases": [
+    {
+      "id": "data-content-checks-win-here",
+      "prompt": "Design checks so we know when our orders dataset is stale, missing rows, full of duplicates, or referencing customers that don't exist — and decide what happens to rows that fail.",
+      "expected_skill": "data-quality-monitor-designer",
+      "should_not_trigger": ["observability-operator", "test-data-architect", "structured-output-validator"],
+      "reason": "Freshness, completeness, uniqueness, and referential integrity are assertions on data CONTENT, and the failure-action question (block/quarantine/alert) is this skill's core vocabulary. No alert wiring, test fixtures, or LLM outputs are in scope."
+    },
+    {
+      "id": "telemetry-implementation-goes-to-observability-operator",
+      "prompt": "Wire up the alerts: page when pipeline job duration exceeds an hour, dashboard the consumer lag, and add a health check for the transform service.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["data-quality-monitor-designer"],
+      "note": "SEAM CASE — job duration, lag, and health checks are SYSTEM signals, and the verbs are implementation (wire, dashboard, add). Even for a check this skill designed, the alert-platform wiring is observability-operator's manual-invocation surface.",
+      "reason": "Nothing asserts on data content; the request is telemetry implementation for pipeline infrastructure."
+    },
+    {
+      "id": "test-fixtures-go-to-test-data-architect",
+      "prompt": "Our integration tests keep flaking because seeded rows collide across parallel workers — design deterministic fixtures and per-worker isolation.",
+      "expected_skill": "test-data-architect",
+      "should_not_trigger": ["data-quality-monitor-designer"],
+      "reason": "The data is TEST data: fixtures, seeds, and parallel isolation. This skill watches production datasets; test-data determinism is a different discipline with its own owner."
+    },
+    {
+      "id": "llm-output-shape-goes-to-structured-output-validator",
+      "prompt": "The model sometimes returns malformed JSON missing required fields — validate its responses against the schema before we act on them.",
+      "expected_skill": "structured-output-validator",
+      "should_not_trigger": ["data-quality-monitor-designer"],
+      "reason": "Validating an LLM response's shape at generation time is structured-output-validator's boundary. Data-quality monitoring asserts on datasets in pipelines and stores, not on a model's per-response envelope."
+    },
+    {
+      "id": "migration-verification-goes-to-runbook-author",
+      "prompt": "For next week's backfill, write the per-batch verification queries — row counts and checksums between old and new tables — and the abort criteria.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": ["data-quality-monitor-designer"],
+      "note": "SEAM CASE — parity checks during a PLANNED one-time move are runbook verification gates. The monitor designer owns STANDING checks that outlive the move; if dual-writes persist after cutover, a standing reconciliation check is where this skill picks up.",
+      "reason": "One-time, per-batch verification with abort criteria is execution safety for a specific operation, not an ongoing monitor."
+    }
+  ]
+}

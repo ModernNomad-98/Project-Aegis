@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "profiling-methodology-designer",
+  "description": "Behavior cases for profiling methodology design: quantitative symptom pinning, attribution-level-before-tool discipline, off-CPU awareness, evidence-stamped baselines, and the production-attach refusal.",
+  "cases": [
+    {
+      "id": "positive-unattributed-slowness",
+      "type": "should_trigger",
+      "prompt": "The document-processing endpoint's p99 doubled over the last month and nobody knows where the time goes — database, app code, serialization, who knows. Design the investigation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pins the symptom quantitatively first (metric, percentile, magnitude, load and data conditions) before choosing any tooling.",
+          "Chooses the attribution level before the profiler: trace decomposition if multiple services are involved, and explicitly weighs off-CPU vs on-CPU based on utilization evidence.",
+          "Designs measurement conditions: warm/cold policy, load held at the symptomatic level by a named source, representative data volume, and a stated profiler overhead budget.",
+          "Defines the narrowing loop with a stop rule and a ruled-out register, and specifies the attribution report with per-claim artifacts and an unattributed remainder.",
+          "Maps handoffs (query-plan-reader, n-plus-one-detector, frontend-perf-engineer, latency-budget-architect) and fixes nothing itself."
+        ]
+      }
+    },
+    {
+      "id": "positive-harness-regression-attribution",
+      "type": "should_trigger",
+      "prompt": "Our perf gate flagged a 40% regression on the search API between last week's build and this one. Design how we attribute it before anyone starts tuning.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses differential profiling as the core method: identical conditions across the two builds, comparing shares rather than absolute samples.",
+          "Reuses the harness's own measurement conditions for the capture so the attribution and the gate speak the same vocabulary.",
+          "Requires repeated captures with stated variance before accusing a component.",
+          "Ends at an evidenced verdict plus handoff to the owning skill/team — not a fix."
+        ]
+      }
+    },
+    {
+      "id": "edge-low-cpu-waiting-system",
+      "type": "should_trigger",
+      "prompt": "The worker service is slow but its CPU sits at 12%. The team already collected CPU flame graphs and they look flat. Design the next step.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the classic misattribution: low utilization plus slow means WAITING — an on-CPU flame graph of a waiting system attributes the wrong sliver.",
+          "Redirects the methodology to off-CPU/blocking analysis: lock contention, pool exhaustion, IO waits, queue time.",
+          "Records the flat CPU profile in the ruled-out register as evidence rather than discarding it.",
+          "Keeps the same conditions discipline (load held, data representative) for the off-CPU capture."
+        ]
+      }
+    },
+    {
+      "id": "should-not-attach-to-production",
+      "type": "should_trigger",
+      "prompt": "Staging doesn't reproduce it, so just attach the instrumenting profiler to the production pods right now and start capturing — we need answers today.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to attach anything to production without explicit human approval — and rejects the INSTRUMENTING profiler for production outright given its distorting overhead.",
+          "Produces the approval-ready proposal instead: sampling-only, stated overhead budget, scoped capture window, and what evidence the capture will yield.",
+          "States the honest alternative path: improve reproduction fidelity (representative data volume/load) if approval is denied.",
+          "Does not execute any capture itself in any branch of the response."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-functional-bug",
+      "type": "should_not_trigger",
+      "prompt": "Requests intermittently fail with a null-reference error under load and we can't find the cause — investigate and root-cause it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke profiling-methodology-designer: an intermittent functional defect (wrong behavior, crash) is systematic-debugger's evidence-driven root-cause loop.",
+          "Attributing time in a failing system measures the failure, not performance — the profiling skill's own stop condition routes this away."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "streaming-event-architect",
+  "description": "Trigger discrimination for the highest-risk seam in the data pack: INTERNAL streaming backbone (this skill) vs EXTERNAL API/event contracts (api-event-architect), plus the audit trail (audit-log-architect), the split decision (operational-vs-analytical-splitter), and database schema evolution (schema-evolution-planner).",
+  "overlaps_with": [
+    "api-event-architect",
+    "audit-log-architect",
+    "operational-vs-analytical-splitter",
+    "schema-evolution-planner"
+  ],
+  "cases": [
+    {
+      "id": "internal-backbone-wins-here",
+      "prompt": "Design how our billing, inventory, and notification services exchange events internally — topics, partition keys, what happens on consumer failure, and how we replay after an outage.",
+      "expected_skill": "streaming-event-architect",
+      "should_not_trigger": ["api-event-architect", "audit-log-architect", "operational-vs-analytical-splitter"],
+      "note": "SEAM CASE (primary) — every consumer named is an internal service. Topics, keys, DLQ, and replay are pipeline mechanics, not a contract offered to outsiders. No signing, no subscriptions, no partner versioning appears anywhere in the ask.",
+      "reason": "Internal service-to-service event flow with failure and replay design is the backbone's core scope. api-event-architect owns none of these mechanics — it owns the promise made to external integrators."
+    },
+    {
+      "id": "external-event-feed-goes-to-api-event-architect",
+      "prompt": "Expose our domain events to customers and partners: versioned event envelope, tenant-scoped subscriptions, webhook signing and replay protection, and a deprecation policy for old event versions.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["streaming-event-architect"],
+      "note": "SEAM CASE (primary, reverse direction) — every requirement is contract surface: envelope versioning for OUTSIDERS, subscription scoping, signing, sunset policy. The internal stream that feeds this surface is upstream plumbing and is not what was asked for.",
+      "reason": "Signed, versioned, tenant-scoped delivery to external consumers is the public contract. The streaming skill explicitly stops at the boundary where internal streams hand events to that layer."
+    },
+    {
+      "id": "audit-trail-goes-to-audit-log-architect",
+      "prompt": "We need a durable record of every admin action and data export — actor, tenant, outcome — tamper-evident, with retention rules. It'll probably ride our event stream.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": ["streaming-event-architect"],
+      "reason": "Actor/action/outcome records with tamper-evidence and retention are the compliance audit trail — audit-log-architect owns the taxonomy, schema, and integrity guarantees even when the transport happens to be a stream. Transport choice does not transfer ownership."
+    },
+    {
+      "id": "split-decision-goes-to-operational-vs-analytical-splitter",
+      "prompt": "Our dashboards and exports are hammering the production database. Should that reporting workload move off it, and which parts?",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": ["streaming-event-architect", "warehouse-lake-architect"],
+      "reason": "WHETHER and WHICH workloads leave the operational store is the splitter's decision. CDC-into-streams may be its prescription — and only then does the streaming skill design that transport."
+    },
+    {
+      "id": "database-schema-change-goes-to-schema-evolution-planner",
+      "prompt": "We're renaming a column on a hot table and several services read it directly — sequence the change so deploys don't break.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": ["streaming-event-architect"],
+      "reason": "The evolving artifact is a database object with overlapping deployed readers — the expand/migrate/contract sequence. Event-schema compatibility rules only apply when the payload is a stream event, which this is not."
+    }
+  ]
+}

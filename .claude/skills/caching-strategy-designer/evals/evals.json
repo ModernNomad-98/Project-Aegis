@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "caching-strategy-designer",
+  "description": "Behavior cases for caching strategy: candidate qualification with rejections, written consistency envelopes, invalidation-before-shipping, tenant-qualified keys, stampede/failure semantics, and the cache-authorization refusal.",
+  "cases": [
+    {
+      "id": "positive-hot-endpoint-cache-design",
+      "type": "should_trigger",
+      "prompt": "The catalog endpoint recomputes pricing tiers on every request — heavy query, data changes maybe daily, huge read volume. Design the caching for it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Qualifies the candidate with evidence (read/write ratio, miss cost, cardinality) and gets a stated staleness tolerance from an owner before designing anything.",
+          "Writes the consistency envelope explicitly (max staleness normal / on invalidation failure / never-stale operations) as the contract everything implements.",
+          "Designs keys with the schema: namespace, version segment for generation purge, tenant qualification for tenant-owned values, and discriminators for everything that varies the value.",
+          "Chooses invalidation with a backstop TTL even if event-driven, enumerating ALL mutation paths including background jobs and admin edits.",
+          "Adds stampede protection (single-flight/jitter) and failure semantics (fail-open or bounded serve-stale), plus hit-ratio targets with a removal trigger, wiring measurement to observability-operator."
+        ]
+      }
+    },
+    {
+      "id": "positive-stale-data-bug-overhaul",
+      "type": "should_trigger",
+      "prompt": "Users sometimes see old workspace settings for up to an hour after saving. We have a cache in front of the settings service. Redesign the invalidation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses against the mutation-path enumeration: finds the write paths that don't emit invalidation (admin edits, bulk operations, other services) as the likely staleness holes.",
+          "Redesigns with event-driven purge on ALL enumerated paths plus a backstop TTL sized to the envelope, or write-through where read-your-write matters.",
+          "Checks key discriminators — under-keying (serving one audience's view to another) is the sibling failure mode.",
+          "States the read-your-writes requirement explicitly for the save-then-view flow and picks the pattern that honors it."
+        ]
+      }
+    },
+    {
+      "id": "edge-expiry-cliff-and-cold-start",
+      "type": "should_trigger",
+      "prompt": "Every deploy flushes our cache and the database gets hammered for two minutes while everything refills at peak traffic. Fix the design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the thundering-herd/cold-start problem: a full flush at peak exceeds what the origin can absorb.",
+          "Applies stampede patterns: single-flight per key so one request recomputes, TTL jitter so families don't expire as one cliff, and a warming plan for the hot set after deploy/flush.",
+          "Questions the flush-on-deploy itself — version-segmented keys allow generation rollover without a global cold start.",
+          "Sizes the miss storm (peak RPS × miss cost) and states whether the origin survives, making warming part of the design rather than ops improvisation."
+        ]
+      }
+    },
+    {
+      "id": "should-not-cache-authorization",
+      "type": "should_trigger",
+      "prompt": "Permission checks hit the database on every request — cache each user's permissions for 15 minutes to speed things up. Design it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Applies the safety rule: authorization results have effectively zero staleness tolerance in the deny direction — a revoked permission must revoke, and a 15-minute window means revoked users keep access for 15 minutes.",
+          "Refuses to design it as a default optimization; requires an explicit human-approved envelope with a revocation-propagation bound if pursued at all.",
+          "Offers the alternatives: query tuning on the permission lookup (query-plan-reader), or event-driven invalidation keyed to permission-change events with the propagation bound stated and approved.",
+          "Does not ship any design where revocation latency is silent."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-asset-caching",
+      "type": "should_not_trigger",
+      "prompt": "Set up long-lived cache headers for our static assets — hashed bundle filenames, immutable caching, and the service-worker strategy for offline.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke caching-strategy-designer: browser asset/bundle caching (hashed filenames, immutable headers, service workers) is frontend-perf-engineer's asset pipeline.",
+          "No data-caching design — envelopes, invalidation, tenant keys — is requested."
+        ]
+      }
+    }
+  ]
+}

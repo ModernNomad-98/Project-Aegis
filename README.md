@@ -58,7 +58,17 @@ rules of the Zero-Trust Engineering Discipline (D16) — approval registers,
 governed standing approval, chat-backlog reconciliation, the context
 co-update CI gate, lane guides, the local CI mirror preflight, risk-tiered
 validation, sharded validation with resume, merge-is-deploy governance, and
-the gated deployment prompt template — see
+the gated deployment prompt template. The **data/performance/QA-validation
+batch** (D23) ships three packs at once: the 7-skill **D12.1 data engineering
+pack** (schema evolution, the internal streaming backbone, data-quality
+monitoring, the operational/analytical split, the warehouse/lake estate, PII
+lifecycle, and data-migration runbooks), the 6-skill **D12.3 performance
+engineering pack** (profiling methodology, query-plan reading, N+1
+detection, caching strategy, latency budgets, and frontend performance), and
+the 2-skill **D10 Tier 1 performance/load validation pair**
+(`performance-test-harness` + `load-test-planner`) — closing the QA
+roadmap's headline gap, with the seam pinned both ways: D12.3 designs FOR
+performance, D10 measures it — see
 [Skills (shipped)](#skills-shipped) below.
 
 ## What this is
@@ -117,13 +127,15 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~110 shipped procedures,
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~125 shipped procedures,
   grouped by the phase categories in the catalog: operating discipline, AI-SDLC
   governance, core architecture & engineering, SaaS & tenant isolation, security &
   supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
-  AI security, compliance & governance, library meta (self-application), and the
+  AI security, compliance & governance, library meta (self-application), the
   D12.8 operational workflow patterns (the Zero-Trust Engineering Discipline's
-  concrete rules). Full list in [Skills (shipped)](#skills-shipped) below.
+  concrete rules), data engineering (D12.1), performance engineering (D12.3),
+  and performance/load validation (D10 Tier 1). Full list in
+  [Skills (shipped)](#skills-shipped) below.
 - **Subagents** — seven read-only specialist reviewers, one per lens; see
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
@@ -178,6 +190,7 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ merged |
 | D13 | Library meta / self-application (5 = `skill-quality-reviewer`, D18, + the 4 completing the scope: `library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`, D22) | P1 | ✅ shipped (D18 + D22) |
 | D12.8 | Operational workflow patterns (10 evidence-extracted skills — the concrete rules of the Zero-Trust Engineering Discipline, D16/D21; sourced from the workflow extraction report) | P1 | ✅ shipped (D21) |
+| D23 | Data + performance + QA-validation batch (15 = D12.1 data engineering 7 + D12.3 performance engineering 6 + D10 Tier 1 perf/load validation 2; D12.3 designs FOR performance, D10 measures it — seam pinned both sides) | P1 | ✅ shipped (D23) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -410,6 +423,42 @@ the concrete, invocable rules of the
 | `sharded-validation-with-resume` | Full tier as named functional shards: persisted status (failed ≠ interrupted), resume only past timeout/infra interruptions (never past real failures), empty-or-fail uncategorized catch-shard, ONE aggregate gate as the sole required check. | auto + manual |
 | `merge-is-deploy-governance` | Standing governance for merge==deploy platforms: documented reality, PR validation as the authoritative gate, post-merge demoted to verification, branch protection recorded in-repo (human-only changes), stated exposure window, revert-PR rollback with strategy-correct mechanics. | auto + manual |
 | `gated-deployment-prompt-template` | Reusable operator prompt for recurring risky ops: placeholders only, hard rules with required inputs, stop conditions with safe halt states, backup-then-verify gating, per-phase smoke expectations, required per-run report, history-index-anchored ETAs; uncited claims labeled "unverified". | auto + manual |
+
+D12.1 — data engineering pack (D23): multi-tenant operational + analytical
+data as a first-class discipline; the internal-pipeline-vs-external-contract
+seam against `api-event-architect` is pinned both ways:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `schema-evolution-planner` | Staged expand→migrate→contract plans for live-store schema change: per-stage old×new compatibility guarantees, consumer enumeration incl. events and analytics extracts, verification gates, deprecation register, rollback per stage; runbook and safety review handed off. | auto + manual |
+| `streaming-event-architect` | INTERNAL event/stream backbone: per-flow stream-vs-queue, keys with honest ordering scope, at-least-once + idempotent consumers ("exactly-once" interrogated), DLQ with owner and replay, retention vs compaction, event-schema compatibility, CDC; external webhooks/feeds stay with `api-event-architect`. | auto + manual |
+| `data-quality-monitor-designer` | Data-content checks across six dimensions placed at ingest/transform/serving, each with severity, owner, and block/quarantine/alert-and-pass — never silent auto-fix; per-dataset quality SLAs; wiring handed to `observability-operator`. | auto + manual |
+| `operational-vs-analytical-splitter` | Decides which workloads leave the transactional store and how (replica / CDC / materialized views / cache) against owner-stated freshness tolerance, with the one-bad-query escape, a stop-doing list with enforcement, and staged cutover. | auto + manual |
+| `warehouse-lake-architect` | Analytical estate design: warehouse/lake/lakehouse by workload and team maturity, zones with contracts, modeling + SCD policy per mart, tenant key mandatory in every zone, PII per lifecycle rules, catalog governance, cost posture. | auto + manual |
+| `pii-lifecycle-designer` | Personal-data lifecycle estate-wide: classification, per-store data map incl. logs/caches/vector stores/backups/vendors, minimization, retention with mechanics, propagating erasure with an honest backup stance, re-identification checks, residency. | auto + manual |
+| `data-migration-runbook-author` | Operator-executable data-move runbooks: plan + safety review + VERIFIED backup as prerequisites, signal-tuned batching with idempotent resume, per-batch verification with expected outputs, numeric abort criteria naming safe halt states, human-approved no-return points. Authors documents; executes nothing. | auto + manual |
+
+D12.3 — performance engineering pack (D23): these skills design FOR
+performance; the D10 pair below MEASURES it (seam pinned both sides):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `profiling-methodology-designer` | Where-does-time-go methodology: attribution level first (low utilization = waiting → off-CPU), measurement conditions with an overhead budget, narrowing loop with stop rule and ruled-out register, handoff map to the narrow tools. Production attach approval-gated; fixes nothing. | auto + manual |
+| `query-plan-reader` | ONE query's plan → ranked verdict: dominant cost node, estimate-vs-actual divergence first, sargability rewrites, composite indexes priced in write amplification, tenant/row-security predicate cost read, re-verification at representative volume. | auto + manual |
+| `n-plus-one-detector` | Chatty data-access patterns (N+1, repeated identical, serial awaits, over-fetch) evidenced by per-request counts, fixed by pattern with request-scoped loaders (a tenant-leak boundary), guarded by query-count budgets in tests; refuses the cache-the-storm reflex. | auto + manual |
+| `caching-strategy-designer` | What/where/how-it-stays-correct caching: written consistency envelope per item, invalidation before shipping with backstop TTLs, tenant-qualified keys, stampede and cold-start protection, failure semantics, hit-ratio targets with a removal trigger; authorization results never cached by default. | auto + manual |
+| `latency-budget-architect` | End-to-end target → per-hop budgets with closing arithmetic: overhead rows, honest fan-out tail math, timeouts DERIVED from budgets with cascade checks, explicit headroom, the budget-claim review rule; consumes SLO targets, never sets them. | auto + manual |
+| `frontend-perf-engineer` | The browser's share: metrics pinned to a device/network class, deletion-first weight audit, splitting with a floor, asset/font strategy, SSR/hydration honesty, evidence-based runtime fixes, bundle-size and metric budgets as CI gates. | auto + manual |
+
+D10 Tier 1 — performance/load validation (D23): the QA roadmap's headline
+pair; both MEASURE (pre-release validation counterpart to
+`slo-reliability-architect`'s production targets), and neither runs against
+production without explicit human approval:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `performance-test-harness` | The measurement instrument: per-surface measured set, environment contract stamped on every result, baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. | auto + manual |
+| `load-test-planner` | The traffic plan: workload model from production evidence (write share explicit, arrival model chosen), whale + long-tail tenant mix with the noisy-neighbor scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, owner-cited pass/fail. | auto + manual |
 
 ## Authoring a new skill
 

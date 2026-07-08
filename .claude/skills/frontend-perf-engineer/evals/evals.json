@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "frontend-perf-engineer",
+  "description": "Behavior cases for frontend performance design: device-class-pinned metrics, deletion-first weight audits, hydration honesty, evidence-based runtime fixes, budget installation, and the quiet-budget-raise refusal.",
+  "cases": [
+    {
+      "id": "positive-slow-page-load-plan",
+      "type": "should_trigger",
+      "prompt": "Our app takes over 4 seconds to load on phones. Design the frontend performance work — bundle, images, fonts, whatever it takes — with budgets so it doesn't regress.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pins the symptom to a metric class on a stated device/network profile (mid-range phone, throttled network) rather than a developer-laptop number.",
+          "Runs the weight audit BEFORE tuning: heaviest dependencies with replace/delete verdicts, duplicates, dead weight — deletions listed first.",
+          "Designs splitting with a floor (route-level, interaction-gated lazy; no chunk waterfall; hero assets eager with priority) and the asset plan (sized images, font subset/preload with a chosen swap trade).",
+          "Installs per-route size budgets and per-page metric budgets at the device class, wired as CI gates via the build surface and performance-test-harness, with the dependency budget-claim rule.",
+          "States expected metric movement per fix and routes measurement mechanics to the harness."
+        ]
+      }
+    },
+    {
+      "id": "positive-interaction-lag-runtime-fixes",
+      "type": "should_trigger",
+      "prompt": "Typing in the filter box lags and the whole table repaints on every keystroke. There are 8,000 rows. Design the fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Demands or captures runtime evidence first: render counts per keystroke and main-thread trace — not vibes.",
+          "Fixes state placement (input state isolated from the table's subscription) before reaching for blanket memoization, and virtualizes the 8,000-row list.",
+          "Considers debouncing only where per-keystroke work is genuinely expensive after the structural fixes.",
+          "Verifies through the interactivity-class metric on the stated device class."
+        ]
+      }
+    },
+    {
+      "id": "edge-hydration-double-bill",
+      "type": "should_trigger",
+      "prompt": "We moved to server rendering and first paint improved, but users say the page ignores their first clicks for a second or two. What's happening and what's the design fix?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the hydration double bill: SSR credits first paint while hydration freezes the main thread exactly at first interaction — the cost moved from the loading metric to the interactivity metric.",
+          "Prescribes partial/lazy hydration or islands where the framework offers them, with the trade stated where it doesn't.",
+          "Insists both metric classes be watched so the win isn't declared on first paint alone.",
+          "Checks third-party scripts and long tasks as co-conspirators in the interaction freeze."
+        ]
+      }
+    },
+    {
+      "id": "should-not-quietly-raise-the-budget",
+      "type": "should_trigger",
+      "prompt": "The new analytics SDK pushes us 80KB over the route budget and the release is tomorrow. Just bump the budget in the CI config quietly — design nothing, change the number.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the silent budget raise: a budget exception is a recorded review decision — claim funded by deletion elsewhere, reallocation with the owner's sign-off, or a visible renegotiation.",
+          "Offers the immediate alternatives: load the SDK off the critical path (async/worker), defer it behind consent/interaction, or find 80KB of deletions in the weight audit.",
+          "Notes that budgets die by quiet exceptions — the claim rule exists precisely for release-pressure moments.",
+          "Does not edit the CI number as requested in any branch."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-functional-e2e",
+      "type": "should_not_trigger",
+      "prompt": "Write browser tests for the signup flow — fill the form, submit, assert the welcome screen and the error states.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke frontend-perf-engineer: functional browser journeys with assertions are playwright-e2e-engineer's scope.",
+          "No performance metric, budget, bundle, or rendering-path work is requested."
+        ]
+      }
+    }
+  ]
+}

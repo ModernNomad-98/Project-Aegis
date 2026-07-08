@@ -1,0 +1,48 @@
+{
+  "skill": "n-plus-one-detector",
+  "description": "Trigger discrimination: many-fast-queries pattern diagnosis (this skill) vs one heavy query (query-plan-reader — the sibling seam), unattributed slowness (profiling-methodology-designer), and cache design (caching-strategy-designer).",
+  "overlaps_with": [
+    "query-plan-reader",
+    "profiling-methodology-designer",
+    "caching-strategy-designer"
+  ],
+  "cases": [
+    {
+      "id": "chatty-pattern-wins-here",
+      "prompt": "Each item in the invoice list triggers its own lookup for customer, currency, and tax rate — hundreds of tiny queries per page render. Fix the access pattern and make sure it can't come back.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": ["query-plan-reader", "profiling-methodology-designer", "caching-strategy-designer"],
+      "reason": "Per-row lookups in the hundreds with a make-it-stay-fixed requirement is the chatty-access home case: pattern diagnosis, batching/eager design, and the query-count budget guard. No single plan, no attribution question, no cache request."
+    },
+    {
+      "id": "one-heavy-query-goes-to-query-plan-reader",
+      "prompt": "The monthly rollup query runs for 8 minutes — here's the execution plan showing a giant sort spilling to disk. Recommend the fix.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["n-plus-one-detector"],
+      "note": "SEAM CASE — the sibling boundary from this side: ONE statement with plan evidence and an operator-level pathology (sort spill). Access-pattern restructuring has nothing to restructure; the verdict lives in the plan.",
+      "reason": "Single heavy statement, plan in hand — the narrowest tool wins; no per-row pattern exists."
+    },
+    {
+      "id": "unattributed-slowness-goes-to-profiling",
+      "prompt": "The whole admin area got sluggish over the quarter. No trace, no query log yet — how do we figure out where the time goes?",
+      "expected_skill": "profiling-methodology-designer",
+      "should_not_trigger": ["n-plus-one-detector"],
+      "reason": "No evidence names data access at all yet. Designing the attribution investigation comes first; a query-count explosion in its findings is what would route here."
+    },
+    {
+      "id": "cache-design-goes-to-caching-strategy-designer",
+      "prompt": "The exchange-rate lookup is one clean query but it runs on every request and the data changes daily — design the caching for it.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["n-plus-one-detector"],
+      "note": "SEAM CASE — a genuine cache candidate: ONE healthy query, high repetition ACROSS requests, daily staleness tolerance. No chatty pattern to fix first; keys/TTL/invalidation are the cache designer's craft.",
+      "reason": "Cross-request repetition of a sane query with stated staleness tolerance is cache design, not access-pattern repair."
+    },
+    {
+      "id": "refusal-cache-the-storm-still-triggers-here",
+      "prompt": "Instead of touching the ORM code, cache the whole 300-query page response for 10 minutes — design the cache.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "reason": "Despite the cache vocabulary, the subject is a 300-query chatty page — the detector triggers and REFUSES the cache reflex (fix the pattern first), rather than letting the request masquerade as cache design. The refusal lives on this side of the seam."
+    }
+  ]
+}
