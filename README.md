@@ -47,7 +47,14 @@ shared control foundation + framework projections + a crosswalk, mapping
 controls that largely already exist and producing auditor-grade evidence on
 top. The first **D13 library-meta pull** (D18) ships `skill-quality-reviewer`
 — the judgment layer atop the mechanical validator, so the library now
-reviews its own additions — see [Skills (shipped)](#skills-shipped) below.
+reviews its own additions. The **D12.8 operational workflow patterns pack**
+(D21) ships the 10 evidence-extracted skills that are the concrete, invocable
+rules of the Zero-Trust Engineering Discipline (D16) — approval registers,
+governed standing approval, chat-backlog reconciliation, the context
+co-update CI gate, lane guides, the local CI mirror preflight, risk-tiered
+validation, sharded validation with resume, merge-is-deploy governance, and
+the gated deployment prompt template — see
+[Skills (shipped)](#skills-shipped) below.
 
 ## What this is
 
@@ -105,19 +112,20 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~96 shipped procedures,
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~106 shipped procedures,
   grouped by the phase categories in the catalog: operating discipline, AI-SDLC
   governance, core architecture & engineering, SaaS & tenant isolation, security &
   supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
-  AI security, compliance & governance, and library meta (self-application). Full
-  list in [Skills (shipped)](#skills-shipped) below.
+  AI security, compliance & governance, library meta (self-application), and the
+  D12.8 operational workflow patterns (the Zero-Trust Engineering Discipline's
+  concrete rules). Full list in [Skills (shipped)](#skills-shipped) below.
 - **Subagents** — seven read-only specialist reviewers, one per lens; see
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions (D1–D18) in §5 are the project's immutable decision log; the
-  D12/D13/D14/D12.8 candidate scopes recorded there are banked-but-not-built future
-  work.
+  — the dated decisions (D1–D21) in §5 are the project's immutable decision log; the
+  D12/D13/D14 candidate scopes recorded there are banked-but-not-built future
+  work (the D12.8 pack graduated from banked to built with D21).
 - **The doctrine**
   ([docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md))
   and **the operating rules** ([CONTRIBUTING.md](CONTRIBUTING.md)) — why the system
@@ -161,8 +169,9 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | 6 | Cloud, DevOps, reliability & release (10) | P1 | ✅ merged |
 | 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
 | 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ merged |
-| D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ this branch |
+| D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ merged |
 | D13 (pull 1) | Library meta / self-application: `skill-quality-reviewer` — the judgment layer atop the mechanical validator (D18); other 4 D13 candidates stay banked | P1 | ✅ shipped (D18) |
+| D12.8 | Operational workflow patterns (10 evidence-extracted skills — the concrete rules of the Zero-Trust Engineering Discipline, D16/D21; sourced from the workflow extraction report) | P1 | ✅ shipped (D21) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -369,6 +378,26 @@ candidates remain banked in the reconciliation doc §3:
 | Skill | What it does | Invocation |
 |---|---|---|
 | `skill-quality-reviewer` | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the full shipped corpus (colliding skills NAMED), duplication/extension (the LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. | auto + manual |
+
+D12.8 — operational workflow patterns (D21): the 10 evidence-extracted
+patterns from the read-only audit of two production multi-agent repositories
+([extraction report](docs/research/aegis-workflow-extraction-report.md)) —
+the concrete, invocable rules of the
+[Zero-Trust Engineering Discipline](docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md)
+(D16), product-agnostic with identifiers templated as placeholders:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `scoped-approval-register` | Durable append-style record of every granted approval — Status / Reason / Scope allowed / Scope FORBIDDEN / Evidence — with supersede-never-rewrite lifecycle and deny-by-default citation; composes `human-approval-boundary` (which decides WHERE approval is required). | auto + manual |
+| `standing-approval-and-auto-advance` | Governed anti-approval-fatigue: named-scope standing approval for the mechanical loop, phase-advance only into already-approved phases, per-session restatement, explicit opt-out, reviewer-block path; merge-after-green strictly opt-in (never default); never covers protected-branch merge or arming auto-merge — rationale anchored to the ungoverned-auto-merge incident. | **manual only** |
+| `chat-backlog-reconciliation` | Cadenced extraction of chat-only decisions/bugs/backlog into dated repo docs, each item audited against PR/source evidence (completed/partial/active/not-active/unknown); chat "done" caps at unknown without repo proof. | auto + manual |
+| `context-co-update-ci-gate` | CI gate failing PRs that touch important paths without a context-map update (declared, reviewable no-op hatch — never silent) + the honest-update protocol (date+SHA stamps, evidence-only status moves, risk notes never deleted without proof); write-back half of `agent-startup-context-gate`. | auto + manual |
+| `lane-authoring-guide` | Pre-work, evidence-cited guide per parallel agent lane — lifecycle slice, contracts, per-unit recipe/checklist, explicit "must NOT do" boundary; mutually exclusive lanes; authored at work's BEGINNING (the closeout owns the end). | auto + manual |
+| `local-ci-mirror-preflight` | Per-commit CI mirror: derive local equivalents of every PR-triggered check from workflow files, baseline on clean mainline first (separate git worktree), classify failures PR-caused / pre-existing / CI-infra / cannot-determine; declared docs-only path. | auto + manual |
+| `risk-tiered-validation-selector` | Fail-closed classifier: changed files → validation depth (docs-only / fast / full) with never-docs-only + forced-full lists, max-over-files aggregation, diffable rules; routes validation COST where `change-classification-gate` routes APPROVAL. | auto + manual |
+| `sharded-validation-with-resume` | Full tier as named functional shards: persisted status (failed ≠ interrupted), resume only past timeout/infra interruptions (never past real failures), empty-or-fail uncategorized catch-shard, ONE aggregate gate as the sole required check. | auto + manual |
+| `merge-is-deploy-governance` | Standing governance for merge==deploy platforms: documented reality, PR validation as the authoritative gate, post-merge demoted to verification, branch protection recorded in-repo (human-only changes), stated exposure window, revert-PR rollback with strategy-correct mechanics. | auto + manual |
+| `gated-deployment-prompt-template` | Reusable operator prompt for recurring risky ops: placeholders only, hard rules with required inputs, stop conditions with safe halt states, backup-then-verify gating, per-phase smoke expectations, required per-run report, history-index-anchored ETAs; uncited claims labeled "unverified". | auto + manual |
 
 ## Authoring a new skill
 

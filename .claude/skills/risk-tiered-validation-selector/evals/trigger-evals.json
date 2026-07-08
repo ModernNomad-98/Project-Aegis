@@ -1,0 +1,42 @@
+{
+  "skill": "risk-tiered-validation-selector",
+  "description": "Trigger discrimination: validation-depth selection (cost routing) vs approval routing (change-classification-gate), tier execution (local-ci-mirror-preflight), and full-tier shard architecture (sharded-validation-with-resume).",
+  "overlaps_with": ["change-classification-gate", "local-ci-mirror-preflight", "sharded-validation-with-resume"],
+  "cases": [
+    {
+      "id": "depth-selection-wins-here",
+      "prompt": "Given the files this PR touches, decide whether we run the docs-only fast path, the fast tier, or full validation — and make the unmatched-file behavior fail closed.",
+      "expected_skill": "risk-tiered-validation-selector",
+      "should_not_trigger": ["change-classification-gate", "local-ci-mirror-preflight"],
+      "reason": "Choosing validation DEPTH from the changed file set with fail-closed semantics is the selector — not the approval/scope gate, and not the execution of the chosen checks."
+    },
+    {
+      "id": "approval-and-scope-go-to-classification-gate",
+      "prompt": "Classify this task before we start: what change class is it, does it need human approval, and what file scope is the work locked to?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": ["risk-tiered-validation-selector"],
+      "reason": "Class → approval path and scope lock is change-classification-gate; the selector shares the class vocabulary but owns only the validation-cost decision."
+    },
+    {
+      "id": "running-the-tier-goes-to-preflight",
+      "prompt": "The change is full-tier — now actually run everything CI would run, locally, verified against clean main first, before I commit.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": ["risk-tiered-validation-selector"],
+      "reason": "Executing the selected tier locally with baseline and failure classification is the preflight; the selector's job ended when the tier was chosen."
+    },
+    {
+      "id": "full-tier-internals-go-to-shards",
+      "prompt": "The full tier takes 45 minutes and dies on timeouts — architect it as named shards with persisted status, resume, and one aggregate required check.",
+      "expected_skill": "sharded-validation-with-resume",
+      "should_not_trigger": ["risk-tiered-validation-selector"],
+      "reason": "The full tier's internal architecture (shards, status file, resume, aggregate gate) is sharded-validation-with-resume; the selector only decides WHEN the full tier applies."
+    },
+    {
+      "id": "docs-only-dispute-wins-here",
+      "prompt": "The team says this change is 'just docs' but it edits AGENTS.md and a lockfile — settle what counts as docs-only in this repo, with the never-docs-only list written down.",
+      "expected_skill": "risk-tiered-validation-selector",
+      "should_not_trigger": ["change-classification-gate"],
+      "reason": "The docs-only definition and its never-docs-only boundary are the selector's artifact (validation cost); no approval-path question is being asked."
+    }
+  ]
+}

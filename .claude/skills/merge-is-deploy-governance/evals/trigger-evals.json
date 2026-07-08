@@ -1,0 +1,42 @@
+{
+  "skill": "merge-is-deploy-governance",
+  "description": "Trigger discrimination: standing merge==deploy pipeline governance vs one release's verdict (release-readiness-reviewer), executable rollback authoring (rollback-runbook-author), merge authority (agent-authorization-matrix), and pipeline stage design (ci-pipeline-architect).",
+  "overlaps_with": ["release-readiness-reviewer", "rollback-runbook-author", "agent-authorization-matrix", "ci-pipeline-architect"],
+  "cases": [
+    {
+      "id": "standing-pipeline-governance-wins-here",
+      "prompt": "Every merge to main goes straight to production on our host. Document that reality, make PR validation the authoritative gate, record the branch-protection config in the repo, and define rollback for this pipeline.",
+      "expected_skill": "merge-is-deploy-governance",
+      "should_not_trigger": ["release-readiness-reviewer", "ci-pipeline-architect", "rollback-runbook-author"],
+      "reason": "Standing governance for a merge==deploy platform (reality doc, gate promotion, protection record, exposure window, revert primitive) is this skill — no single release is being judged, no stage graph designed, no step-by-step runbook authored."
+    },
+    {
+      "id": "one-release-goes-to-release-readiness",
+      "prompt": "We want to ship today's release — is it safe? Evidence on CI state, migration review, flag defaults, rollback rehearsal.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": ["merge-is-deploy-governance"],
+      "reason": "A specific release's evidence-based go/no-go is release-readiness-reviewer; the merge-is-deploy doc is the standing context it runs within."
+    },
+    {
+      "id": "executable-rollback-goes-to-runbook-author",
+      "prompt": "Write the rollback runbook for the orders feature: numbered steps a stranger can execute, per-step verification, and the data repair for the bad window.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["merge-is-deploy-governance"],
+      "reason": "The executable, stranger-proof rollback runbook is rollback-runbook-author; merge-is-deploy governance only fixes the primitive (revert-PR-then-auto-redeploy) that runbook elaborates."
+    },
+    {
+      "id": "merge-authority-goes-to-authorization-matrix",
+      "prompt": "Codify who may merge to main and whether agents may ever arm auto-merge in this repo.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["merge-is-deploy-governance"],
+      "reason": "WHO holds merge/arming authority is the authorization matrix; merge-is-deploy governance composes those floors and adds the pipeline-reality layer (what a merge physically does)."
+    },
+    {
+      "id": "stage-design-goes-to-pipeline-architect",
+      "prompt": "Redesign the pipeline: add a staging environment with promotion gates and a canary strategy so merges stop going straight to production.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["merge-is-deploy-governance"],
+      "reason": "Changing the pipeline's structure (environments, promotion, canary) is ci-pipeline-architect; merge-is-deploy governance documents and governs the pipeline as it IS."
+    }
+  ]
+}

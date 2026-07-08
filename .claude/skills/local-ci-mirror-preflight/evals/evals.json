@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "local-ci-mirror-preflight",
+  "description": "Behavior cases for the per-commit CI mirror: workflow-derived checks, worktree mainline baseline first, four-class failure taxonomy with evidence, docs-only declared path, refusal to commit past PR-caused failures or skip the baseline.",
+  "cases": [
+    {
+      "id": "positive-preflight-before-commit",
+      "type": "should_trigger",
+      "prompt": "I'm about to commit the orders-cache change. Run the preflight so CI doesn't surprise us.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derives the check list from the PR-triggered workflow definitions (respecting paths: filters), not from README claims or memory — every job run or classified with a reason.",
+          "Establishes the mainline baseline FIRST in a separate git worktree (git worktree add <scratch> origin/main), never by flipping a shared checkout, and removes the worktree after.",
+          "Runs the same derived checks on the exact tree state to be committed, capturing real output and durations.",
+          "Classifies any failure into exactly one of PR-caused / pre-existing-on-main / CI-infrastructure / cannot-determine-locally, with evidence per class.",
+          "Produces the preflight record (table + classifications + residual risk) in a form the closeout can cite."
+        ]
+      }
+    },
+    {
+      "id": "edge-failure-also-fails-on-mainline",
+      "type": "should_trigger",
+      "prompt": "The e2e login test fails on my branch. Before I start debugging my change, figure out whose failure this is.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs the same check against the clean mainline baseline before blaming the diff.",
+          "Same failure signature on baseline → classified pre-existing-on-main: reported and routed to its own task, NOT silently fixed inside this PR (scope drift) and NOT absorbed as the PR's fault.",
+          "The PR proceeds only with the pre-existing failure disclosed as non-blocking, evidence cited (baseline run + mainline CI history)."
+        ]
+      }
+    },
+    {
+      "id": "should-not-skip-baseline-or-commit-past-red",
+      "type": "should_trigger",
+      "prompt": "The preflight is slow. Skip the mainline baseline run and just commit — real CI will sort out whose failures they are.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the shortcut when a failure needs classifying: without the baseline every class is a guess — either run the baseline or downgrade claims to cannot-determine and say so.",
+          "A PR-caused failure (or an unclassified failure that could be PR-caused) blocks the commit; 'CI will tell us' is the exact habit this preflight exists to end.",
+          "Offers the honest speed paths instead: the docs-only lightweight path if the diff qualifies, or running only the tier the risk selector assigned."
+        ]
+      }
+    },
+    {
+      "id": "edge-docs-only-lightweight-path",
+      "type": "should_trigger",
+      "prompt": "This diff only touches README.md and two files under docs/. What does the preflight look like?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Takes the explicit docs-only path: confirms every changed file matches the docs-only definition and none is on a never-docs-only surface (workflows, scripts, schema, lockfiles).",
+          "Runs the docs-scoped checks (link/reference sanity, any docs-triggered CI jobs) rather than the full derived list.",
+          "Declares 'docs-only path taken' with the matched definition in the record — a declared classification, never a silent skip."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-release-gate",
+      "type": "should_not_trigger",
+      "prompt": "We want to ship the release today — check CI on the release commit, migration risk, rollback path, and flag defaults, and give a go/no-go.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A release-scoped ship/no-ship evidence gate is release-readiness-reviewer; the local CI mirror is per-commit discipline, not the release verdict."
+        ]
+      }
+    }
+  ]
+}

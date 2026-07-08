@@ -1,0 +1,42 @@
+{
+  "skill": "chat-backlog-reconciliation",
+  "description": "Trigger discrimination: cadenced chat-to-repo extraction+audit vs memory-store governance (agent-memory-governance), repo-source conflicts (source-of-truth-reconciler), single-task closeout (ai-closeout-reporter), and recording one approval (scoped-approval-register).",
+  "overlaps_with": ["agent-memory-governance", "source-of-truth-reconciler", "ai-closeout-reporter", "scoped-approval-register"],
+  "cases": [
+    {
+      "id": "chat-sweep-wins-here",
+      "prompt": "Before we resume the project, go through last month's AI conversations, pull out every decision and backlog item that never made it into the repo, and verify against PRs what actually got done.",
+      "expected_skill": "chat-backlog-reconciliation",
+      "should_not_trigger": ["agent-memory-governance", "ai-closeout-reporter", "source-of-truth-reconciler"],
+      "reason": "A cadenced sweep of ephemeral chat history into dated, evidence-audited repo docs is this skill — not memory-file governance, not a single task's closeout, and no two repo sources are in conflict yet."
+    },
+    {
+      "id": "memory-store-goes-to-memory-governance",
+      "prompt": "Audit the agent's persistent memory directory — which remembered facts are stale, what should never have been stored, and what are the write rules going forward?",
+      "expected_skill": "agent-memory-governance",
+      "should_not_trigger": ["chat-backlog-reconciliation"],
+      "reason": "Curating a persistent agent-memory store is agent-memory-governance; chat-backlog-reconciliation's subject is conversation history and its output is tracked repo docs."
+    },
+    {
+      "id": "repo-conflict-goes-to-source-of-truth",
+      "prompt": "The architecture doc says the API uses cursor pagination but the code clearly does offset pagination — which do we trust and what do we fix?",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": ["chat-backlog-reconciliation"],
+      "reason": "Two repo sources in live conflict need evidence-cited precedence — source-of-truth-reconciler. No chat extraction is involved."
+    },
+    {
+      "id": "single-task-report-goes-to-closeout",
+      "prompt": "You just finished the pagination refactor — write up what changed, what you skipped, and what you validated.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["chat-backlog-reconciliation"],
+      "reason": "A terminal report for one just-finished task is the closeout; the reconciliation sweep covers many conversations on a cadence, after the fact."
+    },
+    {
+      "id": "fresh-approval-goes-to-register",
+      "prompt": "The owner just approved the staging backfill in this conversation — record that grant durably with its scope before we lose the wording.",
+      "expected_skill": "scoped-approval-register",
+      "should_not_trigger": ["chat-backlog-reconciliation"],
+      "reason": "One fresh grant gets recorded immediately via the register; the reconciliation sweep is the cadenced safety net that catches grants which were NOT recorded at the time."
+    }
+  ]
+}

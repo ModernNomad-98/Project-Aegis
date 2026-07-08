@@ -1,0 +1,42 @@
+{
+  "skill": "sharded-validation-with-resume",
+  "description": "Trigger discrimination: full-tier shard/resume architecture vs tier selection (risk-tiered-validation-selector), per-commit local mirroring (local-ci-mirror-preflight), whole-pipeline design (ci-pipeline-architect), and flake diagnosis (flaky-test-detective).",
+  "overlaps_with": ["risk-tiered-validation-selector", "local-ci-mirror-preflight", "ci-pipeline-architect", "flaky-test-detective"],
+  "cases": [
+    {
+      "id": "shard-architecture-wins-here",
+      "prompt": "Split our full validation into named functional shards with a persisted status file, resume-after-timeout, a catch-shard for unassigned tests, and one aggregate required check in CI.",
+      "expected_skill": "sharded-validation-with-resume",
+      "should_not_trigger": ["risk-tiered-validation-selector", "local-ci-mirror-preflight", "ci-pipeline-architect"],
+      "reason": "The full tier's internal architecture — shards, status, resume, aggregate gate — is exactly this skill; no tier is being selected, no local mirror run, and the whole pipeline is not being redesigned."
+    },
+    {
+      "id": "tier-selection-goes-to-selector",
+      "prompt": "Decide from the changed files whether this PR runs docs-only, fast, or full validation — fail closed on anything unmatched.",
+      "expected_skill": "risk-tiered-validation-selector",
+      "should_not_trigger": ["sharded-validation-with-resume"],
+      "reason": "Choosing the tier is the selector; the shard machinery only defines what the FULL tier consists of once selected."
+    },
+    {
+      "id": "pre-commit-run-goes-to-preflight",
+      "prompt": "Before I commit, run everything CI will run locally — baseline against clean main first and classify any failures.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": ["sharded-validation-with-resume"],
+      "reason": "Executing checks per commit with baseline and failure classification is the preflight; where shards exist it invokes the shard runner, but the request is a run, not an architecture."
+    },
+    {
+      "id": "stage-graph-goes-to-pipeline-architect",
+      "prompt": "Overhaul our CI/CD: stage ordering, artifact build-once, deploy gates with named human approvals, and secret handling.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["sharded-validation-with-resume"],
+      "reason": "The delivery pipeline's stage graph, gates, and secret governance are ci-pipeline-architect; shard design is one validation stage's internals and hands its wiring there."
+    },
+    {
+      "id": "intermittent-failure-goes-to-flake-detective",
+      "prompt": "One spec fails intermittently in the ui-e2e shard with the same assertion — root-cause it.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": ["sharded-validation-with-resume"],
+      "reason": "Diagnosing an intermittent test is flaky-test-detective; the shard design must never retry or resume flakes into green."
+    }
+  ]
+}

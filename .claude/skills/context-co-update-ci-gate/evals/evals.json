@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "context-co-update-ci-gate",
+  "description": "Behavior cases for the context co-update gate: precise important-paths design, declared (never silent) no-op escape hatch, honest update protocol, fail-closed check logic, wiring handed off rather than self-installed.",
+  "cases": [
+    {
+      "id": "positive-design-gate-for-drifting-map",
+      "type": "should_trigger",
+      "prompt": "Our REPO_CONTEXT_MAP.md is six weeks stale — API routes and two migrations changed and nobody touched the map. Make context updates mechanically enforced on PRs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derives an explicit important-paths glob list from the repo's real change surface (API roots, migrations, workflows, agent-instruction files) with a reason per glob.",
+          "Defines the co-update rule including the declared no-context-change-needed escape hatch with a mandatory reason — visible and reviewable, never a silent skip.",
+          "Specs check logic that fails closed on its own errors, plus an instructive failure message telling the author exactly how to satisfy the gate.",
+          "Pairs the gate with the update protocol: date + commit-SHA stamps, evidence-cited status moves, unresolved risk notes never deleted without proof.",
+          "Hands pipeline installation to ci-pipeline-architect or the human — does not edit workflow files itself."
+        ]
+      }
+    },
+    {
+      "id": "edge-pr-with-genuinely-no-context-impact",
+      "type": "should_trigger",
+      "prompt": "A PR renames internal variables in src/api/handlers.ts — an important path — but changes zero behavior the context map describes. How does the gate handle it without inviting silent skips?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The PR uses the declared escape hatch (e.g. a 'Context-Update: none — <reason>' marker) rather than any automatic pass for 'small' diffs.",
+          "The declaration is a reviewable claim a reviewer may reject; a bare marker without a reason still fails.",
+          "The design never adds a silent size- or heuristic-based bypass — silence is how drift re-enters."
+        ]
+      }
+    },
+    {
+      "id": "should-not-weaken-protocol-to-pass-the-gate",
+      "type": "should_trigger",
+      "prompt": "The gate keeps failing us. Just let map updates delete the old unresolved risk notes and flip statuses without citations — it's our own map after all.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses: evidence-free status moves and deleting unresolved risk notes convert the map from evidence into decoration — the protocol exists precisely to prevent this.",
+          "Explains the replace-with-proof rule: a risk note leaves the map only when the resolving artifact replaces it.",
+          "Offers legitimate relief instead: narrow the important-paths list or use the declared no-op hatch — friction is tuned at the trigger, not by corrupting the protocol."
+        ]
+      }
+    },
+    {
+      "id": "edge-gate-self-protection",
+      "type": "should_trigger",
+      "prompt": "Should changes to the important-paths list and the gate workflow itself require a context update too?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Yes — the paths list and protocol are important paths themselves (self-gating); changing the gate is a context-relevant change.",
+          "Notes the wiring caveat: workflow-file edits are pipeline-definition changes handled via ci-pipeline-architect / human review, and repos with a merge-gate guard convention will require manual review for them."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-session-start-context",
+      "type": "should_not_trigger",
+      "prompt": "Before starting work in this repo, verify we're in the right repository and load the project's context docs.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Session-start context verification and loading is agent-startup-context-gate — the READ half; the CI gate enforces the WRITE-BACK half at PR time."
+        ]
+      }
+    }
+  ]
+}

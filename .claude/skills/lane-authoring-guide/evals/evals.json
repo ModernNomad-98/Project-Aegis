@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "lane-authoring-guide",
+  "description": "Behavior cases for pre-work lane guides: evidence-cited lifecycle, contract cite-don't-restate, explicit MUST-NOT boundary with cross-lane exclusivity, refusal to author around unowned collisions or omit the boundary.",
+  "cases": [
+    {
+      "id": "positive-author-backend-lane-guide",
+      "type": "should_trigger",
+      "prompt": "We're splitting the feature across three parallel agents: backend read handlers, frontend, and AI routing. Write the backend lane's authoring guide before its agent starts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Fixes the lane identity (surface paths, the repeating unit of work, the approving plan/phase) before distilling anything.",
+          "Distills the request lifecycle from the actual code with a citation per hop (file:line or file+symbol) — uncitable claims labeled unverified, never asserted.",
+          "Contracts section cites the shared implementation contract rather than restating it, and routes contract changes to the coordinator as out-of-lane.",
+          "Includes the step-by-step per-unit recipe, the per-unit checklist, and an explicit MUST-NOT boundary naming real files/dirs/decisions plus an escalation path.",
+          "Checks the boundary for mutual exclusivity against the frontend and AI-routing lanes; shared surfaces get a named owner or coordination rule."
+        ]
+      }
+    },
+    {
+      "id": "edge-lifecycle-claim-cannot-be-verified",
+      "type": "should_trigger",
+      "prompt": "The planner says every read request flows through a caching middleware, but you can't find that middleware anywhere in the entry path. The guide needs the lifecycle section — write it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not write the planner's claim as fact — the code walk wins over recollection; the guide records what the source shows, cited.",
+          "If the caching claim stays in the guide at all, it is labeled unverified and becomes a to-verify item for the lane's first task.",
+          "Surfaces the discrepancy to the planner rather than silently choosing."
+        ]
+      }
+    },
+    {
+      "id": "should-not-omit-the-must-not-boundary",
+      "type": "should_trigger",
+      "prompt": "Skip the 'must not do' section — it feels negative, and the agents are smart enough to infer their boundaries from what the guide tells them to do.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses: agents do not reliably infer complements, and in a parallel effort the explicit negative boundary is the load-bearing part — it is what prevents lane collisions on shared files.",
+          "Explains that boundary-by-omission is how two lanes silently co-own a types file or router registry and collide.",
+          "Keeps the MUST-NOT section with real globs, forbidden decisions, and the escalation path."
+        ]
+      }
+    },
+    {
+      "id": "edge-two-lanes-claim-the-same-shared-file",
+      "type": "should_trigger",
+      "prompt": "Both the frontend lane and the AI-routing lane need to edit src/shared/types.ts during their work. Finish their guides.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not author both guides around an unowned collision zone — the shared file gets a named owner or an explicit coordination rule (e.g. append-only via coordinator, one lane per phase).",
+          "If no owner can be agreed, surfaces the conflict to the human and stops rather than shipping guides that encode a collision."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-stage-end-handoff",
+      "type": "should_not_trigger",
+      "prompt": "Stage 2 just finished — write up what was built, what was deviated from, and what the next stage's agent can rely on.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A stage-END handoff/closeout with deviations and evidence is ai-closeout-reporter territory; the lane guide is authored BEFORE work begins, not after it ends."
+        ]
+      }
+    }
+  ]
+}

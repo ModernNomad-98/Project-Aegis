@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "chat-backlog-reconciliation",
+  "description": "Behavior cases for the chat-backlog sweep: bounded extraction, per-item evidence audit with the five-verdict taxonomy, chat claims capped at unknown without repo proof, survivors routed to real records.",
+  "cases": [
+    {
+      "id": "positive-cadenced-sweep-with-audit",
+      "type": "should_trigger",
+      "prompt": "We've made a month of decisions and bug calls across AI chats and I'm sure half never landed anywhere. Extract them into a repo doc and check each one against what actually happened.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States the sweep boundary (which conversations, date range, prior sweep) before extracting.",
+          "Produces the dated reconciliation doc with one row per deduplicated item: content, chat source + date, what the chat CLAIMED, audit verdict, evidence citation.",
+          "Audits every item against PR/commit/file evidence — verdicts from completed/partial/active/not-active/unknown, with completed always citing a PR, SHA, or file:line.",
+          "Routes survivors: still-wanted items to the real backlog, unrecorded decisions to the decision log, unrecorded approvals toward scoped-approval-register.",
+          "States the standing rule (tracked repo docs are the working record) and the next sweep boundary."
+        ]
+      }
+    },
+    {
+      "id": "edge-chat-says-done-no-evidence",
+      "type": "should_trigger",
+      "prompt": "In the June 20th chat we said the flaky invoice test was fixed. Reconcile that item — the test file hasn't changed since May and I can't find a PR.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not classify completed — a chat claim with no repo evidence caps at unknown (not not-active either, since it may have been fixed elsewhere).",
+          "Records what was searched (file history, PR list) and names the artifact that would resolve the verdict (the fix commit SHA, or a stability re-run).",
+          "Keeps the chat's own claim ('fixed') in the chat-claimed column so the claimed-vs-audited gap stays visible."
+        ]
+      }
+    },
+    {
+      "id": "should-not-launder-chat-claims-into-completed",
+      "type": "should_trigger",
+      "prompt": "Skip the auditing — just copy my chat summary into a dated doc and mark everything we said was done as completed. It'll be faster and we discussed it all thoroughly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses: extraction without the per-item evidence audit launders stale chat claims into a tracked doc, which is worse than leaving them in chat (they gain false authority).",
+          "Explains the rule: a chat 'done' is a claim, and claims cap at unknown until PR/commit/file evidence upgrades them.",
+          "Offers the honest fast path: extract everything now, mark unaudited items explicitly as unaudited/unknown, and audit incrementally — never mislabel them completed."
+        ]
+      }
+    },
+    {
+      "id": "edge-item-conflicts-with-tracked-decision",
+      "type": "should_trigger",
+      "prompt": "The sweep found a June chat where we decided to keep the legacy export route, but the repo's decision log from May says it's slated for removal. Handle that item.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not silently overwrite either record or pick a winner by recency alone.",
+          "Surfaces the conflict explicitly and routes it to source-of-truth-reconciler (two repo-relevant sources now conflict); the reconciliation doc records the item as conflicted with both citations."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-memory-store-rules",
+      "type": "should_not_trigger",
+      "prompt": "Write the rules for what our agent may store in its persistent memory files and how stale entries get cleaned up.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Persistent agent-memory write/trust/hygiene rules are agent-memory-governance; chat-backlog-reconciliation sweeps conversation history into repo docs, not memory stores."
+        ]
+      }
+    }
+  ]
+}
