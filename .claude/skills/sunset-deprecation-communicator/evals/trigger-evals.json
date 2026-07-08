@@ -1,0 +1,42 @@
+{
+  "skill": "sunset-deprecation-communicator",
+  "description": "Trigger discrimination for sunsetting a PRODUCT feature/API to users (this skill: communication + migration) vs retiring a LIBRARY SKILL (skill-deprecation-planner) — the hard seam — vs the standing API deprecation POLICY (api-event-architect) vs the notification delivery SYSTEM (notification-webhook-ux-designer).",
+  "overlaps_with": [
+    "skill-deprecation-planner",
+    "api-event-architect",
+    "notification-webhook-ux-designer"
+  ],
+  "cases": [
+    {
+      "id": "product-sunset-wins-here",
+      "prompt": "Plan the deprecation and sunset of our legacy export feature for customers: impact, migration path, a firm timeline, and an escalating communication plan.",
+      "expected_skill": "sunset-deprecation-communicator",
+      "should_not_trigger": ["skill-deprecation-planner", "api-event-architect"],
+      "note": "SEAM CASE (primary) — a customer-facing feature end-of-life with impact, migration, timeline, and comms is product sunset communication. No library skill and no standing policy is being written.",
+      "reason": "Communicating and migrating external users off a product feature/API is this skill's core scope."
+    },
+    {
+      "id": "skill-retirement-goes-to-skill-deprecation-planner",
+      "prompt": "Retire the 'foo-analyzer' skill from our library — it's superseded. Do the reverse-link sweep across every neighbor's trigger-evals, stage mark→redirect→remove, and move its catalog/README rows to a retired record.",
+      "expected_skill": "skill-deprecation-planner",
+      "should_not_trigger": ["sunset-deprecation-communicator"],
+      "note": "SEAM CASE (primary, reverse — THE hard seam) — the object is an internal library skill; the work is registration mechanics and a reverse-link sweep, not user communication.",
+      "reason": "skill-deprecation-planner retires a library skill (mark→redirect→remove, neighbor sweep, catalog rows). This skill sunsets a product feature for external users. Different object, different mechanism."
+    },
+    {
+      "id": "standing-policy-goes-to-api-event-architect",
+      "prompt": "Define our standing API deprecation policy: how long every version is supported by default, the Sunset/Deprecation header conventions, and our versioning rules.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["sunset-deprecation-communicator"],
+      "note": "SEAM CASE — the standing, general policy and versioning conventions are api-event-architect. This skill executes ONE specific sunset within that policy.",
+      "reason": "api-event-architect owns the durable deprecation policy and header conventions. This skill communicates and migrates a particular sunset event that follows that policy."
+    },
+    {
+      "id": "delivery-system-goes-to-notification-webhook-ux-designer",
+      "prompt": "Build the notification center and preference system that in-app messages are delivered through, with per-category controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": ["sunset-deprecation-communicator"],
+      "reason": "notification-webhook-ux-designer builds the notification delivery system. This skill plans the sunset MESSAGING content and schedule that rides on such a system."
+    }
+  ]
+}

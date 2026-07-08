@@ -1,0 +1,41 @@
+{
+  "skill": "requirements-gathering-facilitator",
+  "description": "Trigger discrimination for GATHERING/eliciting requirements (this skill) vs WRITING the spec afterward (product-spec-writer), vs modeling the domain (domain-modeler), vs reconciling conflicting FACTS (source-of-truth-reconciler).",
+  "overlaps_with": [
+    "product-spec-writer",
+    "domain-modeler",
+    "source-of-truth-reconciler"
+  ],
+  "cases": [
+    {
+      "id": "elicitation-wins-here",
+      "prompt": "The request is vague and stated as a solution, users disagree, and we don't really know the problem yet. Facilitate getting to clear requirements.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": ["product-spec-writer", "domain-modeler"],
+      "note": "SEAM CASE (primary) — vague, solution-first, conflicting input with no understood problem is the elicitation phase. No spec is being written and no domain model is being built.",
+      "reason": "Discovery, problem-vs-solution separation, and conflict surfacing before a spec exists is this skill's core scope."
+    },
+    {
+      "id": "writing-the-spec-goes-to-product-spec-writer",
+      "prompt": "Requirements are understood and agreed. Produce the product spec: problem statement, goals and non-goals, user stories, acceptance criteria, and success metrics.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": ["requirements-gathering-facilitator"],
+      "note": "SEAM CASE (reverse, within pack) — with requirements settled, authoring the structured specification document is product-spec-writer. Elicitation is done.",
+      "reason": "product-spec-writer turns an understood need into a spec. This skill produces the brief that feeds it; it does not write the spec."
+    },
+    {
+      "id": "domain-modeling-goes-to-domain-modeler",
+      "prompt": "Map out the core domain concepts for this area — the entities, their attributes, and the relationships and invariants between them.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": ["requirements-gathering-facilitator"],
+      "reason": "Modeling entities, relationships, and invariants is domain-modeler. Requirements elicitation is about the stakeholders' need, not the conceptual model of the domain."
+    },
+    {
+      "id": "conflicting-facts-go-to-source-of-truth-reconciler",
+      "prompt": "Two docs and the code disagree on what the current retention period actually is. Which one is authoritative?",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": ["requirements-gathering-facilitator"],
+      "reason": "Resolving which of several sources states the correct FACT is source-of-truth-reconciler. This skill reconciles stakeholder disagreement about what to BUILD, not contested facts."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "skill": "roadmap-under-uncertainty-planner",
+  "description": "Trigger discrimination for SEQUENCING/communicating work over time under uncertainty (this skill) vs RANKING the backlog (prioritization-frame-picker), vs one feature's SPEC (product-spec-writer), vs one feature's ROLLOUT (feature-flag-rollout-strategist).",
+  "overlaps_with": [
+    "prioritization-frame-picker",
+    "product-spec-writer",
+    "feature-flag-rollout-strategist"
+  ],
+  "cases": [
+    {
+      "id": "roadmap-sequencing-wins-here",
+      "prompt": "Build a roadmap that survives changing priorities: horizons, confidence that fades with distance, and sequencing that tests our riskiest assumptions first.",
+      "expected_skill": "roadmap-under-uncertainty-planner",
+      "should_not_trigger": ["prioritization-frame-picker", "product-spec-writer"],
+      "note": "SEAM CASE (primary) — horizons, confidence decay, and learning-first sequencing over time are roadmap planning. No single ranking method and no one-feature spec is being produced.",
+      "reason": "Sequencing and communicating an uncertain plan over time is this skill's core scope; it consumes a ranking rather than producing one."
+    },
+    {
+      "id": "ranking-goes-to-prioritization-frame-picker",
+      "prompt": "We can't agree how to rank our backlog. Pick the right prioritization framework and score the items with it.",
+      "expected_skill": "prioritization-frame-picker",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner"],
+      "note": "SEAM CASE (within pack) — choosing and applying a framework to rank items is prioritization. The roadmap consumes that ranking; it doesn't create it.",
+      "reason": "prioritization-frame-picker produces the ranked WHAT. This skill sequences the ranked set over time."
+    },
+    {
+      "id": "one-spec-goes-to-product-spec-writer",
+      "prompt": "For the top roadmap item, write the detailed product spec: problem, scope, scenarios, and acceptance criteria.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner"],
+      "note": "SEAM CASE (within pack) — detailing one feature's requirements is a spec, a level below the roadmap.",
+      "reason": "product-spec-writer specifies one feature. The roadmap places and sequences features; it does not detail their requirements."
+    },
+    {
+      "id": "one-rollout-goes-to-feature-flag-rollout-strategist",
+      "prompt": "Now plan how we actually ship that top item to users behind a flag — staged percentages, guardrails, and a kill switch.",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner"],
+      "reason": "feature-flag-rollout-strategist plans one feature's flag-gated delivery. The roadmap sequences which features happen when, not how one is rolled out."
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "sunset-deprecation-communicator",
+  "description": "Behavior cases for product/API sunset communication: impact assessment, migration path, firm timeline, escalating multi-channel comms, grandfathering, and the tombstone — distinct from retiring a library skill.",
+  "cases": [
+    {
+      "id": "positive-api-version-sunset",
+      "type": "should_trigger",
+      "prompt": "We're retiring v1 of our public API in favor of v2. Plan how we deprecate and sunset it for the integrators who use it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Assesses impact: which integrators use v1, how heavily, and what breaks, naming the hardest-hit for targeted outreach.",
+          "Defines the migration path to v2 with a guide and effort estimate, and follows the standing deprecation policy/window from api-event-architect for the timeline.",
+          "Builds an escalating multi-channel comms plan including Deprecation/Sunset response headers, changelog, versioned docs, and reminder emails as the firm date nears.",
+          "Designs the post-sunset tombstone (an explanatory error pointing to v2, not a silent 404) and straggler monitoring.",
+          "Treats standing versioning policy as api-event-architect's and the notification delivery system as notification-webhook-ux-designer's."
+        ]
+      }
+    },
+    {
+      "id": "positive-feature-sunset-with-grandfathering",
+      "type": "should_trigger",
+      "prompt": "We're sunsetting an old reporting feature. A few big contracts still rely on it. Plan the deprecation and communication.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the contractual/heavy users as the hardest-hit and plans targeted outreach plus grandfathering/extended-support handling.",
+          "Sets a firm sunset date with a window proportional to migration effort, and holds it (grandfathering as the pressure valve, not date-slipping).",
+          "Flags any contractual commitment naming the feature for routing to the commitment owner (a Stop Condition) rather than communicating around it.",
+          "Provides the migration path and escalating comms with what/why/when/what-to-do/help in each message."
+        ]
+      }
+    },
+    {
+      "id": "edge-no-migration-path",
+      "type": "should_trigger",
+      "prompt": "Marketing wants to announce we're killing this feature next month. There's no replacement — users just won't have it anymore. Write the sunset comms.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to paper over the absence of a parity replacement with a cheerful announcement — sunsetting with no path is an eviction.",
+          "Surfaces the no-replacement finding to a human as a reason to reconsider the sunset or its timing (a Stop Condition), not to hide.",
+          "If the decision stands, states the lack of replacement plainly and gives users honest options and a longer window.",
+          "Assesses who is most affected before drafting any message."
+        ]
+      }
+    },
+    {
+      "id": "should-not-decide-the-sunset",
+      "type": "should_trigger",
+      "prompt": "We're not sure whether to kill this feature or not — you decide, and if yes just write the deprecation notice.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to make the sunset decision itself — that is a product/business call, not this skill's.",
+          "Offers the impact assessment (usage, revenue, hardest-hit) that would inform the decision and routes the decision to a human (a Stop Condition).",
+          "Only plans the communication once the decision is confirmed made.",
+          "Does not draft a deprecation notice for an undecided sunset."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-retire-a-skill",
+      "type": "should_not_trigger",
+      "prompt": "We want to retire the old 'foo-analyzer' skill from our skills library — it's superseded. Plan the removal, including updating every neighbor's trigger-evals and the catalog rows.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke sunset-deprecation-communicator: retiring a library skill (mark→redirect→remove, reverse-link sweep across neighbor trigger-evals, catalog/README rows) is skill-deprecation-planner.",
+          "The object is an internal library skill, not a product feature or public API for external users."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "roadmap-under-uncertainty-planner",
+  "description": "Behavior cases for uncertainty-aware roadmapping: horizon organization, confidence that decays with distance, learning-first sequencing, capacity slack, and refusing false-precision dates.",
+  "cases": [
+    {
+      "id": "positive-reset-dated-gantt",
+      "type": "should_trigger",
+      "prompt": "Our roadmap is a four-quarter Gantt of dated features and it's wrong within a month, then gets used against us. Rebuild it to survive uncertainty.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reorganizes into horizons (now/next/later or committed/planned/exploratory) instead of a dated Gantt.",
+          "Ties items to outcomes and makes far-horizon entries themes/directions rather than dated features.",
+          "Labels confidence per item and lets it decay with distance, with no precise date on low-confidence items.",
+          "Adds a re-planning cadence and states the load-bearing assumptions.",
+          "Consumes the ranking from prioritization-frame-picker rather than re-scoring the backlog."
+        ]
+      }
+    },
+    {
+      "id": "positive-learning-first-sequencing",
+      "type": "should_trigger",
+      "prompt": "A big planned initiative rests on an assumption we're not sure about. Help us sequence the roadmap around that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the risky assumption as the biggest unknown and front-loads a cheap uncertainty-reducing bet (spike/prototype/experiment) to test it.",
+          "Sequences later commitments to rest on the evidence from that bet, not on hope.",
+          "Balances dependency order with learning order rather than sequencing purely by what unblocks what.",
+          "Keeps capacity slack for the possibility the assumption is wrong and the plan changes."
+        ]
+      }
+    },
+    {
+      "id": "edge-over-capacity-tradeoff",
+      "type": "should_trigger",
+      "prompt": "Leadership wants all eight of these initiatives this year but we have capacity for maybe five. Put together the roadmap.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reconciles ambition against real capacity including maintenance/interrupt slack rather than compressing eight into the year.",
+          "Shows the trade-off explicitly (what moves to a later horizon) instead of promising everything.",
+          "Sequences the retained items by outcome value and dependency/learning.",
+          "Does not present a 100%-full plan with no slack as achievable."
+        ]
+      }
+    },
+    {
+      "id": "should-not-manufacture-precise-dates",
+      "type": "should_trigger",
+      "prompt": "Just give me exact ship dates for every item through Q4, including the exploratory ones, so I can commit them to the board.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to attach precise dates to low-confidence, far-horizon/exploratory items — that is the false precision that makes roadmaps wrong.",
+          "Offers the confidence-labeled alternative: date ranges for near committed work, quarters for directional, themes for exploratory.",
+          "Escalates the demand for across-the-board precise commitments as a Stop Condition rather than manufacturing certainty.",
+          "Explains precision and confidence are different axes and must match."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-prioritization-framework",
+      "type": "should_not_trigger",
+      "prompt": "We have 30 backlog items and no consistent way to rank them. Which prioritization framework should we use and how do we score them?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke roadmap-under-uncertainty-planner: choosing and applying a prioritization framework to rank items is prioritization-frame-picker.",
+          "This skill sequences an already-prioritized set over time; it doesn't produce the ranking."
+        ]
+      }
+    }
+  ]
+}

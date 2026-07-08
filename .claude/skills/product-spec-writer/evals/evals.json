@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "product-spec-writer",
+  "description": "Behavior cases for product-spec authoring: problem-first framing, explicit non-goals, testable acceptance criteria, success metrics, and routing technical decisions to adr-writer.",
+  "cases": [
+    {
+      "id": "positive-write-feature-spec",
+      "type": "should_trigger",
+      "prompt": "We've agreed on the problem and users for a saved-search feature. Write the product spec engineering can build from.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Opens with the user problem and job-to-be-done before any solution, with the why-now.",
+          "States goals as outcomes AND explicit non-goals bounding scope.",
+          "Writes specific, testable functional requirements each paired with acceptance criteria a QA engineer could verify unaided.",
+          "Specifies edge/error/permission behavior but hands the error model to error-taxonomy-designer and UI states to edge-state-ux-designer.",
+          "Defines success metrics and guardrails and states rollout intent without specifying flag mechanics."
+        ]
+      }
+    },
+    {
+      "id": "positive-rewrite-vague-to-testable",
+      "type": "should_trigger",
+      "prompt": "Our draft spec just says the search should be 'fast and intuitive'. Turn this into something engineering and QA can actually build and verify.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rewrites 'fast' and 'intuitive' as observable behavior and measurable criteria rather than leaving applause-line qualities.",
+          "Pairs each requirement with given/when/then or checklist acceptance criteria.",
+          "Notes where a performance target belongs and cites the owner (latency budget / performance harness) rather than inventing a number.",
+          "Keeps the spec at what-and-why, not implementation detail."
+        ]
+      }
+    },
+    {
+      "id": "edge-route-technical-decision-to-adr",
+      "prompt": "While writing this spec, also decide whether we build search on our existing Postgres or stand up a dedicated search engine, and record that choice.",
+      "type": "should_trigger",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes 'Postgres vs a dedicated search engine' as an architecture decision, not a product-spec element.",
+          "Routes that decision and its alternatives/consequences to adr-writer rather than deciding it inside the spec.",
+          "Keeps the spec focused on user-facing requirements and success, citing the ADR as a dependency/open question.",
+          "Does not smuggle a technical decision into the spec as if it were a product requirement."
+        ]
+      }
+    },
+    {
+      "id": "should-not-write-over-unclear-requirements",
+      "type": "should_trigger",
+      "prompt": "We haven't really agreed what problem this solves and two teams want different things, but just write the spec anyway so we can start.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to write a confident spec over unresolved, contested requirements — that hides the disagreement until build time.",
+          "Routes back to requirements-gathering-facilitator to resolve the problem and stakeholder conflict first (a Stop Condition).",
+          "Offers to capture what IS agreed and list the blocking open questions rather than inventing agreement.",
+          "Does not fabricate goals/non-goals to fill the gap."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-write-an-adr",
+      "type": "should_not_trigger",
+      "prompt": "We've decided to adopt event sourcing for the ledger. Write the ADR: context, the decision, alternatives we considered, consequences, and the rollback plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke product-spec-writer: recording a specific technical decision with context/alternatives/consequences/rollback is adr-writer.",
+          "This is an architecture decision record, not a user-facing product specification."
+        ]
+      }
+    }
+  ]
+}

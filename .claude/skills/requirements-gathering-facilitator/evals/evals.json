@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "requirements-gathering-facilitator",
+  "description": "Behavior cases for requirements elicitation: unpacking a solution-stated-as-requirement, eliciting users/jobs and non-goals, surfacing stakeholder conflict, and producing a confidence-marked brief that feeds product-spec-writer.",
+  "cases": [
+    {
+      "id": "positive-solution-stated-as-requirement",
+      "type": "should_trigger",
+      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Restates 'add an export button' as a problem/job-to-be-done rather than accepting the solution verbatim, asking what the export would let them accomplish.",
+          "Identifies the actual users vs the requester and captures the current workaround as the honest requirement.",
+          "Elicits non-goals, constraints (including any compliance on exported data), and a success measure without inventing precision.",
+          "Produces a requirements brief marking items confirmed/assumed/to-confirm and hands off to product-spec-writer.",
+          "Does not jump to writing the specification or the UI design."
+        ]
+      }
+    },
+    {
+      "id": "positive-stakeholder-conflict",
+      "type": "should_trigger",
+      "prompt": "Sales says the new onboarding must be self-serve; Support insists it needs a human step. Both are adamant. Help us gather the real requirements.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the disagreement explicitly instead of averaging it into a vague compromise.",
+          "Elicits the underlying job each stakeholder is protecting (conversion speed vs activation quality) and separates must-have from preference.",
+          "Identifies who decides and records it as an open decision for a human owner rather than resolving the priority itself.",
+          "Captures the users and success measures for each position so the decider has evidence."
+        ]
+      }
+    },
+    {
+      "id": "edge-elicit-non-goals-and-constraints",
+      "type": "should_trigger",
+      "prompt": "We're kicking off a new sharing feature. Requirements are basically 'let users share stuff'. Facilitate getting to something real.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pushes past the vague ask with open questions and concrete-example prompts (walk me through the last time someone wanted to share).",
+          "Explicitly elicits non-goals (what sharing will NOT do) to bound scope before design.",
+          "Surfaces constraints and obligations (permissions, external recipients, data sensitivity) that any solution must respect.",
+          "Marks each resulting requirement by confidence and lists blocking open questions."
+        ]
+      }
+    },
+    {
+      "id": "should-not-decide-priority",
+      "type": "should_trigger",
+      "prompt": "While you're gathering requirements, just go ahead and decide whether the mobile version or the API ships first — pick one so we can move.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to make the prioritization/business decision itself: facilitation surfaces and structures the trade-off, it does not decide it.",
+          "Records the decision as an open question with the trade-offs and a named decider (a Stop Condition).",
+          "Continues to elicit the requirements and success measures that would inform that decision.",
+          "Does not silently pick an order and present it as a requirement."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-write-the-spec",
+      "type": "should_not_trigger",
+      "prompt": "Requirements are settled and signed off. Now write the product spec: problem, scope, user stories, and acceptance criteria.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke requirements-gathering-facilitator: with requirements understood, writing the problem/scope/stories/acceptance-criteria document is product-spec-writer.",
+          "Elicitation is complete, so the facilitation phase is over."
+        ]
+      }
+    }
+  ]
+}
