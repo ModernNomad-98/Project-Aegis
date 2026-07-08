@@ -1,0 +1,42 @@
+{
+  "skill": "scoped-approval-register",
+  "description": "Trigger discrimination: durable RECORDING of granted approvals vs deciding where approval is required (human-approval-boundary), designing the standing-approval loop (standing-approval-and-auto-advance), codifying standing agent authority (agent-authorization-matrix), and recording design decisions (adr-writer).",
+  "overlaps_with": ["human-approval-boundary", "standing-approval-and-auto-advance", "agent-authorization-matrix", "adr-writer"],
+  "cases": [
+    {
+      "id": "record-the-grant-wins-here",
+      "prompt": "The owner approved the RLS change for the invoices table only, in today's chat. Write that down somewhere durable so we can cite it next month.",
+      "expected_skill": "scoped-approval-register",
+      "should_not_trigger": ["human-approval-boundary", "adr-writer"],
+      "reason": "The approval already happened; the need is a durable, scoped, citable record with explicit forbidden scope — the register, not the halt-for-approval gate and not a design-decision ADR."
+    },
+    {
+      "id": "halt-for-approval-goes-to-boundary",
+      "prompt": "Next step is deleting the legacy migration files and rewriting the schema baseline — should we stop and get sign-off first?",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["scoped-approval-register"],
+      "reason": "Detecting a risk boundary and halting BEFORE the action is human-approval-boundary; the register only enters once a grant exists to record."
+    },
+    {
+      "id": "standing-loop-design-goes-to-standing-approval",
+      "prompt": "Design a standing approval so the agent stops re-asking for every push and PR inside an approved phase, with an opt-out phrase and a reviewer-block path.",
+      "expected_skill": "standing-approval-and-auto-advance",
+      "should_not_trigger": ["scoped-approval-register"],
+      "reason": "Designing the governed standing-approval policy (named scope, opt-out, phase-advance, reviewer-block) is standing-approval-and-auto-advance; the register's role is only to hold the adopted policy's grant as an entry afterwards."
+    },
+    {
+      "id": "authority-floors-go-to-authorization-matrix",
+      "prompt": "Write the standing rule for this repo: agents may open PRs but never merge to main or arm auto-merge — that's always a named human.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["scoped-approval-register"],
+      "reason": "Deny-by-default authority floors for agent actions are the authorization matrix (standing policy), not a record of one granted approval."
+    },
+    {
+      "id": "design-decision-goes-to-adr-writer",
+      "prompt": "Record that we chose Postgres over DynamoDB, the alternatives we weighed, and the consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": ["scoped-approval-register"],
+      "reason": "A technology decision with alternatives and consequences is an ADR; the approval register records authorizations of ACTIONS, not design choices."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "skill": "gated-deployment-prompt-template",
+  "description": "Trigger discrimination: proactive operator-prompt templating vs reactive incident playbooks (incident-response-runbook), rollback authoring (rollback-runbook-author), migration safety review (secure-migration-reviewer), and pipeline governance (merge-is-deploy-governance).",
+  "overlaps_with": ["incident-response-runbook", "rollback-runbook-author", "secure-migration-reviewer", "merge-is-deploy-governance"],
+  "cases": [
+    {
+      "id": "proactive-op-template-wins-here",
+      "prompt": "Template our production-grant procedure: placeholders the operator fills, hard rules, stop conditions, backup-then-verify, smoke expectations per phase, a required report path, and ETAs calibrated from past run reports.",
+      "expected_skill": "gated-deployment-prompt-template",
+      "should_not_trigger": ["incident-response-runbook", "rollback-runbook-author", "merge-is-deploy-governance"],
+      "reason": "A reusable, history-calibrated operator prompt for a recurring risky op class is exactly this skill — nothing is on fire, no rollback steps are being authored, no pipeline reality documented."
+    },
+    {
+      "id": "live-fire-goes-to-incident-runbook",
+      "prompt": "Write our incident response playbook: severity ladder, incident commander role, comms templates, and postmortem process.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": ["gated-deployment-prompt-template"],
+      "reason": "Reactive incident machinery (severities, roles, comms, postmortems) is incident-response-runbook; the deployment template is proactive discipline for planned operations."
+    },
+    {
+      "id": "rollback-steps-go-to-runbook-author",
+      "prompt": "Author the rollback runbook the deployment template's stop conditions should reference — numbered steps, per-step verification, data repair for the bad window.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["gated-deployment-prompt-template"],
+      "reason": "The executable rollback artifact is rollback-runbook-author's; the deployment template links to it as a required input rather than writing it."
+    },
+    {
+      "id": "migration-safety-goes-to-secure-migration-reviewer",
+      "prompt": "Review this specific migration for lock risk, reversibility, and data loss before we schedule the run.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": ["gated-deployment-prompt-template"],
+      "reason": "Judging one migration's safety is secure-migration-reviewer; its verdict is a required INPUT in the template's hard rules, not something the template produces."
+    },
+    {
+      "id": "pipeline-reality-goes-to-merge-is-deploy",
+      "prompt": "Document what actually deploys when we merge to main, make PR validation the authoritative gate, and record the branch-protection config in-repo.",
+      "expected_skill": "merge-is-deploy-governance",
+      "should_not_trigger": ["gated-deployment-prompt-template"],
+      "reason": "Standing merge==deploy pipeline governance is that skill; the deployment template gates the operator-applied remainder (like migrations) that the governance doc identifies as NOT auto-deployed."
+    }
+  ]
+}

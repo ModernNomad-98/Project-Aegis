@@ -1,0 +1,42 @@
+{
+  "skill": "local-ci-mirror-preflight",
+  "description": "Trigger discrimination: per-commit local CI mirroring with failure classification vs the release gate (release-readiness-reviewer), tier selection (risk-tiered-validation-selector), shard/resume architecture (sharded-validation-with-resume), and pipeline design (ci-pipeline-architect).",
+  "overlaps_with": ["release-readiness-reviewer", "risk-tiered-validation-selector", "sharded-validation-with-resume", "ci-pipeline-architect"],
+  "cases": [
+    {
+      "id": "per-commit-mirror-wins-here",
+      "prompt": "Before every commit I want us to run exactly what CI will run, verified against clean main first, and classify any failure as ours or main's. Set that discipline up for this change now.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": ["release-readiness-reviewer", "sharded-validation-with-resume", "ci-pipeline-architect"],
+      "reason": "Deriving local equivalents of PR-triggered checks, baselining on clean mainline, and classifying failures per commit is the preflight — not a release verdict, not shard architecture, not pipeline design."
+    },
+    {
+      "id": "ship-decision-goes-to-release-readiness",
+      "prompt": "Is PR #52 safe to merge and deploy today? Check the release commit's CI, migration review, rollback path, and approvals.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": ["local-ci-mirror-preflight"],
+      "reason": "The release-scoped, evidence-based go/no-go across migrations/rollback/flags is release-readiness-reviewer; the preflight is the upstream per-commit habit."
+    },
+    {
+      "id": "tier-choice-goes-to-selector",
+      "prompt": "Three files changed — decide whether this needs the docs-only fast path, the fast tier, or full validation.",
+      "expected_skill": "risk-tiered-validation-selector",
+      "should_not_trigger": ["local-ci-mirror-preflight"],
+      "reason": "Choosing validation DEPTH by impact class (failing closed to full) is the selector; the preflight then mirrors and runs whatever the chosen tier requires."
+    },
+    {
+      "id": "shard-architecture-goes-to-sharded-validation",
+      "prompt": "Full validation keeps timing out and rerunning from scratch — split it into named shards with a status file and resume, under one aggregate required check.",
+      "expected_skill": "sharded-validation-with-resume",
+      "should_not_trigger": ["local-ci-mirror-preflight"],
+      "reason": "Designing shards, persisted status, resume semantics, and the aggregate gate is sharded-validation-with-resume; the preflight invokes such a runner locally, it does not architect it."
+    },
+    {
+      "id": "pipeline-changes-go-to-ci-pipeline-architect",
+      "prompt": "Add a security-scan stage to CI and make it a merge-blocking required check.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["local-ci-mirror-preflight"],
+      "reason": "Adding/altering CI stages and required checks is pipeline design (manual-only ci-pipeline-architect); the preflight only READS workflow definitions to mirror them."
+    }
+  ]
+}

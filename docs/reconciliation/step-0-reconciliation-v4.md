@@ -439,10 +439,12 @@ pack is pulled forward.
 | **D12.7 Staff+ IC craft (P2)** | `tech-spec-writer` (broader than an ADR), `design-review-facilitator`, `cross-team-dependency-negotiator`, `roadmap-to-commitments-translator`, `staff-scope-selector`, `promotion-packet-writer`, `phased-work-handoff-designer` (multi-stage sequenced work with binding decisions carried forward as evidence — distinct from `ai-closeout-reporter`, which reports ONE turn, and from `ai-sdlc-operating-model`, which frames the whole lifecycle) (build spec substantiated by report P9: decision-ID register carried across stages, changed-files + explicit not-touched lists, proven-invocation-command sections with tell-tale output, deviation flags) | Technical leadership without management authority. |
 
 **D12.8 Operational workflow patterns — evidence-extracted (P1)** *(pack added by D15,
-2026-07-07)*: patterns extracted from a read-only audit of two production multi-agent
-repositories ([`docs/research/aegis-workflow-extraction-report.md`](../research/aegis-workflow-extraction-report.md));
+2026-07-07; **all 10 built 2026-07-07, D21** — the concrete, invocable rules of the
+Zero-Trust Engineering Discipline, D16)*: patterns extracted from a read-only audit of two
+production multi-agent repositories ([`docs/research/aegis-workflow-extraction-report.md`](../research/aegis-workflow-extraction-report.md));
 all HIGH confidence (multiple concrete artifacts each); product content stripped at
-extraction. Candidates (each *(candidate — not built)*, with the report pattern ID):
+extraction; live identifiers templated as placeholders per report §6.3. The pack
+(each **✅ built (D21)**, with the report pattern ID):
 
 - `scoped-approval-register` (P2) — durable approval records with Status/Reason/Scope
   allowed/Scope FORBIDDEN/Evidence; the record format complementing `human-approval-boundary`
@@ -831,6 +833,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   designer → adr-writer. Anti-trend-chasing neutrality is a core principle. On-demand; not
   built. Banked as pack D12.9 in §3; docs-only: no skill built, no phases renumbered,
   validator skill-count target unchanged (96).
+- **D21 (2026-07-07) — D12.8 operational workflow patterns built:** 10 evidence-extracted
+  skills (`scoped-approval-register`, `standing-approval-and-auto-advance`,
+  `chat-backlog-reconciliation`, `context-co-update-ci-gate`, `lane-authoring-guide`,
+  `local-ci-mirror-preflight`, `risk-tiered-validation-selector`,
+  `sharded-validation-with-resume`, `merge-is-deploy-governance`,
+  `gated-deployment-prompt-template`) — the concrete, invocable rules of the Zero-Trust
+  Engineering Discipline (D16). Product-agnostic, sourced from
+  [`docs/research/aegis-workflow-extraction-report.md`](../research/aegis-workflow-extraction-report.md).
+  96→106 skills. Every skill ships `evals/evals.json` + `evals/trigger-evals.json` with
+  discriminating cases against its named composed neighbor (and against its in-batch
+  siblings for the approval and validation clusters); 9 of 10 model-invocable,
+  `standing-approval-and-auto-advance` manual-only (it authors standing autonomy — the
+  `agent-authorization-matrix` reasoning); its merge-after-green is templated strictly as
+  an opt-in deployment-profile choice per the D15 house rule, rationale citing the
+  ungoverned-auto-merge incident. Embedded gh/git commands follow the D19 corrections
+  (strategy-specific auto-merge events; squash commits revert as ordinary commits).
+  `docs-retention-index` (P1, D12.4) and the enrichment deltas remain separate. To be
+  checked by `skill-quality-reviewer` before final trust.
 
 ---
 

@@ -1,0 +1,42 @@
+{
+  "skill": "standing-approval-and-auto-advance",
+  "description": "Trigger discrimination: designing the governed standing-approval loop vs recording one grant (scoped-approval-register), authority floors (agent-authorization-matrix), halting at a boundary (human-approval-boundary), and adversarial approval-UX review (human-agent-trust-reviewer).",
+  "overlaps_with": ["scoped-approval-register", "agent-authorization-matrix", "human-approval-boundary", "human-agent-trust-reviewer"],
+  "cases": [
+    {
+      "id": "governed-fatigue-layer-wins-here",
+      "prompt": "Stop making me approve every mechanical push and PR inside phases I already approved — set up a documented standing approval with an opt-out and a rule for advancing to the next approved phase.",
+      "expected_skill": "standing-approval-and-auto-advance",
+      "should_not_trigger": ["scoped-approval-register", "human-approval-boundary", "agent-authorization-matrix"],
+      "reason": "Designing the recurring standing-approval policy (named loop scope, opt-out phrase, phase-advance, reviewer-block) is this skill; it is not one grant to record, not a halt at a boundary, and not the authority-floor matrix itself."
+    },
+    {
+      "id": "one-grant-goes-to-register",
+      "prompt": "I've adopted the standing approval policy we drafted — record my adoption with its allowed and forbidden scope so future sessions can cite it.",
+      "expected_skill": "scoped-approval-register",
+      "should_not_trigger": ["standing-approval-and-auto-advance"],
+      "reason": "The design work is done; durably recording the human's adoption grant with scope allowed/FORBIDDEN and evidence is the register's job."
+    },
+    {
+      "id": "authority-floors-go-to-matrix",
+      "prompt": "Define what the agent may ever do autonomously in this repo versus what always needs a named human — the deny-by-default action matrix.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["standing-approval-and-auto-advance"],
+      "reason": "The standing authority floors are the matrix; standing-approval-and-auto-advance operates strictly inside the matrix's agent-allowed region and presumes it exists."
+    },
+    {
+      "id": "imminent-boundary-goes-to-approval-boundary",
+      "prompt": "The task is about to touch the RLS policies on the invoices table — halt and get explicit sign-off before proceeding.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": ["standing-approval-and-auto-advance"],
+      "reason": "Halting before a risk boundary mid-task is human-approval-boundary; the standing-approval layer never covers such boundaries and is not the in-flight stop sign."
+    },
+    {
+      "id": "approval-ux-attack-goes-to-trust-reviewer",
+      "prompt": "Review our approval flow for consent fatigue and rubber-stamping — are the agent's justifications training me to click yes?",
+      "expected_skill": "human-agent-trust-reviewer",
+      "should_not_trigger": ["standing-approval-and-auto-advance"],
+      "reason": "Adversarially attacking the approval layer's resilience is human-agent-trust-reviewer; standing-approval-and-auto-advance is the governed policy that review should be run AGAINST, not the review itself."
+    }
+  ]
+}

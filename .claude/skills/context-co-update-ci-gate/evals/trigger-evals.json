@@ -1,0 +1,42 @@
+{
+  "skill": "context-co-update-ci-gate",
+  "description": "Trigger discrimination: PR-time context write-back enforcement vs session-start context reading (agent-startup-context-gate), pipeline design/editing (ci-pipeline-architect), and the cadenced chat sweep (chat-backlog-reconciliation).",
+  "overlaps_with": ["agent-startup-context-gate", "ci-pipeline-architect", "chat-backlog-reconciliation"],
+  "cases": [
+    {
+      "id": "write-back-enforcement-wins-here",
+      "prompt": "PRs keep changing the schema and API without anyone updating the repo context map — make CI fail PRs that touch important paths without a matching context update.",
+      "expected_skill": "context-co-update-ci-gate",
+      "should_not_trigger": ["agent-startup-context-gate", "ci-pipeline-architect"],
+      "reason": "Enforcing context WRITE-BACK on PRs (paths list, co-update rule, protocol, gate spec) is this skill; it is not session-start reading, and the whole-pipeline design authority is not what was asked — one policy gate is."
+    },
+    {
+      "id": "session-start-goes-to-startup-gate",
+      "prompt": "You're resuming in a repo after two weeks — verify the repo identity and read the context map and status docs before touching code.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": ["context-co-update-ci-gate"],
+      "reason": "Reading and verifying context at task start is the startup gate; no PR-time enforcement is being designed."
+    },
+    {
+      "id": "pipeline-design-goes-to-ci-pipeline-architect",
+      "prompt": "Design our CI/CD pipeline — stages for lint, build, tests, security, artifact, deploy gates, and which checks block merge.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["context-co-update-ci-gate"],
+      "reason": "The delivery pipeline's stage graph and merge-blocking semantics are ci-pipeline-architect; the context gate is one policy check that would be wired INTO such a pipeline."
+    },
+    {
+      "id": "chat-sweep-goes-to-reconciliation",
+      "prompt": "Extract the decisions from last month's AI chats into dated repo docs and audit which ones actually happened.",
+      "expected_skill": "chat-backlog-reconciliation",
+      "should_not_trigger": ["context-co-update-ci-gate"],
+      "reason": "Draining ephemeral chat into audited repo docs on a cadence is the reconciliation sweep; the CI gate acts at PR time on code-path changes, not on conversations."
+    },
+    {
+      "id": "install-the-workflow-goes-to-pipeline-architect",
+      "prompt": "Here's the approved context-gate spec — now edit .github/workflows/ to add the job and make it a required check.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["context-co-update-ci-gate"],
+      "reason": "Editing pipeline definitions and required-check config is ci-pipeline-architect's manual-only territory; the context gate skill produces the spec and stops at the handoff."
+    }
+  ]
+}

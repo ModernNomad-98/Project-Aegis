@@ -1,0 +1,42 @@
+{
+  "skill": "lane-authoring-guide",
+  "description": "Trigger discrimination: pre-work per-lane knowledge transfer vs end-of-work closeout/handoff (ai-closeout-reporter), whole-lifecycle contract (ai-sdlc-operating-model), and standing tool-instruction alignment (agent-instruction-consolidator).",
+  "overlaps_with": ["ai-closeout-reporter", "ai-sdlc-operating-model", "agent-instruction-consolidator"],
+  "cases": [
+    {
+      "id": "pre-work-lane-guide-wins-here",
+      "prompt": "Before the frontend agent starts its lane of the multi-agent effort, produce its guide: the request lifecycle it sits in, the contracts it must honor, the recipe and checklist per route, and exactly what it must not touch.",
+      "expected_skill": "lane-authoring-guide",
+      "should_not_trigger": ["ai-closeout-reporter", "ai-sdlc-operating-model", "agent-instruction-consolidator"],
+      "reason": "Evidence-cited planner-to-implementer transfer BEFORE a lane's work begins is the lane guide — not a terminal report, not the lifecycle-stage contract, and not tool-instruction file alignment."
+    },
+    {
+      "id": "end-of-work-goes-to-closeout",
+      "prompt": "The backend lane just completed its last handler — report what changed, what was intentionally not done, validation results, and the handoff notes for the next stage.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["lane-authoring-guide"],
+      "reason": "Work's END: disclosure of what actually happened with evidence is the closeout; the lane guide was work's BEGINNING."
+    },
+    {
+      "id": "lifecycle-contract-goes-to-operating-model",
+      "prompt": "Define how our humans and agents work together across the whole lifecycle — stages, gates, and who holds authority at each stage.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": ["lane-authoring-guide"],
+      "reason": "The end-to-end stage/authority contract is the operating model; a lane guide is one lane's knowledge packet inside such a contract."
+    },
+    {
+      "id": "tool-instruction-files-go-to-consolidator",
+      "prompt": "Our CLAUDE.md, AGENTS.md, and Cursor rules disagree about branch naming and test commands — align them into one source of truth.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": ["lane-authoring-guide"],
+      "reason": "Standing tool-instruction alignment across assistants is the consolidator; lane guides are per-effort, per-lane knowledge, not standing instruction files."
+    },
+    {
+      "id": "lane-approval-scope-goes-to-register",
+      "prompt": "Record that the AI-routing lane is approved to modify src/ai/router only, nothing else, per today's sign-off.",
+      "expected_skill": "scoped-approval-register",
+      "should_not_trigger": ["lane-authoring-guide"],
+      "reason": "Recording the lane's authorization grant with allowed/forbidden scope is the register; the lane guide cites that entry, it does not create it."
+    }
+  ]
+}

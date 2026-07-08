@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "merge-is-deploy-governance",
+  "description": "Behavior cases for merge==deploy governance: verified reality incl. partial auto-deploy, PR gate promoted in writing, post-merge demoted to verification, human-owned protection record, strategy-correct revert mechanics, stated exposure window.",
+  "cases": [
+    {
+      "id": "positive-govern-an-auto-deploy-platform",
+      "type": "should_trigger",
+      "prompt": "Our PaaS deploys main to production on every merge — there is no separate deploy step. Write the standing governance for this pipeline.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies and documents the merge→deploy reality from platform evidence (config file/setting cited), including what does NOT auto-deploy.",
+          "Promotes PR-time required checks (named exactly) to the authoritative pre-production gate and routes any sufficiency gaps.",
+          "Reclassifies post-merge checks as verification whose failure is an incident-class signal, never a gate.",
+          "Records branch protection in-repo with its source labeled and the ownership rule: a named human role changes protection, never agents.",
+          "States the accepted-risk exposure window (duration, blast radius, named accepter) and the revert-PR-then-auto-redeploy rollback primitive with strategy-correct mechanics."
+        ]
+      }
+    },
+    {
+      "id": "edge-partial-auto-deploy-migrations-excluded",
+      "type": "should_trigger",
+      "prompt": "On our platform the app and serverless functions auto-deploy on merge, but database migrations are applied separately by an operator. Fold that into the governance.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Documents the partial reality explicitly: what auto-deploys vs what an operator applies — never assumes all-or-nothing.",
+          "Names the ordering hazard: code requiring an unapplied migration must not merge first; migration-first ordering is stated in the doc.",
+          "Routes the operator-applied part toward the gated deployment procedure (gated-deployment-prompt-template territory) rather than absorbing it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-demote-the-pr-gate",
+      "type": "should_trigger",
+      "prompt": "PR checks slow us down. Since we run post-merge smoke tests anyway, let's treat those as the real gate and keep PR validation light.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses: on a merge==deploy platform, post-merge runs in production's timeline — it can only verify, never gate; there is nothing left to gate after merge.",
+          "States the consequence plainly: anything not validated at PR time is validated in production on real users.",
+          "The lawful direction is strengthening the PR gate (routing to the validation skills), not demoting it."
+        ]
+      }
+    },
+    {
+      "id": "edge-squash-repo-revert-mechanics",
+      "type": "should_trigger",
+      "prompt": "We squash-merge everything. Write the rollback section — a teammate suggested documenting 'git revert -m 1 <sha>' as the standard command.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Corrects the command: squash-merged changes land as ORDINARY commits, so the revert is git revert <sha> — the -m 1 flag applies only to true merge commits and FAILS on squash commits.",
+          "Defines the primitive as revert-PR-then-auto-redeploy with the revert PR passing the same required checks — the gate is not bypassed for rollbacks.",
+          "States what revert does not undo (applied migrations, external effects) and routes the executable runbook to rollback-runbook-author."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-single-release-verdict",
+      "type": "should_not_trigger",
+      "prompt": "Is PR #52 safe to merge and go live today? Check its CI evidence, migration risk, rollback path, and approvals.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "A per-release ship/no-ship verdict is release-readiness-reviewer; merge-is-deploy-governance writes the standing pipeline rules such a review runs under."
+        ]
+      }
+    }
+  ]
+}

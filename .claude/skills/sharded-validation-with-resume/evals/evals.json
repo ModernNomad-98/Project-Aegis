@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "sharded-validation-with-resume",
+  "description": "Behavior cases for shard design: measured shard maps, failed-vs-interrupted status semantics, the resume law (infrastructure only, never failures), the empty-or-fail catch-shard, and the sole aggregate required check.",
+  "cases": [
+    {
+      "id": "positive-shard-a-timing-out-full-tier",
+      "type": "should_trigger",
+      "prompt": "Our full validation takes 45 minutes, dies on timeouts around minute 40, and every interruption reruns everything from scratch. Design the shard-and-resume architecture.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds a small set of NAMED functional shards from the measured full-tier inventory, every existing check assigned to exactly one shard, balanced by real durations.",
+          "Designs the persisted status file distinguishing failed (assertions) from interrupted (timeout/infra), bound to run-id + commit, with mandatory tests_executed counts.",
+          "Resume mode reruns only interrupted/pending shards on the same commit; passes are kept; a new commit invalidates all prior status.",
+          "Adds the uncategorized catch-shard with the empty-or-fail contract, and the CI wiring spec funneling parallel shards into ONE aggregate gate as the sole required check.",
+          "Delivers wiring as a handoff spec (reference YAML) to ci-pipeline-architect/human — edits no pipeline files."
+        ]
+      }
+    },
+    {
+      "id": "edge-new-test-matches-no-shard",
+      "type": "should_trigger",
+      "prompt": "A teammate added tests/notifications.spec.ts and no shard's membership rules match it. What happens on the next full run?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The test lands in the uncategorized catch-shard, which RUNS it and reports failure-by-policy until the test is assigned to a functional shard.",
+          "The fix is a reviewed shard-map change assigning the test — not widening uncategorized into a permanent misc bucket.",
+          "States why: the catch-shard's job is making unassigned tests a visible failure instead of silent coverage decay."
+        ]
+      }
+    },
+    {
+      "id": "should-not-resume-past-a-real-failure",
+      "type": "should_trigger",
+      "prompt": "The api-integration shard failed with three real assertion errors. Run with -Resume so it skips that shard and the aggregate gate goes green — we'll fix the assertions next sprint.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses: resume covers timeout/infrastructure interruptions only — a failed shard is never resumed-away; that is failure laundering through the resume flag.",
+          "Points at the status-file semantics that make this mechanical: failed is not a resume-eligible state.",
+          "The lawful path: fix, rerun the shard (or the tier on the new commit); the gate stays red until the failure is actually resolved."
+        ]
+      }
+    },
+    {
+      "id": "edge-docs-only-skip-vs-required-checks",
+      "type": "should_trigger",
+      "prompt": "Docs-only PRs skip the shard jobs, and branch protection then hangs forever waiting on the skipped required checks. Fix the design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses the anti-pattern: per-shard required checks break under conditional skips.",
+          "Prescribes the aggregate-gate shape: one always()-running gate job as the sole required check, explicitly evaluating shard results — skipped satisfies only when the tier selector said docs-only; skipped on a full-tier run FAILS.",
+          "Keeps branch protection referencing only the stable aggregate name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-flaky-diagnosis",
+      "type": "should_not_trigger",
+      "prompt": "The ui-e2e login test fails about one run in five with the same assertion — figure out why and fix it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes."
+        ]
+      }
+    }
+  ]
+}
