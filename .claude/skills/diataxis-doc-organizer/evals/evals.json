@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "diataxis-doc-organizer",
+  "description": "Behavior cases for Diátaxis organization: classifying docs by actual mode, splitting two-job docs, structuring the four-quadrant tree, and cross-linking instead of embedding.",
+  "cases": [
+    {
+      "id": "positive-organize-messy-docs",
+      "type": "should_trigger",
+      "prompt": "Our docs are a pile of 40 pages and users can't find anything. Organize them properly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies each doc by its ACTUAL mode (tutorial/how-to/reference/explanation) against the two Diátaxis axes.",
+          "Flags docs whose content doesn't match their claimed mode.",
+          "Structures a tree where all four modes are discoverable by reader need.",
+          "Cross-links how-tos to reference rather than embedding, and marks generated reference for api-doc-generator-designer.",
+          "Hands the README to readme-craftsman and the pipeline to docs-as-code-architect."
+        ]
+      }
+    },
+    {
+      "id": "positive-tutorial-is-really-reference",
+      "type": "should_trigger",
+      "prompt": "Our 'getting started tutorial' teaches for two paragraphs then lists every single config option in giant tables. Fix it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses the page as a tutorial doing reference's job — failing both the learner and the looker-upper.",
+          "Splits it: the lesson stays a tutorial with a small guaranteed-success path; the config tables become (or link to) reference.",
+          "Keeps the tutorial hand-held with guaranteed success and no reference dump.",
+          "Cross-links tutorial → reference rather than re-embedding."
+        ]
+      }
+    },
+    {
+      "id": "edge-how-to-vs-tutorial",
+      "type": "should_trigger",
+      "prompt": "We keep arguing whether a page should be a tutorial or a how-to. Help us classify our task pages.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes tutorial (learning-oriented, hand-held, for beginners, guaranteed success) from how-to (task-oriented, a recipe for the already-competent).",
+          "Classifies each page by reader situation, not surface similarity.",
+          "Recommends splitting any page trying to both teach a beginner and hand an expert a recipe.",
+          "Places each in its quadrant with cross-links as needed."
+        ]
+      }
+    },
+    {
+      "id": "should-not-embed-reference-in-guides",
+      "type": "should_trigger",
+      "prompt": "Let's just copy the full API parameter reference into each how-to guide so users don't have to click away.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to embed reference into guides: the same facts in many places guarantees drift and updates in none.",
+          "Keeps reference in one place (ideally generated) and links to it from the how-tos.",
+          "Preserves mode purity so how-tos stay task-focused.",
+          "Notes generated reference belongs with api-doc-generator-designer."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-write-readme",
+      "type": "should_not_trigger",
+      "prompt": "Write our project's README so newcomers understand what it is and can run a quickstart.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke diataxis-doc-organizer: crafting the single README entry point is readme-craftsman.",
+          "The README links into the organized corpus, but writing it is a different job than organizing the set."
+        ]
+      }
+    }
+  ]
+}

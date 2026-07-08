@@ -1,0 +1,41 @@
+{
+  "skill": "adr-sequencer",
+  "description": "Trigger discrimination for MANAGING the ADR corpus over time (this skill) vs AUTHORING one ADR (adr-writer — composed, not replaced), vs organizing the whole docs corpus by type (diataxis-doc-organizer), vs the docs pipeline (docs-as-code-architect).",
+  "overlaps_with": [
+    "adr-writer",
+    "diataxis-doc-organizer",
+    "docs-as-code-architect"
+  ],
+  "cases": [
+    {
+      "id": "corpus-management-wins-here",
+      "prompt": "Curate our ADR log: number them, assign statuses, wire supersede links both ways, and find any contradictions.",
+      "expected_skill": "adr-sequencer",
+      "should_not_trigger": ["adr-writer", "diataxis-doc-organizer"],
+      "note": "SEAM CASE (primary) — index, statuses, superseding graph, and contradiction detection are longitudinal corpus management. No single ADR is being authored and no general docs taxonomy applied.",
+      "reason": "Managing the ADR collection over time is this skill's core scope; it composes adr-writer for any individual record."
+    },
+    {
+      "id": "author-one-adr-goes-to-adr-writer",
+      "prompt": "Write the ADR for choosing Postgres over a dedicated search engine: context, decision, alternatives, consequences, rollback.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": ["adr-sequencer"],
+      "note": "SEAM CASE (primary, reverse — the compose seam) — authoring one record's content is adr-writer. Sequencing only places and links it.",
+      "reason": "adr-writer produces one ADR. This skill extends it with corpus-level management; it delegates single-record authoring rather than duplicating it."
+    },
+    {
+      "id": "corpus-by-type-goes-to-diataxis-doc-organizer",
+      "prompt": "Organize all our documentation into tutorials, how-to, reference, and explanation and fix mis-typed pages.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["adr-sequencer"],
+      "reason": "diataxis-doc-organizer organizes the whole documentation set by mode. ADRs are one decision-history genre; sequencing them is separate from the corpus taxonomy."
+    },
+    {
+      "id": "pipeline-goes-to-docs-as-code-architect",
+      "prompt": "Set up the docs build: generator, PR review, link-checking in CI, and versioned publishing — including where ADRs render.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["adr-sequencer"],
+      "reason": "docs-as-code-architect designs the toolchain that builds/publishes docs. This skill manages the ADR corpus's content, status, and links, not the build system."
+    }
+  ]
+}

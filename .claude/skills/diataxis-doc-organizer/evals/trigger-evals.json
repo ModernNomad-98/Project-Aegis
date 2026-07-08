@@ -1,0 +1,41 @@
+{
+  "skill": "diataxis-doc-organizer",
+  "description": "Trigger discrimination for organizing the whole docs SET by mode (this skill) vs the README entry point (readme-craftsman), the docs pipeline (docs-as-code-architect), and the onboarding set (onboarding-doc-designer).",
+  "overlaps_with": [
+    "readme-craftsman",
+    "docs-as-code-architect",
+    "onboarding-doc-designer"
+  ],
+  "cases": [
+    {
+      "id": "corpus-organization-wins-here",
+      "prompt": "Sort our whole documentation set into tutorials, how-to, reference, and explanation, and fix pages that are the wrong type.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["readme-craftsman", "docs-as-code-architect"],
+      "note": "SEAM CASE (primary) — classifying and structuring the whole set by the four modes is corpus organization. No single README and no toolchain is being built.",
+      "reason": "Shaping the documentation corpus by Diátaxis mode is this skill's core scope."
+    },
+    {
+      "id": "readme-goes-to-readme-craftsman",
+      "prompt": "Write the project's README: what it is, who it's for, and a quickstart that runs.",
+      "expected_skill": "readme-craftsman",
+      "should_not_trigger": ["diataxis-doc-organizer"],
+      "note": "SEAM CASE — the single entry-point front door is a README, not the corpus taxonomy.",
+      "reason": "readme-craftsman writes the entry point that links into the organized corpus; this skill organizes the corpus."
+    },
+    {
+      "id": "pipeline-goes-to-docs-as-code-architect",
+      "prompt": "Set up the docs build pipeline: generator, PR review, CI link-checking, and versioned deploys.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["diataxis-doc-organizer"],
+      "reason": "docs-as-code-architect designs the toolchain that builds/publishes docs. This skill organizes content by mode, independent of the build system."
+    },
+    {
+      "id": "onboarding-set-goes-to-onboarding-doc-designer",
+      "prompt": "Design the onboarding docs for a new engineer joining the team — first-week setup, orientation, and a starter task path.",
+      "expected_skill": "onboarding-doc-designer",
+      "should_not_trigger": ["diataxis-doc-organizer"],
+      "reason": "onboarding-doc-designer designs an audience-defined set for new joiners (spanning modes by need). This skill classifies the general corpus by mode; it doesn't design the onboarding journey."
+    }
+  ]
+}

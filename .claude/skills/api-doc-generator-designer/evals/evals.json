@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "api-doc-generator-designer",
+  "description": "Behavior cases for generated API reference: generating from a source of truth, the generated-vs-authored split, enriching upstream, validated examples, and versioning with the API.",
+  "cases": [
+    {
+      "id": "positive-generate-from-openapi",
+      "type": "should_trigger",
+      "prompt": "We have an OpenAPI spec but our API docs are hand-written and always out of date. Design generated reference.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Generates the exhaustive reference (endpoints, types, params, responses, error catalog) from the OpenAPI spec so it can't drift.",
+          "Splits generated reference from hand-authored guides/quickstart/overviews, mapping to Diátaxis (reference generated; tutorials/how-to authored).",
+          "Puts descriptions/examples IN the schema so they're single-sourced and regenerate.",
+          "Validates examples against the schema and slots generation into the docs pipeline (docs-as-code-architect).",
+          "Treats the contract as api-event-architect's and only documents it."
+        ]
+      }
+    },
+    {
+      "id": "positive-enrich-upstream",
+      "type": "should_trigger",
+      "prompt": "People keep editing the generated API docs to add better descriptions, then the next regen wipes them. What's the right approach?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Directs enrichments (descriptions, examples) upstream into the schema/docstrings so they survive regeneration and stay single-sourced.",
+          "Explains that editing generated output re-creates the drift problem.",
+          "Keeps reference generated and guides authored.",
+          "Validates the enriched examples against the schema."
+        ]
+      }
+    },
+    {
+      "id": "edge-versioned-and-error-catalog",
+      "type": "should_trigger",
+      "prompt": "Our API has multiple versions and a big set of error codes. Make the reference reflect version and errors accurately.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Versions the reference with the API so version X docs match version X, surfacing deprecations from the schema.",
+          "Generates the error catalog from the error model (error-taxonomy-designer's codes) rather than hand-listing.",
+          "Coordinates the versioning/deprecation policy with api-event-architect rather than inventing one.",
+          "Produces a diff/changelog between versions where possible."
+        ]
+      }
+    },
+    {
+      "id": "should-not-generate-without-source-of-truth",
+      "type": "should_trigger",
+      "prompt": "We have no schema and only sparse code comments, but just generate complete accurate API reference anyway.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags that accurate reference can't be generated from a missing/incomplete source of truth.",
+          "Names adopting a machine-readable schema (or completing typed signatures/docstrings) as the real prerequisite (a Stop Condition).",
+          "Refuses to hand-write reference as the fix, since that just restarts the drift problem.",
+          "Scopes what CAN be generated now from whatever structured source exists, honestly."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-design-the-contract",
+      "type": "should_not_trigger",
+      "prompt": "Design our public API contract: resource routes, the response envelope, versioning and deprecation policy, idempotency, and rate limits.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke api-doc-generator-designer: designing routes, envelopes, versioning policy, and rate limits is api-event-architect.",
+          "This skill documents (generates reference for) that contract; it doesn't define it."
+        ]
+      }
+    }
+  ]
+}

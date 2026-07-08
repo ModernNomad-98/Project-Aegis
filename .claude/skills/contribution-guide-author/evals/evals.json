@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "contribution-guide-author",
+  "description": "Behavior cases for CONTRIBUTING guides: the zero-to-merged path, verified setup, automated standards, honest review expectations, security disclosure, and first-contribution on-ramps.",
+  "cases": [
+    {
+      "id": "positive-write-contributing",
+      "type": "should_trigger",
+      "prompt": "We're opening our project to outside contributors but have no CONTRIBUTING guide. Write one.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Structures the guide around the zero-to-merged path (find work → setup → change → checks → PR → review → merge).",
+          "Provides exact, verified setup steps with prerequisites, and states the real fork/branch/PR workflow.",
+          "Points standards at automated linters/formatters with the commands to run checks locally.",
+          "Sets honest review/merge expectations and links code of conduct, license, CLA/DCO, and a PRIVATE security-disclosure process.",
+          "Adds first-contribution on-ramps (good-first-issues, where to ask) and keeps it product-agnostic."
+        ]
+      }
+    },
+    {
+      "id": "positive-process-churn",
+      "type": "should_trigger",
+      "prompt": "Contributors keep bouncing — they can't get the project running and their PRs sit with no response. Fix our contribution docs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Prioritizes verified setup steps as the top bounce point and makes them exact.",
+          "Adds honest review-turnaround and accept-vs-decline expectations to end silent-PR frustration.",
+          "Ensures the documented workflow matches the project's real process.",
+          "Adds where-to-ask and good-first-issue on-ramps."
+        ]
+      }
+    },
+    {
+      "id": "edge-automate-the-standard",
+      "type": "should_trigger",
+      "prompt": "Our CONTRIBUTING has three pages of prose style rules nobody follows. Improve it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Replaces prose style rules with a formatter/linter and the one command to run it locally before pushing.",
+          "Keeps only the conventions that can't be automated, briefly.",
+          "Ties required checks to what CI enforces so contributors can pass before submitting.",
+          "Reduces the guide to what actually helps a contributor merge."
+        ]
+      }
+    },
+    {
+      "id": "should-not-omit-security-disclosure",
+      "type": "should_trigger",
+      "prompt": "Just tell contributors to open a GitHub issue for anything they find, including security bugs, so it's all in one place.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to route security vulnerabilities to public issues — that turns a private report into a zero-day.",
+          "Adds a private security-disclosure process (security contact/policy) distinct from normal issues.",
+          "Keeps public issues for ordinary bugs/features.",
+          "Treats the disclosure channel as a required section, not optional."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-employee-onboarding",
+      "type": "should_not_trigger",
+      "prompt": "Design the onboarding docs for a new engineer joining our team — first-week setup, architecture orientation, how we work, and a starter task.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke contribution-guide-author: onboarding an internal new hire to the codebase and how-we-work is onboarding-doc-designer.",
+          "A contributor guide serves external contributors, a different audience and journey."
+        ]
+      }
+    }
+  ]
+}

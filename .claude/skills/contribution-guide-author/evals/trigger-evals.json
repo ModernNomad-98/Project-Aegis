@@ -1,0 +1,41 @@
+{
+  "skill": "contribution-guide-author",
+  "description": "Trigger discrimination for the external CONTRIBUTING guide (this skill) vs new-hire onboarding (onboarding-doc-designer), the README (readme-craftsman), and the docs contribution toolchain (docs-as-code-architect).",
+  "overlaps_with": [
+    "onboarding-doc-designer",
+    "readme-craftsman",
+    "docs-as-code-architect"
+  ],
+  "cases": [
+    {
+      "id": "contribution-guide-wins-here",
+      "prompt": "Write the CONTRIBUTING guide: setup, the fork/branch/PR workflow, how to run checks, the review process, and how to make a first contribution.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": ["onboarding-doc-designer", "readme-craftsman"],
+      "note": "SEAM CASE (primary) — a zero-to-merged guide for external contributors is a CONTRIBUTING guide. Not internal onboarding and not the README.",
+      "reason": "Designing the contributor's path from setup to merged change is this skill's core scope."
+    },
+    {
+      "id": "new-hire-onboarding-goes-to-onboarding-doc-designer",
+      "prompt": "Design onboarding docs for a new engineer joining the team: first-week setup, architecture orientation, how we work, and a starter task.",
+      "expected_skill": "onboarding-doc-designer",
+      "should_not_trigger": ["contribution-guide-author"],
+      "note": "SEAM CASE (primary, reverse — pin both ways) — an internal new hire joining the codebase is onboarding, not external contribution.",
+      "reason": "onboarding-doc-designer serves an internal joiner learning how-we-work. This skill serves an external contributor merging a change. Different audience and journey."
+    },
+    {
+      "id": "readme-goes-to-readme-craftsman",
+      "prompt": "Write the project README: what it is, who it's for, and a quickstart.",
+      "expected_skill": "readme-craftsman",
+      "should_not_trigger": ["contribution-guide-author"],
+      "reason": "readme-craftsman writes the front door. It links to CONTRIBUTING, but the README serves all readers, not just contributors."
+    },
+    {
+      "id": "docs-toolchain-goes-to-docs-as-code-architect",
+      "prompt": "Set up the docs edit workflow: edit-on-this-page, preview builds, and CI checks so contributors can change docs easily.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["contribution-guide-author"],
+      "reason": "docs-as-code-architect designs the docs contribution mechanics/infra. This skill writes the human-facing guide content."
+    }
+  ]
+}

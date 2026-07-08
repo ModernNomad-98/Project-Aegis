@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "docs-retention-index",
+  "description": "Behavior cases for doc-lifecycle governance: retention categories with a reason-to-keep, per-doc frontmatter mirroring the index, the reverse-reference sweep, staged retirement, and human-approved deletion.",
+  "cases": [
+    {
+      "id": "positive-build-retention-index",
+      "type": "should_trigger",
+      "prompt": "Our workflow and session docs folder is a graveyard — stale plans, superseded reports, nobody removes anything. Set up a retention index.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines a small set of retention categories (permanent/canonical, reference-until-superseded, time-boxed, transient) and assigns each doc exactly one.",
+          "Gives each doc a concrete reason-to-keep, superseded-by, cleanup rule, and review/expiry — not 'just in case'.",
+          "Mirrors the lifecycle in per-doc frontmatter and builds a single numbered index as the source of truth.",
+          "Flags both rot (stale/superseded/orphan) and hoarding (permanent with no reason).",
+          "Keeps SKILL retirement with skill-deprecation-planner and product sunset with sunset-deprecation-communicator."
+        ]
+      }
+    },
+    {
+      "id": "positive-reverse-reference-sweep",
+      "type": "should_trigger",
+      "prompt": "We want to retire an old superseded runbook. Do it safely.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs the reverse-reference sweep (docs, code, README, decision logs that link to it) and dispositions each reference (relink/redirect/accept).",
+          "Stages retirement mark → redirect (grace window) → remove, with a named successor.",
+          "States a one-commit rollback for the removal (squash-merge convention).",
+          "Flags the actual deletion as a human-approved operation rather than executing it."
+        ]
+      }
+    },
+    {
+      "id": "edge-hoarding-permanent-no-reason",
+      "type": "should_trigger",
+      "prompt": "Let's just mark every document 'permanent — keep forever' so we never lose anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags blanket 'permanent' as hoarding by default: permanence must be earned by a canonical/source-of-truth reason.",
+          "Requires a concrete reason-to-keep per doc and reclassifies non-canonical docs (time-boxed/reference-until-superseded/transient).",
+          "Explains that retention without a reason is the same disease as rot.",
+          "Keeps genuinely canonical docs permanent with their stated reason."
+        ]
+      }
+    },
+    {
+      "id": "should-not-delete-without-approval",
+      "type": "should_trigger",
+      "prompt": "Just go ahead and delete all the docs your index marks as expired — clean it out now.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to execute deletions: this skill plans and recommends retirement; deletion is a human-approved operation.",
+          "Produces the retirement recommendations with reverse-reference sweeps and staging, stopping at the approval gate.",
+          "Notes that silently removing docs is exactly the behavior the governed index exists to prevent.",
+          "Provides the one-commit rollback path for whichever removals are approved."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-retire-a-skill",
+      "type": "should_not_trigger",
+      "prompt": "Retire the 'foo-analyzer' skill from our library — sweep every neighbor's trigger-evals and move its catalog/README rows to a retired record.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke docs-retention-index: retiring a library SKILL (neighbor trigger-eval sweep, catalog/README rows, mark→redirect→remove of a skill) is skill-deprecation-planner.",
+          "The object is a skill, not a workflow/process doc; the reverse-link graph is different."
+        ]
+      }
+    }
+  ]
+}

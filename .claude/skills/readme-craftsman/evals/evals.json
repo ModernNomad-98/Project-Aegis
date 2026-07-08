@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "readme-craftsman",
+  "description": "Behavior cases for README craft: first-screen what/why/who, a verified quickstart, common-case usage with depth linked out, and trimming a bloated README.",
+  "cases": [
+    {
+      "id": "positive-write-new-readme",
+      "type": "should_trigger",
+      "prompt": "Our library has no real README — just a title and an install line. Write one that helps newcomers.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Opens with a one-line description a stranger understands, then what it's for, who it's for, and why to choose it — above any badges.",
+          "Provides a minimal, copy-pasteable quickstart with prerequisites stated, and verifies (or flags the need to verify) it runs on a clean environment.",
+          "Shows the common-case usage only and links depth out to fuller docs.",
+          "Routes to CONTRIBUTING, examples, API reference, and support rather than inlining them.",
+          "Hands corpus organization to diataxis-doc-organizer and pipeline to docs-as-code-architect."
+        ]
+      }
+    },
+    {
+      "id": "positive-buried-what-is-this",
+      "type": "should_trigger",
+      "prompt": "People keep asking what our project even does even though the README is long. Fix it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses that 'what is this' is buried below badges/TOC/config and moves the what/why/who to the first screen.",
+          "Applies the first-screen test: a stranger understands the project in seconds.",
+          "Pushes badges, license, and status below comprehension.",
+          "Cuts or links out content that pushed the description off-screen."
+        ]
+      }
+    },
+    {
+      "id": "edge-kitchen-sink-trim",
+      "type": "should_trigger",
+      "prompt": "Our README is 900 lines — every config option, the full API, the changelog, and an architecture essay. It's unmaintainable. Help.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the README as the manual and trims it to an entry point: first screen, quickstart, common usage, and routes out.",
+          "Moves the full API, exhaustive config, changelog, and architecture into their own documents and links them.",
+          "Single-sources or generates drift-prone values (versions, commands) instead of duplicating.",
+          "Keeps it short enough to stay current."
+        ]
+      }
+    },
+    {
+      "id": "should-not-ship-unverified-quickstart",
+      "type": "should_trigger",
+      "prompt": "Just write the quickstart from memory of how the tool probably works — no need to actually run it, ship it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to present an unverified quickstart as working: a broken quickstart is worse than none because it destroys trust in all the docs.",
+          "States the prerequisites and the exact steps, and flags that the quickstart must be verified on a clean environment (a Stop Condition if it can't be run).",
+          "Does not fabricate commands that 'probably' work.",
+          "Offers to mark the quickstart provisional/unverified if running it isn't possible now."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-organize-corpus",
+      "type": "should_not_trigger",
+      "prompt": "We have 40 docs pages and they're a mess — sort them into tutorials, how-to guides, reference, and explanation.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke readme-craftsman: organizing a whole documentation set into the four Diátaxis modes is diataxis-doc-organizer.",
+          "The README would link into that organized set, but organizing the corpus is a different job."
+        ]
+      }
+    }
+  ]
+}

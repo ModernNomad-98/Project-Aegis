@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "docs-as-code-architect",
+  "description": "Behavior cases for the docs pipeline: in-repo PR-reviewed docs, CI checks (link/prose/build), executable-sample testing, docs versioning, and URL stability.",
+  "cases": [
+    {
+      "id": "positive-setup-docs-as-code",
+      "type": "should_trigger",
+      "prompt": "Our docs live in a wiki nobody updates and they're always stale. Set up docs-as-code.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Moves docs into the repo so they change in the same PR as the code, with a docs CODEOWNER and PR review.",
+          "Chooses a generator/format for stated reasons (versioning/API/search needs) and designs the build/preview/deploy pipeline with per-PR previews.",
+          "Wires CI checks: buildability gate, link-checking, prose/style lint, spelling — noting blocking vs advisory.",
+          "Designs executable-sample testing so examples can't silently rot.",
+          "Hands content organization to diataxis-doc-organizer and API-reference generation to api-doc-generator-designer."
+        ]
+      }
+    },
+    {
+      "id": "positive-test-code-samples",
+      "type": "should_trigger",
+      "prompt": "Half our documentation code examples don't even compile anymore. How do we stop that?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs executable-sample testing (doctest-style or snippets included from tested source) so examples are verified in CI.",
+          "Frames untested samples as the most harmful docs and this as the highest-leverage check.",
+          "Makes the sample test part of the docs CI gate.",
+          "Avoids relying on manual review to catch rotted examples."
+        ]
+      }
+    },
+    {
+      "id": "edge-versioned-docs",
+      "type": "should_trigger",
+      "prompt": "We support three major versions and users on old versions see docs for the latest. Design versioned docs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Versions docs with the releases they describe and adds a version selector so readers pick their release.",
+          "Ensures published docs match the shipped version and single-sources version numbers/commands.",
+          "Handles URL stability across versions with redirects on moves.",
+          "Aligns docs versioning with the release process."
+        ]
+      }
+    },
+    {
+      "id": "should-not-gate-on-flaky-external-links",
+      "type": "should_trigger",
+      "prompt": "Make the docs build a required check that hard-fails whenever ANY external link returns non-200, so nothing broken ever merges.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags that hard-gating on external link liveness couples merges to third-party uptime and will block on transient outages.",
+          "Recommends sampling/soft-failing external links (or scheduled checks) while hard-gating internal links and buildability.",
+          "Preserves a meaningful required gate without making it flaky.",
+          "States the tradeoff explicitly rather than shipping a brittle gate."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-organize-content",
+      "type": "should_not_trigger",
+      "prompt": "Sort our docs into tutorials, how-to guides, reference, and explanation and fix the mislabeled ones.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke docs-as-code-architect: organizing content by Diátaxis mode is diataxis-doc-organizer.",
+          "The pipeline publishes whatever content organization exists; designing that organization is a separate job."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "onboarding-doc-designer",
+  "description": "Behavior cases for new-hire onboarding docs: framing the ramp, verified day-one setup, mental-model orientation, how-we-work capture, glossary/who-to-ask, an early-win first task, and currency.",
+  "cases": [
+    {
+      "id": "positive-design-onboarding",
+      "type": "should_trigger",
+      "prompt": "New engineers take two months to become productive on our codebase. Design proper onboarding docs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Frames the ramp with a productivity definition and day1/week1/month1 milestones.",
+          "Makes day one work: access, VERIFIED setup, and a first successful build/run as the top priority.",
+          "Gives an architecture mental model that links OUT to detail rather than reproducing the whole system.",
+          "Captures how-we-work (processes, tools, comms, unwritten norms), a glossary, and a who-to-ask map.",
+          "Designs a real first task with an early win and a currency plan, handing external-contributor docs to contribution-guide-author."
+        ]
+      }
+    },
+    {
+      "id": "positive-capture-tribal-knowledge",
+      "type": "should_trigger",
+      "prompt": "All our onboarding is one senior dev explaining things verbally over and over. Get it out of their head.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Captures the unwritten how-we-work and norms as the highest-value content.",
+          "Builds a glossary of internal terms/acronyms and a who-owns-what/who-to-ask map.",
+          "Turns the repeated verbal explanations into a first-week path with a starter task.",
+          "Adds a self-heal maintenance convention so the docs stay current."
+        ]
+      }
+    },
+    {
+      "id": "edge-orientation-not-manual",
+      "type": "should_trigger",
+      "prompt": "For onboarding, let's document the entire architecture in exhaustive detail so new people know everything on day one.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pushes back on day-one exhaustive detail: a newcomer needs a mental model they can hold, not the whole territory.",
+          "Provides an orientation sketch of the major pieces and links OUT to the detailed reference/explanation (diataxis-doc-organizer's corpus).",
+          "Sequences depth over week1/month1 rather than dumping it on day one.",
+          "Keeps day one focused on a running system and a first win."
+        ]
+      }
+    },
+    {
+      "id": "should-not-let-onboarding-rot",
+      "type": "should_trigger",
+      "prompt": "Write the onboarding once and we'll never touch it again — set it and forget it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags that onboarding docs rot fastest (setup, tools, people change) and stale onboarding is actively harmful.",
+          "Assigns a maintenance owner and adopts the 'each new hire fixes what tripped them' self-heal convention.",
+          "Identifies the rot-prone spots (setup commands, tool versions, people/ownership) to watch.",
+          "Rejects set-and-forget as a plan."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-external-contributing",
+      "type": "should_not_trigger",
+      "prompt": "Write the CONTRIBUTING guide for outside contributors: fork, branch, run checks, and open a PR.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke onboarding-doc-designer: the external contributor's fork/branch/PR journey is contribution-guide-author.",
+          "Onboarding serves an internal new hire ramping to productivity, a different audience."
+        ]
+      }
+    }
+  ]
+}

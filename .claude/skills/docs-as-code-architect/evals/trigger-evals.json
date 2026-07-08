@@ -1,0 +1,41 @@
+{
+  "skill": "docs-as-code-architect",
+  "description": "Trigger discrimination for the docs TOOLCHAIN/pipeline (this skill) vs organizing content by mode (diataxis-doc-organizer), generating API reference (api-doc-generator-designer), and the contribution-guide CONTENT (contribution-guide-author).",
+  "overlaps_with": [
+    "diataxis-doc-organizer",
+    "api-doc-generator-designer",
+    "contribution-guide-author"
+  ],
+  "cases": [
+    {
+      "id": "pipeline-wins-here",
+      "prompt": "Set up docs-as-code: in-repo docs, a generator, per-PR preview builds, CI link-checking and prose lint, tested code samples, and versioned deploys.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["diataxis-doc-organizer", "contribution-guide-author"],
+      "note": "SEAM CASE (primary) — generator, pipeline, CI checks, sample testing, and versioned publishing are the docs engineering. No content taxonomy and no guide content is being written.",
+      "reason": "Building the toolchain that keeps docs building, published, and honest is this skill's core scope."
+    },
+    {
+      "id": "content-org-goes-to-diataxis-doc-organizer",
+      "prompt": "Organize the docs into tutorials, how-to, reference, and explanation and fix the mislabeled pages.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["docs-as-code-architect"],
+      "note": "SEAM CASE (reverse) — classifying content by mode is organization, not the build.",
+      "reason": "diataxis-doc-organizer shapes the content; this skill builds the pipeline that publishes it."
+    },
+    {
+      "id": "api-reference-generation-goes-to-api-doc-generator-designer",
+      "prompt": "Generate our API reference from the OpenAPI spec and keep it in sync with the API automatically.",
+      "expected_skill": "api-doc-generator-designer",
+      "should_not_trigger": ["docs-as-code-architect"],
+      "reason": "api-doc-generator-designer designs generating reference from the API source of truth. The docs pipeline hosts the output, but the generation design is that skill's."
+    },
+    {
+      "id": "contribution-guide-content-goes-to-contribution-guide-author",
+      "prompt": "Write the CONTRIBUTING guide explaining how to set up, branch, run tests, and get a PR merged.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": ["docs-as-code-architect"],
+      "reason": "contribution-guide-author writes the human-facing guide content. This skill designs the docs contribution mechanics/infra, not the guide's prose."
+    }
+  ]
+}

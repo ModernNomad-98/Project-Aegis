@@ -33,7 +33,11 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > PM/product-engineering interface pack, and the 4-skill D12.6
 > growth/analytics engineering pack — `product-spec-writer`≠`adr-writer`,
 > `sunset-deprecation-communicator`≠`skill-deprecation-planner`, and the two
-> three-way event/analytics seams pinned in trigger-evals).
+> three-way event/analytics seams pinned in trigger-evals), and the
+> docs-engineering batch (D25, PART A of a two-PR set: the 8-skill D12.4
+> technical writing / docs engineering pack — `adr-sequencer` extends
+> `adr-writer`, `docs-retention-index`≠`skill-deprecation-planner` pinned
+> both ways, `api-doc-generator-designer`≠`api-event-architect`).
 > `_template` remains a reference template ignored by the validator.
 > Everything under "Backlog" is planned, not built.
 
@@ -694,6 +698,33 @@ ship both eval files; all edit nothing → **model-invocable**.
 | `funnel-definition-designer` | reconciliation §3 D12.6 | yes | Rigorous funnel/conversion/retention definition: steps from real events, a counting model with a pinned denominator, a stated window, order semantics, attribution, and WHERE-not-WHY discipline (causes need an experiment). Consumes `event-schema-architect`; ≠ `ab-test-designer` (causal test). |
 | `ab-test-designer` | reconciliation §3 D12.6 | yes | Designs AND reads experiments: falsifiable hypothesis, one primary metric + guardrails, power/sample-size from a practical MDE, a fixed horizon (no peeking), sticky assignment; readout with CIs, multiple-comparison/SRM/Simpson's/novelty checks, ship/kill/iterate with residual uncertainty. Pinned ≠ `feature-flag-rollout-strategist` (safety rollout). |
 | `product-analytics-instrumenter` | reconciliation §3 D12.6 | yes | The product-analytics INSTRUMENTATION: client-vs-server capture, identity at capture, consent-gating + PII minimization at the source, capture reliability, de-dup, tracking QA. THREE-way seam pinned ≠ `observability-operator` (system telemetry) ≠ `skill-usage-instrumenter` (library usage). |
+
+### Skills (D12.4 — technical writing / docs engineering pack)
+
+The 8-skill docs engineering pack (reconciliation §3 D12.4 table, built by
+D25, 2026-07-07 — PART A of the D12.4+D12.7+D12.9+D14 two-PR batch):
+durable documentation as its own discipline. Three seams are pinned in
+trigger-evals: `adr-sequencer` EXTENDS `adr-writer` (longitudinal ADR
+corpus management — composes it, does not duplicate single-record
+authoring); `docs-retention-index` ↔ `skill-deprecation-planner` (DOC
+lifecycle/retirement vs library-SKILL retirement — pinned both ways, the
+seam `skill-deprecation-planner` already referenced as "banked, not
+built"); `api-doc-generator-designer` ↔ `api-event-architect` (generated
+reference vs the API contract). All 8 ship `evals/evals.json` **and**
+`evals/trigger-evals.json`; all are authoring/design skills that produce
+docs/plans and edit nothing → **model-invocable** (`docs-retention-index`
+gates actual doc DELETION behind human approval).
+
+| Skill | Source (D12.4 / D25) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `readme-craftsman` | reconciliation §3 D12.4 | yes | The README as entry point, not manual: first-screen what/why/who, a verified quickstart, common-case usage, and routes OUT to deeper docs; resists the kitchen sink and stays maintainable. |
+| `adr-sequencer` | reconciliation §3 D12.4 | yes | Longitudinal ADR CORPUS management atop `adr-writer`: the index, status lifecycle, bidirectional superseding links, contradiction detection, new-ADR-vs-amend, append-only history (supersede, never overwrite). Composes `adr-writer` for single records. |
+| `diataxis-doc-organizer` | reconciliation §3 D12.4 | yes | Organizes the whole docs SET by the four Diátaxis modes (tutorial/how-to/reference/explanation), diagnosing actual-vs-claimed mode, splitting two-job docs, cross-linking not embedding, and setting the anti-mode-bleed discipline. |
+| `docs-as-code-architect` | reconciliation §3 D12.4 | yes | The docs TOOLCHAIN/pipeline: in-repo PR-reviewed docs, generator choice, per-PR previews, CI link/prose/build checks, executable-sample testing (the drift-killer), versioned publishing, URL stability. Not the content or its organization. |
+| `api-doc-generator-designer` | reconciliation §3 D12.4 | yes | GENERATED API reference from the source of truth (OpenAPI/GraphQL/docstrings) so it can't drift: the generated-vs-authored split, upstream enrichment, validated examples, versioning. Documents the contract `api-event-architect` owns. |
+| `contribution-guide-author` | reconciliation §3 D12.4 | yes | The zero-to-merged CONTRIBUTING guide: verified setup, the real workflow, automated standards, honest review expectations, governance + PRIVATE security disclosure, and first-contribution on-ramps. Product-agnostic. |
+| `onboarding-doc-designer` | reconciliation §3 D12.4 | yes | New-hire onboarding: the day1/week1/month1 ramp, verified setup, a mental-model orientation (not the manual), how-we-work incl. unwritten norms, a glossary + who-to-ask, an early-win first task, and a self-heal currency plan. |
+| `docs-retention-index` | reconciliation §3 D12.4 | yes | The numbered DOC-lifecycle index: retention category + reason-to-keep + superseded-by + cleanup rule per doc (mirrored in frontmatter), reverse-reference sweep, staged mark→redirect→remove with human-approved deletion. DOC counterpart to `skill-deprecation-planner` (pinned both ways). |
 
 ---
 
