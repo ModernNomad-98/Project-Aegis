@@ -532,6 +532,149 @@ gap:
     `architecture-designer`, `cloud-architecture-decider`, `saas-platform-architect`, and
     `domain-modeler`.
 
+**D12.11 SaaS Architecture Depth** *(pack added by D30, 2026-07-08; all 14:
+candidate — not built; build DEFERRED until AFTER the library-wide
+`skill-quality-reviewer` sweep — then **scheduled to BUILD AHEAD OF the D12.10
+SAST/DAST pack below**)*: net-new architecture-depth gaps surfaced by a private
+read-only deep-audit of production multi-tenant SaaS patterns plus general
+SaaS-architecture research (product-agnostic — evidenced by production
+multi-tenant SaaS patterns; no product/vendor named). Two tiers: a **STRONG
+cluster (10, build-first)** carrying strong real-world evidence, and a
+**LOW-PRIORITY set (4, scale-stage or possibly-extension)**. Each candidate
+records its scope and the exact seam(s) it must pin at build time; three
+(`usage-metering-and-cost-attribution-pipeline-designer`,
+`intra-tenant-scope-architect`, `share-link-access-architect`) are flagged
+standalone-vs-extension for `skill-quality-reviewer` to confirm at build.
+**Scheduling: this pack is positioned to build BEFORE the D12.10 SAST/DAST pack
+that follows it** — the architecture-depth gaps are foundational product
+surfaces, so when packs are pulled the strong cluster here runs first, ahead of
+D12.10.
+
+*STRONG cluster (10 — build these first when the phase is pulled):*
+
+- `command-gateway-architect` *(candidate — not built)* — design a single
+  server-side-mediated write path (a command bus): a command registry + a
+  per-command pipeline (validate → authenticate the actor from the token, never
+  from the client → authorize → server-derive tenant/resource scope from trusted
+  rows → idempotency → execute → emit audit + domain events → safe error
+  envelope), plus the "no direct client writes for protected actions" invariant.
+  SEAMS: `api-event-architect` (external contract, NOT internal dispatch),
+  `authorization-matrix-designer` (the policy it ENFORCES), `audit-log-architect`
+  (the records it emits); backlog components `validation-boundary-designer` /
+  `idempotency-first-designer`.
+- `realtime-subscription-architect` *(candidate — not built)* — design real-time
+  client delivery (WebSocket/SSE/DB-change subscriptions/presence): channel/topic
+  model, authorize-at-subscribe-time (the per-tenant + per-user leak boundary),
+  fan-out, scaling stateful connections, backpressure, reconnect/replay, presence.
+  SEAMS: `streaming-event-architect` (server-internal backbone, NOT client push),
+  `api-event-architect` (request/response + outbound webhooks),
+  `notification-webhook-ux-designer` (UX, not transport).
+- `background-job-orchestration-architect` *(candidate — not built)* — design the
+  async job/worker execution model: offload-from-request-path, worker pools,
+  scheduled/cron jobs, job idempotency + resumability/checkpointing, retry/backoff,
+  job DLQ, visibility timeouts, per-tenant fairness. SEAMS:
+  `streaming-event-architect` (transport vs execution — pin hard),
+  `performance-test-harness` / `load-test-planner` (they measure it).
+- `horizontal-scalability-reviewer` *(candidate — not built)* — review whether a
+  system can scale out: statelessness / session externalization, connection
+  pooling, sticky-session + in-memory-singleton smells, autoscaling +
+  load-balancer config, graceful shutdown/draining. SEAMS:
+  `slo-reliability-architect` (targets), `latency-budget-architect` (latency),
+  `caching-strategy-designer` (caching).
+- `search-architecture-designer` *(candidate — not built)* — design
+  search/discovery: full-text (pg `tsvector` / `pg_trgm`) vs external engine,
+  indexing pipeline + freshness, relevance/ranking, per-tenant search isolation
+  (leak boundary), faceting/pagination seam. SEAMS: `rag-security-architect`
+  (AI/vector retrieval), `multi-tenant-data-architect` (data-store scoping),
+  `pagination-cursor-designer` (pagination).
+- `file-upload-storage-architect` *(candidate — not built)* — design file/object
+  storage & upload flows: direct-vs-proxied upload, signed URLs, tenancy by
+  bucket/path prefix, size/type/content validation, malware scanning,
+  image/derivative processing, retention/lifecycle, CDN, storage-cost posture.
+  SEAMS: `pii-lifecycle-designer` (personal-data lifecycle), `rls-policy-auditor`
+  (storage RLS).
+- `usage-metering-and-cost-attribution-pipeline-designer` *(candidate — not
+  built)* — design the metering → pricing → allocation → rollup → reconciliation
+  data pipeline: a billing-safe usage-event table (no content), time-bounded rate
+  cards, exact/estimated/allocated cost entries with idempotency keys, additive
+  daily rollups, budgets + breach alerts, spend forecast, reconciliation. SEAMS:
+  `saas-cost-architect` (unit-economics/drivers — NOT the ETL; **pin hard, the
+  closest overlap**), `ai-cost-guardrail-designer` (AI budgets/rate-limits/
+  kill-switch), `operational-vs-analytical-splitter` (the rollup is an analytical
+  projection). **FLAG: standalone-vs-extension-of-`saas-cost-architect` —
+  `skill-quality-reviewer` confirms at build time.**
+- `synthetic-monitoring-architect` *(candidate — not built)* — design ongoing
+  black-box production monitoring: scheduled synthetic journeys/probes against the
+  live app + third-party deps, a hard prod-safety contract (probes must not mutate
+  prod or leak test fixtures), synthetic SLIs + alert-on-synthetic-failure,
+  canary/heartbeat probes, result capture/routing. SEAMS:
+  `performance-test-harness` / `load-test-planner` (pre-release measurement),
+  `playwright-e2e-engineer` (CI E2E, not prod-safe scheduled probes),
+  `slo-reliability-architect` (defines SLOs, not the probes),
+  `observability-operator` (white-box instrumentation vs external black-box).
+- `offline-first-sync-architect` *(candidate — not built)* — design the client
+  offline data layer: write-while-offline queue, optimistic apply + rollback on
+  server reject, conflict detection/resolution (LWW/merge/CRDT/manual), local
+  persistence, background sync, online↔offline reconciliation + integrity. SEAMS:
+  `edge-state-ux-designer` (offline/optimistic-rollback UX STATES, not the sync
+  engine), `caching-strategy-designer` (server/distributed cache),
+  `realtime-subscription-architect` (live ONLINE push).
+- `admin-console-architect` *(candidate — not built; **HIGH PRIORITY — pull
+  forward within the strong cluster**, evidenced as the most operationally mature
+  pattern in the audited portfolio)* — design the internal ops/support/superadmin
+  surface: cross-tenant read/write with mandatory audit, impersonation /
+  support-mode-as-user with hard boundaries + audit, least-privilege admin tiers
+  (view-ops vs write-ops vs superadmin), break-glass/elevation workflows, and the
+  operator control-plane (health dashboards, manual failover/retry, data-repair
+  ops). SEAMS: `authorization-matrix-designer` (owns the authz POLICY +
+  impersonation policy — this owns the CONSOLE architecture that ENFORCES it),
+  `observability-operator` (telemetry vs the action surface),
+  `agent-authorization-matrix` (AI-agent authority, not human-admin),
+  `incident-response-runbook` (reactive playbook the console's tools serve).
+
+*LOW-PRIORITY set (4 — bank as candidates, explicitly low-priority;
+standalone-vs-extension deferred to build time):*
+
+- `cell-based-architecture-designer` *(candidate — not built; **LOW** —
+  scale-stage only, most SaaS never needs it)* — cell / blast-radius partitioning
+  (self-contained stack subset, tenant→cell mapping, thin router, cell-by-cell
+  deploy, cross-cell concerns, migration). SEAMS: `saas-platform-architect`
+  (per-component isolation, not whole-stack cells), `architecture-advisor` (its
+  style menu omits cells — this fills that), `agent-containment-reviewer` (agent
+  blast-radius).
+- `data-partitioning-sharding-strategist` *(candidate — not built; **LOW** —
+  scale-stage, "don't shard prematurely")* — OLTP partitioning/sharding for write
+  scale (shard-key selection, range/hash/list partitioning, resharding a hot
+  tenant, cross-shard costs, don't-shard-prematurely gate). SEAMS:
+  `multi-tenant-data-architect` (isolation scoping, not throughput sharding),
+  `warehouse-lake-architect` (analytical partitioning),
+  `operational-vs-analytical-splitter`.
+- `intra-tenant-scope-architect` *(candidate — not built; **LOW** + **FLAG:
+  possibly an extension of `multi-tenant-data-architect` —
+  `skill-quality-reviewer` decides**)* — a second mandatory data-scoping axis
+  below the tenant (location/site/org-unit): per-user scope assignment, an RLS
+  predicate on scoped tables, scope-restricted vs tenant-wide roles, propagation,
+  and migration to add the axis live. SEAMS: `tenant-modeler` (tenant hierarchy),
+  `multi-tenant-data-architect` (`tenant_id` scoping),
+  `authorization-matrix-designer` (roles×permissions, not a row-filter dimension).
+- `share-link-access-architect` *(candidate — not built; **LOW** + **FLAG:
+  possibly an extension of `authorization-matrix-designer` —
+  `skill-quality-reviewer` decides**)* — guest/public share-link access (opaque
+  expiring/revocable tokens, guest sessions, optional password/OTP gating,
+  per-link scope, enumeration/abuse defense, audit). SEAMS:
+  `authorization-matrix-designer` (member roles, not anyone-with-the-link),
+  `api-event-architect` (API credentials/webhook signing).
+
+**Pull-forward priorities (existing backlog, NOT new D12.11 candidates)** — the
+same audit gives strong real-world evidence to pull these forward, HIGH priority,
+from their existing expansion backlogs (they are prioritization signals here, not
+part of the 14 D12.11 candidates): `idempotency-first-designer` (Phase 2 —
+"table-stakes for any mutating API"; TOP pull-forward), the unnamed
+**rate-limit-design** row (Phase 4 — general per-tenant/plan API rate limits +
+noisy-neighbor defense; needs a NAME when pulled), and
+`resilience-architecture-reviewer` (Phase 6 — circuit
+breakers/bulkheads/timeouts/graceful degradation).
+
 **D12.10 Security scanning & orchestration** *(pack added by D27, 2026-07-08; all 3:
 candidate — not built; build DEFERRED until AFTER the library-wide `skill-quality-reviewer`
 sweep and its corrections are complete)*: the library's existing security skills are
@@ -1089,6 +1232,28 @@ Aegis-d28-owasp-a09-a10
   + no-prod-without-sign-off guardrails. Build DEFERRED until AFTER the
   library-wide `skill-quality-reviewer` sweep and its corrections are
   complete. Not built.
+
+- **D30 (2026-07-08) — SaaS Architecture Depth pack (D12.11) banked as candidates
+  (candidate — not built)**, from a private read-only audit of production
+  multi-tenant SaaS patterns + SaaS-architecture research. STRONG cluster (10,
+  build-first, scheduled AHEAD of D12.10 SAST/DAST): `command-gateway-architect`,
+  `realtime-subscription-architect`, `background-job-orchestration-architect`,
+  `horizontal-scalability-reviewer`, `search-architecture-designer`,
+  `file-upload-storage-architect`,
+  `usage-metering-and-cost-attribution-pipeline-designer`,
+  `synthetic-monitoring-architect`, `offline-first-sync-architect`,
+  `admin-console-architect` (HIGH/pull-forward). LOW-PRIORITY (4, scale-stage or
+  possibly-extension): `cell-based-architecture-designer`,
+  `data-partitioning-sharding-strategist`, `intra-tenant-scope-architect` (maybe
+  extends `multi-tenant-data-architect`), `share-link-access-architect` (maybe
+  extends `authorization-matrix-designer`). Each candidate carries its seam-pins
+  for build-time. usage-metering + intra-tenant-scope + share-link flagged
+  standalone-vs-extension for `skill-quality-reviewer` to confirm at build. ALSO:
+  pull forward (HIGH) from existing backlogs — `idempotency-first-designer`
+  (Phase 2, top), rate-limit-design (Phase 4, needs naming),
+  `resilience-architecture-reviewer` (Phase 6). All product-agnostic. Build
+  DEFERRED — this pack builds after the library-wide `skill-quality-reviewer`
+  sweep, ahead of D12.10. Not built.
 main
 
 ---
