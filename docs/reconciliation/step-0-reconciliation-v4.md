@@ -434,7 +434,7 @@ pack is pulled forward.
 | **D12.1 Data engineering (P1) — ✅ all 7 built (D23, 2026-07-07)** | `schema-evolution-planner`, `streaming-event-architect`, `data-quality-monitor-designer`, `operational-vs-analytical-splitter`, `warehouse-lake-architect`, `pii-lifecycle-designer`, `data-migration-runbook-author` | Multi-tenant SaaS operational + analytical data as a first-class discipline. The `streaming-event-architect` ↔ `api-event-architect` internal-pipeline-vs-external-contract seam is pinned in trigger-evals on both directions. |
 | **D12.2 Product engineering craft (P1) — ✅ all 5 built (D24, 2026-07-07)** | `pagination-cursor-designer`, `error-taxonomy-designer`, `edge-state-ux-designer`, `notification-webhook-ux-designer`, `mobile-viewport-craft` | API/UX craft distinct from contract design (Phase 3 `api-event-architect` owns the contract; these own the craft inside it). The `api-event-architect` seam is pinned in every skill's trigger-evals; `error-taxonomy-designer` (error MODEL) ↔ `edge-state-ux-designer` (rendering the error STATE) pinned both ways. |
 | **D12.3 Performance engineering (P1) — ✅ all 6 built (D23, 2026-07-07)** | `profiling-methodology-designer`, `query-plan-reader`, `n-plus-one-detector`, `caching-strategy-designer`, `latency-budget-architect`, `frontend-perf-engineer` | Performance as an engineering discipline — distinct from the load-testing VALIDATION in D10 Tier 1 (`performance-test-harness` + `load-test-planner`, built in the same D23 batch): D12.3 designs for performance, D10 measures it — the seam is pinned in trigger-evals on BOTH sides. `latency-budget-architect` consumes (never sets) `slo-reliability-architect` targets. |
-| **D12.4 Technical writing / docs engineering (P1)** | `readme-craftsman`, `adr-sequencer` (extends shipped `adr-writer` with longitudinal ADR management), `diataxis-doc-organizer`, `docs-as-code-architect`, `api-doc-generator-designer`, `contribution-guide-author`, `onboarding-doc-designer`, `docs-retention-index` (report P1, added by D15: numbered index governing every workflow doc's lifecycle — retention category, reason-to-keep, superseded-by, cleanup rule — mirrored by per-doc retention frontmatter; documentation retirement as an approvable operation) | Durable documentation as its own discipline. |
+| **D12.4 Technical writing / docs engineering (P1) — ✅ all 8 built (D25, 2026-07-07)** | `readme-craftsman`, `adr-sequencer` (extends shipped `adr-writer` with longitudinal ADR management), `diataxis-doc-organizer`, `docs-as-code-architect`, `api-doc-generator-designer`, `contribution-guide-author`, `onboarding-doc-designer`, `docs-retention-index` (report P1, added by D15: numbered index governing every workflow doc's lifecycle — retention category, reason-to-keep, superseded-by, cleanup rule — mirrored by per-doc retention frontmatter; documentation retirement as an approvable operation) | Durable documentation as its own discipline. Three seams pinned in trigger-evals: `adr-sequencer` EXTENDS `adr-writer` (composes, no duplicate); `docs-retention-index`↔`skill-deprecation-planner` (DOC vs SKILL retirement, both ways); `api-doc-generator-designer`↔`api-event-architect` (generated reference vs contract). PART A of the D12.4+D12.7+D12.9+D14 two-PR batch. |
 | **D12.5 PM / product engineering interface (P2) — ✅ all 6 built (D24, 2026-07-07)** | `requirements-gathering-facilitator`, `product-spec-writer` (a product spec, distinct from an ADR), `roadmap-under-uncertainty-planner`, `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `sunset-deprecation-communicator` | The engineering/PM boundary. Two hard seams pinned both ways in trigger-evals: `product-spec-writer`≠`adr-writer`, and `sunset-deprecation-communicator`≠`skill-deprecation-planner` (product-feature sunset vs library-skill retirement). `feature-flag-rollout-strategist`≠`plan-entitlement-architect`/`authorization-matrix-designer`. |
 | **D12.6 Growth / analytics engineering (P2) — ✅ all 4 built (D24, 2026-07-07)** | `event-schema-architect` (analytics counterpart to `api-event-architect`), `funnel-definition-designer`, `ab-test-designer` (design AND reading of results), `product-analytics-instrumenter` | User-facing product analytics, distinct from system-facing observability (Phase 6 `observability-operator` / `slo-reliability-architect`). Two THREE-way seams pinned in trigger-evals: `event-schema-architect`≠`api-event-architect`≠`streaming-event-architect`; `product-analytics-instrumenter`≠`observability-operator`≠`skill-usage-instrumenter`. |
 | **D12.7 Staff+ IC craft (P2)** | `tech-spec-writer` (broader than an ADR), `design-review-facilitator`, `cross-team-dependency-negotiator`, `roadmap-to-commitments-translator`, `staff-scope-selector`, `promotion-packet-writer`, `phased-work-handoff-designer` (multi-stage sequenced work with binding decisions carried forward as evidence — distinct from `ai-closeout-reporter`, which reports ONE turn, and from `ai-sdlc-operating-model`, which frames the whole lifecycle) (build spec substantiated by report P9: decision-ID register carried across stages, changed-files + explicit not-touched lists, proven-invocation-command sections with tell-tale output, deviation flags) | Technical leadership without management authority. |
@@ -924,6 +924,33 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   follow the D19 squash-merge corrections. The two three-way seams
   (`event-schema-architect`, `product-analytics-instrumenter`) are the
   highest mutual-overlap risks flagged for the reviewer pass. To be checked
+  by `skill-quality-reviewer` before final trust.
+- **D25 (2026-07-07) — Technical writing / docs engineering (D12.4, 8
+  skills) built. PART A of the D12.4+D12.7+D12.9+D14 two-PR batch.**
+  140→148 skills. D12.4: `readme-craftsman`, `adr-sequencer`,
+  `diataxis-doc-organizer`, `docs-as-code-architect`,
+  `api-doc-generator-designer`, `contribution-guide-author`,
+  `onboarding-doc-designer`, `docs-retention-index`. Key seams pinned in
+  trigger-evals: `adr-sequencer` EXTENDS `adr-writer` (longitudinal ADR
+  corpus management — composes single-record authoring, does not duplicate
+  it); `docs-retention-index`≠`skill-deprecation-planner` (DOC lifecycle/
+  retirement vs library-SKILL retirement — pinned both ways, honoring the
+  seam `skill-deprecation-planner` already referenced as "banked, not
+  built", now built); `api-doc-generator-designer`≠`api-event-architect`
+  (generated reference vs the API contract it documents). Within-pack
+  seams pinned across `readme-craftsman`/`diataxis-doc-organizer`/
+  `docs-as-code-architect`/`contribution-guide-author`/
+  `onboarding-doc-designer` (entry doc vs corpus-by-mode vs pipeline vs
+  contributor-guide vs new-hire onboarding). Product-agnostic (no product/
+  company/personal names or live identifiers; placeholder paths/ids only —
+  `contribution-guide-author` designs contribution guides generically, not
+  one repo's CONTRIBUTING.md). All 8 are authoring/design skills producing
+  docs/plans and editing nothing → model-invocable; `docs-retention-index`
+  gates actual doc DELETION behind human approval (a Stop Condition), like
+  `skill-deprecation-planner` for skills. PART B (D12.7 staff-IC 7 + D12.9
+  architecture-advisor 1 + D14 framework refresh 3 = 11 skills) is a
+  separate PR branched off main-as-it-is; it does not depend on this PR
+  merging but should land after it for the count arithmetic. To be checked
   by `skill-quality-reviewer` before final trust.
 
 ---

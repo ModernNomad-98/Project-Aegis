@@ -1,0 +1,41 @@
+{
+  "skill": "docs-retention-index",
+  "description": "Trigger discrimination for DOC lifecycle/retention/retirement (this skill) vs library-SKILL retirement (skill-deprecation-planner — the pinned seam, already referenced from its side), product-feature/API sunset to users (sunset-deprecation-communicator), and corpus organization by mode (diataxis-doc-organizer).",
+  "overlaps_with": [
+    "skill-deprecation-planner",
+    "sunset-deprecation-communicator",
+    "diataxis-doc-organizer"
+  ],
+  "cases": [
+    {
+      "id": "doc-lifecycle-wins-here",
+      "prompt": "Govern our workflow docs' lifecycle: a numbered index with retention category, reason-to-keep, superseded-by, and cleanup rule, plus a safe retirement process.",
+      "expected_skill": "docs-retention-index",
+      "should_not_trigger": ["skill-deprecation-planner", "sunset-deprecation-communicator"],
+      "note": "SEAM CASE (primary) — retention categories, reason-to-keep, and staged doc retirement govern DOC lifecycle. Not a skill, not a product feature.",
+      "reason": "Governing the retention and retirement of workflow/process docs is this skill's core scope."
+    },
+    {
+      "id": "skill-retirement-goes-to-skill-deprecation-planner",
+      "prompt": "Deprecate the 'foo-analyzer' skill: reverse-link sweep across neighbor trigger-evals, mark→redirect→remove, and move its catalog/README rows to a retired record.",
+      "expected_skill": "skill-deprecation-planner",
+      "should_not_trigger": ["docs-retention-index"],
+      "note": "SEAM CASE (primary, reverse — the pinned seam) — the object is a library SKILL with a neighbor-trigger-eval reverse-link graph and catalog rows, not a workflow doc.",
+      "reason": "skill-deprecation-planner retires a library skill (it already pins docs-retention-index from its side). This skill governs docs; the reverse-link graph and registration mechanics differ."
+    },
+    {
+      "id": "product-sunset-goes-to-sunset-deprecation-communicator",
+      "prompt": "Plan how we deprecate and sunset a customer-facing feature: rationale, impact, migration path, timeline, and the communication plan.",
+      "expected_skill": "sunset-deprecation-communicator",
+      "should_not_trigger": ["docs-retention-index"],
+      "reason": "sunset-deprecation-communicator sunsets a product feature/API for external users (comms + migration). This skill governs internal doc retention, not user communication."
+    },
+    {
+      "id": "corpus-org-goes-to-diataxis-doc-organizer",
+      "prompt": "Sort our documentation into tutorials, how-to, reference, and explanation.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["docs-retention-index"],
+      "reason": "diataxis-doc-organizer classifies docs by type. This skill governs their lifecycle (keep/supersede/retire), a different axis."
+    }
+  ]
+}

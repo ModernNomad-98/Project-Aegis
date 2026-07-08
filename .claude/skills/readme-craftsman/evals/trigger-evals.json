@@ -1,0 +1,42 @@
+{
+  "skill": "readme-craftsman",
+  "description": "Trigger discrimination for the README entry-point doc (this skill) vs organizing the whole corpus (diataxis-doc-organizer), the docs pipeline (docs-as-code-architect), the contributor guide (contribution-guide-author), and new-hire onboarding (onboarding-doc-designer).",
+  "overlaps_with": [
+    "diataxis-doc-organizer",
+    "docs-as-code-architect",
+    "contribution-guide-author",
+    "onboarding-doc-designer"
+  ],
+  "cases": [
+    {
+      "id": "readme-wins-here",
+      "prompt": "Write our project's README: what it is, who it's for, a quickstart that runs, and links to the deeper docs.",
+      "expected_skill": "readme-craftsman",
+      "should_not_trigger": ["diataxis-doc-organizer", "docs-as-code-architect"],
+      "note": "SEAM CASE (primary) — the single entry-point document with first-screen framing and a quickstart is a README. No corpus taxonomy and no toolchain is being designed.",
+      "reason": "Crafting the project's front-door README is this skill's core scope; it links INTO the corpus that other skills organize and build."
+    },
+    {
+      "id": "corpus-organization-goes-to-diataxis-doc-organizer",
+      "prompt": "Sort our sprawling docs into tutorials, how-to guides, reference, and explanation, and fix the ones that are the wrong type.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["readme-craftsman"],
+      "note": "SEAM CASE — organizing a whole doc SET by Diátaxis mode is corpus organization, not the entry doc.",
+      "reason": "diataxis-doc-organizer shapes the whole documentation set. The README is one entry point that routes into it."
+    },
+    {
+      "id": "pipeline-goes-to-docs-as-code-architect",
+      "prompt": "Set up docs-as-code: the static-site generator, PR-based review, link-checking in CI, and versioned deploys.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["readme-craftsman"],
+      "reason": "docs-as-code-architect designs the docs toolchain/pipeline. This skill writes the README content, not the build system."
+    },
+    {
+      "id": "contributing-goes-to-contribution-guide-author",
+      "prompt": "Write the CONTRIBUTING guide: how to set up, branch, run tests, and get a PR reviewed and merged.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": ["readme-craftsman"],
+      "reason": "contribution-guide-author designs the contributor guide. The README links to it but is a broader front door for all readers."
+    }
+  ]
+}

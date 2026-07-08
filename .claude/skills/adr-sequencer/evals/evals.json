@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "adr-sequencer",
+  "description": "Behavior cases for ADR corpus management: index/status, bidirectional superseding, append-only history, new-vs-amend, and contradiction resolution — composing adr-writer for single records.",
+  "cases": [
+    {
+      "id": "positive-stand-up-adr-log",
+      "type": "should_trigger",
+      "prompt": "We have ~30 ADR files in a folder with inconsistent numbering and no index. Nobody knows which decisions still hold. Sort out the corpus.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds a single index/log listing every ADR with number, title, date, and current status.",
+          "Assigns a lifecycle status (proposed/accepted/rejected/deprecated/superseded) to each, resolving ambiguous ones.",
+          "Wires bidirectional superseding links where later decisions replaced earlier ones.",
+          "Makes the corpus navigable and delegates authoring of any individual record to adr-writer.",
+          "Preserves superseded ADRs as history rather than deleting them."
+        ]
+      }
+    },
+    {
+      "id": "positive-supersede-not-overwrite",
+      "type": "should_trigger",
+      "prompt": "We changed our mind on the caching decision from ADR-012. Someone wants to just edit ADR-012 to say the new thing. Handle it properly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the in-place overwrite: editing ADR-012 to change its decision erases the reasoning that was true when it was made.",
+          "Creates a NEW ADR (via adr-writer) that supersedes ADR-012, and marks ADR-012 'superseded by' the new record — bidirectional.",
+          "Keeps ADR-012 in the corpus as history with its updated status.",
+          "Distinguishes this material change (new ADR) from a mere clarification (amendment)."
+        ]
+      }
+    },
+    {
+      "id": "edge-contradiction-detection",
+      "type": "should_trigger",
+      "prompt": "I think two of our accepted ADRs contradict each other on how we do auth. Find and resolve it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Surfaces the conflicting pair of currently-accepted ADRs rather than leaving the corpus self-contradictory.",
+          "Resolves it with a new superseding/reconciling ADR (authored via adr-writer) and correct status/link updates.",
+          "Routes any contested underlying FACT to source-of-truth-reconciler, and any genuinely new architecture decision to architecture-designer, before recording.",
+          "Does not simply pick one silently."
+        ]
+      }
+    },
+    {
+      "id": "should-not-delete-superseded-adr",
+      "type": "should_trigger",
+      "prompt": "ADR-005 is superseded and just clutters the folder — let's delete it to clean up.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to delete a superseded ADR: it is still history and the trail from newer decisions back to it must survive.",
+          "Keeps it with a 'superseded by' status/link so the evolution stays traceable.",
+          "Explains that append-only history is the point of an ADR corpus.",
+          "Offers navigability improvements (grouping/tags) instead of deletion."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-author-one-adr",
+      "type": "should_not_trigger",
+      "prompt": "Write the ADR for our decision to adopt event sourcing: context, the decision, alternatives, consequences, and rollback.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke adr-sequencer: authoring one ADR's content (context/decision/alternatives/consequences/rollback) is adr-writer.",
+          "Sequencing would only enter to place and link that record within the corpus, which is not what's asked."
+        ]
+      }
+    }
+  ]
+}

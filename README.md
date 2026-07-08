@@ -80,7 +80,15 @@ feature-flag rollout, and product-sunset communication), and the 4-skill
 funnel definitions, A/B testing, and product-analytics instrumentation) —
 with `product-spec-writer`≠`adr-writer` and
 `sunset-deprecation-communicator`≠`skill-deprecation-planner` pinned hard,
-plus the two three-way event/analytics seams.
+plus the two three-way event/analytics seams. The **docs-engineering
+batch** (D25, PART A of a two-PR set) ships the 8-skill **D12.4 technical
+writing / docs engineering pack** (README craft, ADR-corpus sequencing,
+Diátaxis organization, the docs-as-code pipeline, generated API reference,
+contribution guides, new-hire onboarding, and doc-retention governance) —
+`adr-sequencer` extends `adr-writer`, `docs-retention-index` is the
+doc-lifecycle counterpart to `skill-deprecation-planner` (pinned both
+ways), and `api-doc-generator-designer` documents the contract
+`api-event-architect` owns.
 
 ## What this is
 
@@ -138,7 +146,7 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~140 shipped procedures,
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~148 shipped procedures,
   grouped by the phase categories in the catalog: operating discipline, AI-SDLC
   governance, core architecture & engineering, SaaS & tenant isolation, security &
   supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
@@ -203,6 +211,7 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | D12.8 | Operational workflow patterns (10 evidence-extracted skills — the concrete rules of the Zero-Trust Engineering Discipline, D16/D21; sourced from the workflow extraction report) | P1 | ✅ shipped (D21) |
 | D23 | Data + performance + QA-validation batch (15 = D12.1 data engineering 7 + D12.3 performance engineering 6 + D10 Tier 1 perf/load validation 2; D12.3 designs FOR performance, D10 measures it — seam pinned both sides) | P1 | ✅ shipped (D23) |
 | D24 | Product / PM / growth batch (15 = D12.2 product-engineering craft 5 + D12.5 PM/product-engineering interface 6 + D12.6 growth/analytics engineering 4; two hard seams — `product-spec-writer`≠`adr-writer`, `sunset-deprecation-communicator`≠`skill-deprecation-planner` — and the two three-way event/analytics seams pinned in trigger-evals) | P1/P2 | ✅ shipped (D24) |
+| D25 | Docs engineering batch (8 = D12.4 technical writing / docs engineering; `adr-sequencer` extends `adr-writer`, `docs-retention-index`≠`skill-deprecation-planner` pinned both ways, `api-doc-generator-designer`≠`api-event-architect`) — PART A of the D12.4+D12.7+D12.9+D14 two-PR batch | P1 | ✅ shipped (D25) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -512,6 +521,24 @@ in trigger-evals — `event-schema-architect` ≠ `api-event-architect` ≠
 | `funnel-definition-designer` | Rigorous funnel/conversion/retention definition: steps from real events, a counting model with a pinned denominator, a stated window, order semantics, attribution, and WHERE-not-WHY discipline (causes need an experiment). Consumes `event-schema-architect`; ≠ `ab-test-designer`. | auto + manual |
 | `ab-test-designer` | Designs AND reads experiments: falsifiable hypothesis, one primary metric + guardrails, power/sample-size from a practical MDE, a fixed horizon (no peeking), sticky assignment; readout with CIs, multiple-comparison/SRM/Simpson's/novelty checks, ship/kill/iterate with residual uncertainty. Pinned ≠ `feature-flag-rollout-strategist`. | auto + manual |
 | `product-analytics-instrumenter` | The product-analytics INSTRUMENTATION: client-vs-server capture, identity at capture, consent-gating + PII minimization at the source, capture reliability, de-dup, tracking QA. THREE-way seam pinned ≠ `observability-operator` (system telemetry) ≠ `skill-usage-instrumenter` (library usage). | auto + manual |
+
+D12.4 — technical writing / docs engineering (D25): durable documentation
+as its own discipline. `adr-sequencer` EXTENDS `adr-writer` (longitudinal
+ADR management, composed not duplicated); `docs-retention-index` is the
+DOC-lifecycle counterpart to `skill-deprecation-planner` (pinned both
+ways); `api-doc-generator-designer` documents the contract
+`api-event-architect` owns:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `readme-craftsman` | The README as entry point, not manual: first-screen what/why/who, a verified quickstart, common-case usage, and routes OUT to deeper docs; resists the kitchen sink and stays maintainable. | auto + manual |
+| `adr-sequencer` | Longitudinal ADR CORPUS management atop `adr-writer`: the index, status lifecycle, bidirectional superseding links, contradiction detection, new-ADR-vs-amend, and append-only history (supersede, never overwrite). Composes `adr-writer` for single records. | auto + manual |
+| `diataxis-doc-organizer` | Organizes the whole docs SET by the four Diátaxis modes (tutorial/how-to/reference/explanation), diagnosing actual-vs-claimed mode, splitting two-job docs, and setting the discipline that keeps modes from bleeding. | auto + manual |
+| `docs-as-code-architect` | The docs TOOLCHAIN/pipeline: in-repo PR-reviewed docs, generator choice, per-PR previews, CI link/prose/build checks, executable-sample testing (the drift-killer), versioned publishing, and URL stability. | auto + manual |
+| `api-doc-generator-designer` | GENERATED API reference from the source of truth (OpenAPI/GraphQL/docstrings) so it can't drift: the generated-vs-authored split, upstream enrichment, validated examples, versioning. Documents the contract `api-event-architect` owns. | auto + manual |
+| `contribution-guide-author` | The zero-to-merged CONTRIBUTING guide: verified setup, the real workflow, automated standards, honest review expectations, governance + private security disclosure, and first-contribution on-ramps. Product-agnostic. | auto + manual |
+| `onboarding-doc-designer` | New-hire onboarding: the day1/week1/month1 ramp, verified setup, a mental-model orientation (not the manual), how-we-work incl. unwritten norms, a glossary + who-to-ask, an early-win first task, and a self-heal currency plan. | auto + manual |
+| `docs-retention-index` | The numbered DOC-lifecycle index: retention category + reason-to-keep + superseded-by + cleanup rule per doc (mirrored in frontmatter), reverse-reference sweep, staged mark→redirect→remove with human-approved deletion. DOC counterpart to `skill-deprecation-planner` (pinned both ways). | auto + manual |
 
 ## Authoring a new skill
 

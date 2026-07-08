@@ -1,0 +1,41 @@
+{
+  "skill": "onboarding-doc-designer",
+  "description": "Trigger discrimination for new-hire ONBOARDING (this skill) vs the external CONTRIBUTING guide (contribution-guide-author), the README (readme-craftsman), and corpus organization by mode (diataxis-doc-organizer).",
+  "overlaps_with": [
+    "contribution-guide-author",
+    "readme-craftsman",
+    "diataxis-doc-organizer"
+  ],
+  "cases": [
+    {
+      "id": "onboarding-wins-here",
+      "prompt": "Design onboarding for a new engineer: first-week setup, an architecture orientation, how we work, a glossary, who to ask, and a starter task.",
+      "expected_skill": "onboarding-doc-designer",
+      "should_not_trigger": ["contribution-guide-author", "diataxis-doc-organizer"],
+      "note": "SEAM CASE (primary) — an internal joiner's ramp with orientation, how-we-work, and a first task is onboarding. Not external contribution and not corpus taxonomy.",
+      "reason": "Designing a new joiner's path to productivity is this skill's core scope."
+    },
+    {
+      "id": "external-contribution-goes-to-contribution-guide-author",
+      "prompt": "Write the CONTRIBUTING guide for outside contributors: setup, fork/branch/PR, running checks, and the review process.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": ["onboarding-doc-designer"],
+      "note": "SEAM CASE (primary, reverse — pin both ways) — the external contributor's fork/PR journey is a contribution guide, not internal onboarding.",
+      "reason": "contribution-guide-author serves external contributors merging a change. This skill serves an internal new hire ramping to productivity."
+    },
+    {
+      "id": "readme-goes-to-readme-craftsman",
+      "prompt": "Write the README so evaluators quickly understand what the project is and how to try it.",
+      "expected_skill": "readme-craftsman",
+      "should_not_trigger": ["onboarding-doc-designer"],
+      "reason": "readme-craftsman serves evaluators/users at the front door. Onboarding serves someone who has already joined and needs to become productive."
+    },
+    {
+      "id": "corpus-org-goes-to-diataxis-doc-organizer",
+      "prompt": "Classify all our docs into tutorials, how-to, reference, and explanation.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["onboarding-doc-designer"],
+      "reason": "diataxis-doc-organizer organizes the corpus by mode. Onboarding is an audience-defined journey that links into that corpus; it doesn't classify it."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "skill": "api-doc-generator-designer",
+  "description": "Trigger discrimination for GENERATING API reference (this skill) vs designing the API CONTRACT (api-event-architect), the general docs pipeline (docs-as-code-architect), and organizing the corpus by mode (diataxis-doc-organizer).",
+  "overlaps_with": [
+    "api-event-architect",
+    "docs-as-code-architect",
+    "diataxis-doc-organizer"
+  ],
+  "cases": [
+    {
+      "id": "api-reference-generation-wins-here",
+      "prompt": "Generate our API reference from the schema so it stays in sync, with validated examples and a version selector.",
+      "expected_skill": "api-doc-generator-designer",
+      "should_not_trigger": ["api-event-architect", "docs-as-code-architect"],
+      "note": "SEAM CASE (primary) — generating reference from the source of truth to prevent drift is API-doc generation. No contract is being designed and no general pipeline built.",
+      "reason": "Designing generated, drift-proof API reference is this skill's core scope; it documents a contract designed elsewhere."
+    },
+    {
+      "id": "contract-goes-to-api-event-architect",
+      "prompt": "Design the API contract: routes, response envelope, versioning and deprecation policy, idempotency, rate limits, and webhooks.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": ["api-doc-generator-designer"],
+      "note": "SEAM CASE (primary, reverse — cross-pack) — routes, envelopes, versioning policy, and rate limits are the contract itself, not its reference docs.",
+      "reason": "api-event-architect defines the API contract. This skill generates the reference that documents it."
+    },
+    {
+      "id": "general-pipeline-goes-to-docs-as-code-architect",
+      "prompt": "Set up the whole docs build: generator, PR previews, CI checks, and versioned deploys for all our documentation.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": ["api-doc-generator-designer"],
+      "reason": "docs-as-code-architect designs the pipeline for all docs. API-reference generation is one slice that plugs into it."
+    },
+    {
+      "id": "corpus-org-goes-to-diataxis-doc-organizer",
+      "prompt": "Organize all our docs into tutorials, how-to, reference, and explanation.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": ["api-doc-generator-designer"],
+      "reason": "diataxis-doc-organizer classifies the whole corpus by mode. This skill generates the reference mode for an API; it doesn't organize the set."
+    }
+  ]
+}
