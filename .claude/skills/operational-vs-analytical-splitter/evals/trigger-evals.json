@@ -1,0 +1,49 @@
+{
+  "skill": "operational-vs-analytical-splitter",
+  "description": "Trigger discrimination: the WHICH-workloads-move decision (this skill) vs the analytical destination's design (warehouse-lake-architect), the CDC transport (streaming-event-architect), one slow query (query-plan-reader), and cache design (caching-strategy-designer).",
+  "overlaps_with": [
+    "warehouse-lake-architect",
+    "streaming-event-architect",
+    "query-plan-reader",
+    "caching-strategy-designer"
+  ],
+  "cases": [
+    {
+      "id": "split-decision-wins-here",
+      "prompt": "Analytics, exports, and a couple of internal dashboards all hit our transactional database today. Decide what stays, what moves, and what mechanism carries each workload.",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": ["warehouse-lake-architect", "streaming-event-architect", "query-plan-reader"],
+      "reason": "The ask is the boundary decision itself — classify workloads, attribute pain, choose replica/CDC/view/cache per workload against freshness tolerance. No destination is being designed and no single query is the subject."
+    },
+    {
+      "id": "destination-design-goes-to-warehouse-lake-architect",
+      "prompt": "Design our analytical data estate: lake vs warehouse vs lakehouse, raw/staging/curated zones, file formats, and the modeling layer for the marts.",
+      "expected_skill": "warehouse-lake-architect",
+      "should_not_trigger": ["operational-vs-analytical-splitter"],
+      "note": "SEAM CASE — the splitter PRESCRIBES 'CDC into an analytical store' and stops; everything named here (zones, formats, modeling) is the destination's internal design, which the splitter never draws.",
+      "reason": "No workload placement is in question; the analytical estate's own architecture is the deliverable."
+    },
+    {
+      "id": "cdc-transport-goes-to-streaming-event-architect",
+      "prompt": "We've agreed reporting moves off the primary via change data capture. Design the CDC pipeline: capture mechanism, snapshot strategy, ordering, and schema-drift handling.",
+      "expected_skill": "streaming-event-architect",
+      "should_not_trigger": ["operational-vs-analytical-splitter"],
+      "reason": "The split verdict already exists ('we've agreed'); capture mechanics, snapshots, and drift handling are the streaming backbone's CDC design scope."
+    },
+    {
+      "id": "one-slow-query-goes-to-query-plan-reader",
+      "prompt": "This single dashboard query went from 2 seconds to 4 minutes last week. Here's the EXPLAIN output — what's wrong with it?",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": ["operational-vs-analytical-splitter"],
+      "note": "SEAM CASE — the one-bad-query escape, seen from the other side: a single regressed query with plan output in hand is plan-reading, not architecture. The splitter only enters if pain persists after the plan-level fix.",
+      "reason": "One query, plan provided, regression to diagnose — the narrowest tool wins."
+    },
+    {
+      "id": "cache-design-goes-to-caching-strategy-designer",
+      "prompt": "The pricing page recomputes the same aggregate on every request. Design the caching for it — keys, TTL, and how invalidation works when prices change.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["operational-vs-analytical-splitter"],
+      "reason": "Keys, TTLs, and invalidation are cache DESIGN. The splitter may output 'cache' as a workload's mechanism, but a request already inside that mechanism belongs to the cache designer."
+    }
+  ]
+}

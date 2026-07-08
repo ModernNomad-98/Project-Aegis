@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "operational-vs-analytical-splitter",
+  "description": "Behavior cases for the split decision: evidence-attributed pain, freshness-tolerance interrogation, cheapest-adequate mechanism choice, the one-bad-query escape, and the dashboard-on-primary refusal.",
+  "cases": [
+    {
+      "id": "positive-reporting-hurts-checkout",
+      "type": "should_trigger",
+      "prompt": "Checkout latency spikes every morning when the ops dashboards refresh, and month-end exports lock things up. Decide what moves off the production database and how.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies workloads by shape (OLTP vs OLAP vs hybrid) and attributes the observed pain to specific workloads with evidence (lock waits, correlated p99, refresh windows), not vibes.",
+          "Records an owner-confirmed freshness tolerance per analytical consumer and interrogates any real-time claims with the what-decision-changes question.",
+          "Chooses a mechanism per workload (replica / CDC to analytical store / materialized views / cache / stay) justifying each against the next-cheaper option.",
+          "Produces the split boundary with a stop-doing list and an enforcement mechanism (e.g., reporting role with no primary grants), plus a sequenced cutover with dual-run windows and consumer sign-off.",
+          "Names the handoffs: destination design to warehouse-lake-architect, CDC transport to streaming-event-architect, cache design to caching-strategy-designer."
+        ]
+      }
+    },
+    {
+      "id": "positive-new-customer-facing-analytics",
+      "type": "should_trigger",
+      "prompt": "We're adding customer-facing usage analytics to the product. Where should those queries live — the main database, a replica, or something else?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats this as a placement decision for a new read workload: classifies the expected query shapes and volume before answering.",
+          "Establishes the freshness tolerance for customer-facing usage views (typically minutes, not current-transaction) with the owner rather than assuming real-time.",
+          "Notes the tenant-facing dimension: per-tenant correctness and isolation requirements affect the mechanism choice.",
+          "Delivers a verdict with the why-not-cheaper rationale and keeps the primary protected by default."
+        ]
+      }
+    },
+    {
+      "id": "edge-one-bad-query-escape",
+      "type": "should_trigger",
+      "prompt": "Our nightly revenue report takes 40 minutes and slows everything — I think we need a warehouse. Decide the split.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs the one-bad-query check FIRST: inspects whether the pain is a single fixable query before prescribing architecture.",
+          "If the evidence points at one query with a broken plan, stops the split and routes to query-plan-reader, with re-evaluation only if pain persists after the fix.",
+          "Does not let the requester's pre-chosen solution (a warehouse) skip the evidence step — attribution precedes mechanism.",
+          "States the escape check and its result explicitly in the output."
+        ]
+      }
+    },
+    {
+      "id": "should-not-bless-dashboard-on-primary",
+      "type": "should_trigger",
+      "prompt": "Just point the new executive dashboard at the production primary for now — it's read-only, so it can't hurt anything. Sign off on that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the read-only-is-harmless premise: OLAP-shaped scans compete for IO, locks, and connections on the primary regardless of being reads.",
+          "Requires the workload to be classified and its freshness tolerance stated, then offers the cheapest adequate mechanism instead.",
+          "If a temporary exception is granted anyway, requires it to be a recorded human decision with an expiry and the stop-doing enforcement to prevent quiet permanence.",
+          "Does not sign off as requested."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-warehouse-design",
+      "type": "should_not_trigger",
+      "prompt": "The split is decided — CDC feeds our new analytical store. Design the warehouse: zones, modeling approach, partitioning, and how tenants are scoped in it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke operational-vs-analytical-splitter: the decision it owns is already made; zones, modeling, partitioning, and tenant scoping of the destination are warehouse-lake-architect's scope.",
+          "No workload classification or mechanism choice is requested anywhere in the prompt."
+        ]
+      }
+    }
+  ]
+}

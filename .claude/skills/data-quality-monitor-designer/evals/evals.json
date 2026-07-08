@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "data-quality-monitor-designer",
+  "description": "Behavior cases for data-quality monitor design: six-dimension coverage with placement and failure actions, blast-radius ranking, seasonality-aware bands, per-tenant blindness, and the silent-auto-fix refusal.",
+  "cases": [
+    {
+      "id": "positive-warehouse-quality-gates",
+      "type": "should_trigger",
+      "prompt": "Our nightly pipeline feeds the reporting warehouse and nobody trusts the numbers — design the data quality monitoring for it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Ranks datasets by blast radius (consumers and decisions affected) before designing checks, with coverage tiers rather than uniform depth.",
+          "Designs checks across all six dimensions for critical datasets — freshness, completeness/volume, uniqueness, validity, consistency/reconciliation, drift — each with placement (ingest/transform/serving), severity, owner, and one of block/quarantine/alert-and-pass.",
+          "Sources validity rules from schema/contract definitions rather than inferring them from sample data.",
+          "Defines per-dataset quality SLAs citing the consumer that needs each floor, and an explicit residual list of what is not yet covered.",
+          "Hands alert/dashboard wiring to observability-operator instead of embedding alert-platform config."
+        ]
+      }
+    },
+    {
+      "id": "positive-postmortem-what-would-have-caught-this",
+      "type": "should_trigger",
+      "prompt": "Last week a partner feed silently dropped 40% of rows for three days before anyone noticed. Design the monitors that would have caught it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the incident as a candidate check with known severity: volume expectation band per source (not just the aggregate), freshness per critical source, and source-complete checks where the producer can publish counts.",
+          "Places detection at the earliest viable stage (ingest) with a stated deadline for detection latency.",
+          "Routes the red check to a named owner with the check's own evidence as the first diagnostic.",
+          "Considers whether the aggregate masked the failure and adds the per-source/per-tenant slice accordingly."
+        ]
+      }
+    },
+    {
+      "id": "edge-seasonality-and-tenant-blindness",
+      "type": "should_trigger",
+      "prompt": "Add volume alerts on our events table — but note traffic halves on weekends, doubles at month-end, and one huge customer is most of the volume.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects fixed thresholds in favor of expectation bands derived from trailing history aware of the stated weekday/month-end seasonality.",
+          "Flags the aggregate-masks-tenant problem: the dominant customer's feed failing may not trip an aggregate band — adds a per-tenant/per-source slice for exactly that case.",
+          "Treats repeated false positives as a defect in the band with a review path, not a reason to mute the alert.",
+          "Starts new/changed bands as alert-and-pass until history supports promotion to stricter actions."
+        ]
+      }
+    },
+    {
+      "id": "should-not-design-silent-autofix",
+      "type": "should_trigger",
+      "prompt": "When rows fail validation, just have the pipeline default the bad fields to zero or drop the rows so the dashboards stay clean — design it that way.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses silent correction as a monitor failure action: coercing, defaulting, or dropping without a record destroys both the evidence and the number.",
+          "Offers quarantine instead — offending rows preserved with provenance, an owner, and a drain SLA — with repair-and-replay as the reviewed path.",
+          "States that a deliberate auto-correction for a specific field is a separately reviewed, logged transform decided by a human, never a monitor behavior.",
+          "Does not produce any design variant in which failing data disappears unrecorded."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-system-telemetry",
+      "type": "should_not_trigger",
+      "prompt": "Add latency and error-rate alerts for the ingestion service and a dashboard showing queue depth and pod restarts.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke data-quality-monitor-designer: latency, errors, saturation, and restarts are system telemetry — observability-operator implements them against slo-reliability-architect targets.",
+          "Nothing in the request asserts on data CONTENT (freshness, validity, uniqueness of rows) — the subject is service health."
+        ]
+      }
+    }
+  ]
+}

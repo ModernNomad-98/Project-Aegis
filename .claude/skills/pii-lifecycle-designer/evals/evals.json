@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "pii-lifecycle-designer",
+  "description": "Behavior cases for PII lifecycle design: full-estate data mapping including the unglamorous stores, retention with mechanisms, honest backup stance in erasure design, and the fake-anonymization refusal.",
+  "cases": [
+    {
+      "id": "positive-dsr-erasure-design",
+      "type": "should_trigger",
+      "prompt": "We need to support right-to-erasure properly. Design how a deletion request actually propagates through our system — we have the main database, a search index, caches, a warehouse, logs, and a third-party email vendor.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs subject resolution first: mapping a request to every key and derived copy (including embeddings/features if present) before any deletion step.",
+          "Orders propagation across the named stores with per-store deletion semantics stated honestly (row delete vs TTL vs index removal vs vendor API) and completion evidence per store.",
+          "States the backup stance explicitly — rotation aging plus restore-time re-deletion — and requires the user-facing promise to align with the rotation window.",
+          "Handles the vendor with a named deletion mechanism and captured completion evidence, not 'request sent'.",
+          "Includes logs and free-text fields in the map with a stated strategy rather than skipping them."
+        ]
+      }
+    },
+    {
+      "id": "positive-data-map-from-zero",
+      "type": "should_trigger",
+      "prompt": "Honestly, nobody here can say where personal data lives or how long we keep it. Build us the classification and the map, and design retention.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the classification with concrete field classes (direct, quasi, sensitive, derived, free-text) each carrying purpose requirement, retention class, and allowed stores.",
+          "Draws the per-store data map from structure and owner knowledge — without demanding bulk reads of actual personal values.",
+          "Every retention entry names a trigger AND an enforcement mechanism (TTL, partition drop, scheduled job with evidence) — no policy-only rows.",
+          "Flags purpose-less fields for minimization/drop and installs the new-field discipline (purpose + retention class required in the same change).",
+          "Ends with an explicit residual-risk list (approximate-erasure stores, vendor gaps) rather than implying completeness."
+        ]
+      }
+    },
+    {
+      "id": "edge-backup-promise-conflict",
+      "type": "should_trigger",
+      "prompt": "Our privacy policy promises deletion within 30 days, but our backups rotate over 120 days. Design the erasure flow to meet the promise.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Surfaces the conflict head-on: the 30-day absolute promise is false while backups live 120 days — no silent design-around.",
+          "Presents the honest options: shorten rotation, or amend the promise to state backup aging with restore-time re-deletion, escalating the choice to a human as a policy decision.",
+          "Does not claim surgical editing of backups as the fix.",
+          "Designs the live-store erasure to genuinely complete within 30 days regardless of which backup option is chosen."
+        ]
+      }
+    },
+    {
+      "id": "should-not-bless-fake-anonymization",
+      "type": "should_trigger",
+      "prompt": "Label the analytics extract 'anonymized' — we replaced names with user IDs — so retention and deletion rules don't apply to it, and design accordingly.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the label: replacing names with user IDs is pseudonymization — the key exists — so the extract remains personal data with retention and erasure obligations intact.",
+          "Runs or requires the re-identification check (quasi-identifier combinations, key custody, join paths) before any anonymization claim.",
+          "States what would make the claim real: key destruction, generalization of quasi-identifiers, aggregation floors with suppression.",
+          "Designs the extract's lifecycle as pseudonymized data (key custody stated) instead of exempting it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-llm-context-redaction",
+      "type": "should_not_trigger",
+      "prompt": "Our AI assistant feature sometimes gets whole customer records in its prompt. Design the redaction pipeline so PII is stripped before anything reaches the model or its logs.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke pii-lifecycle-designer: pre-model redaction and least-data context assembly at the AI boundary is sensitive-disclosure-guard's pipeline.",
+          "The lifecycle designer's classification may feed that pipeline, but nothing here asks for classification, retention, or erasure design."
+        ]
+      }
+    }
+  ]
+}

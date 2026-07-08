@@ -1,0 +1,48 @@
+{
+  "skill": "pii-lifecycle-designer",
+  "description": "Trigger discrimination: whole-estate PII lifecycle (this skill) vs AI-boundary redaction (sensitive-disclosure-guard), audit-record retention (audit-log-architect), PII-safe test data (test-data-architect), and compliance evidence/control mapping (compliance-control-foundation).",
+  "overlaps_with": [
+    "sensitive-disclosure-guard",
+    "audit-log-architect",
+    "test-data-architect",
+    "compliance-control-foundation"
+  ],
+  "cases": [
+    {
+      "id": "lifecycle-design-wins-here",
+      "prompt": "Map where personal data lives across our databases, warehouse, logs, and vendors, set retention per class, and design how erasure requests propagate — including what we tell users about backups.",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": ["sensitive-disclosure-guard", "audit-log-architect", "compliance-control-foundation"],
+      "reason": "Classification, the per-store data map, retention schedules, and propagating erasure are the lifecycle core. No AI boundary, audit schema, or auditor evidence packaging is requested."
+    },
+    {
+      "id": "ai-boundary-redaction-goes-to-sensitive-disclosure-guard",
+      "prompt": "Audit what our LLM feature puts into prompts and logs, and design the data-minimization and redaction pipeline in front of the model.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": ["pii-lifecycle-designer"],
+      "note": "SEAM CASE — same nouns (PII, redaction, minimization), different boundary: pre-model context assembly and model I/O is the disclosure guard's pipeline (OWASP LLM02). The lifecycle designer's classification is an INPUT to it; the estate-wide retention/erasure design is not being asked for.",
+      "reason": "The subject is what enters model context and its logs — the AI boundary — not where data lives estate-wide or how it dies."
+    },
+    {
+      "id": "audit-record-retention-goes-to-audit-log-architect",
+      "prompt": "Define retention and redaction rules for our audit trail — admin actions, data exports, security events — and who may read it.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": ["pii-lifecycle-designer"],
+      "reason": "The audit trail's schema, integrity, retention, and access are audit-log-architect's own design surface. The lifecycle map lists the audit log as one more store and consumes that design — it does not author it."
+    },
+    {
+      "id": "test-data-anonymization-goes-to-test-data-architect",
+      "prompt": "QA keeps copying production user data into staging for tests. Replace that with safe synthetic fixtures or an approved anonymization path.",
+      "expected_skill": "test-data-architect",
+      "should_not_trigger": ["pii-lifecycle-designer"],
+      "reason": "PII-safe TEST data — synthetic generation and the anonymization path for fixtures — is test-data-architect's explicit scope. The lifecycle designer governs production personal data, not test-fixture strategy."
+    },
+    {
+      "id": "auditor-evidence-goes-to-compliance-foundation",
+      "prompt": "For the upcoming audit, map our data-protection controls to the framework criteria and assemble the evidence showing retention and deletion actually run.",
+      "expected_skill": "compliance-control-foundation",
+      "should_not_trigger": ["pii-lifecycle-designer"],
+      "reason": "Control catalogs, criteria mapping, and evidence packaging are the compliance pack's projection work. The lifecycle design is the implementing mechanism those controls CITE — producing auditor-grade artifacts is not its job."
+    }
+  ]
+}

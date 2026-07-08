@@ -1,0 +1,49 @@
+{
+  "skill": "warehouse-lake-architect",
+  "description": "Trigger discrimination: the analytical DESTINATION's design (this skill) vs the split decision (operational-vs-analytical-splitter), CDC transport (streaming-event-architect), operational tenant data-model design (multi-tenant-data-architect), and PII rule-making (pii-lifecycle-designer).",
+  "overlaps_with": [
+    "operational-vs-analytical-splitter",
+    "streaming-event-architect",
+    "multi-tenant-data-architect",
+    "pii-lifecycle-designer"
+  ],
+  "cases": [
+    {
+      "id": "estate-design-wins-here",
+      "prompt": "Design the analytics platform: raw/staging/curated layers, how we model the marts, partitioning and formats, the catalog, and how tenants stay isolated in customer-facing analytics.",
+      "expected_skill": "warehouse-lake-architect",
+      "should_not_trigger": ["operational-vs-analytical-splitter", "streaming-event-architect", "multi-tenant-data-architect"],
+      "reason": "Zones, modeling, layout, catalog, and analytical tenant access paths are all destination-internal design — the estate architect's whole scope. No workload placement decision or transport mechanics are requested."
+    },
+    {
+      "id": "split-decision-goes-to-splitter",
+      "prompt": "Which of our reporting and export workloads should leave the transactional database, and is a replica enough or do we need a real analytical store?",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": ["warehouse-lake-architect"],
+      "note": "SEAM CASE — 'is a replica enough' is the mechanism-choice question, the splitter's core verdict. The estate architect only enters if the verdict comes back CDC-into-analytical-store.",
+      "reason": "Workload placement and mechanism choice precede destination design; designing a warehouse before this verdict is architecture for imagined consumers."
+    },
+    {
+      "id": "cdc-mechanics-go-to-streaming-event-architect",
+      "prompt": "Design the change-data-capture feed into the analytical store: log-based capture, initial snapshots without hammering the source, ordering, and what happens when someone alters a source table.",
+      "expected_skill": "streaming-event-architect",
+      "should_not_trigger": ["warehouse-lake-architect"],
+      "reason": "Capture mechanism, snapshot strategy, ordering, and schema drift are transport mechanics — the streaming backbone's CDC scope. The estate consumes the feed; it does not design it."
+    },
+    {
+      "id": "operational-tenant-scoping-goes-to-multi-tenant-data-architect",
+      "prompt": "For the operational database itself: shared tables with a tenant key or schema-per-tenant, and how does tenant context flow from request to query?",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": ["warehouse-lake-architect"],
+      "reason": "Operational-store isolation strategy and tenant-context propagation are the operational tenant data model. The estate MIRRORS that posture in analytics; it never defines it."
+    },
+    {
+      "id": "pii-rules-go-to-pii-lifecycle-designer",
+      "prompt": "Define our data retention and deletion policy for personal data — what we keep, for how long, and how erasure requests propagate everywhere including backups.",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": ["warehouse-lake-architect"],
+      "note": "SEAM CASE — the estate design APPLIES per-zone PII allowances derived from lifecycle rules; making the rules (classes, retention schedules, erasure propagation) is pii-lifecycle-designer's scope, estate or no estate.",
+      "reason": "Retention schedules and erasure propagation across all stores is PII lifecycle policy, not analytical architecture."
+    }
+  ]
+}

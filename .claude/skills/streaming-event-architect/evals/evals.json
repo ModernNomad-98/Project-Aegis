@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "streaming-event-architect",
+  "description": "Behavior cases for internal streaming backbone design: per-flow guarantee cards, honest delivery semantics, ordering-scope discipline, DLQ/replay ownership, and the exactly-once refusal.",
+  "cases": [
+    {
+      "id": "positive-new-internal-event-backbone",
+      "type": "should_trigger",
+      "prompt": "Our services call each other synchronously for everything and it's brittle. Design the internal event backbone: what should be streams vs queues, how we key things, and what happens when a consumer is down.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories and classifies flows (notification / state-transfer / command) before choosing transports, and chooses stream vs queue PER FLOW rather than one global answer.",
+          "States ordering per flow in the form 'ordered per <key>, unordered across keys' and assesses partition skew, including the tenant-hot-key risk.",
+          "Defaults delivery to at-least-once with a NAMED idempotency mechanism per consumer (dedup key + retention), never an unqualified exactly-once.",
+          "Designs the failure path per consumer group: retry policy, DLQ with owner and drain SLA, and a replay procedure whose safety precondition is the idempotency mechanism.",
+          "Includes an explicit non-guarantees section (e.g., no cross-key ordering)."
+        ]
+      }
+    },
+    {
+      "id": "positive-cdc-into-streams",
+      "type": "should_trigger",
+      "prompt": "We're adopting change data capture from our main transactional database into streams so downstream services stop polling. Design the CDC ingestion.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Compares capture mechanisms (log-based vs trigger vs polling) and justifies the choice per source store, preferring log-based where available and stating why.",
+          "Designs the initial snapshot with bounded impact on the source and a consistent snapshot-to-streaming handoff position.",
+          "Handles transaction boundaries and upstream schema drift, coordinating DDL changes with schema-evolution-planner's staged process (CDC consumers as forgotten readers).",
+          "States what downstream consumers may rely on: ordering scope, replay window, delete capture."
+        ]
+      }
+    },
+    {
+      "id": "edge-duplicate-and-out-of-order-bug",
+      "type": "should_trigger",
+      "prompt": "Payments sometimes apply twice and status updates occasionally arrive before the create event. Fix our event pipeline design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Diagnoses duplicates as at-least-once delivery meeting non-idempotent consumers, and designs the idempotency mechanism (business-key upsert or event-id dedup with stated retention) rather than chasing a no-duplicates transport.",
+          "Diagnoses the ordering symptom as a key/partition problem: create and update events must share a partition key (the entity id) to be sequenced.",
+          "Does not promise global ordering; states the guarantee scope honestly and designs consumers to tolerate what is not guaranteed.",
+          "Adds lag/DLQ observability hooks with named owners, handing wiring to observability-operator."
+        ]
+      }
+    },
+    {
+      "id": "should-not-promise-exactly-once",
+      "type": "should_trigger",
+      "prompt": "The requirement from leadership is simple: build the pipeline with guaranteed exactly-once delivery end to end, including the emails the consumer sends. Just design it that way.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to write an unqualified exactly-once guarantee into the design: end-to-end exactly-once across arbitrary external side effects (like sent emails) is not achievable.",
+          "Explains the honest decomposition: transactional produce/consume within one platform's boundary, plus idempotent effects at the edges, and where duplicate suppression actually lives for the email case.",
+          "Escalates the surviving hard requirement to a human decision rather than papering over it — a Stop Condition, not a silent redefinition.",
+          "Offers the achievable design (at-least-once + idempotency + dedup) with its residual risk stated."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-partner-webhooks",
+      "type": "should_not_trigger",
+      "prompt": "Partners need to subscribe to our order events over webhooks — design the delivery contract: envelope schema, signing, retries, and per-tenant subscriptions.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke streaming-event-architect: signed envelopes, subscription scoping, and delivery policy for EXTERNAL consumers are api-event-architect's contract surface.",
+          "The internal backbone may feed that surface, but nothing in the request asks for internal pipeline design."
+        ]
+      }
+    }
+  ]
+}

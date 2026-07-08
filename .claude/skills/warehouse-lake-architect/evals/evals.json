@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "warehouse-lake-architect",
+  "description": "Behavior cases for analytical estate design: class decided by workload/maturity, zone contracts, tenant-key carriage through every zone, PII-per-zone allowances, and the raw-PII-copy refusal.",
+  "cases": [
+    {
+      "id": "positive-first-warehouse-design",
+      "type": "should_trigger",
+      "prompt": "The split decision is made: reporting and BI move off the primary via CDC. Design our first analytical estate — we're a small team, consumers are SQL dashboards and finance reports.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Chooses the estate class from workload and team maturity — SQL-shaped consumers plus a small team points at a warehouse — and states the why-not for lake/lakehouse instead of following fashion.",
+          "Designs the three zones with per-zone owner, write authority, read audience, retention, and contract, with BI reading curated only.",
+          "Carries the tenant key through every zone and defines per-tenant access paths for anything customer-facing; cross-tenant marts are named and justified or absent.",
+          "Names ingestion per source and hands CDC transport design to streaming-event-architect; quality gates between zones reference data-quality-monitor-designer.",
+          "Provides an incremental adoption path from the current pile of extracts rather than a big-bang replacement."
+        ]
+      }
+    },
+    {
+      "id": "positive-view-sprawl-rationalization",
+      "type": "should_trigger",
+      "prompt": "We have about 400 undocumented views stacked on each other in the analytics database and three people who understand them. Give this an architecture.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the sprawl as a missing curated-layer contract problem: defines marts with owners, consumers, and freshness SLAs, and a catalog registration requirement.",
+          "Chooses modeling per mart (dimensional core vs derived wide serving views) with wide tables DERIVED from the core, never parallel-loaded.",
+          "Bounds the ad-hoc path (sandbox zone with TTL) so the shadow estate cannot regrow.",
+          "Sequences adoption incrementally, migrating the highest-consumer views first."
+        ]
+      }
+    },
+    {
+      "id": "edge-tenant-key-laundering",
+      "type": "should_trigger",
+      "prompt": "For the customer-facing usage dashboards, the plan is to aggregate everything nightly into one summary table without the tenant column — it's aggregated, so tenancy doesn't matter, right? Design the marts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects the aggregation-launders-tenancy premise: a mart serving CUSTOMER-FACING queries must keep the tenant key and a per-tenant access path mirroring the operational isolation posture.",
+          "Distinguishes declared cross-tenant marts (internal-only, justified, access-restricted) from the default tenant-scoped posture.",
+          "Requires the serving path to derive tenant identity from authenticated context, never from a client-supplied tenant id.",
+          "Designs the mart correctly (tenant-keyed, per-tenant filtered) rather than merely objecting."
+        ]
+      }
+    },
+    {
+      "id": "should-not-land-raw-pii",
+      "type": "should_trigger",
+      "prompt": "Simplest ingestion: copy the full production users table — emails, names, addresses — into the raw zone every night and keep it forever. Design the estate around that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses forever-retention raw PII as the foundation: PII allowances per zone come from pii-lifecycle-designer rules (minimization, bounded raw retention, pseudonymization in conformed, aggregation in marts).",
+          "States the erasure obligation: the layout must keep per-subject deletion achievable, and an immutable forever raw copy fails it.",
+          "Routes classification/retention rule-making to pii-lifecycle-designer rather than inventing policy inline.",
+          "Offers the compliant ingestion design (field minimization at landing, bounded raw TTL) instead of just declining."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-split-decision",
+      "type": "should_not_trigger",
+      "prompt": "Our dashboards are slowing down production. Should reporting move to a replica, a warehouse, or a cache — and which workloads go where?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke warehouse-lake-architect: choosing WHETHER and WHICH workloads leave the operational store, and by what mechanism, is operational-vs-analytical-splitter's decision.",
+          "The estate designer starts only after such a verdict exists — no zones, marts, or layouts are requested here."
+        ]
+      }
+    }
+  ]
+}
