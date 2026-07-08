@@ -19,8 +19,10 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > existing skills — OWASP Agentic Top 10, D7), and the Compliance &
 > Governance batch (the 9-skill ISO 27001 + ISO 42001 + SOC 2 pack with
 > NIST AI RMF as companion — one shared control foundation, framework
-> projections, and a crosswalk, D9) are implemented, plus the first pull
-> from the D13 library-meta scope (`skill-quality-reviewer`, D18) and the
+> projections, and a crosswalk, D9) are implemented, plus the completed
+> D13 library-meta scope (`skill-quality-reviewer`, D18; `library-diff-reviewer`,
+> `eval-runner-designer`, `skill-usage-instrumenter`, and
+> `skill-deprecation-planner`, D22) and the
 > D12.8 operational workflow patterns pack (10 evidence-extracted skills —
 > the concrete rules of the Zero-Trust Engineering Discipline, D21).
 > `_template` remains a reference template ignored by the validator.
@@ -497,25 +499,31 @@ feature's governance posture vs org-level certification readiness),
 `ai-evaluation-harness`, `slo-reliability-architect`,
 `incident-response-runbook`, and `full-codebase-auditor`.
 
-### Skills (D13 pull 1 — library meta / self-application)
+### Skills (D13 — library meta / self-application)
 
-First pull from the banked D13 scope (reconciliation §3 D13 subsection;
-decision D18): the library starts applying its own discipline to itself.
-Ships `evals/evals.json` **and** `evals/trigger-evals.json`. Pure review
-skill — produces a verdict report, edits nothing — so it is
-**model-invocable**. It COMPOSES `scripts/validate-skills.py` (runs it
-first as the entry gate; never re-implements or re-scores its mechanical
-checks) and is discriminated from `agent-governance-audit` (a change's
-process trail vs a skill definition's quality). The other four D13
-candidates (`eval-runner-designer`, `skill-usage-instrumenter`,
-`skill-deprecation-planner`, `library-diff-reviewer`) remain banked —
-candidate, not built; the trigger-evals pin the `library-diff-reviewer`
-seam now (whole skill-adding PR vs ONE skill's quality) so neither skill
-absorbs the other's scope when both exist.
+The complete D13 scope (reconciliation §3 D13 subsection; decisions D18 +
+D22): the library applies its own discipline to itself.
+`skill-quality-reviewer` shipped first (D18); the remaining four shipped
+together (D22), completing the scope. All five ship `evals/evals.json`
+**and** `evals/trigger-evals.json`, and all are pure review/design skills —
+verdicts, specs, and plans; none edits anything — so all are
+**model-invocable**. The composition web: `skill-quality-reviewer` COMPOSES
+`scripts/validate-skills.py` as its entry gate; `library-diff-reviewer`
+composes `skill-quality-reviewer` as its single-skill inner loop (the seam
+pinned at D18, now owned from both sides); `eval-runner-designer` designs
+execution for the eval corpus whose case INTEGRITY `skill-quality-reviewer`
+judges; `skill-usage-instrumenter` produces the evidence package
+`skill-deprecation-planner` consumes; and `skill-deprecation-planner`'s
+doc-lifecycle twin (`docs-retention-index`, D12.4) stays banked with the
+SKILL-vs-DOC seam pinned in trigger-evals.
 
 | Skill | Source (D13) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `skill-quality-reviewer` | reconciliation §3 D13 — highest-leverage candidate, pulled first per the D13 standing rule | yes | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the FULL shipped corpus (colliders NAMED), duplication/extension (LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. |
+| `skill-quality-reviewer` | reconciliation §3 D13 — highest-leverage candidate, pulled first per the D13 standing rule (D18) | yes | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the FULL shipped corpus (colliders NAMED), duplication/extension (LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. |
+| `library-diff-reviewer` | reconciliation §3 D13 (D22) — the PR-level counterpart whose seam was pinned at D18 | yes | Reviews a whole library-changing PR end-to-end: fresh validator evidence pinned to the PR head, registration consistency (placement, post-merge voice, banked-candidate graduation, count arithmetic at EVERY site), collision sweep against the shipped corpus AND in-batch siblings, diff coherence (nothing smuggled in), per-skill quality via `skill-quality-reviewer` as the inner loop. One approve/request-changes verdict; performs no platform action. |
+| `eval-runner-designer` | reconciliation §3 D13 (D22) — closes the design gap D3 left open ("there is no eval runner yet") | yes | Designs how the eval corpus would actually EXECUTE: per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with JUDGE-ERROR honesty, UNRUN-default reporting, cost/sampling tiers, flake policy (repeats + quorum + visible quarantine), advisory-first CI. Design/spec only — never claims a runner exists or that evals pass. |
+| `skill-usage-instrumenter` | reconciliation §3 D13 (D22) — usage telemetry design: invoked vs unused, wrong-fire evidence | yes | Designs the library's usage-evidence layer: invocation signals (auto vs explicit, coarse enums only — never prompt content or user identifiers), wrong-fire/correction events, computed never-fired lists over a stated window, evidence tiers (host-recorded vs self-reported), thresholds that name an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. |
+| `skill-deprecation-planner` | reconciliation §3 D13 (D22) — safe skill sunset: mark, redirect, remove | yes | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record — never silently deleted. Plan only; every stage is human-approved. |
 
 ### Skills (D12.8 — operational workflow patterns pack)
 
@@ -673,13 +681,13 @@ batch maps controls that largely already exist (Phases 3/4, the Phase 5
 evidence pack, Phase 1.5 + Phase 7 AI governance) and produces
 auditor-grade evidence on top.
 
-### D13 — Library meta / self-application (banked; first pull implemented)
-`skill-quality-reviewer` ✅ **implemented** (D18) — moved to
-[Implemented → Skills (D13 pull 1)](#skills-d13-pull-1--library-meta--self-application)
-above. The remaining four D13 candidates (`eval-runner-designer`,
-`skill-usage-instrumenter`, `skill-deprecation-planner`,
-`library-diff-reviewer`) stay banked — candidate, not built. Source: the
-reconciliation doc §3 D13 subsection + D13/D18 in §5.
+### D13 — Library meta / self-application (fully implemented)
+All 5 skills ✅ **implemented** — `skill-quality-reviewer` (D18), then
+`library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`,
+and `skill-deprecation-planner` (D22, 2026-07-07, completing the scope) —
+moved to
+[Implemented → Skills (D13)](#skills-d13--library-meta--self-application)
+above. Source: the reconciliation doc §3 D13 subsection + D13/D18/D22 in §5.
 
 ### D12.8 — Operational workflow patterns (evidence-extracted; implemented)
 All 10 skills ✅ **implemented** (D21, 2026-07-07) — moved to

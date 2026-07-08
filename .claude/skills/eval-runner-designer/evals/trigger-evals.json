@@ -1,0 +1,47 @@
+{
+  "skill": "eval-runner-designer",
+  "description": "Trigger discrimination: designing how skill evals EXECUTE (this skill) vs judging whether eval cases are real or hollow (skill-quality-reviewer), evaluating an AI product feature's behavior (ai-evaluation-harness), product test automation strategy (qa-automation-architect), and real-session usage measurement (skill-usage-instrumenter — field signal vs deliberate lab exercise).",
+  "overlaps_with": [
+    "skill-quality-reviewer",
+    "ai-evaluation-harness",
+    "qa-automation-architect",
+    "skill-usage-instrumenter"
+  ],
+  "cases": [
+    {
+      "id": "runner-execution-design-wins-here",
+      "prompt": "Our evals are structural-only — present and parsing, never executed. Spec out the harness that would actually run each case against a model and score the results.",
+      "expected_skill": "eval-runner-designer",
+      "should_not_trigger": ["skill-quality-reviewer", "ai-evaluation-harness", "qa-automation-architect"],
+      "reason": "The ask is the execution harness for the library's own eval corpus — session setup, scoring, reporting, cost. No judgment on case quality is requested, no product feature is being evaluated, no product test pyramid is in scope."
+    },
+    {
+      "id": "case-integrity-goes-to-skill-quality-reviewer",
+      "prompt": "Look at this skill's evals.json — are these cases real boundary tests, or hollow filler that just restates the workflow?",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": ["eval-runner-designer"],
+      "reason": "Whether the CASES are genuine (real edge, contested should-not-trigger, refusal with teeth) is eval INTEGRITY — skill-quality-reviewer's check 4, judged structurally from the case text. The runner designer takes case content as given and designs how it would execute."
+    },
+    {
+      "id": "product-feature-evals-go-to-evaluation-harness",
+      "prompt": "We're shipping an LLM-powered summarizer — build the eval plan: golden sets, red-team prompts, quality scoring, and regression runs on prompt changes.",
+      "expected_skill": "ai-evaluation-harness",
+      "should_not_trigger": ["eval-runner-designer"],
+      "reason": "Evaluating an AI FEATURE's behavior (quality, safety, regression of a product capability) is ai-evaluation-harness. eval-runner-designer's subject is the skill library's own trigger/behavior evals and their missing runner — not product model behavior."
+    },
+    {
+      "id": "product-test-automation-goes-to-qa-architect",
+      "prompt": "Design our automated test strategy — unit, integration, and E2E layers, what runs on PR vs nightly, and how CI gates merges.",
+      "expected_skill": "qa-automation-architect",
+      "should_not_trigger": ["eval-runner-designer"],
+      "reason": "A product codebase's test-automation architecture is qa-automation-architect. Superficially similar vocabulary (suites, CI lanes, gating) — but the subject is product tests, not a skill library's eval corpus."
+    },
+    {
+      "id": "field-usage-goes-to-usage-instrumenter",
+      "prompt": "Never mind designed test prompts — I want to know which skills actually fire during real work sessions, and which never trigger at all.",
+      "expected_skill": "skill-usage-instrumenter",
+      "should_not_trigger": ["eval-runner-designer"],
+      "reason": "Real-session invocation signal is field measurement (skill-usage-instrumenter). The runner designer covers deliberate exercise of authored cases in a lab harness; 'which skills fire in practice' is the other side of that line."
+    }
+  ]
+}

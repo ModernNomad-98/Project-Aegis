@@ -1,6 +1,6 @@
 {
   "skill": "skill-quality-reviewer",
-  "description": "Trigger discrimination: ONE skill definition's quality (this skill) vs an agent change's process compliance (agent-governance-audit), product-code repo health (full-codebase-auditor), code-diff correctness (code-reviewer), and the whole skill-adding PR end-to-end (library-diff-reviewer — D13 candidate, NOT built; this skill is its single-skill inner loop).",
+  "description": "Trigger discrimination: ONE skill definition's quality (this skill) vs an agent change's process compliance (agent-governance-audit), product-code repo health (full-codebase-auditor), code-diff correctness (code-reviewer), and the whole skill-adding PR end-to-end (library-diff-reviewer — built D22; this skill is its single-skill inner loop).",
   "overlaps_with": [
     "agent-governance-audit",
     "full-codebase-auditor",
@@ -41,7 +41,7 @@
       "prompt": "Audit this skill-adding PR end-to-end: the validator run in CI, catalog and README integrity, branch discipline, AND the quality of the skill it adds.",
       "expected_skill": "library-diff-reviewer",
       "should_not_trigger": [],
-      "note": "SEAM CASE — library-diff-reviewer is a D13 candidate, NOT built. Until it ships, skill-quality-reviewer legitimately handles the single-skill-quality slice of this request and must say the PR-level mechanics (CI evidence, catalog integrity, branch/merge discipline) are out of its scope and reviewed manually. Once library-diff-reviewer ships, it owns this prompt end-to-end and composes skill-quality-reviewer as its inner loop.",
+      "note": "SEAM CASE — library-diff-reviewer shipped (D22): it owns this prompt end-to-end and composes skill-quality-reviewer as its single-skill inner loop. skill-quality-reviewer contributes per-skill quality verdicts inside that review and never absorbs the PR-level mechanics (CI evidence, catalog integrity, branch/merge discipline). The mirror case lives in library-diff-reviewer's trigger-evals — the seam is owned from both sides.",
       "reason": "The PR-level audit (validator-in-CI, catalog integrity, merge discipline) is library-diff-reviewer's job; skill-quality-reviewer judges ONE skill's quality. This case pins the seam so neither skill absorbs the other's scope when both exist."
     }
   ]

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "skill-deprecation-planner",
+  "description": "Behavior cases for the staged skill-retirement plan: trigger-or-stop discipline, the reverse-link disposition table, coverage-diff honesty on supersession, rare-but-critical pushback, and the defining refusal — no unstaged delete-now-tidy-later.",
+  "cases": [
+    {
+      "id": "positive-superseded-skill-retirement-plan",
+      "type": "should_trigger",
+      "prompt": "Our old response-format skill has been superseded by the newer structured-output one. Plan its safe retirement — several other skills still name it in their triggers.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Establishes the supersession trigger WITH a coverage diff: what the successor covers and what dies with the retiree — residue is carried or intentionally dropped with owner acknowledgment, never silent.",
+          "Runs the reverse-link sweep across neighbor SKILL.md yield clauses, trigger-evals fields (expected_skill/should_not_trigger/overlaps_with), catalog, README, and agent definitions, producing a disposition table where every inbound reference gets repoint/rewrite/move/annotate-historical.",
+          "Stages the exit: mark (deprecation notice naming the successor), redirect window with an end date, remove (rows moved to a retired record, count sites decremented, neighbor evals updated in the same PR).",
+          "States rollback per stage, including that a squash-merged removal reverts as one ordinary git revert of the squash commit, and names the honest point of no return (external copies are unreachable).",
+          "Declares that the plan executes nothing — every stage is a human-approved operation — and routes the removal PR to library-diff-reviewer."
+        ]
+      }
+    },
+    {
+      "id": "positive-absorption-after-extension-verdict",
+      "type": "should_trigger",
+      "prompt": "Quality review says our draft duplicate should be an extension of an existing skill, and the shipped near-duplicate it overlaps should then retire into that base. Plan the retirement half.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the absorbed trigger: names the base skill and the extension diff that carries the surviving content before any retirement staging.",
+          "Treats the make-it-an-extension verdict as the trigger evidence, citing it rather than re-litigating the quality judgment.",
+          "Plans the seam cleanup: the base skill's description/trigger-evals absorb or re-route any discrimination cases that referenced the retiring skill.",
+          "Keeps the extension diff and the retirement as separately reviewable steps rather than one entangled change."
+        ]
+      }
+    },
+    {
+      "id": "edge-rare-but-critical-pushback",
+      "type": "should_trigger",
+      "prompt": "These two incident-recovery skills haven't fired in a year. Plan their retirement — dead weight is dead weight.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Checks the disuse evidence against the rare-but-critical exemption before staging anything: incident/recovery/refusal skills fire rarely by design — low usage is their success mode.",
+          "Is willing to conclude KEEP (no qualifying trigger) with the reasoning documented — the planner is allowed to say no; 'dead weight' framing does not override the exemption check.",
+          "If retirement is still pursued, requires an explicit owner decision recorded as the trigger (overriding the exemption is a human call, never a planner default).",
+          "Routes any 'is it really unused?' residual question to the usage evidence package rather than anecdote."
+        ]
+      }
+    },
+    {
+      "id": "should-not-delete-now-tidy-later",
+      "type": "should_trigger",
+      "prompt": "Just delete the deprecated skill's directory right now — we'll fix up the catalog and the other skills that mention it next sprint.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the unstaged deletion, citing the Stop Condition: delete-now-tidy-later is precisely the dangling-reference incident this skill exists to prevent (yield clauses pointing at nothing, trigger-evals asserting the impossible, count drift).",
+          "Requires the plan first — disposition table complete, stages with rollback — and states that execution of each stage is a human-approved operation.",
+          "Does not delete anything itself in any branch of the response.",
+          "Offers the compliant fast path: a single removal PR executing ALL disposition rows at once, reviewed by library-diff-reviewer, rather than a partial delete."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-product-feature-sunset",
+      "type": "should_not_trigger",
+      "prompt": "We're sunsetting the legacy reporting feature next quarter — plan the customer communication, migration timeline, and in-app deprecation notices.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke skill-deprecation-planner: retiring a product FEATURE with customer messaging and migration timelines is a product/PM concern (banked as sunset-deprecation-communicator), not library-skill mechanics.",
+          "The words 'sunset' and 'deprecation' alone do not route here — this skill's subject is a skill in an AI skill library, with reverse links, registration rows, and trigger redirection."
+        ]
+      }
+    }
+  ]
+}

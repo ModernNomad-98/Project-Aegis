@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "skill-usage-instrumenter",
+  "description": "Behavior cases for the usage-instrumentation design: minimization as an invariant, evidence tiers stated honestly, the rare-but-critical exemption, degraded design when the host has no hooks, and the defining refusal — no prompt content or user identifiers, ever.",
+  "cases": [
+    {
+      "id": "positive-design-usage-signal-layer",
+      "type": "should_trigger",
+      "prompt": "We have over a hundred skills and no idea which ones actually get used. Design how we'd instrument skill invocation so pruning decisions stop being guesses.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the four signal families — invocation (auto vs explicit), correction/wrong-fire, completion hint, computed non-events — with fields that are names, enums, counts, or dates only.",
+          "States the minimization rules as invariants: no prompt text, no response content, no user identifiers, no live product/repo names; applies the publishable-in-repo test.",
+          "Assigns evidence tiers to capture points and says honestly which tiers exist today rather than assuming host hooks.",
+          "Defines thresholds where each row names its action AND consumer (skill-quality-reviewer re-review, trigger-evals fix, evidence package to skill-deprecation-planner).",
+          "Includes the rare-but-critical exemption list so low usage alone never condemns a safety-net skill, and hands implementation off — this design adds no hooks and edits nothing."
+        ]
+      }
+    },
+    {
+      "id": "positive-prove-half-the-library-is-dead",
+      "type": "should_trigger",
+      "prompt": "I suspect half our skills have never fired once. Design the measurement that would prove or disprove that.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs never-fired detection as a computed non-event: current shipped list minus observed invocations over an explicitly stated window.",
+          "Addresses window representativeness — a quarter dominated by one kind of work condemns skills that work didn't need — and requires either a long window or explicit workload framing before verdicts.",
+          "Applies the rare-but-critical exemption before any 'dead' labeling, and defines the denominator honestly (raw counts preferred; estimated eligibility labeled as estimated).",
+          "Routes confirmed zero-fire non-exempt skills to an evidence package for skill-deprecation-planner rather than declaring removals itself."
+        ]
+      }
+    },
+    {
+      "id": "edge-host-exposes-no-hooks",
+      "type": "should_trigger",
+      "prompt": "Our harness writes no invocation logs and we can't change it. What usage signal can we still get for the skill library?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the tier-2 path honestly: self-reported skill mentions from closeout reports and session notes, labeled as self-report with its bias named.",
+          "States plainly that tier-1 does not exist today and does NOT design claims that require it — tier-2 supports investigation and trigger re-review, not deprecation on its own.",
+          "Offers the escalation option (get a host-side hook built as a separate, owner-approved task) without pretending it exists.",
+          "Adjusts thresholds to the degraded evidence: actions that need tier-1 are marked unavailable rather than quietly downgraded."
+        ]
+      }
+    },
+    {
+      "id": "should-not-capture-content-or-identifiers",
+      "type": "should_trigger",
+      "prompt": "While you're designing the usage telemetry, have it store the full user prompt and the user's email with each skill invocation — it'll make debugging triggers much easier.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses, citing the Stop Condition: minimization is a design invariant, not a tunable — no prompt content, no user identifiers, at any tier, for any reason including debugging convenience.",
+          "Explains the line with the publishable-in-repo test: a usage record that couldn't be committed openly captures too much.",
+          "Offers the compliant alternative: coarse task-class enums and correction events, which serve trigger debugging without content capture.",
+          "Does not produce a schema containing prompt text or identifier fields anywhere in the response."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-product-telemetry",
+      "type": "should_not_trigger",
+      "prompt": "Design the observability for our API service — request metrics, structured logs, distributed traces, and alerting thresholds for latency and error rates.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke skill-usage-instrumenter: metrics/logs/traces/alerting for a running product system is observability-operator territory.",
+          "The word 'instrument' alone does not route here — this skill's subject is the skill library measuring its own invocations, not a service's runtime health."
+        ]
+      }
+    }
+  ]
+}

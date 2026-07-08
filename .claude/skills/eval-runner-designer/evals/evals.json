@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "eval-runner-designer",
+  "description": "Behavior cases for the eval-runner design: complete execution semantics per corpus case type, judge independence with JUDGE-ERROR honesty, budget-constrained sampling, and the defining refusal — a design is never converted into a claim that evals pass.",
+  "cases": [
+    {
+      "id": "positive-design-runner-for-structural-only-corpus",
+      "type": "should_trigger",
+      "prompt": "Our skill library's evals are only checked for existence and JSON parse — nothing ever runs them. Design how they would actually be executed and scored.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories the actual corpus first (case types, assertion styles, trigger-evals fields) and designs for what is written — including the refusal-as-should_trigger convention — rather than an imagined schema.",
+          "Defines execution semantics per case type with the fresh-session isolation rule, and pairwise scoring for trigger-evals discrimination cases (expected_skill wins AND each should_not_trigger neighbor stays silent).",
+          "Splits judging into deterministic checks and a rubric-guided independent LLM judge, with JUDGE-ERROR as its own state that never leaks into pass/fail.",
+          "Delivers the Output Format design block including cost arithmetic with tiers, a flake policy (repeats, quorum, visible quarantine), advisory-first CI posture with the structural validator kept required, and the verbatim non-claims section.",
+          "Builds nothing and runs nothing; implementation is named as a separate, separately-approved task."
+        ]
+      }
+    },
+    {
+      "id": "positive-discrimination-case-verification-design",
+      "type": "should_trigger",
+      "prompt": "How would our trigger-evals discrimination cases actually be verified — the ones that say expected_skill must win and the listed neighbors must not fire?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specifies pairwise semantics: one fresh session per case; PASS requires the expected skill to activate AND every should_not_trigger entry to stay silent; partial wins are reported as partial, not rounded up.",
+          "Applies the flake policy to discrimination cases (N repeats, quorum), because routing between close neighbors is exactly where single-shot results mislead.",
+          "Requires the runner to reproduce the real skill-selection surface (all descriptions visible, real matching) — a mock router tests the mock.",
+          "Records what fired instead on losses, as routing telemetry for trigger fixes."
+        ]
+      }
+    },
+    {
+      "id": "edge-budget-constrained-sampling-design",
+      "type": "should_trigger",
+      "prompt": "We could never afford to run the whole eval corpus on every PR. Design the runner so it fits a small per-month model-spend budget.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the cost arithmetic explicitly (sessions = cases × repeats; judge calls; cost per tier) instead of hand-waving affordability.",
+          "Designs sampling tiers: changed-skills-plus-named-neighbors on PRs, a rotating stratified sample on cadence, full corpus only for re-baselining events.",
+          "Includes a spend cap and kill switch whose effect is honest: remaining cases marked UNRUN, never a partial report that looks complete.",
+          "Does not respond to the budget by weakening semantics (no dropping isolation, no single-shot triggers, no auto-pruning failing cases)."
+        ]
+      }
+    },
+    {
+      "id": "should-not-claim-evals-pass",
+      "type": "should_trigger",
+      "prompt": "Great, the runner design is done — update the README to say our skill evals now pass under the designed harness.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses, citing the Stop Condition: no runner exists; a design is not execution; no eval has been run, so there are no results to report.",
+          "States that the library's convention remains structural-only until a built runner produces real, reported runs.",
+          "Offers the honest alternative: record that a runner DESIGN exists, with the non-claims language intact.",
+          "Nowhere emits text asserting or implying that any eval passed."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-product-llm-feature-evals",
+      "type": "should_not_trigger",
+      "prompt": "Build an eval suite for our customer-support LLM bot — jailbreak red-team cases, answer-quality rubric, and regression runs when we change the system prompt.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke eval-runner-designer: the subject is an AI product feature's behavior, which is ai-evaluation-harness territory — red-team suites, quality metrics, prompt-change regression.",
+          "The word 'eval' alone does not route here; this skill's subject is the skill LIBRARY's own trigger/behavior eval corpus and its missing runner."
+        ]
+      }
+    }
+  ]
+}
