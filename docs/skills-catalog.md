@@ -22,9 +22,13 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > projections, and a crosswalk, D9) are implemented, plus the completed
 > D13 library-meta scope (`skill-quality-reviewer`, D18; `library-diff-reviewer`,
 > `eval-runner-designer`, `skill-usage-instrumenter`, and
-> `skill-deprecation-planner`, D22) and the
+> `skill-deprecation-planner`, D22), the
 > D12.8 operational workflow patterns pack (10 evidence-extracted skills —
-> the concrete rules of the Zero-Trust Engineering Discipline, D21).
+> the concrete rules of the Zero-Trust Engineering Discipline, D21), and the
+> data/performance/QA-validation batch (D23: the 7-skill D12.1 data
+> engineering pack, the 6-skill D12.3 performance engineering pack, and the
+> 2 D10 Tier 1 performance/load validation skills — D12.3 designs FOR
+> performance, D10 measures it).
 > `_template` remains a reference template ignored by the validator.
 > Everything under "Backlog" is planned, not built.
 
@@ -555,6 +559,75 @@ manual-only.
 | `merge-is-deploy-governance` | P7 | yes | Standing governance when merge==deploy: documented reality (incl. what does NOT auto-deploy), PR validation promoted to the authoritative gate, post-merge demoted to verification, branch-protection config recorded in-repo (human-only changes), stated exposure window, revert-PR rollback with strategy-correct mechanics (squash ⇒ ordinary `git revert <sha>`). |
 | `gated-deployment-prompt-template` | P11 | yes | Reusable operator prompt for recurring risky ops: placeholders only (no live identifiers; env-var names for credentials), hard rules with required inputs, stop conditions with safe halt states, backup-then-verify gating, per-phase smoke expectations, required per-run report, ETA ranges anchored to a deployment-history index; uncited claims labeled "unverified". |
 
+### Skills (D12.1 — data engineering pack)
+
+The 7-skill data engineering pack (reconciliation §3 D12 table, built by D23,
+2026-07-07): multi-tenant operational + analytical data as a first-class
+discipline. All 7 ship `evals/evals.json` **and** `evals/trigger-evals.json`;
+all are design/plan/verdict skills that edit nothing → **model-invocable**.
+The pack's decision chain: `operational-vs-analytical-splitter` decides WHAT
+leaves the operational store; `streaming-event-architect` designs the CDC/
+event transport it prescribes (internal pipeline only — the external contract
+stays with `api-event-architect`, the batch's highest-risk seam, pinned both
+ways); `warehouse-lake-architect` designs the analytical destination;
+`data-quality-monitor-designer` watches the data content;
+`pii-lifecycle-designer` overlays personal-data lifecycle rules estate-wide;
+`schema-evolution-planner` sequences live schema change; and
+`data-migration-runbook-author` turns approved plans into operator-executable
+runbooks (consuming `secure-migration-reviewer` verdicts and
+`rollback-runbook-author` conventions, executing nothing).
+
+| Skill | Source (D12.1 / D23) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `schema-evolution-planner` | reconciliation §3 D12.1 | yes | Staged expand → migrate → contract plans for live-store schema change: per-stage old×new compatibility guarantees, consumer enumeration incl. events + analytics extracts, verification gates per stage, deprecation register, rollback per stage. Plans only; runbook and safety review are named handoffs. |
+| `streaming-event-architect` | reconciliation §3 D12.1 | yes | INTERNAL event/stream backbone: per-flow stream-vs-queue, keys with honest ordering scope ("per key, unordered across keys"), at-least-once + idempotent consumers ("exactly-once" interrogated), DLQ with owner + replay, retention vs compaction, event-schema compatibility, CDC. External webhooks/feeds stay with `api-event-architect`. |
+| `data-quality-monitor-designer` | reconciliation §3 D12.1 | yes | Data-content checks across six dimensions (freshness, volume, uniqueness, validity, consistency, drift) placed at ingest/transform/serving, each with severity, owner, and block/quarantine/alert-and-pass action — never silent auto-fix; per-dataset quality SLAs; alert wiring handed to `observability-operator`. |
+| `operational-vs-analytical-splitter` | reconciliation §3 D12.1 | yes | Decides which workloads leave the transactional store and how (replica / CDC→analytical / materialized views / cache) against owner-stated freshness tolerance, with evidence-attributed pain, the one-bad-query escape to `query-plan-reader`, a stop-doing list with enforcement, and staged cutover. |
+| `warehouse-lake-architect` | reconciliation §3 D12.1 | yes | The analytical estate: warehouse/lake/lakehouse by workload + team maturity, raw→conformed→curated zones with contracts, dimensional-vs-wide modeling + SCD policy, tenant key mandatory in every zone with per-tenant access for customer-facing analytics, PII per lifecycle rules, partitioning/formats, catalog governance, cost posture. |
+| `pii-lifecycle-designer` | reconciliation §3 D12.1 | yes | Personal-data lifecycle estate-wide: classification, per-store data map (incl. logs, caches, vector stores, backups, vendors), minimization, retention with enforcement mechanics, erasure that PROPAGATES with an honest backup stance, anonymization-vs-pseudonymization with re-identification checks, residency. |
+| `data-migration-runbook-author` | reconciliation §3 D12.1 | yes | Operator-executable data-move runbooks: prerequisites (approved plan + safety review + VERIFIED backup), signal-tuned batching with idempotent resume, per-batch verification with expected outputs, numeric abort criteria naming safe halt states, rollback per stage, no-return points flagged for human approval. Authors documents; executes nothing. |
+
+### Skills (D12.3 — performance engineering pack)
+
+The 6-skill performance engineering pack (reconciliation §3 D12 table, built
+by D23, 2026-07-07): performance as an engineering discipline — these skills
+**design FOR performance**; the D10 pair below **measures** it (the seam is
+pinned in trigger-evals on both sides). All 6 ship both eval files; all are
+design/analysis skills that edit nothing → **model-invocable**.
+`profiling-methodology-designer` attributes unexplained time and hands
+findings to the narrow tools: `query-plan-reader` (one heavy query) vs
+`n-plus-one-detector` (many fast queries — the sibling seam), and
+`frontend-perf-engineer` (the browser's share). `latency-budget-architect`
+allocates targets it CONSUMES from `slo-reliability-architect` (never sets
+them); `caching-strategy-designer` never caches authorization results by
+default and defers a new cache store's isolation to
+`multi-tenant-data-architect`.
+
+| Skill | Source (D12.3 / D23) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `profiling-methodology-designer` | reconciliation §3 D12.3 | yes | Where-does-time-go methodology: attribution level first (trace / on-CPU / off-CPU / allocation — low utilization means WAITING), measurement conditions (warm/cold, representative load + volume, overhead budget), narrowing loop with stop rule and ruled-out register, handoff map. Production attach = approval-gated; fixes nothing. |
+| `query-plan-reader` | reconciliation §3 D12.3 | yes | ONE query's plan → ranked verdict: dominant cost node, estimate-vs-actual divergence first (statistics refresh is the cheapest fix), sargability rewrites, composite indexes priced in write amplification, tenant/row-security predicate cost read, re-verification at representative volume. |
+| `n-plus-one-detector` | reconciliation §3 D12.3 | yes | Chatty data-access patterns (N+1, repeated identical, serial awaits, over-fetch) evidenced by per-request counts, fixed by pattern (eager/preload, batched loaders memoized per REQUEST scope — a tenant-leak boundary), guarded by query-count budgets in tests. Refuses the cache-the-storm reflex. |
+| `caching-strategy-designer` | reconciliation §3 D12.3 | yes | What/where/how-it-stays-correct caching: written consistency envelope per item, invalidation before shipping (backstop TTL always), tenant-qualified keys as a correctness boundary, stampede + cold-start protection, failure semantics, hit-ratio targets with a removal trigger. Authorization results never cached by default. |
+| `latency-budget-architect` | reconciliation §3 D12.3 | yes | End-to-end target → per-hop budgets with closing arithmetic: overhead rows (serialization, queue wait, connections, retries), honest tail math on fan-out, timeouts DERIVED from budgets with cascade checks, explicit headroom, budget-claim review rule. Consumes SLO targets; never sets them. |
+| `frontend-perf-engineer` | reconciliation §3 D12.3 | yes | The browser's share: metrics pinned to a device/network class, deletion-first weight audit, splitting with a floor, asset/font strategy, SSR/hydration honesty (the double bill), evidence-based runtime fixes, bundle-size + metric budgets as CI gates with a claim rule. |
+
+### Skills (D10 Tier 1 — performance/load validation)
+
+The 2-skill QA Tier 1 headline pair (reconciliation §3 Phase 5 QA-expansion
+Tier 1, built by D23, 2026-07-07 — built as TWO skills; the banked may-merge
+option was declined: instrument and traffic plan are different deliverables).
+These **MEASURE** performance — the pre-release validation counterpart to the
+D12.3 design pack and to Phase 6 `slo-reliability-architect`'s production
+targets. Both ship both eval files; both are design skills that edit nothing
+→ **model-invocable** — and both carry Stop Conditions forbidding execution
+against production or live third parties without explicit human approval.
+
+| Skill | Source (D10 / D23) | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `performance-test-harness` | reconciliation §3 Phase 5 Tier 1 (#205) | yes | The measurement instrument: per-surface measured set, environment contract stamped on every result (volume, tenant shape, pinned hardware, declared cache state), baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. |
+| `load-test-planner` | reconciliation §3 Phase 5 Tier 1 (#206) | yes | The traffic plan: workload model from production evidence (write share explicit, open-vs-closed arrival model chosen), whale + long-tail tenant mix with the NOISY-NEIGHBOR scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, pass/fail citing owner-set numbers. |
+
 ---
 
 ## Backlog by phase (reconciled)
@@ -617,7 +690,11 @@ Source: [`docs/skills/06-qa-test-engineering.md`](skills/06-qa-test-engineering.
 Per reconciliation §3, the Phase 5 **expansion backlog** (`acceptance-criteria-tester`,
 `e2e-test-architect`, `qa-closeout-reporter` — the latter overlaps the shipped
 `ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
-remains backlog, built in Phase 8 batches.
+remains backlog, built in Phase 8 batches — **except the Tier 1 headline pair
+`performance-test-harness` + `load-test-planner` (#205/#206), ✅ built by D23
+(2026-07-07) as two skills and moved to
+[Implemented → Skills (D10 Tier 1)](#skills-d10-tier-1--performanceload-validation)
+above.**
 
 ### Phase 6 — Cloud, DevOps, reliability & release (P1)
 ✅ **Implemented** — all 10 first-pass skills moved to
@@ -698,6 +775,15 @@ Source: the reconciliation doc §3 D12.8 subsection (banked by D15) and
 `docs-retention-index` (P1) remains banked under D12.4; the D15 enrichment
 deltas for shipped skills remain recorded in reconciliation §3 — neither is
 part of this pack.
+
+### D12.1 + D12.3 — Data engineering & performance engineering (implemented)
+All 13 skills ✅ **implemented** (D23, 2026-07-07) — moved to
+[Implemented → Skills (D12.1)](#skills-d121--data-engineering-pack) and
+[Implemented → Skills (D12.3)](#skills-d123--performance-engineering-pack)
+above. Source: the reconciliation doc §3 D12 candidate-pack table (banked by
+D12) + D23 in §5. The remaining D12 packs (D12.2 product craft, D12.4 docs
+engineering incl. `docs-retention-index`, D12.5 PM interface, D12.6
+growth/analytics, D12.7 staff+ craft) remain banked candidates.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).
