@@ -47,7 +47,12 @@ shared control foundation + framework projections + a crosswalk, mapping
 controls that largely already exist and producing auditor-grade evidence on
 top. The first **D13 library-meta pull** (D18) ships `skill-quality-reviewer`
 — the judgment layer atop the mechanical validator, so the library now
-reviews its own additions. The **D12.8 operational workflow patterns pack**
+reviews its own additions. The **D13 completion** (D22) ships the remaining
+four library-meta skills — `library-diff-reviewer`, `eval-runner-designer`,
+`skill-usage-instrumenter`, and `skill-deprecation-planner` — so the library
+also reviews its own PRs end-to-end, holds an execution design for its
+evals, can measure which skills actually fire, and can retire a skill as
+deliberately as it ships one. The **D12.8 operational workflow patterns pack**
 (D21) ships the 10 evidence-extracted skills that are the concrete, invocable
 rules of the Zero-Trust Engineering Discipline (D16) — approval registers,
 governed standing approval, chat-backlog reconciliation, the context
@@ -112,7 +117,7 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~106 shipped procedures,
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the ~110 shipped procedures,
   grouped by the phase categories in the catalog: operating discipline, AI-SDLC
   governance, core architecture & engineering, SaaS & tenant isolation, security &
   supply chain, QA & evidence, cloud & reliability & release, AI/LLM security, agentic
@@ -123,9 +128,10 @@ entry in the reconciliation doc.
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions (D1–D21) in §5 are the project's immutable decision log; the
-  D12/D13/D14 candidate scopes recorded there are banked-but-not-built future
-  work (the D12.8 pack graduated from banked to built with D21).
+  — the dated decisions (D1–D22) in §5 are the project's immutable decision log; the
+  D12/D14 candidate scopes recorded there are banked-but-not-built future
+  work (the D12.8 pack graduated from banked to built with D21; the D13
+  library-meta scope completed with D22).
 - **The doctrine**
   ([docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md))
   and **the operating rules** ([CONTRIBUTING.md](CONTRIBUTING.md)) — why the system
@@ -170,7 +176,7 @@ for the per-phase skill lists and how the older execution-plan names merge in.
 | 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
 | 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ merged |
 | D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ merged |
-| D13 (pull 1) | Library meta / self-application: `skill-quality-reviewer` — the judgment layer atop the mechanical validator (D18); other 4 D13 candidates stay banked | P1 | ✅ shipped (D18) |
+| D13 | Library meta / self-application (5 = `skill-quality-reviewer`, D18, + the 4 completing the scope: `library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`, D22) | P1 | ✅ shipped (D18 + D22) |
 | D12.8 | Operational workflow patterns (10 evidence-extracted skills — the concrete rules of the Zero-Trust Engineering Discipline, D16/D21; sourced from the workflow extraction report) | P1 | ✅ shipped (D21) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
@@ -366,18 +372,24 @@ Rules section:
 | `compliance-gap-auditor` | ONE parameterized gap audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order; readiness assessment, never an audit opinion. | auto + manual |
 | `ai-lifecycle-risk-manager` | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized across the AI lifecycle with owners, triggers, and a risk register; voluntary and under revision — never a certification target; companion to `iso-42001-aims-architect`. | auto + manual |
 
-D13 pull 1 — library meta / self-application (D18): the library starts
-applying its own discipline to itself. Pure review skill (verdict report
-only, edits nothing) → model-invocable. It **composes**
-`scripts/validate-skills.py` — runs it first as the entry gate, never
-re-implements its mechanical checks — and leaves the whole
-skill-adding-PR audit to `library-diff-reviewer` (D13 candidate, not
-built; the seam is pinned in trigger-evals). The other four D13
-candidates remain banked in the reconciliation doc §3:
+D13 — library meta / self-application (D18 + D22): the library applies its
+own discipline to itself, end to end. All five are pure review/design
+skills (verdicts, specs, plans — none edits anything) → model-invocable.
+`skill-quality-reviewer` **composes** `scripts/validate-skills.py` as its
+entry gate; `library-diff-reviewer` composes `skill-quality-reviewer` as
+its single-skill inner loop (the seam pinned at D18, now owned from both
+sides); `skill-usage-instrumenter` produces the evidence package
+`skill-deprecation-planner` consumes; `docs-retention-index` (the
+DOC-lifecycle twin, D12.4) stays banked with the SKILL-vs-DOC seam pinned
+in trigger-evals:
 
 | Skill | What it does | Invocation |
 |---|---|---|
 | `skill-quality-reviewer` | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the full shipped corpus (colliding skills NAMED), duplication/extension (the LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. | auto + manual |
+| `library-diff-reviewer` | Reviews a whole library-changing PR end-to-end: fresh validator evidence pinned to the PR head, registration consistency (placement, post-merge voice, banked-candidate graduation, count arithmetic at every site), collision sweep against the shipped corpus AND in-batch siblings, diff coherence, per-skill quality via `skill-quality-reviewer` as the inner loop → one approve/request-changes verdict; performs no platform action (no merge, no auto-merge arming). | auto + manual |
+| `eval-runner-designer` | Designs how the eval corpus would actually EXECUTE — per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with JUDGE-ERROR honesty, UNRUN-default reporting, cost/sampling tiers, flake policy, advisory-first CI. Design/spec only: never claims a runner exists or that evals pass. | auto + manual |
+| `skill-usage-instrumenter` | Designs the usage-evidence layer: invocation signals (auto vs explicit, coarse enums — never prompt content or user identifiers), wrong-fire/correction events, never-fired lists over a stated window, evidence tiers, thresholds naming an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. | auto + manual |
+| `skill-deprecation-planner` | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record. Plan only; every stage is human-approved. | auto + manual |
 
 D12.8 — operational workflow patterns (D21): the 10 evidence-extracted
 patterns from the read-only audit of two production multi-agent repositories

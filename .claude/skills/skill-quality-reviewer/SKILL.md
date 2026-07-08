@@ -1,6 +1,6 @@
 ---
 name: skill-quality-reviewer
-description: Review ONE library skill's quality — the judgment layer above scripts/validate-skills.py. Runs the mechanical validator first (structure/lengths/registration/name collisions are its job — never re-checked), judges what it cannot: description trigger-oriented ("use when <situation>") vs merely descriptive; trigger collision with shipped skills, colliders NAMED (the main failure mode at ~96 skills); duplication better shipped as an EXTENSION (the LLM03/ASI04 pattern); evals that test real boundaries vs hollow filler; section substance (Stop Conditions that actually refuse); scope (one job); invocation posture (manual-only iff side effects). Per-check PASS/CONCERN/FAIL with evidence; verdict ship/revise/reject/make-it-an-extension. Use when a skill is drafted, revised, or quality-audited. Do NOT use for a change's process compliance (agent-governance-audit), product code (code-reviewer, full-codebase-auditor), or a whole skill-adding PR (library-diff-reviewer when built).
+description: Review ONE library skill's quality — the judgment layer above scripts/validate-skills.py. Runs the mechanical validator first (structure/lengths/registration/name collisions are its job — never re-checked), judges what it cannot: description trigger-oriented ("use when <situation>") vs merely descriptive; trigger collision with shipped skills, colliders NAMED (the main failure mode at ~96 skills); duplication better shipped as an EXTENSION (the LLM03/ASI04 pattern); evals that test real boundaries vs hollow filler; section substance (Stop Conditions that actually refuse); scope (one job); invocation posture (manual-only iff side effects). Per-check PASS/CONCERN/FAIL with evidence; verdict ship/revise/reject/make-it-an-extension. Use when a skill is drafted, revised, or quality-audited. Do NOT use for a change's process compliance (agent-governance-audit), product code (code-reviewer, full-codebase-auditor), or a whole skill-adding PR (library-diff-reviewer).
 ---
 
 # Skill Quality Reviewer
@@ -34,9 +34,8 @@ make-it-an-extension of a named existing skill.
   skill definition under `.claude/skills/`.
 - Do NOT use when: auditing a skill-adding PR end-to-end (CI validator run,
   catalog integrity, branch/merge discipline) — that is `library-diff-reviewer`
-  (D13 candidate, not built). This skill is that review's inner loop: it
-  judges ONE skill's quality; the PR-level mechanics are out of scope here
-  and reviewed manually until that candidate ships.
+  (D13, built D22). This skill is that review's inner loop: it judges ONE
+  skill's quality; the PR-level mechanics belong to that skill.
 - Do NOT use to re-run what the validator enforces: a validator FAIL goes
   back to the author against the standard — quality review never starts from
   a structurally invalid skill.
@@ -207,4 +206,4 @@ Not inspected: <what this review did not read, and why>
   no-rubber-stamp-on-mechanical-pass refusal.
 - `evals/trigger-evals.json` — discrimination against
   `agent-governance-audit`, `full-codebase-auditor`, `code-reviewer`, and
-  the `library-diff-reviewer` seam (D13 candidate, not built).
+  the `library-diff-reviewer` seam (built D22; owned from both sides).

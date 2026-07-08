@@ -530,8 +530,8 @@ gap:
 
 ### Library meta / self-application (D13) — candidate skills
 
-**BANKED scope (D13, 2026-07-07) — 5 candidate skills; `skill-quality-reviewer` built
-2026-07-07 (first pull, D18); the other 4 remain candidates — not built.** The
+**BANKED scope (D13, 2026-07-07) — 5 candidate skills; SCOPE COMPLETED: `skill-quality-reviewer`
+built 2026-07-07 (first pull, D18); the remaining 4 built 2026-07-07 (D22).** The
 library validates its own structure (`scripts/validate-skills.py`) but had no skills that
 apply its own discipline to itself. These candidates turn the generation standard, the eval
 convention (D3), and today's manual PR review flow into reusable skills.
@@ -542,10 +542,10 @@ satisfied ahead of any D12 pull (built 2026-07-07, D18).
 | Candidate skill *(status per row)* | One-line rationale |
 |---|---|
 | `skill-quality-reviewer` — **✅ built (D18, 2026-07-07)** | Audits a skill against [`docs/skill-generation-standard.md`](../skill-generation-standard.md) as the JUDGMENT layer above the validator (which keeps the mechanical checks: sections, lengths, registration, name collisions): trigger quality, overlap/collision with colliders named, duplication/extension, eval integrity, section substance, scope, invocation posture — so every future addition gets the review the standard demands. |
-| `eval-runner-designer` | Specs what an eval runner should do (inputs, pass criteria, reporting); it does NOT build the runner — closes the design gap D3 left open ("there is no eval runner yet"). |
-| `skill-usage-instrumenter` | Telemetry design: which skills are invoked vs unused, trigger-match rate, false-positive-rate estimation — evidence for pruning and trigger fixes. |
-| `skill-deprecation-planner` | Safe skill sunset — mark deprecated, redirect triggers, remove from catalog — so the library can shrink as deliberately as it grows. |
-| `library-diff-reviewer` | Audits a skill-adding PR the way manual review does today: validator run, cluster-collision check, catalog integrity, incident-eval verification. |
+| `eval-runner-designer` — **✅ built (D22, 2026-07-07)** | Specs what an eval runner should do (inputs, pass criteria, reporting); it does NOT build the runner — closes the design gap D3 left open ("there is no eval runner yet"). |
+| `skill-usage-instrumenter` — **✅ built (D22, 2026-07-07)** | Telemetry design: which skills are invoked vs unused, trigger-match rate, false-positive-rate estimation — evidence for pruning and trigger fixes. |
+| `skill-deprecation-planner` — **✅ built (D22, 2026-07-07)** | Safe skill sunset — mark deprecated, redirect triggers, remove from catalog — so the library can shrink as deliberately as it grows. |
+| `library-diff-reviewer` — **✅ built (D22, 2026-07-07)** | Audits a skill-adding PR the way manual review does today: validator run, cluster-collision check, catalog integrity, incident-eval verification. |
 
 ### Framework refresh & source-currency discipline (D14) — candidate skills
 
@@ -850,6 +850,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   ungoverned-auto-merge incident. Embedded gh/git commands follow the D19 corrections
   (strategy-specific auto-merge events; squash commits revert as ordinary commits).
   `docs-retention-index` (P1, D12.4) and the enrichment deltas remain separate. To be
+  checked by `skill-quality-reviewer` before final trust.
+- **D22 (2026-07-07) — D13 library-meta scope completed:** 4 remaining meta-skills built
+  (`library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`,
+  `skill-deprecation-planner`) joining the earlier `skill-quality-reviewer` (D18).
+  106→110 skills. These operate ON the skill library itself; product-agnostic (apply to
+  any skill library). Seams honored and pinned in trigger-evals on both sides:
+  `library-diff-reviewer` owns the whole skill-adding/modifying/retiring PR and composes
+  `skill-quality-reviewer` as its single-skill inner loop (the D18 seam, now built);
+  `eval-runner-designer` designs eval EXECUTION without claiming a runner exists (the D3
+  convention stands until a built runner produces real runs); `skill-usage-instrumenter`
+  designs the usage-evidence layer under strict minimization (skill names and coarse enums
+  only — never prompt content or user identifiers) with a rare-but-critical exemption;
+  `skill-deprecation-planner` stages skill retirement (mark → redirect → remove, rollback
+  per stage, squash removal reverts as one ordinary commit per the D19 corrections) and
+  pins the SKILL-vs-DOC seam against the still-banked `docs-retention-index` (D12.4). All
+  four are pure review/design skills (edit nothing) → model-invocable.
+  `skill-quality-reviewer`'s own description/trigger-evals annotations updated in the same
+  change ("library-diff-reviewer — not built" would have become false on merge). To be
   checked by `skill-quality-reviewer` before final trust.
 
 ---

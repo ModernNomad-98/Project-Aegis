@@ -1,0 +1,48 @@
+{
+  "skill": "skill-usage-instrumenter",
+  "description": "Trigger discrimination: the skill library measuring its own invocations (this skill) vs product/system telemetry (observability-operator), the retirement plan that consumes the evidence (skill-deprecation-planner — the highest-confusion in-batch pair: 'prune the library' splits into measure-first vs plan-the-exit), deliberate eval execution (eval-runner-designer), and definition quality (skill-quality-reviewer).",
+  "overlaps_with": [
+    "observability-operator",
+    "skill-deprecation-planner",
+    "eval-runner-designer",
+    "skill-quality-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "usage-measurement-design-wins-here",
+      "prompt": "Design how we'd learn which of our skills actually fire in real sessions — invocation counts, auto vs explicit, a never-fired list — so library pruning is evidence-based instead of gut feel.",
+      "expected_skill": "skill-usage-instrumenter",
+      "should_not_trigger": ["observability-operator", "skill-deprecation-planner", "eval-runner-designer"],
+      "reason": "The ask is the measurement layer itself — signals, tiers, windows, thresholds. No service telemetry is involved, no skill has been condemned yet (nothing to plan retirement for), and real-session signal is the opposite of deliberately exercised eval cases."
+    },
+    {
+      "id": "service-telemetry-goes-to-observability-operator",
+      "prompt": "Instrument our backend: request rates, error budgets, trace propagation across services, and paging thresholds.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": ["skill-usage-instrumenter"],
+      "reason": "Runtime health of a product system (metrics, logs, traces, alerting) is observability-operator. skill-usage-instrumenter measures one thing only: skill invocations in the library — shared vocabulary ('instrument', 'telemetry'), disjoint subjects."
+    },
+    {
+      "id": "retirement-planning-goes-to-deprecation-planner",
+      "prompt": "The usage data is in: three skills haven't fired in six months and aren't on the exemption list. Plan their retirement.",
+      "expected_skill": "skill-deprecation-planner",
+      "should_not_trigger": ["skill-usage-instrumenter"],
+      "note": "IN-BATCH SEAM — the highest-confusion pair in the D13 batch. The line: instrumenter designs how evidence ACCRUES; planner designs the staged exit once evidence (or another trigger) exists. 'Prune the library' with no data yet → instrumenter; 'retire these evidenced skills' → planner.",
+      "reason": "Evidence already exists; the remaining work is the staged retirement (mark, redirect, remove, reverse-link dispositions, rollback) — the planner's process, with the instrumenter's evidence package as its input."
+    },
+    {
+      "id": "definition-quality-goes-to-quality-reviewer",
+      "prompt": "This skill's description feels vague — judge whether a model would actually pick it at the right moments and whether it collides with anything shipped.",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": ["skill-usage-instrumenter"],
+      "reason": "Judging the definition (trigger phrasing, collision, eval integrity) is structural quality review. The instrumenter contributes the empirical complement — field data on fires and corrections — but the judgment on the text is the reviewer's."
+    },
+    {
+      "id": "deliberate-exercise-goes-to-eval-runner-designer",
+      "prompt": "Design the harness that runs each skill's authored eval cases against a model in a fresh session and scores whether the right skill fires.",
+      "expected_skill": "eval-runner-designer",
+      "should_not_trigger": ["skill-usage-instrumenter"],
+      "reason": "Executing AUTHORED cases in controlled sessions is the lab side (eval-runner-designer). The instrumenter owns the field side — uncontrived, real-work invocations. Both measure triggering; the contrived-vs-real line separates them."
+    }
+  ]
+}

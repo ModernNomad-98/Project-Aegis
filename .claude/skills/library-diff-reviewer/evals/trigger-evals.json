@@ -1,0 +1,49 @@
+{
+  "skill": "library-diff-reviewer",
+  "description": "Trigger discrimination: the whole library-changing PR end-to-end (this skill) vs ONE skill's quality (skill-quality-reviewer — composed as the inner loop; this is the other side of the seam pinned in that skill's trigger-evals), product-code diff correctness (code-reviewer), the change's process/approval trail (agent-governance-audit), and a release go/no-go (release-readiness-reviewer). In-batch: the retirement PLAN belongs to skill-deprecation-planner; this skill reviews the retirement PR.",
+  "overlaps_with": [
+    "skill-quality-reviewer",
+    "code-reviewer",
+    "agent-governance-audit",
+    "release-readiness-reviewer",
+    "skill-deprecation-planner"
+  ],
+  "cases": [
+    {
+      "id": "whole-skill-adding-pr-wins-here",
+      "prompt": "Audit this skill-adding PR end-to-end: the validator run in CI, catalog and README integrity, branch discipline, AND the quality of the skill it adds.",
+      "expected_skill": "library-diff-reviewer",
+      "should_not_trigger": ["code-reviewer", "agent-governance-audit", "release-readiness-reviewer"],
+      "note": "This is the seam case pinned in skill-quality-reviewer's trigger-evals, now honored from the built side: library-diff-reviewer owns the PR end-to-end and composes skill-quality-reviewer as its single-skill inner loop — the inner loop is invoked BY this review, it does not win the prompt.",
+      "reason": "Validator-in-CI freshness, catalog/README integrity, and diff coherence are PR-level integration checks; per-skill quality is inherited from the composed inner loop. No product code, no process-authority question, no release decision."
+    },
+    {
+      "id": "one-skills-quality-goes-to-skill-quality-reviewer",
+      "prompt": "Before this one drafted skill enters the library, check it properly: is its description something a model would trigger on, does it collide with anything shipped, and are its evals real or filler?",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": ["library-diff-reviewer"],
+      "reason": "One skill's internal quality with no PR surfaces in question (no registration, no count arithmetic, no sibling batch) is exactly the inner loop's own job — invoking the PR-level review around a single draft adds nothing."
+    },
+    {
+      "id": "process-trail-goes-to-governance-audit",
+      "prompt": "For the PR that added last week's skills: who approved it, who armed auto-merge, did validation actually run, and was the closeout honest about what was skipped?",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["library-diff-reviewer"],
+      "reason": "WHO approved, who armed auto-merge, and closeout honesty are the change's governance trail — primary-evidence process auditing, not a judgment on the diff's library integration. library-diff-reviewer judges content; agent-governance-audit judges process."
+    },
+    {
+      "id": "product-diff-goes-to-code-reviewer",
+      "prompt": "Review this PR's diff for correctness, security, and test adequacy — it refactors the billing module.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["library-diff-reviewer"],
+      "reason": "A product-code diff gets correctness review. library-diff-reviewer's subject is a PR that changes the skill library itself — billing code involves no registration surfaces or skill corpus."
+    },
+    {
+      "id": "retirement-plan-goes-to-deprecation-planner",
+      "prompt": "We've decided to retire the legacy report-formatting skill — plan how to do it safely without breaking the skills that reference it.",
+      "expected_skill": "skill-deprecation-planner",
+      "should_not_trigger": ["library-diff-reviewer"],
+      "reason": "Designing the staged retirement (mark, redirect, remove, reverse-link dispositions) is the planner's job BEFORE any PR exists; library-diff-reviewer reviews the retirement PR once it is opened — plan first, review the executed diff second."
+    }
+  ]
+}

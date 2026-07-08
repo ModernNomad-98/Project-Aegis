@@ -1,0 +1,48 @@
+{
+  "skill": "skill-deprecation-planner",
+  "description": "Trigger discrimination: SKILL retirement planning (this skill) vs DOC lifecycle/retirement (docs-retention-index — banked candidate, NOT built; the seam is pinned now so neither absorbs the other when both exist), usage-evidence design (skill-usage-instrumenter), the removal PR's review (library-diff-reviewer), and the quality verdict that may precede retirement (skill-quality-reviewer).",
+  "overlaps_with": [
+    "docs-retention-index",
+    "skill-usage-instrumenter",
+    "library-diff-reviewer",
+    "skill-quality-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "skill-retirement-plan-wins-here",
+      "prompt": "Skill X is superseded by skill Y — plan X's safe exit: mark it, redirect its triggers, and remove it without breaking the neighbors whose yield clauses and trigger-evals name it.",
+      "expected_skill": "skill-deprecation-planner",
+      "should_not_trigger": ["library-diff-reviewer", "skill-usage-instrumenter", "skill-quality-reviewer"],
+      "reason": "A named skill with an established supersession trigger needs the staged lifecycle plan — reverse-link dispositions, mark/redirect/remove, rollback. No PR exists yet to review, no evidence needs gathering, no quality verdict is being asked for."
+    },
+    {
+      "id": "doc-retirement-is-the-docs-retention-index-seam",
+      "prompt": "Build the index that governs our workflow docs' lifecycle — retention category per doc, reason-to-keep, superseded-by chains, and cleanup rules for the stale ones.",
+      "expected_skill": "docs-retention-index",
+      "should_not_trigger": ["skill-deprecation-planner"],
+      "note": "SEAM CASE — docs-retention-index is a banked candidate (D12.4, added by D15), NOT built. Until it ships, skill-deprecation-planner must NOT absorb doc lifecycle: doc retirement is handled manually, and this planner's subject stays the executable skill directories under the library's skills path. Once docs-retention-index ships, it owns doc lifecycle end-to-end; the two discriminate on artifact type — SKILL vs DOC.",
+      "reason": "Retention categories, superseded-by chains, and cleanup rules for DOCUMENTS are doc-lifecycle governance. A skill is an invocable procedure with triggers, evals, and registration arithmetic; a doc is prose with a retention category — different artifact, different lifecycle owner."
+    },
+    {
+      "id": "usage-evidence-goes-to-instrumenter",
+      "prompt": "Before we retire anything, how would we even find out whether these older skills still get invoked by anyone?",
+      "expected_skill": "skill-usage-instrumenter",
+      "should_not_trigger": ["skill-deprecation-planner"],
+      "reason": "The question is how usage evidence ACCRUES — signals, tiers, windows. The planner starts once evidence (or another qualifying trigger) exists; designing the measurement is the instrumenter's whole job, and 'before we retire anything' does not start a retirement."
+    },
+    {
+      "id": "removal-pr-review-goes-to-library-diff-reviewer",
+      "prompt": "Here's the PR that deletes the deprecated skill and updates the catalog, README, and the neighbors' trigger-evals — review it before merge.",
+      "expected_skill": "library-diff-reviewer",
+      "should_not_trigger": ["skill-deprecation-planner"],
+      "reason": "An opened retirement PR needs the executed diff checked — rows moved not vanished, no dangling references, counts decremented, plan conformance. That is the PR-level review; the planner authored the plan the reviewer now checks against."
+    },
+    {
+      "id": "should-it-even-stay-goes-to-quality-reviewer",
+      "prompt": "Is this shipped skill even worth keeping — does it duplicate the newer one we added last month, or does it still earn its place?",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": ["skill-deprecation-planner"],
+      "reason": "Whether a skill duplicates a neighbor is a quality/duplication verdict (check 3 — possibly make-it-an-extension). The planner consumes such a verdict as its absorbed trigger; it does not form the judgment. Verdict first, retirement plan second."
+    }
+  ]
+}

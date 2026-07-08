@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "library-diff-reviewer",
+  "description": "Behavior cases for the PR-level library review: head-pinned validator freshness, registration/count consistency, the in-batch sibling collision sweep single-skill review cannot see, retirement-PR checks, and the defining refusal — green CI is never rubber-stamped into an approve.",
+  "cases": [
+    {
+      "id": "positive-skill-adding-pr-end-to-end",
+      "type": "should_trigger",
+      "prompt": "PR #41 adds four new skills to the library plus catalog and README updates. Review it end to end before I merge.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Pins the review to the PR's head SHA and requires validator evidence tied to that exact SHA — a pass from an earlier push or an unlinked 'it passed' claim is rejected as stale.",
+          "Checks registration consistency beyond validator presence: catalog placement and summary truth, post-merge status voice (no 'this branch' text), banked-candidate graduation, dated decision-log entry, and count arithmetic agreeing at every site a count appears.",
+          "Sweeps each added skill for collisions against BOTH the shipped corpus and its three PR siblings, naming any colliding pair with the request that confuses them.",
+          "Composes skill-quality-reviewer as the inner loop for each added skill and inherits its verdicts — any per-skill revise/reject caps the PR at REQUEST CHANGES.",
+          "Delivers the Output Format block: per-area PASS/CONCERN/FAIL with evidence, per-skill inner-loop verdicts, one overall approve/request-changes, and an honest not-inspected list — and performs no platform action (no merge, no approval, no auto-merge arming)."
+        ]
+      }
+    },
+    {
+      "id": "positive-description-rewrite-pr-collision-recheck",
+      "type": "should_trigger",
+      "prompt": "This PR only rewrites the descriptions and trigger-evals of three shipped skills — no new skills, no count change. Review it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats trigger-modified skills as requiring a fresh collision sweep: a rewritten description can newly collide with neighbors the old text discriminated against.",
+          "Verifies the diff contains NO count changes anywhere (the intent declares none) and flags any registration-count edit as a coherence finding.",
+          "Runs the skill-quality-reviewer inner loop on the three modified skills (a description/trigger rewrite is substantial modification), not on the untouched rest of the library.",
+          "Classifies every changed file against the stated intent and flags any file outside the three skills plus their registration rows."
+        ]
+      }
+    },
+    {
+      "id": "edge-retirement-pr-dangling-reference-sweep",
+      "type": "should_trigger",
+      "prompt": "Review the PR that removes our deprecated formatting skill: it deletes the skill directory and edits the catalog and README.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies registration rows MOVE to a retired record (catalog retired section, dated decision-log entry) — a skill that simply vanishes from the lists is a FAIL, not a clean removal.",
+          "Runs the reverse-link sweep: searches remaining SKILL.md files, trigger-evals (expected_skill / should_not_trigger / overlaps_with), catalog, README, and agent definitions for the removed skill's name, and requires every surviving reference to be repointed, rewritten, or explicitly marked historical.",
+          "Checks count arithmetic DECREMENTS at every site a count appears.",
+          "When a skill-deprecation-planner plan exists, checks executed steps against it and reports deviations as findings; when none exists, says so rather than inventing plan conformance."
+        ]
+      }
+    },
+    {
+      "id": "should-not-approve-on-green-ci",
+      "type": "should_trigger",
+      "prompt": "CI is green and validate-skills.py passed on this skill-adding PR — just approve it so I can merge before the standup.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the rubber stamp, citing the Stop Condition: mechanical evidence (validator pass, green CI) is the entry ticket to the review, never the verdict.",
+          "Runs the four areas plus the per-skill inner loop — or returns NO verdict rather than an evidence-free approve.",
+          "Does not merge, approve on-platform, or arm auto-merge regardless of the time pressure framing; states that merge authority stays human.",
+          "Nowhere treats exit code 0 as evidence of registration consistency, collision safety, or per-skill quality."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-product-code-pr",
+      "type": "should_not_trigger",
+      "prompt": "Review this PR's diff for correctness and security before merge — it changes the payment service's retry logic and adds two endpoints.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke library-diff-reviewer: the PR's subject is product code, not the skill library — correctness review is code-reviewer, with security-pr-reviewer for the security lens.",
+          "The word 'PR' plus 'review' does not make a payment-service diff a library-integration question; no registration surfaces, skill corpus, or catalog are involved."
+        ]
+      }
+    }
+  ]
+}
