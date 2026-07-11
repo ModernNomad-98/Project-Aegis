@@ -1497,6 +1497,57 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   Doc-only: README.md and this entry are the only files touched.
   Validator: 175 skills, exit 0.
 
+- **D36 (2026-07-10) — Getting Started completion: beginner steps, all
+  surfaces, Zero Trust AI Engineering Discipline emphasis (doc-only;
+  README.md + this entry; count stays 175, validator exit 0; no skill file
+  touched).**
+  - **Why.** D35 shipped a good Getting Started rewrite, but an earlier
+    draft of its spec ran; this entry completes the final spec. Everything
+    is additive or a small in-place edit — D35's structure (Step 1, the
+    options, "Your first session", the roster cross-reference) stands.
+  - **Beginner-proofing (writing rule: ELI-beginner, never condescending).**
+    Step 1 now says how to open a terminal (Windows key / Cmd+Space
+    keystrokes) and links git-scm.com/downloads when `git` is missing.
+    Version-prone specifics stay linked to code.claude.com/docs, never
+    reproduced (the deprecated `npm install -g` method stays banned).
+  - **All surfaces.** A "One engine, many surfaces" framing line added
+    after Step 1 (terminal / VS Code + forks / JetBrains / Desktop / web,
+    linking code.claude.com/docs/en/platforms; the old "Options 1–3 are the
+    same engine" intro line trimmed so the two don't repeat). Option 2
+    retitled to cover Cursor/Windsurf/VSCodium with the plain distinction
+    that the skills are used by Claude Code, not the fork's own AI (Cursor's
+    native chat/Composer does not auto-load `.claude/skills/`). Option 3
+    (JetBrains) rewritten as numbered steps fixing a real gotcha — the
+    plugin does NOT bundle the CLI, so the CLI installs FIRST — plus a
+    generalized any-other-editor one-liner (Neovim/Emacs/Sublime/classic
+    Visual Studio → run `claude` in a terminal). Two missing surfaces added
+    and options renumbered: Option 4 Claude Code Desktop app (no terminal
+    at all) and Option 5 Claude Code on the Web (claude.ai/code, zero
+    install, honest cloud-copy caveat); Claude.ai manual-paste fallback is
+    now Option 6. "Using the skills in your own project" gained one literal
+    copy command per OS (PowerShell `Copy-Item -Recurse` / bash `cp -r`),
+    each with a one-line explanation.
+  - **Discipline emphasis.** New README section "The discipline behind it:
+    Zero Trust AI Engineering Discipline" placed immediately after "What
+    this is" — a pitch, not a second doctrine doc: two owner-voice
+    paragraphs (security's never-trust-by-default lesson vs the blind trust
+    AI-assisted development reintroduced; drift + rot and the
+    speed-without-silent-decay payoff), six plain-language rules derived
+    from the doctrine doc and CONTRIBUTING's operating rules (done-isn't-
+    done-until-verified / evidence-not-assertion / assume-drift /
+    small-reviewable-changes / human-is-the-gate / track-every-decision),
+    the two-tier tagline, and one link to
+    docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md.
+  - **Standards placement check (verify-only, no edit).** ISO 27001 /
+    ISO 42001 / SOC 2 already appear in the "What's in the library" roster
+    family 10 line (Compliance & governance); OWASP appears in family lines
+    8 (LLM Top 10), 9 (Agentic Top 10), and 17 (web-app gap closure).
+    Confirmed in place; no edit made.
+  - README's "Map of the system" decision-log range bumped D35→D36 to match
+    this entry.
+  Doc-only: README.md and this entry are the only files touched.
+  Validator: 175 skills, exit 0.
+
 ---
 
 ## 6. Post-merge corrections

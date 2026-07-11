@@ -99,15 +99,51 @@ system replaces that risk with enforced evidence at every step.
 The library holds itself to the bar it enforces: `skill-quality-reviewer` (D18) reviews the
 library's own additions, and its sweep corrections were applied in D33.
 
+## The discipline behind it: Zero Trust AI Engineering Discipline
+
+Security taught the industry its hardest lesson decades ago: never trust by default —
+verify everything. We call it Zero Trust, and nobody serious argues with it anymore. Then
+AI-assisted development arrived and quietly reintroduced blind trust everywhere: trust in
+the AI's "done", trust in its summaries of what it changed, trust in the docs it says it
+updated. **Zero Trust AI Engineering Discipline** applies "never trust, always verify" to
+the entire development lifecycle — every completion claim, test result, and line of
+documentation is checked against reality before it is believed.
+
+Why adopt it? Because unverified AI work fails in two quiet ways: **drift** — docs and
+plans slowly stop describing what the code actually does — and **rot** — tests and
+safeguards silently decay until the day you need them. The discipline is how you get AI's
+speed *without* inheriting its silent decay. Every skill in this library is built to
+operate under it. In practice it comes down to six rules:
+
+- **"Done" isn't done until it's verified** — a completion claim is checked against the
+  real repo and the real test run, never taken on faith.
+- **Demand evidence, not assertion** — a summary saying it works is not proof it works.
+- **Assume drift** — docs and memory are probably slightly stale until reconciled against
+  reality; check by default instead of waiting for proof they're wrong.
+- **Small, reviewable changes — nothing smuggled in** — diffs stay small enough for a
+  human to genuinely review, and contain exactly what they claim to.
+- **A human is the gate** — the AI proposes; a person approves the merge. Always.
+- **Track every decision** — dated, written down, never rewritten.
+
+> **"Never trust, always verify — every step of the lifecycle."**
+> *Assume drift. Demand evidence. Track everything.*
+
+The full doctrine:
+[docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md).
+
 ## How to use this
 
 ### Getting started
 
-Step 1 gets you the repo; then pick the option that matches how you work. Options 1–3 are
-the same Claude Code engine in three different places — the skills behave identically in all
-of them. Option 4 is the honest no-CLI fallback.
+Step 1 gets you the repo; then pick the option that matches how you work. Options 1–5 all
+run Claude Code; Option 6 is the honest fallback for when you can't run Claude Code at all.
 
 **Step 1 — get the repo** (every option starts here):
+
+You'll need a terminal for this step (a window where you type commands). On Windows: press
+the Windows key, type "terminal", press Enter. On Mac: press Cmd+Space, type "terminal",
+press Enter. If typing `git` in it says the command isn't found, install Git first from
+[https://git-scm.com/downloads](https://git-scm.com/downloads).
 
 ```bash
 git clone https://github.com/nguyenpv1980-wq/Project-Aegis.git
@@ -116,6 +152,12 @@ cd Project-Aegis
 
 `git clone` copies the library to your machine; `cd` puts you in the folder every option
 below starts from. Later, run `git pull` from the same folder to update to the latest skills.
+
+**One engine, many surfaces.** Claude Code is one engine available on several surfaces —
+the terminal, VS Code (and forks like Cursor and Windsurf), JetBrains IDEs, a Desktop app,
+and the web. The skills in `.claude/skills/` load the same way on every local surface, so
+pick whichever matches how you work. The current full list is at
+[https://code.claude.com/docs/en/platforms](https://code.claude.com/docs/en/platforms).
 
 **Option 1 — Claude Code CLI (terminal, any OS, works alongside any editor).**
 
@@ -140,7 +182,7 @@ below starts from. Later, run `git pull` from the same folder to update to the l
      is selected from the task itself)
 5. Leaving and coming back: `claude --continue` resumes your most recent session in this repo.
 
-**Option 2 — VS Code (and VS Code-based editors like Cursor).**
+**Option 2 — VS Code — and Cursor, Windsurf, VSCodium (any VS Code fork).**
 
 1. Install the official **Claude Code** extension by Anthropic: open the Extensions view
    (`Ctrl+Shift+X` / `Cmd+Shift+X`), search "Claude Code", and install the one from verified
@@ -152,15 +194,41 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 4. Type the same trigger-style prompts as in Option 1 — the extension and the CLI are the
    same Claude Code. Prefer a terminal? Open the integrated terminal
    (`` Ctrl+` `` / `` Cmd+` ``) and run `claude` there instead.
+5. **Using a fork like Cursor or Windsurf?** The steps above are identical — forks install
+   the same Anthropic extension the same way. One distinction, stated plainly: the skills
+   are used by **Claude Code**, not by the fork's own AI. Cursor's native chat/Composer
+   does *not* auto-load `.claude/skills/` — pasting a `SKILL.md` into it works only as a
+   manual procedure, same as Option 6.
 
-**Option 3 — JetBrains IDEs (IntelliJ, PyCharm, WebStorm, Rider…).** Install the official
-Claude Code plugin from the JetBrains Marketplace, restart the IDE, open the cloned folder,
-and prompt the same way as above — see
-[https://code.claude.com/docs](https://code.claude.com/docs) for specifics. Visual Studio
-(classic) and other IDEs without a plugin: there is no native plugin — use Option 1 and run
-`claude` in any terminal opened at the repo folder; the CLI works alongside any editor.
+**Option 3 — JetBrains IDEs (IntelliJ, PyCharm, WebStorm, Rider…).**
 
-**Option 4 — Claude.ai / the Claude apps (no CLI at all).** Without Claude Code you don't get
+1. Install the Claude Code CLI **first** — the JetBrains plugin does not bundle it; it
+   connects to the CLI you install. Follow the install steps at
+   [https://code.claude.com/docs](https://code.claude.com/docs) (same as Option 1, step 1).
+2. In the IDE: **Settings → Plugins → Marketplace**, search "Claude Code" (by Anthropic),
+   click **Install**, then restart the IDE.
+3. **Open** the cloned `Project-Aegis` folder as the project. The plugin connects to the
+   CLI, shows Claude's changes in the IDE's own diff viewer, and shares your current
+   selection — prompt the same way as in Option 1.
+
+Any other editor (Neovim, Emacs, Sublime, classic Visual Studio…): no plugin needed — open
+a terminal in the repo folder and type `claude`.
+
+**Option 4 — Claude Code Desktop app (no terminal at all).** The same engine in a graphical
+app — visual diff review, parallel sessions, and not a command line in sight. Install it
+from [https://claude.ai](https://claude.ai) (current platforms listed at
+[https://code.claude.com/docs](https://code.claude.com/docs)), open the cloned
+`Project-Aegis` folder, and type the same prompts as in Option 1. For people who never want
+to see a terminal.
+
+**Option 5 — Claude Code on the Web (zero install).**
+[claude.ai/code](https://claude.ai/code) runs Claude Code on Anthropic's servers against a
+Git repository — point it at your fork of this repo (or any repo you've copied skills
+into) and prompt the same way, with nothing installed; it works from a browser and the iOS
+app. One honest caveat: it works on the cloud copy of the repository, not on the files on
+your machine.
+
+**Option 6 — Claude.ai / the Claude apps (no Claude Code at all).** Without Claude Code you don't get
 automatic `.claude/` discovery — but the skills are just Markdown procedures, so you can
 still use them. Open the `SKILL.md` you want (from GitHub or a local clone) and paste its
 content into your project's custom instructions / project knowledge, or reference the pattern
@@ -170,7 +238,27 @@ validator — those are Claude Code features.
 
 **Using the skills in your own project.** Copy the `.claude/skills/<name>/` folders you want
 into your own repo's `.claude/skills/` — Claude Code discovers them there exactly the same
-way. [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
+way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder).
+Literal copy commands, run from inside the cloned `Project-Aegis` folder — swap
+`tdd-engineer` for the skill you want and the path for your own repo:
+
+On Windows (PowerShell):
+
+```powershell
+Copy-Item -Recurse .claude\skills\tdd-engineer C:\path\to\your-repo\.claude\skills\tdd-engineer
+```
+
+`Copy-Item -Recurse` copies the skill's folder and everything inside it into your repo.
+
+On macOS/Linux:
+
+```bash
+cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
+```
+
+`cp -r` is the same copy on Mac and Linux (`-r` means "include everything inside the folder").
+
+[`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
 
 **Your first session — start a project from questions.** If you're starting something new,
@@ -224,7 +312,7 @@ entry in the reconciliation doc.
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions (D1–D35) in §5 are the project's immutable decision log; the
+  — the dated decisions (D1–D36) in §5 are the project's immutable decision log; the
   D12/D14 candidate scopes recorded there are banked-but-not-built future
   work (the D12.8 pack graduated from banked to built with D21; the D13
   library-meta scope completed with D22).
