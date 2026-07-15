@@ -1734,6 +1734,60 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   `skill-quality-reviewer` + `library-diff-reviewer` for the design-vs-review seam.
   - Validator: 179 skills, exit 0.
 
+- **D43 (2026-07-15) — Closed the README presentation-drift ENFORCEMENT gap (the
+  discipline applied to its own repo; doc + validator only; count unchanged at 179;
+  validator exit 0; no skill logic touched).**
+  - **Why.** The library preaches TRACK ("keep the record and reality in sync") and
+    "anything caught by hand twice becomes a machine check," yet README presentation-drift
+    had been hand-caught repeatedly (stale skill counts, a stale skill name, and an
+    auto-merge policy contradiction — corrected around D34 — and now the roles table had
+    shipped without the D42 CONSTRAIN/CURATE design capability). Root cause: the validator's
+    README enforcement was a SUBSTRING check only — `check_catalog_integrity` verifies each
+    skill name appears *somewhere* in README, nothing more. So a skill could ship with stale
+    counts, absent from its roster family, or missing from the roles table and still pass
+    green. This closes BOTH the current drift AND the mechanism so it cannot silently recur.
+  - **Part A — fixed the current drift.** Added the missing **"an AI agent
+    operating-environment architect"** role row (the DESIGN side of the D42 CONSTRAIN/CURATE
+    pack — `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer`),
+    placed adjacent to the AI-security *review* row so design and review read side by side.
+    Audited the other presentation surfaces and CONFIRMED current, fixing none that were not
+    stale: roster family 20 (CONSTRAIN/CURATE, D42, 3) complete (20 family lines, counts sum
+    178 + 1 orchestrator = 179); the About/progression sentence already names the doctrine's
+    inward-facing pillars as shipped; the "six rules" discipline summary is an accurate
+    OUTWARD per-session summary (not a pillar enumeration, makes no false claim) and was left
+    unchanged. Added authoritative `<!-- SKILL-COUNT -->`/`<!-- FAMILY-COUNT -->` markers
+    around the counts in the "What's in the library" intro — the human-readable "179 skills"
+    text stays; the markers wrap the authoritative instance so the check is unambiguous about
+    which number is the current total (historical/aspirational numbers stay unmarked).
+  - **Part B — made CONTRIBUTING a complete, followable rule.** Replaced the vague "Register
+    the skill in the catalog and the README" with a numbered registration checklist (3a–3f)
+    enumerating every surface a new skill must update — catalog; the Skills-(shipped) table;
+    the roster family + its `*(Phase/D, N)*` count; the count claims/markers; the roles table
+    (a JUDGMENT call, with the D42 pack as the worked "yes, this warranted a new role" example);
+    and the doctrine pillar link (judgment) — stating which parts are validator-enforced vs
+    judgment. Added a note under "On self-auditing" documenting WHY the checks exist (the
+    hand-caught-twice rule).
+  - **Part C — added mechanical enforcement to `scripts/validate-skills.py`.**
+    `check_readme_counts` (HARD: the marked `SKILL-COUNT` must equal the real skills on disk);
+    `check_readme_family_roster` (HARD: sum of family counts + 1 project-orchestrator front
+    door == disk, and the number of family lines == the `FAMILY-COUNT` marker; degrades to a
+    WARNING if the roster can't be parsed, so a benign format change doesn't hard-block every
+    PR); plus WARN-level `check_roster_flagships_exist` (a renamed/removed flagship left stale
+    in the roster — the reverse direction the substring check never caught) and
+    `check_roles_table_present` (the curated section exists). Curated/judgment surfaces are
+    WARN, never HARD, so a check cannot false-fire and get muted — a false-firing check would
+    violate the discipline it enforces.
+  - **Proof each hard check can fail (Part C6).** Seeded three drifts and confirmed each
+    ERRORS (exit 1), then reverted atomically: `SKILL-COUNT` 179→178 (marked != disk);
+    family-1 count 8→7 (sum + 1 = 178 != 179 disk); `FAMILY-COUNT` 20→19 (marker != 20 family
+    lines). Per *"a verifier that cannot fail is theater with an exit code"* and *"anything
+    caught by hand twice becomes a machine check."*
+  - **Files.** `README.md` (roles row + count markers), `CONTRIBUTING.md` (registration
+    checklist + self-audit note), `scripts/validate-skills.py` (four new checks + wiring +
+    docstring), + this §5 entry. No `.claude/skills/**` logic/workflow/eval touched. The map
+    is now held to the territory for README counts mechanically, not by memory.
+  - Validator: 179 skills, exit 0 (new checks active and passing, 0 warnings).
+
 ---
 
 ## 6. Post-merge corrections

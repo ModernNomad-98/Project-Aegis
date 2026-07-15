@@ -68,8 +68,38 @@ own proven practice, including failures it absorbed during its own construction.
 2. Rewrite every section against
    [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) — required
    sections, description length, discriminating triggers, overlap avoidance, and evals.
-3. Register the skill in the catalog ([`docs/skills-catalog.md`](docs/skills-catalog.md)) and
-   the [README](README.md).
+3. **Register the skill on every surface it must appear on.** "Register in the README" is not
+   one table — it is all of the surfaces below. The validator mechanically enforces the
+   deterministic parts (3a, 3b, 3d, and the family-count reconciliation); the judgment parts —
+   3c's flagship choice, 3e's role decision, 3f's pillar link — are yours. The rule lists them
+   all so "register the README" can't quietly mean "add to one table and forget the rest":
+   - **3a. [`docs/skills-catalog.md`](docs/skills-catalog.md)** — add the skill to the
+     appropriate section. *(validator-enforced: the name must appear.)*
+   - **3b. [README](README.md) → the "Skills (shipped)" table** — add the skill's row.
+     *(validator-enforced: the name must appear.)*
+   - **3c. [README](README.md) → the roster family under "What's in the library"** (the numbered
+     family list) — if the skill is a flagship example of its family, add it to that family's
+     `*e.g.*` list, and **increment that family's count** in the `*(Phase/D, N)*` marker. If it
+     starts a **new** family, add the family line **and** increment the "20 discipline families"
+     claims. *(The flagship choice is judgment; the family-count total is validator-enforced —
+     see 3d.)*
+   - **3d. [README](README.md) → the count claims** — the current-total ("N skills") and the
+     family count ("N discipline families") must match reality. The authoritative numbers are
+     wrapped in `<!-- SKILL-COUNT -->…<!-- /SKILL-COUNT -->` and
+     `<!-- FAMILY-COUNT -->…<!-- /FAMILY-COUNT -->` markers in the "What's in the library" intro;
+     update the number inside the markers. *(validator-enforced: the marked skill-count must
+     equal the real skills on disk, and the family counts must reconcile — see rule 8.)*
+   - **3e. [README](README.md) → the "The roles Aegis can play" table** — add or update a row
+     **only if** the skill represents a **new user-facing capability/role** not already covered.
+     This is a judgment call: most skills extend an existing role and need **no** new row; a
+     genuinely new capability does. Worked example — the D42 CONSTRAIN/CURATE design pack
+     warranted a new row ("an AI agent operating-environment architect") because it added a design
+     capability the roles table did not yet name. *(Judgment — the validator only checks that the
+     section exists.)*
+   - **3f. [`docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md`](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md)**
+     — **only if** the skill enforces or is named under a doctrine pillar: update that pillar's
+     skill references, and never leave a "(planned)" marker once the skill ships (the D41→D42
+     honesty loop). *(Judgment — not validator-enforced.)*
 4. Run `python scripts/validate-skills.py` and confirm it reports the new count with exit 0
    before opening a PR (rule 8).
 
@@ -87,3 +117,16 @@ judgment layer. The shipped skill **`skill-quality-reviewer`** (built D18; see t
 reconciliation doc, §3) automates that self-audit — checking a skill-adding change against the
 generation standard and the validator gate so every addition gets the review the standard
 demands.
+
+README presentation-drift — a stale skill count, a renamed skill left un-updated in a table, a
+family added without bumping its total — was caught **by hand** more than once during this
+project's own construction. Per the discipline's own rule, *anything caught by hand twice
+becomes a machine check* (Part C of the D43 decision): the validator now reconciles the README's
+authoritative counts against reality — **`check_readme_counts`** (the marked `SKILL-COUNT` must
+equal the skills discovered on disk) and **`check_readme_family_roster`** (the roster's per-family
+counts, plus the one `project-orchestrator` front door, must sum to the real total, and the number
+of family lines must equal the `FAMILY-COUNT` marker). These are hard errors; a roster that can't
+be parsed at all degrades to a warning rather than blocking every PR. The map is now held to the
+territory mechanically, not by memory. See the **D43** entry in
+[`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md)
+§5 for the decision.

@@ -18,6 +18,12 @@ Repo-level checks:
     AND in README.md.
   * bundled-name collision: no skill name duplicates another skill, and no
     skill name shadows a reserved bundled skill name.
+  * README map-matches-territory (decision D43): the README's marked SKILL-COUNT
+    equals the real skill count on disk, and the roster's per-family counts (plus
+    the one project-orchestrator front door) reconcile with disk and with the
+    FAMILY-COUNT marker — both HARD errors. Curated surfaces (roster flagship
+    names, the roles table) are checked at WARNING level only, since they are
+    human-curated and deliberately not 1:1 with the skill set.
 
 The `_template` directory is ALWAYS ignored (it is a template, not a shipped skill).
 When `_template` is the only skill directory, the script prints "no skills found"
@@ -257,6 +263,169 @@ def check_catalog_integrity(skill_names: list[str], rep: Report) -> None:
             rep.error(f"[{name}] not listed in README.md")
 
 
+# --- README map-matches-territory checks (decision D43) --------------------
+#
+# check_catalog_integrity above is only a SUBSTRING test: it verifies each skill
+# name appears SOMEWHERE in README. That let presentation-drift ship green
+# repeatedly — stale skill counts, a family added without bumping its total, a
+# renamed flagship left in the roster. Per the discipline's own rule, "anything
+# caught by hand twice becomes a machine check," these checks reconcile the
+# README's *authoritative* counts against reality. The authoritative numbers are
+# wrapped in HTML-comment markers the validator owns, so there is no guessing
+# which "179" in the prose is the current total (historical and aspirational
+# numbers are deliberately left unmarked).
+
+SKILL_COUNT_MARKER = re.compile(
+    r"<!--\s*SKILL-COUNT\s*-->\s*(\d+)\s*<!--\s*/SKILL-COUNT\s*-->"
+)
+FAMILY_COUNT_MARKER = re.compile(
+    r"<!--\s*FAMILY-COUNT\s*-->\s*(\d+)\s*<!--\s*/FAMILY-COUNT\s*-->"
+)
+# A roster family line, e.g. "1. **Operating discipline** *(Phase 1, 8)* — ...".
+# The trailing (\d+) is that family's declared skill count. Non-greedy name and
+# phase groups tolerate names with punctuation ("CONSTRAIN/CURATE", "Data + ...")
+# and varied phase labels ("Phase 1.5", "D12.8", "D42").
+FAMILY_LINE = re.compile(
+    r"^\d+\.\s+\*\*.+?\*\*\s+\*\([^)]*?,\s*(\d+)\)\*",
+    re.MULTILINE,
+)
+# A backticked kebab-case token (skill-name shape) inside the roster prose.
+ROSTER_SKILL_TOKEN = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`")
+
+WHATS_IN_THE_LIBRARY = "## What's in the library"
+ROLES_SECTION = "## The roles Aegis can play"
+
+
+def _section_text(text: str, header: str) -> str | None:
+    """Return the body of a `## header` section, up to the next `## ` header.
+
+    Returns None if the header is absent — callers decide whether that is an
+    error or a graceful degrade.
+    """
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip() == header:
+            start = i + 1
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start, len(lines)):
+        if lines[j].startswith("## "):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+def check_readme_counts(real_count: int, rep: Report) -> None:
+    """HARD: the README's marked SKILL-COUNT must equal the real skills on disk."""
+    if not README.is_file():
+        return  # check_catalog_integrity already reports the missing README
+    text = README.read_text(encoding="utf-8")
+    m = SKILL_COUNT_MARKER.search(text)
+    if not m:
+        rep.error(
+            "README is missing the <!-- SKILL-COUNT -->N<!-- /SKILL-COUNT --> marker "
+            "(the authoritative current-total the validator reconciles against disk)"
+        )
+        return
+    marked = int(m.group(1))
+    if marked != real_count:
+        rep.error(
+            f"README SKILL-COUNT marker says {marked} but {real_count} skill(s) exist "
+            "on disk (update the marked count in the \"What's in the library\" intro)"
+        )
+
+
+def check_readme_family_roster(real_count: int, rep: Report) -> None:
+    """HARD: the roster under "What's in the library" must reconcile with disk.
+
+    (a) sum(family counts) + 1 (the project-orchestrator front door, which is
+        explicitly NOT a family) == real skill count; and
+    (b) the number of family lines == the FAMILY-COUNT marker.
+
+    Degrades to a WARNING if the roster section is absent or unparseable, so a
+    benign future format change degrades gracefully instead of hard-blocking
+    every PR.
+    """
+    if not README.is_file():
+        return
+    text = README.read_text(encoding="utf-8")
+    section = _section_text(text, WHATS_IN_THE_LIBRARY)
+    if section is None:
+        rep.warn(
+            f"README roster section '{WHATS_IN_THE_LIBRARY}' not found; "
+            "skipping family-count reconciliation"
+        )
+        return
+    family_counts = [int(m.group(1)) for m in FAMILY_LINE.finditer(section)]
+    if not family_counts:
+        rep.warn(
+            "README roster: no family lines parsed under "
+            f"'{WHATS_IN_THE_LIBRARY}'; skipping family-count reconciliation"
+        )
+        return
+    n_families = len(family_counts)
+    total = sum(family_counts) + 1  # +1 = project-orchestrator front door (not a family)
+    if total != real_count:
+        rep.error(
+            f"README roster family counts sum to {sum(family_counts)} + 1 orchestrator "
+            f"= {total}, but {real_count} skill(s) exist on disk "
+            "(a family's *(Phase/D, N)* count is out of sync with reality)"
+        )
+    fm = FAMILY_COUNT_MARKER.search(text)
+    if not fm:
+        rep.error(
+            "README is missing the <!-- FAMILY-COUNT -->N<!-- /FAMILY-COUNT --> marker "
+            "(the authoritative family total the roster is checked against)"
+        )
+    elif int(fm.group(1)) != n_families:
+        rep.error(
+            f"README FAMILY-COUNT marker says {int(fm.group(1))} but {n_families} "
+            "family line(s) exist in the roster (add the family AND bump the marker)"
+        )
+
+
+def check_roster_flagships_exist(real_names: set[str], rep: Report) -> None:
+    """WARN: every backticked kebab-case skill name in the roster must exist.
+
+    Catches a renamed or removed flagship left stale in the roster — the reverse
+    of check_catalog_integrity, which only ensures each real skill appears
+    somewhere. WARNING, not error: the roster is curated prose and a future
+    non-skill backticked token should not hard-block a PR.
+    """
+    if not README.is_file():
+        return
+    text = README.read_text(encoding="utf-8")
+    section = _section_text(text, WHATS_IN_THE_LIBRARY)
+    if section is None:
+        return
+    for token in sorted({m.group(1) for m in ROSTER_SKILL_TOKEN.finditer(section)}):
+        if token not in real_names:
+            rep.warn(
+                f"README roster references `{token}`, which is not a skill on disk "
+                "(a renamed/removed flagship left stale in the roster?)"
+            )
+
+
+def check_roles_table_present(rep: Report) -> None:
+    """WARN: the curated '## The roles Aegis can play' section should exist.
+
+    The roles table is a human-curated positioning layer, deliberately NOT 1:1
+    with skills, so this checks presence only — completeness is a judgment call
+    (see CONTRIBUTING "How to add a skill", step 3e).
+    """
+    if not README.is_file():
+        return
+    text = README.read_text(encoding="utf-8")
+    if ROLES_SECTION not in text:
+        rep.warn(
+            f"README is missing the '{ROLES_SECTION}' section "
+            "(the curated positioning layer)"
+        )
+
+
 def check_name_collisions(skill_names: list[str], rep: Report) -> None:
     seen: set[str] = set()
     for name in skill_names:
@@ -288,6 +457,15 @@ def main() -> int:
 
     check_name_collisions(names, rep)
     check_catalog_integrity([n for n in names if n], rep)
+
+    # README map-matches-territory (decision D43): reconcile the README's
+    # authoritative counts and roster against the real skills on disk.
+    real_count = len(skills)
+    real_names = {s.name for s in skills}
+    check_readme_counts(real_count, rep)          # HARD
+    check_readme_family_roster(real_count, rep)   # HARD
+    check_roster_flagships_exist(real_names, rep)  # WARN
+    check_roles_table_present(rep)                 # WARN
 
     for w in rep.warnings:
         print(f"WARN  {w}")

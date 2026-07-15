@@ -122,6 +122,7 @@ practical terms, Aegis can make Claude act as:
 | **a QA automation and Playwright engineer** | Builds automated tests that click through your app like a real user and catch breakage before customers do. | `playwright-e2e-engineer`, `qa-automation-architect` |
 | **a cloud, DevOps and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
 | **an AI security and agentic-red-team architect** | Attacks your own AI features before an outsider does — prompt injection, data leaks, runaway agents. | `ai-threat-modeler`, `prompt-injection-defender` |
+| **an AI agent operating-environment architect** | Designs how your AI agent runs safely — what it's allowed to do, what it can see, and when it stops — so it can't overreach, leak data, or run away. | `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer` |
 | **an ISO 27001, ISO 42001 and SOC 2 readiness advisor** | Gets you audit-ready for the security and AI-governance certifications enterprise customers ask for. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and runs honest A/B tests, so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
@@ -467,7 +468,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The 179 skills sit in **20 discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->179<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->20<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below.
 
