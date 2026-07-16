@@ -1836,6 +1836,90 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     count/family checks passing. To be checked by `skill-quality-reviewer` +
     `library-diff-reviewer` for the orchestrate-vs-triage seam.
 
+- **D45 (2026-07-16) — Extended `cloud-architecture-decider` to cover the full
+  ABSTRACTION LADDER as a first-class decision axis (rung × provider × posture,
+  was provider × posture only), fixing an enterprise-hyperscaler bias that
+  mis-steered the repo's non-developer/founder audience. Skill-edit only; count
+  stays 182.**
+  - **The gap (from the read-only D45 discovery).** The decider is STRUCTURALLY
+    provider-neutral (its logical-architecture step forbids product names) but
+    CONCRETELY named only AWS/Azure, and its scoring space was provider ×
+    deployment-posture {single/multi/hybrid/stay} — WHICH-hyperscaler ×
+    HOW-MANY. The abstraction RUNG (IaaS vs container-PaaS vs managed-Jamstack/
+    SSR vs Postgres-BaaS vs edge/serverless vs hyperscaler) was not a scoring
+    dimension. For the repo's stated non-developer/founder audience (README
+    no-experience path, whose on-ramp includes deployment), steering to AWS/
+    Azure is the wrong default — the modern 2026 startup default is
+    managed-Jamstack + Postgres-BaaS + edge, with container-PaaS between that
+    and the hyperscalers.
+  - **The fix (Option A from the discovery).** Added the abstraction ladder
+    (IaaS/VPS → container-PaaS → managed-Jamstack/SSR → Postgres-BaaS →
+    edge/serverless → hyperscaler) as a first-class axis: a new Workflow step 4
+    *"Place the workload on the abstraction ladder"* (rule: **pick the highest
+    rung the workload tolerates, then a provider within it**), scoring widened
+    to **rung × provider × posture**, an Abstraction-rung line added to the
+    Output Format, and the managed-vs-self-hosted step reframed as the
+    per-capability refinement WITHIN the rung (the ladder generalizes that
+    toggle). Named the modern 2026 tier — managed-Jamstack (e.g. Vercel,
+    Netlify, Cloudflare Pages), container-PaaS (e.g. Render, Railway, Fly.io),
+    Postgres-BaaS (e.g. Supabase, Neon), edge (e.g. Cloudflare Workers) — and
+    added **GCP** as a named, decide-able hyperscaler option (was absent).
+  - **Brands as refreshable EXAMPLES within durable categories (house style).**
+    Every brand is named only as an "e.g." example inside a durable category
+    label; the DECISION AXES carry the weight (abstraction rung · ops maturity ·
+    workload shape · cost model · compliance/residency · lock-in/exit) and a
+    line states brand pricing/free-tiers/runtime-limits are VOLATILE
+    verification items, never asserted — the same treatment the skill already
+    gives hyperscaler SKUs/regions. Precedent: `merge-is-deploy-governance`
+    names `vercel.json`/`netlify.toml`-class files; `rls-policy-auditor`
+    already names Supabase as a generic mechanism example. A future update
+    swaps the brand list without touching the logic.
+  - **Preserved the product-name-free logical architecture.** The concrete
+    brands live only in the ladder explanation + options/scoring output;
+    Workflow step 2 still bans product names (now says so explicitly), and the
+    Validation Checklist keeps *"zero provider product names"* AND adds a check
+    that brands appear only in the ladder/scoring, never in the logical
+    architecture.
+  - **Handoff asymmetry noted, not resolved.** Hyperscaler-rung mapping still
+    hands off to `aws-saas-architect`/`azure-saas-architect`; the modern tier
+    has NO mapping skill yet, so the handoff notes it is LOWER-TOUCH to map (the
+    platform absorbs account topology, IAM, network, patching) and routes the
+    parts that still need design to existing owners — tenancy to
+    `saas-platform-architect`/`tenant-modeler`/`multi-tenant-data-architect`,
+    Postgres-BaaS RLS to `rls-policy-auditor`, and push-to-deploy to
+    `merge-is-deploy-governance` (auto-deploy-on-push makes merge==deploy MORE
+    central here than on a hyperscaler). No `managed-platform-saas-architect`
+    target was invented.
+  - **Banked (deferred) future candidates** *(both: candidate — not built)*:
+    - `managed-platform-saas-architect` — Option B: a single pattern-named
+      mapping skill for the modern managed-platform tier (container-PaaS /
+      Jamstack / Postgres-BaaS / edge), the modern-tier peer of the aws/azure
+      architects. **Conditional trigger:** build if/when the modern-tier
+      handoff asymmetry bites (a decision lands on the modern tier and the
+      tenancy/RLS/deploy routing proves insufficient).
+    - `gcp-saas-architect` — the parallel hyperscaler mapping skill for GCP
+      (GCP is now a decide-able option here but has no mapper), mirroring
+      `aws-saas-architect`/`azure-saas-architect`. Separate, lower-priority
+      future item.
+  - **Files.** `.claude/skills/cloud-architecture-decider/SKILL.md` (description
+    widened to name the ladder + GCP, still < 1024 chars; Purpose, Use When,
+    Inputs #8 workload-shape, Workflow 7→8 steps, Output Format, Validation
+    Checklist, Gotchas, Supporting Files) and its
+    `references/decision-inputs.md` (new Abstraction-ladder section with the
+    rung table + PlanetScale engine-heritage note; scoring rubric widened to
+    rung × provider × posture; managed-vs-self-hosted table reframed as per-rung
+    refinement). Evals checked — consistent, not edited (out of scope). No
+    other skill and no validator/workflow file touched (→ `gate-guard` passes).
+  - **Product-agnostic.** Brand names are generic market examples; "supabase"
+    (on the standing privacy sweep list — the author's real backend) is named
+    ONLY alongside its peer Neon as an industry Postgres-BaaS example, framed
+    unambiguously as a market example, never as "our stack" — consistent with
+    the existing generic `rls-policy-auditor` Supabase reference; no private
+    project/path/URL named.
+  - Validator: **182 skills, exit 0** (no skill added/removed; D43 count/family
+    markers unchanged at 182/21). To be checked by `skill-quality-reviewer` for
+    the decide-vs-map seam and the brands-as-examples framing.
+
 ---
 
 ## 6. Post-merge corrections
