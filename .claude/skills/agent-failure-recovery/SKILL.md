@@ -1,6 +1,6 @@
 ---
 name: agent-failure-recovery
-description: Recover from a broken working state — failed or interrupted runs, dirty or conflicted trees, partial or wrong commits, broken branches, blocked permissions — without losing work. Invoke explicitly when an agent session ended badly or git state looks wrong. Diagnoses read-only first, preserves everything (rescue branch or labeled stash, untracked files included) before changing anything, and never runs destructive cleanup (reset --hard, clean, force-push, branch -D) without a verified backup and explicit approval. Manual-only, because recovery itself mutates git state.
+description: MANUAL-ONLY; never auto-invoke. Recover from a broken working state — failed or interrupted runs, dirty or conflicted trees, partial or wrong commits, broken branches, blocked permissions — without losing work. Invoke explicitly when an agent session ended badly or git state looks wrong. Diagnoses read-only first, preserves everything (rescue branch or labeled stash, untracked files included) before changing anything, and never runs destructive cleanup (reset --hard, clean, force-push, branch -D) without a verified backup and explicit approval. Manual-only, because recovery itself mutates git state.
 disable-model-invocation: true
 ---
 

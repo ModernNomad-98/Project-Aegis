@@ -396,6 +396,34 @@ cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
 
+**Using Aegis with Codex CLI and other Agent Skills tools.** Aegis skills use the open
+Agent Skills format — one `SKILL.md` with YAML frontmatter per skill — the same format
+Claude Code, OpenAI Codex, Cursor, Gemini CLI and other tools consume. Two ways in:
+
+- **Out of the box (recommended):** the repo-root [`AGENTS.md`](AGENTS.md) is read
+  natively by Codex CLI (and as extra context by Claude Code). It points agents into
+  `.claude/skills/`, and they select and follow the right `SKILL.md` from there — in
+  testing, Codex picked the correct skill and followed its workflow from the pointer
+  alone. Verified against codex-cli 0.138.0-alpha.7 on 2026-07-18; tool behavior is a
+  verification item — recheck on new versions.
+- **Optional native mode:** copy the skills to where the other tool discovers them —
+  `cp -r .claude/skills .codex/skills` inside a project, or per-skill copies into
+  `~/.codex/skills/` for a user-level install. Use real copies (no symlinks — they break
+  on Windows). Four verified caveats before you choose this path:
+  1. Strict-YAML consumers currently drop 67 of the 184 skills silently — descriptions
+     containing an unquoted `: ` fail spec-strict parsers (a YAML normalization pass is
+     planned; Claude Code's parser accepts all 184 today).
+  2. Descriptions cap at 1024 characters ecosystem-wide.
+  3. Native selection sees only roughly the first 92 characters of each description.
+  4. Codex does not honor `disable-model-invocation` — do **not** copy the 18 manual-only
+     operate-class skills across, and do not rely on their leading "MANUAL-ONLY"
+     description sentinels alone (they reduce auto-invocation risk; they are not
+     enforcement).
+
+  For those reasons, don't commit a `.codex/skills` copy to this repo — a committed copy
+  drifts on every skill edit and bakes in all four caveats. The copy is per-user opt-in
+  only.
+
 **Your first session — from a vague idea.** If you're not a developer and you have an idea but
 no idea what to do first, name the front door: `project-orchestrator`. It works out where your
 project is, asks you one plain-language business question at a time, routes each step to the

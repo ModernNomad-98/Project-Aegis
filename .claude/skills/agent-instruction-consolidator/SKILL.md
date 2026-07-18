@@ -1,6 +1,6 @@
 ---
 name: agent-instruction-consolidator
-description: Audit and align agent instruction files across tools — CLAUDE.md (root, nested, local), AGENTS.md, Cursor rules, GitHub Copilot instructions, Windsurf and Cline rules, and similar — into one consistent source of truth. Invoke explicitly when instruction files conflict, duplicate each other, or have drifted, or after adopting a new AI tool. Produces an inventory, a conflict and duplication matrix, and a consolidation proposal with a rule-preservation diff; edits files only after the proposal is approved. Manual-only, because instruction files steer every future agent run.
+description: MANUAL-ONLY; never auto-invoke. Audit and align agent instruction files across tools — CLAUDE.md (root, nested, local), AGENTS.md, Cursor rules, GitHub Copilot instructions, Windsurf and Cline rules, and similar — into one consistent source of truth. Invoke explicitly when instruction files conflict, duplicate each other, or have drifted, or after adopting a new AI tool. Produces an inventory, a conflict and duplication matrix, and a consolidation proposal with a rule-preservation diff; edits files only after the proposal is approved. Manual-only, because instruction files steer every future agent run.
 disable-model-invocation: true
 ---
 

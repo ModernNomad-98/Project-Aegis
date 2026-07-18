@@ -2100,6 +2100,38 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     research pass. Validator: **184 skills, exit 0** (edit-only; D43
     count/family markers unchanged at 184/22).
 
+- **D49 (2026-07-18) — Codex/Agent-Skills portability (AGENTS.md
+  doc-bridge + MANUAL-ONLY sentinels; skill-EDIT + docs, count stays
+  184).**
+  - Shipped repo-root `AGENTS.md` (doc-bridge — natively ingested by Codex
+    CLI, verified 0.138.0-alpha.7; no hardcoded skill count by D43
+    discipline — an unenforced count surface is exactly the drift D43
+    exists to prevent).
+  - README section "Using Aegis with Codex CLI and other Agent Skills
+    tools": out-of-the-box AGENTS.md path recommended; optional native
+    `.codex/skills` copy documented user-side only, with four verified
+    caveats; no committed copy — drift + silent-drop + truncation +
+    ignored manual-only field.
+  - MANUAL-ONLY sentinel (`MANUAL-ONLY; never auto-invoke. `, 32 chars)
+    prepended to all 18 `disable-model-invocation` skills: Codex ignores
+    the field and truncates descriptions to ~92 chars at selection time,
+    so the front sentinel is the only guaranteed-visible position
+    (A/B-validated in the discovery); 7 descriptions trimmed to fit the
+    validator's <1024-char cap (the discovery predicted 6 against Codex's
+    ≤1024 cap; this repo's validator is stricter by one character, which
+    pulled `agent-goal-hijack-defender` in). Inert in Claude Code (the
+    field is enforced there and user /invocation is unaffected),
+    protective everywhere else.
+  - Grounded in the empirical D49 discovery run in Codex CLI itself.
+  - **BANKED FOLLOW-ON (D50 candidate):** strict-YAML normalization of the
+    67 out-of-spec descriptions (single-quoting proven Codex-side;
+    PRECONDITION: verify Claude Code renders a single-quoted description
+    identically before the mass edit) + a HARD strict-YAML parse check in
+    `validate-skills.py` so the corpus stays portable (touches the
+    validator → gate-guard will fire → D43-style admin-merge expected).
+  - Validator: **184 skills, exit 0** (skill-EDIT + docs; D43 count/family
+    markers unchanged at 184/22).
+
 ---
 
 ## 6. Post-merge corrections
