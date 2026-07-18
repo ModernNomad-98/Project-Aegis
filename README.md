@@ -133,10 +133,29 @@ practical terms, Aegis can make Claude act as:
 | **an access-revocation and stale-authority specialist** | When removing someone or revoking access doesn't fully stick — they still see data, stay signed in, or keep the old plan — finds every place the old access survives, designs the fix, and proves the change took effect. | `authority-invalidation-architect` |
 | **a superadmin console and platform-observability designer** | Designs the internal console operators use to watch the whole platform — signups, database health, security posture, cost — and secures that all-seeing view so it can never defeat customer isolation. | `superadmin-observability-console-designer`, `admin-console-architect` |
 
-You never have to pick from this list yourself — Aegis selects and coordinates the right role
-for each step. Not a developer? See [From idea to shipped: the no-experience
-path](#from-idea-to-shipped-the-no-experience-path) for the guided path that puts the right
-one to work for you.
+### Start here: pick your path
+
+You never have to pick from the list above yourself — Aegis selects and coordinates the
+right role for each step. Find the sentence that sounds like you: each door leads to a
+short guided path through the right skills, in the right order.
+
+- **"I have an idea, but I'm not a developer."** → [From idea to shipped: the no-experience
+  path](#from-idea-to-shipped-the-no-experience-path). One pasted prompt starts it;
+  `project-orchestrator` drives the rest.
+- **"I already built something — maybe with AI — and I don't know if it's safe."** →
+  [Check your app before you trust it](docs/paths/check-your-app.md): find what was
+  actually built, stop the urgent leaks, prove customers can't see each other, then get an
+  honest go/no-go.
+- **"Something's broken and I don't know why."** → [Describe the symptom, not the
+  cause](docs/paths/something-is-broken.md). Say it in plain words — "users can see someone
+  else's data", "I removed someone and they still have access" — and the matching
+  specialist takes it from there.
+- **"I want to add AI features without opening a security hole."** → [Add AI features
+  safely](docs/paths/add-ai-safely.md): threat-model first, then design the guardrails,
+  then prove they hold.
+- **"It works — now I want to launch."** → tell Claude Code: *"My app is built — use
+  project-orchestrator to get me ready to release."* It picks up at the deploy-prep stage
+  and ends with a plain-language GO / NO-GO that **you** authorize.
 
 ## The discipline behind it: Zero Trust AI Engineering Discipline
 
@@ -615,7 +634,7 @@ keeps a human as the approval gate on anything irreversible. See
     (deny direction first), verify the change actually took — composing the per-surface
     mechanism owners. *e.g.* `authority-invalidation-architect`.
 
-## Start here (canonical reading order)
+## Canonical reading order (for maintainers)
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).
 2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — canonical architecture audit.

@@ -2163,6 +2163,34 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     install documented for local runs; the retroactive D49 annotation
     reverted to keep §5 append-only. Source: Codex-review P2s on PR #59.
 
+- **D51 (2026-07-18) — Guided-paths layer (README "Start here" picker +
+  3 path docs; DOCS build, count stays 184).**
+  - README "Start here: pick your path" five-door picker replaces the
+    one-door pointer after the roles table; D39's idea→shipped section
+    unchanged as door 1; door 5 routes to `project-orchestrator` stages
+    8–9 — no launch doc, it would restate the orchestrator.
+  - Three path docs: `docs/paths/check-your-app.md` (the flagship —
+    closes the verified unowned "is my app safe?" cold prompt),
+    `docs/paths/add-ai-safely.md` (sequences ~20 owners that had no
+    journey), `docs/paths/something-is-broken.md` (the symptom→owner
+    table, routing TO the D46 cluster owner).
+  - Discriminator: paths name WHO+ORDER+yield+handoff, never HOW (the
+    D38/D46 pattern); path docs link `.claude/skills/` directly so
+    breakage is click-visible; MANUAL-ONLY skills flagged
+    name-it-explicitly, composing the D49/D50 sentinel discipline.
+  - Grounded in the read-only D51 discovery (33/33 sequence skills
+    verified on disk; goals (i)/(v) deliberately NOT given docs — the
+    same test that approved (ii)/(iii)/(iv)). Maintainer "Start here"
+    heading retitled "Canonical reading order (for maintainers)" to end
+    the phrase collision.
+  - BANKED: (1) validator check that `docs/paths/` skill-references
+    resolve on disk — implement in the next validator-touching batch
+    (gate-guard economy); (2) a payment-processor-integration skill
+    candidate (the goal-(v) capability gap: checkout, webhooks, PCI
+    posture).
+  - Validator: **184 skills, exit 0** (no SKILL.md touched; D43/D50
+    markers, roster, and workflows unchanged — normal human merge).
+
 ---
 
 ## 6. Post-merge corrections

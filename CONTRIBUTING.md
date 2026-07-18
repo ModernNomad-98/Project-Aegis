@@ -106,6 +106,10 @@ own proven practice, including failures it absorbed during its own construction.
      — **only if** the skill enforces or is named under a doctrine pillar: update that pillar's
      skill references, and never leave a "(planned)" marker once the skill ships (the D41→D42
      honesty loop). *(Judgment — not validator-enforced.)*
+
+   **The same list runs in reverse:** when renaming or retiring a skill, also grep
+   `docs/paths/` and the README picker for the old name — `skill-deprecation-planner`'s
+   reverse-link sweep includes `docs/paths/` as a named member.
 4. Run `python scripts/validate-skills.py` and confirm it reports the new count with exit 0
    before opening a PR (rule 8).
 
