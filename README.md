@@ -1164,7 +1164,8 @@ model-invocable:
 7. Run the validator until it passes.
 
 Side-effecting skills (writes, network, deploy, spend) MUST set `disable-model-invocation: true`
-and document the irreversible step under **Stop Conditions**.
+and document the irreversible step under **Stop Conditions** (the standard's §5 rule — its
+single narrow approved-write exception stays auto-invocable).
 
 ## Validation
 
@@ -1246,7 +1247,7 @@ scripts/
 - Start with standards, templates, eval convention, and validators (Phase 0).
 - Every skill needs `SKILL.md` with clear frontmatter, concise workflow, output format,
   validation checklist, gotchas, stop conditions, and `evals/evals.json`.
-- Avoid broad `allowed-tools`; use `disable-model-invocation: true` for side-effect workflows.
+- Avoid broad `allowed-tools`; use `disable-model-invocation: true` for side-effect workflows (the standard's §5 rule — its single narrow approved-write exception stays auto-invocable).
 - Use read-only exploration first for audits, architecture, code, security, and QA review.
 - Treat security, tenant isolation, QA evidence, and verification as first-class requirements.
 - Keep product-specific skills out of this reusable foundation.

@@ -174,6 +174,6 @@ when to build which.
 - [ ] `SKILL.md` < 500 lines; detail pushed to `references/`.
 - [ ] All nine required sections present and in order.
 - [ ] `evals/evals.json` present and well-formed; `trigger-evals.json` if trigger overlaps.
-- [ ] No broad `allowed-tools`; `disable-model-invocation: true` if it has side effects.
+- [ ] No broad `allowed-tools`; `disable-model-invocation: true` if it has side effects (the §5 rule — its single narrow approved-write exception stays auto-invocable).
 - [ ] Listed in [`docs/skills-catalog.md`](skills-catalog.md) and `README.md`.
 - [ ] `scripts/validate-skills.py` passes.

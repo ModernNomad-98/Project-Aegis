@@ -166,7 +166,7 @@ Present-but-empty detection, per section:
 | Behavior found in SKILL.md | Required posture |
 |---|---|
 | Edits files/config outside its own report, runs state-changing commands, arms CI/deploys, calls external networks, spends money/tokens on execution | `disable-model-invocation: true` (manual-only) + irreversible step named in Stop Conditions |
-| The standard's single §5 approved-write exception: creates or appends a non-executable documentation or project-state file in the working tree, second-phase only — exact path and content/diff previewed, then explicit, content-specific, single-use in-session approval | stays auto-invocable — no posture flip; anything outside that shape (overwrite/delete/rename, source code, executable/config, policy/CI, secrets, network, external mutation, spend, deploy) remains manual-only per the row above |
+| The standard's single §5 approved-write exception: creates or appends a non-executable documentation or project-state file in the working tree, second-phase only — exact path and content/diff previewed, then explicit, content-specific, single-use in-session approval | stays auto-invocable — no posture flip; anything outside that shape (overwrite/delete/rename; source code; executable/config files; agent-instruction or behavior-steering files; security, identity, authorization, policy, or CI/workflow files; secrets; network; external or live-state mutation; spend; deploy) remains manual-only per the row above |
 | Pure read/review/design/report — produces findings or a proposal artifact, changes nothing | auto-invocable: omit the field (or explicit `false`) |
 
 - Judge from the WORKFLOW TEXT, not the frontmatter claim: a "review" skill

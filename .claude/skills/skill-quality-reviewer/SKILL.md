@@ -104,10 +104,10 @@ skill.
    skill has side effects (edits files/config outside scratch, runs
    state-changing commands, calls networks, deploys, spends money); pure
    review/design/report skills stay auto-invocable — with the standard's
-   single §5 approved-write exception: a non-executable documentation/state
-   append performed only after exact preview and explicit, content-specific,
-   single-use approval stays auto-invocable. Manual-only skills must
-   name the irreversible step in Stop Conditions.
+   single §5 approved-write exception: a skill that creates or appends a
+   non-executable documentation/state file, only after exact preview and
+   explicit, content-specific, single-use approval, stays auto-invocable.
+   Manual-only skills must name the irreversible step in Stop Conditions.
 9. **Deliver the verdict.** Per check PASS / CONCERN / FAIL, each citing
    evidence (quoted description phrases, the named colliding skill, the
    hollow eval case id), then ONE overall recommendation: ship | revise |
