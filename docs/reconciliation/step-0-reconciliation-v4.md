@@ -2239,6 +2239,51 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     enforced the pre-D52 absolute rule); README's current-layout line
     dropped the deleted `templates/` directory. Source: second-pass
     external review of the executed batch.
+  - Post-merge posture-alignment (D53, PR #63): a classified proximity
+    census found the earlier follow-up's sweep understated remaining
+    normative surfaces; all (N) surfaces now carry the §5 pointer
+    (README.md:1166 authoring rule, README.md:1250 principles bullet,
+    docs/skill-generation-standard.md:177 final checklist); Check 7
+    aligned to "creates or appends"
+    (skill-quality-reviewer/SKILL.md:107); the posture table's excluded
+    list completed with agent-instruction, security, identity, and
+    authorization files
+    (skill-quality-reviewer/references/quality-review-checklist.md:169);
+    allowed/forbidden approved-write eval cases added. Sources:
+    post-merge automated review of PR #62 + the in-session census.
+
+- **D53 (2026-07-19) — Posture-rule alignment (docs + skill-EDIT; count
+  stays 184).**
+  - Census-driven (PR #63): a classified proximity scan (±6-line windows
+    over README, CONTRIBUTING, AGENTS.md, the standard, the catalog,
+    `docs/paths/`, `_template`, and skill-quality-reviewer + its
+    references) classified every `disable-model-invocation` /
+    side-effect-rule occurrence NORMATIVE / DESCRIPTIVE / HISTORICAL;
+    only the five (N) surfaces lacking the exception in context were
+    edited.
+  - Fixed: the §5 pointer (cite-don't-restate — full exception text
+    stays only in the standard §5, the frontmatter row, and the posture
+    table) on README's authoring rule and principles bullet and the
+    standard's final checklist; skill-quality-reviewer Check 7 aligned
+    to the standard's "creates or appends a non-executable
+    documentation/state file" wording; the posture reference table's
+    excluded list completed in substance (agent-instruction /
+    behavior-steering files; security, identity, authorization files);
+    one ALLOWED eval case (compliant §5 approved-write → Check 7 PASS,
+    no posture flip) and one FORBIDDEN eval case (approved-write-shaped
+    behavior targeting AGENTS.md / an authorization file → Check 7
+    FAIL, manual-only required).
+  - Verified-compliant and left unchanged: the standard §5 itself
+    (:128/:141-142 governed by its own "with ONE narrow exception,
+    next"), the frontmatter row (:39), `_template` (:4-15, :59, :76-80),
+    and the checklist's §5 citations (:147, :168); all descriptive
+    manual-only listings (catalog, README tables, `docs/paths/`) and
+    historical records untouched.
+  - NEXT: companion D54 = project-orchestrator correctness (incl. the
+    banked explain-the-why edits); the gate-touching batch banked under
+    D52 moves to D55.
+  - Validator: **184 skills, exit 0**; evals JSON parses (7 cases); no
+    `scripts/` or `.github/` files touched — normal merge.
 
 ---
 
