@@ -2285,6 +2285,77 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   - Validator: **184 skills, exit 0**; evals JSON parses (7 cases); no
     `scripts/` or `.github/` files touched — normal merge.
 
+- **D54 (2026-07-19) — Orchestrator correctness (skill-EDIT + docs;
+  count stays 184).**
+  - Source: correctness review of `project-orchestrator` after the D52/D53
+    posture-alignment batches; five fixes, all in the orchestrator's own
+    files plus one sentence in the authoring standard.
+  - Fixed:
+    1. **Append-only state model.** The state-file template kept mutable
+       header fields (`Last updated` / `Current stage` / `Next recommended
+       action`) that the §5 create-or-append-never-overwrite contract could
+       not legally update. Replaced with a second append-only entry type — a
+       dated **STATE SNAPSHOT** (stage + next action) — under the same
+       propose → approve → append flow, latest-snapshot-wins; the schema and
+       the worked example now model exactly two entry types (DECISION,
+       SNAPSHOT), and Capabilities 1-2 read the latest snapshot for current
+       stage. No field is ever overwritten.
+    2. **Approved-create cold start.** When no `docs/project-state.md`
+       exists, the orchestrator now previews the COMPLETE initial document
+       (exact path + full initial content, including the first SNAPSHOT),
+       asks one explicit approval, and creates only after the yes — the
+       create leg of §5's "create or append"; decline/ambiguous creates
+       nothing. Cold-start eval updated to assert it.
+    3. **Manual-only routing invariant.** Stated ONCE as a general rule:
+       before routing to any skill, check its invocation posture; a
+       manual-only target (`disable-model-invocation: true`) is never
+       invoked on the strength of the orchestrator's own auto-invocation —
+       explain the boundary in business terms, STOP the hop, and have the
+       USER invoke it by name (the `docs/paths` convention). Noted why it
+       matters cross-tool: consumers that ignore the posture field have only
+       this text and the description sentinel. The four known routings
+       (stage 4 `prompt-injection-defender`, stage 7
+       `playwright-e2e-engineer`, stage 8 `ci-pipeline-architect` +
+       `observability-operator`) are tagged lightly, citing the invariant.
+       One eval added: the stage-8 flow hands manual-only skills to the
+       user, never auto-chains them.
+    4. **IaC eval scope.** Removed "a deploy workflow config" from the
+       IaC-artifact examples in `evals.json` (that is
+       `ci-pipeline-architect`'s turf per `iac-reviewer`'s own exclusions);
+       kept the Terraform/Bicep/CDK-class examples.
+    5. **Required chosen-over rationale** (the banked explain-the-why edits,
+       folded from the D46/D52 ledger): every proposed DECISION entry MUST
+       carry the "(chosen over …, because …)" clause — the main rejected
+       alternative and the plain-language why — surfaced in the propose-step
+       preview so the user learns the trade-off at every approval.
+       Capabilities 3/4, the template schema + worked example, and the
+       preview/approval eval all assert it; plus one sentence in the
+       authoring standard's Output Format guidance
+       (`docs/skill-generation-standard.md` §4 item 5): decision/design-class
+       skills state what was chosen, why, and the main rejected alternative
+       in plain language.
+  - Clarification (appended, no rewrite of the D52 record): D52's stage-8
+    "unconditional" `ci-pipeline-architect` → … → `incident-response-runbook`
+    chain meant unconditional-on-INPUTS (it runs regardless of the
+    platform/artifact evidence that gates `iac-reviewer` and the provider
+    mappers) — NOT unconditional-on-posture. The manual-only members of that
+    chain are now routed posture-aware via the D54 invariant: still always
+    part of the flow, but handed to the user by name rather than
+    auto-invoked. The two facts compose; neither supersedes the other.
+  - Frontmatter description left unchanged: a semantic re-read confirmed it
+    still accurately describes the skill (front door; detect stage; route by
+    name; one plain-language question; record every dated decision; human as
+    approval/merge gate) — the D54 fixes refine HOW those hold, not WHAT the
+    skill does.
+  - NEXT: D55 = the gate-hardening batch banked under D52 (validator fixture
+    tests; strict required-section ORDER validation; `.claude/agents/` schema
+    + read-only tool validation; `docs/paths/` skill-reference resolution;
+    action full-SHA pinning + validator dependency pinning; CODEOWNERS +
+    Dependabot; live-prose current-count heuristic) — discovery-first, one
+    gate-touching batch after scope approval.
+  - Validator: **184 skills, exit 0**; evals JSON parses (10 cases); no
+    `scripts/` or `.github/` files touched — normal merge.
+
 ---
 
 ## 6. Post-merge corrections

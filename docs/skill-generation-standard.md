@@ -107,6 +107,8 @@ standard — the validator enforces all nine):
    skill must read before acting (context before action).
 4. **Workflow** — the ordered steps the model follows. This is the operational core.
 5. **Output Format** — the exact shape of the deliverable (file, report, structure).
+   Decision- and design-class skills state, in plain language, what was chosen, why,
+   and the main rejected alternative — not just the outcome.
 6. **Validation Checklist** — a checklist the model runs before declaring done.
 7. **Gotchas** — known failure modes, sharp edges, platform quirks.
 8. **Stop Conditions** — when to halt and ask the human instead of proceeding

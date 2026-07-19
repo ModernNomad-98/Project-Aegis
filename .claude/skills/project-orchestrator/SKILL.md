@@ -62,9 +62,11 @@ project through that map is the gap this skill fills.**
 ## Inputs to Inspect
 
 1. **`docs/project-state.md` in the user's product repo, FIRST** (if present) —
-   the recorded current stage, approved brief + MVP scope, decision log, open
-   questions, and next recommended action. This file is the map coordinate; read
-   it before anything else. Absent = stage zero.
+   the current stage and next recommended action (read from the LATEST dated
+   STATE SNAPSHOT entry — the file is append-only, so the newest snapshot IS
+   the current state), the approved brief + MVP scope, decision log, and open
+   questions. This file is the map coordinate; read it before anything else.
+   Absent = stage zero.
 2. **The user's repo, to corroborate the state file** — landmark files that
    reveal the true stage: a requirements/spec doc, a domain/architecture doc or
    ADRs, application source, migrations, tests, CI config, deploy/IaC config. A
@@ -86,11 +88,15 @@ project through that map is the gap this skill fills.**
 ## Workflow
 
 **Capability 1 — Detect the current stage (locate the project ON the map).**
-Read `docs/project-state.md`, then inspect the repo (input 2). Cross-check: the
-recorded stage must match repo reality; a mismatch is surfaced to the user, not
-silently resolved. Output a one-line "you are here" in plain language. With no
-state file and no repo, the project is at stage zero → discovery, and step one
-is to open a `docs/project-state.md` (template below).
+Read `docs/project-state.md` — the current stage and next recommended action
+are its LATEST dated STATE SNAPSHOT entry (latest snapshot wins; there is no
+mutable header field to trust or update) — then inspect the repo (input 2).
+Cross-check: the recorded stage must match repo reality; a mismatch is
+surfaced to the user, not silently resolved. Output a one-line "you are here"
+in plain language. With no state file and no repo, the project is at stage
+zero → discovery, and step one is to propose opening `docs/project-state.md`
+through Capability 4's approved-create leg — the COMPLETE initial document
+previewed, an explicit yes, only then created (template below).
 
 **Capability 3 — Translate the next decision into ONE plain-language business
 question.** Every technical fork surfaces to the user as a business question
@@ -117,7 +123,12 @@ Worked examples (encode the pattern, not these strings):
   a customer a status link, should it expire after 30 days, last forever, or
   stop working the moment the job closes?"**
 
-Ask **one** question at a time. Never assume terminology.
+Ask **one** question at a time. Never assume terminology. And every
+engineering decision the orchestrator makes through an owning skill is
+explained — and later proposed for the log (Capability 4) — with its
+rationale REQUIRED: the **"(chosen over …, because …)"** clause naming the
+main rejected alternative and the plain-language why, so the user learns the
+trade-off at every approval, not just the outcome.
 
 **Capability 2 — Route to the owning skill(s) BY NAME along existing seams.**
 Select the owning skill for the detected stage and invoke it. This is the outer
@@ -138,8 +149,9 @@ here.
 - **Stage 4 — Make it safe.** *Invoke by evidence of the feature, not on the
   default path:* `threat-modeler` / `ai-threat-modeler`;
   `tenant-isolation-reviewer`, `share-link-access-architect`,
-  `file-upload-storage-architect`, `prompt-injection-defender`,
-  `structured-output-validator`, `ai-cost-guardrail-designer`.
+  `file-upload-storage-architect`, `prompt-injection-defender` *(manual-only —
+  the routing invariant applies)*, `structured-output-validator`,
+  `ai-cost-guardrail-designer`.
 - **Stage 5 — Plan the work.** → `tech-spec-writer` →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
@@ -153,9 +165,9 @@ here.
   map; do not re-derive the gates.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
-  `api-contract-test-designer`, `playwright-e2e-engineer`,
-  `manual-test-case-creator`, `accessibility-test-harness`,
-  `performance-test-harness`.
+  `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only — the
+  routing invariant applies)*, `manual-test-case-creator`,
+  `accessibility-test-harness`, `performance-test-harness`.
 - **Stage 8 — Get it ready to run.** Start with `cloud-architecture-decider`,
   then follow its ACTUAL outcome: **AWS** → `aws-saas-architect`; **Azure** →
   `azure-saas-architect`; **modern managed tier** (container-PaaS, managed
@@ -166,14 +178,27 @@ here.
   human's direction (never invent a mapper, never silently reroute to
   AWS/Azure), continuing below once directed. Then `iac-reviewer` ONLY when
   an actual IaC or config-as-code artifact exists, and unconditionally:
-  `ci-pipeline-architect` → `slo-reliability-architect` →
-  `observability-operator` → `rollback-runbook-author` →
+  `ci-pipeline-architect` *(manual-only — the routing invariant applies)* →
+  `slo-reliability-architect` → `observability-operator` *(manual-only — the
+  routing invariant applies)* → `rollback-runbook-author` →
   `incident-response-runbook`. *If merge == deploy on the platform:*
   `merge-is-deploy-governance`. Route FROM the decider's result; never
   re-derive or copy its decision model here.
 - **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` →
   `sharded-validation-with-resume` → `release-readiness-reviewer` (and the
   read-only reviewer subagents in `.claude/agents/`).
+
+**The manual-only routing invariant.** Before routing to ANY skill, check its
+invocation posture. A **manual-only** target (`disable-model-invocation:
+true`; description sentinel "MANUAL-ONLY; never auto-invoke") is never
+invoked on the strength of the orchestrator's own auto-invocation — an
+auto-invoked router must not launder a deliberately human-triggered gate into
+an automatic hop. Instead: EXPLAIN the boundary in business terms (why this
+step is deliberately started by a person), STOP that hop, and hand the
+invocation to the USER by name — the `docs/paths/` convention: "manual-only —
+name it explicitly: you start them by typing the skill's name". This matters
+beyond any one tool: consumers that ignore the posture field have only this
+text and the description sentinel to hold the boundary.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
@@ -194,20 +219,34 @@ prompt, but its OUTPUT is proposals-and-questions — it advances past a stage g
 only after the user confirms.
 
 **Capability 4 — Record the outcome (dated) in `docs/project-state.md`, by
-propose → approve → append.** When a decision is made or a stage advances:
-(1) prepare the complete dated entry (schema and template:
-[references/project-state-template.md](references/project-state-template.md));
+propose → approve → append (or approved-create at cold start).** When a
+decision is made or a stage advances:
+(1) prepare the complete dated entry — one of the template's exactly two
+entry types: a **DECISION** (which MUST carry its "(chosen over …, because
+…)" clause — the main rejected alternative and the why, in plain language) or
+a **STATE SNAPSHOT** (new current stage + next recommended action; a stage
+advance is a NEW snapshot entry, latest snapshot wins — no header field is
+ever updated) — per the schema and template:
+[references/project-state-template.md](references/project-state-template.md);
 (2) show the exact target path, entry ID, date, and exact content in plain
-language; (3) ask ONE lightweight question — "Here is the log entry for what
-we just decided — OK to record it?"; (4) append ONLY after an explicit yes to
-that exact path and content. A decline, an ambiguous answer, or any change to
-the content or path means no write — revise and re-propose. Approval is
-single-use and covers only the displayed entry; the user's answer to the
-business question is NOT itself approval to write. Append-only semantics hold:
-a correction is a NEW dated entry that flags the change, never a silent
-overwrite — the Zero Trust AI Engineering Discipline (Zet-AI Engineering for
-short) applied to the build journey. After an approved append, restate the
-single next recommended action in plain language.
+language — for a DECISION the preview shows the chosen-over clause, so the
+user learns the trade-off at every approval; (3) ask ONE lightweight
+question — "Here is the log entry for what we just decided — OK to record
+it?"; (4) append ONLY after an explicit yes to that exact path and content.
+**The create leg (cold start) follows the same contract:** when no
+`docs/project-state.md` exists, show the COMPLETE initial document — the
+exact target path and the full initial content, including the first STATE
+SNAPSHOT entry — and create the file ONLY after the explicit yes; this is the
+create half of the standard's create-or-append allowance (overwrite is never
+allowed). A decline, an ambiguous answer, or any change to the content or
+path means no write — revise and re-propose (at cold start: nothing is
+created). Approval is single-use and covers only the displayed entry; the
+user's answer to the business question is NOT itself approval to write.
+Append-only semantics hold: a correction is a NEW dated entry that flags the
+change, never a silent overwrite — the Zero Trust AI Engineering Discipline
+(Zet-AI Engineering for short) applied to the build journey. After an
+approved append, restate the single next recommended action in plain
+language.
 
 ## Output Format
 
@@ -225,9 +264,11 @@ RECORDING STATUS: AWAITING EXPLICIT APPROVAL — nothing written
 ```
 
 `docs/project-state.md` is the durable artifact; its structure is the template
-in Supporting Files. It records: current stage; the approved requirements brief +
-MVP scope; the dated decision log; open questions still needing the user; and
-the next recommended action.
+in Supporting Files. It records, append-only: the dated STATE SNAPSHOT log
+(current stage + next recommended action — the latest snapshot IS the current
+state); the approved requirements brief + MVP scope; the dated decision log
+(every entry carrying its chosen-over rationale); and open questions still
+needing the user.
 
 ## Validation Checklist
 
@@ -235,21 +276,26 @@ the next recommended action.
       table, no change-classification matrix. Each is CITED
       (`ai-sdlc-operating-model`'s `references/stage-gate-map.md`;
       `change-classification-gate`) — grep confirms none is reproduced.
-- [ ] Stage was DETECTED from the state file + repo, not assumed; a mid-flight
-      project was continued, not restarted.
+- [ ] Stage was DETECTED from the state file's LATEST STATE SNAPSHOT + repo,
+      not assumed; a mid-flight project was continued, not restarted; no
+      mutable header field was read or updated.
 - [ ] Every technical decision reached the user as ONE plain-language business
-      question; no engineering-mechanics question was pushed onto the user.
+      question; no engineering-mechanics question was pushed onto the user; every
+      DECISION carried its "(chosen over …, because …)" rationale.
 - [ ] Routing named the OWNING skill for the stage; conditional skills were
-      invoked only on evidence of the feature.
+      invoked only on evidence of the feature; every manual-only target was
+      handed to the USER by name (never auto-invoked on the router's authority).
 - [ ] Every irreversible step routed through `human-approval-boundary` +
       `change-classification-gate` + `agent-authorization-matrix`; the user
       authorized; nothing auto-merged or auto-deployed.
-- [ ] Recording followed propose → approve → append: the exact target path,
-      entry ID, date, and content were shown BEFORE any write; an explicit,
-      content-specific yes was received; the content and path did not change
-      between approval and append; the append (dated, stable ID, who-decided)
-      happened only after that approval; a declined or ambiguous answer caused
-      NO write; no prior entry was overwritten.
+- [ ] Recording followed propose → approve → append (or approved-create at
+      cold start): the exact target path, entry ID, date, and content — for a
+      DECISION including its chosen-over clause — were shown BEFORE any write;
+      at cold start the COMPLETE initial document (including the first SNAPSHOT)
+      was previewed before the file was created; an explicit, content-specific
+      yes was received; the content and path did not change between approval and
+      write; a declined or ambiguous answer caused NO write (nothing created at
+      cold start); no prior entry was overwritten.
 - [ ] The next recommended action is stated in plain language.
 
 ## Gotchas
@@ -276,7 +322,20 @@ the next recommended action.
   let the reversible flow.
 - **Silent scope drift in the state file.** Overwriting a past decision hides
   the change. A changed decision is a new dated entry that flags the deviation
-  (the `phased-work-handoff-designer` register discipline).
+  (the `phased-work-handoff-designer` register discipline). The same holds for
+  the current stage: it advances by a NEW dated STATE SNAPSHOT entry, never by
+  editing a header field — there is no mutable header to edit.
+- **Auto-chaining a manual-only skill.** A manual-only target
+  (`disable-model-invocation: true`) exists to be started by a human. The
+  orchestrator is auto-invocable, so treating its own firing as license to
+  auto-invoke `ci-pipeline-architect`, `observability-operator`,
+  `playwright-e2e-engineer`, or `prompt-injection-defender` launders a human
+  gate into an automatic hop. Explain the boundary and hand the invocation to
+  the user by name.
+- **A DECISION entry with no rationale.** "We'll share one data space" records
+  the outcome but not the trade-off. Every DECISION carries its "(chosen over
+  …, because …)" clause so the user learns what was given up and why, at the
+  moment they approve it.
 - **Treating the business answer as write approval.** "Shared space is fine"
   authorized the DECISION, not the recording of it. The log entry is its own
   approval: preview the exact path + content, ask, and append only on the
@@ -297,27 +356,40 @@ the next recommended action.
   knows their next step, or who wants the requirements interview itself, is
   routed to the owning skill (`requirements-gathering-facilitator`,
   `product-spec-writer`, `code-reviewer`, …); this skill steps aside.
-- **A `docs/project-state.md` append without its own approval** — the entry's
-  exact path and content have not been shown, the explicit content-specific
-  yes has not arrived, or the content/path changed after the yes. Do not
-  write; re-propose. A business-question answer is never write approval.
+- **A `docs/project-state.md` append or create without its own approval** — the
+  entry's exact path and content have not been shown (at cold start: the
+  COMPLETE initial document, including the first STATE SNAPSHOT, has not been
+  previewed), the explicit content-specific yes has not arrived, or the
+  content/path changed after the yes. Do not write or create; re-propose. A
+  business-question answer is never write approval.
+- **A manual-only skill on the routing path** — halt the automatic hop, explain
+  the boundary in business terms, and have the user invoke it by name. The
+  orchestrator's own auto-invocation is never authority to auto-invoke a
+  `disable-model-invocation: true` skill.
 
 ## Supporting Files
 
 - [references/project-state-template.md](references/project-state-template.md) —
-  the `docs/project-state.md` schema and a copyable template: current stage,
-  approved brief + MVP scope, the append-only dated decision log (composing
+  the `docs/project-state.md` schema and a copyable template with exactly two
+  append-only dated entry types: STATE SNAPSHOT (current stage + next action,
+  latest-wins, no mutable header field) and DECISION (each carrying its
+  "(chosen over …, because …)" rationale). Composes
   `phased-work-handoff-designer`'s decision-ID register +
   `scoped-approval-register`'s approval-citation pattern + the house
   decision-log format; every entry previewed and explicitly approved before
-  append — Capability 4), open questions, and next action.
-- `evals/evals.json` — behavior cases: the cold vague-idea happy path, the
-  mid-flight state-file edge case, the stage-8 decision-driven routing edges
-  (managed tier without a cloud mapper, the GCP missing-mapper pause,
-  `iac-reviewer` only on an actual IaC artifact), and the refusals (don't
-  auto-merge, don't apply a migration without approval, don't decide a
-  business-scope question, don't treat a business answer as approval to
-  write the log).
+  append, and the file created at cold start only after the COMPLETE initial
+  document is previewed and approved — Capability 4. Also holds the approved
+  brief + MVP scope and open questions.
+- `evals/evals.json` — behavior cases: the cold vague-idea happy path (with
+  approve-before-create of the full initial document), the mid-flight
+  state-file edge case (read the latest snapshot, don't restart), the stage-8
+  decision-driven routing edges (managed tier without a cloud mapper, the GCP
+  missing-mapper pause, `iac-reviewer` only on an actual IaC artifact, and the
+  manual-only skills handed to the user rather than auto-chained), and the
+  refusals (don't auto-merge, don't apply a migration without approval, don't
+  decide a business-scope question, don't treat a business answer as approval
+  to write the log — and the approved DECISION entry shows its chosen-over
+  rationale).
 - `evals/trigger-evals.json` — discrimination against
   `requirements-gathering-facilitator` (elicitation), `ai-sdlc-operating-model`
   (team policy), `product-spec-writer` (spec authoring), and `code-reviewer`

@@ -1,12 +1,14 @@
 # `docs/project-state.md` — schema and template
 
 This is the durable memory of a project's journey from idea to shipped. The
-orchestrator **reads it first every session** (to locate the project on the
-lifecycle map) and **appends to it** as the project advances — each entry
-previewed (exact path + content) and explicitly approved by the user before
-it is written (the orchestrator's Capability 4 propose → approve → append
-contract). It lives in the **user's product repo** at `docs/project-state.md`
-— never in the skills library.
+orchestrator **reads it first every session** (the latest STATE SNAPSHOT entry
+locates the project on the lifecycle map) and **appends to it** as the project
+advances — each entry previewed (exact path + content) and explicitly approved
+by the user before it is written, and the file itself created at cold start
+only after the COMPLETE initial document has been previewed and approved (the
+orchestrator's Capability 4 propose → approve → append/create contract). It
+lives in the **user's product repo** at `docs/project-state.md` — never in the
+skills library.
 
 ## Composition (what this schema reuses, by name)
 
@@ -23,17 +25,27 @@ contract). It lives in the **user's product repo** at `docs/project-state.md`
 
 ## Non-negotiable rules
 
-1. **Append-only.** Never edit or delete a past entry. A correction is a NEW
+1. **Two dated entry types.** A log entry is exactly one of: a **DECISION**
+   (a choice made — the decision log) or a **STATE SNAPSHOT** (where the
+   project stands: current stage + next recommended action — the snapshots
+   table). Both go through the same propose → approve → append flow
+   (Capability 4). **Latest snapshot wins:** the newest snapshot row IS the
+   current state; there is no mutable header field, and no field is ever
+   overwritten in place.
+2. **Append-only.** Never edit or delete a past entry. A correction is a NEW
    dated entry that references and supersedes the old one — the Zero Trust AI
    Engineering Discipline applied to the build journey.
-2. **Dated.** Every entry carries an ISO date (`YYYY-MM-DD`; add time where two
+3. **Dated.** Every entry carries an ISO date (`YYYY-MM-DD`; add time where two
    entries land the same day and order matters).
-3. **Plain language.** Summaries are readable by a non-developer. Technical
+4. **Plain language.** Summaries are readable by a non-developer. Technical
    terms, when unavoidable, are explained in the same line.
-4. **Attributed.** Every decision says who decided: `user` (a business decision
+5. **Rationale required.** Every DECISION entry carries its **"(chosen over …,
+   because …)"** clause — the main rejected alternative and the why, in plain
+   language. An entry without it is not ready to propose.
+6. **Attributed.** Every decision says who decided: `user` (a business decision
    the user authorized) or `orchestrator-via-<skill>` (an engineering decision
    the orchestrator made through the owning skill and explained).
-5. **No secrets, no live identifiers.** Reference environments, tenants, and
+7. **No secrets, no live identifiers.** Reference environments, tenants, and
    people by role or placeholder, never by credential or real name.
 
 ---
@@ -43,9 +55,11 @@ contract). It lives in the **user's product repo** at `docs/project-state.md`
 ```markdown
 # Project State — <plain project name>
 
-Last updated: <YYYY-MM-DD>
-Current stage: <plain-language stage — e.g. "Design: how it will be built">
-Next recommended action: <one plain-language sentence>
+## State snapshots (append-only) — the LATEST row is the current state
+
+| ID | Date | Current stage (plain language) | Next recommended action |
+|----|------|--------------------------------|-------------------------|
+| SS-001 | <YYYY-MM-DD> | <e.g. "Design: how it will be built"> | <one plain-language sentence> |
 
 ## The idea (approved brief)
 
@@ -64,7 +78,7 @@ Next recommended action: <one plain-language sentence>
 
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
-| PS-001 | <date> | <what was decided and why, in plain language> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
+| PS-001 | <date> | <what was decided (chosen over <the main rejected alternative>, because <the plain-language why>)> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
 
 ## Approvals (irreversible steps & scope grants)
 
@@ -89,10 +103,12 @@ Next recommended action: <one plain-language sentence>
 ```markdown
 # Project State — Maintenance job-tracking app
 
-Last updated: 2026-03-04
-Current stage: Design: how it will be built
-Next recommended action: Answer one question about customer data separation, then
-I hand the data design to the multi-tenant data skill.
+## State snapshots (append-only) — the LATEST row is the current state
+
+| ID | Date | Current stage (plain language) | Next recommended action |
+|----|------|--------------------------------|-------------------------|
+| SS-001 | 2026-02-20 | Defining the product (the need is understood) | Approve the first-release scope below, then I hand it to the product-spec skill. |
+| SS-002 | 2026-03-04 | Design: how it will be built | Answer one question about customer data separation, then I hand the data design to the multi-tenant data skill. |
 
 ## The idea (approved brief)
 
@@ -113,9 +129,9 @@ I hand the data design to the multi-tenant data skill.
 
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
-| PS-001 | 2026-02-20 | Ship a small first version: create/assign/complete a job + a customer status link. Everything else waits. | user | yes | brief above; unblocks product spec |
-| PS-002 | 2026-02-27 | Build it as one connected system for now (not many separate services) — cheaper and simpler for a small team and a few hundred users. | orchestrator-via-architecture-advisor | yes | advisor output; unblocks data design |
-| PS-003 | 2026-03-04 | Status links stop working when the job closes (chosen over "expire in 30 days" / "last forever"). | user | yes | unblocks share-link design |
+| PS-001 | 2026-02-20 | Ship a small first version: create/assign/complete a job + a customer status link (chosen over a bigger first release, because a small v1 ships sooner and teaches us more). Everything else waits. | user | yes | brief above; unblocks product spec |
+| PS-002 | 2026-02-27 | Build it as one connected system for now (chosen over many separate services, because one system is cheaper and simpler for a small team and a few hundred users). | orchestrator-via-architecture-advisor | yes | advisor output; unblocks data design |
+| PS-003 | 2026-03-04 | Status links stop working when the job closes (chosen over "expire in 30 days" / "last forever", because a closed job's details shouldn't stay reachable). | user | yes | unblocks share-link design |
 
 ## Approvals (irreversible steps & scope grants)
 
@@ -134,4 +150,7 @@ Note how the user only ever answered **business** questions (what to ship, when 
 link should die, how separate customer data should feel), while the
 "one connected system vs many services" call was made by the orchestrator through
 `architecture-advisor` and recorded as `orchestrator-via-…` — explained in plain
-language, never handed to the user as a technical choice.
+language, never handed to the user as a technical choice. Every decision row
+carries its "(chosen over …, because …)" clause, and where the project stands
+lives in the snapshots table — the stage advance on 2026-03-04 is a NEW
+snapshot row (SS-002), not an edit to a header or to SS-001.
