@@ -1231,7 +1231,7 @@ Notes:
         trigger-evals.json   # when trigger overlaps another skill
 
 docs/
-  reconciliation/  research/  prompts/  roadmaps/  skills/  templates/
+  reconciliation/  research/  prompts/  roadmaps/  skills/
   skill-generation-standard.md
   skills-catalog.md
 

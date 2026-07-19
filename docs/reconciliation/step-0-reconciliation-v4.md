@@ -2232,6 +2232,13 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   - STRATEGIC NEXT ARC: behavioral eval runner — discovery-first,
     advisory-first, piloted on high-blast-radius skills; structural
     validity must not be presented as behavioral proof.
+  - Post-review alignment (same correction batch; PR #61 merged
+    `dbc6690` before this follow-up landed): skill-quality-reviewer's
+    Check 7, description shorthand, and posture reference table updated
+    to carry the standard's §5 approved-write exception (all three still
+    enforced the pre-D52 absolute rule); README's current-layout line
+    dropped the deleted `templates/` directory. Source: second-pass
+    external review of the executed batch.
 
 ---
 
