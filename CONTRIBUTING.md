@@ -140,3 +140,25 @@ be parsed at all degrades to a warning rather than blocking every PR. The map is
 territory mechanically, not by memory. See the **D43** entry in
 [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md)
 §5 for the decision.
+
+## External contributions
+
+Contributions are welcome from anyone. Every pull request is peer-reviewed by the
+maintainer before merge — outside contributions are never self-merged.
+
+Pull requests that touch a **security-relevant surface** get an explicit security
+review. Those surfaces are: `scripts/`, `.github/`, `AGENTS.md`,
+[`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
+any skill's frontmatter invocation posture (`disable-model-invocation` or the
+MANUAL-ONLY sentinel), its **Security Rules**, or its **Stop Conditions**.
+
+Before opening a PR:
+
+- The validator and self-tests must be green — `python scripts/validate-skills.py`
+  and `python scripts/tests/test_validator.py`.
+- Sign off every commit under the [Developer Certificate of
+  Origin](https://developercertificate.org): `git commit -s` adds the
+  `Signed-off-by:` line. There is **no CLA** — Apache-2.0 §5 already governs the
+  license of inbound contributions.
+
+Pull requests from forks run CI with read-only tokens by default.

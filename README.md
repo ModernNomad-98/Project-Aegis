@@ -260,7 +260,7 @@ press Enter. If typing `git` in it says the command isn't found, install Git fir
 [https://git-scm.com/downloads](https://git-scm.com/downloads).
 
 ```bash
-git clone https://github.com/nguyenpv1980-wq/Project-Aegis.git
+git clone https://github.com/ModernNomad-98/Project-Aegis.git
 cd Project-Aegis
 ```
 
@@ -1219,3 +1219,12 @@ scripts/
 Claude Code Skills and subagents can influence future code, tests, reviews, and tool usage.
 Review every generated skill and agent before trusting it. A reusable skill library is useful
 only if it is specific, testable, constrained, maintained, and validated.
+
+## License & contributing
+
+Project Aegis is licensed under the [Apache License 2.0](LICENSE). The **"Project
+Aegis"** and **"Zet-AI Engineering"** names are protected — see
+[TRADEMARKS.md](TRADEMARKS.md). Contributions are welcome, and every pull request
+is security-reviewed before merge — see [CONTRIBUTING.md](CONTRIBUTING.md). Report
+vulnerabilities privately through GitHub Private Vulnerability Reporting — see
+[SECURITY.md](SECURITY.md).
