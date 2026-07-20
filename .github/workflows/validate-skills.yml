@@ -28,6 +28,12 @@ jobs:
       - name: Install validator dependency (PyYAML)
         run: python -m pip install --quiet pyyaml
 
+      # Who validates the validator (decision D55). The gate's own hard checks
+      # are exercised against good/bad fixtures BEFORE it is trusted to judge
+      # the library, so a refactor cannot silently disarm one.
+      - name: Run validator self-tests
+        run: python scripts/tests/test_validator.py
+
       # The default bash shell runs with `-eo pipefail`, so a nonzero exit
       # from the validator fails this job.
       - name: Run skill validator

@@ -1,0 +1,272 @@
+#!/usr/bin/env python3
+"""Self-tests for scripts/validate-skills.py (decision D55).
+
+Run:  python scripts/tests/test_validator.py      # exit 0 = every assertion held
+
+WHY THIS EXISTS
+    validate-skills.py is the repo's single load-bearing merge gate, and until
+    D55 it had no tests at all. Every hard check it grew — the D43 README count
+    markers, the D50 strict-YAML / sentinel / block-scalar trio — was hand-proved
+    once in a pull-request description and never proved again. This suite
+    re-proves them on every CI run, so a later refactor cannot quietly disarm
+    one.
+
+NO PYTEST, DELIBERATELY
+    The repo's entire dependency surface is one package (PyYAML), and the
+    validator fails closed without it. Adding a test framework to test one
+    script would invert that minimalism. Plain asserts suffice: the first
+    failure prints and exits non-zero.
+
+PROVING THE SUITE CAN FAIL
+    A check nobody has watched fail is an assertion, not a gate. Every bad
+    fixture here is paired with the specific error text it must produce. To
+    confirm the suite is really wired to the validator, neuter one check and
+    re-run: comment out the `rep.error(...)` call inside
+    check_description_not_block_scalar() and the two block-scalar cases go red
+    immediately. Any other check can be checked the same way.
+
+IMPORT WRINKLE
+    validate-skills.py is hyphenated, so `import validate_skills` cannot reach
+    it; it is loaded by path through importlib below.
+"""
+from __future__ import annotations
+
+import importlib.util
+import sys
+from contextlib import contextmanager
+from pathlib import Path
+
+TESTS_DIR = Path(__file__).resolve().parent
+FIXTURES = TESTS_DIR / "fixtures"
+VALIDATOR_PATH = TESTS_DIR.parent / "validate-skills.py"
+
+
+def _load_validator():
+    spec = importlib.util.spec_from_file_location("aegis_validator", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"cannot load the validator from {VALIDATOR_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+validator = _load_validator()
+
+# Every satisfied expectation appends its label here, so the run ends with a
+# count rather than a bare "no news is good news".
+PASSES: list[str] = []
+
+
+def expect_error(rep, needle: str, label: str) -> None:
+    """Assert the report contains an error mentioning `needle`, and show it."""
+    hits = [e for e in rep.errors if needle in e]
+    if not hits:
+        raise AssertionError(
+            f"{label}\n    expected an error containing {needle!r}\n"
+            f"    got: {rep.errors or '[]'}"
+        )
+    PASSES.append(label)
+    fired = hits[0] if len(hits[0]) <= 132 else hits[0][:129] + "..."
+    print(f"  PASS  {label}")
+    print(f"        fired: {fired}")
+
+
+def expect_clean(rep, label: str) -> None:
+    """Assert the report is error-free."""
+    if rep.errors:
+        raise AssertionError(f"{label}\n    expected no errors\n    got: {rep.errors}")
+    PASSES.append(label)
+    print(f"  PASS  {label} (no errors)")
+
+
+@contextmanager
+def readme_at(path: Path):
+    """Point the validator's README constant at a fixture for one block."""
+    original = validator.README
+    validator.README = path
+    try:
+        yield
+    finally:
+        validator.README = original
+
+
+# --- existing hard checks (the D50 trio) ------------------------------------
+
+
+def test_strict_yaml_parse():
+    """D50: frontmatter must parse under a spec-strict YAML parser."""
+    good = "name: good-skill\ndescription: 'Does a thing: carefully, on one line.'\n"
+    rep = validator.Report()
+    parsed = validator.check_frontmatter_strict_yaml(good, "good-skill", rep)
+    expect_clean(rep, "strict-YAML accepts a single-quoted description containing ': '")
+    assert parsed["description"] == "Does a thing: carefully, on one line.", (
+        "the parsed value must have its quoting stripped"
+    )
+
+    bad = "name: bad-skill\ndescription: Does a thing: carelessly, unquoted.\n"
+    rep = validator.Report()
+    parsed = validator.check_frontmatter_strict_yaml(bad, "bad-skill", rep)
+    expect_error(
+        rep,
+        "does not parse as strict YAML",
+        "strict-YAML rejects an unquoted ': ' (the 67-skill Codex drop, D49/D50)",
+    )
+    assert parsed is None, "a failed parse must return None, not a partial mapping"
+
+    rep = validator.Report()
+    validator.check_frontmatter_strict_yaml("- just\n- a list\n", "listy", rep)
+    expect_error(rep, "must parse to a YAML mapping", "non-mapping frontmatter rejected")
+
+
+def test_description_block_scalar():
+    """D50 follow-up: a `description:` block scalar is forbidden pre-parse."""
+    for marker in (">", "|"):
+        fm = f"name: x\ndescription: {marker}\n  folded onto the next line\n"
+        rep = validator.Report()
+        validator.check_description_not_block_scalar(fm, "x", rep)
+        expect_error(
+            rep, "block scalar", f"block-scalar description '{marker}' rejected"
+        )
+
+    rep = validator.Report()
+    validator.check_description_not_block_scalar(
+        "name: x\ndescription: 'one quoted line'\n", "x", rep
+    )
+    expect_clean(rep, "a single-quoted description is not a block scalar")
+
+
+def test_manual_only_sentinel_bidirectional():
+    """D50: `disable-model-invocation` and the sentinel must agree both ways."""
+    sentinel = validator.MANUAL_ONLY_SENTINEL
+    assert len(sentinel) == 32, "the sentinel contract is exactly 32 chars"
+
+    rep = validator.Report()
+    validator.check_manual_only_sentinel(
+        "x", {"disable-model-invocation": True}, "Does a thing.", rep
+    )
+    expect_error(
+        rep,
+        "does not START with the exact sentinel",
+        "field -> sentinel: manual-only skill missing the sentinel is rejected",
+    )
+
+    rep = validator.Report()
+    validator.check_manual_only_sentinel("x", {}, sentinel + "Does a thing.", rep)
+    expect_error(
+        rep,
+        "would auto-invoke a skill whose text forbids it",
+        "sentinel -> field: sentinel without the field is rejected",
+    )
+
+    rep = validator.Report()
+    validator.check_manual_only_sentinel(
+        "x", {"disable-model-invocation": True}, sentinel + "Does a thing.", rep
+    )
+    expect_clean(rep, "field + sentinel agreeing is accepted")
+
+    rep = validator.Report()
+    validator.check_manual_only_sentinel("x", {}, "Does a thing.", rep)
+    expect_clean(rep, "an ordinary auto-invocable skill is accepted")
+
+
+# --- existing hard checks (the D43 README markers) --------------------------
+
+
+def test_readme_count_markers():
+    """D43: the marked counts must reconcile with the real skills on disk."""
+    with readme_at(FIXTURES / "readme" / "good.md"):
+        rep = validator.Report()
+        validator.check_readme_counts(5, rep)
+        validator.check_readme_family_roster(5, rep)
+        expect_clean(rep, "README fixture reconciles (SKILL-COUNT 5, 2+2 families +1)")
+
+    with readme_at(FIXTURES / "readme" / "bad-skill-count.md"):
+        rep = validator.Report()
+        validator.check_readme_counts(5, rep)
+        expect_error(
+            rep, "SKILL-COUNT marker says", "stale SKILL-COUNT marker rejected"
+        )
+
+    with readme_at(FIXTURES / "readme" / "bad-family-sum.md"):
+        rep = validator.Report()
+        validator.check_readme_family_roster(5, rep)
+        expect_error(
+            rep, "family counts sum to", "roster family counts out of sync rejected"
+        )
+
+    with readme_at(FIXTURES / "readme" / "good.md"):
+        rep = validator.Report()
+        validator.check_readme_family_roster(99, rep)
+        expect_error(
+            rep,
+            "family counts sum to",
+            "roster that no longer matches the disk count is rejected",
+        )
+
+
+# --- existing hard checks (whole-skill paths) -------------------------------
+
+
+def test_skill_end_to_end():
+    """The per-skill path over real fixture directories on disk."""
+    rep = validator.Report()
+    name = validator.validate_skill(FIXTURES / "skills" / "good-skill", rep)
+    expect_clean(rep, "the canonical good fixture skill validates end to end")
+    assert name == "good-skill", "validate_skill must return the skill name"
+
+    rep = validator.Report()
+    validator.validate_skill(FIXTURES / "skills" / "missing-section", rep)
+    expect_error(
+        rep,
+        "missing required section(s): Stop Conditions",
+        "a skill missing a required section is rejected",
+    )
+
+    rep = validator.Report()
+    validator.validate_skill(FIXTURES / "skills" / "long-description", rep)
+    expect_error(
+        rep,
+        "chars (parsed value; must be < 1024)",
+        "a description over the parsed-length ceiling is rejected",
+    )
+
+    rep = validator.Report()
+    validator.validate_skill(FIXTURES / "skills" / "no-such-fixture", rep)
+    expect_error(rep, "missing SKILL.md", "a skill directory without SKILL.md is rejected")
+
+
+TESTS = [
+    test_strict_yaml_parse,
+    test_description_block_scalar,
+    test_manual_only_sentinel_bidirectional,
+    test_readme_count_markers,
+    test_skill_end_to_end,
+]
+
+
+def main() -> int:
+    if validator.yaml is None:
+        print(
+            "ERROR PyYAML is required to exercise the strict frontmatter parse; "
+            "install it with: python -m pip install -r requirements.txt"
+        )
+        return 1
+
+    print(f"Self-testing {VALIDATOR_PATH.name} ...\n")
+    for test in TESTS:
+        summary = (test.__doc__ or "").strip().splitlines()[0]
+        print(f"{test.__name__} - {summary}")
+        try:
+            test()
+        except AssertionError as exc:
+            print(f"  FAIL  {exc}")
+            print(f"\nFAILED after {len(PASSES)} passing assertion(s).")
+            return 1
+        print()
+
+    print(f"OK: {len(PASSES)} validator self-test assertion(s) passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
