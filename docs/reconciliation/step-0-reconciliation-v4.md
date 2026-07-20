@@ -2558,6 +2558,57 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     `catalog:93` (identity-class mentions outside the original scope). Source:
     post-build review against the combined prompt.
 
+- **D57 (2026-07-20) — About restructure: the construction history
+  relocated to `docs/HISTORY.md`; the README leads with what-it-is and the
+  Start-here picker (docs-only; count stays 184).**
+  - Scope: `README.md`, the new `docs/HISTORY.md`, and this entry. No
+    `scripts/`, `.github/`, or `.claude/` files — `gate-guard` passes and
+    both CI checks are green. The skill corpus is untouched; this is a layout
+    pass, not a content one.
+  - **Why.** The About block ran identity → name story → then a wall of
+    construction history (Phase 0 … Phase 7.5, the D12 craft-pack run, the
+    per-decision recap through D47/184). Popular-repo READMEs (FastAPI, React,
+    LangChain) answer "what is this and why should I care" in seconds and LINK
+    the history rather than showing it; the narrative was correct but buried
+    the orientation a newcomer needs and pushed the "Start here" picker far
+    down the page.
+  - **The move (verbatim relocation, append-only spirit).** README lines
+    31–86 — the entire phase/decision prose narrative, "The repo is built in
+    **phases** …" through "… bringing it to **184 skills** (183→184)." — were
+    lifted byte-for-byte into `docs/HISTORY.md` under a three-line intro that
+    names the reconciliation log (D1–D56) as the authoritative record and
+    links back to the README. Byte-identity proof: the 56-line / 5795-byte
+    region hashes identically pre-move (extracted from the README) and
+    post-move (the body of `HISTORY.md`, intro excluded) —
+    `sha256 b8c16a347fc22b1a187dd4942f664961f327279163753bb1bf8fe9743fcb18ce`.
+    Zero content lost; the historical counts inside the narrative (175 through
+    184, plus every per-pack size) are preserved untouched — they are history,
+    correctly frozen.
+  - **The replacement (one new paragraph, countless).** In its place, a short
+    "How it's built" paragraph: built in validated phases, every addition
+    recorded as an immutable dated decision in the reconciliation log, nothing
+    merged without independent audit and a green validator, full story →
+    `docs/HISTORY.md` and decision-by-decision record → the reconciliation
+    log (both linked). The paragraph carries no counts (countless rule); its
+    only digits are the linked filename `step-0-reconciliation-v4.md`.
+  - **Result.** README 1272 → 1221 lines (−51). The "Start here: pick your
+    path" picker rose from line 139 to line 88 — substantially earlier, the
+    point of the pass. Nothing below the About block was reworded; the
+    Decision Log table (the structured D1…D47 record, including its own
+    "183→184") stays in the README as a separate representation. The one
+    governed `SKILL-COUNT`/`FAMILY-COUNT` marker pair (:485 post-move) is
+    unmoved and reconciles at 184. No dangling anchors — the moved prose held
+    no headings, so nothing anchored into it, and all 8 internal README
+    anchors still resolve to their 22 headings.
+  - Validator: **184 skills, exit 0, 0 warnings**; self-tests **38/38**. `git
+    diff --check` clean; private-name sweep clean on all new and moved-intro
+    prose. No `scripts/` or `.github/` files touched — normal merge.
+  - **Companion owner actions (outside the repo).** The GitHub "About"
+    description and topics are set by the owner to the agreed plain-language
+    text, so the repo's own front matter now matches this framing. **Next:
+    D58 — the open-source readiness pack — is planned, pending the license
+    decision.**
+
 ---
 
 ## 6. Post-merge corrections
