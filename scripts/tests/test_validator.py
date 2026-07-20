@@ -374,6 +374,46 @@ def test_docs_paths_links():
     )
 
 
+def test_workflows_sha_pinned():
+    """D55: every action must be pinned to a full 40-hex commit SHA."""
+    workflows = FIXTURES / "workflows"
+
+    rep = validator.Report()
+    validator.check_workflows_sha_pinned(rep, workflows / "pinned")
+    expect_clean(
+        rep,
+        "a 40-hex pin with a trailing `# vX.Y.Z`, plus a local action, is accepted",
+    )
+
+    rep = validator.Report()
+    validator.check_workflows_sha_pinned(rep, workflows / "floating")
+    expect_error(
+        rep, "actions/checkout@v7", "a floating tag `@v7` is rejected"
+    )
+    expect_error(
+        rep, "actions/setup-python@ece7cb0", "an abbreviated SHA is rejected too"
+    )
+
+    # Pin the real surface: the workflows directory must exist and actually
+    # contain action references, or this check could pass by scanning nothing.
+    shipped = [
+        p
+        for p in validator.WORKFLOWS_DIR.iterdir()
+        if p.suffix in (".yml", ".yaml")
+    ]
+    assert shipped, f"expected workflows under {validator.WORKFLOWS_DIR}"
+    refs = sum(
+        1
+        for p in shipped
+        for line in p.read_text(encoding="utf-8").splitlines()
+        if validator.USES_ACTION_REF.match(line.split("#", 1)[0])
+    )
+    assert refs, "expected the shipped workflows to reference actions"
+    rep = validator.Report()
+    validator.check_workflows_sha_pinned(rep)
+    expect_clean(rep, f"all {refs} shipped action references are SHA-pinned")
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -383,6 +423,7 @@ TESTS = [
     test_section_order,
     test_agents_schema,
     test_docs_paths_links,
+    test_workflows_sha_pinned,
 ]
 
 

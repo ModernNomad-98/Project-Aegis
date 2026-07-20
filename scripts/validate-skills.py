@@ -50,6 +50,9 @@ Repo-level checks:
     every SKILL.md link in docs/paths/ and every docs/paths link in the README
     resolves on disk, and a `[`foo`](.../bar/SKILL.md)` label matches its
     target. Automates the manual "on rename or retire, grep docs/paths/" step.
+  * workflow action pinning (decision D55 — check_workflows_sha_pinned, HARD):
+    every `uses: …@ref` under .github/workflows/ names a full 40-hex commit SHA,
+    never a movable tag, so a floating pin cannot be reintroduced.
   * README map-matches-territory (decision D43): the README's marked SKILL-COUNT
     equals the real skill count on disk, and the roster's per-family counts (plus
     the one project-orchestrator front door) reconcile with disk and with the
@@ -63,8 +66,9 @@ and exits 0.
 
 Exit code 0 = clean (possibly with warnings), non-zero = at least one error.
 Requires PyYAML for the strict frontmatter parse (decision D50):
-`python -m pip install pyyaml`. Fails closed if it is missing. No other
-third-party dependencies.
+`python -m pip install -r requirements.txt`. Fails closed if it is missing. No
+other third-party dependencies — and the self-tests in scripts/tests/ keep it
+that way by using plain asserts rather than a test framework (decision D55).
 """
 from __future__ import annotations
 
@@ -85,6 +89,7 @@ SKILLS_DIR = REPO_ROOT / ".claude" / "skills"
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 CATALOG = REPO_ROOT / "docs" / "skills-catalog.md"
 PATHS_DIR = REPO_ROOT / "docs" / "paths"
+WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 README = REPO_ROOT / "README.md"
 
 IGNORED_DIRS = {"_template"}
@@ -739,6 +744,52 @@ def check_docs_paths_links(
                 )
 
 
+# A workflow step referencing an action, e.g. "- uses: actions/checkout@<ref>".
+# Any trailing "# vX.Y.Z" comment is stripped before this is applied.
+USES_ACTION_REF = re.compile(
+    r"^\s*(?:-\s*)?uses:\s*(?P<action>[^\s@]+)@(?P<ref>\S+)\s*$"
+)
+FULL_COMMIT_SHA = re.compile(r"^[0-9a-f]{40}$")
+
+
+def check_workflows_sha_pinned(rep: Report, workflows_dir: Path | None = None) -> None:
+    """Decision D55 (HARD): pin every action to a full 40-hex commit SHA.
+
+    A tag is a movable pointer: `@v7` can be force-pushed onto different code,
+    so what runs tomorrow need not be what was reviewed today. A commit SHA
+    cannot move. Short SHAs are rejected too — only the full 40 characters carry
+    the collision resistance the pin depends on.
+
+    Readability is preserved by convention, not by the ref: keep the version in
+    a trailing `# vX.Y.Z` comment, which dependabot rewrites when it bumps the
+    pin. References without an `@ref` (local composite actions such as
+    `./.github/actions/foo`) are not action pins and are left alone.
+
+    This is what turns "we pinned once" into "a floating tag cannot come back".
+    """
+    workflows_dir = WORKFLOWS_DIR if workflows_dir is None else workflows_dir
+    if not workflows_dir.is_dir():
+        return
+    for wf in sorted(
+        p for p in workflows_dir.iterdir() if p.suffix in (".yml", ".yaml")
+    ):
+        ctx = _rel(wf)
+        for lineno, raw in enumerate(
+            wf.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            m = USES_ACTION_REF.match(raw.split("#", 1)[0])
+            if not m:
+                continue
+            ref = m.group("ref")
+            if not FULL_COMMIT_SHA.match(ref):
+                rep.error(
+                    f"[{ctx}:{lineno}] `uses: {m.group('action')}@{ref}` is not "
+                    "pinned to a full 40-hex commit SHA (a tag can be moved onto "
+                    "different code; keep the version legible in a trailing "
+                    "`# vX.Y.Z` comment)"
+                )
+
+
 def check_name_collisions(skill_names: list[str], rep: Report) -> None:
     seen: set[str] = set()
     for name in skill_names:
@@ -781,6 +832,7 @@ def main() -> int:
     # Repo surfaces outside .claude/skills/ (decision D55).
     check_agents_schema(rep)                       # HARD
     check_docs_paths_links(rep)                    # HARD
+    check_workflows_sha_pinned(rep)                # HARD
 
     # README map-matches-territory (decision D43): reconcile the README's
     # authoritative counts and roster against the real skills on disk.
