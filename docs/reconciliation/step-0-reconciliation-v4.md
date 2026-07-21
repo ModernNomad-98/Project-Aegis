@@ -2609,6 +2609,64 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     D58 — the open-source readiness pack — is planned, pending the license
     decision.**
 
+- **D58 (2026-07-21) — Open-source readiness pack: an Apache-2.0 license,
+  trademark and security policies, code-owner review, a code of conduct, and a
+  DCO-based contribution model (governance/docs only; count stays 184).**
+  - Scope (eleven touches): new `LICENSE`, `NOTICE`, `TRADEMARKS.md`,
+    `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/CODEOWNERS`, and
+    `.github/pull_request_template.md`; a new "External contributions" section
+    appended to `CONTRIBUTING.md`; two `README.md` touches (a "License &
+    contributing" section and the clone URL); one annotation in
+    [`auto-merge-policy.md`](auto-merge-policy.md); and this entry. No `scripts/`,
+    no workflow files, no `.claude/`. `.github/CODEOWNERS` and the PR template sit
+    outside `.github/workflows/` and match nothing in `gate-guard`'s regex, so
+    both CI checks stay green and this merges normally. The skill corpus is
+    untouched.
+  - **License rationale (Apache-2.0).** Chosen for three properties this library
+    needs: §5 licenses inbound contributions under the same terms **without a
+    CLA** (contributors sign off with the DCO instead); §6 grants **no trademark
+    rights**, which — paired with `TRADEMARKS.md` — lets the material be freely
+    forked while the **"Project Aegis"** and **"Zet-AI Engineering"** names stay
+    protected; and its explicit patent grant with a termination-on-litigation
+    clause gives downstream users patent clarity a bare MIT/BSD notice does not.
+  - **Copyright-holder convention.** `NOTICE` attributes copyright to **"The
+    Project Aegis Authors"**, a collective holder rather than a named individual,
+    so the attribution never needs editing as contributors join — it stays
+    correct with zero maintenance.
+  - **CODEOWNERS reinstated, reversing D55's drop with cause.** D55's
+    gate-hardening batch deliberately dropped a CODEOWNERS file as solo-maintainer
+    ceremony: with a single committer it added a review gate that guarded nothing.
+    Opening the repository to outside contributions inverts that judgment —
+    `* @ModernNomad-98` now makes maintainer review of **every path** structurally
+    mandatory (once the owner enables "Require review from Code Owners"), which is
+    exactly the enforcement D55 correctly called pointless when no external PRs
+    existed. Same artifact, opposite context, opposite decision — recorded here,
+    not silently flipped.
+  - **DCO, not a CLA.** Every commit carries a `Signed-off-by:` line
+    (`git commit -s`) attesting to the [Developer Certificate of
+    Origin](https://developercertificate.org). No copyright assignment and no CLA
+    bot; Apache-2.0 §5 already fixes the inbound license.
+  - **Owner rename recorded.** The canonical repository moved
+    `nguyenpv1980-wq` → `ModernNomad-98` (both under `/Project-Aegis`; old URLs
+    redirect). A repo-wide census updated the single **live** reference — the
+    README clone URL — to `ModernNomad-98`. **Historical records were preserved
+    untouched**: the dated `Repo:` headers in the reconciliation docs (this file,
+    and `auto-merge-policy.md`, whose header was extended as an annotated rename
+    chain rather than overwritten) and the `nguyenpv1980-wq` mentions under
+    `docs/prompts/` and `docs/research/`. Zero live `nguyenpv1980` references
+    remain outside historical records.
+  - **Owner actions required to activate (outside the repo).** The pack wires the
+    policy; five owner-only settings bring it live: enable **Private Vulnerability
+    Reporting** (the SECURITY.md flow), enable branch protection's **"Require
+    review from Code Owners"** (arms CODEOWNERS), set the **auto-merge** repository
+    toggle per [`auto-merge-policy.md`](auto-merge-policy.md), paste the agreed
+    **About** description/topics, and **park the old `nguyenpv1980-wq` username**
+    so the redirects cannot be reclaimed by a third party.
+  - Validator: **184 skills, exit 0, 0 warnings**; self-tests **38/38**. `git
+    diff --check` clean; private-name sweep clean. No `scripts/` or workflow files
+    touched — normal merge; auto-merge left unarmed (this repo's PR-no-merge
+    policy).
+
 ---
 
 ## 6. Post-merge corrections
