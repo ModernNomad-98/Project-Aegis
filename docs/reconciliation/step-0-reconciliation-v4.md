@@ -2667,6 +2667,109 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     touched — normal merge; auto-merge left unarmed (this repo's PR-no-merge
     policy).
 
+- **D59 (2026-07-22) — Governance-prose corrections: current-state counts made
+  countless outside the one governed surface, a single canonical security-review
+  sentence, and the deferred and pending owner items recorded (governance and docs
+  only; count stays 184).**
+  - **The rule this batch encodes (superseding the earlier blanket phrasing).**
+    Current-state **skill totals, family totals, subagent totals, and decision-range
+    endpoints** may appear only in a **governed surface** — the README's single
+    `<!-- SKILL-COUNT -->` / `<!-- FAMILY-COUNT -->` marker pair, which the validator
+    reconciles against the skills actually on disk — or as a **countless pointer** to
+    it. Everywhere else the prose says *what kind* of thing exists, never *how many*.
+    Historical milestone numbers, per-batch deltas (`183→184`), decision IDs, dates,
+    and evidence counts stay legal **when clearly historical**: they describe a past
+    state, so they never go stale. A number that must be re-verified on every build is
+    a maintenance liability; a number the validator already guards is not. This
+    supersedes the earlier blanket phrasing, which banned counts without saying which
+    ones or where they were allowed to live.
+  - **Prose corrections (eight live surfaces).**
+    - [`README.md`](../../README.md) §"Getting started" step 3 — "the 184 skills and 7
+      subagents load automatically" became "every skill and subagent loads
+      automatically", removing two live totals from the first page a newcomer reads.
+    - `README.md` §"Map of the system" — "the 184 shipped procedures: 22 discipline
+      families" became "the shipped procedures, organized into discipline families
+      (authoritative counts: the marked intro below)". The directional word is
+      **below**, not above: "Map of the system" precedes "What's in the library".
+    - `README.md` §"Map of the system" — "seven read-only specialist reviewers" became
+      "the read-only specialist reviewers". A spelled-out total is still a total; the
+      word-versus-digit distinction is an artifact of how counts are *found*, not of
+      what the rule governs.
+    - `README.md` §"Map of the system" — "the dated decisions (D1–D46) in §5" lost its
+      range endpoint, which had long since gone stale.
+    - `README.md` §"What's in the library" — "It isn't one of the 22 families" became
+      "one of those families", five lines below the marker pair it duplicated.
+    - [`docs/HISTORY.md`](../HISTORY.md) intro — the "(D1–D56)" endpoint became a
+      countless pointer, **and the document's boundary was made honest**: it now reads
+      "curated construction history ... through **D47**", naming the reconciliation log
+      as the complete authoritative record. The old intro implied the history covered
+      every decision through D56 when its narrative in fact stops at D47. The moved
+      narrative body was not touched.
+    - [`docs/skills-catalog.md`](../skills-catalog.md) status block — the historical
+      delta `(183→184)` was **kept**; the live clause "bringing the library to its
+      current **184 skills**" was dropped. One sentence, two classes of number, only
+      one of them removed.
+    - [`CONTRIBUTING.md`](../../CONTRIBUTING.md) step 3c — "increment the '20 discipline
+      families' claims" became "increment the marked `FAMILY-COUNT`". This one was
+      **already wrong** (the real total is 22) and contradicted step 3d directly below
+      it, which correctly names the markers as authoritative. It was found by the
+      census, not by the planned item list — the exact failure mode the rule exists to
+      prevent.
+  - **One canonical security-review sentence, verbatim in both places.** The README
+    claimed "every pull request is security-reviewed before merge", which overstates
+    the model: **every** pull request gets maintainer review, and only those touching a
+    security-relevant surface get the additional security review. Both surfaces now
+    carry the same sentence body — *"Every pull request is reviewed by the maintainer
+    before merge; pull requests touching a security-relevant surface receive an
+    additional explicit security review"* — with the README closing on a pointer to
+    `CONTRIBUTING.md`, and `CONTRIBUTING.md` continuing straight into the surface list
+    it owns. `CONTRIBUTING.md`'s prior wording ("peer-reviewed", plus a separate
+    paragraph that re-opened the security tier) differed materially enough to align.
+  - **Conduct-reporting channel — not yet actionable; owner decision pending.**
+    [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md) directs reports "privately to the
+    maintainer @ModernNomad-98 via GitHub". **GitHub has no private user-to-user
+    messaging**, so as written the channel cannot be used. **The file was deliberately
+    left unchanged** rather than patched with a placeholder: a concrete confidential
+    intake — an email address or a form — is an owner decision, not an editorial one.
+    **Private Vulnerability Reporting is not a substitute**: PVR is scoped to security
+    vulnerabilities, not conduct, and its reports land in front of repository
+    maintainers under a security workflow — the wrong venue for a complaint that may
+    be *about* a maintainer.
+  - **Owner-action ledger, updated.** Of the five owner-only settings D58 listed:
+    - **Private Vulnerability Reporting — CONFIRMED ACTIVE** by the owner. Removed from
+      pending; the `SECURITY.md` flow is live.
+    - **"Require review from Code Owners" — deliberately deferred, with a trigger.**
+      During the solo phase `.github/CODEOWNERS` names the only committer, so the gate
+      would block the maintainer on the maintainer's own pull requests and buy nothing.
+      **Flip it on at the first external pull request or the first added
+      collaborator** — that is the moment the enforcement D58 reinstated the file for
+      becomes real. Recorded as a deferral with a trigger, not as an omission.
+    - **Parking the old `nguyenpv1980-wq` username — verify first, then test.** Park it
+      with **no repository named `Project-Aegis` under it**: per GitHub's documentation,
+      creating a repository of that name in the old namespace **overrides the
+      redirect** — precisely the failure the parking exists to prevent. Note also that
+      the old namespace **may already be permanently retired**, since GitHub does not
+      release a renamed owner's namespace when the repository met the
+      more-than-100-clones-in-the-prior-week threshold at rename time; the parking
+      attempt may therefore simply be refused. **Test the redirect after parking**
+      either way — parking counts as successful only if the old URLs still resolve.
+    - **Repository-level "Allow auto-merge" — owner-verify.** External metadata
+      reported the repository toggle still enabled. This is **distinct from per-PR
+      arming**, which is verified `null` on every pull request this project opens and
+      was verified `null` again here. The repository toggle is a capability, not a
+      state; the owner should confirm it matches
+      [`auto-merge-policy.md`](auto-merge-policy.md).
+    - The **About** description and topics paste was completed at D57.
+  - Validator: **184 skills, exit 0, 0 warnings**; self-tests **38/38**. The single
+    `<!-- SKILL-COUNT -->` marker pair is unmoved, still appears exactly once, and
+    still reconciles. A live-count census across `README.md`, `docs/HISTORY.md`,
+    `docs/skills-catalog.md`, `CONTRIBUTING.md`, `AGENTS.md`, and `docs/paths/`
+    classified every remaining digit- or word-bearing number as historical, leaving
+    **zero live-count survivors** outside the marker pair. `git diff --check` clean;
+    private-name sweep clean. No `scripts/`, no `.github/`, no `.claude/` files
+    touched — both CI checks green, normal merge; auto-merge left unarmed (this
+    repo's PR-no-merge policy).
+
 ---
 
 ## 6. Post-merge corrections

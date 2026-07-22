@@ -86,9 +86,9 @@ own proven practice, including failures it absorbed during its own construction.
    - **3c. [README](README.md) → the roster family under "What's in the library"** (the numbered
      family list) — if the skill is a flagship example of its family, add it to that family's
      `*e.g.*` list, and **increment that family's count** in the `*(Phase/D, N)*` marker. If it
-     starts a **new** family, add the family line **and** increment the "20 discipline families"
-     claims. *(The flagship choice is judgment; the family-count total is validator-enforced —
-     see 3d.)*
+     starts a **new** family, add the family line **and** increment the marked
+     `FAMILY-COUNT`. *(The flagship choice is judgment; the family-count total is
+     validator-enforced — see 3d.)*
    - **3d. [README](README.md) → the count claims** — the current-total ("N skills") and the
      family count ("N discipline families") must match reality. The authoritative numbers are
      wrapped in `<!-- SKILL-COUNT -->…<!-- /SKILL-COUNT -->` and
@@ -143,11 +143,12 @@ territory mechanically, not by memory. See the **D43** entry in
 
 ## External contributions
 
-Contributions are welcome from anyone. Every pull request is peer-reviewed by the
-maintainer before merge — outside contributions are never self-merged.
+Contributions are welcome from anyone. Every pull request is reviewed by the
+maintainer before merge; pull requests touching a security-relevant surface
+receive an additional explicit security review. Outside contributions are never
+self-merged.
 
-Pull requests that touch a **security-relevant surface** get an explicit security
-review. Those surfaces are: `scripts/`, `.github/`, `AGENTS.md`,
+Those **security-relevant surfaces** are: `scripts/`, `.github/`, `AGENTS.md`,
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
 any skill's frontmatter invocation posture (`disable-model-invocation` or the
 MANUAL-ONLY sentinel), its **Security Rules**, or its **Stop Conditions**.

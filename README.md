@@ -285,8 +285,8 @@ pick whichever matches how you work. The current full list is at
    claude
    ```
 
-3. That's the whole setup. Claude Code auto-discovers everything under `.claude/` — the 184
-   skills and 7 subagents load automatically. There is no registration step.
+3. That's the whole setup. Claude Code auto-discovers everything under `.claude/` — every
+   skill and subagent loads automatically. There is no registration step.
 4. **How you invoke a skill** — skills are trigger-invoked, not slash-commanded. You invoke
    one by *describing a task that matches its trigger*, or by *naming it*. Two literal
    prompts to type at the Claude Code prompt:
@@ -460,16 +460,17 @@ entry in the reconciliation doc.
 
 ## Map of the system
 
-- **Skills** ([`.claude/skills/`](.claude/skills/)) — the 184 shipped procedures: 22
-  discipline families, fronted by `project-orchestrator`, the beginner-facing router that
-  walks a non-developer through them from idea to shipped. See **[What's in the
+- **Skills** ([`.claude/skills/`](.claude/skills/)) — the shipped procedures, organized
+  into discipline families (authoritative counts: the marked intro below), fronted by
+  `project-orchestrator`, the beginner-facing router that walks a non-developer through
+  them from idea to shipped. See **[What's in the
   library](#whats-in-the-library)** below for the roster (each family, its purpose, and
   example skills), and [Skills (shipped)](#skills-shipped) for the full per-skill tables.
-- **Subagents** — seven read-only specialist reviewers, one per lens; see
+- **Subagents** — the read-only specialist reviewers, one per lens; see
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions (D1–D46) in §5 are the project's immutable decision log; the
+  — the dated decisions in §5 are the project's immutable decision log; the
   D12/D14 candidate scopes recorded there are banked-but-not-built future
   work (the D12.8 pack graduated from banked to built with D21; the D13
   library-meta scope completed with D22).
@@ -487,7 +488,7 @@ build batch), fronted by one beginner-facing orchestrator. This is the scannable
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below.
 
 **Start here — `project-orchestrator` (the front door).** If you're a non-developer with an
-idea and no idea what to do first, this is the one skill to name. It isn't one of the 22 families — it's
+idea and no idea what to do first, this is the one skill to name. It isn't one of those families — it's
 the navigator *above* them all: it works out which stage your project is in, routes you to
 the right skill below (you never need its name), turns every technical choice into a
 plain-language business question, records each dated decision in a `docs/project-state.md`, and
@@ -1224,7 +1225,8 @@ only if it is specific, testable, constrained, maintained, and validated.
 
 Project Aegis is licensed under the [Apache License 2.0](LICENSE). The **"Project
 Aegis"** and **"Zet-AI Engineering"** names are protected — see
-[TRADEMARKS.md](TRADEMARKS.md). Contributions are welcome, and every pull request
-is security-reviewed before merge — see [CONTRIBUTING.md](CONTRIBUTING.md). Report
-vulnerabilities privately through GitHub Private Vulnerability Reporting — see
-[SECURITY.md](SECURITY.md).
+[TRADEMARKS.md](TRADEMARKS.md). Contributions are welcome. Every pull request is
+reviewed by the maintainer before merge; pull requests touching a security-relevant
+surface receive an additional explicit security review — see
+[CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities privately through GitHub
+Private Vulnerability Reporting — see [SECURITY.md](SECURITY.md).

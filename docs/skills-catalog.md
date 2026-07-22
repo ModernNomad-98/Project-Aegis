@@ -79,8 +79,7 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > pointer hole (`admin-console-architect` punts telemetry →
 > `observability-operator` operates backends → nobody designed the console):
 > the layered panel IA with restraint plus the cross-tenant READ-security
-> model, composing the ~12 feed owners rather than restating them (183→184)
-> — bringing the library to its current **184 skills**.
+> model, composing the ~12 feed owners rather than restating them (183→184).
 > `_template` remains a reference template ignored by the validator.
 > Everything under "Backlog" is planned, not built.
 

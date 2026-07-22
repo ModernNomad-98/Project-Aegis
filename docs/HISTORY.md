@@ -1,7 +1,7 @@
 # Project Aegis — Construction History
 
-The construction history of Project Aegis, phase by phase. The authoritative record is the
-decision log (D1–D56) in `docs/reconciliation/` —
+Curated construction history of Project Aegis, phase by phase, through **D47**. The
+complete authoritative record is the dated decision log in `docs/reconciliation/` —
 [`step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md). For what Project
 Aegis *is* and how to start, see the [README](../README.md).
 
