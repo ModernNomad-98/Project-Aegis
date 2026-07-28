@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Self-tests for the repo's gate scripts (decisions D55, D60).
+"""Self-tests for the repo's gate scripts (decisions D55, D60, D61).
 
 Covers scripts/validate-skills.py (D55) and scripts/check_dco.py (D60). The
 file name predates the second script; the CI step runs one command, so the
@@ -423,6 +423,52 @@ def test_workflows_sha_pinned():
     expect_clean(rep, f"all {refs} shipped action references are SHA-pinned")
 
 
+# --- checks added by decision D61 (the Claude Code startup bridge) ----------
+
+
+def test_claude_bridge():
+    """D61: the repo-root CLAUDE.md startup bridge must exist and stay intact."""
+    bridge = FIXTURES / "claude-bridge"
+
+    rep = validator.Report()
+    validator.check_claude_bridge(rep, bridge / "good.md")
+    expect_clean(
+        rep, "a CLAUDE.md importing @AGENTS.md and adding the routing section is accepted"
+    )
+
+    rep = validator.Report()
+    validator.check_claude_bridge(rep, bridge / "no-import.md")
+    expect_error(
+        rep,
+        "not the required",
+        "a CLAUDE.md whose first line is not the @AGENTS.md import is rejected",
+    )
+
+    rep = validator.Report()
+    validator.check_claude_bridge(rep, bridge / "no-section.md")
+    expect_error(
+        rep,
+        "missing the",
+        "a CLAUDE.md that imports but adds no startup-routing section is rejected",
+    )
+
+    rep = validator.Report()
+    validator.check_claude_bridge(rep, bridge / "no-such-file.md")
+    expect_error(
+        rep,
+        "must contain CLAUDE.md",
+        "a missing repo-root CLAUDE.md is rejected",
+    )
+
+    # Pin the real surface, so a mis-pathed CLAUDE_MD cannot make this a no-op.
+    assert validator.CLAUDE_MD.is_file(), (
+        f"expected a shipped bridge at {validator.CLAUDE_MD}"
+    )
+    rep = validator.Report()
+    validator.check_claude_bridge(rep)
+    expect_clean(rep, "the shipped repo-root CLAUDE.md bridge conforms")
+
+
 # --- checks added by decision D60 (scripts/check_dco.py) --------------------
 #
 # These exercise check_dco.py's rules as pure functions over commit RECORDS, so
@@ -560,6 +606,7 @@ TESTS = [
     test_agents_schema,
     test_docs_paths_links,
     test_workflows_sha_pinned,
+    test_claude_bridge,
     test_dco_signoff_required,
     test_dco_bot_exemption,
     test_dco_record_parsing,

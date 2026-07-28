@@ -2908,6 +2908,61 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     the event does not exist before then. After merging, check the Actions tab for a
     `validate-skills` run triggered by the `push` to `main`: the `validate-skills` job
     green, `gate-guard` skipped.
+
+- **D61 (2026-07-28) — Claude Code startup bridge: a root `CLAUDE.md` that imports the
+  shared `AGENTS.md` contract and adds Claude-Code-specific startup routing, plus a HARD
+  validator check that keeps the bridge intact (count stays 184).**
+  - **The gap this closes, observed not assumed.** An authentic beginner acceptance test
+    run in Claude Code failed: with only `AGENTS.md` at the root, Claude Code loaded no
+    startup instructions, never opened `project-orchestrator`, chose a stack, ran
+    `npm install`, and scaffolded eighteen files before any requirements work. The cause
+    is documented, not mysterious — the Claude Code memory documentation is explicit that
+    **Claude Code reads `CLAUDE.md`, not `AGENTS.md`**, at session start. Codex CLI reads
+    `AGENTS.md`; the two tools were never reading the same file, and only one of them had
+    a file to read.
+  - **The fix is the pattern the memory docs themselves prescribe.** A repo-root
+    [`CLAUDE.md`](../../CLAUDE.md) whose **first line is the import `@AGENTS.md`** — a
+    same-directory import Claude Code resolves at session start (and after compaction)
+    with no approval dialog — followed by a short **`## Claude Code — startup routing`**
+    section carrying only what the import alone does not make salient: list
+    `.claude/skills/` and open the owning `SKILL.md` before acting; route an end-to-end
+    or vague request through `project-orchestrator` from Stage 0; use the owning skill
+    directly for a scoped single-stage request; never auto-invoke a MANUAL-ONLY skill;
+    and, when the matching skill is absent from this copy, say so plainly rather than
+    invent or substitute one. One shared contract, two documented entry points.
+  - **Honest limit, kept in the wording.** Memory is **context, not enforcement** — the
+    bridge makes the routing *salient*, it does not make it deterministic, so no new
+    wording claims a mechanical guarantee. The README's beginner promise now reads
+    "model-driven behavior enabled by the repo's startup instructions — verified by a
+    live acceptance test, not a mechanical guarantee." `CLAUDE.md` is itself **countless**
+    — no totals, no ranges — so it never becomes a surface anyone must reconcile.
+  - **`AGENTS.md` left byte-identical.** The shared contract did not change; `CLAUDE.md`
+    imports it rather than restating it, so the two entry points cannot drift apart.
+  - **README, exactly three touches.** (a) The tools-section "Out of the box" bullet
+    carried a **false claim** — that `AGENTS.md` is read "as extra context by Claude
+    Code" — now corrected to the documented truth (Codex reads `AGENTS.md`; Claude Code
+    reads `CLAUDE.md`, which imports it), the verified-against framing kept. (b) The
+    beginner "one prompt to start" promise gains the model-driven honesty clause above.
+    (c) The "files to copy" guidance now names `CLAUDE.md` (Claude Code's startup file;
+    it imports `AGENTS.md`). **Census recorded:** the README had **no** pre-existing
+    instruction to copy `AGENTS.md` into a user's own repo — the sole copy-into-your-repo
+    region copies individual skill folders — so touch (c) is one addition there, not an
+    update to a list that never existed.
+  - **The bridge is a HARD check, not a hope**
+    ([`check_claude_bridge`](../../scripts/validate-skills.py)). Three conditions, each
+    fail-closed: `CLAUDE.md` exists at the root; its first line is exactly `@AGENTS.md`;
+    the startup-routing section header is present. It is dependency-injected like the D55
+    surface checks (a fixture path for the negatives, the real repo-root file for the
+    live pin), so it exercises bad inputs **and** proves the shipped bridge conforms — a
+    green check that scanned nothing is the failure mode D55 taught us to guard.
+  - **Proofs.** Self-tests **51/51** (46 before, five added: the good bridge passes, a
+    non-`@AGENTS.md` first line fails, a missing routing section fails, an absent file
+    fails, and the shipped root file conforms). Validator **184 skills, exit 0, 0
+    warnings**. Both gate scripts byte-compile; `git diff --check` clean; private-name
+    sweep clean. This pull request edits `scripts/validate-skills.py` and adds under
+    `scripts/tests/`, so **`gate-guard` is RED by design** and the merge is a human admin
+    merge (the D43/D50/D55/D60 precedent); `validate-skills` must be green. Auto-merge
+    left unarmed (this repo's PR-no-merge policy).
 ---
 
 ## 6. Post-merge corrections

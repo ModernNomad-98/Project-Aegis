@@ -53,6 +53,12 @@ Repo-level checks:
   * workflow action pinning (decision D55 — check_workflows_sha_pinned, HARD):
     every `uses: …@ref` under .github/workflows/ names a full 40-hex commit SHA,
     never a movable tag, so a floating pin cannot be reintroduced.
+  * Claude Code startup bridge (decision D61 — check_claude_bridge,
+    HARD): the repository root carries a CLAUDE.md whose first line imports the
+    shared contract (`@AGENTS.md`) and which adds a startup-routing section.
+    Claude Code reads CLAUDE.md, not AGENTS.md, at session start; without the
+    bridge no startup routing loads (an authentic beginner acceptance test
+    confirmed it).
   * README map-matches-territory (decision D43): the README's marked SKILL-COUNT
     equals the real skill count on disk, and the roster's per-family counts (plus
     the one project-orchestrator front door) reconcile with disk and with the
@@ -91,6 +97,7 @@ CATALOG = REPO_ROOT / "docs" / "skills-catalog.md"
 PATHS_DIR = REPO_ROOT / "docs" / "paths"
 WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 README = REPO_ROOT / "README.md"
+CLAUDE_MD = REPO_ROOT / "CLAUDE.md"
 
 IGNORED_DIRS = {"_template"}
 MAX_SKILL_LINES = 500
@@ -790,6 +797,56 @@ def check_workflows_sha_pinned(rep: Report, workflows_dir: Path | None = None) -
                 )
 
 
+# The Claude Code startup bridge (decision D61). Claude Code reads CLAUDE.md at
+# session start, not AGENTS.md; the bridge is a root CLAUDE.md whose FIRST line
+# imports the shared contract and which adds Claude-Code-specific startup routing.
+CLAUDE_BRIDGE_IMPORT = "@AGENTS.md"
+CLAUDE_BRIDGE_SECTION = "## Claude Code — startup routing"
+
+
+def check_claude_bridge(rep: Report, claude_md: Path | None = None) -> None:
+    """Decision D61 (HARD): the repo root must carry the Claude Code startup bridge.
+
+    Claude Code reads CLAUDE.md at session start, not AGENTS.md (per the Claude
+    Code memory documentation). An authentic beginner acceptance test confirmed the
+    gap: with only AGENTS.md present, Claude Code loaded no startup instructions,
+    never opened project-orchestrator, and scaffolded files before any requirements
+    work. The fix is the pattern the memory docs prescribe: a root CLAUDE.md whose
+    FIRST line imports the shared contract (`@AGENTS.md`, a same-directory import
+    that needs no approval dialog) and which adds the Claude-Code-specific startup
+    routing the import alone does not make salient.
+
+    Three conditions, all HARD, so the bridge cannot silently lose a half:
+      (a) CLAUDE.md exists at the repository root;
+      (b) its first line is exactly the `@AGENTS.md` import;
+      (c) the startup-routing section header is present.
+    """
+    claude_md = CLAUDE_MD if claude_md is None else claude_md
+    ctx = _rel(claude_md)
+    if not claude_md.is_file():
+        rep.error(
+            f"[{ctx}] the repository root must contain CLAUDE.md — Claude "
+            "Code reads it at session start (not AGENTS.md), so without it no "
+            "startup routing loads (decision D61)"
+        )
+        return
+    text = claude_md.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    first = lines[0].strip() if lines else ""
+    if first != CLAUDE_BRIDGE_IMPORT:
+        rep.error(
+            f"[{ctx}] first line is {first!r}, not the required "
+            f"{CLAUDE_BRIDGE_IMPORT!r} import — the shared contract in "
+            "AGENTS.md must load via a same-directory import on line 1 (decision D61)"
+        )
+    if CLAUDE_BRIDGE_SECTION not in text:
+        rep.error(
+            f"[{ctx}] missing the {CLAUDE_BRIDGE_SECTION!r} section — the "
+            "bridge must add Claude-Code-specific startup routing, not merely "
+            "import AGENTS.md (decision D61)"
+        )
+
+
 def check_name_collisions(skill_names: list[str], rep: Report) -> None:
     seen: set[str] = set()
     for name in skill_names:
@@ -833,6 +890,7 @@ def main() -> int:
     check_agents_schema(rep)                       # HARD
     check_docs_paths_links(rep)                    # HARD
     check_workflows_sha_pinned(rep)                # HARD
+    check_claude_bridge(rep)                       # HARD  (decision D61)
 
     # README map-matches-territory (decision D43): reconcile the README's
     # authoritative counts and roster against the real skills on disk.
