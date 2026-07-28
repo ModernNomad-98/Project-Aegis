@@ -169,7 +169,7 @@ for how to get it running first). This one message is the whole on-ramp:
 > never move to coding until the earlier stage is confirmed."
 
 You don't have to name a skill: `project-orchestrator` picks this up automatically, works out
-where your project is, and drives the rest.
+where your project is, and drives the rest. That automatic selection is model-driven behavior enabled by the repo's startup instructions (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex) — verified by a live acceptance test, not a mechanical guarantee.
 
 **What it actually feels like.** A short, real exchange — not the whole interview, just enough to
 show the shape of it:
@@ -352,7 +352,7 @@ validator — those are Claude Code features.
 
 **Using the skills in your own project.** Copy the `.claude/skills/<name>/` folders you want
 into your own repo's `.claude/skills/` — Claude Code discovers them there exactly the same
-way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder).
+way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder). To also reproduce this repo's startup routing, copy the repo-root `CLAUDE.md` and `AGENTS.md` into your repo root — `CLAUDE.md` is Claude Code's startup file and imports `AGENTS.md`.
 Literal copy commands, run from inside the cloned `Project-Aegis` folder — swap
 `tdd-engineer` for the skill you want and the path for your own repo:
 
@@ -382,7 +382,7 @@ skill — the same format Claude Code, OpenAI Codex, Cursor, Gemini CLI and othe
 consume. Two ways in:
 
 - **Out of the box (recommended):** the repo-root [`AGENTS.md`](AGENTS.md) is read
-  natively by Codex CLI (and as extra context by Claude Code). It points agents into
+  natively by Codex CLI; Claude Code reads [`CLAUDE.md`](CLAUDE.md), which imports AGENTS.md via `@AGENTS.md` (per the Claude Code memory documentation) — one shared contract, two documented entry points. It points agents into
   `.claude/skills/`, and they select and follow the right `SKILL.md` from there — in
   testing, Codex picked the correct skill and followed its workflow from the pointer
   alone. Verified against codex-cli 0.138.0-alpha.7 on 2026-07-18; tool behavior is a
