@@ -1,0 +1,3275 @@
+{
+  "tool": "audit-skill-contracts",
+  "version": "1.0.0",
+  "repo_sha": "08727adf8f3e0f54226fa18639c9a50f2562ed22",
+  "branch": "audit/aegis-corpus-contract-baseline",
+  "skill_count": 184,
+  "skills": [
+    {
+      "name": "ab-test-designer",
+      "skill_md": ".claude/skills/ab-test-designer/SKILL.md",
+      "family": "Skills (D12.6 \u2014 growth / analytics engineering pack)",
+      "description_chars": 996,
+      "references": [
+        ".claude/skills/ab-test-designer/references/ab-test-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "accessibility-test-harness",
+      "skill_md": ".claude/skills/accessibility-test-harness/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 977,
+      "references": [
+        ".claude/skills/accessibility-test-harness/references/a11y-checklists.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "admin-console-architect",
+      "skill_md": ".claude/skills/admin-console-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 978,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "adr-sequencer",
+      "skill_md": ".claude/skills/adr-sequencer/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 932,
+      "references": [
+        ".claude/skills/adr-sequencer/references/adr-corpus-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "adr-writer",
+      "skill_md": ".claude/skills/adr-writer/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 634,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-authorization-matrix",
+      "skill_md": ".claude/skills/agent-authorization-matrix/SKILL.md",
+      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "description_chars": 1021,
+      "references": [
+        ".claude/skills/agent-authorization-matrix/references/matrix-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-containment-reviewer",
+      "skill_md": ".claude/skills/agent-containment-reviewer/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 1000,
+      "references": [
+        ".claude/skills/agent-containment-reviewer/references/containment-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-failure-recovery",
+      "skill_md": ".claude/skills/agent-failure-recovery/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 606,
+      "references": [
+        ".claude/skills/agent-failure-recovery/references/recovery-playbooks.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": false,
+      "eval_cases": 4,
+      "trigger_cases": 0,
+      "manual_only": true,
+      "declares_read_only": true,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-goal-hijack-defender",
+      "skill_md": ".claude/skills/agent-goal-hijack-defender/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 1011,
+      "references": [
+        ".claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-governance-audit",
+      "skill_md": ".claude/skills/agent-governance-audit/SKILL.md",
+      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "description_chars": 1021,
+      "references": [
+        ".claude/skills/agent-governance-audit/references/audit-control-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 9,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-harness-architect",
+      "skill_md": ".claude/skills/agent-harness-architect/SKILL.md",
+      "family": "Skills (D42 \u2014 CONSTRAIN/CURATE design pack: harness, context, loop)",
+      "description_chars": 1021,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-identity-privilege-reviewer",
+      "skill_md": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 990,
+      "references": [
+        ".claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-instruction-consolidator",
+      "skill_md": ".claude/skills/agent-instruction-consolidator/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 609,
+      "references": [
+        ".claude/skills/agent-instruction-consolidator/references/instruction-file-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": false,
+      "eval_cases": 4,
+      "trigger_cases": 0,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-memory-governance",
+      "skill_md": ".claude/skills/agent-memory-governance/SKILL.md",
+      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "description_chars": 1009,
+      "references": [
+        ".claude/skills/agent-memory-governance/references/memory-rules.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-startup-context-gate",
+      "skill_md": ".claude/skills/agent-startup-context-gate/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 583,
+      "references": [
+        ".claude/skills/agent-startup-context-gate/references/context-source-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agent-tool-safety-guard",
+      "skill_md": ".claude/skills/agent-tool-safety-guard/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 995,
+      "references": [
+        ".claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "agentic-loop-designer",
+      "skill_md": ".claude/skills/agentic-loop-designer/SKILL.md",
+      "family": "Skills (D42 \u2014 CONSTRAIN/CURATE design pack: harness, context, loop)",
+      "description_chars": 1021,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-closeout-reporter",
+      "skill_md": ".claude/skills/ai-closeout-reporter/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 462,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": false,
+      "eval_cases": 4,
+      "trigger_cases": 0,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-cost-guardrail-designer",
+      "skill_md": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 984,
+      "references": [
+        ".claude/skills/ai-cost-guardrail-designer/references/cost-guardrail-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 6,
+      "trigger_cases": 8,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-evaluation-harness",
+      "skill_md": ".claude/skills/ai-evaluation-harness/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 984,
+      "references": [
+        ".claude/skills/ai-evaluation-harness/references/eval-harness-design.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-governance-risk-reviewer",
+      "skill_md": ".claude/skills/ai-governance-risk-reviewer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 959,
+      "references": [
+        ".claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-lifecycle-risk-manager",
+      "skill_md": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 970,
+      "references": [
+        ".claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-misinformation-guard",
+      "skill_md": ".claude/skills/ai-misinformation-guard/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 984,
+      "references": [
+        ".claude/skills/ai-misinformation-guard/references/grounding-controls.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-router-architect",
+      "skill_md": ".claude/skills/ai-router-architect/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 1002,
+      "references": [
+        ".claude/skills/ai-router-architect/references/ai-router-design.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-sdlc-operating-model",
+      "skill_md": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
+      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "description_chars": 985,
+      "references": [
+        ".claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-threat-modeler",
+      "skill_md": ".claude/skills/ai-threat-modeler/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 991,
+      "references": [
+        ".claude/skills/ai-threat-modeler/references/llm-top10-threat-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "api-contract-test-designer",
+      "skill_md": ".claude/skills/api-contract-test-designer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 956,
+      "references": [
+        ".claude/skills/api-contract-test-designer/references/contract-test-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "api-doc-generator-designer",
+      "skill_md": ".claude/skills/api-doc-generator-designer/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 935,
+      "references": [
+        ".claude/skills/api-doc-generator-designer/references/api-doc-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "api-event-architect",
+      "skill_md": ".claude/skills/api-event-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 989,
+      "references": [
+        ".claude/skills/api-event-architect/references/api-event-contract-conventions.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 9,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "appsec-implementer",
+      "skill_md": ".claude/skills/appsec-implementer/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 797,
+      "references": [
+        ".claude/skills/appsec-implementer/references/control-implementation-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "architecture-advisor",
+      "skill_md": ".claude/skills/architecture-advisor/SKILL.md",
+      "family": "Skills (D12.9 \u2014 architecture advisory pack)",
+      "description_chars": 1010,
+      "references": [
+        ".claude/skills/architecture-advisor/references/architecture-style-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "architecture-designer",
+      "skill_md": ".claude/skills/architecture-designer/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 715,
+      "references": [
+        ".claude/skills/architecture-designer/references/architecture-artifacts.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "audit-log-architect",
+      "skill_md": ".claude/skills/audit-log-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 1012,
+      "references": [
+        ".claude/skills/audit-log-architect/references/audit-event-taxonomy.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "authority-invalidation-architect",
+      "skill_md": ".claude/skills/authority-invalidation-architect/SKILL.md",
+      "family": "Skills (D46 \u2014 Authority invalidation & propagation)",
+      "description_chars": 1021,
+      "references": [
+        ".claude/skills/authority-invalidation-architect/references/stale-authority-surface-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 9,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "authorization-matrix-designer",
+      "skill_md": ".claude/skills/authorization-matrix-designer/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 956,
+      "references": [
+        ".claude/skills/authorization-matrix-designer/references/authorization-matrix-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "aws-saas-architect",
+      "skill_md": ".claude/skills/aws-saas-architect/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1016,
+      "references": [
+        ".claude/skills/aws-saas-architect/references/aws-mapping.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "azure-saas-architect",
+      "skill_md": ".claude/skills/azure-saas-architect/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 999,
+      "references": [
+        ".claude/skills/azure-saas-architect/references/azure-mapping.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "background-job-orchestration-architect",
+      "skill_md": ".claude/skills/background-job-orchestration-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 871,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "caching-strategy-designer",
+      "skill_md": ".claude/skills/caching-strategy-designer/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 999,
+      "references": [
+        ".claude/skills/caching-strategy-designer/references/invalidation-decision-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "cell-based-architecture-designer",
+      "skill_md": ".claude/skills/cell-based-architecture-designer/SKILL.md",
+      "family": "Skills (D32 \u2014 SaaS architecture depth, D12.11 low-priority set)",
+      "description_chars": 932,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "change-classification-gate",
+      "skill_md": ".claude/skills/change-classification-gate/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 497,
+      "references": [
+        ".claude/skills/change-classification-gate/references/classification-matrix.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "chat-backlog-reconciliation",
+      "skill_md": ".claude/skills/chat-backlog-reconciliation/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 990,
+      "references": [
+        ".claude/skills/chat-backlog-reconciliation/references/reconciliation-audit-format.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ci-pipeline-architect",
+      "skill_md": ".claude/skills/ci-pipeline-architect/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1016,
+      "references": [
+        ".claude/skills/ci-pipeline-architect/references/pipeline-stages.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "clickthrough-test-engineer",
+      "skill_md": ".claude/skills/clickthrough-test-engineer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 1008,
+      "references": [
+        ".claude/skills/clickthrough-test-engineer/references/clickthrough-route-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "cloud-architecture-decider",
+      "skill_md": ".claude/skills/cloud-architecture-decider/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1007,
+      "references": [
+        ".claude/skills/cloud-architecture-decider/references/decision-inputs.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "code-reviewer",
+      "skill_md": ".claude/skills/code-reviewer/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 697,
+      "references": [
+        ".claude/skills/code-reviewer/references/severity-rubric.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "code-simplifier",
+      "skill_md": ".claude/skills/code-simplifier/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 805,
+      "references": [
+        ".claude/skills/code-simplifier/references/simplification-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "command-gateway-architect",
+      "skill_md": ".claude/skills/command-gateway-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 933,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "compliance-control-foundation",
+      "skill_md": ".claude/skills/compliance-control-foundation/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 965,
+      "references": [
+        ".claude/skills/compliance-control-foundation/references/common-control-set.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "compliance-evidence-collector",
+      "skill_md": ".claude/skills/compliance-evidence-collector/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 985,
+      "references": [
+        ".claude/skills/compliance-evidence-collector/references/evidence-cadence-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "compliance-gap-auditor",
+      "skill_md": ".claude/skills/compliance-gap-auditor/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 1008,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "context-co-update-ci-gate",
+      "skill_md": ".claude/skills/context-co-update-ci-gate/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 990,
+      "references": [
+        ".claude/skills/context-co-update-ci-gate/references/gate-design.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "contribution-guide-author",
+      "skill_md": ".claude/skills/contribution-guide-author/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 919,
+      "references": [
+        ".claude/skills/contribution-guide-author/references/contribution-guide-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "cross-team-dependency-negotiator",
+      "skill_md": ".claude/skills/cross-team-dependency-negotiator/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 998,
+      "references": [
+        ".claude/skills/cross-team-dependency-negotiator/references/dependency-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "dast-safety-harness-designer",
+      "skill_md": ".claude/skills/dast-safety-harness-designer/SKILL.md",
+      "family": "Skills (D44 \u2014 Security scanning & orchestration pack, D12.10)",
+      "description_chars": 948,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "data-migration-runbook-author",
+      "skill_md": ".claude/skills/data-migration-runbook-author/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 955,
+      "references": [
+        ".claude/skills/data-migration-runbook-author/references/runbook-skeleton.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "data-partitioning-sharding-strategist",
+      "skill_md": ".claude/skills/data-partitioning-sharding-strategist/SKILL.md",
+      "family": "Skills (D32 \u2014 SaaS architecture depth, D12.11 low-priority set)",
+      "description_chars": 965,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "data-quality-monitor-designer",
+      "skill_md": ".claude/skills/data-quality-monitor-designer/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 965,
+      "references": [
+        ".claude/skills/data-quality-monitor-designer/references/quality-dimension-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "design-review-facilitator",
+      "skill_md": ".claude/skills/design-review-facilitator/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 994,
+      "references": [
+        ".claude/skills/design-review-facilitator/references/design-review-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "diataxis-doc-organizer",
+      "skill_md": ".claude/skills/diataxis-doc-organizer/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 943,
+      "references": [
+        ".claude/skills/diataxis-doc-organizer/references/diataxis-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "docs-as-code-architect",
+      "skill_md": ".claude/skills/docs-as-code-architect/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 894,
+      "references": [
+        ".claude/skills/docs-as-code-architect/references/docs-pipeline-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "docs-first-implementer",
+      "skill_md": ".claude/skills/docs-first-implementer/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 737,
+      "references": [
+        ".claude/skills/docs-first-implementer/references/version-doc-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "docs-retention-index",
+      "skill_md": ".claude/skills/docs-retention-index/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 982,
+      "references": [
+        ".claude/skills/docs-retention-index/references/retention-index-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "domain-modeler",
+      "skill_md": ".claude/skills/domain-modeler/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 654,
+      "references": [
+        ".claude/skills/domain-modeler/references/domain-artifacts.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "edge-state-ux-designer",
+      "skill_md": ".claude/skills/edge-state-ux-designer/SKILL.md",
+      "family": "Skills (D12.2 \u2014 product engineering craft pack)",
+      "description_chars": 1015,
+      "references": [
+        ".claude/skills/edge-state-ux-designer/references/edge-state-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "error-handling-security-reviewer",
+      "skill_md": ".claude/skills/error-handling-security-reviewer/SKILL.md",
+      "family": "Skills (D28 \u2014 OWASP web-app A09/A10 gap closure)",
+      "description_chars": 881,
+      "references": [
+        ".claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "error-taxonomy-designer",
+      "skill_md": ".claude/skills/error-taxonomy-designer/SKILL.md",
+      "family": "Skills (D12.2 \u2014 product engineering craft pack)",
+      "description_chars": 959,
+      "references": [
+        ".claude/skills/error-taxonomy-designer/references/error-model-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "eval-runner-designer",
+      "skill_md": ".claude/skills/eval-runner-designer/SKILL.md",
+      "family": "Skills (D13 \u2014 library meta / self-application)",
+      "description_chars": 998,
+      "references": [
+        ".claude/skills/eval-runner-designer/references/runner-design-blueprint.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "event-schema-architect",
+      "skill_md": ".claude/skills/event-schema-architect/SKILL.md",
+      "family": "Skills (D12.6 \u2014 growth / analytics engineering pack)",
+      "description_chars": 1007,
+      "references": [
+        ".claude/skills/event-schema-architect/references/event-schema-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "feature-flag-rollout-strategist",
+      "skill_md": ".claude/skills/feature-flag-rollout-strategist/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 1003,
+      "references": [
+        ".claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "file-upload-storage-architect",
+      "skill_md": ".claude/skills/file-upload-storage-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 928,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "flaky-test-detective",
+      "skill_md": ".claude/skills/flaky-test-detective/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 968,
+      "references": [
+        ".claude/skills/flaky-test-detective/references/flake-taxonomy.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "framework-edition-tracker",
+      "skill_md": ".claude/skills/framework-edition-tracker/SKILL.md",
+      "family": "Skills (D14 \u2014 framework refresh / source-currency pack)",
+      "description_chars": 933,
+      "references": [
+        ".claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "framework-mapping-refresher",
+      "skill_md": ".claude/skills/framework-mapping-refresher/SKILL.md",
+      "family": "Skills (D14 \u2014 framework refresh / source-currency pack)",
+      "description_chars": 970,
+      "references": [
+        ".claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "frontend-perf-engineer",
+      "skill_md": ".claude/skills/frontend-perf-engineer/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 968,
+      "references": [
+        ".claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "full-codebase-auditor",
+      "skill_md": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "family": "Subagents (read-only reviewers)",
+      "description_chars": 885,
+      "references": [
+        ".claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "funnel-definition-designer",
+      "skill_md": ".claude/skills/funnel-definition-designer/SKILL.md",
+      "family": "Skills (D12.6 \u2014 growth / analytics engineering pack)",
+      "description_chars": 1012,
+      "references": [
+        ".claude/skills/funnel-definition-designer/references/funnel-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "gated-deployment-prompt-template",
+      "skill_md": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1019,
+      "references": [
+        ".claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "horizontal-scalability-reviewer",
+      "skill_md": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 920,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "human-agent-trust-reviewer",
+      "skill_md": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 1009,
+      "references": [
+        ".claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "human-approval-boundary",
+      "skill_md": ".claude/skills/human-approval-boundary/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 543,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "iac-reviewer",
+      "skill_md": ".claude/skills/iac-reviewer/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 954,
+      "references": [
+        ".claude/skills/iac-reviewer/references/iac-review-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "incident-response-runbook",
+      "skill_md": ".claude/skills/incident-response-runbook/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1009,
+      "references": [
+        ".claude/skills/incident-response-runbook/references/incident-runbook-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "integration-test-designer",
+      "skill_md": ".claude/skills/integration-test-designer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 996,
+      "references": [
+        ".claude/skills/integration-test-designer/references/boundary-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "inter-agent-comms-reviewer",
+      "skill_md": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 990,
+      "references": [
+        ".claude/skills/inter-agent-comms-reviewer/references/inter-agent-comms-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "intra-tenant-scope-architect",
+      "skill_md": ".claude/skills/intra-tenant-scope-architect/SKILL.md",
+      "family": "Skills (D32 \u2014 SaaS architecture depth, D12.11 low-priority set)",
+      "description_chars": 940,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "iso-27001-isms-architect",
+      "skill_md": ".claude/skills/iso-27001-isms-architect/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 1012,
+      "references": [
+        ".claude/skills/iso-27001-isms-architect/references/isms-clause-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "iso-42001-aims-architect",
+      "skill_md": ".claude/skills/iso-42001-aims-architect/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 1019,
+      "references": [
+        ".claude/skills/iso-42001-aims-architect/references/aims-clause-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "lane-authoring-guide",
+      "skill_md": ".claude/skills/lane-authoring-guide/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1016,
+      "references": [
+        ".claude/skills/lane-authoring-guide/references/lane-guide-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "latency-budget-architect",
+      "skill_md": ".claude/skills/latency-budget-architect/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 1008,
+      "references": [
+        ".claude/skills/latency-budget-architect/references/tail-math-worksheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "library-diff-reviewer",
+      "skill_md": ".claude/skills/library-diff-reviewer/SKILL.md",
+      "family": "Skills (D13 \u2014 library meta / self-application)",
+      "description_chars": 989,
+      "references": [
+        ".claude/skills/library-diff-reviewer/references/pr-review-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "llm-output-safety-reviewer",
+      "skill_md": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 976,
+      "references": [
+        ".claude/skills/llm-output-safety-reviewer/references/output-sink-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "load-test-planner",
+      "skill_md": ".claude/skills/load-test-planner/SKILL.md",
+      "family": "Skills (D10 Tier 1 \u2014 performance/load validation)",
+      "description_chars": 1023,
+      "references": [
+        ".claude/skills/load-test-planner/references/workload-model-worksheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "local-ci-mirror-preflight",
+      "skill_md": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1007,
+      "references": [
+        ".claude/skills/local-ci-mirror-preflight/references/preflight-procedure.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "manual-test-case-creator",
+      "skill_md": ".claude/skills/manual-test-case-creator/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 983,
+      "references": [
+        ".claude/skills/manual-test-case-creator/references/manual-case-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "memory-context-poisoning-reviewer",
+      "skill_md": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
+      "family": "Skills (Phase 7.5 \u2014 agentic AI security pack)",
+      "description_chars": 1002,
+      "references": [
+        ".claude/skills/memory-context-poisoning-reviewer/references/memory-poisoning-controls.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "merge-is-deploy-governance",
+      "skill_md": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1014,
+      "references": [
+        ".claude/skills/merge-is-deploy-governance/references/governance-doc-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "mobile-viewport-craft",
+      "skill_md": ".claude/skills/mobile-viewport-craft/SKILL.md",
+      "family": "Skills (D12.2 \u2014 product engineering craft pack)",
+      "description_chars": 993,
+      "references": [
+        ".claude/skills/mobile-viewport-craft/references/mobile-viewport-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "model-context-designer",
+      "skill_md": ".claude/skills/model-context-designer/SKILL.md",
+      "family": "Skills (D42 \u2014 CONSTRAIN/CURATE design pack: harness, context, loop)",
+      "description_chars": 981,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "model-poisoning-reviewer",
+      "skill_md": ".claude/skills/model-poisoning-reviewer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 970,
+      "references": [
+        ".claude/skills/model-poisoning-reviewer/references/poisoning-controls.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "multi-framework-crosswalk",
+      "skill_md": ".claude/skills/multi-framework-crosswalk/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 978,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "multi-tenant-data-architect",
+      "skill_md": ".claude/skills/multi-tenant-data-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 960,
+      "references": [
+        ".claude/skills/multi-tenant-data-architect/references/scoping-strategy-tradeoffs.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "multi-tenant-security-tester",
+      "skill_md": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 799,
+      "references": [
+        ".claude/skills/multi-tenant-security-tester/references/negative-test-matrix.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "n-plus-one-detector",
+      "skill_md": ".claude/skills/n-plus-one-detector/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 952,
+      "references": [
+        ".claude/skills/n-plus-one-detector/references/chatty-access-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "notification-webhook-ux-designer",
+      "skill_md": ".claude/skills/notification-webhook-ux-designer/SKILL.md",
+      "family": "Skills (D12.2 \u2014 product engineering craft pack)",
+      "description_chars": 1006,
+      "references": [
+        ".claude/skills/notification-webhook-ux-designer/references/notification-webhook-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "observability-operator",
+      "skill_md": ".claude/skills/observability-operator/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1023,
+      "references": [
+        ".claude/skills/observability-operator/references/instrumentation-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "offline-first-sync-architect",
+      "skill_md": ".claude/skills/offline-first-sync-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 1003,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "onboarding-doc-designer",
+      "skill_md": ".claude/skills/onboarding-doc-designer/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 878,
+      "references": [
+        ".claude/skills/onboarding-doc-designer/references/onboarding-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "operational-vs-analytical-splitter",
+      "skill_md": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 954,
+      "references": [
+        ".claude/skills/operational-vs-analytical-splitter/references/split-decision-worksheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "pagination-cursor-designer",
+      "skill_md": ".claude/skills/pagination-cursor-designer/SKILL.md",
+      "family": "Skills (D12.2 \u2014 product engineering craft pack)",
+      "description_chars": 952,
+      "references": [
+        ".claude/skills/pagination-cursor-designer/references/pagination-design-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "performance-test-harness",
+      "skill_md": ".claude/skills/performance-test-harness/SKILL.md",
+      "family": "Skills (D10 Tier 1 \u2014 performance/load validation)",
+      "description_chars": 1013,
+      "references": [
+        ".claude/skills/performance-test-harness/references/harness-architecture-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "phased-work-handoff-designer",
+      "skill_md": ".claude/skills/phased-work-handoff-designer/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 996,
+      "references": [
+        ".claude/skills/phased-work-handoff-designer/references/handoff-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "pii-lifecycle-designer",
+      "skill_md": ".claude/skills/pii-lifecycle-designer/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 943,
+      "references": [
+        ".claude/skills/pii-lifecycle-designer/references/lifecycle-matrix.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "plan-entitlement-architect",
+      "skill_md": ".claude/skills/plan-entitlement-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 970,
+      "references": [
+        ".claude/skills/plan-entitlement-architect/references/entitlement-matrix-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "playwright-e2e-engineer",
+      "skill_md": ".claude/skills/playwright-e2e-engineer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 972,
+      "references": [
+        ".claude/skills/playwright-e2e-engineer/references/playwright-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "principal-code-analyst",
+      "skill_md": ".claude/skills/principal-code-analyst/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 766,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "prioritization-frame-picker",
+      "skill_md": ".claude/skills/prioritization-frame-picker/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 1008,
+      "references": [
+        ".claude/skills/prioritization-frame-picker/references/prioritization-frames-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "product-analytics-instrumenter",
+      "skill_md": ".claude/skills/product-analytics-instrumenter/SKILL.md",
+      "family": "Skills (D12.6 \u2014 growth / analytics engineering pack)",
+      "description_chars": 994,
+      "references": [
+        ".claude/skills/product-analytics-instrumenter/references/instrumentation-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "product-spec-writer",
+      "skill_md": ".claude/skills/product-spec-writer/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 1008,
+      "references": [
+        ".claude/skills/product-spec-writer/references/product-spec-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "profiling-methodology-designer",
+      "skill_md": ".claude/skills/profiling-methodology-designer/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 955,
+      "references": [
+        ".claude/skills/profiling-methodology-designer/references/profiler-selection-guide.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "project-orchestrator",
+      "skill_md": ".claude/skills/project-orchestrator/SKILL.md",
+      "family": "Skills (D38 \u2014 beginner-facing lifecycle orchestrator / library front door)",
+      "description_chars": 941,
+      "references": [
+        ".claude/skills/project-orchestrator/references/project-state-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 10,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": true,
+      "writes_artifacts": true
+    },
+    {
+      "name": "promotion-packet-writer",
+      "skill_md": ".claude/skills/promotion-packet-writer/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 917,
+      "references": [
+        ".claude/skills/promotion-packet-writer/references/promo-packet-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "prompt-injection-defender",
+      "skill_md": ".claude/skills/prompt-injection-defender/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 1020,
+      "references": [
+        ".claude/skills/prompt-injection-defender/references/injection-defense-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "qa-automation-architect",
+      "skill_md": ".claude/skills/qa-automation-architect/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 903,
+      "references": [
+        ".claude/skills/qa-automation-architect/references/automation-blueprint.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "qa-strategy-architect",
+      "skill_md": ".claude/skills/qa-strategy-architect/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 832,
+      "references": [
+        ".claude/skills/qa-strategy-architect/references/risk-and-layer-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "query-plan-reader",
+      "skill_md": ".claude/skills/query-plan-reader/SKILL.md",
+      "family": "Skills (D12.3 \u2014 performance engineering pack)",
+      "description_chars": 963,
+      "references": [
+        ".claude/skills/query-plan-reader/references/plan-reading-guide.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "rag-security-architect",
+      "skill_md": ".claude/skills/rag-security-architect/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 974,
+      "references": [
+        ".claude/skills/rag-security-architect/references/rag-retrieval-authz.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "readme-craftsman",
+      "skill_md": ".claude/skills/readme-craftsman/SKILL.md",
+      "family": "Skills (D12.4 \u2014 technical writing / docs engineering pack)",
+      "description_chars": 817,
+      "references": [
+        ".claude/skills/readme-craftsman/references/readme-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "realtime-subscription-architect",
+      "skill_md": ".claude/skills/realtime-subscription-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 946,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "regression-suite-curator",
+      "skill_md": ".claude/skills/regression-suite-curator/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 1001,
+      "references": [
+        ".claude/skills/regression-suite-curator/references/curation-rules.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "release-readiness-reviewer",
+      "skill_md": ".claude/skills/release-readiness-reviewer/SKILL.md",
+      "family": "Subagents (read-only reviewers)",
+      "description_chars": 1016,
+      "references": [
+        ".claude/skills/release-readiness-reviewer/references/readiness-evidence.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "requirements-gathering-facilitator",
+      "skill_md": ".claude/skills/requirements-gathering-facilitator/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 996,
+      "references": [
+        ".claude/skills/requirements-gathering-facilitator/references/elicitation-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "reviewable-diff-discipline",
+      "skill_md": ".claude/skills/reviewable-diff-discipline/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 425,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": true
+    },
+    {
+      "name": "risk-tiered-validation-selector",
+      "skill_md": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1008,
+      "references": [
+        ".claude/skills/risk-tiered-validation-selector/references/classifier-rules.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "rls-policy-auditor",
+      "skill_md": ".claude/skills/rls-policy-auditor/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 783,
+      "references": [
+        ".claude/skills/rls-policy-auditor/references/rls-audit-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "roadmap-to-commitments-translator",
+      "skill_md": ".claude/skills/roadmap-to-commitments-translator/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 959,
+      "references": [
+        ".claude/skills/roadmap-to-commitments-translator/references/commitments-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "roadmap-under-uncertainty-planner",
+      "skill_md": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 1015,
+      "references": [
+        ".claude/skills/roadmap-under-uncertainty-planner/references/roadmap-uncertainty-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "rollback-runbook-author",
+      "skill_md": ".claude/skills/rollback-runbook-author/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1020,
+      "references": [
+        ".claude/skills/rollback-runbook-author/references/rollback-runbook-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "saas-cost-architect",
+      "skill_md": ".claude/skills/saas-cost-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 971,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "saas-platform-architect",
+      "skill_md": ".claude/skills/saas-platform-architect/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 815,
+      "references": [
+        ".claude/skills/saas-platform-architect/references/platform-deployment-models.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "sast-orchestration-designer",
+      "skill_md": ".claude/skills/sast-orchestration-designer/SKILL.md",
+      "family": "Skills (D44 \u2014 Security scanning & orchestration pack, D12.10)",
+      "description_chars": 934,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "schema-evolution-planner",
+      "skill_md": ".claude/skills/schema-evolution-planner/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 929,
+      "references": [
+        ".claude/skills/schema-evolution-planner/references/evolution-stage-playbook.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "scoped-approval-register",
+      "skill_md": ".claude/skills/scoped-approval-register/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 999,
+      "references": [
+        ".claude/skills/scoped-approval-register/references/register-format.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "screenshot-evidence-planner",
+      "skill_md": ".claude/skills/screenshot-evidence-planner/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 1001,
+      "references": [
+        ".claude/skills/screenshot-evidence-planner/references/evidence-rules.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "search-architecture-designer",
+      "skill_md": ".claude/skills/search-architecture-designer/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 901,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "secrets-identity-hardener",
+      "skill_md": ".claude/skills/secrets-identity-hardener/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 846,
+      "references": [
+        ".claude/skills/secrets-identity-hardener/references/secret-classification-and-rotation.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "secure-migration-reviewer",
+      "skill_md": ".claude/skills/secure-migration-reviewer/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 830,
+      "references": [
+        ".claude/skills/secure-migration-reviewer/references/migration-safety-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "security-logging-alerting-architect",
+      "skill_md": ".claude/skills/security-logging-alerting-architect/SKILL.md",
+      "family": "Skills (D28 \u2014 OWASP web-app A09/A10 gap closure)",
+      "description_chars": 878,
+      "references": [
+        ".claude/skills/security-logging-alerting-architect/references/security-event-coverage-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "security-pr-reviewer",
+      "skill_md": ".claude/skills/security-pr-reviewer/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 900,
+      "references": [
+        ".claude/skills/security-pr-reviewer/references/security-review-passes.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "security-scan-orchestrator",
+      "skill_md": ".claude/skills/security-scan-orchestrator/SKILL.md",
+      "family": "Skills (D44 \u2014 Security scanning & orchestration pack, D12.10)",
+      "description_chars": 905,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "sensitive-disclosure-guard",
+      "skill_md": ".claude/skills/sensitive-disclosure-guard/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 958,
+      "references": [
+        ".claude/skills/sensitive-disclosure-guard/references/disclosure-controls.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "sharded-validation-with-resume",
+      "skill_md": ".claude/skills/sharded-validation-with-resume/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1009,
+      "references": [
+        ".claude/skills/sharded-validation-with-resume/references/shard-runner-design.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "share-link-access-architect",
+      "skill_md": ".claude/skills/share-link-access-architect/SKILL.md",
+      "family": "Skills (D32 \u2014 SaaS architecture depth, D12.11 low-priority set)",
+      "description_chars": 922,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "skill-deprecation-planner",
+      "skill_md": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "family": "Skills (D13 \u2014 library meta / self-application)",
+      "description_chars": 998,
+      "references": [
+        ".claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "skill-quality-reviewer",
+      "skill_md": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "family": "Skills (D13 \u2014 library meta / self-application)",
+      "description_chars": 1005,
+      "references": [
+        ".claude/skills/skill-quality-reviewer/references/quality-review-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 7,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "skill-usage-instrumenter",
+      "skill_md": ".claude/skills/skill-usage-instrumenter/SKILL.md",
+      "family": "Skills (D13 \u2014 library meta / self-application)",
+      "description_chars": 1007,
+      "references": [
+        ".claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "slo-reliability-architect",
+      "skill_md": ".claude/skills/slo-reliability-architect/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1018,
+      "references": [
+        ".claude/skills/slo-reliability-architect/references/slo-derivation.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "soc2-trust-criteria-mapper",
+      "skill_md": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 994,
+      "references": [
+        ".claude/skills/soc2-trust-criteria-mapper/references/tsc-scoping-map.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "source-currency-auditor",
+      "skill_md": ".claude/skills/source-currency-auditor/SKILL.md",
+      "family": "Skills (D14 \u2014 framework refresh / source-currency pack)",
+      "description_chars": 1015,
+      "references": [
+        ".claude/skills/source-currency-auditor/references/currency-audit-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "source-of-truth-reconciler",
+      "skill_md": ".claude/skills/source-of-truth-reconciler/SKILL.md",
+      "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
+      "description_chars": 587,
+      "references": [
+        ".claude/skills/source-of-truth-reconciler/references/conflict-resolution-examples.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "staff-scope-selector",
+      "skill_md": ".claude/skills/staff-scope-selector/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 962,
+      "references": [
+        ".claude/skills/staff-scope-selector/references/staff-scope-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "standing-approval-and-auto-advance",
+      "skill_md": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
+      "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
+      "description_chars": 1022,
+      "references": [
+        ".claude/skills/standing-approval-and-auto-advance/references/standing-approval-policy.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 6,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "statement-of-applicability-author",
+      "skill_md": ".claude/skills/statement-of-applicability-author/SKILL.md",
+      "family": "Skills (Compliance & Governance batch \u2014 D9)",
+      "description_chars": 1006,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 6,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "static-analysis-reviewer",
+      "skill_md": ".claude/skills/static-analysis-reviewer/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 822,
+      "references": [
+        ".claude/skills/static-analysis-reviewer/references/triage-rubric.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "streaming-event-architect",
+      "skill_md": ".claude/skills/streaming-event-architect/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 959,
+      "references": [
+        ".claude/skills/streaming-event-architect/references/backbone-decision-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 7,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "structured-output-validator",
+      "skill_md": ".claude/skills/structured-output-validator/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 1022,
+      "references": [
+        ".claude/skills/structured-output-validator/references/output-validation-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 6,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "sunset-deprecation-communicator",
+      "skill_md": ".claude/skills/sunset-deprecation-communicator/SKILL.md",
+      "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
+      "description_chars": 980,
+      "references": [
+        ".claude/skills/sunset-deprecation-communicator/references/sunset-comms-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "superadmin-observability-console-designer",
+      "skill_md": ".claude/skills/superadmin-observability-console-designer/SKILL.md",
+      "family": "Skills (D47 \u2014 Superadmin observability console design)",
+      "description_chars": 1009,
+      "references": [
+        ".claude/skills/superadmin-observability-console-designer/references/panel-taxonomy-and-read-security.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 8,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "supply-chain-security-reviewer",
+      "skill_md": ".claude/skills/supply-chain-security-reviewer/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 999,
+      "references": [
+        ".claude/skills/supply-chain-security-reviewer/references/supply-chain-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "synthetic-monitoring-architect",
+      "skill_md": ".claude/skills/synthetic-monitoring-architect/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 985,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "system-prompt-leakage-reviewer",
+      "skill_md": ".claude/skills/system-prompt-leakage-reviewer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 924,
+      "references": [
+        ".claude/skills/system-prompt-leakage-reviewer/references/prompt-leakage-checks.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "systematic-debugger",
+      "skill_md": ".claude/skills/systematic-debugger/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 678,
+      "references": [
+        ".claude/skills/systematic-debugger/references/isolation-tactics.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "tdd-engineer",
+      "skill_md": ".claude/skills/tdd-engineer/SKILL.md",
+      "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
+      "description_chars": 681,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "tech-spec-writer",
+      "skill_md": ".claude/skills/tech-spec-writer/SKILL.md",
+      "family": "Skills (D12.7 \u2014 staff+ IC craft pack)",
+      "description_chars": 968,
+      "references": [
+        ".claude/skills/tech-spec-writer/references/tech-spec-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "tenant-isolation-reviewer",
+      "skill_md": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 884,
+      "references": [
+        ".claude/skills/tenant-isolation-reviewer/references/isolation-surface-checklist.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "tenant-modeler",
+      "skill_md": ".claude/skills/tenant-modeler/SKILL.md",
+      "family": "Skills (Phase 3 \u2014 SaaS & tenant isolation pack)",
+      "description_chars": 970,
+      "references": [
+        ".claude/skills/tenant-modeler/references/tenant-lifecycle-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 3,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "test-coverage-mapper",
+      "skill_md": ".claude/skills/test-coverage-mapper/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 866,
+      "references": [
+        ".claude/skills/test-coverage-mapper/references/coverage-mapping-method.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "test-data-architect",
+      "skill_md": ".claude/skills/test-data-architect/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 999,
+      "references": [
+        ".claude/skills/test-data-architect/references/test-data-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "test-plan-designer",
+      "skill_md": ".claude/skills/test-plan-designer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 868,
+      "references": [
+        ".claude/skills/test-plan-designer/references/test-plan-template.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "threat-modeler",
+      "skill_md": ".claude/skills/threat-modeler/SKILL.md",
+      "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
+      "description_chars": 893,
+      "references": [
+        ".claude/skills/threat-modeler/references/threat-catalog.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "usage-metering-and-cost-attribution-pipeline-designer",
+      "skill_md": ".claude/skills/usage-metering-and-cost-attribution-pipeline-designer/SKILL.md",
+      "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
+      "description_chars": 956,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    },
+    {
+      "name": "vite-build-qa-engineer",
+      "skill_md": ".claude/skills/vite-build-qa-engineer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 1022,
+      "references": [
+        ".claude/skills/vite-build-qa-engineer/references/vite-build-checks.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "vitest-unit-component-engineer",
+      "skill_md": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
+      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "description_chars": 926,
+      "references": [
+        ".claude/skills/vitest-unit-component-engineer/references/vitest-patterns.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 4,
+      "trigger_cases": 4,
+      "manual_only": true,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "warehouse-lake-architect",
+      "skill_md": ".claude/skills/warehouse-lake-architect/SKILL.md",
+      "family": "Skills (D12.1 \u2014 data engineering pack)",
+      "description_chars": 940,
+      "references": [
+        ".claude/skills/warehouse-lake-architect/references/estate-decision-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 5,
+      "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": true,
+      "writes_artifacts": false
+    }
+  ],
+  "agents": [
+    ".claude/agents/ai-security-red-team-reviewer.md",
+    ".claude/agents/full-codebase-auditor.md",
+    ".claude/agents/principal-architecture-reviewer.md",
+    ".claude/agents/qa-automation-lead.md",
+    ".claude/agents/release-readiness-reviewer.md",
+    ".claude/agents/secure-saas-reviewer.md",
+    ".claude/agents/senior-troubleshooting-lead.md"
+  ],
+  "guided_paths": [
+    "docs/paths/add-ai-safely.md",
+    "docs/paths/check-your-app.md",
+    "docs/paths/something-is-broken.md"
+  ]
+}

@@ -1,0 +1,5754 @@
+{
+  "nodes": [
+    {
+      "name": "ab-test-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "accessibility-test-harness",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "admin-console-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "adr-sequencer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "adr-writer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-authorization-matrix",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-containment-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-failure-recovery",
+      "manual_only": true,
+      "declares_read_only": true
+    },
+    {
+      "name": "agent-goal-hijack-defender",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-governance-audit",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
+      "name": "agent-harness-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-identity-privilege-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-instruction-consolidator",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-memory-governance",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-startup-context-gate",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agent-tool-safety-guard",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "agentic-loop-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-closeout-reporter",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-cost-guardrail-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-evaluation-harness",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-governance-risk-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-lifecycle-risk-manager",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-misinformation-guard",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-router-architect",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-sdlc-operating-model",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-threat-modeler",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "api-contract-test-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "api-doc-generator-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "api-event-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "appsec-implementer",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "architecture-advisor",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "architecture-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "audit-log-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "authority-invalidation-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "authorization-matrix-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "aws-saas-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "azure-saas-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "background-job-orchestration-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "caching-strategy-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "cell-based-architecture-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "change-classification-gate",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "chat-backlog-reconciliation",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ci-pipeline-architect",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "clickthrough-test-engineer",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "cloud-architecture-decider",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "code-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "code-simplifier",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "command-gateway-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "compliance-control-foundation",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "compliance-evidence-collector",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "compliance-gap-auditor",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "context-co-update-ci-gate",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "contribution-guide-author",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "cross-team-dependency-negotiator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "dast-safety-harness-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "data-migration-runbook-author",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "data-partitioning-sharding-strategist",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "data-quality-monitor-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "design-review-facilitator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "diataxis-doc-organizer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "docs-as-code-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "docs-first-implementer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "docs-retention-index",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "domain-modeler",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "edge-state-ux-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "error-handling-security-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "error-taxonomy-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "eval-runner-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "event-schema-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "feature-flag-rollout-strategist",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "file-upload-storage-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "flaky-test-detective",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "framework-edition-tracker",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "framework-mapping-refresher",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "frontend-perf-engineer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "full-codebase-auditor",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "funnel-definition-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "gated-deployment-prompt-template",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "horizontal-scalability-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "human-agent-trust-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "human-approval-boundary",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "iac-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "incident-response-runbook",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "integration-test-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "inter-agent-comms-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "intra-tenant-scope-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "iso-27001-isms-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "iso-42001-aims-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "lane-authoring-guide",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "latency-budget-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "library-diff-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "llm-output-safety-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "load-test-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "local-ci-mirror-preflight",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "manual-test-case-creator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "memory-context-poisoning-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "merge-is-deploy-governance",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "mobile-viewport-craft",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "model-context-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "model-poisoning-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "multi-framework-crosswalk",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "multi-tenant-data-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "multi-tenant-security-tester",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "n-plus-one-detector",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "notification-webhook-ux-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "observability-operator",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "offline-first-sync-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "onboarding-doc-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "operational-vs-analytical-splitter",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "pagination-cursor-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "performance-test-harness",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "phased-work-handoff-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "pii-lifecycle-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "plan-entitlement-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "playwright-e2e-engineer",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "principal-code-analyst",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "prioritization-frame-picker",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "product-analytics-instrumenter",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "product-spec-writer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "profiling-methodology-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "project-orchestrator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "promotion-packet-writer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "prompt-injection-defender",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "qa-automation-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "qa-strategy-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "query-plan-reader",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "rag-security-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "readme-craftsman",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "realtime-subscription-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "regression-suite-curator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "release-readiness-reviewer",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
+      "name": "requirements-gathering-facilitator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "reviewable-diff-discipline",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "risk-tiered-validation-selector",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "rls-policy-auditor",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "roadmap-to-commitments-translator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "roadmap-under-uncertainty-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "rollback-runbook-author",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "saas-cost-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "saas-platform-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "sast-orchestration-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "schema-evolution-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "scoped-approval-register",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "screenshot-evidence-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "search-architecture-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "secrets-identity-hardener",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "secure-migration-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "security-logging-alerting-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "security-pr-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "security-scan-orchestrator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "sensitive-disclosure-guard",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "sharded-validation-with-resume",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "share-link-access-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "skill-deprecation-planner",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "skill-quality-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "skill-usage-instrumenter",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "slo-reliability-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "soc2-trust-criteria-mapper",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "source-currency-auditor",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
+      "name": "source-of-truth-reconciler",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "staff-scope-selector",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "standing-approval-and-auto-advance",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "statement-of-applicability-author",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "static-analysis-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "streaming-event-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "structured-output-validator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "sunset-deprecation-communicator",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "superadmin-observability-console-designer",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
+      "name": "supply-chain-security-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "synthetic-monitoring-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "system-prompt-leakage-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "systematic-debugger",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "tdd-engineer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "tech-spec-writer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "tenant-isolation-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "tenant-modeler",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "test-coverage-mapper",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "test-data-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "test-plan-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "threat-modeler",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "usage-metering-and-cost-attribution-pipeline-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "vite-build-qa-engineer",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "vitest-unit-component-engineer",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
+      "name": "warehouse-lake-architect",
+      "manual_only": false,
+      "declares_read_only": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "ab-test-designer",
+      "to": "event-schema-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ab-test-designer",
+      "to": "feature-flag-rollout-strategist",
+      "type": "description-mention"
+    },
+    {
+      "from": "ab-test-designer",
+      "to": "funnel-definition-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "accessibility-test-harness",
+      "to": "clickthrough-test-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "accessibility-test-harness",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "accessibility-test-harness",
+      "to": "screenshot-evidence-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "admin-console-architect",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "admin-console-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "admin-console-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "admin-console-architect",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "admin-console-architect",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "adr-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "docs-as-code-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-sequencer",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-writer",
+      "to": "architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-writer",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-writer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-writer",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-writer",
+      "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-authorization-matrix",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-authorization-matrix",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-authorization-matrix",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-containment-reviewer",
+      "to": "agent-goal-hijack-defender",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-containment-reviewer",
+      "to": "agent-goal-hijack-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-containment-reviewer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-containment-reviewer",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "agent-containment-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "memory-context-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "prompt-injection-defender",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-goal-hijack-defender",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-governance-audit",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-governance-audit",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-governance-audit",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-governance-audit",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-governance-audit",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "agent-authorization-matrix",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "agent-containment-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "agentic-loop-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "ai-cost-guardrail-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "command-gateway-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "model-context-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "prompt-injection-defender",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-harness-architect",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-identity-privilege-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-memory-governance",
+      "to": "agent-startup-context-gate",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-memory-governance",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-memory-governance",
+      "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "llm-output-safety-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "agent-failure-recovery",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "agent-goal-hijack-defender",
+      "type": "body-route"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "agent-goal-hijack-defender",
+      "type": "body-route"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "agent-goal-hijack-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "agent-harness-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "ai-threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "ai-threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "ai-threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "agentic-loop-designer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "ai-router-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "error-handling-security-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-cost-guardrail-designer",
+      "to": "saas-cost-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "ai-threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "regression-suite-curator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-evaluation-harness",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
+      "to": "ai-sdlc-operating-model",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
+      "to": "ai-threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "ai-evaluation-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "ai-threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "iso-42001-aims-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "iso-42001-aims-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-lifecycle-risk-manager",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "llm-output-safety-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "model-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-misinformation-guard",
+      "to": "structured-output-validator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-router-architect",
+      "to": "ai-cost-guardrail-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-router-architect",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-router-architect",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-router-architect",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-router-architect",
+      "to": "structured-output-validator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-sdlc-operating-model",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-sdlc-operating-model",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-sdlc-operating-model",
+      "to": "agent-memory-governance",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "ai-evaluation-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-threat-modeler",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-contract-test-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "api-contract-test-designer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-contract-test-designer",
+      "to": "integration-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "api-contract-test-designer",
+      "to": "integration-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-contract-test-designer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "diataxis-doc-organizer",
+      "type": "body-route"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "docs-as-code-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "api-doc-generator-designer",
+      "to": "docs-as-code-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-event-architect",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-event-architect",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-event-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "rls-policy-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "secure-migration-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "appsec-implementer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "cloud-architecture-decider",
+      "type": "body-route"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "cloud-architecture-decider",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "domain-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "saas-platform-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "architecture-advisor",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-designer",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "architecture-designer",
+      "to": "adr-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-designer",
+      "to": "domain-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-designer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "audit-log-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "audit-log-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "caching-strategy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "plan-entitlement-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "realtime-subscription-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "realtime-subscription-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "search-architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "share-link-access-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "authority-invalidation-architect",
+      "to": "share-link-access-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "authorization-matrix-designer",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "authorization-matrix-designer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "authorization-matrix-designer",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "authorization-matrix-designer",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "azure-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "cloud-architecture-decider",
+      "type": "body-route"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "cloud-architecture-decider",
+      "type": "description-mention"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "aws-saas-architect",
+      "to": "threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "ai-threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "aws-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "cloud-architecture-decider",
+      "type": "body-route"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "cloud-architecture-decider",
+      "type": "description-mention"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "azure-saas-architect",
+      "to": "threat-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "command-gateway-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "load-test-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "streaming-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "streaming-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "background-job-orchestration-architect",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "frontend-perf-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "n-plus-one-detector",
+      "type": "body-route"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "n-plus-one-detector",
+      "type": "body-route"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "n-plus-one-detector",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "caching-strategy-designer",
+      "to": "query-plan-reader",
+      "type": "body-route"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "agent-containment-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "architecture-advisor",
+      "type": "body-route"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "architecture-advisor",
+      "type": "description-mention"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "data-partitioning-sharding-strategist",
+      "type": "body-route"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "saas-platform-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "cell-based-architecture-designer",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "agent-memory-governance",
+      "type": "description-mention"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "scoped-approval-register",
+      "type": "body-route"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "scoped-approval-register",
+      "type": "description-mention"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "chat-backlog-reconciliation",
+      "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-pipeline-architect",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "ci-pipeline-architect",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-pipeline-architect",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-pipeline-architect",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-pipeline-architect",
+      "to": "vite-build-qa-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "accessibility-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "ai-closeout-reporter",
+      "type": "body-route"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "playwright-e2e-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "screenshot-evidence-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "clickthrough-test-engineer",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "aws-saas-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "azure-saas-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "azure-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "saas-platform-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
+      "to": "code-simplifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
+      "to": "principal-code-analyst",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-simplifier",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-simplifier",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "command-gateway-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "command-gateway-architect",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "command-gateway-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "command-gateway-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "multi-framework-crosswalk",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-control-foundation",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "compliance-gap-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-evidence-collector",
+      "to": "screenshot-evidence-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "compliance-evidence-collector",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "compliance-gap-auditor",
+      "to": "multi-framework-crosswalk",
+      "type": "description-mention"
+    },
+    {
+      "from": "context-co-update-ci-gate",
+      "to": "agent-startup-context-gate",
+      "type": "description-mention"
+    },
+    {
+      "from": "context-co-update-ci-gate",
+      "to": "chat-backlog-reconciliation",
+      "type": "description-mention"
+    },
+    {
+      "from": "context-co-update-ci-gate",
+      "to": "ci-pipeline-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "context-co-update-ci-gate",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "docs-as-code-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "docs-as-code-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "onboarding-doc-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "onboarding-doc-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "readme-craftsman",
+      "type": "body-route"
+    },
+    {
+      "from": "contribution-guide-author",
+      "to": "readme-craftsman",
+      "type": "description-mention"
+    },
+    {
+      "from": "cross-team-dependency-negotiator",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "cross-team-dependency-negotiator",
+      "to": "architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "cross-team-dependency-negotiator",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "cross-team-dependency-negotiator",
+      "to": "roadmap-to-commitments-translator",
+      "type": "body-route"
+    },
+    {
+      "from": "cross-team-dependency-negotiator",
+      "to": "roadmap-to-commitments-translator",
+      "type": "description-mention"
+    },
+    {
+      "from": "dast-safety-harness-designer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "dast-safety-harness-designer",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "dast-safety-harness-designer",
+      "to": "multi-tenant-security-tester",
+      "type": "description-mention"
+    },
+    {
+      "from": "dast-safety-harness-designer",
+      "to": "security-scan-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "dast-safety-harness-designer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-migration-runbook-author",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-migration-runbook-author",
+      "to": "schema-evolution-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-migration-runbook-author",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-partitioning-sharding-strategist",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-partitioning-sharding-strategist",
+      "to": "operational-vs-analytical-splitter",
+      "type": "body-route"
+    },
+    {
+      "from": "data-partitioning-sharding-strategist",
+      "to": "operational-vs-analytical-splitter",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-partitioning-sharding-strategist",
+      "to": "warehouse-lake-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "data-partitioning-sharding-strategist",
+      "to": "warehouse-lake-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "structured-output-validator",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "test-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "code-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "design-review-facilitator",
+      "to": "tech-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "diataxis-doc-organizer",
+      "to": "adr-sequencer",
+      "type": "description-mention"
+    },
+    {
+      "from": "diataxis-doc-organizer",
+      "to": "api-doc-generator-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "diataxis-doc-organizer",
+      "to": "docs-as-code-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "diataxis-doc-organizer",
+      "to": "onboarding-doc-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "diataxis-doc-organizer",
+      "to": "readme-craftsman",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "api-doc-generator-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "api-doc-generator-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "contribution-guide-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "diataxis-doc-organizer",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "readme-craftsman",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-as-code-architect",
+      "to": "readme-craftsman",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-first-implementer",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-retention-index",
+      "to": "diataxis-doc-organizer",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-retention-index",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-retention-index",
+      "to": "skill-deprecation-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "docs-retention-index",
+      "to": "sunset-deprecation-communicator",
+      "type": "body-route"
+    },
+    {
+      "from": "docs-retention-index",
+      "to": "sunset-deprecation-communicator",
+      "type": "description-mention"
+    },
+    {
+      "from": "domain-modeler",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "accessibility-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "error-taxonomy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "error-taxonomy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "mobile-viewport-craft",
+      "type": "body-route"
+    },
+    {
+      "from": "edge-state-ux-designer",
+      "to": "mobile-viewport-craft",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "appsec-implementer",
+      "type": "body-route"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "appsec-implementer",
+      "type": "body-route"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "appsec-implementer",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "error-taxonomy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "error-taxonomy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-handling-security-reviewer",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-taxonomy-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "error-taxonomy-designer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-taxonomy-designer",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "error-taxonomy-designer",
+      "to": "edge-state-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "error-taxonomy-designer",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "eval-runner-designer",
+      "to": "ai-evaluation-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "eval-runner-designer",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "eval-runner-designer",
+      "to": "skill-quality-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "product-analytics-instrumenter",
+      "type": "body-route"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "product-analytics-instrumenter",
+      "type": "body-route"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "product-analytics-instrumenter",
+      "type": "description-mention"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "streaming-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "streaming-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "event-schema-architect",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "ab-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "ab-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "ab-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "ab-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "plan-entitlement-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "plan-entitlement-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "rls-policy-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "file-upload-storage-architect",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "flaky-test-detective",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "flaky-test-detective",
+      "to": "regression-suite-curator",
+      "type": "description-mention"
+    },
+    {
+      "from": "flaky-test-detective",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "flaky-test-detective",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-edition-tracker",
+      "to": "framework-mapping-refresher",
+      "type": "body-route"
+    },
+    {
+      "from": "framework-edition-tracker",
+      "to": "framework-mapping-refresher",
+      "type": "body-route"
+    },
+    {
+      "from": "framework-edition-tracker",
+      "to": "framework-mapping-refresher",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-edition-tracker",
+      "to": "multi-framework-crosswalk",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-edition-tracker",
+      "to": "source-currency-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-mapping-refresher",
+      "to": "framework-edition-tracker",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-mapping-refresher",
+      "to": "library-diff-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "framework-mapping-refresher",
+      "to": "library-diff-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "framework-mapping-refresher",
+      "to": "source-currency-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "caching-strategy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "latency-budget-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "latency-budget-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "latency-budget-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "performance-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "frontend-perf-engineer",
+      "to": "vite-build-qa-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "full-codebase-auditor",
+      "to": "agent-startup-context-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "full-codebase-auditor",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "full-codebase-auditor",
+      "to": "principal-code-analyst",
+      "type": "description-mention"
+    },
+    {
+      "from": "full-codebase-auditor",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "ab-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "ab-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "event-schema-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "event-schema-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "product-analytics-instrumenter",
+      "type": "body-route"
+    },
+    {
+      "from": "funnel-definition-designer",
+      "to": "product-analytics-instrumenter",
+      "type": "description-mention"
+    },
+    {
+      "from": "gated-deployment-prompt-template",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "gated-deployment-prompt-template",
+      "to": "merge-is-deploy-governance",
+      "type": "description-mention"
+    },
+    {
+      "from": "gated-deployment-prompt-template",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "gated-deployment-prompt-template",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "caching-strategy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "latency-budget-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "latency-budget-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "ai-misinformation-guard",
+      "type": "body-route"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "ai-misinformation-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "aws-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "azure-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "regression-suite-curator",
+      "type": "description-mention"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "rollback-runbook-author",
+      "type": "body-route"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "rollback-runbook-author",
+      "type": "body-route"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "rollback-runbook-author",
+      "type": "body-route"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "incident-response-runbook",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "api-contract-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "multi-tenant-security-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "multi-tenant-security-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "multi-tenant-security-tester",
+      "type": "description-mention"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "integration-test-designer",
+      "to": "vitest-unit-component-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "agent-identity-privilege-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "inter-agent-comms-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "intra-tenant-scope-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "intra-tenant-scope-architect",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "intra-tenant-scope-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "intra-tenant-scope-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "intra-tenant-scope-architect",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "compliance-evidence-collector",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "iso-42001-aims-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "soc2-trust-criteria-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "statement-of-applicability-author",
+      "type": "body-route"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "statement-of-applicability-author",
+      "type": "body-route"
+    },
+    {
+      "from": "iso-27001-isms-architect",
+      "to": "statement-of-applicability-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "ai-governance-risk-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "ai-lifecycle-risk-manager",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "compliance-evidence-collector",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "iso-27001-isms-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iso-42001-aims-architect",
+      "to": "statement-of-applicability-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "lane-authoring-guide",
+      "to": "agent-instruction-consolidator",
+      "type": "description-mention"
+    },
+    {
+      "from": "lane-authoring-guide",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "lane-authoring-guide",
+      "to": "ai-sdlc-operating-model",
+      "type": "description-mention"
+    },
+    {
+      "from": "lane-authoring-guide",
+      "to": "scoped-approval-register",
+      "type": "description-mention"
+    },
+    {
+      "from": "latency-budget-architect",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "latency-budget-architect",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "library-diff-reviewer",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "library-diff-reviewer",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "library-diff-reviewer",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "library-diff-reviewer",
+      "to": "skill-quality-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
+      "to": "ai-misinformation-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
+      "to": "structured-output-validator",
+      "type": "description-mention"
+    },
+    {
+      "from": "load-test-planner",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "load-test-planner",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "load-test-planner",
+      "to": "test-data-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
+      "to": "risk-tiered-validation-selector",
+      "type": "description-mention"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
+      "to": "sharded-validation-with-resume",
+      "type": "description-mention"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "clickthrough-test-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "clickthrough-test-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "qa-strategy-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "screenshot-evidence-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "test-plan-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "manual-test-case-creator",
+      "to": "test-plan-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "agent-memory-governance",
+      "type": "description-mention"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "model-poisoning-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "model-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "rag-security-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "memory-context-poisoning-reviewer",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "merge-is-deploy-governance",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "merge-is-deploy-governance",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "merge-is-deploy-governance",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "merge-is-deploy-governance",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "accessibility-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "accessibility-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "edge-state-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "frontend-perf-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "mobile-viewport-craft",
+      "to": "frontend-perf-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
+      "to": "agent-startup-context-gate",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
+      "to": "memory-context-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-poisoning-reviewer",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "model-poisoning-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-poisoning-reviewer",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-poisoning-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-framework-crosswalk",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-framework-crosswalk",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-framework-crosswalk",
+      "to": "soc2-trust-criteria-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-framework-crosswalk",
+      "to": "statement-of-applicability-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-data-architect",
+      "to": "tenant-isolation-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "multi-tenant-data-architect",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-data-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "multi-tenant-data-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "multi-tenant-data-architect",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "n-plus-one-detector",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "n-plus-one-detector",
+      "to": "caching-strategy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "n-plus-one-detector",
+      "to": "profiling-methodology-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "n-plus-one-detector",
+      "to": "query-plan-reader",
+      "type": "description-mention"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "edge-state-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "edge-state-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "notification-webhook-ux-designer",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "observability-operator",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "observability-operator",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "observability-operator",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "observability-operator",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "observability-operator",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "observability-operator",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "offline-first-sync-architect",
+      "to": "caching-strategy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "offline-first-sync-architect",
+      "to": "command-gateway-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "offline-first-sync-architect",
+      "to": "edge-state-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "offline-first-sync-architect",
+      "to": "realtime-subscription-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "onboarding-doc-designer",
+      "to": "contribution-guide-author",
+      "type": "body-route"
+    },
+    {
+      "from": "onboarding-doc-designer",
+      "to": "contribution-guide-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "onboarding-doc-designer",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "onboarding-doc-designer",
+      "to": "readme-craftsman",
+      "type": "description-mention"
+    },
+    {
+      "from": "operational-vs-analytical-splitter",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "operational-vs-analytical-splitter",
+      "to": "query-plan-reader",
+      "type": "body-route"
+    },
+    {
+      "from": "operational-vs-analytical-splitter",
+      "to": "query-plan-reader",
+      "type": "description-mention"
+    },
+    {
+      "from": "operational-vs-analytical-splitter",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "operational-vs-analytical-splitter",
+      "to": "warehouse-lake-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "pagination-cursor-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "pagination-cursor-designer",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "pagination-cursor-designer",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "pagination-cursor-designer",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "pagination-cursor-designer",
+      "to": "query-plan-reader",
+      "type": "description-mention"
+    },
+    {
+      "from": "performance-test-harness",
+      "to": "latency-budget-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "performance-test-harness",
+      "to": "load-test-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "performance-test-harness",
+      "to": "load-test-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "performance-test-harness",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "performance-test-harness",
+      "to": "test-data-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "phased-work-handoff-designer",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "phased-work-handoff-designer",
+      "to": "ai-sdlc-operating-model",
+      "type": "body-route"
+    },
+    {
+      "from": "phased-work-handoff-designer",
+      "to": "ai-sdlc-operating-model",
+      "type": "description-mention"
+    },
+    {
+      "from": "phased-work-handoff-designer",
+      "to": "lane-authoring-guide",
+      "type": "description-mention"
+    },
+    {
+      "from": "pii-lifecycle-designer",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "pii-lifecycle-designer",
+      "to": "sensitive-disclosure-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "pii-lifecycle-designer",
+      "to": "test-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "saas-cost-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "playwright-e2e-engineer",
+      "to": "accessibility-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "playwright-e2e-engineer",
+      "to": "clickthrough-test-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "playwright-e2e-engineer",
+      "to": "integration-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "playwright-e2e-engineer",
+      "to": "vitest-unit-component-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "principal-code-analyst",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "principal-code-analyst",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "principal-code-analyst",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "roadmap-under-uncertainty-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "roadmap-under-uncertainty-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "prioritization-frame-picker",
+      "to": "roadmap-under-uncertainty-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "event-schema-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "event-schema-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "event-schema-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "event-schema-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-analytics-instrumenter",
+      "to": "skill-usage-instrumenter",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "adr-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "feature-flag-rollout-strategist",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "frontend-perf-engineer",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "frontend-perf-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "n-plus-one-detector",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "n-plus-one-detector",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "n-plus-one-detector",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "query-plan-reader",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "query-plan-reader",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "agent-startup-context-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ai-closeout-reporter",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ai-sdlc-operating-model",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ai-sdlc-operating-model",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ai-sdlc-operating-model",
+      "type": "description-mention"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "architecture-advisor",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "aws-saas-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "change-classification-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ci-pipeline-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "ci-pipeline-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "code-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "domain-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "local-ci-mirror-preflight",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "multi-tenant-data-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "phased-work-handoff-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "prioritization-frame-picker",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "qa-strategy-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "risk-tiered-validation-selector",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "roadmap-to-commitments-translator",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "rollback-runbook-author",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "sharded-validation-with-resume",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "promotion-packet-writer",
+      "to": "ai-closeout-reporter",
+      "type": "body-route"
+    },
+    {
+      "from": "promotion-packet-writer",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "promotion-packet-writer",
+      "to": "phased-work-handoff-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "promotion-packet-writer",
+      "to": "staff-scope-selector",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "ai-threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "llm-output-safety-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "system-prompt-leakage-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-automation-architect",
+      "to": "flaky-test-detective",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-automation-architect",
+      "to": "qa-strategy-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-automation-architect",
+      "to": "test-plan-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-strategy-architect",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-strategy-architect",
+      "to": "test-coverage-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "qa-strategy-architect",
+      "to": "test-plan-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "caching-strategy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "n-plus-one-detector",
+      "type": "description-mention"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "operational-vs-analytical-splitter",
+      "type": "body-route"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "operational-vs-analytical-splitter",
+      "type": "description-mention"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "profiling-methodology-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "query-plan-reader",
+      "to": "profiling-methodology-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "rag-security-architect",
+      "to": "model-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "rag-security-architect",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "rag-security-architect",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "rag-security-architect",
+      "to": "sensitive-disclosure-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "rag-security-architect",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "readme-craftsman",
+      "to": "contribution-guide-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "readme-craftsman",
+      "to": "diataxis-doc-organizer",
+      "type": "description-mention"
+    },
+    {
+      "from": "readme-craftsman",
+      "to": "docs-as-code-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "readme-craftsman",
+      "to": "docs-as-code-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "readme-craftsman",
+      "to": "onboarding-doc-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "realtime-subscription-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "realtime-subscription-architect",
+      "to": "notification-webhook-ux-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "realtime-subscription-architect",
+      "to": "offline-first-sync-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "realtime-subscription-architect",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "regression-suite-curator",
+      "to": "flaky-test-detective",
+      "type": "description-mention"
+    },
+    {
+      "from": "regression-suite-curator",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "regression-suite-curator",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "regression-suite-curator",
+      "to": "test-coverage-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "ai-closeout-reporter",
+      "type": "body-route"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "release-readiness-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "domain-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "risk-tiered-validation-selector",
+      "to": "change-classification-gate",
+      "type": "description-mention"
+    },
+    {
+      "from": "risk-tiered-validation-selector",
+      "to": "local-ci-mirror-preflight",
+      "type": "description-mention"
+    },
+    {
+      "from": "risk-tiered-validation-selector",
+      "to": "sharded-validation-with-resume",
+      "type": "description-mention"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "multi-tenant-security-tester",
+      "type": "description-mention"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-to-commitments-translator",
+      "to": "cross-team-dependency-negotiator",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-to-commitments-translator",
+      "to": "prioritization-frame-picker",
+      "type": "body-route"
+    },
+    {
+      "from": "roadmap-to-commitments-translator",
+      "to": "prioritization-frame-picker",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-to-commitments-translator",
+      "to": "roadmap-under-uncertainty-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-under-uncertainty-planner",
+      "to": "feature-flag-rollout-strategist",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-under-uncertainty-planner",
+      "to": "prioritization-frame-picker",
+      "type": "body-route"
+    },
+    {
+      "from": "roadmap-under-uncertainty-planner",
+      "to": "prioritization-frame-picker",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-under-uncertainty-planner",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "secure-migration-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "secure-migration-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-cost-architect",
+      "to": "plan-entitlement-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "saas-cost-architect",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-cost-architect",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-platform-architect",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-platform-architect",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-platform-architect",
+      "to": "saas-cost-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "saas-platform-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "saas-platform-architect",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "security-scan-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "supply-chain-security-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "sast-orchestration-designer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "data-migration-runbook-author",
+      "type": "body-route"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "data-migration-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "secure-migration-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "schema-evolution-planner",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "scoped-approval-register",
+      "to": "adr-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "scoped-approval-register",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "scoped-approval-register",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "scoped-approval-register",
+      "to": "standing-approval-and-auto-advance",
+      "type": "description-mention"
+    },
+    {
+      "from": "screenshot-evidence-planner",
+      "to": "ai-closeout-reporter",
+      "type": "description-mention"
+    },
+    {
+      "from": "screenshot-evidence-planner",
+      "to": "clickthrough-test-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "screenshot-evidence-planner",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "search-architecture-designer",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "search-architecture-designer",
+      "to": "pagination-cursor-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "search-architecture-designer",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "secrets-identity-hardener",
+      "to": "appsec-implementer",
+      "type": "body-route"
+    },
+    {
+      "from": "secrets-identity-hardener",
+      "to": "appsec-implementer",
+      "type": "description-mention"
+    },
+    {
+      "from": "secrets-identity-hardener",
+      "to": "rls-policy-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "secrets-identity-hardener",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "secrets-identity-hardener",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "rls-policy-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "rls-policy-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "secure-migration-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "dast-safety-harness-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "sast-orchestration-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-scan-orchestrator",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "llm-output-safety-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "system-prompt-leakage-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "flaky-test-detective",
+      "type": "body-route"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "flaky-test-detective",
+      "type": "description-mention"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "local-ci-mirror-preflight",
+      "type": "body-route"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "local-ci-mirror-preflight",
+      "type": "description-mention"
+    },
+    {
+      "from": "sharded-validation-with-resume",
+      "to": "risk-tiered-validation-selector",
+      "type": "description-mention"
+    },
+    {
+      "from": "share-link-access-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "share-link-access-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "share-link-access-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "share-link-access-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-deprecation-planner",
+      "to": "docs-retention-index",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-deprecation-planner",
+      "to": "library-diff-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-deprecation-planner",
+      "to": "skill-usage-instrumenter",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-quality-reviewer",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-quality-reviewer",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-quality-reviewer",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-quality-reviewer",
+      "to": "library-diff-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "eval-runner-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "skill-deprecation-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "skill-deprecation-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "skill-quality-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "skill-usage-instrumenter",
+      "to": "skill-quality-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "architecture-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "incident-response-runbook",
+      "type": "description-mention"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "qa-strategy-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "slo-reliability-architect",
+      "to": "systematic-debugger",
+      "type": "description-mention"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-evidence-collector",
+      "type": "body-route"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-evidence-collector",
+      "type": "body-route"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-evidence-collector",
+      "type": "body-route"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-evidence-collector",
+      "type": "description-mention"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-gap-auditor",
+      "type": "body-route"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "soc2-trust-criteria-mapper",
+      "to": "multi-framework-crosswalk",
+      "type": "description-mention"
+    },
+    {
+      "from": "source-currency-auditor",
+      "to": "framework-edition-tracker",
+      "type": "body-route"
+    },
+    {
+      "from": "source-currency-auditor",
+      "to": "framework-edition-tracker",
+      "type": "description-mention"
+    },
+    {
+      "from": "source-currency-auditor",
+      "to": "framework-mapping-refresher",
+      "type": "body-route"
+    },
+    {
+      "from": "source-currency-auditor",
+      "to": "framework-mapping-refresher",
+      "type": "description-mention"
+    },
+    {
+      "from": "source-currency-auditor",
+      "to": "skill-quality-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "source-of-truth-reconciler",
+      "to": "agent-startup-context-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "source-of-truth-reconciler",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "staff-scope-selector",
+      "to": "prioritization-frame-picker",
+      "type": "description-mention"
+    },
+    {
+      "from": "staff-scope-selector",
+      "to": "promotion-packet-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "staff-scope-selector",
+      "to": "roadmap-under-uncertainty-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "standing-approval-and-auto-advance",
+      "to": "agent-authorization-matrix",
+      "type": "body-route"
+    },
+    {
+      "from": "standing-approval-and-auto-advance",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "standing-approval-and-auto-advance",
+      "to": "human-agent-trust-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "standing-approval-and-auto-advance",
+      "to": "scoped-approval-register",
+      "type": "description-mention"
+    },
+    {
+      "from": "statement-of-applicability-author",
+      "to": "compliance-control-foundation",
+      "type": "description-mention"
+    },
+    {
+      "from": "statement-of-applicability-author",
+      "to": "iso-27001-isms-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "statement-of-applicability-author",
+      "to": "iso-42001-aims-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "statement-of-applicability-author",
+      "to": "multi-framework-crosswalk",
+      "type": "description-mention"
+    },
+    {
+      "from": "static-analysis-reviewer",
+      "to": "secure-migration-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "static-analysis-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "static-analysis-reviewer",
+      "to": "supply-chain-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "streaming-event-architect",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "streaming-event-architect",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "streaming-event-architect",
+      "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "streaming-event-architect",
+      "to": "operational-vs-analytical-splitter",
+      "type": "description-mention"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "agent-tool-safety-guard",
+      "type": "body-route"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "ai-misinformation-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "ai-router-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "llm-output-safety-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "llm-output-safety-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "structured-output-validator",
+      "to": "llm-output-safety-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "api-event-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "api-event-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "notification-webhook-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "notification-webhook-ux-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "skill-deprecation-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "sunset-deprecation-communicator",
+      "to": "skill-deprecation-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "admin-console-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "admin-console-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "audit-log-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "security-logging-alerting-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "superadmin-observability-console-designer",
+      "to": "synthetic-monitoring-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "supply-chain-security-reviewer",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "supply-chain-security-reviewer",
+      "to": "static-analysis-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "supply-chain-security-reviewer",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "supply-chain-security-reviewer",
+      "to": "threat-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "load-test-planner",
+      "type": "body-route"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "load-test-planner",
+      "type": "description-mention"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "observability-operator",
+      "type": "description-mention"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "performance-test-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "synthetic-monitoring-architect",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "system-prompt-leakage-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "system-prompt-leakage-reviewer",
+      "to": "ai-evaluation-harness",
+      "type": "body-route"
+    },
+    {
+      "from": "system-prompt-leakage-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "system-prompt-leakage-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "system-prompt-leakage-reviewer",
+      "to": "sensitive-disclosure-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "systematic-debugger",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "systematic-debugger",
+      "to": "tdd-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tdd-engineer",
+      "to": "change-classification-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "adr-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "adr-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "product-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "tenant-isolation-reviewer",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-isolation-reviewer",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "tenant-isolation-reviewer",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
+      "to": "multi-tenant-data-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "tenant-modeler",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-coverage-mapper",
+      "to": "full-codebase-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-coverage-mapper",
+      "to": "qa-strategy-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-coverage-mapper",
+      "to": "test-plan-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "integration-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "manual-test-case-creator",
+      "type": "body-route"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "multi-tenant-security-tester",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-data-architect",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "test-plan-designer",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-plan-designer",
+      "to": "qa-strategy-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-plan-designer",
+      "to": "test-coverage-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "appsec-implementer",
+      "type": "body-route"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "static-analysis-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "tenant-modeler",
+      "type": "body-route"
+    },
+    {
+      "from": "threat-modeler",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "usage-metering-and-cost-attribution-pipeline-designer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "usage-metering-and-cost-attribution-pipeline-designer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "usage-metering-and-cost-attribution-pipeline-designer",
+      "to": "operational-vs-analytical-splitter",
+      "type": "description-mention"
+    },
+    {
+      "from": "usage-metering-and-cost-attribution-pipeline-designer",
+      "to": "saas-cost-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "usage-metering-and-cost-attribution-pipeline-designer",
+      "to": "saas-cost-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "qa-automation-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "vitest-unit-component-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "integration-test-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "integration-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "playwright-e2e-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "tdd-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "test-plan-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "vitest-unit-component-engineer",
+      "to": "vite-build-qa-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "warehouse-lake-architect",
+      "to": "cloud-architecture-decider",
+      "type": "body-route"
+    },
+    {
+      "from": "warehouse-lake-architect",
+      "to": "operational-vs-analytical-splitter",
+      "type": "description-mention"
+    },
+    {
+      "from": "warehouse-lake-architect",
+      "to": "pii-lifecycle-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "warehouse-lake-architect",
+      "to": "streaming-event-architect",
+      "type": "description-mention"
+    }
+  ],
+  "unreferenced_skills": [
+    "authority-invalidation-architect",
+    "background-job-orchestration-architect",
+    "cell-based-architecture-designer",
+    "context-co-update-ci-gate",
+    "data-quality-monitor-designer",
+    "design-review-facilitator",
+    "docs-first-implementer",
+    "file-upload-storage-architect",
+    "gated-deployment-prompt-template",
+    "horizontal-scalability-reviewer",
+    "inter-agent-comms-reviewer",
+    "intra-tenant-scope-architect",
+    "project-orchestrator",
+    "reviewable-diff-discipline",
+    "superadmin-observability-console-designer",
+    "usage-metering-and-cost-attribution-pipeline-designer"
+  ]
+}

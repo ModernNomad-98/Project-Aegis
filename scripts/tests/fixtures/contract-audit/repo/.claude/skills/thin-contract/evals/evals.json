@@ -1,0 +1,13 @@
+{
+  "skill": "thin-contract",
+  "cases": [
+    {
+      "id": "no-assertions",
+      "type": "should_trigger",
+      "prompt": "Summarize this changelog.",
+      "expect": {
+        "triggers": true
+      }
+    }
+  ]
+}
