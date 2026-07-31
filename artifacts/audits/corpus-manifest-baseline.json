@@ -1,8 +1,12 @@
 {
-  "tool": "audit-skill-contracts",
-  "version": "1.0.0",
-  "repo_sha": "08727adf8f3e0f54226fa18639c9a50f2562ed22",
+  "engine": "audit-skill-contracts",
+  "engine_version": "2.0.0",
+  "catalog_version": "2.0.0",
+  "repo_sha": "f88b56f12676c3a3ee47a245284c9190e61af5d1",
   "branch": "audit/aegis-corpus-contract-baseline",
+  "working_tree_dirty": true,
+  "dirty_paths_in_scanned_surfaces": [],
+  "corpus_content_hash": "754184b16ec473970951f9af9590566c7ef7ef95611d4c6a7b0bc4761fb9d754",
   "skill_count": 184,
   "skills": [
     {
@@ -3258,7 +3262,7 @@
       "writes_artifacts": false
     }
   ],
-  "agents": [
+  "agents_enumerated_not_audited": [
     ".claude/agents/ai-security-red-team-reviewer.md",
     ".claude/agents/full-codebase-auditor.md",
     ".claude/agents/principal-architecture-reviewer.md",
@@ -3267,7 +3271,7 @@
     ".claude/agents/secure-saas-reviewer.md",
     ".claude/agents/senior-troubleshooting-lead.md"
   ],
-  "guided_paths": [
+  "guided_paths_enumerated_not_audited": [
     "docs/paths/add-ai-safely.md",
     "docs/paths/check-your-app.md",
     "docs/paths/something-is-broken.md"

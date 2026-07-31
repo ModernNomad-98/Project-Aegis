@@ -59,6 +59,13 @@ jobs:
       - name: Run validator self-tests
         run: python scripts/tests/test_validator.py
 
+      # The corpus contract-audit engine + rule catalog (AEGIS program, PR 1)
+      # are held to the same standard: every catalog rule proven able to fire
+      # and to stay silent, the loader proven to fail closed, on every CI run.
+      # The audit itself stays report-only; only its SELF-TESTS gate here.
+      - name: Run contract-audit self-tests
+        run: python scripts/tests/test_audit_skill_contracts.py
+
       # The default bash shell runs with `-eo pipefail`, so a nonzero exit
       # from the validator fails this job.
       - name: Run skill validator

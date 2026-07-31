@@ -47,6 +47,41 @@ Rules of this register (from the program's operating rules):
   (`scripts/tests/fixtures/contract-audit/`) keeps proving the rule fires on
   an annotated name.
 
+### AEGIS-061 (candidate) — High-authority repository tooling can self-certify without independent owning-review gates
+
+- **Classification / severity / status:** Candidate governance defect / P1 / **Candidate — evidenced by this program's own first iteration**
+- **Observed behavior and evidence:**
+  - PR #75's first iteration authored the corpus audit engine, its policy,
+    its tests, and its frozen evidence in one session, and the only
+    validation was run by that same authoring session — no repository
+    control required an independent owning review before the PR was
+    presented as ready.
+  - The gate-guard path filter
+    (`.github/workflows/validate-skills.yml`) covers
+    `scripts/validate-skills.py`, `scripts/check_dco.py`, and
+    `scripts/tests/`, but **not** `scripts/audit-skill-contracts.py` or
+    `scripts/audit-rules.yaml` — a future PR editing only the audit engine
+    or its rule catalog (the program's evidence producer) would pass
+    gate-guard GREEN.
+- **Expected behavior:** Changes to high-authority tooling (merge gates,
+  audit engines, audit policy, evidence generators) require an independent
+  owning review in an isolated session, and the enforcement-surface guard
+  covers the evidence producer itself.
+- **Why a new ID:** Not covered by AEGIS-001..059 — AEGIS-018 is missing
+  runner infrastructure, AEGIS-019 is intervention accounting, AEGIS-016/-017
+  are test-evidence hygiene. This is a review-AUTHORITY gap: who is allowed
+  to certify the certifier.
+- **Likely owner:** `docs/audits/changed-surface-review-matrix.md` (the first
+  control, added with this finding); gate-guard path-filter widening (an
+  enforcement batch, since it touches `.github/workflows/`);
+  `agent-governance-audit` as the standing reviewer.
+- **Suggested batch:** the matrix ships now (documentation control); the
+  gate-scope widening joins the next enforcement-surface batch.
+- **Positive regression:** every remediation-PR closeout reports per-reviewer
+  verdicts for each changed surface class per the matrix.
+- **Negative regression:** a PR touching `scripts/audit-rules.yaml` alone
+  must not pass the enforcement guard silently once the filter is widened.
+
 No further new IDs are proposed by this baseline pass. Two observations were
 deliberately NOT given IDs (below) because their evidence is incomplete or
 their materiality is unconfirmed.
@@ -78,11 +113,14 @@ their materiality is unconfirmed.
 | EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | — |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
 
-Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
+Rules that fired zero times on the live corpus (SIDE-001..004, APPR-001,
 APPR-003, STATE-001..004, VOCAB-003, PARITY-001..002, EVAL-001..003,
 ROUTE-001, REF-001..003) are each proven ABLE to fire by fixture
-(`scripts/tests/test_audit_skill_contracts.py`, 25 assertions): a zero is a
-scanned zero, not an unscanned one.
+(`scripts/tests/test_audit_skill_contracts.py`): a zero is a scanned zero,
+not an unscanned one. Audit policy lives in the versioned rule catalog
+`scripts/audit-rules.yaml` (each rule cites its authoritative skill or
+standard section, its fixtures, and its false-positive limits); the Python
+engine is generic mechanism.
 
 ## 4. Semantic-review coverage record
 
@@ -99,6 +137,13 @@ scanned zero, not an unscanned one.
   their audit coverage is mechanical-only. Full per-skill worksheet passes
   are scheduled across the remediation batches, cluster by cluster, and get
   recorded here as they land.
+- **The executable queue is
+  `artifacts/audits/semantic-review-queue.json`** (engine `--queue` output):
+  every semantic-candidate finding routed to its owning reviewer skill
+  (`skill-quality-reviewer`, `agent-governance-audit`, …) plus a per-skill
+  rubric-pass queue — all entries QUEUED, none executed by the engine. A
+  future runner executes them in isolated sessions; nothing is manually
+  swept in-conversation.
 
 ## 5. Remediation-batch adjustments recommended by this baseline
 
@@ -115,6 +160,14 @@ The planned PR 2..11 sequence stands. Three adjustments:
 3. **PR 11 absorbs AEGIS-060 (candidate)** — fixture hygiene is a
    precondition of the behavioral-eval pilot, and the fix is five small,
    mechanically-regressed edits.
+
+4. **AEGIS-061 (candidate) splits across two controls**: the
+   changed-surface review matrix
+   ([changed-surface-review-matrix.md](changed-surface-review-matrix.md))
+   ships with this PR as the documentation control; widening the gate-guard
+   path filter to cover `scripts/audit-skill-contracts.py` and
+   `scripts/audit-rules.yaml` belongs to the next enforcement-surface batch
+   (it edits `.github/workflows/`).
 
 ROUTE-002 triage (311 edges) is NOT assigned to a numbered batch yet;
 recommend triaging it inside PR 5 (shared vocabulary) discovery, splitting a

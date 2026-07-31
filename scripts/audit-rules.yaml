@@ -1,0 +1,675 @@
+# Project Aegis — corpus contract-audit RULE CATALOG (v2.0.0)
+#
+# This file is the AUDIT POLICY. scripts/audit-skill-contracts.py is a generic,
+# read-only mechanical ENGINE that executes it; the engine carries no rule
+# knowledge of its own. Project Aegis skills and standards remain the
+# authorities on what good behavior means — every rule cites its owning skill
+# or standard section, and every rule classified `semantic` is a REVIEW-QUEUE
+# feeder for the named reviewer skill, never a mechanically proven defect.
+#
+# Versioning: bump `catalog_version` on any rule addition/removal/behavior
+# change; the engine embeds it in all outputs so baselines are comparable.
+#
+# Required fields per rule (the engine fails closed if one is missing):
+#   id, title, authority, surfaces, classification, severity, detector,
+#   positive_fixture, negative_fixture, aegis_families,
+#   false_positive_limits, semantic_review_owner
+#
+# `aegis_families: []` means the rule maps to no existing AEGIS-001..059 ID
+# (census/graph evidence); it is NOT an implicit claim of novelty.
+
+catalog_version: "2.0.0"
+
+config:
+  # Fixture repo used by scripts/tests/test_audit_skill_contracts.py.
+  fixture_root: scripts/tests/fixtures/contract-audit/repo
+  # A CONTRACT declaration ("this artifact is append-only") vs DOMAIN
+  # vocabulary ("append-only formats"): a governed-artifact noun must sit
+  # within 50 chars of the phrase. Shared by every STATE rule. Calibrated on
+  # the live corpus (warehouse/PII/ADR storage talk must NOT bind).
+  append_contract_declaration: '(?i)(?:\bappend[- ]only\b[^.\n]{0,50}\b(?:file|log|entry|entries|record|template|state|register|history|snapshot|decision)\b|\b(?:file|log|entry|entries|record|template|state|register|history|snapshot|decision)s?\b[^.\n]{0,50}\bappend[- ]only\b)'
+  # SKILL.md sections that DESCRIBE failure modes by repo convention
+  # (docs/skill-generation-standard.md §4: Gotchas = "known failure modes",
+  # Stop Conditions = "when to halt") — mutation verbs there are warnings.
+  warning_sections: ["Gotchas", "Stop Conditions"]
+  # Backticked kebab tokens that are legitimately NOT skill names on routing
+  # surfaces. Curated from the live corpus; extend deliberately.
+  non_skill_tokens:
+    - disable-model-invocation
+    - allowed-tools
+    - should-not-trigger
+    - should-trigger
+    - trigger-evals
+    - manual-only
+    - read-only
+    - fail-closed
+    - append-only
+    - auto-merge
+    - no-verify
+    - docs-as-code
+    - stage-gate-map
+    - project-state
+    - skill-generation-standard
+    - step-0-reconciliation-v4
+    - pre-existing-on-main   # local-ci-mirror-preflight failure category
+    - happy-dom              # npm test-environment package
+  # Vocabulary census terms (defect family F; AEGIS-039/-044/-047). Counted
+  # word-bounded; census output is DATA, not findings.
+  census_terms:
+    - proposed
+    - approved scope
+    - planned
+    - prioritized
+    - sequenced
+    - targeted
+    - estimated
+    - commit-able
+    - committed
+    - accepted
+    - verified
+    - ready
+    - complete
+    - durable
+    - deployed
+    - released
+  # Skills whose Stage-2-cluster contracts received the PR-1 rubric-GUIDED
+  # targeted review (NOT a formal per-question worksheet). Everything else is
+  # mechanical-only; the semantic-review queue carries the formal passes.
+  targeted_review_done:
+    - project-orchestrator
+    - prioritization-frame-picker
+    - roadmap-under-uncertainty-planner
+    - roadmap-to-commitments-translator
+    - product-spec-writer
+
+rules:
+  # ==== Family A — side-effect & invocation posture =========================
+
+  - id: SIDE-001
+    title: Read-only-declared skill instructs artifact writes
+    authority: "docs/skill-generation-standard.md §5 (Least privilege & side effects: default read-only); human-approval-boundary"
+    surfaces: [skill-frontmatter-description, skill-body]
+    classification: mechanical
+    severity: P1
+    confidence: medium
+    detector:
+      type: region_conjunction
+      declaration_regions: [description, purpose]
+      declaration_pattern: '(?i)\bread[- ]only\b|\bchanges nothing\b|\bwrites nothing\b|\bnever (?:writes|creates|modifies|edits)\b|\bno (?:file )?writes\b'
+      violation_regions: [workflow, output_format]
+      violation_pattern: '(?i)(?:\b(?:write|save|persist|record)\s+(?:the\s+|a\s+|it\s+|your\s+)?(?:results?|report|output|findings?|file|entry|artifact)s?\s+(?:to|in|under)\b|\bcreate\s+(?:a\s+|the\s+)?(?:new\s+)?(?:file|directory)\b|\bappend\s+(?:it\s+|the\s+entry\s+)?to\b|\bgit\s+(?:commit|push|add)\b|\b(?:npm|pip|yarn|pnpm)\s+install\b|`(?:Write|Edit|NotebookEdit)`)'
+      negation_guard: true
+      strip_fences: true
+      evidence: "declares read-only but instructs: {match}"
+    positive_fixture: .claude/skills/readonly-scratch-writer/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-057, AEGIS-020]
+    false_positive_limits: >-
+      Verb anchoring cannot distinguish instructing a write from designing one;
+      matches are lexical. Calibrated with artifact-noun anchors so design
+      prose does not fire, at the cost of missing unanchored phrasing.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: SIDE-002
+    title: Read-only-declared skill mentions scratch/temp/memory writes
+    authority: "docs/skill-generation-standard.md §5 (exception does NOT cover external or live-state mutation); AEGIS handoff §A ('no repository write' is not 'read-only')"
+    surfaces: [skill-body]
+    classification: mechanical
+    severity: P0
+    confidence: medium
+    detector:
+      type: region_conjunction
+      declaration_regions: [description, purpose]
+      declaration_pattern: '(?i)\bread[- ]only\b|\bchanges nothing\b|\bwrites nothing\b|\bnever (?:writes|creates|modifies|edits)\b|\bno (?:file )?writes\b'
+      violation_regions: [body]
+      violation_pattern: '(?i)\b(?:write|create|save|stash|persist)\b[^.\n]{0,60}\b(?:scratch(?:pad)?|temp(?:orary)?\s+(?:file|dir)|memory\s+(?:file|dir|directory))\b|\b(?:scratch(?:pad)?|temp(?:orary)?\s+(?:file|dir)|memory\s+(?:file|dir|directory))\b[^.\n]{0,40}\b(?:write|create|save|stash)\b'
+      negation_guard: true
+      strip_fences: true
+      evidence: "read-only-declared skill mentions scratch/temp/memory write: {match}"
+    positive_fixture: .claude/skills/readonly-scratch-writer/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-057, AEGIS-020]
+    false_positive_limits: >-
+      Proximity windows (60/40 chars) can join unrelated clauses or miss
+      distant ones; negated guidance is excluded but reported-speech is not.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: SIDE-003
+    title: Read-only-declared skill grants write-capable tools
+    authority: "docs/skill-generation-standard.md §5 (a read-and-report skill needs no allowed-tools widening) and §2 (frontmatter rules)"
+    surfaces: [skill-frontmatter-description]
+    classification: mechanical
+    severity: P0
+    confidence: high
+    detector:
+      type: posture_grant_contradiction
+      declaration_pattern: '(?i)\bread[- ]only\b|\bchanges nothing\b|\bwrites nothing\b|\bnever (?:writes|creates|modifies|edits)\b|\bno (?:file )?writes\b'
+      write_tools: [write, edit, notebookedit, bash, powershell]
+      evidence: "declares read-only but allowed-tools grants {match}"
+    positive_fixture: .claude/skills/readonly-scratch-writer/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-057]
+    false_positive_limits: >-
+      None known: the declaration and the grant are both objective frontmatter
+      facts.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: SIDE-004
+    title: Auto-invocable skill instructs hard side effects without the approved-write exception
+    authority: "docs/skill-generation-standard.md §5 (write/network/deploy/spend requires disable-model-invocation:true; the approved-write exception covers only previewed, content-approved doc/state writes)"
+    surfaces: [skill-body]
+    classification: semantic
+    severity: P1
+    confidence: low
+    detector:
+      type: posture_side_effect
+      instruction_regions: [workflow]
+      instruction_pattern: '(?i)\bgit\s+(?:push|commit)\b|\b(?:npm|pip|yarn|pnpm)\s+install\b|\bdeploy(?:s|ing)?\s+(?:the|to)\b|\bcurl\s+-|\bhttp\s+post\b|\bpurchase\b|\bprovision\s+(?:the|a)\b'
+      approval_pattern: '(?i)explicit(?:,)?\s+content-specific|propose\s*(?:→|->)\s*approve|exact\s+(?:target\s+)?path\s+and\s+(?:the\s+)?(?:exact\s+)?content|single-use\s+approval'
+      strip_fences: false
+      evidence: "auto-invocable skill instructs a hard side effect without approved-write language: {match}"
+    positive_fixture: .claude/skills/auto-deployer/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-020, AEGIS-057]
+    false_positive_limits: >-
+      Fenced examples are deliberately INCLUDED (a fenced `git push` an
+      auto-invocable skill tells the model to run is still an instruction), so
+      illustrative snippets can fire; posture judgment (instruction vs
+      teaching material) is the reviewer's, which is why this rule is
+      classified semantic and queue-routed, never mechanically proven.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family B — approval & authority =====================================
+
+  - id: APPR-001
+    title: Bare generic status value with no approval class
+    authority: "scoped-approval-register (Status / Scope allowed / Scope FORBIDDEN / Evidence citation pattern); AEGIS handoff §B"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: surface_pattern
+      pattern: '(?im)^\s*(?:[-*]\s*)?\**status\**\s*:\s*\**(?:accepted|approved|ready|final|complete|done|committed)\**\s*$'
+      surfaces: [skill_md, references]
+      evidence: "bare generic status with no approval class: {match}"
+    positive_fixture: .claude/skills/generic-approval/references/approval-record.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-055, AEGIS-008]
+    false_positive_limits: >-
+      Line-anchored; a qualified status split across lines is missed, and a
+      table cell status cannot be bound to its column semantics.
+    semantic_review_owner: agent-governance-audit
+
+  - id: APPR-002
+    title: Scope grant authorizing BUILD from a requirements-stage approval
+    authority: "human-approval-boundary; scoped-approval-register (deny-by-default: an action is authorized only as worded); AEGIS handoff §B"
+    surfaces: [skill-body, skill-references]
+    classification: semantic
+    severity: P0
+    confidence: medium
+    detector:
+      type: surface_pattern
+      pattern: '(?i)\bbuild\s+(?:the\s+)?(?:approved\s+)?v?\d*\s*scope\b'
+      surfaces: [skill_md, references]
+      evidence: "scope grant that authorizes BUILDING from a requirements-stage approval: {match} (content approval must not become implementation authority)"
+    positive_fixture: .claude/skills/generic-approval/references/approval-record.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-003, AEGIS-008]
+    false_positive_limits: >-
+      The phrase can appear in text that CRITIQUES the grant; whether a given
+      occurrence launders approval into build authority is a judgment call —
+      hence semantic classification.
+    semantic_review_owner: agent-governance-audit
+
+  - id: APPR-003
+    title: Approval record with allowed scope but no forbidden scope
+    authority: "scoped-approval-register (Scope allowed / Scope FORBIDDEN are both required fields of the citation pattern)"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: surface_pattern_absence
+      present_pattern: '(?i)\bscope allowed\b'
+      absent_pattern: '(?i)\bforbidden\b'
+      surfaces: [skill_md, references]
+      evidence: "approval record defines 'Scope allowed' but no FORBIDDEN scope (the scoped-approval-register pattern requires both)"
+    positive_fixture: .claude/skills/generic-approval/references/approval-record.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-008, AEGIS-003]
+    false_positive_limits: >-
+      File-level absence check: a file with several records where only one
+      lacks the forbidden field reports once at file granularity.
+    semantic_review_owner: agent-governance-audit
+
+  # ==== Family C — project-state & append-only ==============================
+
+  - id: STATE-001
+    title: Append-only-declared file carries mutable placeholders
+    authority: "project-orchestrator references/project-state-template.md (Non-negotiable rules 1-2: two dated entry types; append-only; supersede, never rewrite)"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P0
+    confidence: high
+    detector:
+      type: append_contract_conjunction
+      violation_pattern: '(?i)\b(?:not yet defined|none yet|to be filled|to be determined|fill in later|TBD)\b'
+      proximity_lines: 0
+      negation_guard: false
+      evidence: "append-only-declared file carries mutable placeholder {match} (will demand later replacement the contract forbids)"
+    positive_fixture: .claude/skills/state-contradictor/references/state-template.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-002, AEGIS-006]
+    false_positive_limits: >-
+      A placeholder used as an illustration of what NOT to write fires too;
+      the append-only declaration itself is bound by a contract-noun window
+      that excludes storage-domain vocabulary.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: STATE-002
+    title: Append-only-declared file instructs overwrite/rewrite/truncate
+    authority: "project-orchestrator references/project-state-template.md (rule 2: never edit or delete a past entry); AEGIS handoff §C"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P0
+    confidence: medium
+    detector:
+      type: append_contract_conjunction
+      violation_pattern: '(?i)\b(?:overwrit(?:e|es|ing|ten)|rewrit(?:e|es|ing|ten)|truncat(?:e|es|ing|ed)|replac(?:e|es|ing|ed)\s+(?:the\s+|this\s+|its\s+)?(?:file|content|entry|section|row))\b'
+      proximity_lines: 15
+      negation_guard: true
+      evidence: "append-only-declared file instructs {match} near the declaration itself"
+    positive_fixture: .claude/skills/state-contradictor/references/state-template.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-002, AEGIS-004]
+    false_positive_limits: >-
+      The ±15-line proximity window trades recall for precision: a real
+      contradiction at file distance is missed (semantic queue territory);
+      domain vocabulary beyond the window never fires. Gotchas/Stop Conditions
+      are masked (warnings, not instructions).
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: STATE-003
+    title: Middle insertion described inside an append-only contract
+    authority: "AEGIS handoff §C (append-only means pre-existing bytes remain the immutable prefix; new bytes begin at EOF)"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P0
+    confidence: medium
+    detector:
+      type: append_contract_conjunction
+      violation_pattern: '(?i)\binsert(?:ing|ed|s)?\b[^.\n]{0,50}\b(?:row|entry|section|above|between|middle)\b'
+      proximity_lines: 15
+      negation_guard: true
+      evidence: "append-only-declared file instructs middle insertion: {match} (append-only means new bytes begin at EOF)"
+    positive_fixture: .claude/skills/state-contradictor/references/state-template.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-005, AEGIS-002]
+    false_positive_limits: >-
+      Same proximity/negation trade-offs as STATE-002; "insert" describing a
+      UI action rather than a file mutation can fire within the window.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: STATE-004
+    title: Exact-operation claim with unbound placeholders in command fences
+    authority: "AEGIS handoff §C / AEGIS-058 (authorization binds exact target, hashes, payload; no placeholders in an approved plan)"
+    surfaces: [skill-body, skill-references]
+    classification: semantic
+    severity: P0
+    confidence: medium
+    detector:
+      type: fenced_placeholder_command
+      exactness_pattern: '(?i)\bexact (?:command|operation|append|content)\b'
+      placeholder_pattern: '<[a-z][a-z0-9 _-]{1,40}>'
+      command_pattern: '(?i)\b(?:cat|cp|mv|git|python|Add-Content|>>)\b'
+      evidence: "'exact' operation still contains unbound placeholder: {match}"
+    positive_fixture: .claude/skills/state-contradictor/references/state-template.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-058]
+    false_positive_limits: >-
+      A template that TEACHES the placeholder-then-bind pattern legitimately
+      shows placeholders; whether the surrounding text promises exactness is a
+      reading — semantic classification.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: STATE-005
+    title: Narrative approved-state section inside an append-only contract
+    authority: "project-orchestrator references/project-state-template.md (rule 1: exactly two dated entry types; latest snapshot wins; no mutable field)"
+    surfaces: [skill-body, skill-references]
+    classification: semantic
+    severity: P1
+    confidence: medium
+    detector:
+      type: append_contract_conjunction
+      violation_pattern: '(?m)^#{2,4} .*\((?:approved|current)\)\s*$'
+      proximity_lines: 0
+      negation_guard: false
+      evidence: "append-only-declared file contains narrative section {match} with no defined supersession mechanics (how is it updated without rewriting bytes?)"
+    positive_fixture: .claude/skills/state-contradictor/references/state-template.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-002, AEGIS-006]
+    false_positive_limits: >-
+      Whether a "(approved)" section has workable supersession semantics is a
+      design question the pattern cannot answer — it only locates candidates.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family D — artifact governance ======================================
+
+  - id: ARTF-001
+    title: Durability claim without a durability level
+    authority: "AEGIS handoff §D durability taxonomy (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released) — not yet a repo standard; that absence IS AEGIS-056"
+    surfaces: [skill-body]
+    classification: semantic
+    severity: P1
+    confidence: medium
+    detector:
+      type: surface_pattern_absence
+      present_pattern: '(?i)\bdurabl[ye]\b'
+      absent_pattern: '(?i)\b(?:transcript-only|workspace-persisted|git-tracked|locally committed|remote-persisted|released|untracked|committed)\b'
+      surfaces: [skill_md_body_defenced]
+      evidence: "claims durability ({match}) without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)"
+    positive_fixture: .claude/skills/durable-vague/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-056, AEGIS-049]
+    false_positive_limits: >-
+      Any occurrence of "committed" (even non-durability senses) suppresses
+      the rule for the whole file, so it UNDER-fires; "durable" used
+      figuratively over-fires. Candidates only.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family E — handoff & route graph ====================================
+
+  - id: ROUTE-001
+    title: Routing reference to a name that is not on disk
+    authority: "docs/skill-generation-standard.md §2 (descriptions route by exact names); validator D55 precedent (dangling names rot silently)"
+    surfaces: [skill-frontmatter-description, skill-body]
+    classification: mechanical
+    severity: P1
+    confidence: medium
+    detector:
+      type: name_resolution
+      evidence_description: "description references `{match}`, which is not a skill on disk"
+      evidence_body: "routing line references `{match}`, which is not a skill on disk: {line}"
+      routing_line_pattern: '(?i)(→|\broutes? to\b|\binvoke[sd]?\b|\bhand(?:s|ed)? (?:off|over|to)\b|\bdelegate[sd]? to\b|\bbelongs to\b|\bowned by\b|\bgoes to\b)'
+    positive_fixture: .claude/skills/bad-stage-router/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-053]
+    false_positive_limits: >-
+      Non-skill kebab tokens on routing lines need the curated allowlist;
+      reviewer agents (.claude/agents) count as known names. Unbackticked
+      stale names are missed entirely.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: ROUTE-002
+    title: Exclusion toward a neighbor that never reciprocates
+    authority: "skill-quality-reviewer (trigger collision with colliders NAMED is its named main failure mode); reciprocity itself is NOT yet a written standard — census evidence, no AEGIS ID"
+    surfaces: [skill-frontmatter-description]
+    classification: mechanical
+    severity: info
+    confidence: low
+    detector:
+      type: exclusion_reciprocity
+      evidence: "exclusion toward `{match}` is not reciprocated ({match}'s description never mentions this skill)"
+    positive_fixture: .claude/skills/stale-linker/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: []
+    false_positive_limits: >-
+      Many one-directional exclusions are correct (hub skills cannot name
+      every excluder). This rule produces CENSUS data for triage, not
+      defects; it maps to no AEGIS ID.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: ROUTE-003
+    title: Stage-2 route reaches commitments without the roadmap owner
+    authority: "project-orchestrator SKILL.md (Workflow, Capability 2 route); roadmap-to-commitments-translator description (consumes a roadmap); prioritization-frame-picker description (sequencing is the roadmap planner's)"
+    surfaces: [skill-body]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: route_segment
+      start_pattern: '\*\*Stage 2\b'
+      end_pattern: '\*\*Stage 3\b'
+      anchor: roadmap-to-commitments-translator
+      required: roadmap-under-uncertainty-planner
+      related: [prioritization-frame-picker, roadmap-under-uncertainty-planner, roadmap-to-commitments-translator]
+      evidence: "Stage 2 route reaches roadmap-to-commitments-translator without roadmap-under-uncertainty-planner, but the commitments skill declares a roadmap as its input and the prioritization skill hands sequencing to the roadmap planner (AEGIS-035)"
+    positive_fixture: .claude/skills/bad-stage-router/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-035, AEGIS-045]
+    false_positive_limits: >-
+      Bound to the literal "**Stage 2"/"**Stage 3" markers; a reworded route
+      escapes detection until the catalog is updated.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family F — commitment vocabulary ====================================
+
+  - id: VOCAB-002
+    title: Committed used as a roadmap horizon label
+    authority: "roadmap-to-commitments-translator description (reserves 'committed' for capacity-backed promises); AEGIS handoff §F"
+    surfaces: [skill-frontmatter-description, skill-body, skill-references]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: surface_pattern
+      pattern: '(?i)now\s*\(committed\)|committed\s*/\s*planned\s*/\s*exploratory'
+      surfaces: [skill_md, references]
+      evidence: "'committed' used as a roadmap HORIZON label ({match}) while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)"
+      related: [roadmap-to-commitments-translator]
+    positive_fixture: .claude/skills/committed-roadmap/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-044, AEGIS-039]
+    false_positive_limits: >-
+      Fires wherever the label pattern appears, including text QUOTING the
+      conflict in order to warn about it.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: VOCAB-003
+    title: Approved scope described as a commitment
+    authority: "roadmap-to-commitments-translator (commit-able vs aspirational separation); AEGIS handoff §F"
+    surfaces: [skill-frontmatter-description, skill-body, skill-references]
+    classification: mechanical
+    severity: P0
+    confidence: medium
+    detector:
+      type: surface_pattern
+      pattern: '(?i)\bcommitted\s+(?:v\d+\s+)?scope\b|\bscope\s+is\s+committed\b'
+      surfaces: [skill_md, references]
+      evidence: "approved scope described as a commitment: {match} (AEGIS-039)"
+    positive_fixture: .claude/skills/committed-roadmap/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-039]
+    false_positive_limits: >-
+      Cannot tell asserting the laundering from warning against it; low base
+      rate keeps this usable.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family G — workflow-to-output parity ================================
+
+  - id: PARITY-001
+    title: Validation Checklist with no checkable items
+    authority: "docs/skill-generation-standard.md §4 item 6 (a checklist the model runs before declaring done)"
+    surfaces: [skill-body]
+    classification: mechanical
+    severity: P2
+    confidence: high
+    detector:
+      type: section_check
+      section: Validation Checklist
+      check: has_checkboxes
+      evidence: "Validation Checklist contains no checkbox items — nothing verifiable"
+    positive_fixture: .claude/skills/thin-contract/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-014, AEGIS-015]
+    false_positive_limits: >-
+      Only the "- [ ]" form counts as checkable; prose checklists fail even
+      when substantive.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: PARITY-002
+    title: Output Format too thin to verify against
+    authority: "docs/skill-generation-standard.md §4 item 5 (the exact shape of the deliverable)"
+    surfaces: [skill-body]
+    classification: mechanical
+    severity: P2
+    confidence: high
+    detector:
+      type: section_check
+      section: Output Format
+      check: min_content
+      min_lines: 2
+      min_single_line_chars: 60
+      evidence: "Output Format is empty or a single short line — the output contract is not specified enough to verify against"
+    positive_fixture: .claude/skills/thin-contract/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-034, AEGIS-015]
+    false_positive_limits: >-
+      Length thresholds are proxies; a long vague contract passes, a short
+      precise one fails.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family H — eval coverage ============================================
+
+  - id: EVAL-001
+    title: No negative discrimination case anywhere in the skill's evals
+    authority: "docs/skill-generation-standard.md §6 (at least ... a should-not-do case)"
+    surfaces: [evals-json, trigger-evals-json]
+    classification: mechanical
+    severity: P2
+    confidence: high
+    detector:
+      type: eval_case_shape
+      check: negative_presence
+      evidence: "no negative discrimination case in evals.json or trigger-evals.json — trigger discrimination is untested even structurally"
+    positive_fixture: .claude/skills/readonly-scratch-writer/evals/evals.json
+    negative_fixture: .claude/skills/clean-skill/evals/evals.json
+    aegis_families: [AEGIS-018, AEGIS-014]
+    false_positive_limits: >-
+      Structural presence only — a present negative case may still be hollow
+      (that judgment is queue-routed).
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: EVAL-002
+    title: Eval case unjudgeable as written
+    authority: "docs/skill-generation-standard.md §6 (objective assertions required); repo eval schemas (evals.json: expect.assertions; trigger-evals.json: expected_skill)"
+    surfaces: [evals-json, trigger-evals-json]
+    classification: mechanical
+    severity: P2
+    confidence: high
+    detector:
+      type: eval_case_shape
+      check: judgeable
+      evidence_evals: "evals.json case {match} has no expect.assertions — unjudgeable as written"
+      evidence_trigger: "trigger-evals case {match} names no expected_skill — unjudgeable as written"
+    positive_fixture: .claude/skills/thin-contract/evals/evals.json
+    negative_fixture: .claude/skills/clean-skill/evals/evals.json
+    aegis_families: [AEGIS-018]
+    false_positive_limits: >-
+      Field presence is not assertion quality; both schemas are repo
+      conventions and drift with them.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: EVAL-003
+    title: Approval/state-related skill with no refusal or boundary case
+    authority: "docs/skill-generation-standard.md §6; skill-quality-reviewer (evals that test real boundaries vs hollow filler)"
+    surfaces: [evals-json]
+    classification: mechanical
+    severity: P1
+    confidence: medium
+    detector:
+      type: eval_case_shape
+      check: boundary_for_risk
+      risk_pattern: '(?i)approv|authoriz'
+      state_pattern: '(?i)project-state|append-only|state file'
+      refusal_pattern: '(?i)refus|halt|stop|declin|reject|never|no write|not write|forbid'
+      evidence: "approval/state-related skill has no refusal or boundary eval case"
+    positive_fixture: .claude/skills/generic-approval/evals/evals.json
+    negative_fixture: .claude/skills/clean-skill/evals/evals.json
+    aegis_families: [AEGIS-014, AEGIS-018]
+    false_positive_limits: >-
+      Risk classification is keyword-based; refusal keywords in an unrelated
+      assertion satisfy the check spuriously.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: EVAL-004
+    title: Trigger-eval neighbor name not machine-resolvable
+    authority: "repo trigger-evals convention (expected_skill / should_not_trigger / overlaps_with name neighbors); eval-runner-designer (a runner must resolve names mechanically)"
+    surfaces: [trigger-evals-json]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: eval_neighbor_resolution
+      annotation_strip_pattern: '\s*\((?:sub)?agent\)\s*$'
+      severity_annotated: P2
+      evidence_stale: "trigger-evals references neighbor {match}, which is not a skill or agent on disk"
+      evidence_annotated: "trigger-evals neighbor {match} is annotated prose, not a resolvable name (target {stripped} exists) — an eval runner cannot match it mechanically"
+    positive_fixture: .claude/skills/thin-contract/evals/trigger-evals.json
+    negative_fixture: .claude/skills/clean-skill/evals/trigger-evals.json
+    aegis_families: [AEGIS-060, AEGIS-018]
+    false_positive_limits: >-
+      Only the "(subagent)"/"(agent)" annotation form is stripped; other
+      prose decorations report as stale.
+    semantic_review_owner: skill-quality-reviewer
+
+  # ==== Family I — reference integrity ======================================
+
+  - id: REF-001
+    title: Markdown link target missing on disk
+    authority: "validator D55 check_docs_paths_links precedent extended to skill bodies; docs/skill-generation-standard.md §9/§3 (Supporting Files must resolve)"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: link_resolution
+      evidence: "link target does not exist on disk: {match}"
+    positive_fixture: .claude/skills/stale-linker/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-053]
+    false_positive_limits: >-
+      Fenced example links are excluded by fence-stripping; targets with
+      spaces or angle-bracket syntax are not parsed.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: REF-002
+    title: Absolute user-machine path in shipped content
+    authority: "docs/skill-generation-standard.md §5 (never embed ... absolute machine-specific paths)"
+    surfaces: [skill-body, skill-references]
+    classification: semantic
+    severity: info
+    confidence: low
+    detector:
+      type: surface_pattern
+      pattern: '[A-Za-z]:[\\/][Uu]sers[\\/]|(?<![A-Za-z0-9])/Users/'
+      surfaces: [skill_md_defenced, references_defenced]
+      evidence: "absolute user-machine path in shipped content: {context}"
+    positive_fixture: .claude/skills/stale-linker/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-053]
+    false_positive_limits: >-
+      Deliberate fictional example paths (common in eval prompts and
+      teaching text) fire; lowercase /users/ API routes are excluded, macOS
+      /Users/ is not distinguishable from an example.
+    semantic_review_owner: skill-quality-reviewer
+
+  - id: REF-003
+    title: Bare references/ file mention missing on disk
+    authority: "docs/skill-generation-standard.md §4 item 9 / §3 (Supporting Files & progressive disclosure)"
+    surfaces: [skill-body, skill-references]
+    classification: mechanical
+    severity: P1
+    confidence: high
+    detector:
+      type: bare_reference
+      pattern: '(?<![\[(/`\w])references/[A-Za-z0-9._/-]+\.md'
+      evidence: "referenced file does not exist: {match}"
+    positive_fixture: .claude/skills/stale-linker/SKILL.md
+    negative_fixture: .claude/skills/clean-skill/SKILL.md
+    aegis_families: [AEGIS-053]
+    false_positive_limits: >-
+      Only the literal "references/…md" form is checked; other bare mentions
+      are not resolved.
+    semantic_review_owner: skill-quality-reviewer

@@ -1,61 +1,54 @@
 #!/usr/bin/env python3
-"""Read-only corpus-wide skill-contract audit (AEGIS remediation program, PR 1).
+"""Generic, read-only mechanical audit ENGINE for the Project Aegis corpus.
 
-Scans every shipped skill (SKILL.md + references/ + evals/), the reviewer
-agents, and the guided-path docs for the DEFECT FAMILIES the VolunteerFlow
-acceptance test exposed (AEGIS-001..059, frozen under
-docs/audits/volunteerflow/), and for structural contract rot the mechanical
-validator does not own. It NEVER mutates the repository: the only writes it
-performs are to output paths the caller explicitly passes, and it refuses to
-write inside `.claude/skills/`.
+ARCHITECTURE (v2 — the hybrid model)
+    * POLICY lives in scripts/audit-rules.yaml: a declarative, versioned rule
+      catalog organized by defect family. Every rule cites the authoritative
+      Project Aegis skill or standard section it derives from, its fixtures,
+      its AEGIS defect-family mapping, its false-positive limitations, and
+      the reviewer skill that owns its semantic fallback.
+    * THIS FILE is mechanism only: a small set of generic detector primitives
+      (pattern scan, region conjunction, name resolution, link resolution,
+      eval-schema shape, route-segment, reciprocity) plus corpus loading,
+      provenance, and output rendering. It hard-codes no rule pattern, no
+      skill name, no severity, and no AEGIS mapping.
+    * SEMANTIC questions are never reported as mechanically proven. A rule
+      classified `semantic` emits SEMANTIC-REVIEW CANDIDATES, which the
+      --queue output routes to the owning reviewer skill
+      (skill-quality-reviewer, agent-governance-audit, ...) for execution in
+      isolated sessions by a future runner. Structural validity is never
+      behavioral proof; behavioral evals remain UNRUN.
 
-WHAT THIS IS NOT
-    * Not a replacement for scripts/validate-skills.py — nothing the validator
-      owns (frontmatter strictness, sentinel, section order, counts, link rot
-      in docs/paths/) is re-checked here.
-    * Not a behavioral eval runner. Every rule below is static text analysis;
-      findings marked `mechanical: false` are SEMANTIC-REVIEW CANDIDATES, not
-      asserted defects. Structural validity is never behavioral proof.
-    * Not a merge gate (yet). Exit code 0 means "audit ran to completion";
-      baseline findings are DATA, not failure. `--fail-on-findings` exists for
-      a future CI lane. Exit 2 = the tool itself could not run (wrong path,
-      no skills dir) — a wrong-path run must never masquerade as a clean scan.
+WHAT THE ENGINE MAY MECHANICALLY ASSERT (objective facts only)
+    file/skill existence; parse and schema validity; exact name resolution;
+    route-graph consistency; missing required fields; invocation-posture
+    contradictions between frontmatter facts; exact path and hash evidence;
+    broken references; declared-pattern co-occurrence (with the catalog's own
+    stated false-positive limits attached).
 
-RULE FAMILIES (rule id → defect family → AEGIS anchor)
-    SIDE-001..003   side-effect & invocation posture     AEGIS-020, -057
-    APPR-001..003   approval & authority vocabulary      AEGIS-003, -008, -048, -055
-    STATE-001..005  project-state & append-only          AEGIS-002, -004..006, -052, -058
-    ARTF-001        artifact governance & durability     AEGIS-049, -050, -056
-    ROUTE-001..003  handoff & route graph                AEGIS-032, -035, -044..046
-    VOCAB-002..003  commitment vocabulary                AEGIS-039, -044
-    PARITY-001..002 workflow-to-output parity            AEGIS-014, -015, -034
-    EVAL-001..003   eval coverage                        AEGIS-014, -018
-    REF-001..003    reference integrity                  AEGIS-053
+READ-ONLY GUARANTEE
+    The engine mutates nothing it scans. The only writes are to output paths
+    the caller passes explicitly, and paths inside `.claude/skills/` are
+    refused. Exit 2 = the engine or catalog could not run (wrong path, bad
+    catalog) — a wrong-path run must never masquerade as a clean scan.
+    Baseline findings are DATA (exit 0); `--fail-on-findings` exists for a
+    future CI lane.
 
-    (VOCAB-001 is the vocabulary CENSUS — counts, not findings — emitted into
-    the JSON/Markdown reports so connected-skill contradictions can be judged
-    with evidence rather than recollection.)
-
-OUTPUTS (all optional; none written unless asked)
-    --json PATH      machine-readable findings + census + rule inventory
-    --markdown PATH  human-readable baseline report
-    --graph PATH     cross-skill route/exclusion graph + derived diagnostics
-    --manifest PATH  frozen per-skill repository manifest (paths, posture,
-                     classification flags, eval-case inventory, catalog family)
-
-DETERMINISM
-    Output is a pure function of the working tree: findings sort by
-    (file, line, rule); the only provenance stamps are the repo HEAD SHA and
-    branch (read via git, read-only). No wall-clock timestamps, so two runs on
-    the same tree produce byte-identical reports.
+PROVENANCE / DETERMINISM
+    Outputs embed: engine + catalog versions, repo HEAD SHA, branch, whether
+    the working tree is dirty, dirty paths under the scanned surfaces, and a
+    corpus content hash (SHA-256 over every scanned file's path + bytes) —
+    so a baseline states exactly WHAT was scanned, not just which commit the
+    checkout pointed at. No wall-clock stamps; identical trees produce
+    byte-identical reports.
 
 Requires PyYAML (the repo's one dependency, decision D50). Fails closed
-without it. Self-tests: scripts/tests/test_audit_skill_contracts.py (plain
-asserts, no framework — decision D55 minimalism).
+without it. Self-tests: scripts/tests/test_audit_skill_contracts.py.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -67,37 +60,32 @@ try:
 except ImportError:  # reported fail-closed in main()
     yaml = None
 
-TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.0.0"
+ENGINE_NAME = "audit-skill-contracts"
+ENGINE_VERSION = "2.0.0"
+
+ENGINE_ROOT = Path(__file__).resolve().parent.parent
+CATALOG_PATH = Path(__file__).resolve().parent / "audit-rules.yaml"
 
 IGNORED_DIRS = {"_template"}
-
 SEVERITIES = ("P0", "P1", "P2", "info")
 
-# Vocabulary census terms (defect family F / AEGIS-039, -044, -047): the words
-# whose meaning drifted between connected skills during the VolunteerFlow run.
-CENSUS_TERMS = [
-    "proposed",
-    "approved scope",
-    "planned",
-    "prioritized",
-    "sequenced",
-    "targeted",
-    "estimated",
-    "commit-able",
-    "committed",
-    "accepted",
-    "verified",
-    "ready",
-    "complete",
-    "durable",
-    "deployed",
-    "released",
+REQUIRED_RULE_FIELDS = [
+    "id",
+    "title",
+    "authority",
+    "surfaces",
+    "classification",
+    "severity",
+    "detector",
+    "positive_fixture",
+    "negative_fixture",
+    "aegis_families",
+    "false_positive_limits",
+    "semantic_review_owner",
 ]
 
-# --- shared parsing helpers (duplicated from validate-skills.py by design: ---
-# this tool must stay runnable standalone against ANY checkout path, and the
-# validator is imported nowhere else either; the self-tests pin both copies).
+
+# --- text primitives (mechanism, not policy) --------------------------------
 
 
 def split_frontmatter(text: str):
@@ -118,6 +106,26 @@ def split_frontmatter(text: str):
 
 
 SECTION_HEADER_RE = re.compile(r"^##\s+(.*\S)\s*$")
+FENCE_RE = re.compile(r"^(```|~~~)")
+BACKTICKED_KEBAB = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`")
+MD_LINK = re.compile(r"\[[^\]]*\]\(([^)#\s]+)(?:#[^)]*)?\)")
+CHECKBOX = re.compile(r"- \[ \]")
+
+# Negation guard: a mutation verb is not a violation when the surrounding
+# words forbid it ("never overwrite", "overwrite is never allowed", "don't
+# overwrite", "no field is ever overwritten", "supersede-never-rewrite").
+NEG_BEFORE = re.compile(
+    r"(?i)(?:\bnever|\bnot|\bno\b|\bwithout|\bforbid\w*|\bban(?:s|ned)?\b|\brefus\w*"
+    r"|\binstead of|\brather than|\bdon['’]?t\b|\bdoesn['’]?t\b|\bwon['’]?t\b)"
+    r"(?:\W+\w+){0,3}\W*$"
+)
+NEG_AFTER = re.compile(r"(?i)^\W*(?:\w+\W+){0,4}(?:never|not\b|no\b|forbidden|banned)")
+
+
+def negated(text: str, start: int, end: int) -> bool:
+    return bool(NEG_BEFORE.search(text[max(0, start - 60) : start])) or bool(
+        NEG_AFTER.match(text[end : end + 60])
+    )
 
 
 def sections_of(body: str) -> dict[str, str]:
@@ -139,16 +147,9 @@ def sections_of(body: str) -> dict[str, str]:
     return out
 
 
-FENCE_RE = re.compile(r"^(```|~~~)")
-
-
 def strip_fences(text: str) -> str:
-    """Blank out fenced code blocks (line count preserved) for prose-only rules.
-
-    Rules that hunt PROSE claims (links, read-only declarations) must not fire
-    on example content inside fences; rules that audit TEMPLATES (the STATE
-    family) need the fences kept — templates live inside them.
-    """
+    """Blank fenced code blocks, preserving line COUNT (offsets change; any
+    line number must be computed on the SAME string a match ran against)."""
     out: list[str] = []
     in_fence = False
     for line in text.splitlines():
@@ -160,9 +161,25 @@ def strip_fences(text: str) -> str:
     return "\n".join(out)
 
 
+def mask_sections(text: str, masked_titles: list[str]) -> str:
+    """Blank the named `## ` sections, preserving line count."""
+    out: list[str] = []
+    masked = False
+    for line in text.splitlines():
+        m = SECTION_HEADER_RE.match(line)
+        if m:
+            masked = m.group(1).strip() in masked_titles
+        out.append("" if masked and not m else line)
+    return "\n".join(out)
+
+
 def line_of(text: str, offset: int) -> int:
-    """1-based line number of a character offset."""
+    """1-based line number of a character offset IN THE GIVEN STRING."""
     return text.count("\n", 0, offset) + 1
+
+
+def context_line(text: str, offset: int, width: int = 60) -> str:
+    return text[offset : offset + width].splitlines()[0] if text[offset:] else ""
 
 
 # --- finding model ----------------------------------------------------------
@@ -180,38 +197,31 @@ class Finding:
         "family",
         "aegis_map",
         "remediation_owner",
+        "semantic_review_owner",
         "confidence",
         "mechanical",
     )
 
-    def __init__(
-        self,
-        rule: str,
-        severity: str,
-        file: str,
-        line: int,
-        owning_skill: str,
-        evidence: str,
-        family: str,
-        aegis_map: list[str],
-        remediation_owner: str,
-        confidence: str,
-        mechanical: bool,
-        related_skills: list[str] | None = None,
-    ) -> None:
-        assert severity in SEVERITIES, severity
-        self.rule = rule
-        self.severity = severity
+    def __init__(self, rule_def: dict, file: str, line: int, owning_skill: str,
+                 evidence: str, severity: str | None = None,
+                 related_skills: list[str] | None = None) -> None:
+        sev = severity or rule_def["severity"]
+        assert sev in SEVERITIES, sev
+        self.rule = rule_def["id"]
+        self.severity = sev
         self.file = file
         self.line = line
         self.owning_skill = owning_skill
-        self.related_skills = related_skills or []
-        self.evidence = evidence.strip()[:300]
-        self.family = family
-        self.aegis_map = aegis_map
-        self.remediation_owner = remediation_owner
-        self.confidence = confidence
-        self.mechanical = mechanical
+        self.related_skills = related_skills or list(
+            rule_def.get("detector", {}).get("related", [])
+        )
+        self.evidence = evidence.strip()[:300].rstrip()
+        self.family = rule_def["id"].split("-")[0].lower()
+        self.aegis_map = list(rule_def["aegis_families"])
+        self.remediation_owner = owning_skill
+        self.semantic_review_owner = rule_def["semantic_review_owner"]
+        self.confidence = rule_def.get("confidence", "medium")
+        self.mechanical = rule_def["classification"] == "mechanical"
 
     def as_dict(self) -> dict:
         return {s: getattr(self, s) for s in self.__slots__}
@@ -243,10 +253,9 @@ class Skill:
         ) if (path / "references").is_dir() else []
         self.evals_path = path / "evals" / "evals.json"
         self.trigger_evals_path = path / "evals" / "trigger-evals.json"
-        # Two DIFFERENT schemas by repo convention: evals.json cases carry
-        # type/expect.assertions; trigger-evals.json cases carry
-        # expected_skill/should_not_trigger (a list of neighbor names) plus a
-        # top-level overlaps_with list.
+        # Two DIFFERENT schemas by repo convention (standard §6): evals.json
+        # cases carry type/expect.assertions; trigger-evals.json cases carry
+        # expected_skill/should_not_trigger plus top-level overlaps_with.
         self.evals_raw = self._load_json(self.evals_path)
         self.trigger_raw = self._load_json(self.trigger_evals_path)
         self.eval_cases = self._cases(self.evals_raw)
@@ -270,162 +279,43 @@ class Skill:
     def rel(self, path: Path | None = None) -> str:
         return (path or self.skill_md).relative_to(self.repo).as_posix()
 
-    # classification flags for the manifest + EVAL-003 risk targeting
-    def classify(self) -> dict[str, bool]:
-        d = self.description.lower()
-        blob = (self.description + "\n" + self.body).lower()
-        return {
-            "manual_only": bool(self.frontmatter.get("disable-model-invocation") is True),
-            "declares_read_only": bool(READ_ONLY_DECL.search(self.description))
-            or bool(READ_ONLY_DECL.search(self.sections.get("Purpose", ""))),
-            "approval_related": bool(re.search(r"approv|authoriz", d)),
-            "state_related": bool(re.search(r"project-state|append-only|state file", blob)),
-            "writes_artifacts": bool(WRITE_INSTRUCTION.search(self.sections.get("Workflow", "")))
-            or bool(WRITE_INSTRUCTION.search(self.sections.get("Output Format", ""))),
-        }
+    def md_surfaces(self) -> list[tuple[Path, str]]:
+        """(path, text) for SKILL.md + every markdown reference."""
+        return [(self.skill_md, self.text)] + [
+            (p, p.read_text(encoding="utf-8")) for p in self.references
+            if p.suffix == ".md"
+        ]
+
+    def region(self, name: str) -> str:
+        if name == "description":
+            return self.description
+        if name == "purpose":
+            return self.sections.get("Purpose", "")
+        if name == "workflow":
+            return self.sections.get("Workflow", "")
+        if name == "output_format":
+            return self.sections.get("Output Format", "")
+        if name == "body":
+            return self.body
+        raise KeyError(name)
 
 
-# --- rule patterns ----------------------------------------------------------
-
-READ_ONLY_DECL = re.compile(
-    r"(?i)\bread[- ]only\b|\bchanges nothing\b|\bwrites nothing\b"
-    r"|\bnever (?:writes|creates|modifies|edits)\b|\bno (?:file )?writes\b"
-)
-
-# Imperative write instructions. Each alternative is anchored to an artifact
-# noun or a mutating command so design-TALK about writes ("design the append
-# helper") does not fire.
-WRITE_INSTRUCTION = re.compile(
-    r"(?i)(?:\b(?:write|save|persist|record)\s+(?:the\s+|a\s+|it\s+|your\s+)?"
-    r"(?:results?|report|output|findings?|file|entry|artifact)s?\s+(?:to|in|under)\b"
-    r"|\bcreate\s+(?:a\s+|the\s+)?(?:new\s+)?(?:file|directory)\b"
-    r"|\bappend\s+(?:it\s+|the\s+entry\s+)?to\b"
-    r"|\bgit\s+(?:commit|push|add)\b"
-    r"|\b(?:npm|pip|yarn|pnpm)\s+install\b"
-    r"|`(?:Write|Edit|NotebookEdit)`)"
-)
-
-SCRATCH_WRITE = re.compile(
-    r"(?i)\b(?:write|create|save|stash|persist)\b[^.\n]{0,60}"
-    r"\b(scratch(?:pad)?|temp(?:orary)?\s+(?:file|dir)|memory\s+(?:file|dir|directory))\b"
-    r"|\b(scratch(?:pad)?|temp(?:orary)?\s+(?:file|dir)|memory\s+(?:file|dir|directory))\b"
-    r"[^.\n]{0,40}\b(?:write|create|save|stash)\b"
-)
-
-# Negation guard: a mutation verb is not a violation when the surrounding words
-# forbid it ("never overwrite", "overwrite is never allowed", "no field is ever
-# overwritten", "supersede-never-rewrite").
-NEG_BEFORE = re.compile(
-    r"(?i)(?:\bnever|\bnot|\bno\b|\bwithout|\bforbid\w*|\bban(?:s|ned)?\b|\brefus\w*"
-    r"|\binstead of|\brather than|\bdon['’]?t\b|\bdoesn['’]?t\b|\bwon['’]?t\b"
-    r"|\bd?is(?:n['’]?t)?\s+not\b)(?:\W+\w+){0,3}\W*$"
-)
-NEG_AFTER = re.compile(r"(?i)^\W*(?:\w+\W+){0,4}(?:never|not\b|no\b|forbidden|banned)")
-
-
-def negated(text: str, start: int, end: int) -> bool:
-    return bool(NEG_BEFORE.search(text[max(0, start - 60) : start])) or bool(
-        NEG_AFTER.match(text[end : end + 60])
-    )
-
-
-GENERIC_STATUS = re.compile(
-    r"(?im)^\s*(?:[-*]\s*)?\**status\**\s*:\s*\**(accepted|approved|ready|final|complete|done|committed)\**\s*$"
-)
-
-SCOPE_ALLOWED = re.compile(r"(?i)\bscope allowed\b")
-SCOPE_FORBIDDEN = re.compile(r"(?i)\bforbidden\b")
-BUILD_SCOPE_GRANT = re.compile(r"(?i)\bbuild\s+(?:the\s+)?(?:approved\s+)?v?\d*\s*scope\b")
-
-# A CONTRACT declaration ("this artifact is append-only"), distinguished from
-# DOMAIN vocabulary ("append-only formats", warehouse/ADR talk) by requiring a
-# governed-artifact noun near the phrase. Calibrated on the live corpus:
-# without the noun window, warehouse/PII/ADR skills discussing append-only
-# STORAGE all false-positived against overwrite verbs used as domain terms.
-APPEND_ONLY_DECL = re.compile(
-    r"(?i)(?:\bappend[- ]only\b[^.\n]{0,50}"
-    r"\b(?:file|log|entry|entries|record|template|state|register|history|snapshot|decision)\b"
-    r"|\b(?:file|log|entry|entries|record|template|state|register|history|snapshot|decision)s?\b"
-    r"[^.\n]{0,50}\bappend[- ]only\b)"
-)
-MUTABLE_PLACEHOLDER = re.compile(
-    r"(?i)\b(not yet defined|none yet|to be filled|to be determined|fill in later|TBD)\b"
-)
-OVERWRITE_VERB = re.compile(
-    r"(?i)\b(overwrit(?:e|es|ing|ten)|rewrit(?:e|es|ing|ten)|truncat(?:e|es|ing|ed)"
-    r"|replac(?:e|es|ing|ed)\s+(?:the\s+|this\s+|its\s+)?(?:file|content|entry|section|row))\b"
-)
-MIDDLE_INSERT = re.compile(
-    r"(?i)\binsert(?:ing|ed|s)?\b[^.\n]{0,50}\b(?:row|entry|section|above|between|middle)\b"
-)
-APPROVED_NARRATIVE_SECTION = re.compile(r"(?m)^#{2,4} .*\((?:approved|current)\)\s*$")
-PLACEHOLDER_TOKEN = re.compile(r"<[a-z][a-z0-9 _-]{1,40}>")
-
-DURABLE_CLAIM = re.compile(r"(?i)\bdurabl[ye]\b")
-DURABILITY_LEVEL = re.compile(
-    r"(?i)\b(transcript-only|workspace-persisted|git-tracked|locally committed|"
-    r"remote-persisted|released|untracked|committed)\b"
-)
-
-BACKTICKED_KEBAB = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`")
-# Backticked kebab tokens that are legitimately NOT skill names on routing
-# surfaces (curated from the live corpus; extend deliberately, never casually).
-NON_SKILL_TOKENS = {
-    "disable-model-invocation",
-    "allowed-tools",
-    "should-not-trigger",
-    "should-trigger",
-    "trigger-evals",
-    "manual-only",
-    "read-only",
-    "fail-closed",
-    "append-only",
-    "auto-merge",
-    "no-verify",
-    "docs-as-code",
-    "stage-gate-map",
-    "project-state",
-    "skill-generation-standard",
-    "step-0-reconciliation-v4",
-    # curated from the live corpus (non-skill kebab tokens on routing lines):
-    "pre-existing-on-main",  # local-ci-mirror-preflight failure category
-    "happy-dom",             # npm test-environment package
-}
-ROUTING_LINE = re.compile(
-    r"(?i)(→|\broutes? to\b|\binvoke[sd]?\b|\bhand(?:s|ed)? (?:off|over|to)\b|"
-    r"\bdelegate[sd]? to\b|\bbelongs to\b|\bowned by\b|\bgoes to\b)"
-)
-
-STAGE2_HEADER = re.compile(r"\*\*Stage 2\b")
-STAGE3_HEADER = re.compile(r"\*\*Stage 3\b")
-
-COMMITTED_HORIZON = re.compile(
-    r"(?i)now\s*\(committed\)|committed\s*/\s*planned\s*/\s*exploratory"
-)
-COMMITTED_SCOPE = re.compile(r"(?i)\bcommitted\s+(?:v\d+\s+)?scope\b|\bscope\s+is\s+committed\b")
-
-CHECKBOX = re.compile(r"- \[ \]")
-
-MD_LINK = re.compile(r"\[[^\]]*\]\(([^)#\s]+)(?:#[^)]*)?\)")
-BARE_REF = re.compile(r"(?<![\[(/`\w])references/[A-Za-z0-9._/-]+\.md")
-# Drive-letter Windows form, or POSIX /Users/ (macOS home, capital U — a
-# lowercase /users/ is an API route, calibrated on the live corpus).
-USER_ABS_PATH = re.compile(r"[A-Za-z]:[\\/][Uu]sers[\\/]|(?<![A-Za-z0-9])/Users/")
-
-REFUSAL_CASE = re.compile(r"(?i)refus|halt|stop|declin|reject|never|no write|not write|forbid")
-
-
-# --- the audit --------------------------------------------------------------
+# --- the engine -------------------------------------------------------------
 
 
 class Audit:
-    def __init__(self, repo: Path) -> None:
+    def __init__(self, repo: Path, catalog: dict | None = None) -> None:
         self.repo = repo
         self.skills_dir = repo / ".claude" / "skills"
+        self.catalog = catalog if catalog is not None else load_catalog()
+        self.config = self.catalog["config"]
+        self.rules = {r["id"]: r for r in self.catalog["rules"]}
         self.findings: list[Finding] = []
         self.skills: list[Skill] = []
         self.census: dict[str, dict[str, int]] = {}
         self.graph: dict = {}
+        self._append_decl = re.compile(self.config["append_contract_declaration"])
+        self._warning_sections = list(self.config["warning_sections"])
 
     # -- discovery -----------------------------------------------------------
 
@@ -434,409 +324,215 @@ class Audit:
             if child.is_dir() and child.name not in IGNORED_DIRS:
                 self.skills.append(Skill(child, self.repo))
 
-    # -- family A: side-effect & posture (AEGIS-020, -057) -------------------
+    def agent_names(self) -> set[str]:
+        agents_dir = self.repo / ".claude" / "agents"
+        if not agents_dir.is_dir():
+            return set()
+        return {p.stem for p in agents_dir.glob("*.md")}
 
-    def audit_side_effects(self, s: Skill) -> None:
-        flags = s.classify()
-        if not flags["declares_read_only"]:
+    # -- generic detectors ---------------------------------------------------
+    # Each takes (rule, skill) or (rule, corpus context) and appends findings.
+    # No detector knows any pattern of its own: patterns arrive as data.
+
+    def det_region_conjunction(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        decl = re.compile(d["declaration_pattern"])
+        if not any(decl.search(s.region(r)) for r in d["declaration_regions"]):
             return
-        scan = s.sections.get("Workflow", "") + "\n" + s.sections.get("Output Format", "")
-        scan = strip_fences(scan)
-        for m in WRITE_INSTRUCTION.finditer(scan):
-            if negated(scan, m.start(), m.end()):
-                continue
-            self.findings.append(Finding(
-                "SIDE-001", "P1", s.rel(), 0, s.name,
-                f"declares read-only but instructs: {m.group(0)!r}",
-                "side-effect", ["AEGIS-057", "AEGIS-020"], s.name, "medium", True,
-            ))
-        for m in SCRATCH_WRITE.finditer(strip_fences(s.body)):
-            if negated(s.body, m.start(), m.end()):
-                continue
-            self.findings.append(Finding(
-                "SIDE-002", "P0", s.rel(), 0, s.name,
-                f"read-only-declared skill mentions scratch/temp/memory write: {m.group(0)!r}",
-                "side-effect", ["AEGIS-057", "AEGIS-020"], s.name, "medium", True,
-            ))
+        viol = re.compile(d["violation_pattern"])
+        for region_name in d["violation_regions"]:
+            text = s.region(region_name)
+            if d.get("strip_fences"):
+                text = strip_fences(text)
+            for m in viol.finditer(text):
+                if d.get("negation_guard") and negated(text, m.start(), m.end()):
+                    continue
+                self.findings.append(Finding(
+                    rule, s.rel(), 0, s.name,
+                    d["evidence"].replace("{match}", repr(m.group(0))),
+                ))
+
+    def det_posture_grant_contradiction(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        decl = re.compile(d["declaration_pattern"])
+        if not (decl.search(s.description) or decl.search(s.region("purpose"))):
+            return
         tools = s.frontmatter.get("allowed-tools")
-        if tools:
-            tool_list = tools if isinstance(tools, list) else [tools]
-            writey = [t for t in tool_list if str(t).strip().lower() in
-                      {"write", "edit", "notebookedit", "bash", "powershell"}]
-            if writey:
+        if not tools:
+            return
+        tool_list = tools if isinstance(tools, list) else [tools]
+        writey = [t for t in tool_list
+                  if str(t).strip().lower() in set(d["write_tools"])]
+        if writey:
+            self.findings.append(Finding(
+                rule, s.rel(), 0, s.name,
+                d["evidence"].replace("{match}", repr(writey)),
+            ))
+
+    def det_posture_side_effect(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        if s.frontmatter.get("disable-model-invocation") is True:
+            return  # manual-only posture satisfies standard §5
+        approval = re.compile(d["approval_pattern"])
+        if approval.search(s.body):
+            return  # the approved-write exception language is present
+        instr = re.compile(d["instruction_pattern"])
+        for region_name in d["instruction_regions"]:
+            text = s.region(region_name)
+            if d.get("strip_fences"):
+                text = strip_fences(text)
+            for m in instr.finditer(text):
+                if negated(text, m.start(), m.end()):
+                    continue
                 self.findings.append(Finding(
-                    "SIDE-003", "P0", s.rel(), 0, s.name,
-                    f"declares read-only but allowed-tools grants {writey}",
-                    "side-effect", ["AEGIS-057"], s.name, "high", True,
+                    rule, s.rel(), 0, s.name,
+                    d["evidence"].replace("{match}", repr(m.group(0))),
                 ))
 
-    # -- family B: approval & authority (AEGIS-003/-008/-048/-055) -----------
+    def _pattern_surfaces(self, s: Skill, names: list[str]):
+        """Yield (path, text) per catalog surface name; text keeps line count."""
+        for name in names:
+            if name in ("skill_md", "skill_md_defenced"):
+                text = s.text if name == "skill_md" else strip_fences(s.text)
+                yield s.skill_md, text
+            elif name == "skill_md_body_defenced":
+                yield s.skill_md, strip_fences(s.body)
+            elif name in ("references", "references_defenced"):
+                for p in s.references:
+                    if p.suffix == ".md":
+                        t = p.read_text(encoding="utf-8")
+                        yield p, (strip_fences(t) if name.endswith("_defenced") else t)
 
-    def audit_approvals(self, s: Skill) -> None:
-        surfaces = [(s.skill_md, s.text)] + [
-            (p, p.read_text(encoding="utf-8")) for p in s.references if p.suffix == ".md"
+    def det_surface_pattern(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        pat = re.compile(d["pattern"])
+        for path, text in self._pattern_surfaces(s, d["surfaces"]):
+            for m in pat.finditer(text):
+                ev = d["evidence"].replace("{match}", repr(m.group(0)))
+                ev = ev.replace("{context}", repr(context_line(text, m.start())))
+                self.findings.append(Finding(
+                    rule, s.rel(path), line_of(text, m.start()), s.name, ev,
+                ))
+
+    def det_surface_pattern_absence(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        present = re.compile(d["present_pattern"])
+        absent = re.compile(d["absent_pattern"])
+        for path, text in self._pattern_surfaces(s, d["surfaces"]):
+            m = present.search(text)
+            if m and not absent.search(text):
+                self.findings.append(Finding(
+                    rule, s.rel(path), line_of(text, m.start()), s.name,
+                    d["evidence"].replace("{match}", repr(m.group(0))),
+                ))
+
+    def det_append_contract_conjunction(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        viol = re.compile(d["violation_pattern"])
+        surfaces = [(s.skill_md, mask_sections(s.text, self._warning_sections))] + [
+            (p, p.read_text(encoding="utf-8")) for p in s.references
+            if p.suffix == ".md"
         ]
         for path, text in surfaces:
-            for m in GENERIC_STATUS.finditer(text):
-                self.findings.append(Finding(
-                    "APPR-001", "P1", s.rel(path), line_of(text, m.start()), s.name,
-                    f"bare generic status with no approval class: {m.group(0).strip()!r}",
-                    "approval", ["AEGIS-055", "AEGIS-008"], s.name, "high", True,
-                ))
-            if SCOPE_ALLOWED.search(text) and not SCOPE_FORBIDDEN.search(text):
-                self.findings.append(Finding(
-                    "APPR-003", "P1", s.rel(path), 0, s.name,
-                    "approval record defines 'Scope allowed' but no FORBIDDEN scope "
-                    "(the scoped-approval-register pattern requires both)",
-                    "approval", ["AEGIS-008", "AEGIS-003"], s.name, "high", True,
-                ))
-            for m in BUILD_SCOPE_GRANT.finditer(text):
-                self.findings.append(Finding(
-                    "APPR-002", "P0", s.rel(path), line_of(text, m.start()), s.name,
-                    f"scope grant that authorizes BUILDING from a requirements-stage "
-                    f"approval: {m.group(0)!r} (content approval must not become "
-                    "implementation authority)",
-                    "approval", ["AEGIS-003", "AEGIS-008"], s.name, "medium", False,
-                ))
-
-    # -- family C: project-state & append-only (AEGIS-002 family) ------------
-
-    # SKILL.md sections that DESCRIBE failure modes by convention — a mutation
-    # verb there is a warning, not an instruction (calibrated on the live
-    # corpus: skill-deprecation-planner's Gotchas name "rewrites the record"
-    # as the anti-pattern). References/templates carry no such convention and
-    # stay fully scanned.
-    WARNING_SECTIONS = ("Gotchas", "Stop Conditions")
-
-    @classmethod
-    def mask_warning_sections(cls, text: str) -> str:
-        """Blank the warning-convention sections, preserving line numbers."""
-        out: list[str] = []
-        masked = False
-        for line in text.splitlines():
-            m = SECTION_HEADER_RE.match(line)
-            if m:
-                masked = m.group(1).strip() in cls.WARNING_SECTIONS
-            out.append("" if masked and not m else line)
-        return "\n".join(out)
-
-    def audit_state(self, s: Skill) -> None:
-        surfaces = [(s.skill_md, self.mask_warning_sections(s.text))] + [
-            (p, p.read_text(encoding="utf-8")) for p in s.references if p.suffix == ".md"
-        ]
-        for path, text in surfaces:
-            decl_lines = [line_of(text, m.start()) for m in APPEND_ONLY_DECL.finditer(text)]
+            decl_lines = [line_of(text, m.start())
+                          for m in self._append_decl.finditer(text)]
             if not decl_lines:
                 continue
-
-            def near_decl(line_no: int, window: int = 15) -> bool:
-                return any(abs(line_no - d) <= window for d in decl_lines)
-
-            for m in MUTABLE_PLACEHOLDER.finditer(text):
-                self.findings.append(Finding(
-                    "STATE-001", "P0", s.rel(path), line_of(text, m.start()), s.name,
-                    f"append-only-declared file carries mutable placeholder {m.group(0)!r} "
-                    "(will demand later replacement the contract forbids)",
-                    "state-append", ["AEGIS-002", "AEGIS-006"], s.name, "high", True,
-                ))
-            # The verb rules require PROXIMITY to a contract declaration (±15
-            # lines): at file distance, overwrite/insert verbs are usually about
-            # a DIFFERENT artifact (calibrated on the live corpus — deprecation
-            # dispositions, SCD policies) and belong to semantic review, not here.
-            for m in OVERWRITE_VERB.finditer(text):
-                if negated(text, m.start(), m.end()):
+            window = int(d.get("proximity_lines", 0))
+            for m in viol.finditer(text):
+                if d.get("negation_guard") and negated(text, m.start(), m.end()):
                     continue
                 ln = line_of(text, m.start())
-                if not near_decl(ln):
+                if window and not any(abs(ln - dl) <= window for dl in decl_lines):
                     continue
                 self.findings.append(Finding(
-                    "STATE-002", "P0", s.rel(path), ln, s.name,
-                    f"append-only-declared file instructs {m.group(0)!r} near the "
-                    "declaration itself",
-                    "state-append", ["AEGIS-002", "AEGIS-004"], s.name, "medium", True,
+                    rule, s.rel(path), ln, s.name,
+                    d["evidence"].replace("{match}", repr(m.group(0).strip())),
                 ))
-            for m in MIDDLE_INSERT.finditer(text):
-                if negated(text, m.start(), m.end()):
-                    continue
-                ln = line_of(text, m.start())
-                if not near_decl(ln):
-                    continue
-                self.findings.append(Finding(
-                    "STATE-003", "P0", s.rel(path), ln, s.name,
-                    f"append-only-declared file instructs middle insertion: {m.group(0)!r} "
-                    "(append-only means new bytes begin at EOF)",
-                    "state-append", ["AEGIS-005", "AEGIS-002"], s.name, "medium", True,
-                ))
-            for m in APPROVED_NARRATIVE_SECTION.finditer(text):
-                self.findings.append(Finding(
-                    "STATE-005", "P1", s.rel(path), line_of(text, m.start()), s.name,
-                    f"append-only-declared file contains narrative section {m.group(0).strip()!r} "
-                    "with no defined supersession mechanics (how is it updated without "
-                    "rewriting bytes?)",
-                    "state-append", ["AEGIS-002", "AEGIS-006"], s.name, "medium", False,
-                ))
-            # STATE-004: placeholders inside command fences presented as exact
-            if re.search(r"(?i)\bexact (?:command|operation|append|content)\b", text):
-                in_fence = False
-                for i, line in enumerate(text.splitlines(), start=1):
-                    if FENCE_RE.match(line.strip()):
-                        in_fence = not in_fence
-                        continue
-                    if in_fence and PLACEHOLDER_TOKEN.search(line) and re.search(
-                        r"(?i)\b(cat|cp|mv|git|python|Add-Content|>>)\b", line
-                    ):
-                        self.findings.append(Finding(
-                            "STATE-004", "P0", s.rel(path), i, s.name,
-                            f"'exact' operation still contains unbound placeholder: {line.strip()!r}",
-                            "state-append", ["AEGIS-058"], s.name, "medium", False,
-                        ))
 
-    # -- family D: artifact governance (AEGIS-049/-050/-056) -----------------
-
-    def audit_artifacts(self, s: Skill) -> None:
-        text = strip_fences(s.body)
-        m = DURABLE_CLAIM.search(text)
-        if m and not DURABILITY_LEVEL.search(text):
-            self.findings.append(Finding(
-                "ARTF-001", "P1", s.rel(), line_of(s.body, m.start()), s.name,
-                f"claims durability ({m.group(0)!r}) without naming a durability level "
-                "(transcript-only / workspace-persisted / Git-tracked / locally "
-                "committed / remote-persisted / released)",
-                "artifact", ["AEGIS-056", "AEGIS-049"], s.name, "medium", False,
-            ))
-
-    # -- family E: handoff & route graph (AEGIS-032/-035/-044..046) ----------
-
-    def audit_routes(self) -> None:
-        names = {s.name for s in self.skills}
-        # Routing lines may legitimately reference the read-only reviewer
-        # AGENTS (.claude/agents/) — those are neither skills nor stale.
-        known = names | self.agent_names()
-        edges: list[dict] = []
-        desc_mentions: dict[str, set[str]] = {}
-        for s in self.skills:
-            mentioned = set()
-            for m in BACKTICKED_KEBAB.finditer(s.description):
-                tok = m.group(1)
-                if tok in names:
-                    mentioned.add(tok)
-                elif tok not in NON_SKILL_TOKENS and tok not in known:
-                    self.findings.append(Finding(
-                        "ROUTE-001", "P1", s.rel(), 0, s.name,
-                        f"description references `{tok}`, which is not a skill on disk",
-                        "route", ["AEGIS-053"], s.name, "medium", True,
-                    ))
-            # unbackticked mentions still route (descriptions cite names bare)
-            for other in names:
-                if other != s.name and other in s.description:
-                    mentioned.add(other)
-            desc_mentions[s.name] = mentioned - {s.name}
-            for tgt in sorted(desc_mentions[s.name]):
-                edges.append({"from": s.name, "to": tgt, "type": "description-mention"})
-
-            body_defenced = strip_fences(s.body)
-            for line in body_defenced.splitlines():
-                if not ROUTING_LINE.search(line):
-                    continue
-                for m in BACKTICKED_KEBAB.finditer(line):
-                    tok = m.group(1)
-                    if tok in names:
-                        if tok != s.name:
-                            edges.append({"from": s.name, "to": tok, "type": "body-route"})
-                    elif tok not in NON_SKILL_TOKENS and tok not in known:
-                        self.findings.append(Finding(
-                            "ROUTE-001", "P1", s.rel(), 0, s.name,
-                            f"routing line references `{tok}`, which is not a skill on disk: "
-                            f"{line.strip()[:120]!r}",
-                            "route", ["AEGIS-053"], s.name, "medium", True,
-                        ))
-
-        # ROUTE-002: exclusion reciprocity — A excludes toward B, B never
-        # mentions A anywhere in its own description.
-        for s in self.skills:
-            desc = s.description
-            cut = desc.lower().find("do not use")
-            if cut < 0:
+    def det_fenced_placeholder_command(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        exact = re.compile(d["exactness_pattern"])
+        placeholder = re.compile(d["placeholder_pattern"])
+        command = re.compile(d["command_pattern"])
+        for path, text in s.md_surfaces():
+            if not exact.search(text):
                 continue
-            tail = desc[cut:]
-            for tgt in sorted(n for n in desc_mentions[s.name] if n in tail):
-                if s.name not in desc_mentions.get(tgt, set()):
+            in_fence = False
+            for i, line in enumerate(text.splitlines(), start=1):
+                if FENCE_RE.match(line.strip()):
+                    in_fence = not in_fence
+                    continue
+                if in_fence and placeholder.search(line) and command.search(line):
                     self.findings.append(Finding(
-                        "ROUTE-002", "info", s.rel(), 0, s.name,
-                        f"exclusion toward `{tgt}` is not reciprocated ({tgt}'s "
-                        "description never mentions this skill)",
-                        "route", ["AEGIS-044"], tgt, "low", True,
-                        related_skills=[tgt],
+                        rule, s.rel(path), i, s.name,
+                        d["evidence"].replace("{match}", repr(line.strip())),
                     ))
 
-        # ROUTE-003: the Stage-2 route contract (AEGIS-035, verified on main).
-        for s in self.skills:
-            seg = self.stage2_segment(s.body)
-            if seg is None:
-                continue
-            if ("roadmap-to-commitments-translator" in seg
-                    and "roadmap-under-uncertainty-planner" not in seg):
-                self.findings.append(Finding(
-                    "ROUTE-003", "P1", s.rel(), 0, s.name,
-                    "Stage 2 route reaches roadmap-to-commitments-translator without "
-                    "roadmap-under-uncertainty-planner, but the commitments skill "
-                    "declares a roadmap as its input and the prioritization skill "
-                    "hands sequencing to the roadmap planner (AEGIS-035)",
-                    "route", ["AEGIS-035", "AEGIS-045"], s.name, "high", True,
-                    related_skills=[
-                        "prioritization-frame-picker",
-                        "roadmap-under-uncertainty-planner",
-                        "roadmap-to-commitments-translator",
-                    ],
-                ))
+    def det_section_check(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        section = s.sections.get(d["section"])
+        if section is None:
+            return  # section presence is the validator's check, not ours
+        if d["check"] == "has_checkboxes":
+            if not CHECKBOX.search(section):
+                self.findings.append(Finding(rule, s.rel(), 0, s.name, d["evidence"]))
+        elif d["check"] == "min_content":
+            nonblank = [l for l in section.splitlines() if l.strip()]
+            if not nonblank or (
+                len(nonblank) < int(d["min_lines"])
+                and len(nonblank[0].strip()) < int(d["min_single_line_chars"])
+            ):
+                self.findings.append(Finding(rule, s.rel(), 0, s.name, d["evidence"]))
 
-        # graph diagnostics
-        inbound: dict[str, int] = {s.name: 0 for s in self.skills}
-        for e in edges:
-            if e["to"] in inbound:
-                inbound[e["to"]] += 1
-        unreferenced = sorted(n for n, k in inbound.items() if k == 0)
-        self.graph = {
-            "nodes": sorted(
-                (
-                    {
-                        "name": s.name,
-                        "manual_only": s.classify()["manual_only"],
-                        "declares_read_only": s.classify()["declares_read_only"],
-                    }
-                    for s in self.skills
-                ),
-                key=lambda n: n["name"],
-            ),
-            "edges": sorted(edges, key=lambda e: (e["from"], e["to"], e["type"])),
-            "unreferenced_skills": unreferenced,
-        }
-
-    @staticmethod
-    def stage2_segment(body: str) -> str | None:
-        m = STAGE2_HEADER.search(body)
-        if not m:
-            return None
-        m3 = STAGE3_HEADER.search(body, m.end())
-        return body[m.start() : m3.start() if m3 else len(body)]
-
-    # -- family F: vocabulary (AEGIS-039/-044) -------------------------------
-
-    def audit_vocabulary(self, s: Skill) -> None:
-        surfaces = [(s.skill_md, s.text)] + [
-            (p, p.read_text(encoding="utf-8")) for p in s.references if p.suffix == ".md"
-        ]
-        counts: dict[str, int] = {}
-        for path, text in surfaces:
-            for term in CENSUS_TERMS:
-                # word-bounded: "ready" must not count "already", "complete"
-                # must not count "completeness"
-                n = len(re.findall(rf"(?i)\b{re.escape(term)}\b", text))
-                if n:
-                    counts[term] = counts.get(term, 0) + n
-            for m in COMMITTED_HORIZON.finditer(text):
-                self.findings.append(Finding(
-                    "VOCAB-002", "P1", s.rel(path), line_of(text, m.start()), s.name,
-                    f"'committed' used as a roadmap HORIZON label ({m.group(0)!r}) while "
-                    "roadmap-to-commitments-translator reserves 'committed' for "
-                    "capacity-backed promises (AEGIS-044)",
-                    "vocabulary", ["AEGIS-044", "AEGIS-039"],
-                    "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
-                    "high", True,
-                    related_skills=["roadmap-to-commitments-translator"],
-                ))
-            for m in COMMITTED_SCOPE.finditer(text):
-                self.findings.append(Finding(
-                    "VOCAB-003", "P0", s.rel(path), line_of(text, m.start()), s.name,
-                    f"approved scope described as a commitment: {m.group(0)!r} (AEGIS-039)",
-                    "vocabulary", ["AEGIS-039"], s.name, "medium", True,
-                ))
-        if counts:
-            self.census[s.name] = dict(sorted(counts.items()))
-
-    # -- family G: workflow-to-output parity (AEGIS-014/-015/-034) -----------
-
-    def audit_parity(self, s: Skill) -> None:
-        checklist = s.sections.get("Validation Checklist")
-        if checklist is not None and not CHECKBOX.search(checklist):
-            self.findings.append(Finding(
-                "PARITY-001", "P2", s.rel(), 0, s.name,
-                "Validation Checklist contains no checkbox items — nothing verifiable",
-                "parity", ["AEGIS-014", "AEGIS-015"], s.name, "high", True,
-            ))
-        out = s.sections.get("Output Format")
-        nonblank = [l for l in (out or "").splitlines() if l.strip()]
-        if out is not None and (
-            not nonblank or (len(nonblank) == 1 and len(nonblank[0].strip()) < 60)
-        ):
-            self.findings.append(Finding(
-                "PARITY-002", "P2", s.rel(), 0, s.name,
-                "Output Format is empty or a single line — the output contract is "
-                "not specified enough to verify against",
-                "parity", ["AEGIS-034", "AEGIS-015"], s.name, "high", True,
-            ))
-
-    # -- family H: eval coverage (AEGIS-014/-018) ----------------------------
-
-    def audit_evals(self, s: Skill, known_names: set[str]) -> None:
+    def det_eval_case_shape(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
         if not (s.eval_cases or s.trigger_cases):
-            return  # absence of evals.json is the validator's finding, not ours
-
-        # EVAL-001: a negative discrimination case exists SOMEWHERE — an
-        # evals.json case typed should_not_trigger, or a trigger-evals case
-        # whose expected_skill is a neighbor / that lists should_not_trigger.
-        has_negative = any(
-            c.get("type") == "should_not_trigger" for c in s.eval_cases
-        ) or any(
-            c.get("should_not_trigger") or c.get("expected_skill") not in (None, s.name)
-            for c in s.trigger_cases
-        )
-        if not has_negative:
-            self.findings.append(Finding(
-                "EVAL-001", "P2", s.rel(s.evals_path), 0, s.name,
-                "no negative discrimination case in evals.json or "
-                "trigger-evals.json — trigger discrimination is untested even "
-                "structurally",
-                "eval-coverage", ["AEGIS-018", "AEGIS-014"], s.name, "high", True,
-            ))
-
-        # EVAL-002: unjudgeable-as-written, PER SCHEMA. evals.json cases need
-        # expect.assertions; trigger-evals cases need an expected_skill.
-        for c in s.eval_cases:
-            if not (c.get("expect") or {}).get("assertions"):
+            return  # absence of evals.json is the validator's finding
+        check = d["check"]
+        if check == "negative_presence":
+            has_negative = any(
+                c.get("type") == "should_not_trigger" for c in s.eval_cases
+            ) or any(
+                c.get("should_not_trigger")
+                or c.get("expected_skill") not in (None, s.name)
+                for c in s.trigger_cases
+            )
+            if not has_negative:
                 self.findings.append(Finding(
-                    "EVAL-002", "P2", s.rel(s.evals_path), 0, s.name,
-                    f"evals.json case {c.get('id', '<no id>')!r} has no "
-                    "expect.assertions — unjudgeable as written",
-                    "eval-coverage", ["AEGIS-018"], s.name, "high", True,
+                    rule, s.rel(s.evals_path), 0, s.name, d["evidence"],
                 ))
-        for c in s.trigger_cases:
-            if not c.get("expected_skill"):
-                self.findings.append(Finding(
-                    "EVAL-002", "P2", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals case {c.get('id', '<no id>')!r} names no "
-                    "expected_skill — unjudgeable as written",
-                    "eval-coverage", ["AEGIS-018"], s.name, "high", True,
-                ))
+        elif check == "judgeable":
+            for c in s.eval_cases:
+                if not (c.get("expect") or {}).get("assertions"):
+                    self.findings.append(Finding(
+                        rule, s.rel(s.evals_path), 0, s.name,
+                        d["evidence_evals"].replace(
+                            "{match}", repr(c.get("id", "<no id>"))),
+                    ))
+            for c in s.trigger_cases:
+                if not c.get("expected_skill"):
+                    self.findings.append(Finding(
+                        rule, s.rel(s.trigger_evals_path), 0, s.name,
+                        d["evidence_trigger"].replace(
+                            "{match}", repr(c.get("id", "<no id>"))),
+                    ))
+        elif check == "boundary_for_risk":
+            risky = bool(re.search(d["risk_pattern"], s.description)) or bool(
+                re.search(d["state_pattern"], s.description + "\n" + s.body)
+            )
+            if risky and s.eval_cases:
+                if not re.search(d["refusal_pattern"], json.dumps(s.eval_cases)):
+                    self.findings.append(Finding(
+                        rule, s.rel(s.evals_path), 0, s.name, d["evidence"],
+                    ))
 
-        # EVAL-003: approval/state-related skills need a refusal/boundary case
-        # in their BEHAVIOR evals (trigger cases are discrimination, not
-        # boundary behavior).
-        flags = s.classify()
-        if (flags["approval_related"] or flags["state_related"]) and s.eval_cases:
-            if not REFUSAL_CASE.search(json.dumps(s.eval_cases)):
-                self.findings.append(Finding(
-                    "EVAL-003", "P1", s.rel(s.evals_path), 0, s.name,
-                    "approval/state-related skill has no refusal or boundary eval case",
-                    "eval-coverage", ["AEGIS-014", "AEGIS-018"], s.name, "medium", True,
-                ))
-
-        # EVAL-004: every neighbor NAME in the trigger fixtures must exist on
-        # disk — a rename/retire that missed an eval leaves the discrimination
-        # suite testing against a ghost.
+    def det_eval_neighbor_resolution(self, rule: dict, s: Skill,
+                                     known_names: set[str]) -> None:
+        d = rule["detector"]
+        strip = re.compile(d["annotation_strip_pattern"])
         neighbor_names: set[str] = set()
-        raw = s.trigger_raw
-        for n in raw.get("overlaps_with") or []:
+        for n in s.trigger_raw.get("overlaps_with") or []:
             neighbor_names.add(str(n))
         for c in s.trigger_cases:
             if c.get("expected_skill"):
@@ -846,33 +542,23 @@ class Audit:
         for n in sorted(neighbor_names):
             if not n or n in known_names:
                 continue
-            stripped = re.sub(r"\s*\((?:sub)?agent\)\s*$", "", n)
+            stripped = strip.sub("", n)
             if stripped in known_names:
-                # The target EXISTS (as a skill or reviewer agent) but the name
-                # field carries a prose annotation — a machine consumer (the
-                # future eval runner, AEGIS-018) cannot resolve it as written.
                 self.findings.append(Finding(
-                    "EVAL-004", "P2", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals neighbor {n!r} is annotated prose, not a "
-                    f"resolvable name (target {stripped!r} exists) — an eval "
-                    "runner cannot match it mechanically",
-                    "eval-coverage", ["AEGIS-018", "AEGIS-053"], s.name, "high", True,
+                    rule, s.rel(s.trigger_evals_path), 0, s.name,
+                    d["evidence_annotated"].replace("{match}", repr(n))
+                    .replace("{stripped}", repr(stripped)),
+                    severity=d["severity_annotated"],
                 ))
             else:
                 self.findings.append(Finding(
-                    "EVAL-004", "P1", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals references neighbor {n!r}, which is not a "
-                    "skill or agent on disk",
-                    "eval-coverage", ["AEGIS-053", "AEGIS-018"], s.name, "high", True,
+                    rule, s.rel(s.trigger_evals_path), 0, s.name,
+                    d["evidence_stale"].replace("{match}", repr(n)),
                 ))
 
-    # -- family I: reference integrity (AEGIS-053) ---------------------------
-
-    def audit_references(self, s: Skill) -> None:
-        surfaces = [(s.skill_md, s.text)] + [
-            (p, p.read_text(encoding="utf-8")) for p in s.references if p.suffix == ".md"
-        ]
-        for path, text in surfaces:
+    def det_link_resolution(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        for path, text in s.md_surfaces():
             defenced = strip_fences(text)
             for m in MD_LINK.finditer(defenced):
                 target = m.group(1)
@@ -880,61 +566,243 @@ class Audit:
                     continue
                 if not (path.parent / target).resolve().exists():
                     self.findings.append(Finding(
-                        "REF-001", "P1", s.rel(path), line_of(defenced, m.start()), s.name,
-                        f"link target does not exist on disk: {target!r}",
-                        "reference", ["AEGIS-053"], s.name, "high", True,
+                        rule, s.rel(path), line_of(defenced, m.start()), s.name,
+                        d["evidence"].replace("{match}", repr(target)),
                     ))
-            for m in BARE_REF.finditer(defenced):
+
+    def det_bare_reference(self, rule: dict, s: Skill) -> None:
+        d = rule["detector"]
+        pat = re.compile(d["pattern"])
+        for path, text in s.md_surfaces():
+            defenced = strip_fences(text)
+            for m in pat.finditer(defenced):
                 if not (s.dir / m.group(0)).is_file():
                     self.findings.append(Finding(
-                        "REF-003", "P1", s.rel(path), line_of(defenced, m.start()), s.name,
-                        f"referenced file does not exist: {m.group(0)!r}",
-                        "reference", ["AEGIS-053"], s.name, "high", True,
+                        rule, s.rel(path), line_of(defenced, m.start()), s.name,
+                        d["evidence"].replace("{match}", repr(m.group(0))),
                     ))
-            for m in USER_ABS_PATH.finditer(defenced):
+
+    # -- corpus-level detectors ----------------------------------------------
+
+    def det_name_resolution(self, rule: dict, known: set[str],
+                            skill_names: set[str]) -> None:
+        d = rule["detector"]
+        allow = set(self.config["non_skill_tokens"])
+        routing = re.compile(d["routing_line_pattern"])
+        for s in self.skills:
+            for m in BACKTICKED_KEBAB.finditer(s.description):
+                tok = m.group(1)
+                if tok not in known and tok not in allow:
+                    self.findings.append(Finding(
+                        rule, s.rel(), 0, s.name,
+                        d["evidence_description"].replace("{match}", tok),
+                    ))
+            body_defenced = strip_fences(s.body)
+            for line in body_defenced.splitlines():
+                if not routing.search(line):
+                    continue
+                for m in BACKTICKED_KEBAB.finditer(line):
+                    tok = m.group(1)
+                    if tok not in known and tok not in allow:
+                        self.findings.append(Finding(
+                            rule, s.rel(), 0, s.name,
+                            d["evidence_body"].replace("{match}", tok)
+                            .replace("{line}", repr(line.strip()[:120])),
+                        ))
+
+    def det_exclusion_reciprocity(self, rule: dict,
+                                  desc_mentions: dict[str, set[str]]) -> None:
+        d = rule["detector"]
+        for s in self.skills:
+            cut = s.description.lower().find("do not use")
+            if cut < 0:
+                continue
+            tail = s.description[cut:]
+            for tgt in sorted(n for n in desc_mentions[s.name] if n in tail):
+                if s.name not in desc_mentions.get(tgt, set()):
+                    self.findings.append(Finding(
+                        rule, s.rel(), 0, s.name,
+                        d["evidence"].replace("{match}", tgt),
+                        related_skills=[tgt],
+                    ))
+
+    @staticmethod
+    def route_segment(body: str, start_pattern: str, end_pattern: str) -> str | None:
+        """The text slice between the start marker and the next end marker
+        (or EOF). None when the start marker is absent."""
+        m = re.compile(start_pattern).search(body)
+        if not m:
+            return None
+        m2 = re.compile(end_pattern).search(body, m.end())
+        return body[m.start() : m2.start() if m2 else len(body)]
+
+    def det_route_segment(self, rule: dict) -> None:
+        d = rule["detector"]
+        for s in self.skills:
+            seg = self.route_segment(s.body, d["start_pattern"], d["end_pattern"])
+            if seg is None:
+                continue
+            m = re.compile(d["start_pattern"]).search(s.body)
+            if d["anchor"] in seg and d["required"] not in seg:
                 self.findings.append(Finding(
-                    "REF-002", "info", s.rel(path), line_of(defenced, m.start()), s.name,
-                    f"absolute user-machine path in shipped content: "
-                    f"{defenced[m.start():m.start()+60].splitlines()[0]!r}",
-                    "reference", ["AEGIS-053"], s.name, "low", False,
+                    rule, s.rel(), line_of(s.body, m.start()), s.name,
+                    d["evidence"], related_skills=list(d["related"]),
                 ))
 
-    # -- run + outputs -------------------------------------------------------
+    # -- graph + census (engine-level objective facts) -----------------------
+
+    def build_graph(self) -> dict[str, set[str]]:
+        skill_names = {s.name for s in self.skills}
+        edges: list[dict] = []
+        desc_mentions: dict[str, set[str]] = {}
+        for s in self.skills:
+            mentioned = {
+                m.group(1) for m in BACKTICKED_KEBAB.finditer(s.description)
+                if m.group(1) in skill_names
+            }
+            for other in skill_names:
+                if other != s.name and other in s.description:
+                    mentioned.add(other)
+            desc_mentions[s.name] = mentioned - {s.name}
+            for tgt in sorted(desc_mentions[s.name]):
+                edges.append({"from": s.name, "to": tgt, "type": "description-mention"})
+            body_defenced = strip_fences(s.body)
+            for line in body_defenced.splitlines():
+                for m in BACKTICKED_KEBAB.finditer(line):
+                    tok = m.group(1)
+                    if tok in skill_names and tok != s.name:
+                        edges.append({"from": s.name, "to": tok, "type": "body-route"})
+        inbound = {s.name: 0 for s in self.skills}
+        for e in edges:
+            if e["to"] in inbound:
+                inbound[e["to"]] += 1
+        self.graph = {
+            "engine_version": ENGINE_VERSION,
+            "catalog_version": self.catalog["catalog_version"],
+            "nodes": sorted(
+                (
+                    {
+                        "name": s.name,
+                        "manual_only": s.frontmatter.get("disable-model-invocation") is True,
+                    }
+                    for s in self.skills
+                ),
+                key=lambda n: n["name"],
+            ),
+            "edges": sorted(edges, key=lambda e: (e["from"], e["to"], e["type"])),
+            "unreferenced_skills": sorted(n for n, k in inbound.items() if k == 0),
+        }
+        return desc_mentions
+
+    def build_census(self) -> None:
+        terms = self.config["census_terms"]
+        for s in self.skills:
+            counts: dict[str, int] = {}
+            for _, text in s.md_surfaces():
+                for term in terms:
+                    n = len(re.findall(rf"(?i)\b{re.escape(term)}\b", text))
+                    if n:
+                        counts[term] = counts.get(term, 0) + n
+            if counts:
+                self.census[s.name] = dict(sorted(counts.items()))
+
+    # -- run -----------------------------------------------------------------
+
+    PER_SKILL_DETECTORS = {
+        "region_conjunction": "det_region_conjunction",
+        "posture_grant_contradiction": "det_posture_grant_contradiction",
+        "posture_side_effect": "det_posture_side_effect",
+        "surface_pattern": "det_surface_pattern",
+        "surface_pattern_absence": "det_surface_pattern_absence",
+        "append_contract_conjunction": "det_append_contract_conjunction",
+        "fenced_placeholder_command": "det_fenced_placeholder_command",
+        "section_check": "det_section_check",
+        "eval_case_shape": "det_eval_case_shape",
+        "link_resolution": "det_link_resolution",
+        "bare_reference": "det_bare_reference",
+    }
+    CORPUS_DETECTORS = {"name_resolution", "eval_neighbor_resolution",
+                        "exclusion_reciprocity", "route_segment"}
 
     def run(self) -> None:
         self.discover()
-        known_names = {s.name for s in self.skills} | self.agent_names()
-        for s in self.skills:
-            self.audit_side_effects(s)
-            self.audit_approvals(s)
-            self.audit_state(s)
-            self.audit_artifacts(s)
-            self.audit_vocabulary(s)
-            self.audit_parity(s)
-            self.audit_evals(s, known_names)
-            self.audit_references(s)
-        self.audit_routes()
+        skill_names = {s.name for s in self.skills}
+        known = skill_names | self.agent_names()
+
+        for rule in self.catalog["rules"]:
+            dtype = rule["detector"]["type"]
+            if dtype in self.PER_SKILL_DETECTORS:
+                fn = getattr(self, self.PER_SKILL_DETECTORS[dtype])
+                for s in self.skills:
+                    fn(rule, s)
+            elif dtype == "eval_neighbor_resolution":
+                for s in self.skills:
+                    self.det_eval_neighbor_resolution(rule, s, known)
+            elif dtype == "name_resolution":
+                self.det_name_resolution(rule, known, skill_names)
+            elif dtype == "route_segment":
+                self.det_route_segment(rule)
+            elif dtype == "exclusion_reciprocity":
+                pass  # needs the graph; handled after build_graph below
+            else:  # unreachable when the catalog validated — belt and braces
+                raise CatalogError(f"unknown detector type {dtype!r}")
+
+        desc_mentions = self.build_graph()
+        for rule in self.catalog["rules"]:
+            if rule["detector"]["type"] == "exclusion_reciprocity":
+                self.det_exclusion_reciprocity(rule, desc_mentions)
+
+        self.build_census()
         self.findings.sort(key=lambda f: (f.file, f.line, f.rule, f.evidence))
 
-    def agent_names(self) -> set[str]:
-        agents_dir = self.repo / ".claude" / "agents"
-        if not agents_dir.is_dir():
-            return set()
-        return {p.stem for p in agents_dir.glob("*.md")}
+    # -- provenance ----------------------------------------------------------
 
-    def git_provenance(self) -> dict[str, str]:
-        def _git(*args: str) -> str:
-            try:
-                return subprocess.run(
-                    ["git", *args], cwd=self.repo, capture_output=True,
-                    text=True, check=True,
-                ).stdout.strip()
-            except (OSError, subprocess.CalledProcessError):
-                return "unknown"
+    def _git(self, *args: str) -> str:
+        try:
+            return subprocess.run(
+                ["git", *args], cwd=self.repo, capture_output=True,
+                text=True, check=True,
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            return "unknown"
+
+    def corpus_content_hash(self) -> str:
+        """SHA-256 over every scanned file's relative path + bytes — states
+        exactly WHAT was scanned, independent of the checkout's HEAD."""
+        h = hashlib.sha256()
+        for s in self.skills:
+            files = [s.skill_md] + list(s.references)
+            for extra in (s.evals_path, s.trigger_evals_path):
+                if extra.is_file():
+                    files.append(extra)
+            for f in sorted(set(files)):
+                if f.is_file():
+                    h.update(f.relative_to(self.repo).as_posix().encode())
+                    h.update(b"\0")
+                    h.update(f.read_bytes())
+                    h.update(b"\0")
+        return h.hexdigest()
+
+    def provenance(self) -> dict:
+        status = self._git("status", "--porcelain")
+        dirty_paths = [
+            line[3:].strip() for line in status.splitlines() if line.strip()
+        ] if status not in ("", "unknown") else []
+        scanned_prefix = ".claude/skills/"
         return {
-            "repo_sha": _git("rev-parse", "HEAD"),
-            "branch": _git("branch", "--show-current"),
+            "engine": ENGINE_NAME,
+            "engine_version": ENGINE_VERSION,
+            "catalog_version": self.catalog["catalog_version"],
+            "repo_sha": self._git("rev-parse", "HEAD"),
+            "branch": self._git("branch", "--show-current"),
+            "working_tree_dirty": bool(dirty_paths) or status == "unknown",
+            "dirty_paths_in_scanned_surfaces": sorted(
+                p for p in dirty_paths if p.replace("\\", "/").startswith(scanned_prefix)
+            ),
+            "corpus_content_hash": self.corpus_content_hash(),
         }
+
+    # -- outputs -------------------------------------------------------------
 
     def summary(self) -> dict:
         by_sev: dict[str, int] = {s: 0 for s in SEVERITIES}
@@ -943,15 +811,15 @@ class Audit:
             by_sev[f.severity] += 1
             by_rule[f.rule] = by_rule.get(f.rule, 0) + 1
         return {
-            "tool": TOOL_NAME,
-            "version": TOOL_VERSION,
-            **self.git_provenance(),
+            **self.provenance(),
             "skill_count": len(self.skills),
+            "rule_count": len(self.rules),
             "finding_count": len(self.findings),
             "by_severity": by_sev,
             "by_rule": dict(sorted(by_rule.items())),
             "mechanical_count": sum(1 for f in self.findings if f.mechanical),
-            "semantic_review_candidates": sum(1 for f in self.findings if not f.mechanical),
+            "semantic_review_candidates": sum(
+                1 for f in self.findings if not f.mechanical),
         }
 
     def to_json(self) -> dict:
@@ -966,8 +834,13 @@ class Audit:
         lines = [
             "# Skill-contract audit — baseline report",
             "",
-            f"- Tool: `{TOOL_NAME}` v{TOOL_VERSION}",
-            f"- Repo SHA: `{s['repo_sha']}` (branch `{s['branch']}`)",
+            f"- Engine: `{ENGINE_NAME}` v{ENGINE_VERSION}; rule catalog "
+            f"v{s['catalog_version']} ({s['rule_count']} rules, "
+            "`scripts/audit-rules.yaml`)",
+            f"- Repo SHA: `{s['repo_sha']}` (branch `{s['branch']}`; working "
+            f"tree dirty: {str(s['working_tree_dirty']).lower()}; dirty scanned "
+            f"surfaces: {s['dirty_paths_in_scanned_surfaces'] or 'none'})",
+            f"- Corpus content hash: `{s['corpus_content_hash']}`",
             f"- Skills scanned: **{s['skill_count']}**",
             f"- Findings: **{s['finding_count']}** "
             f"({s['mechanical_count']} mechanical, "
@@ -975,7 +848,9 @@ class Audit:
             "",
             "A baseline finding is EXPECTED here: this report freezes the state of",
             "the corpus BEFORE remediation. A finding below is not a tool failure,",
-            "and structural findings are not behavioral proof of misbehavior.",
+            "structural findings are not behavioral proof, and rows marked",
+            "SEMANTIC-REVIEW CANDIDATE are queue entries for the named reviewer",
+            "skill — never mechanically proven defects.",
             "",
             "| Severity | Count |",
             "|---|---:|",
@@ -991,11 +866,12 @@ class Audit:
         lines += ["", "## Findings (P0/P1 + all semantic-review candidates)", ""]
         for f in detailed:
             loc = f"{f.file}:{f.line}" if f.line else f.file
-            kind = "mechanical" if f.mechanical else "SEMANTIC-REVIEW CANDIDATE"
+            kind = "mechanical" if f.mechanical else (
+                f"SEMANTIC-REVIEW CANDIDATE → {f.semantic_review_owner}")
+            maps = ", ".join(f.aegis_map) if f.aegis_map else "—"
             lines.append(
                 f"- **{f.rule}** [{f.severity}/{f.confidence}/{kind}] `{loc}` "
-                f"(owner: {f.remediation_owner}; maps: {', '.join(f.aegis_map)}) — "
-                f"{f.evidence.rstrip()}"
+                f"(owner: {f.remediation_owner}; maps: {maps}) — {f.evidence}"
             )
         lines += ["", "## P2/info findings (summarized; full detail in the JSON report)", ""]
         by_rule: dict[str, list[Finding]] = {}
@@ -1015,10 +891,14 @@ class Audit:
 
     def manifest(self) -> dict:
         families = self.catalog_families()
+        side1 = self.rules.get("SIDE-001", {}).get("detector", {})
+        eval3 = self.rules.get("EVAL-003", {}).get("detector", {})
+        decl = re.compile(side1.get("declaration_pattern", r"$^"))
+        writes = re.compile(side1.get("violation_pattern", r"$^"))
+        risk = re.compile(eval3.get("risk_pattern", r"$^"))
+        state = re.compile(eval3.get("state_pattern", r"$^"))
         return {
-            "tool": TOOL_NAME,
-            "version": TOOL_VERSION,
-            **self.git_provenance(),
+            **self.provenance(),
             "skill_count": len(self.skills),
             "skills": [
                 {
@@ -1031,15 +911,28 @@ class Audit:
                     "has_trigger_evals": s.trigger_evals_path.is_file(),
                     "eval_cases": len(s.eval_cases),
                     "trigger_cases": len(s.trigger_cases),
-                    **s.classify(),
+                    "manual_only": s.frontmatter.get("disable-model-invocation") is True,
+                    # classification flags derive from catalog rule patterns
+                    # (SIDE-001, EVAL-003) — data, not engine policy
+                    "declares_read_only": bool(decl.search(s.description))
+                    or bool(decl.search(s.sections.get("Purpose", ""))),
+                    "approval_related": bool(risk.search(s.description)),
+                    "state_related": bool(state.search(s.description + "\n" + s.body)),
+                    "writes_artifacts": bool(
+                        writes.search(s.sections.get("Workflow", ""))
+                    ) or bool(writes.search(s.sections.get("Output Format", ""))),
                 }
                 for s in self.skills
             ],
-            "agents": sorted(
+            # Coverage disclosure (kept honest): agents and guided paths are
+            # ENUMERATED for name-resolution only; their content is NOT
+            # audited by this engine (agents schema + docs/paths links are
+            # validator-owned, decision D55).
+            "agents_enumerated_not_audited": sorted(
                 p.relative_to(self.repo).as_posix()
                 for p in (self.repo / ".claude" / "agents").glob("*.md")
             ) if (self.repo / ".claude" / "agents").is_dir() else [],
-            "guided_paths": sorted(
+            "guided_paths_enumerated_not_audited": sorted(
                 p.relative_to(self.repo).as_posix()
                 for p in (self.repo / "docs" / "paths").glob("*.md")
             ) if (self.repo / "docs" / "paths").is_dir() else [],
@@ -1061,17 +954,111 @@ class Audit:
                 out.setdefault(m.group(1), heading)
         return out
 
+    def review_queue(self) -> dict:
+        """The structured semantic-review queue: what a future runner executes
+        in isolated sessions. Nothing here is manually invoked in-line."""
+        finding_reviews = [
+            {
+                "reviewer": f.semantic_review_owner,
+                "rule": f.rule,
+                "question": self.rules[f.rule]["title"],
+                "skill": f.owning_skill,
+                "file": f.file,
+                "line": f.line,
+                "evidence": f.evidence,
+                "status": "queued",
+            }
+            for f in self.findings if not f.mechanical
+        ]
+        targeted = set(self.config.get("targeted_review_done", []))
+        rubric_queue = [
+            {
+                "skill": s.name,
+                "reviewer": "skill-quality-reviewer",
+                "scope": "12-question rubric (docs/audits/semantic-review-rubric.md)",
+                "pr1_targeted_review": s.name in targeted,
+                "status": "queued",
+            }
+            for s in self.skills
+        ]
+        totals: dict[str, int] = {}
+        for e in finding_reviews:
+            totals[e["reviewer"]] = totals.get(e["reviewer"], 0) + 1
+        totals["skill-quality-reviewer (rubric passes)"] = len(rubric_queue)
+        return {
+            **self.provenance(),
+            "note": "Every entry is QUEUED — none is executed by the engine. "
+                    "Completion requires an isolated-session review by the "
+                    "named reviewer skill and a recorded verdict.",
+            "finding_reviews": finding_reviews,
+            "rubric_queue": rubric_queue,
+            "reviewer_totals": dict(sorted(totals.items())),
+        }
+
+
+# --- catalog loading --------------------------------------------------------
+
+
+class CatalogError(Exception):
+    pass
+
+
+def load_catalog(path: Path | None = None) -> dict:
+    """Load + validate the rule catalog. Fails closed on any policy defect:
+    a missing field, an unknown detector, or a fixture that does not exist
+    means the POLICY is broken and no scan may pretend to be complete."""
+    path = CATALOG_PATH if path is None else path
+    if not path.is_file():
+        raise CatalogError(f"rule catalog not found: {path}")
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or "rules" not in data or "config" not in data:
+        raise CatalogError("catalog must be a mapping with 'config' and 'rules'")
+    if not data.get("catalog_version"):
+        raise CatalogError("catalog_version missing")
+    known_detectors = set(Audit.PER_SKILL_DETECTORS) | Audit.CORPUS_DETECTORS
+    fixture_root = ENGINE_ROOT / data["config"].get("fixture_root", "")
+    seen: set[str] = set()
+    for rule in data["rules"]:
+        for field in REQUIRED_RULE_FIELDS:
+            if field not in rule:
+                raise CatalogError(f"rule {rule.get('id', '<no id>')!r} missing "
+                                   f"required field {field!r}")
+        if rule["id"] in seen:
+            raise CatalogError(f"duplicate rule id {rule['id']!r}")
+        seen.add(rule["id"])
+        if rule["severity"] not in SEVERITIES:
+            raise CatalogError(f"rule {rule['id']}: bad severity {rule['severity']!r}")
+        if rule["classification"] not in ("mechanical", "semantic"):
+            raise CatalogError(f"rule {rule['id']}: bad classification")
+        dtype = rule["detector"].get("type")
+        if dtype not in known_detectors:
+            raise CatalogError(f"rule {rule['id']}: unknown detector {dtype!r}")
+        for fx in ("positive_fixture", "negative_fixture"):
+            if not (fixture_root / rule[fx]).is_file():
+                raise CatalogError(
+                    f"rule {rule['id']}: {fx} does not exist: {rule[fx]}"
+                )
+    return data
+
 
 # --- CLI --------------------------------------------------------------------
 
 
+def _write(path_str: str, content: str) -> None:
+    p = Path(path_str)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(content, encoding="utf-8", newline="\n")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--repo", default=str(Path(__file__).resolve().parent.parent))
+    ap.add_argument("--repo", default=str(ENGINE_ROOT))
     ap.add_argument("--json", dest="json_out")
     ap.add_argument("--markdown", dest="md_out")
     ap.add_argument("--graph", dest="graph_out")
     ap.add_argument("--manifest", dest="manifest_out")
+    ap.add_argument("--queue", dest="queue_out",
+                    help="structured semantic-review queue for a future runner")
     ap.add_argument("--fail-on-findings", action="store_true",
                     help="exit 1 when any P0/P1 finding exists (future CI lane)")
     ap.add_argument("--quiet", action="store_true")
@@ -1081,44 +1068,45 @@ def main(argv: list[str] | None = None) -> int:
         print("ERROR PyYAML is required (python -m pip install pyyaml)")
         return 2
 
+    try:
+        catalog = load_catalog()
+    except (CatalogError, yaml.YAMLError) as exc:
+        print(f"ERROR rule catalog invalid: {exc}")
+        return 2
+
     repo = Path(args.repo).resolve()
     if not (repo / ".claude" / "skills").is_dir():
         print(f"ERROR no .claude/skills/ under {repo} — refusing to report a "
               "clean scan of nothing (a wrong path must fail, not pass)")
         return 2
 
-    audit = Audit(repo)
-    audit.run()
-
-    for out_path in (args.json_out, args.md_out, args.graph_out, args.manifest_out):
+    for out_path in (args.json_out, args.md_out, args.graph_out,
+                     args.manifest_out, args.queue_out):
         if out_path and ".claude" + "/skills" in Path(out_path).resolve().as_posix():
             print(f"ERROR refusing to write output inside .claude/skills/: {out_path}")
             return 2
 
+    audit = Audit(repo, catalog)
+    audit.run()
+
     if args.json_out:
-        Path(args.json_out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.json_out).write_text(
-            json.dumps(audit.to_json(), indent=2, sort_keys=False) + "\n",
-            encoding="utf-8", newline="\n",
-        )
+        _write(args.json_out, json.dumps(audit.to_json(), indent=2) + "\n")
     if args.md_out:
-        Path(args.md_out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.md_out).write_text(audit.to_markdown(), encoding="utf-8", newline="\n")
+        _write(args.md_out, audit.to_markdown())
     if args.graph_out:
-        Path(args.graph_out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.graph_out).write_text(
-            json.dumps(audit.graph, indent=2) + "\n", encoding="utf-8", newline="\n",
-        )
+        _write(args.graph_out, json.dumps(audit.graph, indent=2) + "\n")
     if args.manifest_out:
-        Path(args.manifest_out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.manifest_out).write_text(
-            json.dumps(audit.manifest(), indent=2) + "\n", encoding="utf-8", newline="\n",
-        )
+        _write(args.manifest_out, json.dumps(audit.manifest(), indent=2) + "\n")
+    if args.queue_out:
+        _write(args.queue_out, json.dumps(audit.review_queue(), indent=2) + "\n")
 
     s = audit.summary()
     if not args.quiet:
-        print(f"{TOOL_NAME} v{TOOL_VERSION} — repo {s['repo_sha'][:12]} "
-              f"({s['branch']}), {s['skill_count']} skill(s)")
+        print(f"{ENGINE_NAME} v{ENGINE_VERSION} + catalog v{s['catalog_version']} "
+              f"— repo {s['repo_sha'][:12]} ({s['branch']}), "
+              f"{s['skill_count']} skill(s), {s['rule_count']} rule(s)")
+        print(f"corpus content hash: {s['corpus_content_hash'][:16]}…  "
+              f"dirty: {str(s['working_tree_dirty']).lower()}")
         print(f"findings: {s['finding_count']} "
               f"(P0 {s['by_severity']['P0']}, P1 {s['by_severity']['P1']}, "
               f"P2 {s['by_severity']['P2']}, info {s['by_severity']['info']}; "
