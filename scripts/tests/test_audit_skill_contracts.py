@@ -47,6 +47,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from unittest import mock
 
 TESTS_DIR = Path(__file__).resolve().parent
 REAL_REPO = TESTS_DIR.parent.parent
@@ -798,9 +799,44 @@ def test_skills_root_symlink_rejected() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def _create_junction(link: Path, target: Path) -> tuple[str, str]:
+    """Try to create a Windows directory JUNCTION at `link` -> `target`.
+
+    Returns ("created", "") on success, or ("skip", reason) when the host cannot
+    create one — and NEVER raises for host incapability (Gate 2.9 portability):
+      * a non-Windows host has no junctions at all;
+      * a Windows host may lack the `cmd` interpreter on PATH;
+      * `cmd` may vanish between discovery and invocation (a PATH race);
+      * `mklink /J` may return non-zero (privilege/filesystem).
+    A genuine containment FAILURE is NOT this helper's concern — that is asserted
+    by the caller only after ("created", "")."""
+    if os.name != "nt":
+        return "skip", "not a Windows host (junctions are Windows-only)"
+    cmd_exe = shutil.which("cmd.exe") or shutil.which("cmd")
+    if cmd_exe is None:
+        return "skip", "no Windows command interpreter (cmd.exe) on PATH"
+    try:
+        r = subprocess.run(
+            [cmd_exe, "/c", "mklink", "/J", str(link), str(target)],
+            capture_output=True, text=True,
+        )
+    except FileNotFoundError as exc:
+        # defensive: the interpreter disappeared after discovery (PATH race)
+        return "skip", f"Windows command interpreter unavailable mid-call ({exc})"
+    if r.returncode != 0 or not link.exists():
+        return "skip", (
+            f"mklink /J failed (rc={r.returncode}: "
+            f"{r.stderr.strip() or r.stdout.strip()})"
+        )
+    return "created", ""
+
+
 def test_junction_escape_rejected() -> None:
     """Windows junctions are reparse points os.walk does not treat as links;
-    _check_input's is_junction/resolve backstop must still reject them."""
+    _check_input's is_junction/resolve backstop must still reject them. On a
+    Windows host the junction is created and the containment assertion runs
+    (PASS); on an unsupported host the case reports an honest SKIP and is NEVER
+    counted as passed (Gate 2.9)."""
     tmp = Path(tempfile.mkdtemp(prefix="aegis-jn-"))
     try:
         ext = tmp / "external-ref-dir"
@@ -808,12 +844,12 @@ def test_junction_escape_rejected() -> None:
         (ext / "OUTSIDE-JUNCTION-TARGET.md").write_text("x", encoding="utf-8")
         repo = _copy_fixture(tmp)
         junction = repo / ".claude" / "skills" / "clean-skill" / "references"
-        r = subprocess.run(["cmd", "/c", "mklink", "/J", str(junction), str(ext)],
-                           capture_output=True, text=True)
-        if r.returncode != 0 or not junction.exists():
-            print(f"  SKIP  junction creation unsupported on this host (rc={r.returncode}: "
-                  f"{r.stderr.strip() or r.stdout.strip()})")
+        status, reason = _create_junction(junction, ext)
+        if status == "skip":
+            print(f"  SKIP  Windows junction test not executed: {reason}")
             return
+        # status == "created": the real security assertion (a FAILURE here is a
+        # genuine FAIL of the suite, never a SKIP).
         rc, stdout = _run_capture(repo, "--json", str(tmp / "o.json"))
         assert rc == 2, f"a junctioned references dir must exit 2, got {rc}"
         assert not (tmp / "o.json").exists()
@@ -826,6 +862,42 @@ def test_junction_escape_rejected() -> None:
             pass
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_junction_helper_is_portable() -> None:
+    """Gate 2.9 portability regression: the unsupported-host branches must SKIP
+    WITHOUT invoking subprocess.run and WITHOUT raising — proven deterministically
+    by forcing command discovery to fail, so no real non-Windows host is needed.
+    A `subprocess.run` invocation on either branch fails the test loudly."""
+    def _boom(*_a, **_k):
+        raise AssertionError("subprocess.run must NOT be called on an unsupported host")
+
+    # (a) non-Windows host: skip before any interpreter lookup or run.
+    with mock.patch.object(os, "name", "posix"), \
+            mock.patch.object(subprocess, "run", _boom):
+        status, reason = _create_junction(Path("link"), Path("target"))
+    assert status == "skip" and "Windows" in reason, (status, reason)
+
+    # (b) Windows host but no cmd interpreter on PATH: skip before any run.
+    with mock.patch.object(os, "name", "nt"), \
+            mock.patch.object(shutil, "which", return_value=None), \
+            mock.patch.object(subprocess, "run", _boom):
+        status, reason = _create_junction(Path("link"), Path("target"))
+    assert status == "skip" and "interpreter" in reason, (status, reason)
+
+    # (c) Windows host, interpreter found, but it vanishes at call time
+    # (PATH race): the FileNotFoundError is caught and turned into a SKIP.
+    def _raise_fnf(*_a, **_k):
+        raise FileNotFoundError(2, "No such file or directory", "cmd.exe")
+
+    with mock.patch.object(os, "name", "nt"), \
+            mock.patch.object(shutil, "which", return_value="cmd.exe"), \
+            mock.patch.object(subprocess, "run", _raise_fnf):
+        status, reason = _create_junction(Path("link"), Path("target"))
+    assert status == "skip" and "unavailable" in reason, (status, reason)
+
+    ok("junction helper is portable: unsupported hosts SKIP with no subprocess.run "
+       "and no raise (non-Windows / no-cmd / PATH-race)")
 
 
 def test_agent_file_symlink_rejected() -> None:
@@ -966,6 +1038,7 @@ def main() -> int:
     test_agent_file_symlink_rejected()
     test_skills_root_symlink_rejected()
     test_junction_escape_rejected()
+    test_junction_helper_is_portable()
     test_fixture_source_is_neutral_layout()
     test_auxiliary_inputs_provenance()
     test_wrong_path_fails()
