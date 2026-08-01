@@ -9,11 +9,14 @@ structural contract rot the mechanical validator does not own. Reviewer agents
 resolution and the manifest only — their CONTENT is not audited here (that is
 the validator's surface). It NEVER mutates the repository: the only writes it
 performs are to output paths the caller explicitly passes, and it refuses to
-write anywhere inside `.claude/skills/`. Audited INPUTS are containment-checked
-fail-closed BEFORE any read: a symlinked skill directory, SKILL.md, reference,
-or eval file — or any audited path resolving outside the repository root —
-aborts the run with exit 2 so an untrusted checkout cannot make this tool read
-or disclose files outside the repository.
+write anywhere inside `.claude/skills/`. EVERY repository-controlled input —
+the skill corpus (skill dirs, SKILL.md, references, eval files) AND the
+auxiliary inputs (docs/skills-catalog.md, .claude/agents/, docs/paths/) and
+Markdown-link targets — is containment-checked fail-closed BEFORE any read,
+hash, parse, or enumeration: a symlink, a Windows junction/reparse point, or
+any path (or parent chain) resolving outside the repository root aborts the
+run with exit 2, disclosing only the offending repo-relative path — never the
+external target's content, filename, listing, heading, marker, or hash.
 
 WHAT THIS IS NOT
     * Not a replacement for scripts/validate-skills.py — nothing the validator
@@ -86,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.2.0"
+TOOL_VERSION = "1.3.0"
 
 
 class InputContainmentError(Exception):
@@ -739,38 +742,69 @@ class Audit:
 
     # -- discovery -----------------------------------------------------------
 
-    def _assert_contained(self) -> None:
-        """Fail closed BEFORE any audited content is read (Gate 2.5 blocker 2):
-        no audited skill directory, SKILL.md, reference, or eval file may be a
-        symlink (or Windows junction), and every audited path must resolve
-        inside the repository root. os.walk(followlinks=False) never descends a
-        symlinked directory; the resolve() check backstops junctions, which
-        os.walk does not treat as links. Raises InputContainmentError with the
-        offending PATH only — never the target's content."""
+    # -- ONE fail-closed input-containment primitive (Gate 2.7) --------------
+    # EVERY repository-controlled input the tool reads, hashes, parses, or
+    # enumerates passes through _check_input BEFORE that access — the skill
+    # corpus AND the auxiliary inputs (docs/skills-catalog.md, .claude/agents/,
+    # docs/paths/) and Markdown-link targets. A symlink, a Windows junction /
+    # reparse point, or any path (or parent chain) resolving outside the
+    # repository root is rejected with the offending PATH only — never the
+    # external target's content, filename, listing, heading, marker, or hash.
+
+    def _check_input(self, p: Path) -> None:
+        """Raise InputContainmentError unless `p` is a non-link path whose
+        resolved location (parents included) stays inside the repo root."""
+        if p.is_symlink() or getattr(p, "is_junction", lambda: False)():
+            raise InputContainmentError(f"symlink/junction input refused: {p}")
         repo_root = self.repo.resolve()
+        rp = p.resolve()  # canonicalizes the whole parent chain
+        if rp != repo_root and repo_root not in rp.parents:
+            raise InputContainmentError(f"input resolves outside the repository root: {p}")
 
-        def _reject(p: Path, why: str) -> None:
-            raise InputContainmentError(f"{why}: {p}")
+    def _contained_glob(self, directory: Path, pattern: str) -> list[Path]:
+        """Enumerate `directory`/`pattern` ONLY after proving the directory and
+        every match are contained — an out-of-repo target never contributes a
+        filename to any output. Absent directory → empty (not an error)."""
+        if not (directory.exists() or directory.is_symlink()):
+            return []
+        self._check_input(directory)
+        out: list[Path] = []
+        for p in sorted(directory.glob(pattern)):
+            self._check_input(p)
+            out.append(p)
+        return out
 
-        def _check(p: Path) -> None:
-            if p.is_symlink() or getattr(p, "is_junction", lambda: False)():
-                _reject(p, "symlink/junction inside the audited corpus")
-            rp = p.resolve()
-            if rp != repo_root and repo_root not in rp.parents:
-                _reject(p, "audited path resolves outside the repository root")
-
-        if self.skills_dir.is_symlink():
-            _reject(self.skills_dir, "symlink/junction inside the audited corpus")
+    def _assert_skill_corpus_contained(self) -> None:
+        repo_root = self.repo.resolve()
+        if self.skills_dir.is_symlink() or getattr(self.skills_dir, "is_junction", lambda: False)():
+            raise InputContainmentError(f"symlink/junction input refused: {self.skills_dir}")
         for child in sorted(self.skills_dir.iterdir()):
-            _check(child)
+            self._check_input(child)
             if not child.is_dir() or child.name in IGNORED_DIRS:
                 continue
+            # os.walk(followlinks=False) never descends a symlinked directory;
+            # _check_input backstops junctions (not treated as links by os.walk)
+            # and any parent-chain escape.
             for root, dirs, files in os.walk(child, followlinks=False):
                 for name in sorted(dirs) + sorted(files):
-                    _check(Path(root) / name)
+                    self._check_input(Path(root) / name)
+
+    def _assert_all_inputs_contained(self) -> None:
+        """Fail closed BEFORE any read/hash/parse/enumerate — skill corpus AND
+        every auxiliary input surface (Gate 2.7 fix for the catalog / agents /
+        paths bypass)."""
+        self._assert_skill_corpus_contained()
+        catalog = self.repo / "docs" / "skills-catalog.md"
+        if catalog.exists() or catalog.is_symlink():
+            self._check_input(catalog)
+        for d in (self.repo / ".claude" / "agents", self.repo / "docs" / "paths"):
+            if d.exists() or d.is_symlink():
+                self._check_input(d)
+                for child in sorted(d.iterdir()):
+                    self._check_input(child)
 
     def discover(self) -> None:
-        self._assert_contained()  # fail-closed BEFORE the first read
+        self._assert_all_inputs_contained()  # fail-closed BEFORE the first read
         for child in sorted(self.skills_dir.iterdir()):
             if child.is_dir() and child.name not in IGNORED_DIRS:
                 self.skills.append(Skill(child, self.repo))
@@ -1311,10 +1345,11 @@ class Audit:
         self.findings.sort(key=lambda f: (f.file, f.line, f.rule, f.evidence))
 
     def agent_names(self) -> set[str]:
-        agents_dir = self.repo / ".claude" / "agents"
-        if not agents_dir.is_dir():
-            return set()
-        return {p.stem for p in agents_dir.glob("*.md")}
+        # Contained enumeration: a symlinked/junctioned agents dir or agent file
+        # is refused — an out-of-repo name never enters known_names (which would
+        # otherwise silently absorb foreign names and weaken ROUTE/EVAL-004).
+        return {p.stem for p in self._contained_glob(
+            self.repo / ".claude" / "agents", "*.md")}
 
     # -- provenance (captured ONCE; reused by every output) ------------------
 
@@ -1386,12 +1421,50 @@ class Audit:
                 "sha256 over, for each audited file sorted by repo-relative POSIX "
                 "path: path-bytes + NUL + the file's raw on-disk bytes + NUL. "
                 "Reproducible only from an equivalent checkout — line endings are "
-                "part of the hashed bytes. Covers the audited skill corpus only, "
-                "not agents/guided-paths (enumerated, not audited); the engine "
-                "that produced the scan is identified separately by engine_sha256."
+                "part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY "
+                "(each skill's SKILL.md + references + eval JSONs). It does NOT "
+                "cover the AUXILIARY inputs that also affect output — "
+                "docs/skills-catalog.md (content → manifest `family`), the "
+                "`.claude/agents/` filenames (→ known_names + manifest), and the "
+                "`docs/paths/` filenames (→ manifest); those are summarized "
+                "separately under `auxiliary_inputs`. The engine that produced "
+                "the scan is identified separately by engine_sha256."
             ),
+            # §8 provenance honesty: a SEPARATELY-NAMED evidence field for the
+            # auxiliary inputs whose content/filenames affect output but are NOT
+            # in the corpus hash. This does NOT redefine corpus_content_hash and
+            # introduces no policy architecture — it closes the reproducibility
+            # gap for the manifest's catalog/agents/paths-derived fields.
+            "auxiliary_inputs": self._auxiliary_inputs(),
         }
         return self._provenance
+
+    def _auxiliary_inputs(self) -> dict:
+        """Content hash of docs/skills-catalog.md (auxiliary CONTENT) + the
+        enumerated agent/guided-path FILENAMES (name-only). All contained;
+        absent surfaces reported as such. Never external content/names."""
+        catalog = self.repo / "docs" / "skills-catalog.md"
+        cat_hash = "absent"
+        if catalog.exists() or catalog.is_symlink():
+            self._check_input(catalog)
+            if catalog.is_file():
+                cat_hash = hashlib.sha256(catalog.read_bytes()).hexdigest()
+        return {
+            "skills_catalog": {
+                "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
+                "sha256": cat_hash,
+            },
+            "agent_names_enumerated": {
+                "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
+                "names": sorted(p.stem for p in self._contained_glob(
+                    self.repo / ".claude" / "agents", "*.md")),
+            },
+            "guided_path_names_enumerated": {
+                "kind": "enumerated name only (feeds manifest); not in corpus hash",
+                "names": sorted(p.name for p in self._contained_glob(
+                    self.repo / "docs" / "paths", "*.md")),
+            },
+        }
 
     def provenance(self) -> dict:
         return dict(self.capture_provenance())
@@ -1463,9 +1536,15 @@ class Audit:
             f"- **Mechanically scanned:** all {s['skill_count']} shipped skills' "
             "SKILL.md + references + eval JSONs (this report).",
             "- **Enumerated only (NOT content-audited):** reviewer agents "
-            "(`.claude/agents/`) and guided-path docs (`docs/paths/`) — listed in "
-            "the manifest for name resolution; their content is the validator's "
-            "surface.",
+            "(`.claude/agents/`) and guided-path docs (`docs/paths/`) — their "
+            "FILENAMES feed name resolution and the manifest; their content is "
+            "the validator's surface.",
+            "- **Auxiliary input (content read, NOT in the corpus hash):** "
+            "`docs/skills-catalog.md` supplies the manifest `family` field. It, "
+            "and the agent/guided-path filenames, are recorded separately under "
+            "provenance `auxiliary_inputs`; the corpus content hash covers the "
+            "skill corpus only. All input surfaces are containment-checked "
+            "fail-closed before any read (no symlink/junction/repo-escape).",
             "- **Semantically reviewed:** none by this tool — semantic candidates "
             "are queued for the named reviewer skills, not executed here.",
             "- **Behavioral evals:** UNRUN. No eval case is executed or reported "
@@ -1534,21 +1613,28 @@ class Audit:
                 for s in self.skills
             ],
             # Coverage disclosure (fix v1#4): agents and guided paths are
-            # ENUMERATED for name resolution only; their CONTENT is not audited
-            # by this tool (that is the validator's surface, decision D55).
+            # ENUMERATED for name resolution only (contained enumeration —
+            # Gate 2.7); their CONTENT is not audited (validator's surface, D55).
             "agents_enumerated_not_audited": sorted(
                 p.relative_to(self.repo).as_posix()
-                for p in (self.repo / ".claude" / "agents").glob("*.md")
-            ) if (self.repo / ".claude" / "agents").is_dir() else [],
+                for p in self._contained_glob(self.repo / ".claude" / "agents", "*.md")
+            ),
             "guided_paths_enumerated_not_audited": sorted(
                 p.relative_to(self.repo).as_posix()
-                for p in (self.repo / "docs" / "paths").glob("*.md")
-            ) if (self.repo / "docs" / "paths").is_dir() else [],
+                for p in self._contained_glob(self.repo / "docs" / "paths", "*.md")
+            ),
         }
 
     def catalog_families(self) -> dict[str, str]:
-        """Skill → catalog section heading, parsed from docs/skills-catalog.md."""
+        """Skill → catalog section heading, parsed from docs/skills-catalog.md.
+        AUXILIARY input: its CONTENT feeds the manifest `family` field but is NOT
+        part of the corpus content hash. Contained fail-closed before reading
+        (Gate 2.7): a symlinked/junctioned/escaping catalog is refused, never
+        read."""
         catalog = self.repo / "docs" / "skills-catalog.md"
+        if not (catalog.exists() or catalog.is_symlink()):
+            return {}
+        self._check_input(catalog)
         if not catalog.is_file():
             return {}
         out: dict[str, str] = {}

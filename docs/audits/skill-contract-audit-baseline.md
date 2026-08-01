@@ -1,7 +1,7 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.2.0 (engine sha256 `4bb3e8d0110f390b…`)
-- Repo SHA: `8b8e8ec6d9549055e401590f2b72ace053ea5259` (branch `audit/aegis-corpus-contract-baseline`; working tree dirty: true; dirty scanned surfaces: none)
+- Tool: `audit-skill-contracts` v1.3.0 (engine sha256 `5f37f154e5141247…`)
+- Repo SHA: `16fe1229e7026fe577d7a104610bd9c58af79143` (branch `audit/aegis-corpus-contract-baseline`; working tree dirty: true; dirty scanned surfaces: none)
 - Corpus content hash: `3239d84e2b2eae1f08fd3bd88a09413fcd7ffcf57255cddd6f4e729aabdd9cf7` (703 files, 3905871 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **416** (317 mechanical, 99 semantic-review candidates)
@@ -15,7 +15,8 @@ mechanically proven defects.
 ## Coverage (what was and was not reviewed)
 
 - **Mechanically scanned:** all 184 shipped skills' SKILL.md + references + eval JSONs (this report).
-- **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — listed in the manifest for name resolution; their content is the validator's surface.
+- **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is the validator's surface.
+- **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read (no symlink/junction/repo-escape).
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
 - **Behavioral evals:** UNRUN. No eval case is executed or reported as passing by this tool.
 - **Rules whose own limits admit use-vs-mention or contextual ambiguity** (STATE-001, VOCAB-002/003, EVAL-003, SIDE-004, APPR-002, STATE-004/005, ARTF-001, REF-002) are classified semantic-candidate: their findings are review-queue entries a reviewer confirms, never mechanically proven defects.

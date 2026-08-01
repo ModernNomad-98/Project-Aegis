@@ -35,6 +35,7 @@ FIXTURES
 """
 from __future__ import annotations
 
+import atexit
 import contextlib
 import hashlib
 import importlib.util
@@ -42,14 +43,35 @@ import io
 import os
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 TESTS_DIR = Path(__file__).resolve().parent
-FIXTURE_REPO = TESTS_DIR / "fixtures" / "contract-audit" / "repo"
 REAL_REPO = TESTS_DIR.parent.parent
 AUDIT_PATH = TESTS_DIR.parent / "audit-skill-contracts.py"
+
+# Gate 2.7 item 2: the TRACKED fixture source uses a NEUTRAL `dot-claude/`
+# layout, so the Claude Code harness never discovers fixture skills (auto-
+# deployer, clean-skill, …) as live invocable session skills. Tests run against
+# a THROWAWAY copy OUTSIDE the repo in which `dot-claude` is materialized to
+# `.claude`. Nothing tracked ever contains a nested literal `.claude/skills`.
+_FIXTURE_SRC = TESTS_DIR / "fixtures" / "contract-audit" / "repo"  # contains dot-claude/
+
+
+def _materialize_fixture_repo() -> Path:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-fixture-"))
+    dst = tmp / "repo"
+    shutil.copytree(_FIXTURE_SRC, dst)
+    neutral = dst / "dot-claude"
+    assert neutral.is_dir(), f"neutral fixture source must exist: {neutral}"
+    neutral.rename(dst / ".claude")
+    atexit.register(lambda: shutil.rmtree(tmp, ignore_errors=True))
+    return dst
+
+
+FIXTURE_REPO = _materialize_fixture_repo()
 
 
 def _load_by_path(path: Path, module_name: str):
@@ -476,6 +498,29 @@ def test_provenance_content_sensitivity_and_inclusion() -> None:
     ok("corpus hash is content-sensitive and excludes agents/guided-paths (inclusion boundary)")
 
 
+def test_auxiliary_inputs_provenance() -> None:
+    """§8 provenance honesty: auxiliary inputs (catalog content + agent/path
+    filenames) that affect output are recorded in a SEPARATELY-NAMED field, not
+    folded into the corpus hash; the byte-form note says so explicitly."""
+    ra = real_audit()
+    p = ra.provenance()
+    aux = p["auxiliary_inputs"]
+    assert set(aux) == {"skills_catalog", "agent_names_enumerated",
+                        "guided_path_names_enumerated"}, aux
+    cat = aux["skills_catalog"]["sha256"]
+    assert cat == "absent" or re.fullmatch(r"[0-9a-f]{64}", cat), cat
+    assert isinstance(aux["agent_names_enumerated"]["names"], list)
+    assert isinstance(aux["guided_path_names_enumerated"]["names"], list)
+    # the corpus hash must NOT be silently described as covering auxiliary inputs
+    bf = p["corpus_hash_byte_form"].lower()
+    assert "auxiliary" in bf and "does not cover" in bf, bf
+    # and the auxiliary inputs are NOT in the audited (hashed) file set
+    audited = {f.as_posix() for f in ra.audited_files()}
+    assert not any("skills-catalog.md" in x for x in audited)
+    ok("auxiliary inputs (catalog/agents/paths) recorded separately; corpus hash "
+       "honestly scoped to the skill corpus")
+
+
 def test_corpus_hash_follows_declared_posix_order() -> None:
     """Gate 2.5 blocker 3: the hash's file order must be the DECLARED key —
     repo-relative POSIX path strings — not platform-native Path ordering.
@@ -638,6 +683,192 @@ def test_escaping_markdown_link_is_flagged_not_passed() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+# --- auxiliary-input containment: catalog / agents / paths (Gate 2.7) -------
+
+
+def _run_capture(repo: Path, *extra: str) -> tuple[int, str]:
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = audit_mod.main(["--repo", str(repo), "--quiet", *extra])
+    return rc, buf.getvalue()
+
+
+def _skip_if_no_symlink(exc: OSError) -> bool:
+    if getattr(exc, "winerror", None) == 1314:
+        print(f"  SKIP  symlink privilege unavailable on this host ({exc})")
+        return True
+    return False
+
+
+def test_catalog_symlink_fails_closed() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-cat-"))
+    try:
+        marker = "AEGIS-G27-CATALOG-MARKER external-catalog-secret-heading"
+        (tmp / "external.md").write_text(f"# {marker}\n| `x` |\n", encoding="utf-8")
+        repo = _copy_fixture(tmp)
+        (repo / "docs").mkdir(parents=True, exist_ok=True)
+        cat = repo / "docs" / "skills-catalog.md"
+        try:
+            os.symlink(tmp / "external.md", cat)
+        except OSError as exc:
+            if _skip_if_no_symlink(exc):
+                return
+            raise
+        outs = {n: tmp / n for n in ("o.json", "m.json", "o.md", "g.json")}
+        rc, stdout = _run_capture(
+            repo, "--json", str(outs["o.json"]), "--manifest", str(outs["m.json"]),
+            "--markdown", str(outs["o.md"]), "--graph", str(outs["g.json"]))
+        assert rc == 2, f"a symlinked docs/skills-catalog.md must exit 2, got {rc}"
+        for p in outs.values():
+            assert not p.exists(), f"no output may be written on containment refusal: {p}"
+        assert marker not in stdout, "external catalog heading must not appear in output"
+        ok("symlinked docs/skills-catalog.md fails closed (exit 2); no output, marker nowhere")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_agents_dir_symlink_leaks_no_filenames() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-ag-"))
+    try:
+        ext = tmp / "external-agents"
+        ext.mkdir()
+        secret_name = "SECRET-AGENT-DIR-LISTING-G27.md"
+        (ext / secret_name).write_text("x", encoding="utf-8")
+        repo = _copy_fixture(tmp)
+        agents = repo / ".claude" / "agents"
+        shutil.rmtree(agents)
+        try:
+            os.symlink(ext, agents, target_is_directory=True)
+        except OSError as exc:
+            if _skip_if_no_symlink(exc):
+                return
+            raise
+        rc, stdout = _run_capture(repo, "--manifest", str(tmp / "m.json"))
+        assert rc == 2, f"a symlinked .claude/agents/ must exit 2, got {rc}"
+        assert not (tmp / "m.json").exists()
+        assert secret_name not in stdout, "external agent filename must not leak"
+        ok("symlinked .claude/agents/ fails closed; external filename never enumerated")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_paths_dir_symlink_leaks_no_filenames() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-gp-"))
+    try:
+        ext = tmp / "external-paths"
+        ext.mkdir()
+        secret_name = "SECRET-GUIDED-PATH-LISTING-G27.md"
+        (ext / secret_name).write_text("x", encoding="utf-8")
+        repo = _copy_fixture(tmp)
+        (repo / "docs").mkdir(parents=True, exist_ok=True)
+        try:
+            os.symlink(ext, repo / "docs" / "paths", target_is_directory=True)
+        except OSError as exc:
+            if _skip_if_no_symlink(exc):
+                return
+            raise
+        rc, stdout = _run_capture(repo, "--manifest", str(tmp / "m.json"))
+        assert rc == 2, f"a symlinked docs/paths/ must exit 2, got {rc}"
+        assert not (tmp / "m.json").exists()
+        assert secret_name not in stdout, "external guided-path filename must not leak"
+        ok("symlinked docs/paths/ fails closed; external filename never enumerated")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_skills_root_symlink_rejected() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-sr-"))
+    try:
+        ext_skills = tmp / "external-skills"
+        (ext_skills / "outside").mkdir(parents=True)
+        (ext_skills / "outside" / "SKILL.md").write_text(
+            "---\nname: outside\ndescription: 'x'\n---\n\n# Outside\n", encoding="utf-8")
+        repo = tmp / "repo2"
+        (repo / ".claude").mkdir(parents=True)
+        try:
+            os.symlink(ext_skills, repo / ".claude" / "skills", target_is_directory=True)
+        except OSError as exc:
+            if _skip_if_no_symlink(exc):
+                return
+            raise
+        rc, stdout = _run_capture(repo)
+        assert rc == 2, f"a symlinked .claude/skills/ root must exit 2, got {rc}"
+        ok("symlinked .claude/skills/ root is rejected (exit 2)")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_junction_escape_rejected() -> None:
+    """Windows junctions are reparse points os.walk does not treat as links;
+    _check_input's is_junction/resolve backstop must still reject them."""
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-jn-"))
+    try:
+        ext = tmp / "external-ref-dir"
+        ext.mkdir()
+        (ext / "OUTSIDE-JUNCTION-TARGET.md").write_text("x", encoding="utf-8")
+        repo = _copy_fixture(tmp)
+        junction = repo / ".claude" / "skills" / "clean-skill" / "references"
+        r = subprocess.run(["cmd", "/c", "mklink", "/J", str(junction), str(ext)],
+                           capture_output=True, text=True)
+        if r.returncode != 0 or not junction.exists():
+            print(f"  SKIP  junction creation unsupported on this host (rc={r.returncode}: "
+                  f"{r.stderr.strip() or r.stdout.strip()})")
+            return
+        rc, stdout = _run_capture(repo, "--json", str(tmp / "o.json"))
+        assert rc == 2, f"a junctioned references dir must exit 2, got {rc}"
+        assert not (tmp / "o.json").exists()
+        assert "OUTSIDE-JUNCTION-TARGET" not in stdout
+        ok("a Windows junction into the audited corpus is rejected (exit 2)")
+        # remove the junction link (not its target) before cleanup
+        try:
+            os.rmdir(junction)
+        except OSError:
+            pass
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_agent_file_symlink_rejected() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-af-"))
+    try:
+        marker = "AEGIS-G27-AGENT-FILE-CONTENT"
+        (tmp / "external-agent.md").write_text(marker + "\n", encoding="utf-8")
+        repo = _copy_fixture(tmp)
+        link = repo / ".claude" / "agents" / "linked-agent.md"
+        try:
+            os.symlink(tmp / "external-agent.md", link)
+        except OSError as exc:
+            if _skip_if_no_symlink(exc):
+                return
+            raise
+        rc, stdout = _run_capture(repo)
+        assert rc == 2, f"a symlinked agent file must exit 2, got {rc}"
+        assert marker not in stdout
+        ok("a symlinked agent file is rejected before its stem/content is used")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+# --- fixture layout: neutral source, no live-session discovery (Gate 2.7) ----
+
+
+def test_fixture_source_is_neutral_layout() -> None:
+    # the TRACKED source must use dot-claude and contain NO literal .claude that
+    # the harness would discover as live skills.
+    assert (_FIXTURE_SRC / "dot-claude" / "skills").is_dir(), (
+        "tracked fixture source must use the neutral dot-claude/skills layout"
+    )
+    assert not (_FIXTURE_SRC / ".claude").exists(), (
+        "tracked fixture source must NOT contain a literal .claude/ directory"
+    )
+    # the audited copy is a throwaway OUTSIDE the repo with a materialized .claude
+    assert (FIXTURE_REPO / ".claude" / "skills").is_dir()
+    assert str(REAL_REPO.resolve()) not in str(FIXTURE_REPO.resolve()), (
+        "materialized fixture must live outside the Project Aegis repository"
+    )
+    ok("fixture source uses neutral dot-claude; .claude is materialized only in a temp repo")
+
+
 # --- the scanner cannot green-pass a wrong path -----------------------------
 
 
@@ -729,6 +960,14 @@ def main() -> int:
     test_input_symlink_skill_dir_fails_closed()
     test_input_containment_accepts_regular_files()
     test_escaping_markdown_link_is_flagged_not_passed()
+    test_catalog_symlink_fails_closed()
+    test_agents_dir_symlink_leaks_no_filenames()
+    test_paths_dir_symlink_leaks_no_filenames()
+    test_agent_file_symlink_rejected()
+    test_skills_root_symlink_rejected()
+    test_junction_escape_rejected()
+    test_fixture_source_is_neutral_layout()
+    test_auxiliary_inputs_provenance()
     test_wrong_path_fails()
     test_refuses_to_write_into_skills()
     test_write_refusal_resolves_symlink_escape()
