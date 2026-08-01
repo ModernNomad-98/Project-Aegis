@@ -1,22 +1,22 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.1.0",
-    "engine_sha256": "69005962ebd350772c7beb2734b7f01c3f85d0759b71e071b0f4d474bb7f0033",
-    "repo_sha": "8c896dc4a56106040d864b7b4d965d4f20e5c7a3",
+    "version": "1.2.0",
+    "engine_sha256": "4bb3e8d0110f390b3f9c6b4eecd78cd824f141b9845a11d20c24ad242597d2c0",
+    "repo_sha": "8b8e8ec6d9549055e401590f2b72ace053ea5259",
     "branch": "audit/aegis-corpus-contract-baseline",
     "working_tree_dirty": true,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 703,
     "audited_byte_count": 3905871,
-    "corpus_content_hash": "754184b16ec473970951f9af9590566c7ef7ef95611d4c6a7b0bc4761fb9d754",
+    "corpus_content_hash": "3239d84e2b2eae1f08fd3bd88a09413fcd7ffcf57255cddd6f4e729aabdd9cf7",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the audited skill corpus only, not agents/guided-paths (enumerated, not audited); the engine that produced the scan is identified separately by engine_sha256.",
     "skill_count": 184,
     "rule_count": 27,
-    "finding_count": 334,
+    "finding_count": 416,
     "by_severity": {
       "P0": 1,
-      "P1": 17,
+      "P1": 99,
       "P2": 5,
       "info": 311
     },
@@ -26,11 +26,12 @@
       "EVAL-004": 5,
       "ROUTE-002": 311,
       "ROUTE-003": 1,
+      "SIDE-004": 82,
       "STATE-005": 2,
       "VOCAB-002": 4
     },
-    "mechanical_count": 321,
-    "semantic_review_candidates": 13
+    "mechanical_count": 317,
+    "semantic_review_candidates": 99
   },
   "rule_inventory": [
     {
@@ -89,7 +90,7 @@
     },
     {
       "id": "SIDE-004",
-      "purpose": "auto-invocable skill's Workflow instructs a hard side effect without \u00a75 cover",
+      "purpose": "auto-invocable skill's Workflow instructs a \u00a75 mutation class without cover",
       "authority": "skill-generation-standard.md \u00a75 (write/network/deploy/spend needs disable-model-invocation:true; approved-write exception covers only previewed doc/state appends)",
       "severity": "P1",
       "classification": "semantic-candidate",
@@ -102,8 +103,8 @@
         "AEGIS-020",
         "AEGIS-057"
       ],
-      "limits": "fenced illustrative snippets are INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; an approval phrase elsewhere does NOT suppress it",
-      "hit_count": 0
+      "limits": "covers the \u00a75 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write \u2014 approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)",
+      "hit_count": 82
     },
     {
       "id": "APPR-001",
@@ -167,7 +168,7 @@
       "purpose": "append-only-declared file carries mutable placeholders",
       "authority": "project-state-template.md (rules 1-2: append-only; supersede, never rewrite)",
       "severity": "P0",
-      "classification": "mechanical",
+      "classification": "semantic-candidate",
       "surfaces": [
         "skill-body",
         "references"
@@ -330,7 +331,7 @@
       "purpose": "committed used as a roadmap horizon label",
       "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS \u00a7F",
       "severity": "P1",
-      "classification": "mechanical",
+      "classification": "semantic-candidate",
       "surfaces": [
         "frontmatter.description",
         "skill-body",
@@ -350,7 +351,7 @@
       "purpose": "approved scope described as a commitment",
       "authority": "roadmap-to-commitments-translator (commit-able vs aspirational); AEGIS \u00a7F",
       "severity": "P0",
-      "classification": "mechanical",
+      "classification": "semantic-candidate",
       "surfaces": [
         "frontmatter.description",
         "skill-body",
@@ -442,7 +443,7 @@
       "purpose": "approval/state-related skill with no refusal or boundary case",
       "authority": "skill-generation-standard.md \u00a76; skill-quality-reviewer (real boundaries vs hollow filler)",
       "severity": "P1",
-      "classification": "mechanical",
+      "classification": "semantic-candidate",
       "surfaces": [
         "evals.json"
       ],
@@ -674,6 +675,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/adr-sequencer/SKILL.md",
+      "line": 0,
+      "owning_skill": "adr-sequencer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record) is written by `adr' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "adr-sequencer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/adr-writer/SKILL.md",
@@ -688,6 +706,40 @@
       "remediation_owner": "adr-writer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/adr-writer/SKILL.md",
+      "line": 0,
+      "owning_skill": "adr-writer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "adr-writer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/adr-writer/SKILL.md",
+      "line": 0,
+      "owning_skill": "adr-writer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'create `docs/adr/` with `NNNN-title.md`' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "adr-writer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -933,6 +985,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/agent-governance-audit/SKILL.md",
+      "line": 0,
+      "owning_skill": "agent-governance-audit",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "agent-governance-audit",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/agent-harness-architect/SKILL.md",
@@ -947,6 +1016,40 @@
       "remediation_owner": "agent-harness-architect",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/agent-harness-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "agent-harness-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record schema itself is `audit-log' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "agent-harness-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/agent-harness-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "agent-harness-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'write, design the test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "agent-harness-architect",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -1142,6 +1245,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-cost-guardrail-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'spend budgets' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "ai-cost-guardrail-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/ai-evaluation-harness/SKILL.md",
@@ -1335,6 +1455,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-lifecycle-risk-manager",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "ai-lifecycle-risk-manager",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/ai-misinformation-guard/SKILL.md",
@@ -1429,6 +1566,23 @@
       "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-sdlc-operating-model",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "ai-sdlc-operating-model",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -1704,6 +1858,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/architecture-advisor/SKILL.md",
+      "line": 0,
+      "owning_skill": "architecture-advisor",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "architecture-advisor",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/architecture-designer/SKILL.md",
@@ -1718,6 +1889,57 @@
       "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/architecture-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "architecture-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the migration' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "architecture-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/audit-log-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "audit-log-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'update/delete attempts on audit records' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "audit-log-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/audit-log-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "audit-log-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the negative-test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "audit-log-architect",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ARTF-001",
@@ -1785,6 +2007,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/azure-saas-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "azure-saas-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "azure-saas-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/background-job-orchestration-architect/SKILL.md",
@@ -1833,6 +2072,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/background-job-orchestration-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "background-job-orchestration-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "background-job-orchestration-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/caching-strategy-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "caching-strategy-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "caching-strategy-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/cell-based-architecture-designer/SKILL.md",
@@ -1879,6 +2152,40 @@
       "remediation_owner": "cell-based-architecture-designer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/cell-based-architecture-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "cell-based-architecture-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "cell-based-architecture-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/change-classification-gate/SKILL.md",
+      "line": 0,
+      "owning_skill": "change-classification-gate",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'apply per class' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "change-classification-gate",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -1943,6 +2250,23 @@
       "remediation_owner": "chat-backlog-reconciliation",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/chat-backlog-reconciliation/SKILL.md",
+      "line": 0,
+      "owning_skill": "chat-backlog-reconciliation",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'Write the dated reconciliation doc' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "chat-backlog-reconciliation",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -2023,6 +2347,57 @@
       "remediation_owner": "cloud-architecture-decider",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/cloud-architecture-decider/SKILL.md",
+      "line": 0,
+      "owning_skill": "cloud-architecture-decider",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "cloud-architecture-decider",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/cloud-architecture-decider/SKILL.md",
+      "line": 0,
+      "owning_skill": "cloud-architecture-decider",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record to `adr' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "cloud-architecture-decider",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/code-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "code-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "code-reviewer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -2441,6 +2816,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/docs-as-code-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "docs-as-code-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "docs-as-code-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/docs-first-implementer/SKILL.md",
+      "line": 0,
+      "owning_skill": "docs-first-implementer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'implemented defensively' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "docs-first-implementer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/docs-retention-index/SKILL.md",
@@ -2471,6 +2880,23 @@
       "remediation_owner": "docs-retention-index",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/domain-modeler/SKILL.md",
+      "line": 0,
+      "owning_skill": "domain-modeler",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'buy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "domain-modeler",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -2729,6 +3155,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/flaky-test-detective/SKILL.md",
+      "line": 0,
+      "owning_skill": "flaky-test-detective",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Fix that one cause at the test layer** when it is a test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "flaky-test-detective",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/framework-edition-tracker/SKILL.md",
@@ -2791,6 +3234,23 @@
       "remediation_owner": "frontend-perf-engineer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "line": 0,
+      "owning_skill": "full-codebase-auditor",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "full-codebase-auditor",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -2889,6 +3349,57 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "line": 0,
+      "owning_skill": "gated-deployment-prompt-template",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "gated-deployment-prompt-template",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "line": 0,
+      "owning_skill": "gated-deployment-prompt-template",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'writes its report' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "gated-deployment-prompt-template",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "line": 0,
+      "owning_skill": "gated-deployment-prompt-template",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the hard rules** \u2014 non-negotiables for every run of this class' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "gated-deployment-prompt-template",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
@@ -2935,6 +3446,23 @@
       "remediation_owner": "horizontal-scalability-reviewer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "horizontal-scalability-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "horizontal-scalability-reviewer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3064,6 +3592,23 @@
       "remediation_owner": "incident-response-runbook",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/incident-response-runbook/SKILL.md",
+      "line": 0,
+      "owning_skill": "incident-response-runbook",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploys' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "incident-response-runbook",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3322,6 +3867,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/latency-budget-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "latency-budget-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'spend budget' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "latency-budget-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/library-diff-reviewer/SKILL.md",
@@ -3370,6 +3932,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "llm-output-safety-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'writes and runs code' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "llm-output-safety-reviewer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/load-test-planner/SKILL.md",
@@ -3416,6 +3995,23 @@
       "remediation_owner": "local-ci-mirror-preflight",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
+      "line": 0,
+      "owning_skill": "local-ci-mirror-preflight",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [vcs-mutation]: 'git worktree' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "local-ci-mirror-preflight",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3498,6 +4094,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "memory-context-poisoning-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'write \u2014 untrusted-derived entries' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "memory-context-poisoning-reviewer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/merge-is-deploy-governance/SKILL.md",
@@ -3560,6 +4173,40 @@
       "remediation_owner": "merge-is-deploy-governance",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+      "line": 0,
+      "owning_skill": "merge-is-deploy-governance",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "merge-is-deploy-governance",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+      "line": 0,
+      "owning_skill": "merge-is-deploy-governance",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'fix-forward \u2014 not a \"gate failure' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "merge-is-deploy-governance",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3626,6 +4273,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/multi-tenant-data-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "multi-tenant-data-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the migration' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/multi-tenant-security-tester/SKILL.md",
@@ -3672,6 +4336,57 @@
       "remediation_owner": "multi-tenant-security-tester",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+      "line": 0,
+      "owning_skill": "multi-tenant-security-tester",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'Seed tenant A and tenant' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "multi-tenant-security-tester",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+      "line": 0,
+      "owning_skill": "multi-tenant-security-tester",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'implement the suite' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "multi-tenant-security-tester",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/n-plus-one-detector/SKILL.md",
+      "line": 0,
+      "owning_skill": "n-plus-one-detector",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [install]: 'Install the regression guard' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "n-plus-one-detector",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3771,6 +4486,23 @@
       "mechanical": false
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/onboarding-doc-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "onboarding-doc-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "onboarding-doc-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
@@ -3866,6 +4598,23 @@
       "remediation_owner": "phased-work-handoff-designer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/phased-work-handoff-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "phased-work-handoff-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'stage doesn\\'t say \"tests' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "phased-work-handoff-designer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -3994,6 +4743,23 @@
       "remediation_owner": "product-analytics-instrumenter",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/product-analytics-instrumenter/SKILL.md",
+      "line": 0,
+      "owning_skill": "product-analytics-instrumenter",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'purchases' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "product-analytics-instrumenter",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4127,6 +4893,40 @@
       "remediation_owner": "project-orchestrator",
       "confidence": "high",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/project-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "project-orchestrator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deployment' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "project-orchestrator",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/project-orchestrator/SKILL.md",
+      "line": 0,
+      "owning_skill": "project-orchestrator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'create leg \u2014 the COMPLETE initial document' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "project-orchestrator",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ARTF-001",
@@ -4278,6 +5078,74 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/qa-automation-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-automation-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the migration' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "qa-automation-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/qa-strategy-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "qa-strategy-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'seeded database' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "qa-strategy-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/query-plan-reader/SKILL.md",
+      "line": 0,
+      "owning_skill": "query-plan-reader",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'execution EXECUTES the write' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "query-plan-reader",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/query-plan-reader/SKILL.md",
+      "line": 0,
+      "owning_skill": "query-plan-reader",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'apply (via the change' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "query-plan-reader",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/rag-security-architect/SKILL.md",
@@ -4342,6 +5210,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/realtime-subscription-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "realtime-subscription-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "realtime-subscription-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/regression-suite-curator/SKILL.md",
@@ -4374,6 +5259,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/regression-suite-curator/SKILL.md",
+      "line": 0,
+      "owning_skill": "regression-suite-curator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'fixed bug' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "regression-suite-curator",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/release-readiness-reviewer/SKILL.md",
@@ -4404,6 +5306,23 @@
       "remediation_owner": "release-readiness-reviewer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/release-readiness-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "release-readiness-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploying' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "release-readiness-reviewer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "EVAL-004",
@@ -4455,6 +5374,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/reviewable-diff-discipline/SKILL.md",
+      "line": 0,
+      "owning_skill": "reviewable-diff-discipline",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record it for the closeout' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "reviewable-diff-discipline",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
@@ -4471,6 +5407,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+      "line": 0,
+      "owning_skill": "risk-tiered-validation-selector",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'Write the docs' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "risk-tiered-validation-selector",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+      "line": 0,
+      "owning_skill": "risk-tiered-validation-selector",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the forced-full list:** surfaces whose risk ignores diff' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "risk-tiered-validation-selector",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/rls-policy-auditor/SKILL.md",
@@ -4485,6 +5455,40 @@
       "remediation_owner": "rls-policy-auditor",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/rls-policy-auditor/SKILL.md",
+      "line": 0,
+      "owning_skill": "rls-policy-auditor",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'INSERT/WITH CHECK:** can a row' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "rls-policy-auditor",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/rls-policy-auditor/SKILL.md",
+      "line": 0,
+      "owning_skill": "rls-policy-auditor",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the negative-test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "rls-policy-auditor",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4567,7 +5571,7 @@
       ],
       "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
-      "mechanical": true
+      "mechanical": false
     },
     {
       "rule": "VOCAB-002",
@@ -4586,7 +5590,7 @@
       ],
       "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
-      "mechanical": true
+      "mechanical": false
     },
     {
       "rule": "VOCAB-002",
@@ -4605,7 +5609,7 @@
       ],
       "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
-      "mechanical": true
+      "mechanical": false
     },
     {
       "rule": "VOCAB-002",
@@ -4624,7 +5628,7 @@
       ],
       "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
-      "mechanical": true
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4641,6 +5645,23 @@
       "remediation_owner": "rollback-runbook-author",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/rollback-runbook-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "rollback-runbook-author",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "rollback-runbook-author",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4673,6 +5694,40 @@
       "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/saas-platform-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "saas-platform-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "saas-platform-architect",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/saas-platform-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "saas-platform-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'buy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "saas-platform-architect",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4739,6 +5794,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/schema-evolution-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "schema-evolution-planner",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "schema-evolution-planner",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/schema-evolution-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "schema-evolution-planner",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'write from application code' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "schema-evolution-planner",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/scoped-approval-register/SKILL.md",
@@ -4787,6 +5876,23 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/scoped-approval-register/SKILL.md",
+      "line": 0,
+      "owning_skill": "scoped-approval-register",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'create the register' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "scoped-approval-register",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/scoped-approval-register/SKILL.md",
@@ -4818,6 +5924,23 @@
       "remediation_owner": "screenshot-evidence-planner",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/screenshot-evidence-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "screenshot-evidence-planner",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'seeded data' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "screenshot-evidence-planner",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4868,6 +5991,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/search-architecture-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "search-architecture-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'write latency) vs asynchronous (index via change' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "search-architecture-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/search-architecture-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "search-architecture-designer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'buys' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "search-architecture-designer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/secrets-identity-hardener/SKILL.md",
@@ -4914,6 +6071,23 @@
       "remediation_owner": "secure-migration-reviewer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/secure-migration-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "secure-migration-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'Deploy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "secure-migration-reviewer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -4978,6 +6152,23 @@
       "remediation_owner": "security-logging-alerting-architect",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/security-logging-alerting-architect/SKILL.md",
+      "line": 0,
+      "owning_skill": "security-logging-alerting-architect",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'implemented by `observability-operator` (manual-only); logging changes' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "security-logging-alerting-architect",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5140,6 +6331,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "skill-deprecation-planner",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [doc-state-write]: 'record (catalog retired section + decision-log entry' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "skill-deprecation-planner",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "line": 0,
+      "owning_skill": "skill-deprecation-planner",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'write the coverage diff' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "skill-deprecation-planner",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
@@ -5186,6 +6411,57 @@
       "remediation_owner": "skill-quality-reviewer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "skill-quality-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'deploys' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "skill-quality-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'edits files/config' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "skill-quality-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'spends money' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5282,6 +6558,23 @@
       "remediation_owner": "soc2-trust-criteria-mapper",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
+      "line": 0,
+      "owning_skill": "soc2-trust-criteria-mapper",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [spend]: 'buy' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "soc2-trust-criteria-mapper",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5427,6 +6720,23 @@
       "remediation_owner": "structured-output-validator",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/structured-output-validator/SKILL.md",
+      "line": 0,
+      "owning_skill": "structured-output-validator",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [data-store-write]: 'seeding a banned-content fixture' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "structured-output-validator",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5637,6 +6947,40 @@
       "mechanical": true
     },
     {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/systematic-debugger/SKILL.md",
+      "line": 0,
+      "owning_skill": "systematic-debugger",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Fix one thing' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "systematic-debugger",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/tdd-engineer/SKILL.md",
+      "line": 0,
+      "owning_skill": "tdd-engineer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the failing test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "tdd-engineer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/tech-spec-writer/SKILL.md",
@@ -5683,6 +7027,40 @@
       "remediation_owner": "tech-spec-writer",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "tenant-isolation-reviewer",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the negative-test plan**: concrete tests' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "tenant-isolation-reviewer",
+      "confidence": "low",
+      "mechanical": false
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/tenant-modeler/SKILL.md",
+      "line": 0,
+      "owning_skill": "tenant-modeler",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [deploy-provision]: 'provisioning' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "tenant-modeler",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",
@@ -5779,6 +7157,23 @@
       "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
+    },
+    {
+      "rule": "SIDE-004",
+      "severity": "P1",
+      "file": ".claude/skills/threat-modeler/SKILL.md",
+      "line": 0,
+      "owning_skill": "threat-modeler",
+      "related_skills": [],
+      "evidence": "auto-invocable skill's Workflow instructs a \u00a75 mutation [source-write]: 'Write the validation test' \u2014 semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+      "family": "side-effect",
+      "aegis_map": [
+        "AEGIS-020",
+        "AEGIS-057"
+      ],
+      "remediation_owner": "threat-modeler",
+      "confidence": "low",
+      "mechanical": false
     },
     {
       "rule": "ROUTE-002",

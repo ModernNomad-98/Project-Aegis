@@ -9,7 +9,11 @@ structural contract rot the mechanical validator does not own. Reviewer agents
 resolution and the manifest only — their CONTENT is not audited here (that is
 the validator's surface). It NEVER mutates the repository: the only writes it
 performs are to output paths the caller explicitly passes, and it refuses to
-write anywhere inside `.claude/skills/`.
+write anywhere inside `.claude/skills/`. Audited INPUTS are containment-checked
+fail-closed BEFORE any read: a symlinked skill directory, SKILL.md, reference,
+or eval file — or any audited path resolving outside the repository root —
+aborts the run with exit 2 so an untrusted checkout cannot make this tool read
+or disclose files outside the repository.
 
 WHAT THIS IS NOT
     * Not a replacement for scripts/validate-skills.py — nothing the validator
@@ -70,6 +74,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -81,7 +86,12 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.1.0"
+TOOL_VERSION = "1.2.0"
+
+
+class InputContainmentError(Exception):
+    """An audited input is a symlink or resolves outside the repository root.
+    Raised BEFORE the offending content is read; main() maps it to exit 2."""
 
 IGNORED_DIRS = {"_template"}
 
@@ -342,21 +352,71 @@ SCRATCH_WRITE = re.compile(
     r"[^.\n]{0,40}\b(?:write|create|save|stash)\b"
 )
 
-# Hard side effects that the standard-§5 approved-write exception NEVER covers
-# (its exception is limited to previewed, content-approved doc/state APPENDS):
-# repository push/commit, package installs, deploys, raw network POSTs, and
-# provisioning. SIDE-004 flags these when an AUTO-INVOCABLE skill INSTRUCTS one
-# in its Workflow. Because "instruction vs teaching material" is a reading, and
-# because an unrelated approval phrase elsewhere must not suppress a genuine
-# push/deploy instruction, this is a SEMANTIC-REVIEW CANDIDATE, never mechanical.
-HARD_SIDE_EFFECT = re.compile(
-    r"(?i)\bgit\s+(?:push|commit)\b"
-    r"|\b(?:npm|pip|yarn|pnpm)\s+install\b"
-    r"|\bdeploy(?:s|ing)?\s+(?:the\b|to\b|it\b)"
-    r"|\bcurl\s+-[A-Za-z]"
-    r"|\bhttp\s+post\b"
-    r"|\bprovision(?:s|ing)?\s+(?:the|a|an)\b"
+# SIDE-004: the standard-§5 mutation classes an AUTO-INVOCABLE skill may not
+# instruct without manual-only posture — with ONE exception: a previewed,
+# content-approved doc/state create/append (the approved-write exception).
+# Each class below is scanned over the Workflow of every non-manual skill; at
+# most ONE candidate per class per skill is emitted (a review-queue entry, not
+# a proven defect — instruction-vs-teaching is the reviewer's judgment). Only
+# the `doc-state-write` class consults the approved-write exception, and only
+# when the protocol markers sit WITHIN A FEW LINES of the write instruction —
+# an approval phrase elsewhere in the body never suppresses anything
+# (Gate 2.5 blocker 1; the rejected v2 body-wide suppression stays rejected).
+SIDE_EFFECT_CLASSES: list[tuple[str, re.Pattern, bool]] = [
+    ("vcs-mutation", re.compile(
+        r"(?i)\bgit\s+(?:push|commit|add|fetch|pull|merge|rebase|stash|worktree"
+        r"|cherry-pick|restore|reset|switch|checkout)\b"), False),
+    ("install", re.compile(
+        r"(?i)\b(?:npm|pip3?|yarn|pnpm|uv|cargo|gem|brew|winget|choco|apt(?:-get)?)"
+        r"\s+(?:install|add|ci)\b"
+        r"|\binstall(?:s|ing)?\b[^.\n]{0,50}\b(?:package|dependenc\w*|guard|tool|librar\w*|hook)s?\b"), False),
+    ("deploy-provision", re.compile(
+        r"(?i)\bdeploy(?:s|ing|ment)?\b|\bprovision(?:s|ing|ed)?\b"), False),
+    ("network", re.compile(
+        r"(?i)\bcurl\s+-[A-Za-z]|\bhttp\s+post\b"
+        r"|\bsend\s+(?:a\s+|the\s+)?(?:request|webhook|notification)s?\b"
+        r"|\bcall\s+(?:the\s+)?(?:api|endpoint)\b"), False),
+    ("source-write", re.compile(
+        r"(?i)\b(?:write|writing|implement|edit|modify|refactor|apply|stage|patch)(?:s|ed|ing)?\b"
+        r"[^.\n]{0,60}\b(?:test|spec|code|patch|diff|change|fix(?:es)?|implementation"
+        r"|module|function|class|migration|config\w*|suite|guard|defensively|stub|mock)s?\b"
+        r"|\bfix(?:es|ed|ing)?\b[^.\n]{0,50}\b(?:one thing|thing|bug|issue|failure|test"
+        r"|root cause|cause|flake)s?\b"
+        r"|\bstage\s+by\s+explicit\s+path\b"), False),
+    ("data-store-write", re.compile(
+        r"(?i)\bexecut(?:es?|ing|ion)\b[^.\n]{0,60}\b(?:write|mutation|statement)s?\b"
+        r"|\bseed(?:s|ing|ed)?\b[^.\n]{0,60}\b(?:tenant|data|fixture|database|store)\w*"
+        r"|\b(?:insert|update|delete|upsert|truncate)\b[^.\n]{0,40}\b(?:row|table|record|database)s?\b"), False),
+    ("spend", re.compile(
+        r"(?i)\bpurchase(?:s|d)?\b|\bspend(?:s|ing)?\b[^.\n]{0,40}\b(?:money|budget|credit|dollar)\w*"
+        r"|\bbuy(?:s|ing)?\b"), False),
+    ("doc-state-write", re.compile(
+        r"(?i)\b(?:write|writing|create|append|save|record|persist)(?:s|ed|ing)?\b"
+        r"[^.\n]{0,60}(?:\b(?:file|document|doc|report|register|entry|entries|log|note"
+        r"|adr|readme|handoff|closeout)s?\b|\bdocs?/|`[\w./ -]+\.md`?)"), True),
+]
+
+# The §5 approved-write protocol, recognized ONLY in the immediate vicinity of
+# a doc/state write instruction: exact target path + exact content/diff preview
+# + explicit (content-specific / single-use) approval. All three marker groups
+# must appear within the window for the exception to apply.
+APPROVED_WRITE_MARKERS = (
+    re.compile(r"(?i)\bexact\s+(?:target\s+)?path\b"),
+    re.compile(r"(?i)\bexact\s+content\b|\bcontent\s+(?:or\s+)?diff\b|\bexact\s+diff\b"),
+    re.compile(r"(?i)\bapproval\b|\bapproved?\b"),
 )
+
+
+def approved_write_protocol_near(text: str, offset: int, window_lines: int = 8) -> bool:
+    """True only when ALL approved-write protocol markers appear within
+    ±window_lines of the write instruction at `offset` — the §5 exception is
+    bound to the specific previewed write, never to the body at large."""
+    line = line_of(text, offset)
+    lines = text.splitlines()
+    lo = max(0, line - 1 - window_lines)
+    hi = min(len(lines), line + window_lines)
+    segment = "\n".join(lines[lo:hi])
+    return all(p.search(segment) for p in APPROVED_WRITE_MARKERS)
 
 # Negation guard: a mutation verb is not a violation when the surrounding words
 # forbid it ("never overwrite", "overwrite is never allowed", "no field is ever
@@ -493,13 +553,13 @@ RULES: list[dict] = [
      "positive_fixture": "readonly-scratch-writer", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-057"],
      "limits": "none known: declaration and grant are both objective frontmatter facts"},
-    {"id": "SIDE-004", "purpose": "auto-invocable skill's Workflow instructs a hard side effect without §5 cover",
+    {"id": "SIDE-004", "purpose": "auto-invocable skill's Workflow instructs a §5 mutation class without cover",
      "authority": "skill-generation-standard.md §5 (write/network/deploy/spend needs disable-model-invocation:true; approved-write exception covers only previewed doc/state appends)",
      "severity": "P1", "classification": "semantic-candidate",
      "surfaces": ["Workflow"],
      "positive_fixture": "auto-deployer", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-020", "AEGIS-057"],
-     "limits": "fenced illustrative snippets are INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; an approval phrase elsewhere does NOT suppress it"},
+     "limits": "covers the §5 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write — approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)"},
     {"id": "APPR-001", "purpose": "bare generic status value with no approval class",
      "authority": "scoped-approval-register (Status / Scope allowed / FORBIDDEN / Evidence pattern)",
      "severity": "P1", "classification": "mechanical",
@@ -523,7 +583,7 @@ RULES: list[dict] = [
      "limits": "file-level absence check: one of several records lacking the field reports once"},
     {"id": "STATE-001", "purpose": "append-only-declared file carries mutable placeholders",
      "authority": "project-state-template.md (rules 1-2: append-only; supersede, never rewrite)",
-     "severity": "P0", "classification": "mechanical",
+     "severity": "P0", "classification": "semantic-candidate",
      "surfaces": ["skill-body", "references"],
      "positive_fixture": "state-contradictor", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-002", "AEGIS-006"],
@@ -586,14 +646,14 @@ RULES: list[dict] = [
      "limits": "bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
-     "severity": "P1", "classification": "mechanical",
+     "severity": "P1", "classification": "semantic-candidate",
      "surfaces": ["frontmatter.description", "skill-body", "references"],
      "positive_fixture": "committed-roadmap", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-044", "AEGIS-039"],
      "limits": "lexical: fires wherever the label pattern appears, including text QUOTING the conflict to warn about it"},
     {"id": "VOCAB-003", "purpose": "approved scope described as a commitment",
      "authority": "roadmap-to-commitments-translator (commit-able vs aspirational); AEGIS §F",
-     "severity": "P0", "classification": "mechanical",
+     "severity": "P0", "classification": "semantic-candidate",
      "surfaces": ["frontmatter.description", "skill-body", "references"],
      "positive_fixture": "committed-roadmap", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-039"],
@@ -628,7 +688,7 @@ RULES: list[dict] = [
      "limits": "field presence is not assertion quality; both schemas are repo conventions"},
     {"id": "EVAL-003", "purpose": "approval/state-related skill with no refusal or boundary case",
      "authority": "skill-generation-standard.md §6; skill-quality-reviewer (real boundaries vs hollow filler)",
-     "severity": "P1", "classification": "mechanical",
+     "severity": "P1", "classification": "semantic-candidate",
      "surfaces": ["evals.json"],
      "positive_fixture": "generic-approval", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-014", "AEGIS-018"],
@@ -679,7 +739,38 @@ class Audit:
 
     # -- discovery -----------------------------------------------------------
 
+    def _assert_contained(self) -> None:
+        """Fail closed BEFORE any audited content is read (Gate 2.5 blocker 2):
+        no audited skill directory, SKILL.md, reference, or eval file may be a
+        symlink (or Windows junction), and every audited path must resolve
+        inside the repository root. os.walk(followlinks=False) never descends a
+        symlinked directory; the resolve() check backstops junctions, which
+        os.walk does not treat as links. Raises InputContainmentError with the
+        offending PATH only — never the target's content."""
+        repo_root = self.repo.resolve()
+
+        def _reject(p: Path, why: str) -> None:
+            raise InputContainmentError(f"{why}: {p}")
+
+        def _check(p: Path) -> None:
+            if p.is_symlink() or getattr(p, "is_junction", lambda: False)():
+                _reject(p, "symlink/junction inside the audited corpus")
+            rp = p.resolve()
+            if rp != repo_root and repo_root not in rp.parents:
+                _reject(p, "audited path resolves outside the repository root")
+
+        if self.skills_dir.is_symlink():
+            _reject(self.skills_dir, "symlink/junction inside the audited corpus")
+        for child in sorted(self.skills_dir.iterdir()):
+            _check(child)
+            if not child.is_dir() or child.name in IGNORED_DIRS:
+                continue
+            for root, dirs, files in os.walk(child, followlinks=False):
+                for name in sorted(dirs) + sorted(files):
+                    _check(Path(root) / name)
+
     def discover(self) -> None:
+        self._assert_contained()  # fail-closed BEFORE the first read
         for child in sorted(self.skills_dir.iterdir()):
             if child.is_dir() and child.name not in IGNORED_DIRS:
                 self.skills.append(Skill(child, self.repo))
@@ -724,24 +815,32 @@ class Audit:
                         "side-effect", ["AEGIS-057"], s.name, "high", True,
                     ))
 
-        # SIDE-004 (fix v1#2): an AUTO-INVOCABLE skill whose Workflow INSTRUCTS a
-        # hard side effect. The standard-§5 approved-write exception NEVER covers
-        # push/deploy/install/network/provision, so — unlike v2's rejected
-        # design — an approval phrase elsewhere in the body must NOT suppress
-        # this. Scanned for ALL non-manual skills, not only read-only-declared
-        # ones. Emitted as a SEMANTIC-REVIEW CANDIDATE (instruction vs teaching).
+        # SIDE-004 (fix v1#2 + Gate 2.5 blocker 1): an AUTO-INVOCABLE skill whose
+        # Workflow instructs any standard-§5 mutation class — source/test/config
+        # writes, VCS mutation, install, network, deploy/provision, data-store /
+        # live-state writes, spend, or repository doc/state writes not bound to
+        # the approved-write protocol. Scanned for ALL non-manual skills. At most
+        # ONE candidate per class per skill (a review-queue entry, never a proven
+        # defect). Only the doc-state-write class consults the approved-write
+        # exception, and only when the protocol markers (exact path + exact
+        # content/diff preview + approval) sit within a few lines of the write —
+        # an approval phrase elsewhere never suppresses any class.
         if not flags["manual_only"]:
             wf = s.sections.get("Workflow", "")
-            for m in HARD_SIDE_EFFECT.finditer(wf):
-                if negated(wf, m.start(), m.end()):
-                    continue
-                self.findings.append(Finding(
-                    "SIDE-004", "P1", s.rel(), 0, s.name,
-                    f"auto-invocable skill's Workflow instructs a hard side effect "
-                    f"({m.group(0)!r}); §5's approved-write exception does not cover "
-                    "push/deploy/install/network/provision",
-                    "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "low", False,
-                ))
+            for cls_name, pattern, exception_scoped in SIDE_EFFECT_CLASSES:
+                for m in pattern.finditer(wf):
+                    if negated(wf, m.start(), m.end()):
+                        continue
+                    if exception_scoped and approved_write_protocol_near(wf, m.start()):
+                        continue  # the §5 exception, bound to THIS write only
+                    self.findings.append(Finding(
+                        "SIDE-004", "P1", s.rel(), 0, s.name,
+                        f"auto-invocable skill's Workflow instructs a §5 mutation "
+                        f"[{cls_name}]: {m.group(0)!r} — semantic-review candidate "
+                        "(instruction vs teaching is the reviewer's judgment)",
+                        "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "low", False,
+                    ))
+                    break  # one candidate per class per skill bounds the queue
 
     # -- family B: approval & authority (AEGIS-003/-008/-048/-055) -----------
 
@@ -810,7 +909,7 @@ class Audit:
                     "STATE-001", "P0", s.rel(path), line_of(text, m.start()), s.name,
                     f"append-only-declared file carries mutable placeholder {m.group(0)!r} "
                     "(will demand later replacement the contract forbids)",
-                    "state-append", ["AEGIS-002", "AEGIS-006"], s.name, "high", True,
+                    "state-append", ["AEGIS-002", "AEGIS-006"], s.name, "high", False,
                 ))
             # The verb rules require PROXIMITY to a contract declaration (±15
             # lines): at file distance, overwrite/insert verbs are usually about
@@ -1020,14 +1119,14 @@ class Audit:
                     "capacity-backed promises (AEGIS-044)",
                     "vocabulary", ["AEGIS-044", "AEGIS-039"],
                     "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
-                    "high", True,
+                    "high", False,
                     related_skills=["roadmap-to-commitments-translator"],
                 ))
             for m in COMMITTED_SCOPE.finditer(text):
                 self.findings.append(Finding(
                     "VOCAB-003", "P0", s.rel(path), line_of(text, m.start()), s.name,
                     f"approved scope described as a commitment: {m.group(0)!r} (AEGIS-039)",
-                    "vocabulary", ["AEGIS-039"], s.name, "medium", True,
+                    "vocabulary", ["AEGIS-039"], s.name, "medium", False,
                 ))
         if counts:
             self.census[s.name] = dict(sorted(counts.items()))
@@ -1107,7 +1206,7 @@ class Audit:
                 self.findings.append(Finding(
                     "EVAL-003", "P1", s.rel(s.evals_path), 0, s.name,
                     "approval/state-related skill has no refusal or boundary eval case",
-                    "eval-coverage", ["AEGIS-014", "AEGIS-018"], s.name, "medium", True,
+                    "eval-coverage", ["AEGIS-014", "AEGIS-018"], s.name, "medium", False,
                 ))
 
         # EVAL-004: every neighbor NAME in the trigger fixtures must exist on
@@ -1153,13 +1252,26 @@ class Audit:
         surfaces = [(s.skill_md, s.text)] + [
             (p, p.read_text(encoding="utf-8")) for p in s.references if p.suffix == ".md"
         ]
+        repo_root = self.repo.resolve()
         for path, text in surfaces:
             defenced = strip_fences(text)
             for m in MD_LINK.finditer(defenced):
                 target = m.group(1)
                 if re.match(r"(?i)https?:|mailto:", target):
                     continue
-                if not (path.parent / target).resolve().exists():
+                resolved = (path.parent / target).resolve()
+                # Escape check FIRST (Gate 2.5 blocker 2): a link resolving
+                # outside the repository is flagged even when the target
+                # exists on the machine — existence is never a pass. The
+                # target is NEVER read; the finding carries the link text only.
+                if resolved != repo_root and repo_root not in resolved.parents:
+                    self.findings.append(Finding(
+                        "REF-001", "P1", s.rel(path), line_of(defenced, m.start()), s.name,
+                        f"link target resolves OUTSIDE the repository: {target!r} "
+                        "(existence on the local machine is not a pass)",
+                        "reference", ["AEGIS-053"], s.name, "high", True,
+                    ))
+                elif not resolved.exists():
                     self.findings.append(Finding(
                         "REF-001", "P1", s.rel(path), line_of(defenced, m.start()), s.name,
                         f"link target does not exist on disk: {target!r}",
@@ -1225,11 +1337,14 @@ class Audit:
     def audited_files(self) -> list[Path]:
         """The exact, de-duplicated set of files READ for findings — the corpus
         the content hash covers. Agents and guided-path docs are deliberately
-        NOT here (they are enumerated, not audited)."""
+        NOT here (they are enumerated, not audited). Sorted by the DECLARED
+        hash key — the repo-relative POSIX path string — so the ordering is
+        identical on Windows and POSIX (Gate 2.5 blocker 3: platform-native
+        Path ordering is case-folded on Windows and would silently reorder)."""
         files: list[Path] = []
         for s in self.skills:
             files.extend(s.audited_paths())
-        return sorted(set(files))
+        return sorted(set(files), key=lambda f: f.relative_to(self.repo).as_posix())
 
     def capture_provenance(self) -> dict:
         """Capture provenance ONCE (idempotent). Every output reuses this
@@ -1355,9 +1470,11 @@ class Audit:
             "are queued for the named reviewer skills, not executed here.",
             "- **Behavioral evals:** UNRUN. No eval case is executed or reported "
             "as passing by this tool.",
-            "- **Lexical mechanical rules** (VOCAB-002/003, STATE-001, EVAL-003, "
-            "…) carry documented use-vs-mention limits in the rule inventory; a "
-            "reviewer confirms materiality.",
+            "- **Rules whose own limits admit use-vs-mention or contextual "
+            "ambiguity** (STATE-001, VOCAB-002/003, EVAL-003, SIDE-004, APPR-002, "
+            "STATE-004/005, ARTF-001, REF-002) are classified semantic-candidate: "
+            "their findings are review-queue entries a reviewer confirms, never "
+            "mechanically proven defects.",
             "",
             "| Severity | Count |",
             "|---|---:|",
@@ -1489,7 +1606,14 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
     audit = Audit(repo)
-    audit.run()
+    try:
+        audit.run()
+    except InputContainmentError as exc:
+        # Fail closed BEFORE reading (Gate 2.5 blocker 2): the message names
+        # the offending PATH only — never any file content. No output is
+        # written; a containment violation must never look like a clean scan.
+        print(f"ERROR audited-input containment violated — refusing to read: {exc}")
+        return 2
 
     if args.json_out:
         Path(args.json_out).parent.mkdir(parents=True, exist_ok=True)

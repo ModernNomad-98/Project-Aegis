@@ -76,12 +76,13 @@ their materiality is unconfirmed.
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
 | EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | — |
+| SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
 
-Rules that fired zero times on the live corpus (SIDE-001..004, APPR-001,
+Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
 APPR-003, STATE-001..004, VOCAB-003, PARITY-001..002, EVAL-001..003,
 ROUTE-001, REF-001..003) are each proven ABLE to fire by fixture
-(`scripts/tests/test_audit_skill_contracts.py`, 35 assertions): a zero is a
+(`scripts/tests/test_audit_skill_contracts.py`, 46 assertions): a zero is a
 scanned zero, not an unscanned one.
 
 ## 4. Semantic-review coverage record
