@@ -39,12 +39,16 @@ IMPORT WRINKLE
 from __future__ import annotations
 
 import importlib.util
+import shutil
+import subprocess
 import sys
+import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
 TESTS_DIR = Path(__file__).resolve().parent
 FIXTURES = TESTS_DIR / "fixtures"
+REPO_ROOT = TESTS_DIR.parent.parent
 VALIDATOR_PATH = TESTS_DIR.parent / "validate-skills.py"
 DCO_PATH = TESTS_DIR.parent / "check_dco.py"
 
@@ -337,36 +341,58 @@ def test_agents_schema():
     expect_clean(rep, f"all {len(shipped)} shipped reviewer agents conform")
 
 
+def _materialize_paths_tree(dst_root: Path) -> Path:
+    """Copy the NEUTRAL `paths-tree` fixture into `dst_root` and materialize its
+    `dot-claude/` as `.claude/` there (Gate 2.8). The fixture is stored under
+    `dot-claude/` in the tracked tree so its `fixture-linked-skill/SKILL.md` is
+    never nested under a literal `.claude/skills/` path that the session harness
+    would discover as a live skill; the `.claude` name — needed for the
+    guided-path links to resolve — exists only inside this throwaway copy."""
+    tree = dst_root / "paths-tree"
+    shutil.copytree(FIXTURES / "paths-tree", tree)
+    neutral = tree / "dot-claude"
+    assert neutral.is_dir(), f"neutral fixture source must exist: {neutral}"
+    neutral.rename(tree / ".claude")
+    return tree
+
+
 def test_docs_paths_links():
-    """D55: guided-path and README picker links must resolve."""
-    tree = FIXTURES / "paths-tree"
-    good_paths, good_readme = tree / "docs" / "paths", tree / "README-good.md"
+    """D55: guided-path and README picker links must resolve. The fixture is
+    stored under a neutral dot-claude/ layout and materialized to .claude only
+    inside a throwaway temp repo (Gate 2.8), so fixture-linked-skill is never a
+    live session skill."""
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-paths-"))
+    try:
+        tree = _materialize_paths_tree(tmp)
+        good_paths, good_readme = tree / "docs" / "paths", tree / "README-good.md"
 
-    rep = validator.Report()
-    validator.check_docs_paths_links(rep, good_paths, good_readme)
-    expect_clean(rep, "resolving path links and a resolving picker are accepted")
+        rep = validator.Report()
+        validator.check_docs_paths_links(rep, good_paths, good_readme)
+        expect_clean(rep, "resolving path links and a resolving picker are accepted")
 
-    rep = validator.Report()
-    validator.check_docs_paths_links(rep, tree / "docs" / "paths-dangling", good_readme)
-    expect_error(
-        rep, "which does not exist on disk", "a dangling SKILL.md link is rejected"
-    )
+        rep = validator.Report()
+        validator.check_docs_paths_links(rep, tree / "docs" / "paths-dangling", good_readme)
+        expect_error(
+            rep, "which does not exist on disk", "a dangling SKILL.md link is rejected"
+        )
 
-    rep = validator.Report()
-    validator.check_docs_paths_links(rep, tree / "docs" / "paths-mismatch", good_readme)
-    expect_error(
-        rep,
-        "does not match its target skill",
-        "a resolving link whose label names a DIFFERENT skill is rejected",
-    )
+        rep = validator.Report()
+        validator.check_docs_paths_links(rep, tree / "docs" / "paths-mismatch", good_readme)
+        expect_error(
+            rep,
+            "does not match its target skill",
+            "a resolving link whose label names a DIFFERENT skill is rejected",
+        )
 
-    rep = validator.Report()
-    validator.check_docs_paths_links(rep, good_paths, tree / "README-dangling.md")
-    expect_error(
-        rep,
-        "which does not exist on disk",
-        "a README picker pointing at a missing path doc is rejected",
-    )
+        rep = validator.Report()
+        validator.check_docs_paths_links(rep, good_paths, tree / "README-dangling.md")
+        expect_error(
+            rep,
+            "which does not exist on disk",
+            "a README picker pointing at a missing path doc is rejected",
+        )
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
     # Pin the real surface, so a mis-pathed PATHS_DIR cannot make this a no-op.
     shipped = list(validator.PATHS_DIR.glob("*.md"))
@@ -381,6 +407,75 @@ def test_docs_paths_links():
     expect_clean(
         rep, f"all {linked} links across {len(shipped)} shipped guided paths resolve"
     )
+
+
+def test_no_nested_fixture_skill_or_agent_dirs():
+    """Gate 2.8: no TRACKED path may nest `.claude/skills/` or `.claude/agents/`
+    outside the real repo-root libraries. Such a nested SKILL.md is discovered by
+    the Claude Code SESSION harness as a live, invocable skill (independent of
+    frontmatter), contaminating routing and the available-skill roster. Proven
+    from the actual `git ls-files` census so it cannot pass by traversing a
+    directory that was moved or missed; the real root libraries are pinned
+    non-empty so a wrong-path refactor cannot make the guard a green no-op."""
+    out = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=REPO_ROOT, capture_output=True, text=True, check=True
+    )
+    tracked = [p for p in out.stdout.split("\0") if p]
+    assert tracked, "git ls-files returned nothing — wrong CWD or not a git checkout"
+
+    nested_skills = [
+        p for p in tracked if "/.claude/skills/" in p and not p.startswith(".claude/skills/")
+    ]
+    nested_agents = [
+        p for p in tracked if "/.claude/agents/" in p and not p.startswith(".claude/agents/")
+    ]
+    assert not nested_skills, (
+        "tracked nested .claude/skills fixtures become LIVE session skills: "
+        f"{nested_skills}"
+    )
+    assert not nested_agents, (
+        "tracked nested .claude/agents fixtures become LIVE session agents: "
+        f"{nested_agents}"
+    )
+    # The two explicit fixture patterns the owner named must have zero matches.
+    fixture_skill_leaks = [
+        p for p in tracked
+        if p.startswith("scripts/tests/fixtures/") and "/.claude/skills/" in p
+    ]
+    fixture_agent_leaks = [
+        p for p in tracked
+        if p.startswith("scripts/tests/fixtures/") and "/.claude/agents/" in p
+    ]
+    assert fixture_skill_leaks == [], f"scripts/tests/fixtures/**/.claude/skills/**: {fixture_skill_leaks}"
+    assert fixture_agent_leaks == [], f"scripts/tests/fixtures/**/.claude/agents/**: {fixture_agent_leaks}"
+    PASSES.append("no tracked nested .claude/skills or .claude/agents outside the root libraries")
+    print("  PASS  no tracked nested .claude/skills or .claude/agents fixture leaks (git ls-files census)")
+
+    # Pin the REAL root libraries so the guard cannot pass by scanning nothing.
+    root_skills = [
+        p for p in tracked
+        if p.startswith(".claude/skills/") and p.endswith("/SKILL.md")
+    ]
+    root_agents = [
+        p for p in tracked
+        if p.startswith(".claude/agents/") and p.endswith(".md")
+    ]
+    assert len(root_skills) >= 100, (
+        f"the real .claude/skills library must exist and be non-empty (got {len(root_skills)})"
+    )
+    assert root_agents, "the real .claude/agents reviewer library must exist and be non-empty"
+    PASSES.append(f"real root libraries pinned: {len(root_skills)} skills, {len(root_agents)} agents")
+    print(f"  PASS  real root libraries pinned non-empty ({len(root_skills)} skills, "
+          f"{len(root_agents)} agents)")
+
+    # The neutral fixture SOURCE must still be present (dot-claude), so the move
+    # is proven complete rather than deleted.
+    assert any(
+        p == "scripts/tests/fixtures/paths-tree/dot-claude/skills/fixture-linked-skill/SKILL.md"
+        for p in tracked
+    ), "the neutral paths-tree fixture source (dot-claude) must remain tracked"
+    PASSES.append("neutral paths-tree dot-claude fixture source is tracked")
+    print("  PASS  neutral paths-tree/dot-claude fixture source is tracked")
 
 
 def test_workflows_sha_pinned():
@@ -605,6 +700,7 @@ TESTS = [
     test_section_order,
     test_agents_schema,
     test_docs_paths_links,
+    test_no_nested_fixture_skill_or_agent_dirs,
     test_workflows_sha_pinned,
     test_claude_bridge,
     test_dco_signoff_required,
