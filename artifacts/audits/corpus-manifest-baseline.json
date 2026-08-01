@@ -1,8 +1,15 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.0.0",
-  "repo_sha": "08727adf8f3e0f54226fa18639c9a50f2562ed22",
+  "version": "1.1.0",
+  "engine_sha256": "69005962ebd350772c7beb2734b7f01c3f85d0759b71e071b0f4d474bb7f0033",
+  "repo_sha": "8c896dc4a56106040d864b7b4d965d4f20e5c7a3",
   "branch": "audit/aegis-corpus-contract-baseline",
+  "working_tree_dirty": true,
+  "dirty_paths_in_scanned_surfaces": [],
+  "audited_file_count": 703,
+  "audited_byte_count": 3905871,
+  "corpus_content_hash": "754184b16ec473970951f9af9590566c7ef7ef95611d4c6a7b0bc4761fb9d754",
+  "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the audited skill corpus only, not agents/guided-paths (enumerated, not audited); the engine that produced the scan is identified separately by engine_sha256.",
   "skill_count": 184,
   "skills": [
     {
@@ -3258,7 +3265,7 @@
       "writes_artifacts": false
     }
   ],
-  "agents": [
+  "agents_enumerated_not_audited": [
     ".claude/agents/ai-security-red-team-reviewer.md",
     ".claude/agents/full-codebase-auditor.md",
     ".claude/agents/principal-architecture-reviewer.md",
@@ -3267,7 +3274,7 @@
     ".claude/agents/secure-saas-reviewer.md",
     ".claude/agents/senior-troubleshooting-lead.md"
   ],
-  "guided_paths": [
+  "guided_paths_enumerated_not_audited": [
     "docs/paths/add-ai-safely.md",
     "docs/paths/check-your-app.md",
     "docs/paths/something-is-broken.md"

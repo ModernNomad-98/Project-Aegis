@@ -78,10 +78,10 @@ their materiality is unconfirmed.
 | EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | — |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
 
-Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
+Rules that fired zero times on the live corpus (SIDE-001..004, APPR-001,
 APPR-003, STATE-001..004, VOCAB-003, PARITY-001..002, EVAL-001..003,
 ROUTE-001, REF-001..003) are each proven ABLE to fire by fixture
-(`scripts/tests/test_audit_skill_contracts.py`, 25 assertions): a zero is a
+(`scripts/tests/test_audit_skill_contracts.py`, 35 assertions): a zero is a
 scanned zero, not an unscanned one.
 
 ## 4. Semantic-review coverage record

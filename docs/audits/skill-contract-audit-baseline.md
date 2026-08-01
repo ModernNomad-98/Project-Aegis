@@ -1,13 +1,24 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.0.0
-- Repo SHA: `08727adf8f3e0f54226fa18639c9a50f2562ed22` (branch `audit/aegis-corpus-contract-baseline`)
-- Skills scanned: **184**
+- Tool: `audit-skill-contracts` v1.1.0 (engine sha256 `69005962ebd35077…`)
+- Repo SHA: `8c896dc4a56106040d864b7b4d965d4f20e5c7a3` (branch `audit/aegis-corpus-contract-baseline`; working tree dirty: true; dirty scanned surfaces: none)
+- Corpus content hash: `754184b16ec473970951f9af9590566c7ef7ef95611d4c6a7b0bc4761fb9d754` (703 files, 3905871 bytes)
+- Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **334** (321 mechanical, 13 semantic-review candidates)
 
 A baseline finding is EXPECTED here: this report freezes the state of
 the corpus BEFORE remediation. A finding below is not a tool failure,
-and structural findings are not behavioral proof of misbehavior.
+structural findings are not behavioral proof, and rows marked
+SEMANTIC-REVIEW CANDIDATE are readings for a reviewer skill — never
+mechanically proven defects.
+
+## Coverage (what was and was not reviewed)
+
+- **Mechanically scanned:** all 184 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — listed in the manifest for name resolution; their content is the validator's surface.
+- **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
+- **Behavioral evals:** UNRUN. No eval case is executed or reported as passing by this tool.
+- **Lexical mechanical rules** (VOCAB-002/003, STATE-001, EVAL-003, …) carry documented use-vs-mention limits in the rule inventory; a reviewer confirms materiality.
 
 | Severity | Count |
 |---|---:|
@@ -36,7 +47,7 @@ and structural findings are not behavioral proof of misbehavior.
 - **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/offline-first-sync-architect/SKILL.md:74` (owner: offline-first-sync-architect; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/operational-vs-analytical-splitter/SKILL.md:88` (owner: operational-vs-analytical-splitter; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **ROUTE-003** [P1/high/mechanical] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-035, AEGIS-045) — Stage 2 route reaches roadmap-to-commitments-translator without roadmap-under-uncertainty-planner, but the commitments skill declares a roadmap as its input and the prioritization skill hands sequencing to the roadmap planner (AEGIS-035)
-- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:252` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:262` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:71` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
 - **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:122` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
 - **APPR-002** [P0/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:140` (owner: project-orchestrator; maps: AEGIS-003, AEGIS-008) — scope grant that authorizes BUILDING from a requirements-stage approval: 'Build the v1 scope' (content approval must not become implementation authority)
