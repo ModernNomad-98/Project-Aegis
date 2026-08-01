@@ -65,13 +65,3 @@ Score each PASS / CONCERN / FAIL, with evidence, or N/A with a reason.
 The register records which skills have received a full twelve-question pass
 and which have received only the mechanical audit. Unreviewed is stated as
 unreviewed — never implied as clean.
-
-## The executable queue
-
-The engine's `--queue` output
-(`artifacts/audits/semantic-review-queue.json`) is the structured to-do list
-this rubric is executed FROM: each semantic-candidate finding routed to its
-owning reviewer skill, plus a rubric-pass entry per shipped skill. A future
-runner executes queue entries in isolated sessions; the queue is never
-worked by manually invoking reviewer skills across the corpus in one
-conversation.

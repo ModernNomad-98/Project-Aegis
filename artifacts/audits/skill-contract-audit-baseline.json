@@ -1,15 +1,10 @@
 {
   "summary": {
-    "engine": "audit-skill-contracts",
-    "engine_version": "2.0.0",
-    "catalog_version": "2.0.0",
-    "repo_sha": "f88b56f12676c3a3ee47a245284c9190e61af5d1",
+    "tool": "audit-skill-contracts",
+    "version": "1.0.0",
+    "repo_sha": "08727adf8f3e0f54226fa18639c9a50f2562ed22",
     "branch": "audit/aegis-corpus-contract-baseline",
-    "working_tree_dirty": true,
-    "dirty_paths_in_scanned_surfaces": [],
-    "corpus_content_hash": "754184b16ec473970951f9af9590566c7ef7ef95611d4c6a7b0bc4761fb9d754",
     "skill_count": 184,
-    "rule_count": 27,
     "finding_count": 334,
     "by_severity": {
       "P0": 1,
@@ -41,9 +36,10 @@
       ],
       "evidence": "exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ab-test-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "event-schema-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -58,9 +54,10 @@
       ],
       "evidence": "exclusion toward `manual-test-case-creator` is not reciprocated (manual-test-case-creator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "accessibility-test-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "manual-test-case-creator",
       "confidence": "low",
       "mechanical": true
     },
@@ -75,9 +72,10 @@
       ],
       "evidence": "exclusion toward `screenshot-evidence-planner` is not reciprocated (screenshot-evidence-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "accessibility-test-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "screenshot-evidence-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -92,9 +90,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "admin-console-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -109,9 +108,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "admin-console-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -126,9 +126,10 @@
       ],
       "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "admin-console-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "incident-response-runbook",
       "confidence": "low",
       "mechanical": true
     },
@@ -143,9 +144,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "admin-console-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -160,9 +162,10 @@
       ],
       "evidence": "exclusion toward `adr-writer` is not reciprocated (adr-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "adr-sequencer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "adr-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -177,9 +180,10 @@
       ],
       "evidence": "exclusion toward `docs-as-code-architect` is not reciprocated (docs-as-code-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "adr-sequencer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "docs-as-code-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -194,9 +198,10 @@
       ],
       "evidence": "exclusion toward `source-of-truth-reconciler` is not reciprocated (source-of-truth-reconciler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "adr-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "source-of-truth-reconciler",
       "confidence": "low",
       "mechanical": true
     },
@@ -211,9 +216,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-authorization-matrix",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -228,9 +234,10 @@
       ],
       "evidence": "exclusion toward `human-approval-boundary` is not reciprocated (human-approval-boundary's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-authorization-matrix",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "human-approval-boundary",
       "confidence": "low",
       "mechanical": true
     },
@@ -242,13 +249,12 @@
       "owning_skill": "agent-authorization-matrix",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "agent-authorization-matrix",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -263,9 +269,10 @@
       ],
       "evidence": "exclusion toward `ai-cost-guardrail-designer` is not reciprocated (ai-cost-guardrail-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-containment-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-cost-guardrail-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -280,9 +287,10 @@
       ],
       "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-containment-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "incident-response-runbook",
       "confidence": "low",
       "mechanical": true
     },
@@ -294,13 +302,12 @@
       "owning_skill": "agent-containment-reviewer",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "agent-containment-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -315,9 +322,10 @@
       ],
       "evidence": "exclusion toward `agent-tool-safety-guard` is not reciprocated (agent-tool-safety-guard's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-goal-hijack-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-tool-safety-guard",
       "confidence": "low",
       "mechanical": true
     },
@@ -332,9 +340,10 @@
       ],
       "evidence": "exclusion toward `memory-context-poisoning-reviewer` is not reciprocated (memory-context-poisoning-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-goal-hijack-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "memory-context-poisoning-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -349,9 +358,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-goal-hijack-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -363,13 +373,12 @@
       "owning_skill": "agent-goal-hijack-defender",
       "related_skills": [],
       "evidence": "trigger-evals neighbor 'ai-security-red-team-reviewer (subagent)' is annotated prose, not a resolvable name (target 'ai-security-red-team-reviewer' exists) \u2014 an eval runner cannot match it mechanically",
-      "family": "eval",
+      "family": "eval-coverage",
       "aegis_map": [
-        "AEGIS-060",
-        "AEGIS-018"
+        "AEGIS-018",
+        "AEGIS-053"
       ],
       "remediation_owner": "agent-goal-hijack-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -384,9 +393,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-governance-audit",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -401,9 +411,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-governance-audit",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -418,9 +429,10 @@
       ],
       "evidence": "exclusion toward `full-codebase-auditor` is not reciprocated (full-codebase-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-governance-audit",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "full-codebase-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -435,9 +447,10 @@
       ],
       "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-governance-audit",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "release-readiness-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -452,9 +465,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-governance-audit",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -469,9 +483,10 @@
       ],
       "evidence": "exclusion toward `model-context-designer` is not reciprocated (model-context-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-harness-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "model-context-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -486,9 +501,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-identity-privilege-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -503,9 +519,10 @@
       ],
       "evidence": "exclusion toward `agent-tool-safety-guard` is not reciprocated (agent-tool-safety-guard's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-identity-privilege-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-tool-safety-guard",
       "confidence": "low",
       "mechanical": true
     },
@@ -520,9 +537,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-identity-privilege-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -537,9 +555,10 @@
       ],
       "evidence": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-identity-privilege-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "secrets-identity-hardener",
       "confidence": "low",
       "mechanical": true
     },
@@ -554,9 +573,10 @@
       ],
       "evidence": "exclusion toward `agent-startup-context-gate` is not reciprocated (agent-startup-context-gate's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-memory-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-startup-context-gate",
       "confidence": "low",
       "mechanical": true
     },
@@ -571,9 +591,10 @@
       ],
       "evidence": "exclusion toward `source-of-truth-reconciler` is not reciprocated (source-of-truth-reconciler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-memory-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "source-of-truth-reconciler",
       "confidence": "low",
       "mechanical": true
     },
@@ -585,13 +606,12 @@
       "owning_skill": "agent-memory-governance",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "agent-memory-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -606,9 +626,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-tool-safety-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -623,9 +644,10 @@
       ],
       "evidence": "exclusion toward `rag-security-architect` is not reciprocated (rag-security-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-tool-safety-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rag-security-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -640,9 +662,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-cost-guardrail-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -657,9 +680,10 @@
       ],
       "evidence": "exclusion toward `plan-entitlement-architect` is not reciprocated (plan-entitlement-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-cost-guardrail-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "plan-entitlement-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -674,9 +698,10 @@
       ],
       "evidence": "exclusion toward `saas-cost-architect` is not reciprocated (saas-cost-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-cost-guardrail-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-cost-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -691,9 +716,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-evaluation-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -708,9 +734,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-evaluation-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -725,9 +752,10 @@
       ],
       "evidence": "exclusion toward `regression-suite-curator` is not reciprocated (regression-suite-curator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-evaluation-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "regression-suite-curator",
       "confidence": "low",
       "mechanical": true
     },
@@ -742,9 +770,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-evaluation-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -756,13 +785,12 @@
       "owning_skill": "ai-evaluation-harness",
       "related_skills": [],
       "evidence": "trigger-evals neighbor 'ai-security-red-team-reviewer (subagent)' is annotated prose, not a resolvable name (target 'ai-security-red-team-reviewer' exists) \u2014 an eval runner cannot match it mechanically",
-      "family": "eval",
+      "family": "eval-coverage",
       "aegis_map": [
-        "AEGIS-060",
-        "AEGIS-018"
+        "AEGIS-018",
+        "AEGIS-053"
       ],
       "remediation_owner": "ai-evaluation-harness",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -777,9 +805,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-governance-risk-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -794,9 +823,10 @@
       ],
       "evidence": "exclusion toward `ai-sdlc-operating-model` is not reciprocated (ai-sdlc-operating-model's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-governance-risk-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": true
     },
@@ -811,9 +841,10 @@
       ],
       "evidence": "exclusion toward `ai-threat-modeler` is not reciprocated (ai-threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-governance-risk-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -828,9 +859,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-governance-risk-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -845,9 +877,10 @@
       ],
       "evidence": "exclusion toward `ai-governance-risk-reviewer` is not reciprocated (ai-governance-risk-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-lifecycle-risk-manager",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-governance-risk-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -862,9 +895,10 @@
       ],
       "evidence": "exclusion toward `ai-threat-modeler` is not reciprocated (ai-threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-lifecycle-risk-manager",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -879,9 +913,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-lifecycle-risk-manager",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -896,9 +931,10 @@
       ],
       "evidence": "exclusion toward `model-poisoning-reviewer` is not reciprocated (model-poisoning-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-misinformation-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "model-poisoning-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -913,9 +949,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-misinformation-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -930,9 +967,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-router-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -947,9 +985,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-router-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -964,9 +1003,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-sdlc-operating-model",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -981,9 +1021,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-sdlc-operating-model",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -998,9 +1039,10 @@
       ],
       "evidence": "exclusion toward `rag-security-architect` is not reciprocated (rag-security-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rag-security-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1015,9 +1057,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1032,9 +1075,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ai-threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1046,13 +1090,12 @@
       "owning_skill": "ai-threat-modeler",
       "related_skills": [],
       "evidence": "trigger-evals neighbor 'ai-security-red-team-reviewer (subagent)' is annotated prose, not a resolvable name (target 'ai-security-red-team-reviewer' exists) \u2014 an eval runner cannot match it mechanically",
-      "family": "eval",
+      "family": "eval-coverage",
       "aegis_map": [
-        "AEGIS-060",
-        "AEGIS-018"
+        "AEGIS-018",
+        "AEGIS-053"
       ],
       "remediation_owner": "ai-threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -1067,9 +1110,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-contract-test-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1084,9 +1128,10 @@
       ],
       "evidence": "exclusion toward `playwright-e2e-engineer` is not reciprocated (playwright-e2e-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-contract-test-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "playwright-e2e-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1101,9 +1146,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-doc-generator-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1118,9 +1164,10 @@
       ],
       "evidence": "exclusion toward `diataxis-doc-organizer` is not reciprocated (diataxis-doc-organizer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-doc-generator-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "diataxis-doc-organizer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1135,9 +1182,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-event-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1152,9 +1200,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "api-event-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1169,9 +1218,10 @@
       ],
       "evidence": "exclusion toward `rls-policy-auditor` is not reciprocated (rls-policy-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "appsec-implementer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rls-policy-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -1186,9 +1236,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "appsec-implementer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1203,9 +1254,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "appsec-implementer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1220,9 +1272,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "architecture-advisor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1237,9 +1290,10 @@
       ],
       "evidence": "exclusion toward `cloud-architecture-decider` is not reciprocated (cloud-architecture-decider's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "architecture-advisor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "cloud-architecture-decider",
       "confidence": "low",
       "mechanical": true
     },
@@ -1254,9 +1308,10 @@
       ],
       "evidence": "exclusion toward `domain-modeler` is not reciprocated (domain-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "architecture-advisor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "domain-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1271,9 +1326,10 @@
       ],
       "evidence": "exclusion toward `saas-platform-architect` is not reciprocated (saas-platform-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "architecture-advisor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1288,9 +1344,10 @@
       ],
       "evidence": "exclusion toward `domain-modeler` is not reciprocated (domain-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "domain-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1302,13 +1359,12 @@
       "owning_skill": "audit-log-architect",
       "related_skills": [],
       "evidence": "claims durability ('durably') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "audit-log-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -1323,9 +1379,10 @@
       ],
       "evidence": "exclusion toward `cloud-architecture-decider` is not reciprocated (cloud-architecture-decider's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "aws-saas-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "cloud-architecture-decider",
       "confidence": "low",
       "mechanical": true
     },
@@ -1340,9 +1397,10 @@
       ],
       "evidence": "exclusion toward `saas-platform-architect` is not reciprocated (saas-platform-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "aws-saas-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1357,9 +1415,10 @@
       ],
       "evidence": "exclusion toward `saas-platform-architect` is not reciprocated (saas-platform-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "azure-saas-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1374,9 +1433,10 @@
       ],
       "evidence": "exclusion toward `load-test-planner` is not reciprocated (load-test-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "background-job-orchestration-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "load-test-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -1391,9 +1451,10 @@
       ],
       "evidence": "exclusion toward `performance-test-harness` is not reciprocated (performance-test-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "background-job-orchestration-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "performance-test-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -1408,9 +1469,10 @@
       ],
       "evidence": "exclusion toward `streaming-event-architect` is not reciprocated (streaming-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "background-job-orchestration-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "streaming-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1425,9 +1487,10 @@
       ],
       "evidence": "exclusion toward `agent-containment-reviewer` is not reciprocated (agent-containment-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cell-based-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-containment-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1442,9 +1505,10 @@
       ],
       "evidence": "exclusion toward `architecture-advisor` is not reciprocated (architecture-advisor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cell-based-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-advisor",
       "confidence": "low",
       "mechanical": true
     },
@@ -1459,9 +1523,10 @@
       ],
       "evidence": "exclusion toward `saas-platform-architect` is not reciprocated (saas-platform-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cell-based-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1476,9 +1541,10 @@
       ],
       "evidence": "exclusion toward `agent-memory-governance` is not reciprocated (agent-memory-governance's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "chat-backlog-reconciliation",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-memory-governance",
       "confidence": "low",
       "mechanical": true
     },
@@ -1493,9 +1559,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "chat-backlog-reconciliation",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -1510,9 +1577,10 @@
       ],
       "evidence": "exclusion toward `scoped-approval-register` is not reciprocated (scoped-approval-register's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "chat-backlog-reconciliation",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "scoped-approval-register",
       "confidence": "low",
       "mechanical": true
     },
@@ -1527,9 +1595,10 @@
       ],
       "evidence": "exclusion toward `source-of-truth-reconciler` is not reciprocated (source-of-truth-reconciler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "chat-backlog-reconciliation",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "source-of-truth-reconciler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1544,9 +1613,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ci-pipeline-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1561,9 +1631,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "ci-pipeline-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1578,9 +1649,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cloud-architecture-decider",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1595,9 +1667,10 @@
       ],
       "evidence": "exclusion toward `iac-reviewer` is not reciprocated (iac-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cloud-architecture-decider",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "iac-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1612,9 +1685,10 @@
       ],
       "evidence": "exclusion toward `saas-platform-architect` is not reciprocated (saas-platform-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cloud-architecture-decider",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-platform-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1629,9 +1703,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "code-simplifier",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1646,9 +1721,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "command-gateway-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1663,9 +1739,10 @@
       ],
       "evidence": "exclusion toward `audit-log-architect` is not reciprocated (audit-log-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "command-gateway-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "audit-log-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1680,9 +1757,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "command-gateway-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1697,9 +1775,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "compliance-evidence-collector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -1714,9 +1793,10 @@
       ],
       "evidence": "exclusion toward `audit-log-architect` is not reciprocated (audit-log-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "compliance-evidence-collector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "audit-log-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1731,9 +1811,10 @@
       ],
       "evidence": "exclusion toward `screenshot-evidence-planner` is not reciprocated (screenshot-evidence-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "compliance-evidence-collector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "screenshot-evidence-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -1748,9 +1829,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "compliance-gap-auditor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -1765,9 +1847,10 @@
       ],
       "evidence": "exclusion toward `full-codebase-auditor` is not reciprocated (full-codebase-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "compliance-gap-auditor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "full-codebase-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -1782,9 +1865,10 @@
       ],
       "evidence": "exclusion toward `agent-startup-context-gate` is not reciprocated (agent-startup-context-gate's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "context-co-update-ci-gate",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-startup-context-gate",
       "confidence": "low",
       "mechanical": true
     },
@@ -1799,9 +1883,10 @@
       ],
       "evidence": "exclusion toward `chat-backlog-reconciliation` is not reciprocated (chat-backlog-reconciliation's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "context-co-update-ci-gate",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "chat-backlog-reconciliation",
       "confidence": "low",
       "mechanical": true
     },
@@ -1816,9 +1901,10 @@
       ],
       "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "context-co-update-ci-gate",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ci-pipeline-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1833,9 +1919,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cross-team-dependency-negotiator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1850,9 +1937,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "cross-team-dependency-negotiator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -1867,9 +1955,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-security-tester` is not reciprocated (multi-tenant-security-tester's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "dast-safety-harness-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-security-tester",
       "confidence": "low",
       "mechanical": true
     },
@@ -1884,9 +1973,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "dast-safety-harness-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -1901,9 +1991,10 @@
       ],
       "evidence": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-migration-runbook-author",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rollback-runbook-author",
       "confidence": "low",
       "mechanical": true
     },
@@ -1918,9 +2009,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-partitioning-sharding-strategist",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1935,9 +2027,10 @@
       ],
       "evidence": "exclusion toward `operational-vs-analytical-splitter` is not reciprocated (operational-vs-analytical-splitter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-partitioning-sharding-strategist",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "operational-vs-analytical-splitter",
       "confidence": "low",
       "mechanical": true
     },
@@ -1952,9 +2045,10 @@
       ],
       "evidence": "exclusion toward `warehouse-lake-architect` is not reciprocated (warehouse-lake-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-partitioning-sharding-strategist",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "warehouse-lake-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -1969,9 +2063,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-quality-monitor-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -1986,9 +2081,10 @@
       ],
       "evidence": "exclusion toward `structured-output-validator` is not reciprocated (structured-output-validator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-quality-monitor-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "structured-output-validator",
       "confidence": "low",
       "mechanical": true
     },
@@ -2003,9 +2099,10 @@
       ],
       "evidence": "exclusion toward `test-data-architect` is not reciprocated (test-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "data-quality-monitor-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "test-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2020,9 +2117,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "design-review-facilitator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2037,9 +2135,10 @@
       ],
       "evidence": "exclusion toward `requirements-gathering-facilitator` is not reciprocated (requirements-gathering-facilitator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "design-review-facilitator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "requirements-gathering-facilitator",
       "confidence": "low",
       "mechanical": true
     },
@@ -2054,9 +2153,10 @@
       ],
       "evidence": "exclusion toward `tech-spec-writer` is not reciprocated (tech-spec-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "design-review-facilitator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tech-spec-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2071,9 +2171,10 @@
       ],
       "evidence": "exclusion toward `diataxis-doc-organizer` is not reciprocated (diataxis-doc-organizer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "docs-retention-index",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "diataxis-doc-organizer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2088,9 +2189,10 @@
       ],
       "evidence": "exclusion toward `sunset-deprecation-communicator` is not reciprocated (sunset-deprecation-communicator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "docs-retention-index",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "sunset-deprecation-communicator",
       "confidence": "low",
       "mechanical": true
     },
@@ -2105,9 +2207,10 @@
       ],
       "evidence": "exclusion toward `accessibility-test-harness` is not reciprocated (accessibility-test-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "edge-state-ux-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "accessibility-test-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -2122,9 +2225,10 @@
       ],
       "evidence": "exclusion toward `appsec-implementer` is not reciprocated (appsec-implementer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "error-handling-security-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "appsec-implementer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2139,9 +2243,10 @@
       ],
       "evidence": "exclusion toward `error-taxonomy-designer` is not reciprocated (error-taxonomy-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "error-handling-security-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "error-taxonomy-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2156,9 +2261,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "error-handling-security-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2173,9 +2279,10 @@
       ],
       "evidence": "exclusion toward `static-analysis-reviewer` is not reciprocated (static-analysis-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "error-handling-security-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "static-analysis-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2190,9 +2297,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "error-taxonomy-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2207,9 +2315,10 @@
       ],
       "evidence": "exclusion toward `ai-evaluation-harness` is not reciprocated (ai-evaluation-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "eval-runner-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-evaluation-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -2224,9 +2333,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "eval-runner-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2241,9 +2351,10 @@
       ],
       "evidence": "exclusion toward `skill-quality-reviewer` is not reciprocated (skill-quality-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "eval-runner-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2258,9 +2369,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "event-schema-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2275,9 +2387,10 @@
       ],
       "evidence": "exclusion toward `streaming-event-architect` is not reciprocated (streaming-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "event-schema-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "streaming-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2292,9 +2405,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "feature-flag-rollout-strategist",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2309,9 +2423,10 @@
       ],
       "evidence": "exclusion toward `plan-entitlement-architect` is not reciprocated (plan-entitlement-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "feature-flag-rollout-strategist",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "plan-entitlement-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2326,9 +2441,10 @@
       ],
       "evidence": "exclusion toward `pii-lifecycle-designer` is not reciprocated (pii-lifecycle-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "file-upload-storage-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "pii-lifecycle-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2343,9 +2459,10 @@
       ],
       "evidence": "exclusion toward `rls-policy-auditor` is not reciprocated (rls-policy-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "file-upload-storage-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rls-policy-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -2360,9 +2477,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "flaky-test-detective",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -2377,9 +2495,10 @@
       ],
       "evidence": "exclusion toward `multi-framework-crosswalk` is not reciprocated (multi-framework-crosswalk's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "framework-edition-tracker",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-framework-crosswalk",
       "confidence": "low",
       "mechanical": true
     },
@@ -2394,9 +2513,10 @@
       ],
       "evidence": "exclusion toward `library-diff-reviewer` is not reciprocated (library-diff-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "framework-mapping-refresher",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "library-diff-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2411,9 +2531,10 @@
       ],
       "evidence": "exclusion toward `latency-budget-architect` is not reciprocated (latency-budget-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "frontend-perf-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "latency-budget-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2428,9 +2549,10 @@
       ],
       "evidence": "exclusion toward `playwright-e2e-engineer` is not reciprocated (playwright-e2e-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "frontend-perf-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "playwright-e2e-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2445,9 +2567,10 @@
       ],
       "evidence": "exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "funnel-definition-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "event-schema-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2462,9 +2585,10 @@
       ],
       "evidence": "exclusion toward `product-analytics-instrumenter` is not reciprocated (product-analytics-instrumenter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "funnel-definition-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "product-analytics-instrumenter",
       "confidence": "low",
       "mechanical": true
     },
@@ -2479,9 +2603,10 @@
       ],
       "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "gated-deployment-prompt-template",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "incident-response-runbook",
       "confidence": "low",
       "mechanical": true
     },
@@ -2496,9 +2621,10 @@
       ],
       "evidence": "exclusion toward `merge-is-deploy-governance` is not reciprocated (merge-is-deploy-governance's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "gated-deployment-prompt-template",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "merge-is-deploy-governance",
       "confidence": "low",
       "mechanical": true
     },
@@ -2513,9 +2639,10 @@
       ],
       "evidence": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "gated-deployment-prompt-template",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rollback-runbook-author",
       "confidence": "low",
       "mechanical": true
     },
@@ -2530,9 +2657,10 @@
       ],
       "evidence": "exclusion toward `secure-migration-reviewer` is not reciprocated (secure-migration-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "gated-deployment-prompt-template",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "secure-migration-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2547,9 +2675,10 @@
       ],
       "evidence": "exclusion toward `caching-strategy-designer` is not reciprocated (caching-strategy-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "horizontal-scalability-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "caching-strategy-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2564,9 +2693,10 @@
       ],
       "evidence": "exclusion toward `latency-budget-architect` is not reciprocated (latency-budget-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "horizontal-scalability-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "latency-budget-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2581,9 +2711,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "horizontal-scalability-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2598,9 +2729,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "human-agent-trust-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -2615,9 +2747,10 @@
       ],
       "evidence": "exclusion toward `ai-governance-risk-reviewer` is not reciprocated (ai-governance-risk-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "human-agent-trust-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-governance-risk-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2632,9 +2765,10 @@
       ],
       "evidence": "exclusion toward `ai-misinformation-guard` is not reciprocated (ai-misinformation-guard's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "human-agent-trust-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-misinformation-guard",
       "confidence": "low",
       "mechanical": true
     },
@@ -2649,9 +2783,10 @@
       ],
       "evidence": "exclusion toward `human-approval-boundary` is not reciprocated (human-approval-boundary's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "human-agent-trust-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "human-approval-boundary",
       "confidence": "low",
       "mechanical": true
     },
@@ -2663,13 +2798,12 @@
       "owning_skill": "human-approval-boundary",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "human-approval-boundary",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -2684,9 +2818,10 @@
       ],
       "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "iac-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ci-pipeline-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2701,9 +2836,10 @@
       ],
       "evidence": "exclusion toward `secure-migration-reviewer` is not reciprocated (secure-migration-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "iac-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "secure-migration-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2718,9 +2854,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "incident-response-runbook",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -2735,9 +2872,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-security-tester` is not reciprocated (multi-tenant-security-tester's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "integration-test-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-security-tester",
       "confidence": "low",
       "mechanical": true
     },
@@ -2752,9 +2890,10 @@
       ],
       "evidence": "exclusion toward `agent-identity-privilege-reviewer` is not reciprocated (agent-identity-privilege-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "inter-agent-comms-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-identity-privilege-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2769,9 +2908,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "inter-agent-comms-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2786,9 +2926,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "inter-agent-comms-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -2803,9 +2944,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "inter-agent-comms-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2820,9 +2962,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "intra-tenant-scope-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2837,9 +2980,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "intra-tenant-scope-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -2854,9 +2998,10 @@
       ],
       "evidence": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "intra-tenant-scope-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tenant-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -2871,9 +3016,10 @@
       ],
       "evidence": "exclusion toward `compliance-gap-auditor` is not reciprocated (compliance-gap-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "iso-27001-isms-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "compliance-gap-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -2888,9 +3034,10 @@
       ],
       "evidence": "exclusion toward `soc2-trust-criteria-mapper` is not reciprocated (soc2-trust-criteria-mapper's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "iso-27001-isms-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "soc2-trust-criteria-mapper",
       "confidence": "low",
       "mechanical": true
     },
@@ -2905,9 +3052,10 @@
       ],
       "evidence": "exclusion toward `ai-governance-risk-reviewer` is not reciprocated (ai-governance-risk-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "iso-42001-aims-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-governance-risk-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2922,9 +3070,10 @@
       ],
       "evidence": "exclusion toward `agent-instruction-consolidator` is not reciprocated (agent-instruction-consolidator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "lane-authoring-guide",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-instruction-consolidator",
       "confidence": "low",
       "mechanical": true
     },
@@ -2939,9 +3088,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "lane-authoring-guide",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -2956,9 +3106,10 @@
       ],
       "evidence": "exclusion toward `ai-sdlc-operating-model` is not reciprocated (ai-sdlc-operating-model's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "lane-authoring-guide",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": true
     },
@@ -2973,9 +3124,10 @@
       ],
       "evidence": "exclusion toward `scoped-approval-register` is not reciprocated (scoped-approval-register's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "lane-authoring-guide",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "scoped-approval-register",
       "confidence": "low",
       "mechanical": true
     },
@@ -2990,9 +3142,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "latency-budget-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3007,9 +3160,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "library-diff-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -3024,9 +3178,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "library-diff-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3041,9 +3196,10 @@
       ],
       "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "library-diff-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "release-readiness-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3058,9 +3214,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "load-test-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3075,9 +3232,10 @@
       ],
       "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "local-ci-mirror-preflight",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ci-pipeline-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3092,9 +3250,10 @@
       ],
       "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "local-ci-mirror-preflight",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "release-readiness-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3109,9 +3268,10 @@
       ],
       "evidence": "exclusion toward `qa-strategy-architect` is not reciprocated (qa-strategy-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "manual-test-case-creator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-strategy-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3126,9 +3286,10 @@
       ],
       "evidence": "exclusion toward `agent-memory-governance` is not reciprocated (agent-memory-governance's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "memory-context-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-memory-governance",
       "confidence": "low",
       "mechanical": true
     },
@@ -3143,9 +3304,10 @@
       ],
       "evidence": "exclusion toward `model-poisoning-reviewer` is not reciprocated (model-poisoning-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "memory-context-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "model-poisoning-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3160,9 +3322,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "memory-context-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -3177,9 +3340,10 @@
       ],
       "evidence": "exclusion toward `rag-security-architect` is not reciprocated (rag-security-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "memory-context-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rag-security-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3194,9 +3358,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "merge-is-deploy-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -3211,9 +3376,10 @@
       ],
       "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "merge-is-deploy-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ci-pipeline-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3228,9 +3394,10 @@
       ],
       "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "merge-is-deploy-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "release-readiness-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3245,9 +3412,10 @@
       ],
       "evidence": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "merge-is-deploy-governance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rollback-runbook-author",
       "confidence": "low",
       "mechanical": true
     },
@@ -3262,9 +3430,10 @@
       ],
       "evidence": "exclusion toward `accessibility-test-harness` is not reciprocated (accessibility-test-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "mobile-viewport-craft",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "accessibility-test-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -3279,9 +3448,10 @@
       ],
       "evidence": "exclusion toward `frontend-perf-engineer` is not reciprocated (frontend-perf-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "mobile-viewport-craft",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "frontend-perf-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3296,9 +3466,10 @@
       ],
       "evidence": "exclusion toward `prompt-injection-defender` is not reciprocated (prompt-injection-defender's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "model-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prompt-injection-defender",
       "confidence": "low",
       "mechanical": true
     },
@@ -3313,9 +3484,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "model-poisoning-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3330,9 +3502,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "multi-tenant-security-tester",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3347,9 +3520,10 @@
       ],
       "evidence": "exclusion toward `tenant-isolation-reviewer` is not reciprocated (tenant-isolation-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "multi-tenant-security-tester",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tenant-isolation-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3364,9 +3538,10 @@
       ],
       "evidence": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "multi-tenant-security-tester",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tenant-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -3381,9 +3556,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "notification-webhook-ux-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3398,9 +3574,10 @@
       ],
       "evidence": "exclusion toward `edge-state-ux-designer` is not reciprocated (edge-state-ux-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "notification-webhook-ux-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "edge-state-ux-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3415,9 +3592,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "observability-operator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -3432,9 +3610,10 @@
       ],
       "evidence": "exclusion toward `caching-strategy-designer` is not reciprocated (caching-strategy-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "offline-first-sync-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "caching-strategy-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3449,9 +3628,10 @@
       ],
       "evidence": "exclusion toward `edge-state-ux-designer` is not reciprocated (edge-state-ux-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "offline-first-sync-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "edge-state-ux-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3463,13 +3643,12 @@
       "owning_skill": "offline-first-sync-architect",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "offline-first-sync-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3481,13 +3660,12 @@
       "owning_skill": "operational-vs-analytical-splitter",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "operational-vs-analytical-splitter",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3502,9 +3680,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "pagination-cursor-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3519,9 +3698,10 @@
       ],
       "evidence": "exclusion toward `query-plan-reader` is not reciprocated (query-plan-reader's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "pagination-cursor-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "query-plan-reader",
       "confidence": "low",
       "mechanical": true
     },
@@ -3536,9 +3716,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "phased-work-handoff-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -3553,9 +3734,10 @@
       ],
       "evidence": "exclusion toward `ai-sdlc-operating-model` is not reciprocated (ai-sdlc-operating-model's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "phased-work-handoff-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": true
     },
@@ -3570,9 +3752,10 @@
       ],
       "evidence": "exclusion toward `lane-authoring-guide` is not reciprocated (lane-authoring-guide's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "phased-work-handoff-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "lane-authoring-guide",
       "confidence": "low",
       "mechanical": true
     },
@@ -3587,9 +3770,10 @@
       ],
       "evidence": "exclusion toward `audit-log-architect` is not reciprocated (audit-log-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "pii-lifecycle-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "audit-log-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3604,9 +3788,10 @@
       ],
       "evidence": "exclusion toward `test-data-architect` is not reciprocated (test-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "pii-lifecycle-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "test-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -3621,9 +3806,10 @@
       ],
       "evidence": "exclusion toward `accessibility-test-harness` is not reciprocated (accessibility-test-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "playwright-e2e-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "accessibility-test-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -3638,9 +3824,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "principal-code-analyst",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -3655,9 +3842,10 @@
       ],
       "evidence": "exclusion toward `product-spec-writer` is not reciprocated (product-spec-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "prioritization-frame-picker",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "product-spec-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3672,9 +3860,10 @@
       ],
       "evidence": "exclusion toward `requirements-gathering-facilitator` is not reciprocated (requirements-gathering-facilitator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "prioritization-frame-picker",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "requirements-gathering-facilitator",
       "confidence": "low",
       "mechanical": true
     },
@@ -3689,9 +3878,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "product-analytics-instrumenter",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -3706,9 +3896,10 @@
       ],
       "evidence": "exclusion toward `skill-usage-instrumenter` is not reciprocated (skill-usage-instrumenter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "product-analytics-instrumenter",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "skill-usage-instrumenter",
       "confidence": "low",
       "mechanical": true
     },
@@ -3723,9 +3914,10 @@
       ],
       "evidence": "exclusion toward `adr-writer` is not reciprocated (adr-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "product-spec-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "adr-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3740,9 +3932,10 @@
       ],
       "evidence": "exclusion toward `feature-flag-rollout-strategist` is not reciprocated (feature-flag-rollout-strategist's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "product-spec-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "feature-flag-rollout-strategist",
       "confidence": "low",
       "mechanical": true
     },
@@ -3757,9 +3950,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "profiling-methodology-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -3774,9 +3968,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "profiling-methodology-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -3791,9 +3986,10 @@
       ],
       "evidence": "exclusion toward `ai-sdlc-operating-model` is not reciprocated (ai-sdlc-operating-model's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": true
     },
@@ -3808,9 +4004,10 @@
       ],
       "evidence": "exclusion toward `product-spec-writer` is not reciprocated (product-spec-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "product-spec-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3825,9 +4022,10 @@
       ],
       "evidence": "exclusion toward `requirements-gathering-facilitator` is not reciprocated (requirements-gathering-facilitator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "requirements-gathering-facilitator",
       "confidence": "low",
       "mechanical": true
     },
@@ -3835,7 +4033,7 @@
       "rule": "ROUTE-003",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 138,
+      "line": 0,
       "owning_skill": "project-orchestrator",
       "related_skills": [
         "prioritization-frame-picker",
@@ -3849,7 +4047,6 @@
         "AEGIS-045"
       ],
       "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -3857,17 +4054,16 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 262,
+      "line": 252,
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3879,13 +4075,12 @@
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)",
-      "family": "state",
+      "family": "state-append",
       "aegis_map": [
         "AEGIS-002",
         "AEGIS-006"
       ],
       "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3897,13 +4092,12 @@
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)",
-      "family": "state",
+      "family": "state-append",
       "aegis_map": [
         "AEGIS-002",
         "AEGIS-006"
       ],
       "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3915,13 +4109,12 @@
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "scope grant that authorizes BUILDING from a requirements-stage approval: 'Build the v1 scope' (content approval must not become implementation authority)",
-      "family": "appr",
+      "family": "approval",
       "aegis_map": [
         "AEGIS-003",
         "AEGIS-008"
       ],
       "remediation_owner": "project-orchestrator",
-      "semantic_review_owner": "agent-governance-audit",
       "confidence": "medium",
       "mechanical": false
     },
@@ -3936,9 +4129,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "promotion-packet-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -3953,9 +4147,10 @@
       ],
       "evidence": "exclusion toward `phased-work-handoff-designer` is not reciprocated (phased-work-handoff-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "promotion-packet-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "phased-work-handoff-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -3970,9 +4165,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "prompt-injection-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -3984,13 +4180,12 @@
       "owning_skill": "prompt-injection-defender",
       "related_skills": [],
       "evidence": "trigger-evals neighbor 'ai-security-red-team-reviewer (subagent)' is annotated prose, not a resolvable name (target 'ai-security-red-team-reviewer' exists) \u2014 an eval runner cannot match it mechanically",
-      "family": "eval",
+      "family": "eval-coverage",
       "aegis_map": [
-        "AEGIS-060",
-        "AEGIS-018"
+        "AEGIS-018",
+        "AEGIS-053"
       ],
       "remediation_owner": "prompt-injection-defender",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -4005,9 +4200,10 @@
       ],
       "evidence": "exclusion toward `test-plan-designer` is not reciprocated (test-plan-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "qa-automation-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "test-plan-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4022,9 +4218,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "rag-security-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4039,9 +4236,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "realtime-subscription-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4056,9 +4254,10 @@
       ],
       "evidence": "exclusion toward `notification-webhook-ux-designer` is not reciprocated (notification-webhook-ux-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "realtime-subscription-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "notification-webhook-ux-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4073,9 +4272,10 @@
       ],
       "evidence": "exclusion toward `streaming-event-architect` is not reciprocated (streaming-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "realtime-subscription-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "streaming-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4090,9 +4290,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "regression-suite-curator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4107,9 +4308,10 @@
       ],
       "evidence": "exclusion toward `test-coverage-mapper` is not reciprocated (test-coverage-mapper's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "regression-suite-curator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "test-coverage-mapper",
       "confidence": "low",
       "mechanical": true
     },
@@ -4124,9 +4326,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "release-readiness-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4141,9 +4344,10 @@
       ],
       "evidence": "exclusion toward `security-pr-reviewer` is not reciprocated (security-pr-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "release-readiness-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "security-pr-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4155,13 +4359,12 @@
       "owning_skill": "release-readiness-reviewer",
       "related_skills": [],
       "evidence": "trigger-evals neighbor 'release-readiness-reviewer (subagent)' is annotated prose, not a resolvable name (target 'release-readiness-reviewer' exists) \u2014 an eval runner cannot match it mechanically",
-      "family": "eval",
+      "family": "eval-coverage",
       "aegis_map": [
-        "AEGIS-060",
-        "AEGIS-018"
+        "AEGIS-018",
+        "AEGIS-053"
       ],
       "remediation_owner": "release-readiness-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "high",
       "mechanical": true
     },
@@ -4176,9 +4379,10 @@
       ],
       "evidence": "exclusion toward `domain-modeler` is not reciprocated (domain-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "requirements-gathering-facilitator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "domain-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -4193,9 +4397,10 @@
       ],
       "evidence": "exclusion toward `source-of-truth-reconciler` is not reciprocated (source-of-truth-reconciler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "requirements-gathering-facilitator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "source-of-truth-reconciler",
       "confidence": "low",
       "mechanical": true
     },
@@ -4210,9 +4415,10 @@
       ],
       "evidence": "exclusion toward `change-classification-gate` is not reciprocated (change-classification-gate's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "risk-tiered-validation-selector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "change-classification-gate",
       "confidence": "low",
       "mechanical": true
     },
@@ -4227,9 +4433,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "rls-policy-auditor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -4244,9 +4451,10 @@
       ],
       "evidence": "exclusion toward `prioritization-frame-picker` is not reciprocated (prioritization-frame-picker's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "roadmap-to-commitments-translator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prioritization-frame-picker",
       "confidence": "low",
       "mechanical": true
     },
@@ -4261,9 +4469,10 @@
       ],
       "evidence": "exclusion toward `roadmap-under-uncertainty-planner` is not reciprocated (roadmap-under-uncertainty-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "roadmap-to-commitments-translator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "roadmap-under-uncertainty-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -4278,9 +4487,10 @@
       ],
       "evidence": "exclusion toward `feature-flag-rollout-strategist` is not reciprocated (feature-flag-rollout-strategist's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "feature-flag-rollout-strategist",
       "confidence": "low",
       "mechanical": true
     },
@@ -4295,9 +4505,10 @@
       ],
       "evidence": "exclusion toward `product-spec-writer` is not reciprocated (product-spec-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "product-spec-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4311,13 +4522,12 @@
         "roadmap-to-commitments-translator"
       ],
       "evidence": "'committed' used as a roadmap HORIZON label ('committed/planned/exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
-      "family": "vocab",
+      "family": "vocabulary",
       "aegis_map": [
         "AEGIS-044",
         "AEGIS-039"
       ],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
       "mechanical": true
     },
@@ -4331,13 +4541,12 @@
         "roadmap-to-commitments-translator"
       ],
       "evidence": "'committed' used as a roadmap HORIZON label ('committed/planned/\\n   exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
-      "family": "vocab",
+      "family": "vocabulary",
       "aegis_map": [
         "AEGIS-044",
         "AEGIS-039"
       ],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
       "mechanical": true
     },
@@ -4351,13 +4560,12 @@
         "roadmap-to-commitments-translator"
       ],
       "evidence": "'committed' used as a roadmap HORIZON label ('Now (committed)') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
-      "family": "vocab",
+      "family": "vocabulary",
       "aegis_map": [
         "AEGIS-044",
         "AEGIS-039"
       ],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
       "mechanical": true
     },
@@ -4371,13 +4579,12 @@
         "roadmap-to-commitments-translator"
       ],
       "evidence": "'committed' used as a roadmap HORIZON label ('Committed / Planned / Exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
-      "family": "vocab",
+      "family": "vocabulary",
       "aegis_map": [
         "AEGIS-044",
         "AEGIS-039"
       ],
-      "remediation_owner": "roadmap-under-uncertainty-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
       "confidence": "high",
       "mechanical": true
     },
@@ -4392,9 +4599,10 @@
       ],
       "evidence": "exclusion toward `secure-migration-reviewer` is not reciprocated (secure-migration-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "rollback-runbook-author",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "secure-migration-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4409,9 +4617,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "saas-platform-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4426,9 +4635,10 @@
       ],
       "evidence": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "saas-platform-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tenant-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -4443,9 +4653,10 @@
       ],
       "evidence": "exclusion toward `static-analysis-reviewer` is not reciprocated (static-analysis-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sast-orchestration-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "static-analysis-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4460,9 +4671,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sast-orchestration-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4477,9 +4689,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "schema-evolution-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4494,9 +4707,10 @@
       ],
       "evidence": "exclusion toward `streaming-event-architect` is not reciprocated (streaming-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "schema-evolution-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "streaming-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4511,9 +4725,10 @@
       ],
       "evidence": "exclusion toward `adr-writer` is not reciprocated (adr-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "scoped-approval-register",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "adr-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4528,9 +4743,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "scoped-approval-register",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -4545,9 +4761,10 @@
       ],
       "evidence": "exclusion toward `human-approval-boundary` is not reciprocated (human-approval-boundary's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "scoped-approval-register",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "human-approval-boundary",
       "confidence": "low",
       "mechanical": true
     },
@@ -4559,13 +4776,12 @@
       "owning_skill": "scoped-approval-register",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "scoped-approval-register",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -4580,9 +4796,10 @@
       ],
       "evidence": "exclusion toward `ai-closeout-reporter` is not reciprocated (ai-closeout-reporter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "screenshot-evidence-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-closeout-reporter",
       "confidence": "low",
       "mechanical": true
     },
@@ -4597,9 +4814,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "search-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4614,9 +4832,10 @@
       ],
       "evidence": "exclusion toward `pagination-cursor-designer` is not reciprocated (pagination-cursor-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "search-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "pagination-cursor-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4631,9 +4850,10 @@
       ],
       "evidence": "exclusion toward `rag-security-architect` is not reciprocated (rag-security-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "search-architecture-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rag-security-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4648,9 +4868,10 @@
       ],
       "evidence": "exclusion toward `rls-policy-auditor` is not reciprocated (rls-policy-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "secrets-identity-hardener",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "rls-policy-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -4665,9 +4886,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "secrets-identity-hardener",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -4682,9 +4904,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "secure-migration-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4699,9 +4922,10 @@
       ],
       "evidence": "exclusion toward `audit-log-architect` is not reciprocated (audit-log-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-logging-alerting-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "audit-log-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4716,9 +4940,10 @@
       ],
       "evidence": "exclusion toward `incident-response-runbook` is not reciprocated (incident-response-runbook's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-logging-alerting-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "incident-response-runbook",
       "confidence": "low",
       "mechanical": true
     },
@@ -4733,9 +4958,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-logging-alerting-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -4750,9 +4976,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-logging-alerting-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4767,9 +4994,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-pr-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4784,9 +5012,10 @@
       ],
       "evidence": "exclusion toward `static-analysis-reviewer` is not reciprocated (static-analysis-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-scan-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "static-analysis-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4801,9 +5030,10 @@
       ],
       "evidence": "exclusion toward `supply-chain-security-reviewer` is not reciprocated (supply-chain-security-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "security-scan-orchestrator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "supply-chain-security-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4818,9 +5048,10 @@
       ],
       "evidence": "exclusion toward `ai-governance-risk-reviewer` is not reciprocated (ai-governance-risk-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sensitive-disclosure-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-governance-risk-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4835,9 +5066,10 @@
       ],
       "evidence": "exclusion toward `llm-output-safety-reviewer` is not reciprocated (llm-output-safety-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sensitive-disclosure-guard",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "llm-output-safety-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4852,9 +5084,10 @@
       ],
       "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sharded-validation-with-resume",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ci-pipeline-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4869,9 +5102,10 @@
       ],
       "evidence": "exclusion toward `flaky-test-detective` is not reciprocated (flaky-test-detective's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sharded-validation-with-resume",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "flaky-test-detective",
       "confidence": "low",
       "mechanical": true
     },
@@ -4886,9 +5120,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "share-link-access-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -4903,9 +5138,10 @@
       ],
       "evidence": "exclusion toward `authorization-matrix-designer` is not reciprocated (authorization-matrix-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "share-link-access-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "authorization-matrix-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4920,9 +5156,10 @@
       ],
       "evidence": "exclusion toward `library-diff-reviewer` is not reciprocated (library-diff-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-deprecation-planner",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "library-diff-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4937,9 +5174,10 @@
       ],
       "evidence": "exclusion toward `agent-governance-audit` is not reciprocated (agent-governance-audit's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-quality-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": true
     },
@@ -4954,9 +5192,10 @@
       ],
       "evidence": "exclusion toward `code-reviewer` is not reciprocated (code-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-quality-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "code-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -4971,9 +5210,10 @@
       ],
       "evidence": "exclusion toward `full-codebase-auditor` is not reciprocated (full-codebase-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-quality-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "full-codebase-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -4988,9 +5228,10 @@
       ],
       "evidence": "exclusion toward `eval-runner-designer` is not reciprocated (eval-runner-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-usage-instrumenter",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "eval-runner-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5005,9 +5246,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-usage-instrumenter",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -5022,9 +5264,10 @@
       ],
       "evidence": "exclusion toward `skill-quality-reviewer` is not reciprocated (skill-quality-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "skill-usage-instrumenter",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5039,9 +5282,10 @@
       ],
       "evidence": "exclusion toward `systematic-debugger` is not reciprocated (systematic-debugger's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "slo-reliability-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "systematic-debugger",
       "confidence": "low",
       "mechanical": true
     },
@@ -5056,9 +5300,10 @@
       ],
       "evidence": "exclusion toward `compliance-evidence-collector` is not reciprocated (compliance-evidence-collector's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "soc2-trust-criteria-mapper",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "compliance-evidence-collector",
       "confidence": "low",
       "mechanical": true
     },
@@ -5073,9 +5318,10 @@
       ],
       "evidence": "exclusion toward `compliance-gap-auditor` is not reciprocated (compliance-gap-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "soc2-trust-criteria-mapper",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "compliance-gap-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -5090,9 +5336,10 @@
       ],
       "evidence": "exclusion toward `skill-quality-reviewer` is not reciprocated (skill-quality-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "source-currency-auditor",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "skill-quality-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5107,9 +5354,10 @@
       ],
       "evidence": "exclusion toward `prioritization-frame-picker` is not reciprocated (prioritization-frame-picker's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "staff-scope-selector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "prioritization-frame-picker",
       "confidence": "low",
       "mechanical": true
     },
@@ -5124,9 +5372,10 @@
       ],
       "evidence": "exclusion toward `roadmap-under-uncertainty-planner` is not reciprocated (roadmap-under-uncertainty-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "staff-scope-selector",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "roadmap-under-uncertainty-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -5141,9 +5390,10 @@
       ],
       "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "standing-approval-and-auto-advance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-authorization-matrix",
       "confidence": "low",
       "mechanical": true
     },
@@ -5158,9 +5408,10 @@
       ],
       "evidence": "exclusion toward `human-agent-trust-reviewer` is not reciprocated (human-agent-trust-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "standing-approval-and-auto-advance",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "human-agent-trust-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5175,9 +5426,10 @@
       ],
       "evidence": "exclusion toward `compliance-control-foundation` is not reciprocated (compliance-control-foundation's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "statement-of-applicability-author",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "compliance-control-foundation",
       "confidence": "low",
       "mechanical": true
     },
@@ -5192,9 +5444,10 @@
       ],
       "evidence": "exclusion toward `audit-log-architect` is not reciprocated (audit-log-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "streaming-event-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "audit-log-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5206,13 +5459,12 @@
       "owning_skill": "streaming-event-architect",
       "related_skills": [],
       "evidence": "claims durability ('Durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
-      "family": "artf",
+      "family": "artifact",
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
       ],
       "remediation_owner": "streaming-event-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
       "confidence": "medium",
       "mechanical": false
     },
@@ -5227,9 +5479,10 @@
       ],
       "evidence": "exclusion toward `agent-tool-safety-guard` is not reciprocated (agent-tool-safety-guard's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "structured-output-validator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-tool-safety-guard",
       "confidence": "low",
       "mechanical": true
     },
@@ -5244,9 +5497,10 @@
       ],
       "evidence": "exclusion toward `api-event-architect` is not reciprocated (api-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sunset-deprecation-communicator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "api-event-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5261,9 +5515,10 @@
       ],
       "evidence": "exclusion toward `skill-deprecation-planner` is not reciprocated (skill-deprecation-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "sunset-deprecation-communicator",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "skill-deprecation-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -5278,9 +5533,10 @@
       ],
       "evidence": "exclusion toward `admin-console-architect` is not reciprocated (admin-console-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "superadmin-observability-console-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "admin-console-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5295,9 +5551,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "superadmin-observability-console-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -5312,9 +5569,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "superadmin-observability-console-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5329,9 +5587,10 @@
       ],
       "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "supply-chain-security-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "threat-modeler",
       "confidence": "low",
       "mechanical": true
     },
@@ -5346,9 +5605,10 @@
       ],
       "evidence": "exclusion toward `load-test-planner` is not reciprocated (load-test-planner's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "synthetic-monitoring-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "load-test-planner",
       "confidence": "low",
       "mechanical": true
     },
@@ -5363,9 +5623,10 @@
       ],
       "evidence": "exclusion toward `observability-operator` is not reciprocated (observability-operator's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "synthetic-monitoring-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "observability-operator",
       "confidence": "low",
       "mechanical": true
     },
@@ -5380,9 +5641,10 @@
       ],
       "evidence": "exclusion toward `performance-test-harness` is not reciprocated (performance-test-harness's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "synthetic-monitoring-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "performance-test-harness",
       "confidence": "low",
       "mechanical": true
     },
@@ -5397,9 +5659,10 @@
       ],
       "evidence": "exclusion toward `playwright-e2e-engineer` is not reciprocated (playwright-e2e-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "synthetic-monitoring-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "playwright-e2e-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5414,9 +5677,10 @@
       ],
       "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "synthetic-monitoring-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "slo-reliability-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5431,9 +5695,10 @@
       ],
       "evidence": "exclusion toward `agent-tool-safety-guard` is not reciprocated (agent-tool-safety-guard's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "system-prompt-leakage-reviewer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "agent-tool-safety-guard",
       "confidence": "low",
       "mechanical": true
     },
@@ -5448,9 +5713,10 @@
       ],
       "evidence": "exclusion toward `tdd-engineer` is not reciprocated (tdd-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "systematic-debugger",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tdd-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5465,9 +5731,10 @@
       ],
       "evidence": "exclusion toward `adr-writer` is not reciprocated (adr-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "tech-spec-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "adr-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5482,9 +5749,10 @@
       ],
       "evidence": "exclusion toward `architecture-designer` is not reciprocated (architecture-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "tech-spec-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "architecture-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5499,9 +5767,10 @@
       ],
       "evidence": "exclusion toward `product-spec-writer` is not reciprocated (product-spec-writer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "tech-spec-writer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "product-spec-writer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5516,9 +5785,10 @@
       ],
       "evidence": "exclusion toward `full-codebase-auditor` is not reciprocated (full-codebase-auditor's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "test-coverage-mapper",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "full-codebase-auditor",
       "confidence": "low",
       "mechanical": true
     },
@@ -5533,9 +5803,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-data-architect` is not reciprocated (multi-tenant-data-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "test-data-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-data-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5550,9 +5821,10 @@
       ],
       "evidence": "exclusion toward `multi-tenant-security-tester` is not reciprocated (multi-tenant-security-tester's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "test-data-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "multi-tenant-security-tester",
       "confidence": "low",
       "mechanical": true
     },
@@ -5567,9 +5839,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "test-data-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5584,9 +5857,10 @@
       ],
       "evidence": "exclusion toward `static-analysis-reviewer` is not reciprocated (static-analysis-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "static-analysis-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5601,9 +5875,10 @@
       ],
       "evidence": "exclusion toward `tenant-isolation-reviewer` is not reciprocated (tenant-isolation-reviewer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "threat-modeler",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tenant-isolation-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5618,9 +5893,10 @@
       ],
       "evidence": "exclusion toward `ai-cost-guardrail-designer` is not reciprocated (ai-cost-guardrail-designer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "usage-metering-and-cost-attribution-pipeline-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "ai-cost-guardrail-designer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5635,9 +5911,10 @@
       ],
       "evidence": "exclusion toward `operational-vs-analytical-splitter` is not reciprocated (operational-vs-analytical-splitter's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "usage-metering-and-cost-attribution-pipeline-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "operational-vs-analytical-splitter",
       "confidence": "low",
       "mechanical": true
     },
@@ -5652,9 +5929,10 @@
       ],
       "evidence": "exclusion toward `saas-cost-architect` is not reciprocated (saas-cost-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "usage-metering-and-cost-attribution-pipeline-designer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "saas-cost-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5669,9 +5947,10 @@
       ],
       "evidence": "exclusion toward `playwright-e2e-engineer` is not reciprocated (playwright-e2e-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "vite-build-qa-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "playwright-e2e-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5686,9 +5965,10 @@
       ],
       "evidence": "exclusion toward `qa-automation-architect` is not reciprocated (qa-automation-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "vite-build-qa-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "qa-automation-architect",
       "confidence": "low",
       "mechanical": true
     },
@@ -5703,9 +5983,10 @@
       ],
       "evidence": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "vite-build-qa-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "secrets-identity-hardener",
       "confidence": "low",
       "mechanical": true
     },
@@ -5720,9 +6001,10 @@
       ],
       "evidence": "exclusion toward `tdd-engineer` is not reciprocated (tdd-engineer's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "vitest-unit-component-engineer",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "tdd-engineer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5737,9 +6019,10 @@
       ],
       "evidence": "exclusion toward `streaming-event-architect` is not reciprocated (streaming-event-architect's description never mentions this skill)",
       "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "warehouse-lake-architect",
-      "semantic_review_owner": "skill-quality-reviewer",
+      "aegis_map": [
+        "AEGIS-044"
+      ],
+      "remediation_owner": "streaming-event-architect",
       "confidence": "low",
       "mechanical": true
     }
