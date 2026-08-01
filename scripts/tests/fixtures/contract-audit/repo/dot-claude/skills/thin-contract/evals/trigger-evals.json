@@ -1,0 +1,18 @@
+{
+  "skill": "thin-contract",
+  "cases": [
+    {
+      "id": "no-expected-skill",
+      "prompt": "Summarize."
+    },
+    {
+      "id": "stale-neighbors",
+      "prompt": "Summarize the release notes.",
+      "expected_skill": "thin-contract",
+      "should_not_trigger": [
+        "ghost-neighbor",
+        "clean-skill (subagent)"
+      ]
+    }
+  ]
+}

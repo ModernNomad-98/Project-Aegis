@@ -1,0 +1,27 @@
+{
+  "skill": "clean-skill",
+  "cases": [
+    {
+      "id": "positive",
+      "type": "should_trigger",
+      "prompt": "Tidy this diagram layout.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Proposes a tidied layout."
+        ]
+      }
+    },
+    {
+      "id": "negative",
+      "type": "should_not_trigger",
+      "prompt": "What is a diagram?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Answered as a plain response."
+        ]
+      }
+    }
+  ]
+}

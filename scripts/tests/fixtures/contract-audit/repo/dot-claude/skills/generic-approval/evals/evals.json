@@ -1,0 +1,27 @@
+{
+  "skill": "generic-approval",
+  "cases": [
+    {
+      "id": "positive",
+      "type": "should_trigger",
+      "prompt": "Record this approval.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Captures the decision."
+        ]
+      }
+    },
+    {
+      "id": "negative",
+      "type": "should_not_trigger",
+      "prompt": "What is an approval?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Answered as a plain response."
+        ]
+      }
+    }
+  ]
+}

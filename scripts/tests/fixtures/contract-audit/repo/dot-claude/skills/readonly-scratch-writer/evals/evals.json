@@ -1,0 +1,16 @@
+{
+  "skill": "readonly-scratch-writer",
+  "cases": [
+    {
+      "id": "positive-only",
+      "type": "should_trigger",
+      "prompt": "Review my build config.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reviews the config."
+        ]
+      }
+    }
+  ]
+}

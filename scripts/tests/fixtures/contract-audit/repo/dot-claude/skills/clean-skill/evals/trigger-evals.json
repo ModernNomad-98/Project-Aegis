@@ -1,0 +1,16 @@
+{
+  "skill": "clean-skill",
+  "overlaps_with": [
+    "readonly-scratch-writer"
+  ],
+  "cases": [
+    {
+      "id": "seam",
+      "prompt": "Tidy the layout.",
+      "expected_skill": "clean-skill",
+      "should_not_trigger": [
+        "readonly-scratch-writer"
+      ]
+    }
+  ]
+}
