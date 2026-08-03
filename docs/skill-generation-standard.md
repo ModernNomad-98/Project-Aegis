@@ -126,14 +126,18 @@ headers must all be present.
 ## 5. Least privilege & side effects
 
 This section is the repository's adopted least-privilege and side-effect policy: the
-Project Aegis **TALI v3.2.2** direction, host-neutral and behavior-based. **Adopting this
-wording defines the standard; it does NOT activate TALI for any existing shipped skill.**
+Project Aegis **TALI v3.2.3** direction — the owner-authorized, review-corrected successor to
+the independently reviewed **v3.2.2** design basis — host-neutral and behavior-based. **Adopting
+this wording defines the standard; it does NOT activate TALI for any existing shipped skill.**
 No shipped skill or execution route receives TALI authority merely because this policy is
 merged — TALI eligibility attaches only to a SEPARATELY classified and SEPARATELY activated
 execution route, under a later, separately authorized owner decision with route-specific
-evidence. Eligibility is by BEHAVIOR; no skill is named permanently eligible. The normative
-wording below is adopted verbatim (only line-wrapping is adapted for Markdown, and the
-action × context table is kept in a code fence to preserve its alignment).
+evidence. Eligibility is by BEHAVIOR; no skill is named permanently eligible. The v3.2.2
+normative wording below is adopted with line-wrapping adapted for Markdown (the action × context
+table kept in a code fence); v3.2.3's corrections — a deterministic validation-output constraint
+and the repository-working-tree scope clarification — are integrated into the eligibility clause,
+validation preflight (g), the action × context validation rows, the evidence closeout (j), and
+the deterministic sequence below.
 
 - Default to read-only. A skill that only reads and reports needs no allowed-tools widening.
 - Any write/network/deploy/spend behavior requires the repository's standard manual-only marker
@@ -157,7 +161,8 @@ or other irreversible action. Those remain manual-only and require `disable-mode
 
 Eligibility is by BEHAVIOR and explicit classification through the repository's governing process;
 NO skill is named permanently eligible here. TALI eligibility attaches to a SEPARATELY DEFINED
-execution route/phase whose possible mutations are CONFINED to ordinary approved source/test files.
+execution route/phase whose possible repository working-tree mutations are CONFINED to ordinary
+approved source/test files.
 A skill with ANY reachable install, network, Git, database, seeding, live-system, security-control,
 governance, or other excluded mutation is NOT TALI-eligible until that route is split and cannot be
 reached through the TALI phase. Deny-by-default. Every operation is exactly one of AUTONOMOUS,
@@ -230,6 +235,14 @@ network access; live-service access; database writes; test-data seeding; secret 
 destructive cleanup; and unaccounted generated/ignored output. A command is NOT safe by name.
 If any effect cannot be established absent read-only, the command is not TALI-autonomous.
 Textual preflight is a proposal filter, not a substitute for host enforcement.
+An autonomous TALI validation command must not create, modify, rename, or delete any path in the
+repository working tree outside the exact approved file set. Cache, coverage, build, generated,
+ignored, report, snapshot, temporary, and other repository outputs outside the approved file set
+are FORBIDDEN UNDER TALI. Host-managed ephemeral scratch outside the repository may be used only
+when the active host isolates it from the repository working tree, secrets, network access, live
+services, databases, external state, and other protected surfaces, and removes it before closeout.
+If an output path or side effect cannot be proven in advance, the validation command is FORBIDDEN
+UNDER TALI.
 
 **(h) HOST FAIL-CLOSED, CONTINUOUS.** TALI editing is available only when the active agent host can
 enforce or reliably support filesystem boundaries, shell-command permission boundaries, network
@@ -252,12 +265,14 @@ determines whether any approval path exists. A newly discovered or changed chang
 follows the reclassification rule in (d) before either route applies. The acting agent never
 issues itself a new or wider scope.
 
-**(j) EVIDENCE CLOSEOUT.** Separately report: tracked-file changes; new untracked files; generated
-files; permitted ignored output; temporary/cache changes; validation actually run; validation
-not run; failures verbatim; anything not inspected; anything not provably unchanged;
-intentionally not done; residual approval required. The closeout must CITE the approval record
-required by (l). git diff is never claimed to prove all filesystem changes. "none" is stated
-only where absence was actually verified.
+**(j) EVIDENCE CLOSEOUT.** Separately report: tracked-file changes; new untracked files; validation
+actually run; validation not run; failures verbatim; anything not inspected; anything not provably
+unchanged; intentionally not done; residual approval required. Unexpected generated, ignored,
+temporary, cache, coverage, build, report, or snapshot output in the repository working tree is a
+policy violation and must be reported — never described as permitted. Any host-managed ephemeral
+scratch outside the repository must be reported and confirmed removed. The closeout must CITE the
+approval record required by (l). git diff is never claimed to prove all filesystem changes. "none"
+may be stated only after absence was actually verified.
 
 **(k) APPROVAL EXPIRY & STALENESS.** The exact-scope approval is one-time and valid only for the
 current live session and this exact task. It expires at closeout, at the end of the session,
@@ -305,7 +320,9 @@ Begin editing while any of {valid direct current-
 Edit approved in-scope ordinary source/test file
   (all preconditions present) ...................... D:FORBID-TALI S:AUTON  X:FORBID-TALI H:FORBID-TALI U:FORBID-TALI
 Single-file/single-module internal refactor in set ... D:FORBID-TALI S:AUTON  X:FORBID-TALI H:FORBID-TALI U:FORBID-TALI
-Run approved validation command that passed preflight  D:FORBID-TALI S:AUTON  X:FORBID-TALI H:FORBID-TALI U:FORBID-TALI
+Run approved validation cmd (passed preflight AND
+  produces NO unapproved repository working-tree
+  output) ......................................... D:FORBID-TALI S:AUTON  X:FORBID-TALI H:FORBID-TALI U:FORBID-TALI
 New ordinary source/test file inside the SAME approved
   module (proposed scope expansion) / path not in the
   approved set ..................................... D:FORBID-TALI S:APPROVAL X:APPROVAL H:FORBID-TALI U:FORBID-TALI
@@ -323,7 +340,11 @@ Newly discovered or changed change class ............. FORBIDDEN UNDER TALI unti
                                                        during reclassification; afterwards the
                                                        resulting operation receives exactly one of
                                                        the three states (all contexts)
-Validation cmd whose side-effect-freedom not proven .. FORBIDDEN UNDER TALI (all contexts)
+Validation cmd whose side-effect-freedom not proven,
+  or that may produce cache / coverage / build /
+  generated / ignored / temporary / report / snapshot
+  or other repository working-tree output outside the
+  approved set ..................................... FORBIDDEN UNDER TALI (all contexts)
 Protected surface (path OR behavior); security-test
   assertion weakening; any git mutation; install;
   network/API/webhook/MCP; database write / seeding /
@@ -367,7 +388,10 @@ Legend (three states only):
    record required by (l) is fixed before any edit.
 8. Before the first edit AND before EACH subsequent mutating action or validation command, the
    acting agent re-confirms that: all preconditions still hold; host enforcement remains
-   continuously in force (h); and the approval has not expired or gone stale (k). Any failure stops
+   continuously in force (h); and the approval has not expired or gone stale (k). Before any
+   validation command it additionally re-confirms that the preflight remains valid, that the
+   command will produce NO unapproved repository working-tree output, and that any allowed
+   host-managed scratch is isolated outside the repository and will be removed. Any failure stops
    TALI and returns the work to manual-only.
 9. With all conditions continuously present — valid direct current-session request, completed
    classification, exact scope approval, continuously verified host enforcement, citable approval

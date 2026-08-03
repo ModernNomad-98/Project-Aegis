@@ -69,6 +69,10 @@ schema. Be specific enough that two runs produce consistent shapes.
       between approval and write. Autonomous source/test editing is NOT implied here;
       it exists only inside a separately classified and activated TALI route
       (Exception 2, §5), never by default.
+- [ ] Any autonomous TALI validation command produced NO unapproved repository
+      working-tree output (no cache/coverage/build/generated/ignored/temporary/report/
+      snapshot files outside the approved set), and any host-managed scratch stayed
+      outside the repository and was removed before closeout.
 
 ## Gotchas
 
@@ -84,10 +88,16 @@ schema. Be specific enough that two runs produce consistent shapes.
 - Before a documentation/project-state append under the standard-§5 approved-write
   exception (Exception 1): show the exact target path and exact content, wait for the
   explicit content-specific yes, and write only what was approved. A declined,
-  ambiguous, or changed approval means NO write. Every other side effect stays
-  manual-only (`disable-model-invocation: true`) unless it runs inside a separately
-  classified and separately activated TALI route (Exception 2, §5) with all of that
-  route's preconditions met — this template activates no such route.
+  ambiguous, or changed approval means NO write.
+- Every side effect outside Exception 1 remains manual-only
+  (`disable-model-invocation: true`) unless it is an ordinary approved source/test edit
+  inside a separately classified and separately activated TALI route with every §5
+  precondition satisfied. Delete or rename; Git mutation; package installation; network,
+  API, webhook, or MCP access; database write or seeding; deployment, provisioning,
+  spending, or live-state mutation; protected-surface change; security-control change;
+  governance change; architecture change; and every other §5 FORBIDDEN UNDER TALI class
+  remain forbidden and must hand off to the owning policy. A generic approval does not
+  convert any forbidden operation into a TALI operation. This template activates no route.
 
 ## Supporting Files
 
