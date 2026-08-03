@@ -113,6 +113,20 @@
           "Still separates the committed subset from the not-committed (directional) remainder."
         ]
       }
+    },
+    {
+      "id": "edge-no-external-dependencies-after-complete-discovery",
+      "type": "should_trigger",
+      "prompt": "We finished dependency discovery for this self-contained internal report feature and confirmed it has no external or cross-team dependencies. Architecture is done and we have a velocity baseline. Are we readiness-clear on the dependency side?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats completed dependency discovery that finds no external dependency as SUFFICIENT (Dependencies: none verified), not as missing evidence.",
+          "Does NOT return NOT COMMIT-ABLE on the basis of absent 'secured dependencies' when no dependency exists; secured-dependency evidence is required only where a dependency was actually discovered.",
+          "Still enforces the other evidence requirements independently (architecture/design, technical planning, a measured capacity basis, and a named human decision for any final commitment).",
+          "Distinguishes 'unknown - discovery incomplete' (missing) and a known-but-unsecured required dependency (insufficient) from 'none verified' after complete discovery (sufficient)."
+        ]
+      }
     }
   ]
 }

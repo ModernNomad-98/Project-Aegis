@@ -92,9 +92,9 @@ DECISION and STATE SNAPSHOT exactly as defined above.
 |----|------|---------------------------|-------------|----------------|----------------------|
 | PS-001 | <date> | <what was decided (chosen over <the main rejected alternative>, because <the plain-language why>)> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
 | PS-002 | <date> | Product specification complete — Stage 2 can classify the remaining owners (chosen over jumping to design, because the spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | spec; unblocks Stage 2 owner classification |
-| PS-003 | <date> | Prioritization not applicable (chosen over ranking, because one bounded MVP with no competing initiative to rank). | orchestrator | yes | Stage 2 exit gate |
-| PS-004 | <date> | Roadmap planning not applicable (chosen over sequencing horizons, because one bounded release with no sequencing decision). | orchestrator | yes | Stage 2 exit gate |
-| PS-005 | <date> | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator | yes | Stage 2 exit gate MET |
+| PS-003 | <date> | Prioritization not applicable (chosen over ranking, because one bounded MVP with no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-004 | <date> | Roadmap planning not applicable (chosen over sequencing horizons, because one bounded release with no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-005 | <date> | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET |
 
 ## Approvals (irreversible steps & scope grants)
 
@@ -147,9 +147,9 @@ DECISION and STATE SNAPSHOT exactly as defined above.
 |----|------|---------------------------|-------------|----------------|----------------------|
 | PS-001 | 2026-02-20 | Ship a small first version: create/assign/complete a job + a customer status link (chosen over a bigger first release, because a small v1 ships sooner and teaches us more). Everything else waits. | user | yes | brief above; unblocks product spec |
 | PS-002 | 2026-02-24 | Product specification complete — Stage 2 can classify the remaining owners (chosen over jumping straight to design, because the spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | spec; unblocks Stage 2 owner classification |
-| PS-003 | 2026-02-25 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator | yes | Stage 2 exit gate |
-| PS-004 | 2026-02-25 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator | yes | Stage 2 exit gate |
-| PS-005 | 2026-02-25 09:10 | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator | yes | Stage 2 exit gate MET → design may begin |
+| PS-003 | 2026-02-25 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-004 | 2026-02-25 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-005 | 2026-02-25 09:10 | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET → design may begin |
 | PS-006 | 2026-02-27 | Build it as one connected system for now (chosen over many separate services, because one system is cheaper and simpler for a small team and a few hundred users). | orchestrator-via-architecture-advisor | yes | advisor output; unblocks data design |
 | PS-007 | 2026-03-04 | Status links stop working when the job closes (chosen over "expire in 30 days" / "last forever", because a closed job's details shouldn't stay reachable). | user | yes | unblocks share-link design |
 

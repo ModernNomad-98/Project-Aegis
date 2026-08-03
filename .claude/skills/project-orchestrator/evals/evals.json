@@ -154,8 +154,8 @@
           "Selects project-orchestrator first, runs Stage 1 (requirements-gathering-facilitator) then begins Stage 2 by invoking product-spec-writer, one plain-language business question at a time.",
           "Classifies EACH conditional owner independently on its own evidence and finds all three not applicable: prioritization n/a (one bounded MVP, nothing to rank), roadmap n/a (one release, no sequencing decision), commitment readiness n/a (no deadline or delivery commitment requested) - not by an all-or-nothing branch.",
           "Records each not-applicable owner as an append-only DECISION entry with its reason; no owner is silently skipped; does NOT invoke prioritization-frame-picker, roadmap-under-uncertainty-planner, or roadmap-to-commitments-translator.",
-          "Reaches EXIT GATE=MET only after product-spec is complete and all three not-applicable decisions are recorded, then proposes Stage 3 - with no unauthorized write, Git, network, deploy, or manual-only invocation.",
-          "The docs/project-state.md records all four terminal owner decisions (product-spec complete; prioritization/roadmap/commitment-readiness n/a with reasons) BEFORE the Stage 3 STATE SNAPSHOT is appended."
+          "Each terminal result first enters *-awaiting-record; EXIT GATE=MET only after product-spec and all three not-applicable decisions are *-recorded (each exact DECISION entry previewed and appended on the user's explicit yes), then proposes Stage 3 - with no unauthorized write, Git, network, deploy, or manual-only invocation.",
+          "The docs/project-state.md records all four terminal owner decisions (product-spec complete; prioritization/roadmap/commitment-readiness n/a with reasons, each attributed orchestrator-via-project-orchestrator) BEFORE the Stage 3 STATE SNAPSHOT is appended."
         ]
       }
     },
@@ -183,7 +183,7 @@
           "Classifies owners independently: prioritization n/a (one bounded MVP, nothing to rank), roadmap n/a (one release, no sequencing decision - a deadline alone does not require horizons), commitment readiness APPLICABLE (a delivery date was requested).",
           "Invokes ONLY roadmap-to-commitments-translator among the three (in readiness mode); does NOT invoke prioritization-frame-picker or roadmap-under-uncertainty-planner.",
           "Assesses the six-week date as readiness; with no architecture or throughput evidence the result may be NOT COMMIT-ABLE, naming the missing evidence and keeping the date an unverified target.",
-          "Records prioritization and roadmap n/a with reasons; once all three owners are terminal, Stage 3 may proceed with no delivery promise manufactured from the deadline."
+          "Records prioritization and roadmap n/a with reasons; once all three owners are *-recorded (terminal results appended after approval), Stage 3 may proceed with no delivery promise manufactured from the deadline."
         ]
       }
     },
@@ -197,7 +197,7 @@
           "Classifies owners independently: prioritization APPLICABLE (many competing requests, a real ranking decision), roadmap n/a (no sequencing or horizon decision surfaced), commitment readiness n/a (nobody asked for a deadline or delivery promise).",
           "Invokes ONLY prioritization-frame-picker among the three; does NOT invoke roadmap-under-uncertainty-planner or roadmap-to-commitments-translator.",
           "Records roadmap and commitment readiness each n/a with a reason; competing priorities alone do not pull in commitment readiness.",
-          "Reaches EXIT GATE=MET only after product-spec complete + prioritization complete + the two n/a decisions are recorded."
+          "Reaches EXIT GATE=MET only after product-spec, prioritization, and the two n/a decisions are all *-recorded (previewed and appended on the user's yes); a terminal result still awaiting its append keeps the gate BLOCKED."
         ]
       }
     },
@@ -224,7 +224,7 @@
         "assertions": [
           "Commitment readiness is applicable (the board asked for a firm promise) and runs as a readiness assessment; it returns NOT COMMIT-ABLE, naming the missing evidence (architecture/design, dependency discovery, technical planning, measured throughput, or capacity basis).",
           "Emits no committed deliverable and no delivery date; keeps the ten-week target unverified; never manufactures a commitment from approved scope, gross available hours, or an authorization.",
-          "Marks commitment readiness terminal (NOT COMMIT-ABLE satisfies the owner, not incomplete), so the exit gate can be MET and Stage 3 design may proceed.",
+          "Marks commitment readiness NOT-COMMIT-ABLE-awaiting-record, then NOT-COMMIT-ABLE-recorded once its entry is appended on the user's yes (NOT COMMIT-ABLE satisfies the owner, not incomplete); only once all four owners are *-recorded is the exit gate MET and Stage 3 design proposed.",
           "Records when the commitment should be reassessed (once the missing evidence exists)."
         ]
       }
@@ -236,10 +236,52 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Holds EXIT GATE=BLOCKED because at least one conditional owner is still unclassified or pending (roadmap and commitment readiness were neither run, classified n/a with a reason, nor given a NOT COMMIT-ABLE result).",
-          "Does NOT propose Stage 3 design; names the unclassified/pending owner(s) and the required next action (classify or run them).",
-          "Treats unclassified and pending as gate-blocking, not as complete or n/a; does not silently skip an owner.",
+          "Holds EXIT GATE=BLOCKED because at least one conditional owner is still unclassified, pending, or awaiting-record (roadmap and commitment readiness were neither recorded complete, recorded n/a with a reason, nor recorded NOT COMMIT-ABLE).",
+          "Does NOT propose Stage 3 design; names the unclassified/pending owner(s) and the required next action (classify, run, or record them).",
+          "Treats unclassified, pending, and *-awaiting-record as gate-blocking, not as *-recorded; does not silently skip an owner.",
           "Does not treat 'jump straight to design' as authority to bypass the exit gate."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage2-terminal-result-awaits-recording",
+      "type": "should_trigger",
+      "prompt": "For my simple maintenance app: the product spec is done and you've worked out that prioritization, roadmap, and commitments aren't needed. Can we start the design now?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Each owner has reached a terminal analytical result but the DECISION entries are only PROPOSED - the ledger shows product-spec=complete-awaiting-record and the three planning owners as n/a-awaiting-record, not *-recorded.",
+          "Previews the exact DECISION entry (docs/project-state.md path, id, date, content) for each and awaits the user's explicit approval before appending - it does not append on inferred consent.",
+          "Holds EXIT GATE=BLOCKED and does NOT propose Stage 3 while any owner is *-awaiting-record; NEXT OWNER names 'record terminal decision'.",
+          "Does not treat reaching a terminal result as satisfying the gate."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage2-recorded-terminal-decisions-open-gate",
+      "type": "should_trigger",
+      "prompt": "Yes - record each of those four Stage 2 decisions exactly as you previewed them.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Appends each previewed DECISION entry only after the explicit yes, moving product-spec to complete-recorded and the three planning owners to n/a-recorded (with reasons).",
+          "Only once all four owners are *-recorded does EXIT GATE become MET.",
+          "Then, and only then, proposes Stage 3 design as the next step.",
+          "No entry was appended before its own explicit approval, and no prior entry was overwritten."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage2-classification-is-no-invocation",
+      "type": "should_trigger",
+      "prompt": "The product spec just got approved and recorded. What's the very next step?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States that the next action is the read-only owner-applicability classification, and that NO skill is invoked for it.",
+          "WHAT HAPPENS NEXT shows a classification decision (no skill invoked), not an owning skill with an invokes arrow; NEXT OWNER=classification decision.",
+          "Does not invent a skill invocation for the classification step.",
+          "Reserves the invocation arrow for steps where a skill is actually invoked."
         ]
       }
     }

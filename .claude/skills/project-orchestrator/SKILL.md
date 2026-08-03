@@ -141,10 +141,12 @@ here.
   (produces the requirements brief).
 - **Stage 2 — Define the product.** ALWAYS begins → invoke `product-spec-writer`.
   After the spec is complete, classify each remaining owner **independently by
-  evidence** (a read-only judgement, explained in plain language). Invoke ONLY an
+  evidence** (a read-only judgement that invokes NO skill — it appears in WHAT
+  HAPPENS NEXT as a classification decision, not an invocation). Invoke ONLY an
   owner whose own criteria below are met; classify each other owner `n/a` with a
   reason. No skill is invoked to manufacture the very evidence that would justify
-  invoking it.
+  invoking it. Recording a terminal owner result is likewise a non-invocation
+  step: preview the exact DECISION entry and await the user's approval.
   - **Prioritization** — APPLICABLE on evidence of competing capabilities,
     initiatives, or release choices; a real ranking or scope-tradeoff decision;
     or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
@@ -187,15 +189,22 @@ here.
   trap the project in Stage 2: the product is defined enough to enter design,
   and the commitment is reassessed later, once the missing evidence exists.
 
-  **Stage 2 exit gate.** Each owner carries one ledger state (Output Format).
-  `product-spec-writer` runs `pending` until `complete`; each conditional owner
-  starts `unclassified`, turns `pending` while an applicable owner runs, and
-  ends at a terminal state — `complete`, `n/a` (reason), or, for commitment
-  readiness only, `NOT COMMIT-ABLE` (missing evidence). `unclassified`,
-  `pending`, and `blocked` hold the gate BLOCKED; `complete`, `n/a` (reason),
-  and `NOT COMMIT-ABLE` each satisfy an owner's exit requirement. All four owners
-  must be terminal before Stage 3 design is proposed — never on a silent skip,
-  and `NOT COMMIT-ABLE` counts as satisfied, not incomplete.
+  **Stage 2 exit gate (recorded, not merely reached).** Each owner carries one
+  ledger state (Output Format). A terminal analytical result does NOT by itself
+  satisfy the gate: reaching `complete`, `n/a` (reason), or `NOT COMMIT-ABLE`
+  first puts the owner in an `*-awaiting-record` state, because the outcome is
+  only PROPOSED until Capability 4 runs — preview the exact DECISION entry, take
+  the user's explicit yes to that exact path and content, append it, and confirm
+  it landed. Only then is the owner recorded. `product-spec-writer` moves from
+  `pending` to `complete-awaiting-record` and finally `complete-recorded`; each
+  conditional owner starts `unclassified`, turns `pending` while it runs,
+  reaches its terminal result as `*-awaiting-record`, and is satisfied only at
+  the matching `*-recorded` state. `unclassified`, `pending`, `blocked`, and
+  every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
+  `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
+  satisfy an owner. All four owners must be `*-recorded` before Stage 3 design
+  is proposed — never while a result is awaiting its append, and never on a
+  silent skip; `NOT-COMMIT-ABLE-recorded` counts as satisfied, not incomplete.
 - **Stage 3 — Design how it's built.** → `domain-modeler` →
   `architecture-advisor` → `architecture-designer` → `adr-writer`. *By evidence
   of a SaaS/multi-customer product:* `saas-platform-architect`,
@@ -311,13 +320,13 @@ Each turn produces (never a wall of jargon):
 WHERE YOU ARE:   <plain-language stage — e.g. "You have an agreed idea but no written plan yet.">
 WHAT I CHECKED:  <state file + repo signals that put you here>
 ONE QUESTION:    <a single business question, if a decision is needed>   (else: —)
-WHAT HAPPENS NEXT: <the owning skill I'll hand this to, named plainly>  → invokes `<skill-name>`
+WHAT HAPPENS NEXT: <one of — classification decision (no skill invoked) | owning skill named plainly → invokes `<skill-name>` | record terminal decision (preview + await your exact approval)>
 STAGE-2 OWNERS:  (shown while in Stage 2)
-  product-spec=<pending|complete|blocked(reason)>;
-  prioritization=<unclassified|pending|complete|n/a(reason)|blocked(reason)>;
-  roadmap=<unclassified|pending|complete|n/a(reason)|blocked(reason)>;
-  commitment-readiness=<unclassified|pending|complete|n/a(reason)|NOT-COMMIT-ABLE(missing evidence)|blocked(reason)>;
-  NEXT OWNER=<skill-name|classification decision|none>;  EXIT GATE=<MET|BLOCKED>
+  product-spec=<pending|complete-awaiting-record|complete-recorded|blocked(reason)>;
+  prioritization=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|blocked(reason)>;
+  roadmap=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|blocked(reason)>;
+  commitment-readiness=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|NOT-COMMIT-ABLE-awaiting-record(missing evidence)|NOT-COMMIT-ABLE-recorded(missing evidence)|blocked(reason)>;
+  NEXT OWNER=<skill-name|classification decision|record terminal decision|none>;  EXIT GATE=<MET|BLOCKED>
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
 LOG ENTRY PROPOSED: <docs/project-state.md path + entry ID + date + exact content>
@@ -355,14 +364,20 @@ needing the user.
       `roadmap-to-commitments-translator` held with the roadmap planner invoked
       at most once; no skill was invoked to manufacture the evidence that would
       justify it; no owner was silently skipped.
-- [ ] **Stage 2 ledger + exit gate truthful:** the owner ledger showed real
-      states — `unclassified`/`pending`/`blocked` were not mislabelled as
-      `complete` or `n/a`, and any of them held EXIT GATE=BLOCKED with NEXT OWNER
-      named; commitment readiness ran as a readiness assessment and any `NOT
-      COMMIT-ABLE` produced no date or delivery promise; Stage 3 design was
-      proposed only once all four owners were terminal (`complete`, `n/a` with
-      reason, or `NOT COMMIT-ABLE`), with `NOT COMMIT-ABLE` counted as satisfied,
-      not incomplete.
+- [ ] **Stage 2 ledger + recorded exit gate:** the owner ledger showed real
+      states — `unclassified`/`pending`/`blocked`/`*-awaiting-record` were not
+      mislabelled as `*-recorded`, and any of them held EXIT GATE=BLOCKED with
+      NEXT OWNER named; a terminal analytical result first entered
+      `*-awaiting-record`, its exact DECISION entry was previewed and appended
+      only on the user's explicit yes, and ONLY `complete-recorded` /
+      `n/a-recorded` / `NOT-COMMIT-ABLE-recorded` satisfied an owner; Stage 3
+      design was proposed only once all four owners were `*-recorded` — never
+      while a result awaited its append; commitment readiness ran as a readiness
+      assessment and any `NOT COMMIT-ABLE` produced no date or delivery promise.
+- [ ] **Classification and recording shown as non-invocation steps:** when the
+      next action was owner classification or recording a terminal decision,
+      WHAT HAPPENS NEXT said so plainly (no invented skill-invocation arrow); the
+      invocation arrow appeared only when a skill was actually invoked.
 - [ ] Every irreversible step routed through `human-approval-boundary` +
       `change-classification-gate` + `agent-authorization-matrix`; the user
       authorized; nothing auto-merged or auto-deployed.

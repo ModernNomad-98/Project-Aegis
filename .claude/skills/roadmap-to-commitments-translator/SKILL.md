@@ -65,7 +65,8 @@ mode, because the lifecycle uses this skill in two different places:
   product scope; an uncertainty-aware roadmap where roadmap planning applies;
   architecture or design evidence; technical planning and meaningful
   dependency discovery; measured throughput or another defensible capacity
-  basis; identified and secured dependencies where required; risk/uncertainty
+  basis; completed dependency discovery (secured where a real dependency
+  exists — `verified-none` is sufficient); risk/uncertainty
   evidence; and a human decision when a real commitment is on the table. When
   material evidence is missing, the result is **`NOT COMMIT-ABLE`**, and it
   names every material missing-evidence category, what evidence should come
@@ -166,6 +167,12 @@ capacity-backed deliverables and date RANGES emitted.
       `none — awaiting named human decision` until a named human decides.
 - [ ] Dependencies are folded in; commitments gated on uncommitted
       external work are not treated as firm.
+- [ ] Dependency STATE drives the verdict, not the mere absence of "secured"
+      entries: `unknown` (incomplete discovery) is missing evidence and a
+      known-but-unsecured required dependency is insufficient, but `none
+      verified` after completed discovery is SUFFICIENT — a self-contained
+      deliverable with no external dependency is not forced to `NOT COMMIT-ABLE`
+      on that basis alone.
 - [ ] Outcomes are translated into concrete deliverables with honest date
       RANGES, not false-precise dates.
 - [ ] The not-committed gap is stated explicitly with reasons.
@@ -208,11 +215,17 @@ capacity-backed deliverables and date RANGES emitted.
   accept the tradeoff → surface the over-commitment risk explicitly and
   escalate the decision; do not manufacture a commitment by padding or
   by committing the best case.
-- The evidence a real commitment needs (architecture, dependency discovery,
-  technical planning, measured throughput, secured dependencies) is absent →
-  return `NOT COMMIT-ABLE`, name the missing evidence and the reassessment
-  point, and keep any date an unverified target. Never convert gross available
-  hours into capacity evidence, approved scope into a promise, or an
+- The evidence a real commitment needs is absent → return `NOT COMMIT-ABLE`,
+  name the missing evidence and the reassessment point, and keep any date an
+  unverified target. Dependency evidence is judged by STATE, not by the mere
+  absence of "secured" entries: `unknown — discovery incomplete` is MISSING
+  evidence; a known-but-unsecured REQUIRED dependency is INSUFFICIENT; but
+  `none verified` after COMPLETED dependency discovery is SUFFICIENT — a
+  self-contained deliverable that genuinely has no external dependency is not
+  penalised, and secured-dependency evidence is required only where an actual
+  dependency was discovered. Architecture/design, technical planning, and a
+  measured capacity basis remain independently required. Never convert gross
+  available hours into capacity evidence, approved scope into a promise, or an
   implementation/governance authorization into delivery evidence; never call a
   target date a commitment; never create a human commitment automatically —
   `COMMIT-ABLE` only signals that a named human may now decide.
