@@ -557,7 +557,7 @@ RULES: list[dict] = [
      "aegis_map": ["AEGIS-057"],
      "limits": "none known: declaration and grant are both objective frontmatter facts"},
     {"id": "SIDE-004", "purpose": "auto-invocable skill's Workflow instructs a §5 mutation class without cover",
-     "authority": "skill-generation-standard.md §5 (write/network/deploy/spend needs disable-model-invocation:true; approved-write exception covers only previewed doc/state appends)",
+     "authority": "skill-generation-standard.md §5 (write/network/deploy/spend needs disable-model-invocation:true; §5 recognizes two bounded exceptions — the previewed doc/state approved-write, and a separately classified and separately activated TALI route that no shipped skill holds by default). This scanner recognizes only the doc/state approved-write; TALI activation is out of band, so these candidates remain unresolved and unchanged by TALI adoption",
      "severity": "P1", "classification": "semantic-candidate",
      "surfaces": ["Workflow"],
      "positive_fixture": "auto-deployer", "negative_fixture": "clean-skill",
