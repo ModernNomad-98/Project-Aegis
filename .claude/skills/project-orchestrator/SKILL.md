@@ -139,8 +139,52 @@ here.
 
 - **Stage 1 — Understand the need.** → `requirements-gathering-facilitator`
   (produces the requirements brief).
-- **Stage 2 — Define the product.** → `product-spec-writer` →
-  `prioritization-frame-picker` → `roadmap-to-commitments-translator`.
+- **Stage 2 — Define the product.** ALWAYS begins with `product-spec-writer`.
+  After the spec is complete, classify the REST of Stage 2 **by evidence** (a
+  read-only judgement, explained in plain language) — never run a planning
+  skill just because it exists:
+  - *Simple-MVP branch* — one bounded MVP, no competing initiative or real
+    ranking decision, no material sequencing uncertainty, no request for a
+    delivery commitment, and no need to compare release options: then
+    `prioritization-frame-picker`, `roadmap-under-uncertainty-planner`, and
+    `roadmap-to-commitments-translator` are each **`not applicable`**. Name
+    every skipped owner and its evidence-based reason (never a silent skip),
+    propose those not-applicable outcomes through the existing append-only
+    DECISION mechanism (Capability 4), and do NOT invoke the three planning
+    skills.
+  - *Planning-required branch* — competing capabilities or initiatives, a real
+    prioritization decision, sequencing uncertainty, multiple release options,
+    stakeholder timing pressure, a requested deadline, or a request for a
+    delivery commitment: `prioritization-frame-picker` →
+    `roadmap-under-uncertainty-planner` (exactly once, and before commitments)
+    → `roadmap-to-commitments-translator`, the last in **readiness-assessment
+    mode** (next paragraph). Prioritization precedes roadmap; roadmap precedes
+    commitment readiness.
+
+  **Commitment readiness at Stage 2 is a READINESS ASSESSMENT, never a
+  promise.** When the evidence a real commitment needs — architecture/design,
+  dependency discovery, technical planning, measured throughput, or a
+  defensible capacity basis — is absent, the readiness result is **`NOT
+  COMMIT-ABLE`**: record that no delivery commitment is supportable, record the
+  exact missing evidence, keep any stakeholder date as an **unverified target
+  only**, and record when the assessment should be revisited. A target date, an
+  approved scope, gross available hours, nominal team size, an implementation
+  authorization, or a governance approval is NEVER turned into a delivery
+  promise. `NOT COMMIT-ABLE` is a **completed** readiness result — it does NOT
+  trap the project in Stage 2: the product is defined enough to enter design,
+  and the commitment is reassessed later, once the missing evidence exists.
+
+  **Stage 2 exit gate.** `product-spec-writer` must be complete, AND each
+  conditional owner (`prioritization-frame-picker`,
+  `roadmap-under-uncertainty-planner`, `roadmap-to-commitments-translator`)
+  must carry EXACTLY ONE recorded status — **complete**, **`not applicable`
+  (with reason)**, or **readiness complete with `NOT COMMIT-ABLE` (missing
+  evidence recorded)**. Only then is Stage 3 design proposed. An owner with NO
+  recorded status BLOCKS advancement; distinguish an incomplete owner from a
+  deliberately-skipped owner (reason recorded) from a completed `NOT
+  COMMIT-ABLE` readiness result — the last counts as complete, not incomplete.
+  This is the Stage 2 checklist (completed / skipped-with-reason / next-owner),
+  recorded append-only — never a silent skip.
 - **Stage 3 — Design how it's built.** → `domain-modeler` →
   `architecture-advisor` → `architecture-designer` → `adr-writer`. *By evidence
   of a SaaS/multi-customer product:* `saas-platform-architect`,
@@ -257,7 +301,9 @@ WHERE YOU ARE:   <plain-language stage — e.g. "You have an agreed idea but no 
 WHAT I CHECKED:  <state file + repo signals that put you here>
 ONE QUESTION:    <a single business question, if a decision is needed>   (else: —)
 WHAT HAPPENS NEXT: <the owning skill I'll hand this to, named plainly>  → invokes `<skill-name>`
+STAGE-2 OWNERS:  product-spec=<complete|blocked>; prioritization=<complete|n/a(reason)|blocked>; roadmap=<complete|n/a(reason)|blocked>; commitment-readiness=<complete|n/a(reason)|NOT-COMMIT-ABLE(missing evidence)|blocked>; EXIT GATE=<MET|BLOCKED>   (shown while in Stage 2)
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
+NEXT ACTION:     <the single next recommended action, in plain language>
 LOG ENTRY PROPOSED: <docs/project-state.md path + entry ID + date + exact content>
 RECORDING STATUS: AWAITING EXPLICIT APPROVAL — nothing written
                   (after your explicit yes → RECORDED: <path + ID + date + exact content appended>)
@@ -285,6 +331,16 @@ needing the user.
 - [ ] Routing named the OWNING skill for the stage; conditional skills were
       invoked only on evidence of the feature; every manual-only target was
       handed to the USER by name (never auto-invoked on the router's authority).
+- [ ] **Stage 2 routed by evidence:** it began with `product-spec-writer`; the
+      simple-MVP vs planning-required branch was chosen from evidence; on the
+      planning branch `roadmap-under-uncertainty-planner` ran exactly once and
+      before `roadmap-to-commitments-translator`; no owner was silently skipped
+      (each not-applicable owner carries a reason); commitment processing ran as
+      a readiness assessment and any `NOT COMMIT-ABLE` result produced no date or
+      delivery promise; the Stage 2 exit gate was satisfied — every owner
+      complete, `not applicable` with reason, or `NOT COMMIT-ABLE` with missing
+      evidence recorded — before Stage 3 was proposed, with `NOT COMMIT-ABLE`
+      counted as a completed readiness result, not an incomplete owner.
 - [ ] Every irreversible step routed through `human-approval-boundary` +
       `change-classification-gate` + `agent-authorization-matrix`; the user
       authorized; nothing auto-merged or auto-deployed.

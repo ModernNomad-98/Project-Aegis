@@ -71,6 +71,34 @@
           "This skill extracts commitments FROM a roadmap; it doesn't build one."
         ]
       }
+    },
+    {
+      "id": "edge-readiness-not-commitable-missing-evidence",
+      "type": "should_trigger",
+      "prompt": "We have an approved product idea and the board wants a firm ten-week delivery date. There's no architecture yet, no dependency discovery, and we've never shipped together so there's no velocity to measure. Give me the commitment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs in readiness-assessment mode and returns NOT COMMIT-ABLE because the required evidence (architecture/design, dependency discovery, technical planning, measured throughput, secured dependencies) is absent.",
+          "Names the missing evidence categories and the earliest lifecycle point to reassess.",
+          "Keeps the requested ten-week date as an unverified target only, and creates no commitment.",
+          "Does not manufacture a commitment from approved scope, a target date, gross available hours, nominal team size, or an authorization."
+        ]
+      }
+    },
+    {
+      "id": "should-not-equate-commitable-with-committed",
+      "type": "should_trigger",
+      "prompt": "Architecture is done, dependencies are secured, and we have three sprints of velocity. So the March release is committed now, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States that even with sufficient evidence, COMMIT-ABLE only means a named human may now make the commitment decision - it is not itself a delivery promise.",
+          "Does not automatically label the date or scope as committed; the commitment status stays 'HUMAN DECISION REQUIRED' until a named human decides.",
+          "Does not treat implementation authorization or governance approval as delivery evidence.",
+          "Presents the committable set with honest date ranges for the human to decide on."
+        ]
+      }
     }
   ]
 }

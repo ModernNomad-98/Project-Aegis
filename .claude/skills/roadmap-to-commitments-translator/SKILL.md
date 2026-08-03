@@ -55,6 +55,34 @@ uncertain; this extracts the firm-promise slice from it.
 
 ## Workflow
 
+**Two modes — state which one you are in.** Before the steps below, decide the
+mode, because the lifecycle uses this skill in two different places:
+
+- **Readiness assessment** (used at product-definition time, e.g. a
+  beginner's Stage 2). Decide whether a delivery commitment is even
+  supportable YET. Before producing any commitment, inspect whether the
+  evidence a real commitment needs actually exists — an approved, current
+  product scope; an uncertainty-aware roadmap where roadmap planning applies;
+  architecture or design evidence; technical planning and meaningful
+  dependency discovery; measured throughput or another defensible capacity
+  basis; identified and secured dependencies where required; risk/uncertainty
+  evidence; and a human decision when a real commitment is on the table. When
+  material evidence is missing, the result is **`NOT COMMIT-ABLE`**, and it
+  names every material missing-evidence category, what evidence should come
+  next, the earliest lifecycle point to reassess, and any stakeholder date as
+  an **unverified target only** — never a promise. A `NOT COMMIT-ABLE`
+  readiness result is a VALID, completed output: it does not block
+  architecture or technical planning; it withholds a promise until the
+  evidence exists. Never manufacture a commitment from approved product scope,
+  a target date, gross available hours, nominal team size, an implementation
+  authorization, a governance approval, a roadmap horizon, or unsupported
+  assumptions.
+- **Final commitment assessment** (used later, once evidence is sufficient).
+  Even then, **`COMMIT-ABLE` means the evidence is sufficient for a human
+  commitment decision — it is not itself a delivery promise**; a named human
+  remains the commitment authority. The steps below produce the committable
+  set and honest date RANGES once that bar is met.
+
 1. **Separate commit-able from aspirational.** Only items that are
    high-confidence, capacity-backed, AND dependency-clear become
    commitments. Everything else stays directional. This split is the whole
@@ -91,6 +119,13 @@ deliverable translation, and the gap-communication format:
 
 ```
 ROADMAP → COMMITMENTS — <team/horizon>
+Mode:          READINESS ASSESSMENT | FINAL COMMITMENT ASSESSMENT
+Readiness:     COMMIT-ABLE | NOT COMMIT-ABLE
+Missing evidence: <named list | none>
+Next evidence needed: <named list | none>
+Reassess after: <stage or evidence milestone>
+Commitment status: NONE | HUMAN DECISION REQUIRED | HUMAN-APPROVED
+Target dates:  <unverified targets | none>
 Capacity basis: velocity evidence; minus maintenance/interrupts; buffer   (not aspiration)
 Committed:      <deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence>
 Dependencies:  <what each commitment needs> → cross-team-dependency-negotiator (secured?)
@@ -150,6 +185,14 @@ Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific
   accept the tradeoff → surface the over-commitment risk explicitly and
   escalate the decision; do not manufacture a commitment by padding or
   by committing the best case.
+- The evidence a real commitment needs (architecture, dependency discovery,
+  technical planning, measured throughput, secured dependencies) is absent →
+  return `NOT COMMIT-ABLE`, name the missing evidence and the reassessment
+  point, and keep any date an unverified target. Never convert gross available
+  hours into capacity evidence, approved scope into a promise, or an
+  implementation/governance authorization into delivery evidence; never call a
+  target date a commitment; never create a human commitment automatically —
+  `COMMIT-ABLE` only signals that a named human may now decide.
 
 ## Supporting Files
 

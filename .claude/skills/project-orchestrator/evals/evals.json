@@ -143,6 +143,63 @@
           "The reviewing task belongs to code-reviewer / security-pr-reviewer, not the whole-journey navigator."
         ]
       }
+    },
+    {
+      "id": "edge-stage2-simple-mvp-skips-planning-with-reason",
+      "type": "should_trigger",
+      "prompt": "I run a small maintenance business and jobs keep getting missed. I want one simple app to log a job, assign someone, and mark it done. That's the whole idea - nothing else competing, no deadline, just help me get it built.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Selects project-orchestrator first, runs Stage 1 (requirements-gathering-facilitator) then begins Stage 2 with product-spec-writer, one plain-language business question at a time.",
+          "Classifies this as the simple-MVP branch from the evidence (one bounded MVP, no competing initiative, no ranking or sequencing decision, no delivery-commitment request).",
+          "Records prioritization-frame-picker, roadmap-under-uncertainty-planner, and roadmap-to-commitments-translator each as 'not applicable' with an explicit evidence-based reason - no owner is silently skipped - proposing those not-applicable outcomes through the append-only DECISION mechanism.",
+          "Does NOT invoke prioritization-frame-picker, roadmap-under-uncertainty-planner, or roadmap-to-commitments-translator.",
+          "Treats the Stage 2 exit gate as MET once product-spec-writer is complete and the three not-applicable outcomes are recorded, then proposes Stage 3 design - with no unauthorized write, Git, network, deploy, or manual-only invocation."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage2-planning-route-orders-owners",
+      "type": "should_trigger",
+      "prompt": "We're building a member portal with online payments, an events calendar, and a document library. The board wants it live for the AGM in ten weeks. I don't know which piece to build first and I'm not sure what depends on what. Take me from here.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs Stage 2 in this exact owner order: product-spec-writer -> prioritization-frame-picker -> roadmap-under-uncertainty-planner -> roadmap-to-commitments-translator (the planning-required branch, selected from competing capabilities, a deadline, and sequencing uncertainty).",
+          "Invokes roadmap-under-uncertainty-planner exactly once, and never invokes roadmap-to-commitments-translator before the roadmap planner has run.",
+          "Invokes each planning skill only because the evidence calls for it, not merely because it exists.",
+          "Explains each engineering decision in plain language and asks at most one business question per turn."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage2-not-commitable-allows-design-without-promise",
+      "type": "should_trigger",
+      "prompt": "Same member-portal project. The board is pushing for a firm 'it'll be done in ten weeks' promise now, before any architecture or estimation work. Give them the commitment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs commitment processing at Stage 2 as a readiness assessment and returns NOT COMMIT-ABLE, naming the missing evidence (architecture/design, dependency discovery, technical planning, measured throughput, or capacity basis).",
+          "Creates no delivery date and no delivery promise; keeps the ten-week board target as an unverified target only, and never manufactures a commitment from approved scope, gross available hours, or an authorization.",
+          "Marks the commitment-readiness owner COMPLETE (NOT COMMIT-ABLE is a completed readiness result, not an incomplete owner), allowing the Stage 2 exit gate to be MET.",
+          "Proposes advancing to Stage 3 design and records when the commitment should be reassessed (once the missing evidence exists)."
+        ]
+      }
+    },
+    {
+      "id": "should-not-advance-with-unclassified-stage2-owner",
+      "type": "should_trigger",
+      "prompt": "The product spec is done and I ran the prioritization. Let's jump straight to designing the architecture now.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Detects that a conditional Stage 2 owner (roadmap-under-uncertainty-planner and/or roadmap-to-commitments-translator) has no recorded status - neither complete, nor 'not applicable' with a reason, nor a NOT COMMIT-ABLE readiness result.",
+          "Holds the Stage 2 exit gate at BLOCKED and does NOT propose Stage 3 design.",
+          "Names the unclassified owner(s) and the required next action (complete the owner, or record it not applicable with a reason, or run commitment readiness) in plain language.",
+          "Does not treat 'let's jump straight to design' as authority to skip an owner silently."
+        ]
+      }
     }
   ]
 }
