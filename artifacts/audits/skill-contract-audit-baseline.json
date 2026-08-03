@@ -3,13 +3,13 @@
     "tool": "audit-skill-contracts",
     "version": "1.3.0",
     "engine_sha256": "279e64426933d6222d969935312c269d163732ff6de7bbbe39568ad85c7b8396",
-    "repo_sha": "9e7785be64b2dd4905da37ce9367acb787bcb9b6",
+    "repo_sha": "0148d650088bf7725553853830943a52f1146f85",
     "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 703,
-    "audited_byte_count": 3840038,
-    "corpus_content_hash": "b9b7ca429793369457d544b342d3674ede2e53b56b6036d219e9700a7664f290",
+    "audited_byte_count": 3853596,
+    "corpus_content_hash": "01c8d50cbb7c3a6b8a3c28039a794dd31598a105fc2f036cb43027ddd7922a6e",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -39,10 +39,10 @@
     },
     "skill_count": 184,
     "rule_count": 27,
-    "finding_count": 416,
+    "finding_count": 415,
     "by_severity": {
       "P0": 1,
-      "P1": 99,
+      "P1": 98,
       "P2": 5,
       "info": 311
     },
@@ -51,12 +51,11 @@
       "ARTF-001": 10,
       "EVAL-004": 5,
       "ROUTE-002": 311,
-      "ROUTE-003": 1,
       "SIDE-004": 82,
       "STATE-005": 2,
       "VOCAB-002": 4
     },
-    "mechanical_count": 317,
+    "mechanical_count": 316,
     "semantic_review_candidates": 99
   },
   "rule_inventory": [
@@ -350,7 +349,7 @@
         "AEGIS-045"
       ],
       "limits": "bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection",
-      "hit_count": 1
+      "hit_count": 0
     },
     {
       "id": "VOCAB-002",
@@ -4900,27 +4899,6 @@
       "mechanical": true
     },
     {
-      "rule": "ROUTE-003",
-      "severity": "P1",
-      "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 0,
-      "owning_skill": "project-orchestrator",
-      "related_skills": [
-        "prioritization-frame-picker",
-        "roadmap-under-uncertainty-planner",
-        "roadmap-to-commitments-translator"
-      ],
-      "evidence": "Stage 2 route reaches roadmap-to-commitments-translator without roadmap-under-uncertainty-planner, but the commitments skill declares a roadmap as its input and the prioritization skill hands sequencing to the roadmap planner (AEGIS-035)",
-      "family": "route",
-      "aegis_map": [
-        "AEGIS-035",
-        "AEGIS-045"
-      ],
-      "remediation_owner": "project-orchestrator",
-      "confidence": "high",
-      "mechanical": true
-    },
-    {
       "rule": "SIDE-004",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
@@ -4958,7 +4936,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 262,
+      "line": 308,
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -7711,10 +7689,12 @@
       "targeted": 1
     },
     "project-orchestrator": {
-      "complete": 9,
+      "approved scope": 1,
+      "commit-able": 8,
+      "complete": 19,
       "deployed": 1,
       "durable": 2,
-      "proposed": 2,
+      "proposed": 4,
       "ready": 4
     },
     "promotion-packet-writer": {
@@ -7747,7 +7727,8 @@
       "verified": 3
     },
     "roadmap-to-commitments-translator": {
-      "commit-able": 7,
+      "approved scope": 1,
+      "commit-able": 14,
       "committed": 14
     },
     "roadmap-under-uncertainty-planner": {

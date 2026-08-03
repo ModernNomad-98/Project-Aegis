@@ -4155,11 +4155,6 @@
     {
       "from": "project-orchestrator",
       "to": "product-spec-writer",
-      "type": "body-route"
-    },
-    {
-      "from": "project-orchestrator",
-      "to": "product-spec-writer",
       "type": "description-mention"
     },
     {
