@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.3.0",
     "engine_sha256": "279e64426933d6222d969935312c269d163732ff6de7bbbe39568ad85c7b8396",
-    "repo_sha": "560b2f317323c223a9b176bf1be12ce00921d8de",
-    "branch": "policy/tali-v3-2-2-adoption",
+    "repo_sha": "9e7785be64b2dd4905da37ce9367acb787bcb9b6",
+    "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 703,
-    "audited_byte_count": 3905871,
-    "corpus_content_hash": "3239d84e2b2eae1f08fd3bd88a09413fcd7ffcf57255cddd6f4e729aabdd9cf7",
+    "audited_byte_count": 3840038,
+    "corpus_content_hash": "b9b7ca429793369457d544b342d3674ede2e53b56b6036d219e9700a7664f290",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "6be5f087bd514651d845b17642985f0faffec7dbdf25474949e309026b4f1712"
+        "sha256": "9a0940bfbb3b2e1b82672a71d68d3814be461af0f3cecddf0591d47b9dcda0c6"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
