@@ -3,13 +3,13 @@
     "tool": "audit-skill-contracts",
     "version": "1.3.0",
     "engine_sha256": "279e64426933d6222d969935312c269d163732ff6de7bbbe39568ad85c7b8396",
-    "repo_sha": "a190b41e28a597b0dd093286a4936609c7ef27fe",
+    "repo_sha": "2fb6133ecb3ec7356023509839e1196272e8339d",
     "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 703,
-    "audited_byte_count": 3864331,
-    "corpus_content_hash": "54857b32562ff0bc66eef9b21392e99a52028ab6a86fd2229b502dd536d00c9b",
+    "audited_byte_count": 3871373,
+    "corpus_content_hash": "632dde681d36cec383e1579d53a477ab10d06427df6cf835da82387deacf72fe",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -4936,7 +4936,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 324,
+      "line": 333,
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -7691,10 +7691,10 @@
     "project-orchestrator": {
       "approved scope": 1,
       "commit-able": 10,
-      "complete": 26,
+      "complete": 30,
       "deployed": 1,
       "durable": 2,
-      "proposed": 4,
+      "proposed": 5,
       "ready": 4
     },
     "promotion-packet-writer": {
@@ -7728,9 +7728,9 @@
     },
     "roadmap-to-commitments-translator": {
       "approved scope": 1,
-      "commit-able": 21,
+      "commit-able": 22,
       "committed": 19,
-      "verified": 4
+      "verified": 7
     },
     "roadmap-under-uncertainty-planner": {
       "committed": 9,

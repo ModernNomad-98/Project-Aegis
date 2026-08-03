@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.3.0 (engine sha256 `279e64426933d622…`)
-- Repo SHA: `a190b41e28a597b0dd093286a4936609c7ef27fe` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `54857b32562ff0bc66eef9b21392e99a52028ab6a86fd2229b502dd536d00c9b` (703 files, 3864331 bytes)
+- Repo SHA: `2fb6133ecb3ec7356023509839e1196272e8339d` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `632dde681d36cec383e1579d53a477ab10d06427df6cf835da82387deacf72fe` (703 files, 3871373 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **415** (316 mechanical, 99 semantic-review candidates)
 
@@ -94,7 +94,7 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/product-analytics-instrumenter/SKILL.md` (owner: product-analytics-instrumenter; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchases' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:324` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:333` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:83` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
 - **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:138` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
 - **APPR-002** [P0/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:160` (owner: project-orchestrator; maps: AEGIS-003, AEGIS-008) — scope grant that authorizes BUILDING from a requirements-stage approval: 'Build the v1 scope' (content approval must not become implementation authority)
@@ -242,7 +242,7 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: approved scope×1, commit-able×10, complete×26, deployed×1, durable×2, proposed×4, ready×4
+- `project-orchestrator`: approved scope×1, commit-able×10, complete×30, deployed×1, durable×2, proposed×5, ready×4
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2
@@ -251,7 +251,7 @@ mechanically proven defects.
 - `release-readiness-reviewer`: ready×2, verified×2
 - `reviewable-diff-discipline`: verified×1
 - `rls-policy-auditor`: verified×3
-- `roadmap-to-commitments-translator`: approved scope×1, commit-able×21, committed×19, verified×4
+- `roadmap-to-commitments-translator`: approved scope×1, commit-able×22, committed×19, verified×7
 - `roadmap-under-uncertainty-planner`: committed×9, planned×7, prioritized×2
 - `rollback-runbook-author`: deployed×1, verified×3
 - `saas-cost-architect`: accepted×1, committed×1, complete×1
