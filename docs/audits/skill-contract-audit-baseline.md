@@ -1,7 +1,7 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.3.0 (engine sha256 `5f37f154e5141247…`)
-- Repo SHA: `16fe1229e7026fe577d7a104610bd9c58af79143` (branch `audit/aegis-corpus-contract-baseline`; working tree dirty: true; dirty scanned surfaces: none)
+- Tool: `audit-skill-contracts` v1.3.0 (engine sha256 `dea2d78cf7851489…`)
+- Repo SHA: `6b295ba413b676601177820f8f87f15838a26afb` (branch `policy/tali-v3-2-2-adoption`; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `3239d84e2b2eae1f08fd3bd88a09413fcd7ffcf57255cddd6f4e729aabdd9cf7` (703 files, 3905871 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **416** (317 mechanical, 99 semantic-review candidates)
