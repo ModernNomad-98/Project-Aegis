@@ -80,8 +80,8 @@
         "triggers": true,
         "assertions": [
           "Runs in readiness-assessment mode and returns NOT COMMIT-ABLE because the required evidence (architecture/design, dependency discovery, technical planning, measured throughput, secured dependencies) is absent.",
-          "Names the missing evidence categories and the earliest lifecycle point to reassess.",
-          "Keeps the requested ten-week date as an unverified target only, and creates no commitment.",
+          "In the output, Capacity basis is 'none' (naming the missing capacity evidence) and Committed is 'none' - no velocity figure and no date range are invented.",
+          "Reports dependency state as 'unknown - discovery incomplete', NOT 'none verified'; keeps the ten-week date an unverified target; names the missing evidence and the reassessment point.",
           "Does not manufacture a commitment from approved scope, a target date, gross available hours, nominal team size, or an authorization."
         ]
       }
@@ -94,9 +94,23 @@
         "triggers": true,
         "assertions": [
           "States that even with sufficient evidence, COMMIT-ABLE only means a named human may now make the commitment decision - it is not itself a delivery promise.",
-          "Does not automatically label the date or scope as committed; the commitment status stays 'HUMAN DECISION REQUIRED' until a named human decides.",
+          "Keeps Commitment status = 'HUMAN DECISION REQUIRED' and Committed = 'none - awaiting named human decision'; does not auto-label the March date or scope as committed.",
           "Does not treat implementation authorization or governance approval as delivery evidence.",
           "Presents the committable set with honest date ranges for the human to decide on."
+        ]
+      }
+    },
+    {
+      "id": "final-commitment-requires-evidence-and-approval",
+      "type": "should_trigger",
+      "prompt": "The architecture is signed off, cross-team dependencies are secured, we have a solid velocity baseline, and the sponsor has formally approved committing to the Q3 milestone. Produce the final commitment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs in final commitment mode only because sufficient evidence exists AND a named human approved; only then emits capacity-backed deliverables with honest date RANGES.",
+          "Grounds each committed deliverable in velocity evidence minus maintenance/interrupts with a buffer, and shows the secured dependencies.",
+          "Sets Commitment status = HUMAN-APPROVED attributed to the named approver; without that approval it would emit no committed deliverable (Committed stays none).",
+          "Still separates the committed subset from the not-committed (directional) remainder."
         ]
       }
     }

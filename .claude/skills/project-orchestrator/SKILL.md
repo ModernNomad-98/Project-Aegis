@@ -139,27 +139,40 @@ here.
 
 - **Stage 1 — Understand the need.** → `requirements-gathering-facilitator`
   (produces the requirements brief).
-- **Stage 2 — Define the product.** ALWAYS begins with `product-spec-writer`.
-  After the spec is complete, classify the REST of Stage 2 **by evidence** (a
-  read-only judgement, explained in plain language) — never run a planning
-  skill just because it exists:
-  - *Simple-MVP branch* — one bounded MVP, no competing initiative or real
-    ranking decision, no material sequencing uncertainty, no request for a
-    delivery commitment, and no need to compare release options: then
-    `prioritization-frame-picker`, `roadmap-under-uncertainty-planner`, and
-    `roadmap-to-commitments-translator` are each **`not applicable`**. Name
-    every skipped owner and its evidence-based reason (never a silent skip),
-    propose those not-applicable outcomes through the existing append-only
-    DECISION mechanism (Capability 4), and do NOT invoke the three planning
-    skills.
-  - *Planning-required branch* — competing capabilities or initiatives, a real
-    prioritization decision, sequencing uncertainty, multiple release options,
-    stakeholder timing pressure, a requested deadline, or a request for a
-    delivery commitment: `prioritization-frame-picker` →
-    `roadmap-under-uncertainty-planner` (exactly once, and before commitments)
-    → `roadmap-to-commitments-translator`, the last in **readiness-assessment
-    mode** (next paragraph). Prioritization precedes roadmap; roadmap precedes
-    commitment readiness.
+- **Stage 2 — Define the product.** ALWAYS begins → invoke `product-spec-writer`.
+  After the spec is complete, classify each remaining owner **independently by
+  evidence** (a read-only judgement, explained in plain language). Invoke ONLY an
+  owner whose own criteria below are met; classify each other owner `n/a` with a
+  reason. No skill is invoked to manufacture the very evidence that would justify
+  invoking it.
+  - **Prioritization** — APPLICABLE on evidence of competing capabilities,
+    initiatives, or release choices; a real ranking or scope-tradeoff decision;
+    or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
+    already-agreed MVP with no ranking decision. A requested date alone does not
+    make it applicable. When applicable: → invoke `prioritization-frame-picker`.
+  - **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; multiple
+    horizons or releases; unclarity about what comes first or later; or timing
+    pressure that genuinely needs an uncertainty-aware sequence. NOT APPLICABLE
+    for one bounded release with no sequencing decision, or a deadline that can
+    be assessed without building horizons. A deadline alone does not make it
+    applicable. When applicable: → invoke `roadmap-under-uncertainty-planner`.
+  - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
+    promise, delivery commitment, or feasibility/readiness decision, or a target
+    date must be assessed honestly. NOT APPLICABLE when nobody asked for a
+    commitment and the project is simply defining the product and moving into
+    design. Competing priorities alone do not make it applicable. When
+    applicable: → invoke `roadmap-to-commitments-translator` (readiness mode).
+  - **Order when several apply** (skip any `n/a` owner without invoking it):
+    `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
+    `roadmap-to-commitments-translator`.
+  - **Worked classifications.** (1) One bounded MVP + a requested deadline:
+    prioritization `n/a`, roadmap `n/a` (unless real sequencing work is
+    evidenced), commitment readiness applicable. (2) Competing capabilities, no
+    deadline or commitment request: prioritization applicable, roadmap applicable
+    only if sequencing/horizons are needed, commitment readiness `n/a`. (3)
+    Competing capabilities + sequencing uncertainty + a requested deadline: all
+    three applicable, in the order above. (4) One bounded MVP, no deadline,
+    ranking, or sequencing need: all three `n/a`.
 
   **Commitment readiness at Stage 2 is a READINESS ASSESSMENT, never a
   promise.** When the evidence a real commitment needs — architecture/design,
@@ -174,17 +187,15 @@ here.
   trap the project in Stage 2: the product is defined enough to enter design,
   and the commitment is reassessed later, once the missing evidence exists.
 
-  **Stage 2 exit gate.** `product-spec-writer` must be complete, AND each
-  conditional owner (`prioritization-frame-picker`,
-  `roadmap-under-uncertainty-planner`, `roadmap-to-commitments-translator`)
-  must carry EXACTLY ONE recorded status — **complete**, **`not applicable`
-  (with reason)**, or **readiness complete with `NOT COMMIT-ABLE` (missing
-  evidence recorded)**. Only then is Stage 3 design proposed. An owner with NO
-  recorded status BLOCKS advancement; distinguish an incomplete owner from a
-  deliberately-skipped owner (reason recorded) from a completed `NOT
-  COMMIT-ABLE` readiness result — the last counts as complete, not incomplete.
-  This is the Stage 2 checklist (completed / skipped-with-reason / next-owner),
-  recorded append-only — never a silent skip.
+  **Stage 2 exit gate.** Each owner carries one ledger state (Output Format).
+  `product-spec-writer` runs `pending` until `complete`; each conditional owner
+  starts `unclassified`, turns `pending` while an applicable owner runs, and
+  ends at a terminal state — `complete`, `n/a` (reason), or, for commitment
+  readiness only, `NOT COMMIT-ABLE` (missing evidence). `unclassified`,
+  `pending`, and `blocked` hold the gate BLOCKED; `complete`, `n/a` (reason),
+  and `NOT COMMIT-ABLE` each satisfy an owner's exit requirement. All four owners
+  must be terminal before Stage 3 design is proposed — never on a silent skip,
+  and `NOT COMMIT-ABLE` counts as satisfied, not incomplete.
 - **Stage 3 — Design how it's built.** → `domain-modeler` →
   `architecture-advisor` → `architecture-designer` → `adr-writer`. *By evidence
   of a SaaS/multi-customer product:* `saas-platform-architect`,
@@ -301,7 +312,12 @@ WHERE YOU ARE:   <plain-language stage — e.g. "You have an agreed idea but no 
 WHAT I CHECKED:  <state file + repo signals that put you here>
 ONE QUESTION:    <a single business question, if a decision is needed>   (else: —)
 WHAT HAPPENS NEXT: <the owning skill I'll hand this to, named plainly>  → invokes `<skill-name>`
-STAGE-2 OWNERS:  product-spec=<complete|blocked>; prioritization=<complete|n/a(reason)|blocked>; roadmap=<complete|n/a(reason)|blocked>; commitment-readiness=<complete|n/a(reason)|NOT-COMMIT-ABLE(missing evidence)|blocked>; EXIT GATE=<MET|BLOCKED>   (shown while in Stage 2)
+STAGE-2 OWNERS:  (shown while in Stage 2)
+  product-spec=<pending|complete|blocked(reason)>;
+  prioritization=<unclassified|pending|complete|n/a(reason)|blocked(reason)>;
+  roadmap=<unclassified|pending|complete|n/a(reason)|blocked(reason)>;
+  commitment-readiness=<unclassified|pending|complete|n/a(reason)|NOT-COMMIT-ABLE(missing evidence)|blocked(reason)>;
+  NEXT OWNER=<skill-name|classification decision|none>;  EXIT GATE=<MET|BLOCKED>
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
 LOG ENTRY PROPOSED: <docs/project-state.md path + entry ID + date + exact content>
@@ -331,16 +347,22 @@ needing the user.
 - [ ] Routing named the OWNING skill for the stage; conditional skills were
       invoked only on evidence of the feature; every manual-only target was
       handed to the USER by name (never auto-invoked on the router's authority).
-- [ ] **Stage 2 routed by evidence:** it began with `product-spec-writer`; the
-      simple-MVP vs planning-required branch was chosen from evidence; on the
-      planning branch `roadmap-under-uncertainty-planner` ran exactly once and
-      before `roadmap-to-commitments-translator`; no owner was silently skipped
-      (each not-applicable owner carries a reason); commitment processing ran as
-      a readiness assessment and any `NOT COMMIT-ABLE` result produced no date or
-      delivery promise; the Stage 2 exit gate was satisfied — every owner
-      complete, `not applicable` with reason, or `NOT COMMIT-ABLE` with missing
-      evidence recorded — before Stage 3 was proposed, with `NOT COMMIT-ABLE`
-      counted as a completed readiness result, not an incomplete owner.
+- [ ] **Stage 2 owners classified independently:** Stage 2 began by invoking
+      `product-spec-writer`; each conditional owner was classified applicable or
+      `n/a` (with a reason) on ITS OWN evidence — not by an all-or-nothing branch;
+      only applicable owners were invoked, and when several applied the order
+      `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
+      `roadmap-to-commitments-translator` held with the roadmap planner invoked
+      at most once; no skill was invoked to manufacture the evidence that would
+      justify it; no owner was silently skipped.
+- [ ] **Stage 2 ledger + exit gate truthful:** the owner ledger showed real
+      states — `unclassified`/`pending`/`blocked` were not mislabelled as
+      `complete` or `n/a`, and any of them held EXIT GATE=BLOCKED with NEXT OWNER
+      named; commitment readiness ran as a readiness assessment and any `NOT
+      COMMIT-ABLE` produced no date or delivery promise; Stage 3 design was
+      proposed only once all four owners were terminal (`complete`, `n/a` with
+      reason, or `NOT COMMIT-ABLE`), with `NOT COMMIT-ABLE` counted as satisfied,
+      not incomplete.
 - [ ] Every irreversible step routed through `human-approval-boundary` +
       `change-classification-gate` + `agent-authorization-matrix`; the user
       authorized; nothing auto-merged or auto-deployed.

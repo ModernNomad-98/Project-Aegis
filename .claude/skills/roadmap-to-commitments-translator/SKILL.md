@@ -126,21 +126,44 @@ Next evidence needed: <named list | none>
 Reassess after: <stage or evidence milestone>
 Commitment status: NONE | HUMAN DECISION REQUIRED | HUMAN-APPROVED
 Target dates:  <unverified targets | none>
-Capacity basis: velocity evidence; minus maintenance/interrupts; buffer   (not aspiration)
-Committed:      <deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence>
-Dependencies:  <what each commitment needs> → cross-team-dependency-negotiator (secured?)
-NOT committed (directional): <roadmap items excluded — and WHY (capacity/dependency/uncertainty)>
+Capacity basis: <verified velocity evidence + calculation (minus maintenance/interrupts, buffer)
+                 | none — missing <named capacity evidence>>
+Committed:      <deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence
+                 | none — readiness is NOT COMMIT-ABLE
+                 | none — awaiting named human decision>
+Dependencies:  <known dependencies + state → cross-team-dependency-negotiator (secured?)
+                 | unknown — discovery incomplete
+                 | none verified>
+NOT committed (directional): <excluded roadmap items + reason (capacity/dependency/uncertainty)
+                 | all delivery items — readiness is NOT COMMIT-ABLE>
 Over-commit tradeoff: <if asked for more: commit-less | add-capacity | accept-lower-confidence>
 Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific dep →
                cross-team-dependency-negotiator; ranking → prioritization-frame-picker
 ```
 
+**Field rules by mode.** In **readiness mode / `NOT COMMIT-ABLE`**: `Capacity
+basis` is `none` (missing evidence named), `Committed` is `none`, no date range
+is invented, `Target dates` stay unverified, and incomplete dependency
+discovery is `unknown` — never "none verified". In **readiness mode /
+`COMMIT-ABLE`**: `Committed` is still `none — awaiting named human decision`
+(`COMMIT-ABLE` is evidence sufficiency, not a promise). Only in **final
+commitment mode**, and only once a named human has approved, are
+capacity-backed deliverables and date RANGES emitted.
+
 ## Validation Checklist
 
 - [ ] Commit-able items are separated from aspirational by confidence,
       capacity, AND dependency-clarity.
-- [ ] Commitments are grounded in velocity evidence minus maintenance/
-      interrupts, with a buffer — not aspiration.
+- [ ] In **final commitment mode** — and only with sufficient evidence AND a
+      named human's approval — commitments are grounded in velocity evidence
+      minus maintenance/interrupts, with a buffer, not aspiration. These
+      capacity-backed checks apply ONLY in that mode.
+- [ ] In **readiness mode / `NOT COMMIT-ABLE`**, `Capacity basis` and
+      `Committed` are `none` (missing evidence named) — no capacity figure or
+      commitment is fabricated; `Target dates` stay unverified; incomplete
+      dependency discovery is `unknown`, not "none verified".
+- [ ] `COMMIT-ABLE` alone emits no committed deliverable — `Committed` stays
+      `none — awaiting named human decision` until a named human decides.
 - [ ] Dependencies are folded in; commitments gated on uncommitted
       external work are not treated as firm.
 - [ ] Outcomes are translated into concrete deliverables with honest date
