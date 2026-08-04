@@ -20,8 +20,13 @@ never in the skills library, and never confused with it.
 - **Approvals** composes `scoped-approval-register`'s citation pattern: Status /
   Scope allowed / **Scope FORBIDDEN** / Evidence, append-style, supersede-never-
   rewrite, deny-by-default (an action is authorized only if an ACTIVE entry's
-  allowed scope covers it as worded). **Scope agreement, spec acceptance, and
-  design acceptance are NOT implementation authority** — that is a separate,
+  allowed scope covers it as worded). An ACTIVE approval's allowed scope is
+  **frozen to immutable evidence** — stated inline exactly, or referenced by a
+  DECISION id or an accepted-artifact path + SHA-256, never by pointer to a
+  mutable projection — so a later projection refresh cannot change what was
+  approved; a scope change is a NEW superseding approval entry. **Scope
+  agreement, spec acceptance, and design acceptance are NOT implementation
+  authority** — that is a separate,
   explicitly previewed and separately recorded grant.
 - **Plain-language summaries** are the house decision-log format: a human
   reading months later understands each entry without re-deriving it.
@@ -156,7 +161,7 @@ entry type — it uses DECISION and STATE SNAPSHOT exactly as defined above.
 
 | ID | Status | Date / who | Scope allowed | Scope FORBIDDEN | Evidence |
 |----|--------|-----------|---------------|-----------------|----------|
-| A-001 | ACTIVE \| SUPERSEDED by <id> \| EXPIRED <date> | <date> / user | <exactly what was authorized, as worded> | <adjacent action this does NOT authorize — e.g. this is scope agreement only, NOT authority to implement> | <where the grant is recorded> |
+| A-001 | ACTIVE \| SUPERSEDED by <id> \| EXPIRED <date> | <date> / user | <the exact allowed scope stated inline — or referenced to immutable evidence: a DECISION id, or an accepted-artifact path + SHA-256; NEVER a mutable projection> | <adjacent action this does NOT authorize — e.g. this is scope agreement only, NOT authority to implement> | <immutable reference: DECISION id / accepted-artifact path + SHA-256> |
 
 ## Deviations (a decision changed course)
 
@@ -228,7 +233,7 @@ entry type — it uses DECISION and STATE SNAPSHOT exactly as defined above.
 
 | ID | Status | Date / who | Scope allowed | Scope FORBIDDEN | Evidence |
 |----|--------|-----------|---------------|-----------------|----------|
-| A-001 | ACTIVE | 2026-02-20 / user | The v1 product scope listed in the current-scope projection is the agreed first-release scope. | Scope agreement ONLY — this is NOT authority to write code, install packages, run a migration, commit, push, or deploy. Implementation authority is a separate later approval. Adding invoicing or a mobile app needs a new decision. | brief sign-off, this file |
+| A-001 | ACTIVE | 2026-02-20 / user | The v1 scope EXACTLY as recorded in immutable Decision PS-001: create/assign/complete a job + a customer status link — the agreed first-release scope. (Authority source: Decision PS-001, not the mutable current-scope projection.) | Scope agreement ONLY — this is NOT authority to write code, install packages, run a migration, commit, push, or deploy. Implementation authority is a separate later approval. Adding invoicing or a mobile app needs a new decision. | Decision PS-001; brief sign-off, this file |
 
 ## Deviations (a decision changed course)
 

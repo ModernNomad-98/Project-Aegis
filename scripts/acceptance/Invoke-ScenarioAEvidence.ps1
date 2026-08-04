@@ -34,11 +34,32 @@
     failure can be inspected.
 
 .PARAMETER WorkDir
-    Root directory to create the disposable repo + evidence under. Must be OUTSIDE this
-    skills repo (the harness refuses otherwise). Defaults to a fresh unique directory
-    under the system temp folder.
+    Base directory under which to create this run's OWNED work directory. Must be OUTSIDE
+    this skills repo (the harness refuses otherwise). Defaults to the system temp folder.
+    The harness NEVER deletes or recurses the base or its pre-existing contents: it always
+    creates a fresh unique child directory ("scenario-a-run-<stamp>-<id>") that it owns via
+    an ownership marker, and on a passing run it removes ONLY that owned child - and only
+    after verifying the marker's run-id matches. A caller-supplied -WorkDir that already
+    contains a `product-repo` or `evidence` directory is therefore safe.
+
+.PARAMETER FixtureDir
+    Override the fixture state-sequence directory (for tests). Defaults to the bundled
+    scenario-a-fixture/state-sequence next to this script.
+
+.PARAMETER LoadOnly
+    Define the harness functions (Get-ImmutableRows, Test-AppendOnly, Remove-OwnedRunRoot,
+    ...) and return WITHOUT running the main flow. Used by Test-ScenarioAEvidence.ps1 to
+    dot-source and unit-test the functions.
 
 .NOTES
+    ### APPEND-ONLY over EVERY immutable row, placeholders INCLUDED
+    Get-ImmutableRows returns, per immutable section, the ordered list of ALL data rows -
+    real ID-bearing rows AND empty-state "(none yet)"/"(none recorded ...)" placeholders.
+    Test-AppendOnly requires PREV's rows to be an exact PREFIX of CUR's, so deleting,
+    editing, reordering, or replacing ANY previous row (a placeholder among them) is a
+    violation. Per schema rule 9 the first real entry is appended AFTER the placeholder;
+    the placeholder is preserved, never dropped.
+
     ### `git diff --no-index` EXIT-CODE SEMANTICS (important)
     `git diff --no-index a b` is a plain two-file comparator. It exits:
         0  -> the two files are IDENTICAL
@@ -74,7 +95,9 @@
 [CmdletBinding()]
 param(
     [switch] $KeepEvidence,
-    [string] $WorkDir
+    [string] $WorkDir,
+    [string] $FixtureDir,
+    [switch] $LoadOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -166,8 +189,12 @@ function Invoke-GitCapture {
 }
 
 # Parse the four IMMUTABLE sections of a project-state.md string, returning per-section
-# lists of EVIDENCE rows (ID-bearing: SS-/PS-/A-) and PLACEHOLDER rows (empty-state
-# scaffolding). Mutable projection sections are ignored entirely.
+# an ORDERED list of EVERY immutable data row - both real ID-bearing rows (SS-/PS-/A-)
+# AND empty-state placeholder rows (e.g. "(none yet)" / "(none recorded ...)"). Header
+# and separator rows are excluded. Mutable projection sections are ignored entirely.
+# Placeholders are treated as immutable rows exactly like evidence: the schema (rule 9)
+# preserves them - the first real entry is APPENDED after the placeholder, and the
+# placeholder is never edited, replaced, or deleted.
 function Get-ImmutableRows {
     param([Parameter(Mandatory)][string] $Content)
 
@@ -193,8 +220,7 @@ function Get-ImmutableRows {
 
     $result = @{}
     foreach ($key in $wanted) {
-        $evidence    = New-Object System.Collections.Generic.List[string]
-        $placeholder = New-Object System.Collections.Generic.List[string]
+        $rows = New-Object System.Collections.Generic.List[string]
 
         if ($rawBySection.ContainsKey($key)) {
             $rawLines = @($rawBySection[$key])
@@ -220,44 +246,22 @@ function Get-ImmutableRows {
                     if ($ln -notmatch '^\s*-\s') { continue }
                 }
 
-                # Classify the row.
-                $isPlaceholder = $false
-                if ($ln -match '(?i)\(none recorded') { $isPlaceholder = $true }
-
-                $firstCell = ''
-                if ($ln -match '^\s*\|') {
-                    $cells = $ln.Trim().Trim('|').Split('|')
-                    if ($cells.Count -gt 0) { $firstCell = $cells[0].Trim() }
-                    if ($firstCell -in @('(none yet)', '(none)', '-', '-', '')) { $isPlaceholder = $true }
-                }
-
-                $isEvidence = ($firstCell -match '^(SS|PS|A)-\d+$')
-
-                if ($isEvidence) {
-                    $evidence.Add($ln.Trim())
-                } elseif ($isPlaceholder) {
-                    $placeholder.Add($ln.Trim())
-                } else {
-                    # Unknown non-empty immutable row - treat as evidence so an accidental
-                    # edit surfaces as a violation rather than being silently ignored.
-                    $evidence.Add($ln.Trim())
-                }
+                # EVERY immutable data row - placeholder OR evidence - is kept, in order.
+                $rows.Add($ln.Trim())
             }
         }
 
-        $result[$key] = [pscustomobject]@{
-            Evidence    = @($evidence)
-            Placeholder = @($placeholder)
-        }
+        $result[$key] = @($rows)
     }
     return $result
 }
 
-# Assert that CUR is an append-only successor of PREV: in every immutable section, the
-# ordered list of PREV's evidence rows must be an exact prefix of CUR's, and CUR may
-# only ADD rows at the end. Placeholder (empty-state) rows may exist only while a section
-# has zero evidence rows and may be dropped exactly when the first evidence row arrives
-# (project-state schema rule 9). Mutable projection sections are not checked here.
+# Assert that CUR is an append-only successor of PREV. In every immutable section the
+# ORDERED list of PREV's rows (placeholders AND evidence) must be an EXACT PREFIX of
+# CUR's: no previous row may be deleted, edited, reordered, or replaced, and CUR may
+# only ADD new rows at the end. Deleting a preserved "(none yet)" placeholder is therefore
+# a violation, not a valid transition. Mutable projection sections are not checked here -
+# they may be freely refreshed.
 function Test-AppendOnly {
     param(
         [Parameter(Mandatory)] $PrevRows,
@@ -267,27 +271,20 @@ function Test-AppendOnly {
     $added    = New-Object System.Collections.Generic.List[string]
 
     foreach ($key in @('State snapshots', 'Decision log', 'Approvals', 'Deviations')) {
-        $prevEv = @($PrevRows[$key].Evidence)
-        $curEv  = @($CurRows[$key].Evidence)
+        $prev = @($PrevRows[$key])
+        $cur  = @($CurRows[$key])
 
-        if ($curEv.Count -lt $prevEv.Count) {
-            $problems.Add("[$key] evidence rows DROPPED (prev $($prevEv.Count) -> now $($curEv.Count)).")
+        if ($cur.Count -lt $prev.Count) {
+            $problems.Add("[$key] an immutable row was DELETED (prev $($prev.Count) row(s) -> now $($cur.Count)); previous rows, including empty-state placeholders, are preserved.")
         } else {
-            for ($i = 0; $i -lt $prevEv.Count; $i++) {
-                if ($curEv[$i] -ne $prevEv[$i]) {
-                    $problems.Add("[$key] immutable row #$($i + 1) was edited/reordered.")
+            for ($i = 0; $i -lt $prev.Count; $i++) {
+                if ($cur[$i] -ne $prev[$i]) {
+                    $problems.Add("[$key] immutable row #$($i + 1) was edited, reordered, or replaced (every previous row must be preserved byte-for-byte).")
                 }
             }
-            if ($curEv.Count -gt $prevEv.Count) {
-                for ($i = $prevEv.Count; $i -lt $curEv.Count; $i++) {
-                    $added.Add("[$key] +$($curEv[$i])")
-                }
+            for ($i = $prev.Count; $i -lt $cur.Count; $i++) {
+                $added.Add("[$key] +$($cur[$i])")
             }
-        }
-
-        $curPh = @($CurRows[$key].Placeholder)
-        if (($curPh.Count -gt 0) -and ($curEv.Count -gt 0)) {
-            $problems.Add("[$key] empty-state placeholder present alongside real evidence.")
         }
     }
 
@@ -299,17 +296,53 @@ function Test-AppendOnly {
 }
 
 # ---------------------------------------------------------------------------
+# Cleanup: delete ONLY a run directory this run created and can PROVE it owns via
+# a matching ownership marker. Never Remove-Item -Recurse an unverified directory,
+# and never anything inside the skills repo. Returns $true only if it deleted.
+# ---------------------------------------------------------------------------
+function Remove-OwnedRunRoot {
+    param(
+        [string] $Root,
+        [string] $ExpectedRunId,
+        [string] $MarkerName,
+        [Parameter(Mandatory)][string] $SkillsRepoRoot
+    )
+    if ([string]::IsNullOrWhiteSpace($Root)) { return $false }
+    if (-not (Test-Path -LiteralPath $Root)) { return $false }
+    if (Path-IsInside -Child $Root -Parent $SkillsRepoRoot) {
+        Write-Host "Cleanup REFUSED: run dir resolves inside the skills repo - not deleting."
+        return $false
+    }
+    $marker = Join-Path $Root $MarkerName
+    if (-not (Test-Path -LiteralPath $marker)) {
+        Write-Host ("Cleanup REFUSED: ownership marker '{0}' not found in '{1}' - not deleting an unverified directory." -f $MarkerName, $Root)
+        return $false
+    }
+    $content = ''
+    try { $content = Read-Utf8File -Path $marker } catch { }
+    if ($content -notmatch [regex]::Escape("run-id: $ExpectedRunId")) {
+        Write-Host ("Cleanup REFUSED: ownership marker run-id in '{0}' does not match this run - not deleting." -f $Root)
+        return $false
+    }
+    Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction SilentlyContinue
+    return $true
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+if (-not $LoadOnly) {
+
 $exitCode  = 1
 $runPassed = $false
 $failures  = New-Object System.Collections.Generic.List[string]
 
 # Populated inside the try so the finally can report/clean them.
-$WorkRoot = $null
-$Repo     = $null
-$Evidence = $null
-$weCreatedWorkRoot = $false
+$MarkerName   = '.scenario-a-run-id'
+$RunId        = [guid]::NewGuid().ToString('N')
+$OwnedRunRoot = $null
+$Repo         = $null
+$Evidence     = $null
 
 try {
     Write-Host "=== Scenario A acceptance-evidence harness ==="
@@ -324,7 +357,10 @@ try {
     # Resolve the fixture directory relative to this script (READ-only; inside skills repo).
     $ScriptDir      = $PSScriptRoot
     $SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\..'))
-    $FixtureDir     = Join-Path $ScriptDir 'scenario-a-fixture\state-sequence'
+    if ([string]::IsNullOrWhiteSpace($FixtureDir)) {
+        $FixtureDir = Join-Path $ScriptDir 'scenario-a-fixture\state-sequence'
+    }
+    $FixtureDir = [System.IO.Path]::GetFullPath($FixtureDir)
     if (-not (Test-Path -LiteralPath $FixtureDir)) {
         throw "Fixture directory not found: $FixtureDir"
     }
@@ -352,33 +388,49 @@ try {
         throw ("Fixture set mismatch. Missing: [{0}]  Unexpected: [{1}]" -f ($missing -join ', '), ($extra -join ', '))
     }
 
-    # Resolve the work root (OUTSIDE the skills repo).
+    # Resolve the BASE directory (OUTSIDE the skills repo): system temp by default,
+    # or the caller's -WorkDir. We NEVER delete or recurse the base or its existing
+    # contents - we only ever create, own, and later remove a fresh unique child.
     if ([string]::IsNullOrWhiteSpace($WorkDir)) {
-        $stamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
-        $rand  = ([guid]::NewGuid().ToString('N')).Substring(0, 8)
-        $WorkRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("scenario-a-evidence-$stamp-$rand")
-        $weCreatedWorkRoot = $true
+        $baseDir = [System.IO.Path]::GetTempPath()
     } else {
-        $WorkRoot = $WorkDir
-        $weCreatedWorkRoot = $false
+        $baseDir = [System.IO.Path]::GetFullPath($WorkDir)
+        if (Path-IsInside -Child $baseDir -Parent $SkillsRepoRoot) {
+            throw "Refusing to run: -WorkDir '$baseDir' is inside the skills repo. Evidence must live OUTSIDE the skills repo."
+        }
+        if (-not (Test-Path -LiteralPath $baseDir)) {
+            New-Item -ItemType Directory -Force -Path $baseDir | Out-Null
+        }
     }
-    $WorkRoot = [System.IO.Path]::GetFullPath($WorkRoot)
 
-    # Safety: never operate inside the skills repo.
-    if (Path-IsInside -Child $WorkRoot -Parent $SkillsRepoRoot) {
-        throw "Refusing to run: work dir '$WorkRoot' is inside the skills repo '$SkillsRepoRoot'. Evidence must live OUTSIDE the skills repo."
+    # ALWAYS create a NEW unique run directory owned by THIS run, under the base.
+    # A caller-supplied -WorkDir that already contains files is safe: we touch only
+    # this owned child, never the caller's pre-existing product-repo/evidence/etc.
+    $stamp   = (Get-Date).ToString('yyyyMMdd-HHmmss')
+    $RunRoot = Join-Path $baseDir ("scenario-a-run-$stamp-" + $RunId.Substring(0, 12))
+    if (Test-Path -LiteralPath $RunRoot) {
+        throw "Run directory unexpectedly already exists (refusing to reuse): $RunRoot"
     }
+    if (Path-IsInside -Child $RunRoot -Parent $SkillsRepoRoot) {
+        throw "Refusing to run: run dir '$RunRoot' resolves inside the skills repo."
+    }
+    New-Item -ItemType Directory -Force -Path $RunRoot | Out-Null
+    $OwnedRunRoot = $RunRoot     # only this exact directory may be cleaned up
 
-    $Repo     = Join-Path $WorkRoot 'product-repo'
-    $Evidence = Join-Path $WorkRoot 'evidence'
+    # Ownership marker: cleanup will delete $RunRoot ONLY if this marker is present
+    # and its run-id matches. This is what makes recursive cleanup safe.
+    $MarkerPath = Join-Path $RunRoot $MarkerName
+    Write-Utf8File -Path $MarkerPath -Content ("scenario-a-evidence-harness`nrun-id: $RunId`ncreated: {0}`n" -f (Now-Iso))
+
+    $Repo     = Join-Path $RunRoot 'product-repo'
+    $Evidence = Join-Path $RunRoot 'evidence'
     $RepoDocs = Join-Path $Repo 'docs'
 
-    New-Item -ItemType Directory -Force -Path $WorkRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $Repo     | Out-Null
     New-Item -ItemType Directory -Force -Path $RepoDocs | Out-Null
     New-Item -ItemType Directory -Force -Path $Evidence | Out-Null
 
-    Write-Host ("work root  : {0}" -f $WorkRoot)
+    Write-Host ("run dir    : {0}  (owned; run-id {1})" -f $RunRoot, $RunId.Substring(0,12))
     Write-Host ("repo       : {0}" -f $Repo)
     Write-Host ("evidence   : {0}" -f $Evidence)
     Write-Host ""
@@ -563,29 +615,25 @@ catch {
 }
 finally {
     # Cleanup policy:
-    #   * Keep everything when -KeepEvidence is set OR when the run failed (so a failure
-    #     can be inspected).
-    #   * Otherwise clean up. Only ever remove directories the harness created, and never
-    #     anything inside the skills repo (guaranteed by the earlier Path-IsInside guard).
+    #   * Keep everything when -KeepEvidence is set OR when the run FAILED (so a failure
+    #     can be inspected) - the run's evidence is preserved, never deleted.
+    #   * Otherwise remove ONLY the owned run directory, and only after Remove-OwnedRunRoot
+    #     proves ownership via the matching marker. The caller's -WorkDir and its other
+    #     contents are never touched.
     $keep = ($KeepEvidence -or (-not $runPassed))
     if ($keep) {
-        if ($Evidence) { Write-Host ("Evidence kept at : {0}" -f $Evidence) }
-        if ($Repo)     { Write-Host ("Disposable repo  : {0}" -f $Repo) }
+        if ($Evidence)     { Write-Host ("Evidence kept at : {0}" -f $Evidence) }
+        if ($Repo)         { Write-Host ("Disposable repo  : {0}" -f $Repo) }
+        if ($OwnedRunRoot) { Write-Host ("Owned run dir    : {0}  (kept)" -f $OwnedRunRoot) }
     } else {
-        try {
-            if ($weCreatedWorkRoot) {
-                if ($WorkRoot -and (Test-Path -LiteralPath $WorkRoot)) {
-                    Remove-Item -LiteralPath $WorkRoot -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            } else {
-                if ($Repo     -and (Test-Path -LiteralPath $Repo))     { Remove-Item -LiteralPath $Repo     -Recurse -Force -ErrorAction SilentlyContinue }
-                if ($Evidence -and (Test-Path -LiteralPath $Evidence)) { Remove-Item -LiteralPath $Evidence -Recurse -Force -ErrorAction SilentlyContinue }
-            }
-            Write-Host "Cleaned up disposable repo and evidence (run passed; -KeepEvidence not set)."
-        } catch {
-            Write-Host ("Cleanup warning: {0}" -f $_.Exception.Message)
+        $removed = Remove-OwnedRunRoot -Root $OwnedRunRoot -ExpectedRunId $RunId -MarkerName $MarkerName -SkillsRepoRoot $SkillsRepoRoot
+        if ($removed) {
+            Write-Host "Cleaned up the owned run directory (ownership marker verified; run passed; -KeepEvidence not set)."
+        } else {
+            Write-Host "Left the work area in place (cleanup found nothing it could prove it owned)."
         }
     }
 }
 
-exit $exitCode
+    exit $exitCode
+}

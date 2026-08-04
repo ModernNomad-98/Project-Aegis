@@ -13,16 +13,21 @@ bounded first release, **no deadline and no delivery commitment**. It exercises 
 project-state journey from cold start to the start of design:
 
 1. **Cold start** — the file is created with the first State snapshot `SS-001`
-   ("Defining the product") and empty-state Decision log / Approvals / Deviations.
-2. **Discovery recorded** — the scope decision `PS-001` (a business decision, `user`) and
-   the scope-agreement approval `A-001` are appended; projections are refreshed.
-3. **Low-risk batch recorded** — reversible product-definition details are folded into the
-   **mutable projections** (no new immutable rows).
-4. **Product spec complete** — `PS-002` appended.
-5. **Prioritization / roadmap / commitment readiness not applicable** — `PS-003`, `PS-004`,
-   `PS-005` appended, each "not applicable (chosen over …, because …)" attributed
-   `orchestrator-via-project-orchestrator`. These four DECISION entries are the Stage 2
-   exit gate.
+   ("Defining the product") and empty-state `(none yet)` placeholder rows in the Decision
+   log and Approvals (and `(none recorded …)` in Deviations). These placeholder rows are
+   PRESERVED in every later version.
+2. **Discovery recorded** — the scope decision `PS-001` (`user`) and the scope-agreement
+   approval `A-001` are APPENDED after the placeholders. `A-001` freezes its allowed scope
+   to immutable Decision `PS-001` (not to the mutable projection); projections are refreshed.
+3. **Low-risk batch recorded** — the reversible product-definition choices (slot duration,
+   multi-day navigation, link expiry, notification behavior) are FIRST appended to the
+   Decision log as rationale-bearing rows `PS-002`, `PS-003`, `PS-004`, `PS-005` (attributed
+   `user`), and only THEN are the mutable projections refreshed from those recorded rows.
+4. **Product spec complete** — `PS-006` appended.
+5. **Prioritization / roadmap / commitment readiness not applicable** — `PS-007`, `PS-008`,
+   `PS-009` appended, each "not applicable (chosen over …, because …)" attributed
+   `orchestrator-via-project-orchestrator`. Those, with `PS-006`, are the four Stage 2
+   exit-gate owner decisions.
 6. **Stage 3 snapshot** — `SS-002` ("Design: how it will be built") appended. Scenario A
    **stops here**: there is no `SS-003`.
 
@@ -35,11 +40,13 @@ The fixture that encodes this exact sequence lives at
 
 - The **immutable evidence** sections — `State snapshots`, `Decision log`, `Approvals`,
   `Deviations` — are **append-only**: no existing row is ever edited, deleted, reordered,
-  or replaced; new rows are only added at the end. (Empty-state scaffolding rows may be
-  dropped exactly once, when the first real evidence row arrives.)
+  or replaced; new rows are only appended at the end. Empty-state `(none yet)` placeholder
+  rows are PRESERVED — the first real entry is appended AFTER the placeholder, and the
+  placeholder is never dropped or replaced (schema rule 9). The harness FAILS the run if any
+  previous immutable row, a placeholder included, is deleted, edited, reordered, or replaced.
 - The **mutable projection** sections (`Current product summary`, `Current approved scope`,
   `Current users/roles`, `Current success definition`, `Open questions`) may be **freely
-  refreshed** at checkpoints.
+  refreshed** at checkpoints, but must never contradict the immutable records.
 - The acceptance **evidence is stored OUTSIDE** the disposable product repo, and the
   product repo is **never committed to** for evidence.
 
@@ -69,11 +76,27 @@ copies), so the recorded SHA-256 values match across editions and machines.
 - `-KeepEvidence` — keep the work directory (disposable repo + evidence) after the run.
   Without it, a **passing** run cleans up after itself. A **failing** run always keeps its
   evidence so you can inspect it, regardless of this switch.
-- `-WorkDir <path>` — root directory to create the disposable repo + evidence under. Must
-  be **outside this skills repo** (the harness refuses otherwise). Defaults to a fresh
-  unique directory under the system temp folder.
+- `-WorkDir <path>` — **base** directory under which the run creates its own unique child
+  ("scenario-a-run-…"). Must be **outside this skills repo**. The harness NEVER deletes or
+  recurses the base or its pre-existing contents: it creates, owns (via an ownership marker),
+  and — only on a passing run and only after verifying the marker — removes only that child.
+  A `-WorkDir` that already contains a `product-repo`/`evidence` directory is therefore safe.
+- `-FixtureDir <path>` — override the fixture state-sequence directory (used by the tests).
+- `-LoadOnly` — define the harness functions and return without running (used by the tests).
 
 The harness exits **0** on all-pass and **non-zero** on any failure.
+
+### Negative / safety tests
+
+`scripts/acceptance/Test-ScenarioAEvidence.ps1` proves the harness's guarantees — caller-owned
+directories are never deleted; deleting a preserved placeholder, or editing / deleting /
+reordering an immutable row, FAILS append-only; a mutable projection-only refresh and the
+complete low-risk batch SUCCEED; an unexpected fixture file fails; and an added commit is
+detected. Run it the same way:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Test-ScenarioAEvidence.ps1"
+```
 
 ## How to read the evidence directory
 

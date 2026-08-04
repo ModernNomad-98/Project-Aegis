@@ -37,6 +37,46 @@ commit or push; deployment; a financial commitment; a delivery promise; a
 production change. Bundling any of these into a low-risk batch is the AR-A-004
 failure.
 
+### The two recording forms
+
+Capability 4's preview → approve → append is instantiated as exactly ONE of two
+forms. Every high-risk / authority-changing / irreversible action uses the
+single-entry form; only the low-risk decisions of §1 may use the batch form.
+
+**SINGLE-ENTRY form** (any one decision; ALWAYS used for a high-risk action):
+
+- exact target path;
+- exactly one entry ID;
+- the entry's date;
+- attribution (`user` | `orchestrator-via-<skill>`);
+- the byte-for-byte full entry (no ellipsis, no omitted column);
+- ONE approval question for that entry;
+- exact post-write confirmation — the appended entry reproduced, or an exact
+  hash + complete path + entry id.
+
+**LOW-RISK-BATCH form** (only the low-risk, reversible product-definition
+decisions of §1):
+
+- the exact target path (or paths);
+- the ORDERED list of EVERY entry ID in the batch;
+- each entry's date and attribution;
+- the byte-for-byte full content of EVERY entry (nothing summarized or omitted
+  from the preview);
+- the exact mutable-projection refresh, if one is included, shown in the SAME
+  preview;
+- ONE approval question covering exactly that complete, bounded batch — no entry
+  is added to or removed from it after it is shown;
+- an atomic append where practical (all entries, then the projection refresh);
+- post-write confirmation LISTING every recorded ID and every refreshed
+  projection;
+- partial-failure handling: if the atomic append cannot complete, report EXACTLY
+  which entries and which projection refresh did and did NOT land, and treat the
+  batch as not fully recorded (re-propose the remainder).
+
+The batch preview is complete or it is not shown: an orchestrator never omits an
+entry from the preview or the confirmation, and never silently reverts a batch to
+several separate approval turns.
+
 ## 2. Authority grants are separate and explicit (deny-by-default)
 
 Scope agreement, product-spec acceptance, design acceptance, and "permission to

@@ -32,7 +32,7 @@
 
 - What the business does: a small physiotherapy clinic treats patients by scheduled appointments.
 - What goes wrong today: appointments are kept in a paper diary at the front desk, so slots get double-booked and no-shows are only noticed when the patient does not arrive.
-- Who the customers/users are: the front-desk receptionist (internal) and the patient (external, who would receive a reminder link).
+- Who the customers/users are: the front-desk receptionist (internal) and the patient (external, who receives a reminder link).
 - What "done enough to ship" means (MVP): still being defined — the proposed first release is to book an appointment, see today's schedule, mark a patient arrived or no-show, and send the patient a reminder link.
 
 ## Current approved scope — projection (refresh from records)

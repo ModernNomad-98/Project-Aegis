@@ -103,14 +103,28 @@
     {
       "id": "readiness-commitable-does-not-require-human-decision",
       "type": "should_trigger",
-      "prompt": "Readiness question only: architecture is signed off, dependencies are secured, and we have three sprints of measured velocity. Nobody has formally approved committing yet. Are we readiness-clear to commit?",
+      "prompt": "Readiness question only. The immutable records show an approved current product scope; the architecture and design are signed off; there is a written technical implementation plan; dependency discovery is COMPLETE and the two external dependencies are secured; we have three sprints of measured velocity giving a defensible capacity basis; risk and uncertainty have been assessed; the stakeholder target is a Q3 window. The sponsor has NOT formally approved committing yet. Judged purely on the technical evidence, are we readiness-clear to commit?",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Judges readiness on TECHNICAL evidence only and returns COMMIT-ABLE - the absence of a human commitment decision does NOT force NOT COMMIT-ABLE.",
+          "With EVERY required technical evidence category present (approved current scope, architecture/design, a technical implementation plan, completed dependency discovery with dependencies secured, measured velocity giving a defensible capacity basis, and risk/uncertainty evidence), returns Readiness = COMMIT-ABLE.",
+          "Judges readiness on TECHNICAL evidence only - the absence of a human commitment decision does NOT force NOT COMMIT-ABLE.",
           "Sets Commitment status = HUMAN DECISION REQUIRED and Committed = none (COMMIT-ABLE is evidence sufficiency, not a promise).",
-          "Shows the non-binding Candidate committable set (deliverables + honest date RANGES) for the named human to decide on, distinct from Committed.",
-          "Does not emit a delivery promise or auto-approve the commitment; the human decision is required only before a FINAL commitment is emitted."
+          "Shows the non-binding Candidate committable set (deliverables + honest date RANGES) for the named human to decide on, distinct from Committed; emits NO final commitment (the human decision is required only before a FINAL commitment)."
+        ]
+      }
+    },
+    {
+      "id": "readiness-not-commitable-when-one-technical-category-missing",
+      "type": "should_trigger",
+      "prompt": "Readiness question only. The immutable records show an approved current product scope; the architecture and design are signed off; dependency discovery is complete and dependencies secured; we have three sprints of measured velocity and a defensible capacity basis; risk is assessed; the target is a Q3 window. There is NO technical implementation plan yet. The sponsor is undecided. Are we readiness-clear to commit?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns Readiness = NOT COMMIT-ABLE because one required technical evidence category is absent.",
+          "Names the missing category explicitly: the technical implementation plan / technical planning.",
+          "Reflects the NOT COMMIT-ABLE mode in the fields (Committed = none; Capacity basis as specified for that mode); keeps the Q3 target an unverified target only and records when to reassess.",
+          "Does NOT cite the undecided sponsor as the reason - readiness is judged on technical evidence, and here it is the missing technical plan, not the missing human decision, that forces NOT COMMIT-ABLE."
         ]
       }
     },

@@ -12,13 +12,15 @@
 
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
+| (none yet) | — | (none recorded — no decision has been recorded yet) | — | — | — |
 | PS-001 | 2026-03-03 | Ship a small first version: book an appointment, see today's schedule, mark arrived or no-show, and send the patient a reminder link (chosen over a bigger first release with billing and treatment notes, because a small v1 ships sooner and teaches us more). Everything else waits. | user | yes | discovery brief; unblocks product spec |
 
 ## Approvals (irreversible steps & scope grants)
 
 | ID | Status | Date / who | Scope allowed | Scope FORBIDDEN | Evidence |
 |----|--------|-----------|---------------|-----------------|----------|
-| A-001 | ACTIVE | 2026-03-03 / user | The v1 product scope listed in the current-scope projection is the agreed first-release scope. | Scope agreement ONLY — this is NOT authority to write code, install packages, run a migration, commit, push, or deploy. Implementation authority is a separate later approval. Adding billing or a patient self-booking portal needs a new decision. | discovery sign-off, this file |
+| (none yet) | — | — | — | — | (none recorded — no approval has been granted yet) |
+| A-001 | ACTIVE | 2026-03-03 / user | The v1 scope EXACTLY as recorded in immutable Decision PS-001: book an appointment into an open slot, see today's schedule, mark a patient arrived or no-show, and send the patient a read-only reminder link — this is the agreed first-release scope. (Authority source: Decision PS-001, not the mutable current-scope projection.) | Scope agreement ONLY — this is NOT authority to write code, install packages, run a migration, commit, push, or deploy. Implementation authority is a separate later approval. Adding billing or a patient self-booking portal needs a new decision. | Decision PS-001; discovery sign-off, this file |
 
 ## Deviations (a decision changed course)
 
@@ -58,4 +60,6 @@
 > An answered question is removed here once its DECISION is recorded above.
 
 - When should a patient's reminder link stop working — the moment the appointment time passes, or a fixed number of days later? (Low-risk; reversible.) — folds into the current scope once you pick.
-- Should the schedule screen default to today only, or show the whole week? (Low-risk; reversible.) — folds into the current scope once you pick.
+- Should the schedule screen default to today only, or step to another day, or show the whole week? (Low-risk; reversible.) — folds into the current scope once you pick.
+- How long should an appointment slot be? (Low-risk; reversible.) — folds into the current scope once you pick.
+- Should v1 send any automated SMS or email, or is the single reminder link enough? (Low-risk; reversible.) — folds into the current scope once you pick.

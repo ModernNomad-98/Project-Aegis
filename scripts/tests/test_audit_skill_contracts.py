@@ -435,44 +435,57 @@ def test_stage2_malformed_and_leakage() -> None:
 
 
 def test_route003_branch_aware() -> None:
-    """Thread-12 fix: ROUTE-003 is branch-aware, not co-occurrence. A Stage-2
-    route that reaches the commitments skill is cleared ONLY when it BOTH names
-    the roadmap owner AND carries a readiness / NOT COMMIT-ABLE guard."""
+    """Per-route ROUTE-003 (thread-12 follow-up): each detectable commitments
+    route is validated on its OWN line, so unrelated explanatory text elsewhere
+    in the Stage-2 segment cannot clear a separate unguarded route. A commitments
+    route = a physical line naming roadmap-to-commitments-translator WITH a routing
+    marker; its readiness / NOT COMMIT-ABLE guard must be on that line."""
     gaps = audit_mod.Audit.stage2_commitments_route_gaps
-    # safe: the commitments skill is never reached in this segment
-    assert gaps("route via `prioritization-frame-picker` only") == []
-    # safe: roadmap owner named AND a readiness / NOT COMMIT-ABLE guard present
-    safe = (
-        "`roadmap-under-uncertainty-planner` then `roadmap-to-commitments-translator` "
-        "runs as a readiness assessment; the result is NOT COMMIT-ABLE when the "
-        "evidence a real commitment needs is absent"
+
+    # (1) commitments not reached by any detectable route -> clean.
+    assert gaps("- classify via `prioritization-frame-picker` on evidence.") == []
+
+    # (2) a per-line-guarded route with roadmap classified n/a (the deadline-only
+    #     shape) -> clean.
+    ok_deadline = (
+        "- Roadmap - NOT APPLICABLE here; classify `roadmap-under-uncertainty-planner` n/a.\n"
+        "- Commitment readiness - when applicable: -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
     )
-    assert gaps(safe) == [], "a guarded, owner-named route must be clean"
-    # unsafe: planner ABSENT (the original AEGIS-035 route gap) even with a guard
-    g = gaps("`roadmap-to-commitments-translator` readiness NOT COMMIT-ABLE only")
-    assert g and any("AEGIS-035" in x for x in g), (
-        "commitments reached without the roadmap owner named must fire (AEGIS-035)"
+    assert gaps(ok_deadline) == [], "a per-line-guarded route with roadmap n/a must be clean"
+
+    # (3) THE reviewer's case: guard words (readiness, NOT COMMIT-ABLE) and the
+    #     roadmap owner appear in explanatory PROSE, but a SEPARATE line routes
+    #     straight to commitments with no guard on THAT line -> must fire AEGIS-044.
+    gamed = (
+        "Commitment readiness runs in readiness mode and returns NOT COMMIT-ABLE without "
+        "evidence; `roadmap-under-uncertainty-planner` is a Stage-2 owner.\n"
+        "- Then -> invoke `roadmap-to-commitments-translator` to get the date.\n"
     )
-    # unsafe: planner NAMED but NO readiness guard — the co-occurrence trap. This
-    # is the case the pre-fix rule wrongly cleared; it MUST fire now.
-    g = gaps(
-        "`roadmap-under-uncertainty-planner` then `roadmap-to-commitments-translator` "
-        "with no guard on fabricating a promise"
-    )
+    g = gaps(gamed)
     assert g and any("AEGIS-044" in x for x in g), (
-        "co-occurrence of the roadmap-planner token must NOT clear ROUTE-003 "
-        "when the readiness / NOT COMMIT-ABLE guard is missing"
+        "an unguarded commitments route must fire even when guard words appear elsewhere"
     )
-    # a genuine deadline-only route (roadmap n/a) stays clean because the guard,
-    # not roadmap co-occurrence, is the invariant
-    deadline_only = (
-        "classify each owner independently; roadmap n/a here; "
-        "`roadmap-to-commitments-translator` runs in readiness mode and returns "
-        "NOT COMMIT-ABLE without evidence — `roadmap-under-uncertainty-planner` "
-        "remains the named owner it is classified against"
+    assert not any("AEGIS-035" in x for x in g), (
+        "the roadmap owner IS classified in prose here, so only the guard gap should fire"
     )
-    assert gaps(deadline_only) == [], "a guarded deadline-only route must be clean"
-    ok("ROUTE-003 is branch-aware: co-occurrence alone never clears the commitments route")
+
+    # (4) unguarded route AND the roadmap owner never classified anywhere -> BOTH gaps.
+    no_owner = "- spec -> `product-spec-writer` -> invoke `roadmap-to-commitments-translator`.\n"
+    g2 = gaps(no_owner)
+    assert any("AEGIS-044" in x for x in g2), "unguarded route fires AEGIS-044"
+    assert any("AEGIS-035" in x for x in g2), "missing roadmap-owner classification fires AEGIS-035"
+
+    # (5) one guarded and one UNGUARDED commitments route in the same segment ->
+    #     the unguarded one still fires (per-route, not per-segment).
+    mixed = (
+        "- Roadmap: classify `roadmap-under-uncertainty-planner` (may be n/a).\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+        "- Shortcut -> route to `roadmap-to-commitments-translator` right now.\n"
+    )
+    gm = gaps(mixed)
+    assert gm and any("AEGIS-044" in x for x in gm), "one unguarded route among several must fire"
+
+    ok("ROUTE-003 is per-route: the guard must be on the route line; prose elsewhere cannot clear an unguarded route")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------

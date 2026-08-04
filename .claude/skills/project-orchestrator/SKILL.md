@@ -152,13 +152,15 @@ here.
 - **Stage 1 — Understand the need.** → `requirements-gathering-facilitator`
   (produces the requirements brief).
 - **Stage 2 — Define the product.** ALWAYS begins → invoke `product-spec-writer`.
-  After the spec is complete, classify each remaining owner **independently by
-  evidence** (a read-only judgement that invokes NO skill — it appears in WHAT
-  HAPPENS NEXT as a classification decision, not an invocation). Invoke ONLY an
-  owner whose own criteria below are met; classify each other owner `n/a` with a
-  reason. No skill is invoked to manufacture the very evidence that would justify
-  invoking it. Recording a terminal owner result is likewise a non-invocation
-  step: preview the exact DECISION entry and await the user's approval.
+  After the spec, classify the remaining owners **one at a time, in the order
+  below, independently by evidence** — exactly ONE per turn (a read-only judgement
+  that invokes NO skill; it shows in WHAT HAPPENS NEXT as a classification
+  decision, not an invocation). Never classify, predict, or imply a LATER owner's
+  result: each stays `unclassified` until its own turn, classified only AFTER the
+  current owner's result is recorded — so prose, the STAGE-2 OWNERS ledger, NEXT
+  OWNER, and EXIT GATE agree. Invoke ONLY an owner whose criteria below are met;
+  classify each other `n/a` with a reason. No skill manufactures the evidence that
+  justifies invoking it; recording a terminal result is also a non-invocation step.
   - **Prioritization** — APPLICABLE on evidence of competing capabilities,
     initiatives, or release choices; a real ranking or scope-tradeoff decision;
     or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
@@ -178,11 +180,10 @@ here.
     applicable: → invoke `roadmap-to-commitments-translator` (readiness mode).
   - **Order when several apply** (skip any `n/a` owner without invoking it):
     `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
-    `roadmap-to-commitments-translator`.
-  - **Worked classifications** (each asserted by an eval): bounded MVP + a
-    deadline → only commitment readiness applies; competing capabilities, no
-    deadline → prioritization (+ roadmap only if sequencing is needed); all three
-    signals together → all apply, in order; a bounded MVP with none → all `n/a`.
+    `roadmap-to-commitments-translator` (readiness mode).
+  - **Worked classifications** (each asserted by an eval): bounded MVP + deadline
+    → only commitment readiness; competing capabilities, no deadline → prioritization
+    (+ roadmap if sequencing); all three signals → all in order; bounded MVP, none → `n/a`.
 
   **Commitment readiness at Stage 2 is a READINESS ASSESSMENT, never a
   promise.** When the evidence a real commitment needs — architecture/design,
@@ -195,8 +196,8 @@ here.
   COMMIT-ABLE` is a **completed** result — it does NOT trap the project in Stage
   2. Record the reassessment as a deferred next-action tied to its evidence
   milestone; when that milestone is later reached (e.g. architecture recorded at
-  Stage 3), re-invoke `roadmap-to-commitments-translator` — a requested date is
-  never left unverified indefinitely.
+  Stage 3), re-invoke `roadmap-to-commitments-translator` (readiness mode) — a
+  requested date is never left unverified indefinitely.
 
   **Stage 2 exit gate (recorded, not merely reached).** Each owner carries one
   ledger state (Output Format). A terminal analytical result does NOT satisfy the
@@ -328,9 +329,8 @@ STAGE-2 OWNERS:  (shown while in Stage 2)
   NEXT OWNER=<skill-name|classification decision|record terminal decision|none>;  EXIT GATE=<MET|BLOCKED>
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
-LOG ENTRY PROPOSED: <docs/project-state.md path + entry ID + date + exact content>
-RECORDING STATUS: AWAITING EXPLICIT APPROVAL — nothing written
-                  (after your explicit yes → RECORDED: <path + ID + date + exact content appended>)
+RECORDING: one form (see references/recording-and-authority.md) — SINGLE=<path + one ID + date + attribution + byte-for-byte entry>; BATCH (low-risk only)=<path(s) + ORDERED list of every ID + each date/attribution + byte-for-byte content of EVERY entry + any exact projection refresh>, ONE approval for the complete bounded batch (high-risk actions are never batched)
+RECORDING STATUS: AWAITING EXPLICIT APPROVAL — nothing written (after your yes → RECORDED: the exact single entry; or the batch's every recorded ID + every refreshed projection listed — partial-failure reports exactly what did and did not land)
 ```
 
 `docs/project-state.md` is the durable artifact (template in Supporting Files):
