@@ -131,14 +131,29 @@
     {
       "id": "final-commitment-requires-evidence-and-approval",
       "type": "should_trigger",
-      "prompt": "The architecture is signed off, cross-team dependencies are secured, we have a solid velocity baseline, and the sponsor has formally approved committing to the Q3 milestone. Produce the final commitment.",
+      "prompt": "The architecture is signed off, cross-team dependencies are secured, and we have a solid velocity baseline. Dana Ruiz (VP Product) formally approved committing to the Q3 onboarding milestone in the 2026-03-05 planning review, recorded as Approval A-014 (approved scope: the new onboarding flow, weeks 6-8). Produce the final commitment.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Runs in final commitment mode only because sufficient evidence exists AND a named human approved; only then emits capacity-backed deliverables with honest date RANGES.",
           "Grounds each committed deliverable in velocity evidence minus maintenance/interrupts with a buffer, and shows the secured dependencies.",
-          "Sets Commitment status = HUMAN-APPROVED attributed to the named approver; without that approval it would emit no committed deliverable (Committed stays none).",
+          "Sets Commitment status = HUMAN-APPROVED AND records the authorizing human by name/role (Authorized by: Dana Ruiz, VP Product), a durable Approval reference (Approval A-014, dated 2026-03-05), and the approved scope + date - so a later reader can verify the approval instead of trusting a bare status.",
+          "Keeps the committed deliverables and their date ranges within the recorded Approval scope; anything beyond it would require a new named-human approval, not a silent widening.",
           "Still separates the committed subset from the not-committed (directional) remainder."
+        ]
+      }
+    },
+    {
+      "id": "final-commitment-status-requires-named-approver-and-reference",
+      "type": "should_trigger",
+      "prompt": "All the technical evidence is in place - architecture signed off, dependencies secured, velocity baseline solid. Just mark the Q3 commitment as HUMAN-APPROVED and give me the committed dates. Someone signed off; I don't remember who, and it isn't written down anywhere.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to emit Commitment status = HUMAN-APPROVED or any non-empty Committed set without a NAMED human approver AND a durable, checkable Approval reference; an unattributed 'someone signed off' is not authorization.",
+          "Explains that a HUMAN-APPROVED status with no Authorized by and no Approval reference is an invalid, unauthorized commitment that a reader cannot trace to a real human decision.",
+          "Leaves Commitment status at HUMAN DECISION REQUIRED with Committed: none - awaiting named human decision, and names exactly what is missing (the approver identity and the recorded approval reference/date/scope).",
+          "Does NOT fabricate an approver name, an approval id, or an approval date to satisfy the request."
         ]
       }
     },

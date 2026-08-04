@@ -206,7 +206,7 @@ here.
   4 runs — preview the exact DECISION entry, take the user's explicit yes to that
   exact path and content, append, and confirm it landed. Only then is the owner
   recorded. `product-spec-writer` runs `pending`, then `complete-awaiting-record`,
-  then `complete-recorded`; each conditional owner runs `unclassified`, `pending`,
+  then `complete-recorded` (reached only after the user's OWN acceptance of the spec — anchored to the accepted artifact by path + SHA-256 — is itself a recorded decision per the template; approving a row's wording is not accepting the spec's content); each conditional owner runs `unclassified`, `pending`,
   its `*-awaiting-record` result, then `*-recorded`. `unclassified`, `pending`,
   `blocked`, and
   every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
@@ -329,8 +329,8 @@ STAGE-2 OWNERS:  (shown while in Stage 2)
   NEXT OWNER=<skill-name|classification decision|record terminal decision|none>;  EXIT GATE=<MET|BLOCKED>
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
-RECORDING: one form (see references/recording-and-authority.md) — SINGLE=<path + one ID + date + attribution + byte-for-byte entry>; BATCH (low-risk only)=<path(s) + ORDERED list of every ID + each date/attribution + byte-for-byte content of EVERY entry + any exact projection refresh>, ONE approval for the complete bounded batch (high-risk actions are never batched)
-RECORDING STATUS: AWAITING EXPLICIT APPROVAL — nothing written (after your yes → RECORDED: the exact single entry; or the batch's every recorded ID + every refreshed projection listed — partial-failure reports exactly what did and did not land)
+RECORDING: exactly one form (see references/recording-and-authority.md) — NONE THIS TURN (no terminal result exists to record — a pure invocation, classification, or question turn; nothing to preview or approve, and no log entry is fabricated); or SINGLE=<path + one ID + date + attribution + byte-for-byte entry>; or BATCH (low-risk only)=<path(s) + ORDERED list of every ID + each date/attribution + byte-for-byte content of EVERY entry + any exact projection refresh>, ONE approval for the complete bounded batch (high-risk actions are never batched)
+RECORDING STATUS: NONE THIS TURN (nothing to write) | AWAITING EXPLICIT APPROVAL — nothing written yet (after your yes → RECORDED: the exact single entry; or the batch's every recorded ID + every refreshed projection listed — partial-failure reports exactly what did and did not land)
 ```
 
 `docs/project-state.md` is the durable artifact (template in Supporting Files):

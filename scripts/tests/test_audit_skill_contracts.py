@@ -458,7 +458,8 @@ def test_route003_branch_aware() -> None:
     #     straight to commitments with no guard on THAT line -> must fire AEGIS-044.
     gamed = (
         "Commitment readiness runs in readiness mode and returns NOT COMMIT-ABLE without "
-        "evidence; `roadmap-under-uncertainty-planner` is a Stage-2 owner.\n"
+        "evidence; Roadmap is NOT APPLICABLE so `roadmap-under-uncertainty-planner` is "
+        "classified n/a.\n"
         "- Then -> invoke `roadmap-to-commitments-translator` to get the date.\n"
     )
     g = gaps(gamed)
@@ -466,7 +467,7 @@ def test_route003_branch_aware() -> None:
         "an unguarded commitments route must fire even when guard words appear elsewhere"
     )
     assert not any("AEGIS-035" in x for x in g), (
-        "the roadmap owner IS classified in prose here, so only the guard gap should fire"
+        "the roadmap owner carries a real n/a verdict here, so only the guard gap should fire"
     )
 
     # (4) unguarded route AND the roadmap owner never classified anywhere -> BOTH gaps.
@@ -485,7 +486,44 @@ def test_route003_branch_aware() -> None:
     gm = gaps(mixed)
     assert gm and any("AEGIS-044" in x for x in gm), "one unguarded route among several must fire"
 
-    ok("ROUTE-003 is per-route: the guard must be on the route line; prose elsewhere cannot clear an unguarded route")
+    # (6) F3 - THE reviewer's case: an unconditional INVOCATION of the planner plus a
+    #     separately guarded commitments route. Invocation is NOT classification, so the
+    #     roadmap-owner gap (AEGIS-035) must fire while the guarded route stays clean.
+    invoke_only = (
+        "- Stage 2 owners: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    g6 = gaps(invoke_only)
+    assert any("AEGIS-035" in x for x in g6), (
+        "a bare invocation of the planner is NOT classification -> AEGIS-035 must fire"
+    )
+    assert not any("AEGIS-044" in x for x in g6), (
+        "the commitments route is guarded (readiness mode) -> AEGIS-044 must NOT fire"
+    )
+
+    # (6b) the SAME invocation, now with a real roadmap verdict on its own non-invocation
+    #      line -> clean. Proves it is the missing VERDICT, not the invocation, that the
+    #      check demands (and that a legitimate contract still passes).
+    invoke_plus_verdict = (
+        "- Roadmap - APPLICABLE (sequencing uncertainty); classified applicable.\n"
+        "- Stage 2 owners: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(invoke_plus_verdict) == [], (
+        "an explicit roadmap verdict line + a guarded route is clean, even beside an invocation"
+    )
+
+    # (7) naming the planner "a Stage-2 owner" (no verdict) is not classification either.
+    named_not_classified = (
+        "`roadmap-under-uncertainty-planner` is a Stage-2 owner in this workflow.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(named_not_classified)), (
+        "merely naming the planner an owner (no applicable/n-a verdict) must still fire AEGIS-035"
+    )
+
+    ok("ROUTE-003 is per-route AND invocation!=classification: the guard must be on the route line, "
+       "and the roadmap owner needs a real verdict (not a routing marker or the word 'owner')")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------

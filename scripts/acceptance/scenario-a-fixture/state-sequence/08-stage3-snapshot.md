@@ -7,6 +7,7 @@
 | ID | Date | Current stage (plain language) | Next recommended action |
 |----|------|--------------------------------|-------------------------|
 | SS-001 | 2026-03-02 | Defining the product (the need is understood) | Approve the first-release scope, then I hand it to the product-spec skill. |
+| SS-002 | 2026-03-12 | Design: how it will be built | Answer one question about the patient reminder link, then I hand the share-link design to the share-link skill. |
 
 ## Decision log (append-only)
 
@@ -18,9 +19,11 @@
 | PS-003 | 2026-03-04 | The schedule screen defaults to today and can step to another day (chosen over today-only, or a full-week grid, because stepping day-by-day covers the need without the complexity of a week view). | user | yes | low-risk batch; folds into current scope |
 | PS-004 | 2026-03-04 | The patient reminder link stops working once the appointment time has passed (chosen over a fixed number of days, or never expiring, because a past appointment's details should not stay reachable). | user | yes | low-risk batch; folds into current scope |
 | PS-005 | 2026-03-04 | Notifications for v1 are just the single reminder link — no automated SMS or email (chosen over adding SMS or email reminders, because one link is enough to ship and test the core flow). | user | yes | low-risk batch; folds into current scope |
-| PS-006 | 2026-03-06 | Product specification complete — Stage 2 can classify the remaining owners (chosen over jumping straight to design, because the spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | spec; unblocks Stage 2 owner classification |
-| PS-007 | 2026-03-09 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-008 | 2026-03-09 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-006 | 2026-03-06 | I accept the product specification as written — it matches the agreed v1 scope and its acceptance criteria (chosen over another spec-revision round, because the spec is ready to build against). | user | yes | accepted artifact `docs/specs/clinic-appointment-tracker-v1.md` (sha256:7c9b1e5a2d4f60318a9c0b7e4d2f1a6c8b3e5d7f9a1c2e4b6d8f0a2c4e6b8d0f2), accepted 2026-03-06; unblocks the product-spec owner record |
+| PS-007 | 2026-03-06 | Product-spec owner complete — the recorded USER acceptance (Decision PS-006) exists, so Stage 2 can classify the remaining owners (chosen over declaring the spec done on an orchestrator say-so, because owner completion requires the recorded user acceptance, not merely permission to append). | orchestrator-via-product-spec-writer | yes | references Decision PS-006 (user spec acceptance); unblocks Stage 2 owner classification |
+| PS-008 | 2026-03-09 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-009 | 2026-03-09 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-010 | 2026-03-09 09:10 | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET → design may begin |
 
 ## Approvals (irreversible steps & scope grants)
 
@@ -50,7 +53,7 @@
 
 - In scope for v1: book an appointment into an open 30-minute slot; see the schedule (defaults to today, can step to another day); mark a patient arrived or no-show; send the patient a read-only reminder link that stops working once the appointment time has passed.
 - Explicitly OUT of scope for v1: billing/invoicing, clinical treatment notes, a patient self-booking portal, a mobile app, automated SMS or email beyond the single reminder link.
-- Basis: approved by user on 2026-03-03 (see Approval A-001 and Decision PS-001); low-risk details PS-002..PS-005; product specification complete (Decision PS-006).
+- Basis: approved by user (PS-001, A-001); low-risk details PS-002..PS-005; spec accepted (PS-006), owner complete (PS-007). Stage 2 exit gate MET (PS-008/PS-009/PS-010).
 
 ## Current users/roles — projection (refresh from records)
 
@@ -59,11 +62,11 @@
 
 ## Current success definition — projection (refresh from records)
 
-- A receptionist can book a 30-minute slot without double-booking, see the day (and step to another), mark each patient arrived or no-show, and the patient gets a reminder link that stops working after the appointment — with no appointment lost from the paper diary. (Sharpened from the accepted spec, PS-006.)
+- The accepted spec (PS-006) defines the v1 behavior; the Stage 2 exit gate is MET (PS-007..PS-010); the project is in design (SS-002).
 
 ## Open questions — projection (refresh from records)
 
 > Current projection — refresh from authoritative recorded decisions and accepted artifacts.
 > An answered question is removed here once its DECISION is recorded above.
 
-- Stage 2 owner classification is under way (prioritization, then roadmap, then commitment readiness) — one owner at a time. No open question needs you right now.
+- For the patient reminder link, should it be a private unguessable web link that needs no login, or should it also ask the patient to confirm their date of birth before showing the appointment? (The simpler link is faster to use; the date-of-birth check adds privacy.) — unblocks the reminder-link design.

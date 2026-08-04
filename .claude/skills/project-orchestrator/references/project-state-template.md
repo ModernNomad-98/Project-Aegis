@@ -126,7 +126,21 @@ NOT record itself.** Reaching a terminal result first puts the owner in an
 exact entry is previewed (exact path + id + date + byte-for-byte content),
 explicitly approved by the user, appended, and confirmed — the Capability 4
 flow. Until that append is confirmed the owner is NOT recorded and the exit gate
-stays BLOCKED. Pending, unclassified, and `*-awaiting-record` owner states may
+stays BLOCKED.
+
+**The product-spec owner needs the user's acceptance of the specification —
+not just an approval to append a row.** Approving the exact WORDING of a DECISION
+entry (Capability 4) is a different act from the user accepting what the
+specification actually says. So the product-spec owner records TWO append-only
+decisions, in order: first the **user's acceptance of the specification**,
+attributed to `user` and anchored to the accepted artifact by its path + a
+SHA-256 of that artifact + the acceptance date (a status a later reader can
+verify, never the bare token `spec`); then the **owner-completion** entry
+(attributed to `orchestrator-via-product-spec-writer`) whose Evidence REFERENCES
+that acceptance decision and the same artifact. Without a recorded,
+artifact-anchored user acceptance the product-spec owner stays BLOCKED, and the
+four-owner gate can never open — and Stage 3 never begins — on a specification no
+human durably accepted. Pending, unclassified, and `*-awaiting-record` owner states may
 appear in the orchestrator's current-turn output but are NOT persisted as
 binding decisions. The Stage 3 STATE SNAPSHOT is appended only after all four
 owner DECISION entries are recorded and satisfy the exit gate. This adds NO new
@@ -152,10 +166,11 @@ entry type — it uses DECISION and STATE SNAPSHOT exactly as defined above.
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
 | PS-001 | <date> | <what was decided (chosen over <the main rejected alternative>, because <the plain-language why>)> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
-| PS-002 | <date> | Product specification complete — Stage 2 can classify the remaining owners (chosen over jumping to design, because the spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | spec; unblocks Stage 2 owner classification |
-| PS-003 | <date> | Prioritization not applicable (chosen over ranking, because one bounded MVP with no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-004 | <date> | Roadmap planning not applicable (chosen over sequencing horizons, because one bounded release with no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-005 | <date> | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET |
+| PS-002 | <date> | User accepted the product specification — the actual spec content, not merely the wording of this row (chosen over proceeding on an unread draft, because Stage 3 must build the spec the user endorsed). | user | yes | accepted artifact `docs/specs/<product>-v1.md` @ sha256:<64-hex of that file>; accepted by user on <date> |
+| PS-003 | <date> | Product specification owner complete — Stage 2 can classify the remaining owners (chosen over jumping to design, because the accepted spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | references PS-002 (user acceptance) + `docs/specs/<product>-v1.md`; unblocks Stage 2 owner classification |
+| PS-004 | <date> | Prioritization not applicable (chosen over ranking, because one bounded MVP with no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-005 | <date> | Roadmap planning not applicable (chosen over sequencing horizons, because one bounded release with no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-006 | <date> | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET |
 
 ## Approvals (irreversible steps & scope grants)
 

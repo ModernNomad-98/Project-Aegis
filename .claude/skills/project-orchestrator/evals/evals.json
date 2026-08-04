@@ -286,6 +286,20 @@
       }
     },
     {
+      "id": "edge-no-recording-operation-this-turn",
+      "type": "should_trigger",
+      "prompt": "I haven't decided anything yet - can you just tell me which stage owner comes next and kick it off? There's nothing for me to write down right now.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The mandatory Output Format's RECORDING STATUS is 'NONE THIS TURN' because the turn performs no recording operation - a pure invocation/classification/question with no terminal result to preview, approve, or append.",
+          "Does NOT fabricate a decision-log or approval row, and does NOT open an approval ceremony for a decision that has not been reached, merely to give the RECORDING field a value.",
+          "Reserves the SINGLE and BATCH recording forms for a turn that actually records a terminal result; naming or invoking an owning skill is not itself a recording.",
+          "A low-risk decision still being assembled in the visible pending batch is reported as none-this-turn until its checkpoint, never written prematurely."
+        ]
+      }
+    },
+    {
       "id": "edge-consumer-repo-not-skills-library",
       "type": "should_trigger",
       "prompt": "I'm not a developer. Someone set up a fresh repo for my delivery-tracking app and copied a .claude/skills folder into it so I'd have the helpers. There's no app code yet. Where do I start?",
@@ -464,6 +478,20 @@
           "Does NOT declare Stage 3 / design; names the missing owners and the next action (classify, run, or record them), holding EXIT GATE=BLOCKED.",
           "Cross-checks the state file against repo reality (no code) and continues from the recorded Stage 2 position rather than restarting discovery.",
           "Only once all four owner decisions are *-recorded does it propose the Stage 3 STATE SNAPSHOT."
+        ]
+      }
+    },
+    {
+      "id": "edge-product-spec-owner-needs-user-acceptance-anchored-to-artifact",
+      "type": "should_trigger",
+      "prompt": "product-spec-writer says the spec is done and I approved the wording of the 'spec complete' log row. Are we clear to move on to Stage 3 design now?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes approving the WORDING of a decision row (the Capability 4 append approval) from the user's acceptance of the specification's actual content; the former does not satisfy the latter.",
+          "Requires the user's OWN spec acceptance to be recorded as its own append-only DECISION, attributed to 'user' and anchored to the accepted artifact by path + a SHA-256 + an acceptance date - never the bare evidence token 'spec'.",
+          "Holds the product-spec owner BLOCKED (not complete-recorded) until that artifact-anchored user acceptance is recorded; the four-owner gate cannot open and Stage 3 does not begin without it.",
+          "Does not treat the orchestrator-attributed 'spec complete' entry as a substitute for the user's durable business acceptance of the spec."
         ]
       }
     },

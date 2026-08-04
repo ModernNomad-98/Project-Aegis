@@ -37,11 +37,29 @@ commit or push; deployment; a financial commitment; a delivery promise; a
 production change. Bundling any of these into a low-risk batch is the AR-A-004
 failure.
 
-### The two recording forms
+### The recording forms
 
-Capability 4's preview → approve → append is instantiated as exactly ONE of two
-forms. Every high-risk / authority-changing / irreversible action uses the
-single-entry form; only the low-risk decisions of §1 may use the batch form.
+Capability 4's preview → approve → append is instantiated as exactly ONE of three
+declared forms. MOST turns record nothing and use the none-this-turn form; every
+high-risk / authority-changing / irreversible action uses the single-entry form;
+only the low-risk decisions of §1 may use the batch form. The mandatory Output
+Format always names which form is in effect, so a normal turn is never forced to
+invent a log entry or open an approval ceremony for a decision not yet reached.
+
+**NONE THIS TURN form** (the default — a turn that performs NO recording
+operation: a pure skill invocation, an owner classification decision, a discovery
+or clarification question, or an answer that only updates the conversation-only
+pending batch of §1):
+
+- no terminal result exists yet, so there is nothing to preview, approve, or
+  append this turn;
+- the Output Format states `RECORDING STATUS: NONE THIS TURN`; the orchestrator
+  does NOT fabricate a decision/approval row and does NOT start an approval
+  ceremony for a decision that has not been reached;
+- a low-risk batch still being ASSEMBLED (not yet at its §1 checkpoint) is
+  none-this-turn — it becomes a BATCH record only when §1 steps 5–7 fire;
+- invocation is not a recording: routing to an owning skill, and recording that
+  skill's terminal result, are different turns.
 
 **SINGLE-ENTRY form** (any one decision; ALWAYS used for a high-risk action):
 

@@ -97,6 +97,7 @@ param(
     [switch] $KeepEvidence,
     [string] $WorkDir,
     [string] $FixtureDir,
+    [string] $Manifest,
     [switch] $LoadOnly
 )
 
@@ -152,6 +153,78 @@ function Path-IsInside {
     if (-not $c.EndsWith($sep)) { $c = $c + $sep }
     if (-not $p.EndsWith($sep)) { $p = $p + $sep }
     return $c.StartsWith($p, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+# SHA-256 of a file's content with CRLF/CR normalized to LF, so a working-tree that git
+# smudged to CRLF (autocrlf) hashes the same as the LF blob the manifest was pinned from.
+function Get-NormalizedSha256 {
+    param([Parameter(Mandatory)][string] $Path)
+    $text = [System.IO.File]::ReadAllText($Path)
+    $norm = $text.Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($norm)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
+    return "sha256:" + ([System.BitConverter]::ToString($hash).Replace("-", "").ToLower())
+}
+
+# First-cell ID of each immutable TABLE row, per section, in order (SS-/PS-/A- or a
+# placeholder token like "(none yet)"). Deviations is not ID-checked here - its placeholder
+# persistence is covered by the append-only check.
+function Get-SectionIds {
+    param([Parameter(Mandatory)][string] $Content)
+    $rows = Get-ImmutableRows -Content $Content
+    $out = @{}
+    foreach ($key in @('State snapshots', 'Decision log', 'Approvals')) {
+        $ids = New-Object System.Collections.Generic.List[string]
+        foreach ($r in @($rows[$key])) {
+            $t = $r.Trim()
+            if ($t.StartsWith('|')) { $ids.Add($t.Trim('|').Split('|')[0].Trim()) }
+        }
+        $out[$key] = @($ids)
+    }
+    return $out
+}
+
+# Best-effort resolve reparse points (symlink / junction / mount) to the PHYSICAL target.
+# Returns the resolved full path, or $null if it cannot be resolved confidently (fail
+# closed). A path with NO reparse points along its existing chain resolves to its own
+# lexical full path. This is what makes the external-WorkDir containment check honest: a
+# junction/symlink that physically lands inside the repo is caught even though its lexical
+# path looks external.
+function Resolve-PhysicalDir {
+    param([Parameter(Mandatory)][string] $Path)
+    try {
+        $cur = [System.IO.Path]::GetFullPath($Path)
+        $guard = 0
+        while ($true) {
+            $guard++
+            if ($guard -gt 64) { return $null }     # link loop / too deep -> fail closed
+            $probe = $cur
+            while ($probe -and -not (Test-Path -LiteralPath $probe)) {
+                $parent = Split-Path -Parent $probe
+                if (-not $parent -or $parent -eq $probe) { $probe = $null; break }
+                $probe = $parent
+            }
+            if (-not $probe -or -not (Test-Path -LiteralPath $probe)) {
+                return $cur       # nothing along the chain exists yet; lexical path is physical
+            }
+            $item = Get-Item -LiteralPath $probe -Force -ErrorAction Stop
+            $isReparse = (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+            if (-not $isReparse) {
+                return $cur       # deepest existing ancestor is a real dir -> physical path known
+            }
+            $target = $item.Target
+            if ($target -is [System.Array]) { $target = $target[0] }
+            if ([string]::IsNullOrWhiteSpace($target)) { return $null }   # unresolvable -> fail closed
+            if (-not [System.IO.Path]::IsPathRooted($target)) {
+                $target = [System.IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $probe) $target))
+            }
+            $rest = $cur.Substring($probe.Length).TrimStart('\', '/')
+            if ($rest) { $cur = Join-Path $target $rest } else { $cur = $target }
+        }
+    } catch {
+        return $null       # anything unexpected -> fail closed
+    }
 }
 
 # Invoke native git, capturing exit code + stdout + stderr WITHOUT letting a non-zero
@@ -295,6 +368,116 @@ function Test-AppendOnly {
     }
 }
 
+# Assert a fixture version conforms to its manifest step: the normalized SHA-256 matches
+# (content pin - catches ANY content change, including a required row consistently removed
+# from every later version), AND the ordered immutable IDs of each ID-bearing section
+# exactly equal the manifest's expected IDs (catches a removed / duplicated / unexpected /
+# missing-required row directly, not merely row-level append-only).
+function Test-ManifestStep {
+    param(
+        [Parameter(Mandatory)] $Step,
+        [Parameter(Mandatory)][string] $FilePath,
+        [Parameter(Mandatory)][string] $Content
+    )
+    $problems = New-Object System.Collections.Generic.List[string]
+
+    $actualSha = Get-NormalizedSha256 -Path $FilePath
+    if ($actualSha -ne [string]$Step.sha256) {
+        $problems.Add("content hash mismatch (manifest $($Step.sha256); actual $actualSha) - fixture modified without updating its approved manifest hash")
+    }
+
+    $ids = Get-SectionIds -Content $Content
+    $map = @{
+        'State snapshots' = @($Step.snapshots)
+        'Decision log'    = @($Step.decisions)
+        'Approvals'       = @($Step.approvals)
+    }
+    foreach ($key in @('State snapshots', 'Decision log', 'Approvals')) {
+        $exp = @($map[$key] | ForEach-Object { [string]$_ })
+        $act = @($ids[$key] | ForEach-Object { [string]$_ })
+        if (($act -join '|') -ne ($exp -join '|')) {
+            $problems.Add("[$key] immutable IDs [$($act -join ', ')] do not match the required manifest IDs [$($exp -join ', ')]")
+        }
+    }
+    return [pscustomobject]@{ Ok = ($problems.Count -eq 0); Problems = @($problems) }
+}
+
+# FAIL CLOSED for the disposable-repo commit-count. A zero count is accepted ONLY when the
+# git command exited 0 AND returned exactly one clean, parseable, non-negative 32-bit integer
+# whose value is 0. A nonzero exit, empty / malformed / multi-line / non-numeric / negative /
+# overflowing output, or any positive count is a FAILURE - so a broken git check can never be
+# mistaken for "0 commits". This is a pure function so tests can drive it without touching git.
+function Test-ZeroCommitCount {
+    param([int] $ExitCode, [string] $StdOut, [string] $StdErr)
+    if ($ExitCode -ne 0) {
+        return [pscustomobject]@{ Ok = $false; Reason = "git rev-list exited $ExitCode (stderr: $StdErr)" }
+    }
+    $lines = @(($StdOut -split '\r?\n') | Where-Object { $_.Trim() -ne '' })
+    if ($lines.Count -ne 1) {
+        return [pscustomobject]@{ Ok = $false; Reason = "expected exactly one output line, got $($lines.Count): '$StdOut'" }
+    }
+    $raw = $lines[0].Trim()
+    $parsed = 0
+    if (-not [int]::TryParse($raw, [ref]$parsed)) {
+        return [pscustomobject]@{ Ok = $false; Reason = "output is not a valid 32-bit integer: '$raw'" }
+    }
+    if ($parsed -lt 0) { return [pscustomobject]@{ Ok = $false; Reason = "negative commit count: $parsed" } }
+    if ($parsed -ne 0) { return [pscustomobject]@{ Ok = $false; Reason = "unexpected commit count: $parsed" } }
+    return [pscustomobject]@{ Ok = $true; Reason = "0 commits (git exit 0; one clean integer)" }
+}
+
+# First manifest step index (0-based) whose $Section list (snapshots|decisions|approvals)
+# contains $Id, or -1. Used for the semantic ordering gates (owners-before-Stage-3;
+# acceptance-before-owner-completion).
+function Get-FirstStepIndex {
+    param([Parameter(Mandatory)] $Steps, [Parameter(Mandatory)][string] $Section, [Parameter(Mandatory)][string] $Id)
+    $arr = @($Steps)
+    for ($i = 0; $i -lt $arr.Count; $i++) {
+        $vals = @($arr[$i].$Section | ForEach-Object { [string]$_ })
+        if ($vals -contains $Id) { return $i }
+    }
+    return -1
+}
+
+# Semantic ordering gates over the manifest step sequence (pure function, so tests can drive
+# it on synthetic step data): forbidden snapshot ids never appear; the Stage 3 snapshot is in
+# the final step; the four Stage 2 owner records are recorded BEFORE the Stage 3 snapshot step;
+# and the user's product-spec acceptance is recorded BEFORE the product-spec owner completion.
+function Test-SemanticGates {
+    param([Parameter(Mandatory)] $Steps, [Parameter(Mandatory)] $Semantics)
+    $problems = New-Object System.Collections.Generic.List[string]
+    $passes   = New-Object System.Collections.Generic.List[string]
+    $arr = @($Steps)
+    $sem = $Semantics
+
+    $allSnap = @($arr | ForEach-Object { $_.snapshots } | ForEach-Object { [string]$_ })
+    $forbHit = @(@($sem.forbidden_snapshot_ids | ForEach-Object { [string]$_ }) | Where-Object { $allSnap -contains $_ })
+    if ($forbHit.Count -gt 0) { $problems.Add("forbidden snapshot id(s) appear in the sequence: $($forbHit -join ', ')") }
+    else { $passes.Add("no forbidden snapshot id (e.g. SS-003) in the sequence") }
+
+    $s3 = [string]$sem.stage3_snapshot_id
+    $finalSnap = @($arr[$arr.Count - 1].snapshots | ForEach-Object { [string]$_ })
+    if ($finalSnap -contains $s3) { $passes.Add("Stage 3 snapshot $s3 present in the final version") }
+    else { $problems.Add("final version is missing the Stage 3 snapshot $s3") }
+
+    $stage3Idx = Get-FirstStepIndex -Steps $arr -Section 'snapshots' -Id $s3
+    if ($stage3Idx -lt 1) {
+        $problems.Add("Stage 3 snapshot appears at step index $stage3Idx; it must follow the recorded owner gate")
+    } else {
+        $pre = @($arr[$stage3Idx - 1].decisions | ForEach-Object { [string]$_ })
+        $missing = @(@($sem.stage2_owner_ids | ForEach-Object { [string]$_ }) | Where-Object { $pre -notcontains $_ })
+        if ($missing.Count -gt 0) { $problems.Add("Stage 2 owner record(s) [$($missing -join ', ')] are not recorded before the Stage 3 snapshot") }
+        else { $passes.Add("all Stage 2 owner records ($($sem.stage2_owner_ids -join ', ')) recorded before the Stage 3 snapshot") }
+    }
+
+    $ai = Get-FirstStepIndex -Steps $arr -Section 'decisions' -Id ([string]$sem.spec_acceptance_id)
+    $oi = Get-FirstStepIndex -Steps $arr -Section 'decisions' -Id ([string]$sem.spec_owner_completion_id)
+    if ($ai -ge 0 -and $oi -gt $ai) { $passes.Add("user spec acceptance ($($sem.spec_acceptance_id)) recorded before product-spec owner completion ($($sem.spec_owner_completion_id))") }
+    else { $problems.Add("product-spec owner completion ($($sem.spec_owner_completion_id), step $oi) must be recorded AFTER the user's spec acceptance ($($sem.spec_acceptance_id), step $ai)") }
+
+    return [pscustomobject]@{ Ok = ($problems.Count -eq 0); Problems = @($problems); Passes = @($passes) }
+}
+
 # ---------------------------------------------------------------------------
 # Cleanup: delete ONLY a run directory this run created and can PROVE it owns via
 # a matching ownership marker. Never Remove-Item -Recurse an unverified directory,
@@ -366,26 +549,30 @@ try {
     }
     Write-Host ("fixtures   : {0}" -f $FixtureDir)
 
-    # The exact expected fixture set, in replay order.
-    $expectedFiles = @(
-        '00-cold-start.md',
-        '01-discovery-recorded.md',
-        '02-lowrisk-batch-recorded.md',
-        '03-product-spec-complete.md',
-        '04-prioritization-na.md',
-        '05-roadmap-na.md',
-        '06-commitment-readiness-na.md',
-        '07-stage3-snapshot.md'
-    )
+    # Load the approved fixture MANIFEST (default: manifest.json beside the state-sequence
+    # dir). It pins, per ordered step, the file's normalized SHA-256 and the exact expected
+    # immutable IDs. The manifest - not a hard-coded list - is the source of truth.
+    if ([string]::IsNullOrWhiteSpace($Manifest)) {
+        $Manifest = Join-Path (Split-Path -Parent $FixtureDir) 'manifest.json'
+    }
+    $Manifest = [System.IO.Path]::GetFullPath($Manifest)
+    if (-not (Test-Path -LiteralPath $Manifest)) {
+        throw "Fixture manifest not found: $Manifest"
+    }
+    $manifestObj = (Read-Utf8File -Path $Manifest) | ConvertFrom-Json
+    $steps = @($manifestObj.steps)
+    if ($steps.Count -lt 1) { throw "Fixture manifest has no steps: $Manifest" }
+    $expectedFiles = @($steps | ForEach-Object { [string]$_.file })
+    Write-Host ("manifest   : {0}  ({1} steps)" -f $Manifest, $steps.Count)
 
-    # Assert the fixture set is EXACTLY as expected (no unexpected / missing files).
+    # Assert the fixture set is EXACTLY the manifest's file set (no unexpected / missing files).
     $actualFiles = @(Get-ChildItem -LiteralPath $FixtureDir -Filter '*.md' -File |
         Select-Object -ExpandProperty Name | Sort-Object)
     $expectedSorted = @($expectedFiles | Sort-Object)
     $missing = @($expectedSorted | Where-Object { $actualFiles -notcontains $_ })
     $extra   = @($actualFiles   | Where-Object { $expectedSorted -notcontains $_ })
     if (($missing.Count -gt 0) -or ($extra.Count -gt 0)) {
-        throw ("Fixture set mismatch. Missing: [{0}]  Unexpected: [{1}]" -f ($missing -join ', '), ($extra -join ', '))
+        throw ("Fixture set mismatch vs manifest. Missing: [{0}]  Unexpected: [{1}]" -f ($missing -join ', '), ($extra -join ', '))
     }
 
     # Resolve the BASE directory (OUTSIDE the skills repo): system temp by default,
@@ -395,12 +582,20 @@ try {
         $baseDir = [System.IO.Path]::GetTempPath()
     } else {
         $baseDir = [System.IO.Path]::GetFullPath($WorkDir)
-        if (Path-IsInside -Child $baseDir -Parent $SkillsRepoRoot) {
-            throw "Refusing to run: -WorkDir '$baseDir' is inside the skills repo. Evidence must live OUTSIDE the skills repo."
-        }
         if (-not (Test-Path -LiteralPath $baseDir)) {
             New-Item -ItemType Directory -Force -Path $baseDir | Out-Null
         }
+    }
+    # Containment is checked on the PHYSICAL target, AFTER resolving any symlink / junction /
+    # mount / reparse point. A lexical GetFullPath check alone can be fooled by an
+    # external-looking link whose target is inside the repo. Fail CLOSED if the physical path
+    # cannot be resolved confidently.
+    $basePhysical = Resolve-PhysicalDir -Path $baseDir
+    if ($null -eq $basePhysical) {
+        throw "Refusing to run: work dir '$baseDir' contains a symlink/junction/reparse point that cannot be resolved to a physical path (failing closed)."
+    }
+    if (Path-IsInside -Child $basePhysical -Parent $SkillsRepoRoot) {
+        throw "Refusing to run: work dir '$baseDir' resolves (physically) INSIDE the skills repo '$SkillsRepoRoot'. Evidence must live OUTSIDE the skills repo."
     }
 
     # ALWAYS create a NEW unique run directory owned by THIS run, under the base.
@@ -522,18 +717,28 @@ try {
             }
         }
 
+        # (g) Manifest conformance: content hash pin + the EXACT expected immutable IDs for
+        #     THIS step. This catches a required row removed consistently from every version,
+        #     a duplicated / unexpected ID, or a fixture modified without updating the manifest.
+        $manifestNote = 'manifest OK'
+        $ms = Test-ManifestStep -Step $steps[$idx] -FilePath $curEvidenceSnapshot -Content (Read-Utf8File -Path $curEvidenceSnapshot)
+        if (-not $ms.Ok) {
+            $manifestNote = "MANIFEST VIOLATION: " + ($ms.Problems -join ' | ')
+            $stepFailures.Add($manifestNote)
+        }
+
         $stepPass = ($stepFailures.Count -eq 0)
         foreach ($f in $stepFailures) { $failures.Add("[$fixName] $f") }
 
         $statusWord = 'PASS'
         if (-not $stepPass) { $statusWord = 'FAIL' }
-        $logLine = ("{0}  STEP {1} ({2})  {3}  untracked={4}; {5}; {6}; sha256={7}" -f `
-            (Now-Iso), $nn, $fixName, $statusWord, $untrackedOk, $diffNote, $appendNote, $hash)
+        $logLine = ("{0}  STEP {1} ({2})  {3}  untracked={4}; {5}; {6}; {7}; sha256={8}" -f `
+            (Now-Iso), $nn, $fixName, $statusWord, $untrackedOk, $diffNote, $appendNote, $manifestNote, $hash)
         Append-Utf8Line -Path $EvidenceLog -Line $logLine
 
         $color = 'Green'
         if (-not $stepPass) { $color = 'Red' }
-        Write-Host ("[{0}] {1}  {2}" -f $statusWord, $fixName, $appendNote) -ForegroundColor $color
+        Write-Host ("[{0}] {1}  {2}; {3}" -f $statusWord, $fixName, $appendNote, $manifestNote) -ForegroundColor $color
 
         $stepResults += [pscustomobject]@{
             Index      = $nn
@@ -557,33 +762,23 @@ try {
     $finalSnapshot = Join-Path $Evidence ("project-state.{0:D2}.md" -f ($expectedFiles.Count - 1))
     $finalText     = Read-Utf8File -Path $finalSnapshot
 
-    # SS-003 must be ABSENT (Scenario A stops at SS-002).
-    if ($finalText -match 'SS-003') {
-        $failures.Add("Final version unexpectedly contains SS-003 (Scenario A must stop at SS-002).")
-        Write-Host "[FAIL] SS-003 present in final version" -ForegroundColor Red
-    } else {
-        Write-Host "[PASS] SS-003 absent in final version"
-    }
+    $sem = $manifestObj.semantics
 
-    # SS-002 should be PRESENT (Scenario A reaches Stage 3 design) - sanity check.
-    if ($finalText -match 'SS-002') {
-        Write-Host "[PASS] SS-002 present in final version (Stage 3 reached)"
-    } else {
-        $failures.Add("Final version is missing SS-002 (Stage 3 design snapshot expected).")
-        Write-Host "[FAIL] SS-002 missing from final version" -ForegroundColor Red
-    }
+    # Forbidden-id, Stage-3-present, four-owners-before-Stage-3, and acceptance-before-completion
+    # gates (from the validated per-step manifest data). Test-SemanticGates is a pure function so
+    # the negative tests can prove each gate fires on bad step data.
+    $sg = Test-SemanticGates -Steps $steps -Semantics $sem
+    foreach ($p in $sg.Passes)   { Write-Host "[PASS] $p" }
+    foreach ($p in $sg.Problems) { $failures.Add($p); Write-Host "[FAIL] $p" -ForegroundColor Red }
 
-    # NO commits may exist in the disposable repo.
+    # NO commits may exist in the disposable repo - FAIL CLOSED (see Test-ZeroCommitCount).
     $rev = Invoke-GitCapture -GitArgs @('rev-list', '--count', '--all') -RepoDir $Repo
-    $revText = $rev.StdOut.Trim()
-    if ([string]::IsNullOrEmpty($revText)) { $revText = '0' }
-    $commitCount = 0
-    [void][int]::TryParse($revText, [ref]$commitCount)
-    if ($commitCount -ne 0) {
-        $failures.Add("Disposable repo unexpectedly has $commitCount commit(s); evidence must never be committed.")
-        Write-Host "[FAIL] disposable repo has $commitCount commit(s)" -ForegroundColor Red
+    $cc  = Test-ZeroCommitCount -ExitCode $rev.ExitCode -StdOut $rev.StdOut -StdErr $rev.StdErr
+    if ($cc.Ok) {
+        Write-Host "[PASS] disposable repo has exactly 0 commits ($($cc.Reason))"
     } else {
-        Write-Host "[PASS] disposable repo has 0 commits (evidence never committed)"
+        $failures.Add("no-commits assertion failed: $($cc.Reason)")
+        Write-Host "[FAIL] no-commits assertion: $($cc.Reason)" -ForegroundColor Red
     }
 
     # -----------------------------------------------------------------------

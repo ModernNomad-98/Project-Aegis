@@ -23,18 +23,33 @@ project-state journey from cold start to the start of design:
    multi-day navigation, link expiry, notification behavior) are FIRST appended to the
    Decision log as rationale-bearing rows `PS-002`, `PS-003`, `PS-004`, `PS-005` (attributed
    `user`), and only THEN are the mutable projections refreshed from those recorded rows.
-4. **Product spec complete** — `PS-006` appended.
-5. **Prioritization / roadmap / commitment readiness not applicable** — `PS-007`, `PS-008`,
-   `PS-009` appended, each "not applicable (chosen over …, because …)" attributed
-   `orchestrator-via-project-orchestrator`. Those, with `PS-006`, are the four Stage 2
-   exit-gate owner decisions.
-6. **Stage 3 snapshot** — `SS-002` ("Design: how it will be built") appended. Scenario A
+4. **User accepts the product specification** — `PS-006` (attributed `user`) is appended,
+   recording the user's acceptance of the actual spec CONTENT and anchoring it to the accepted
+   artifact by its path + a SHA-256 of that artifact + the acceptance date. Approving the
+   wording of a log row is not the same as accepting the spec's content.
+5. **Product spec owner complete** — `PS-007` (attributed `orchestrator-via-product-spec-writer`)
+   is appended; its Evidence REFERENCES the `PS-006` user acceptance and the same artifact. The
+   product-spec owner is not complete until `PS-006` exists.
+6. **Prioritization / roadmap / commitment readiness not applicable** — `PS-008`, `PS-009`,
+   `PS-010` appended, each "not applicable (chosen over …, because …)" attributed
+   `orchestrator-via-project-orchestrator`. Those four — `PS-007`, `PS-008`, `PS-009`, `PS-010`
+   — are the Stage 2 exit-gate owner decisions.
+7. **Stage 3 snapshot** — `SS-002` ("Design: how it will be built") appended. Scenario A
    **stops here**: there is no `SS-003`.
 
 The fixture that encodes this exact sequence lives at
-`scripts/acceptance/scenario-a-fixture/state-sequence/` as eight ordered full versions
-(`00-cold-start.md` … `07-stage3-snapshot.md`). Each file is the complete
-`project-state.md` **after** that step.
+`scripts/acceptance/scenario-a-fixture/state-sequence/` as nine ordered full versions
+(`00-cold-start.md` … `08-stage3-snapshot.md`). Each file is the complete
+`project-state.md` **after** that step. A sibling `scripts/acceptance/scenario-a-fixture/manifest.json`
+pins, PER STEP, the exact immutable IDs that must be present in each section AND a
+line-ending-agnostic SHA-256 of that version (content normalized to LF before hashing, so an
+autocrlf smudge cannot cause a false mismatch). The manifest also declares the SEMANTIC GATES
+the harness enforces across the whole sequence: the user spec acceptance (`PS-006`) is recorded
+BEFORE the product-spec owner completion (`PS-007`); the four Stage 2 owner records
+(`PS-007`, `PS-008`, `PS-009`, `PS-010`) are all present BEFORE the Stage 3 snapshot (`SS-002`);
+and the forbidden `SS-003` never appears. Removing a required row from every version, or editing
+a fixture without updating its manifest hash, therefore FAILS the run — the append-only prefix
+check alone can no longer pass an evidence sequence that silently dropped a required owner.
 
 ### The property being proven
 
@@ -77,10 +92,16 @@ copies), so the recorded SHA-256 values match across editions and machines.
   Without it, a **passing** run cleans up after itself. A **failing** run always keeps its
   evidence so you can inspect it, regardless of this switch.
 - `-WorkDir <path>` — **base** directory under which the run creates its own unique child
-  ("scenario-a-run-…"). Must be **outside this skills repo**. The harness NEVER deletes or
-  recurses the base or its pre-existing contents: it creates, owns (via an ownership marker),
-  and — only on a passing run and only after verifying the marker — removes only that child.
-  A `-WorkDir` that already contains a `product-repo`/`evidence` directory is therefore safe.
+  ("scenario-a-run-…"). Must be **outside this skills repo**. The containment check first
+  resolves reparse points (symlinks / Windows junctions / mount points) to the PHYSICAL target
+  BEFORE comparing paths, so a link whose real target is inside the skills repo is refused — a
+  lexical path comparison alone would be fooled into writing evidence into the repo. The harness
+  NEVER deletes or recurses the base or its pre-existing contents: it creates, owns (via an
+  ownership marker), and — only on a passing run and only after verifying the marker — removes
+  only that child. A `-WorkDir` that already contains a `product-repo`/`evidence` directory is
+  therefore safe.
+- `-Manifest <path>` — override the fixture manifest (defaults to `manifest.json` beside the
+  state-sequence directory); it supplies the per-step hashes + expected IDs and the semantic gates.
 - `-FixtureDir <path>` — override the fixture state-sequence directory (used by the tests).
 - `-LoadOnly` — define the harness functions and return without running (used by the tests).
 
@@ -88,26 +109,44 @@ The harness exits **0** on all-pass and **non-zero** on any failure.
 
 ### Negative / safety tests
 
-`scripts/acceptance/Test-ScenarioAEvidence.ps1` proves the harness's guarantees — caller-owned
-directories are never deleted; deleting a preserved placeholder, or editing / deleting /
-reordering an immutable row, FAILS append-only; a mutable projection-only refresh and the
-complete low-risk batch SUCCEED; an unexpected fixture file fails; and an added commit is
-detected. Run it the same way:
+`scripts/acceptance/Test-ScenarioAEvidence.ps1` proves the harness's guarantees:
+
+- **Append-only** — deleting a preserved placeholder, or editing / deleting / reordering an
+  immutable row, FAILS; a mutable projection-only refresh and the complete low-risk batch SUCCEED.
+- **Manifest conformance (F1)** — a per-step hash mismatch (a fixture edited without updating the
+  manifest), a duplicated or an unexpected immutable ID, and an unexpected fixture file all FAIL;
+  and the full sequence FAILS when a required row is removed from every version — an owner
+  (`PS-010`), the user acceptance (`PS-006`), or the owner completion (`PS-007`).
+- **Semantic gates** — the sequence FAILS if the user acceptance (`PS-006`) or a Stage 2 owner is
+  missing, or if acceptance does not precede completion; caller-owned directories are never deleted.
+- **External-evidence boundary (F6)** — a `-WorkDir` that is a symlink/junction whose PHYSICAL
+  target is inside the skills repo is REJECTED and no run directory leaks into the repo; a normal
+  external `-WorkDir` with a pre-existing `product-repo`/sentinel survives untouched.
+- **Fail-closed commit count (F5)** — the zero-commit check accepts only git exit 0 with exactly
+  one non-negative integer `0`; a non-zero git exit, or empty / non-numeric / multi-line / negative
+  / unexpectedly-positive output, all FAIL — a broken Git check never silently certifies "0 commits".
+
+The integration cases launch the harness in a CHILD process using the **currently running
+PowerShell host executable** — `pwsh` under PowerShell Core, `powershell.exe` under Windows
+PowerShell — resolved from the live process rather than a hard-coded Windows-only binary, so the
+suite runs under both editions (the self-check prints which host it selected). Run it the same way:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Test-ScenarioAEvidence.ps1"
 ```
 
+Under PowerShell 7, run `pwsh -NoProfile -File "scripts/acceptance/Test-ScenarioAEvidence.ps1"`.
+
 ## How to read the evidence directory
 
 With `-KeepEvidence` (or after a failure) the printed **evidence** path contains:
 
-- `project-state.00.md` … `project-state.07.md` — the archived, byte-exact copy of each
+- `project-state.00.md` … `project-state.08.md` — the archived, byte-exact copy of each
   replayed version. This is the durable evidence, kept outside the product repo.
 - `sha256sums.txt` — one `sha256sum`-format line per archived version
   (`<hash>  project-state.NN.md`). Verify later with, e.g.,
   `Get-FileHash -Algorithm SHA256 project-state.03.md` and compare the lower-cased hash.
-- `diff.00-to-01.txt` … `diff.06-to-07.txt` — the captured `git diff --no-index` output
+- `diff.00-to-01.txt` … `diff.07-to-08.txt` — the captured `git diff --no-index` output
   between consecutive versions (the visible append/refresh at each step).
 - `evidence-log.txt` — one ISO-8601-timestamped `PASS`/`FAIL` line per step plus a final
   `RUN RESULT` line. Each step line records whether the file was untracked, the diff
@@ -137,8 +176,10 @@ record of what changed, not the pass/fail oracle.
 - The disposable product repo only ever holds `docs/project-state.md` as an **untracked**
   file — the harness never runs `git add` or `git commit`. It verifies untracked status
   with **both** `git status --short --untracked-files=all` and
-  `git ls-files --others --exclude-standard`, and asserts at the end that
-  `git rev-list --count --all` is **0**.
+  `git ls-files --others --exclude-standard`, and at the end requires
+  `git rev-list --count --all` to exit 0 AND return exactly one non-negative integer, then
+  asserts that integer is **0**. A non-zero git exit or malformed count FAILS the run — it is
+  never silently coerced to 0, so a broken Git check can never certify the no-commits property.
 - Every evidence artifact is written into the **external** evidence directory, never inside
   this skills repo. The harness refuses to run if its work directory resolves to a path
   inside the skills repo.

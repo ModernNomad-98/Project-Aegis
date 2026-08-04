@@ -132,6 +132,15 @@ Missing evidence: <named list | none>
 Next evidence needed: <named list | none>
 Reassess after: <stage or evidence milestone>
 Commitment status: NONE | HUMAN DECISION REQUIRED | HUMAN-APPROVED
+Authorized by: <named human approver — role + name/handle — who made the commitment decision;
+                 REQUIRED and non-empty when Commitment status = HUMAN-APPROVED
+                 | n/a — no final commitment approved (status NONE or HUMAN DECISION REQUIRED)>
+Approval reference: <durable evidence of that approval — recorded Approval id / decision-log entry
+                 id / dated message link — so a later reader can verify it, not just read a status;
+                 REQUIRED when HUMAN-APPROVED | n/a>
+Approval scope + date: <exactly which deliverables + date RANGES the named human approved, and the
+                 approval date — bounds the binding commitment; a scope change needs a NEW approval
+                 | n/a>
 Target dates:  <unverified targets | none>
 Capacity basis: <verified velocity evidence + calculation (minus maintenance/interrupts, buffer)
                  | none — missing <named capacity evidence>>
@@ -163,7 +172,15 @@ not a promise), and the **`Candidate committable set`** carries the proposed
 deliverables + honest date RANGES the named human is asked to decide on — it is
 non-binding and is NOT the `Committed` set. Only in **final commitment mode**,
 and only once a named human has approved, are capacity-backed deliverables and
-date RANGES emitted as `Committed` (the candidate set becomes `n/a`).
+date RANGES emitted as `Committed` (the candidate set becomes `n/a`). In that
+mode `Commitment status: HUMAN-APPROVED` is valid ONLY when `Authorized by`,
+`Approval reference`, and `Approval scope + date` are all populated: a
+`HUMAN-APPROVED` status — or any non-empty `Committed` set — without a named
+human approver AND a durable, checkable approval reference is an invalid,
+unauthorized commitment (the reader cannot tell an asserted status from a real
+approval). The `Committed` deliverables and their date ranges must fall within
+the recorded `Approval scope`; anything beyond it requires a new named-human
+approval, never a silent widening.
 
 ## Validation Checklist
 

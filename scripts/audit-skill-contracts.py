@@ -89,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.5.0"
+TOOL_VERSION = "1.6.0"
 
 
 class InputContainmentError(Exception):
@@ -646,7 +646,7 @@ RULES: list[dict] = [
      "surfaces": ["skill-body"],
      "positive_fixture": "bad-stage-router", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-035", "AEGIS-045"],
-     "limits": "PER-ROUTE (v1.5.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — the readiness / NOT COMMIT-ABLE guard must be ON THAT LINE, so explanatory text elsewhere in the Stage-2 segment cannot clear a separate unguarded route; roadmap-under-uncertainty-planner must be independently classified (n/a valid). A zero honestly means every commitments-reaching route is self-guarded. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes (the contract keeps each real invocation route, with its marker, skill token, and guard, on one line)"},
+     "limits": "PER-ROUTE (v1.6.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — the readiness / NOT COMMIT-ABLE guard must be ON THAT LINE, so explanatory text elsewhere in the Stage-2 segment cannot clear a separate unguarded route. The roadmap owner (roadmap-under-uncertainty-planner) must be independently CLASSIFIED with real verdict language (applicable / not applicable / n/a / classif* / unclassified) on a NON-invocation line — a routing marker or the bare word 'owner' no longer counts (invocation/naming is not classification); classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a real verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes (the contract keeps each real invocation route, with its marker, skill token, and guard, on one line)"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
      "severity": "P1", "classification": "semantic-candidate",
@@ -1147,16 +1147,33 @@ class Audit:
         carry a readiness-mode / ``NOT COMMIT-ABLE`` guard ON THAT LINE — a
         co-occurrence of the guard words somewhere else in the segment does not
         count (AEGIS-044). Separately, the roadmap owner
-        (`roadmap-under-uncertainty-planner`) must be independently classified as
-        its own Stage-2 owner — named on a route or classification line;
-        classified ``n/a`` is valid, so a deadline-only project legitimately
-        routes to commitments with roadmap n/a (AEGIS-035)."""
+        (`roadmap-under-uncertainty-planner`) must be independently CLASSIFIED as
+        its own Stage-2 owner. Invocation is NOT classification (F3): a routing
+        marker pointed at the planner (``→`` / ``invoke`` / ``route to``) only
+        calls the skill, and calling it "a Stage-2 owner" only names it — neither
+        records the owner's applicability verdict. Classification requires real
+        verdict language (``APPLICABLE`` / ``NOT APPLICABLE`` / ``n/a`` /
+        ``classif*`` / ``unclassified``) for the roadmap owner on a line that is
+        NOT itself a route to the planner; classified ``n/a`` is valid, so a
+        deadline-only project legitimately routes to commitments with the roadmap
+        owner classified n/a (AEGIS-035)."""
         marker = re.compile(
             r"(?i)(→|\binvoke[sd]?\b|\broutes?\s+to\b|\bhand(?:s|ed)?\s+(?:to|off)\b)")
-        classify = re.compile(r"(?i)\b(applicable|not applicable|n/?a|classif\w*|owner)\b")
+        # Real classification VERDICT grammar. Deliberately NOT a routing marker and
+        # NOT the bare word "owner": naming a skill an owner does not classify it.
+        classify = re.compile(
+            r"(?i)\b(not\s+applicable|applicable|n/?a|classif\w*|unclassified)\b")
+        # The roadmap owner, referenced by its planner skill token OR by an explicit
+        # "Roadmap" Stage-2 owner bullet (the label its classification hangs on).
+        roadmap_ref = re.compile(
+            r"(?i)(roadmap-under-uncertainty-planner|^\s*[-*]\s*\*{0,2}roadmap\b)")
 
         def guarded(line: str) -> bool:
             return bool(re.search(r"(?i)\breadiness\b", line)) or "NOT COMMIT-ABLE" in line
+
+        def routes_to_planner(line: str) -> bool:
+            # a line that INVOKES / routes to the planner — invocation, not classification
+            return "roadmap-under-uncertainty-planner" in line and bool(marker.search(line))
 
         lines = seg.splitlines()
         commit_routes = [
@@ -1172,15 +1189,19 @@ class Audit:
                     "a Stage-2 route invokes roadmap-to-commitments-translator "
                     "without a readiness-mode / NOT COMMIT-ABLE guard ON THAT "
                     f"ROUTE (AEGIS-044): {ln.strip()[:110]!r}")
+        # The roadmap owner is classified ONLY by a non-invocation line that states a
+        # real verdict for it — a bare "→ invoke roadmap-under-uncertainty-planner",
+        # or merely calling it "a Stage-2 owner", no longer counts (F3).
         roadmap_owner_classified = any(
-            "roadmap-under-uncertainty-planner" in ln
-            and (marker.search(ln) or classify.search(ln))
+            roadmap_ref.search(ln) and classify.search(ln) and not routes_to_planner(ln)
             for ln in lines
         )
         if not roadmap_owner_classified:
             gaps.append(
-                "roadmap-under-uncertainty-planner is not independently classified "
-                "as a Stage-2 owner (AEGIS-035 route gap)")
+                "the roadmap owner (roadmap-under-uncertainty-planner) is not "
+                "independently classified — invocation/naming is not classification; "
+                "a verdict (applicable / not applicable / n/a) must be recorded for "
+                "it (AEGIS-035 route gap)")
         return gaps
 
     # -- family F: vocabulary (AEGIS-039/-044) -------------------------------
