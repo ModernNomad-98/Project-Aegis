@@ -1,15 +1,15 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.4.0",
-    "engine_sha256": "0a22432c42c041ca59342d3b96b66320ab8664b0cc140e1eb83e87e527da9b26",
-    "repo_sha": "50a84f5decfbf23b562ba0a1869d073a72955a75",
+    "version": "1.5.0",
+    "engine_sha256": "8a698f0c9f711264c5d5726453df2f679d25cc2a6eb6d3d4d7f85e15023d58ab",
+    "repo_sha": "7eb6e1f6ffd325df71f195d1b8d898ebcf80384f",
     "branch": "fix/aegis-stage2-evidence-driven-route",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 704,
-    "audited_byte_count": 3902326,
-    "corpus_content_hash": "c5a222df71e4d5daad1d9e29b3c97ba64691a08fb348cd3c680634233a5439ac",
+    "audited_byte_count": 3909840,
+    "corpus_content_hash": "50b26b823e7791665c4a9c9ae96d1bb702b83953e93264c96b3e41565e370f6b",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -333,8 +333,8 @@
     },
     {
       "id": "ROUTE-003",
-      "purpose": "Stage-2 route reaches commitments unsafely \u2014 roadmap owner unnamed OR no readiness/NOT-COMMIT-ABLE guard",
-      "authority": "project-orchestrator (Stage-2 route, independent per-owner classification); roadmap-to-commitments-translator (readiness mode returns NOT COMMIT-ABLE when evidence is absent)",
+      "purpose": "a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified",
+      "authority": "project-orchestrator (Stage-2 per-owner routes); roadmap-to-commitments-translator (readiness mode returns NOT COMMIT-ABLE when evidence is absent)",
       "severity": "P1",
       "classification": "mechanical",
       "surfaces": [
@@ -346,7 +346,7 @@
         "AEGIS-035",
         "AEGIS-045"
       ],
-      "limits": "branch-aware (v1.4.0, thread-12 fix): a Stage-2 route reaching the commitments skill is cleared ONLY when it BOTH names roadmap-under-uncertainty-planner as an independently-classified owner AND carries a readiness / NOT COMMIT-ABLE guard \u2014 so a zero honestly means 'commitments is readiness-guarded and the roadmap owner is named', not merely that the two tokens co-occur; a legitimate deadline-only route (roadmap n/a) stays clean because the guard, not roadmap co-occurrence, is now the invariant. Still bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection",
+      "limits": "PER-ROUTE (v1.5.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 the readiness / NOT COMMIT-ABLE guard must be ON THAT LINE, so explanatory text elsewhere in the Stage-2 segment cannot clear a separate unguarded route; roadmap-under-uncertainty-planner must be independently classified (n/a valid). A zero honestly means every commitments-reaching route is self-guarded. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes (the contract keeps each real invocation route, with its marker, skill token, and guard, on one line)",
       "hit_count": 0
     },
     {
@@ -7636,13 +7636,13 @@
       "targeted": 1
     },
     "project-orchestrator": {
-      "accepted": 9,
+      "accepted": 12,
       "approved scope": 4,
       "commit-able": 9,
-      "complete": 36,
+      "complete": 41,
       "deployed": 1,
       "durable": 2,
-      "proposed": 8,
+      "proposed": 7,
       "ready": 3
     },
     "promotion-packet-writer": {
