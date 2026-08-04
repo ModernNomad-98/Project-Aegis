@@ -1,15 +1,15 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.3.0",
-    "engine_sha256": "279e64426933d6222d969935312c269d163732ff6de7bbbe39568ad85c7b8396",
-    "repo_sha": "2fb6133ecb3ec7356023509839e1196272e8339d",
-    "branch": "",
+    "version": "1.4.0",
+    "engine_sha256": "0a22432c42c041ca59342d3b96b66320ab8664b0cc140e1eb83e87e527da9b26",
+    "repo_sha": "50a84f5decfbf23b562ba0a1869d073a72955a75",
+    "branch": "fix/aegis-stage2-evidence-driven-route",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 703,
-    "audited_byte_count": 3871373,
-    "corpus_content_hash": "632dde681d36cec383e1579d53a477ab10d06427df6cf835da82387deacf72fe",
+    "audited_file_count": 704,
+    "audited_byte_count": 3902326,
+    "corpus_content_hash": "c5a222df71e4d5daad1d9e29b3c97ba64691a08fb348cd3c680634233a5439ac",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -39,24 +39,22 @@
     },
     "skill_count": 184,
     "rule_count": 27,
-    "finding_count": 415,
+    "finding_count": 412,
     "by_severity": {
-      "P0": 1,
-      "P1": 98,
+      "P0": 0,
+      "P1": 96,
       "P2": 5,
       "info": 311
     },
     "by_rule": {
-      "APPR-002": 1,
       "ARTF-001": 10,
       "EVAL-004": 5,
       "ROUTE-002": 311,
       "SIDE-004": 82,
-      "STATE-005": 2,
       "VOCAB-002": 4
     },
     "mechanical_count": 316,
-    "semantic_review_candidates": 99
+    "semantic_review_candidates": 96
   },
   "rule_inventory": [
     {
@@ -167,7 +165,7 @@
         "AEGIS-008"
       ],
       "limits": "the phrase can appear in text that CRITIQUES the grant \u2014 use vs mention is a reading",
-      "hit_count": 1
+      "hit_count": 0
     },
     {
       "id": "APPR-003",
@@ -280,7 +278,7 @@
         "AEGIS-006"
       ],
       "limits": "whether a (approved) section has workable supersession semantics is a design question",
-      "hit_count": 2
+      "hit_count": 0
     },
     {
       "id": "ARTF-001",
@@ -335,8 +333,8 @@
     },
     {
       "id": "ROUTE-003",
-      "purpose": "Stage-2 route reaches commitments without the roadmap owner",
-      "authority": "project-orchestrator (Stage-2 route); roadmap-to-commitments-translator (consumes a roadmap)",
+      "purpose": "Stage-2 route reaches commitments unsafely \u2014 roadmap owner unnamed OR no readiness/NOT-COMMIT-ABLE guard",
+      "authority": "project-orchestrator (Stage-2 route, independent per-owner classification); roadmap-to-commitments-translator (readiness mode returns NOT COMMIT-ABLE when evidence is absent)",
       "severity": "P1",
       "classification": "mechanical",
       "surfaces": [
@@ -348,7 +346,7 @@
         "AEGIS-035",
         "AEGIS-045"
       ],
-      "limits": "bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection",
+      "limits": "branch-aware (v1.4.0, thread-12 fix): a Stage-2 route reaching the commitments skill is cleared ONLY when it BOTH names roadmap-under-uncertainty-planner as an independently-classified owner AND carries a readiness / NOT COMMIT-ABLE guard \u2014 so a zero honestly means 'commitments is readiness-guarded and the roadmap owner is named', not merely that the two tokens co-occur; a legitimate deadline-only route (roadmap n/a) stays clean because the guard, not roadmap co-occurrence, is now the invariant. Still bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection",
       "hit_count": 0
     },
     {
@@ -4936,7 +4934,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/project-orchestrator/SKILL.md",
-      "line": 333,
+      "line": 332,
       "owning_skill": "project-orchestrator",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -4944,57 +4942,6 @@
       "aegis_map": [
         "AEGIS-056",
         "AEGIS-049"
-      ],
-      "remediation_owner": "project-orchestrator",
-      "confidence": "medium",
-      "mechanical": false
-    },
-    {
-      "rule": "STATE-005",
-      "severity": "P1",
-      "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
-      "line": 83,
-      "owning_skill": "project-orchestrator",
-      "related_skills": [],
-      "evidence": "append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)",
-      "family": "state-append",
-      "aegis_map": [
-        "AEGIS-002",
-        "AEGIS-006"
-      ],
-      "remediation_owner": "project-orchestrator",
-      "confidence": "medium",
-      "mechanical": false
-    },
-    {
-      "rule": "STATE-005",
-      "severity": "P1",
-      "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
-      "line": 138,
-      "owning_skill": "project-orchestrator",
-      "related_skills": [],
-      "evidence": "append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)",
-      "family": "state-append",
-      "aegis_map": [
-        "AEGIS-002",
-        "AEGIS-006"
-      ],
-      "remediation_owner": "project-orchestrator",
-      "confidence": "medium",
-      "mechanical": false
-    },
-    {
-      "rule": "APPR-002",
-      "severity": "P0",
-      "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
-      "line": 160,
-      "owning_skill": "project-orchestrator",
-      "related_skills": [],
-      "evidence": "scope grant that authorizes BUILDING from a requirements-stage approval: 'Build the v1 scope' (content approval must not become implementation authority)",
-      "family": "approval",
-      "aegis_map": [
-        "AEGIS-003",
-        "AEGIS-008"
       ],
       "remediation_owner": "project-orchestrator",
       "confidence": "medium",
@@ -7689,13 +7636,14 @@
       "targeted": 1
     },
     "project-orchestrator": {
-      "approved scope": 1,
-      "commit-able": 10,
-      "complete": 30,
+      "accepted": 9,
+      "approved scope": 4,
+      "commit-able": 9,
+      "complete": 36,
       "deployed": 1,
       "durable": 2,
-      "proposed": 5,
-      "ready": 4
+      "proposed": 8,
+      "ready": 3
     },
     "promotion-packet-writer": {
       "ready": 3
@@ -7728,8 +7676,9 @@
     },
     "roadmap-to-commitments-translator": {
       "approved scope": 1,
-      "commit-able": 22,
-      "committed": 19,
+      "commit-able": 32,
+      "committed": 23,
+      "proposed": 2,
       "verified": 7
     },
     "roadmap-under-uncertainty-planner": {

@@ -4075,11 +4075,6 @@
     {
       "from": "project-orchestrator",
       "to": "ai-sdlc-operating-model",
-      "type": "body-route"
-    },
-    {
-      "from": "project-orchestrator",
-      "to": "ai-sdlc-operating-model",
       "type": "description-mention"
     },
     {
@@ -4195,6 +4190,11 @@
     {
       "from": "project-orchestrator",
       "to": "risk-tiered-validation-selector",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "roadmap-to-commitments-translator",
       "type": "body-route"
     },
     {
