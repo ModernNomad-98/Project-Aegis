@@ -96,7 +96,21 @@
           "States that even with sufficient evidence, COMMIT-ABLE only means a named human may now make the commitment decision - it is not itself a delivery promise.",
           "Keeps Commitment status = 'HUMAN DECISION REQUIRED' and Committed = 'none - awaiting named human decision'; does not auto-label the March date or scope as committed.",
           "Does not treat implementation authorization or governance approval as delivery evidence.",
-          "Presents the committable set with honest date ranges for the human to decide on."
+          "Presents the non-binding Candidate committable set with honest date ranges for the human to decide on, distinct from Committed."
+        ]
+      }
+    },
+    {
+      "id": "readiness-commitable-does-not-require-human-decision",
+      "type": "should_trigger",
+      "prompt": "Readiness question only: architecture is signed off, dependencies are secured, and we have three sprints of measured velocity. Nobody has formally approved committing yet. Are we readiness-clear to commit?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Judges readiness on TECHNICAL evidence only and returns COMMIT-ABLE - the absence of a human commitment decision does NOT force NOT COMMIT-ABLE.",
+          "Sets Commitment status = HUMAN DECISION REQUIRED and Committed = none (COMMIT-ABLE is evidence sufficiency, not a promise).",
+          "Shows the non-binding Candidate committable set (deliverables + honest date RANGES) for the named human to decide on, distinct from Committed.",
+          "Does not emit a delivery promise or auto-approve the commitment; the human decision is required only before a FINAL commitment is emitted."
         ]
       }
     },

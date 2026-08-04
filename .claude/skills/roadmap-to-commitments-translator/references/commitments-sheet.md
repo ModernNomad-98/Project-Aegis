@@ -58,3 +58,15 @@ Present, don't pad:
 - Explicitly accept lower confidence on the extra (labeled as such).
 
 Escalate the choice; never manufacture a commitment by padding.
+
+## Readiness mode — the candidate set is non-binding
+
+At readiness time (mode = READINESS ASSESSMENT) the split above produces a
+**candidate** set, not commitments. Readiness is judged on TECHNICAL evidence
+only — a missing human decision never forces `NOT COMMIT-ABLE`. When the
+technical evidence is sufficient (readiness = `COMMIT-ABLE`) but no human has
+decided yet, present the candidate deliverables and honest RANGES as the
+**`Candidate committable set` (non-binding)** for the named human to decide on;
+`Committed` stays `none — awaiting named human decision` until they do. The
+human decision is required only before a FINAL commitment is emitted — never to
+reach readiness.

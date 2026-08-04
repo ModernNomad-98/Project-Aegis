@@ -1,0 +1,96 @@
+# Recording & authority discipline
+
+The detail behind the orchestrator's **Capability 4** (propose → approve →
+append/refresh) and its human gate. The orchestrator stays thin and CITES this;
+the schema and section mutability live in
+[project-state-template.md](project-state-template.md). Four controls: risk-tiered
+recording, authority-grant separation, idempotent-and-exact recording, and the
+mutable-projection refresh.
+
+## 1. Risk-tiered recording (do not ceremony every answer)
+
+A file-operation ceremony after every ordinary product answer is
+approval theater. Tier the recording by risk.
+
+**Low-risk, reversible product-definition decisions** — status ownership, a
+link's display fields, a link's lifetime, whether notifications exist, ordinary
+terminology and workflow choices:
+
+1. ask ONE question that turn;
+2. acknowledge the answer;
+3. add it to a **visible pending-decision batch** (conversation-only — not
+   binding, not recorded);
+4. continue discovery or spec clarification;
+5. at a logical checkpoint, show EVERY exact proposed entry in the batch;
+6. request ONE explicit approval to append the complete, bounded batch;
+7. append the approved batch atomically where practical;
+8. confirm every appended entry (§3).
+
+The pending batch is shown completely before approval and disappears after it is
+recorded or explicitly rejected.
+
+**Never batched — each takes its own explicit approval:** implementation
+authority; scope expansion or removal after approval; security or privacy risk
+acceptance; consequential architecture; data migration; deletion; any
+irreversible action; package installation; network execution; a version-control
+commit or push; deployment; a financial commitment; a delivery promise; a
+production change. Bundling any of these into a low-risk batch is the AR-A-004
+failure.
+
+## 2. Authority grants are separate and explicit (deny-by-default)
+
+Scope agreement, product-spec acceptance, design acceptance, and "permission to
+proceed" are **not** implementation authority. Authority to implement is a
+SEPARATE grant, recorded as its own Approval entry whose allowed scope and
+**FORBIDDEN** scope are previewed and recorded before anything runs
+(`scoped-approval-register` via the template's Approvals table).
+
+- Ambiguous words — "yes", "continue", "proceed", "looks good", "that works" —
+  apply ONLY to the exact proposal immediately awaiting approval. Approval is
+  never widened by inference to an adjacent or later action.
+- Nothing that changes the world — installing a package, scaffolding, editing
+  source, running a migration, a network action, a commit or push, a
+  deployment, any implementation — happens without the relevant ACTIVE
+  authority grant covering it as worded. Absent that grant, halt and route
+  through `human-approval-boundary` + `change-classification-gate` +
+  `agent-authorization-matrix`.
+
+## 3. Idempotent and exact recording
+
+- **Exact means complete, byte-for-byte.** A preview or confirmation that must
+  be exact never uses an ellipsis, an omitted column, a truncated anchor, a
+  summary, or a paraphrase. Post-write confirmation reproduces the exact entry,
+  OR gives an exact hash plus the complete file location and the entry
+  identifier.
+- **Proposal fingerprint (do not repeat a corrected proposal).** A user
+  correction supersedes the prior proposal: the rejected proposal is invalid
+  and is discarded, not offered again unless the user explicitly restores it.
+  Keep an in-turn fingerprint of the proposal awaiting approval so a rejected
+  one is not re-emitted.
+- **Already-recorded scan (no duplicates).** Before proposing a new entry, scan
+  the existing IDs and the semantic content of the records. If the decision is
+  already recorded, report it AS recorded and move to the next valid action —
+  never mint a duplicate ID or a semantically duplicate row.
+- **Checklist-derived counts.** Any "question X of Y" progress count is derived
+  from an explicit checklist, not conversational memory. When the set changes,
+  show the corrected count; never claim "X of Y" unless Y is stable and
+  evidence-backed.
+
+## 4. Mutable-projection refresh (cite the template)
+
+The current-view sections are mutable **projections** re-derived from the
+immutable records; the immutable evidence sections are append-only. A projection
+never contradicts the records — if it would, it is stale and is refreshed from
+the records (the exact refresh previewed inside the same low-risk batch) before
+a stage is reported complete. See
+[project-state-template.md](project-state-template.md) for the section list and
+the conflict rule; nothing here changes that schema.
+
+## Stop conditions
+
+- A consequential, authority-changing, or irreversible action is in a low-risk
+  batch → pull it out; it gets its own explicit approval.
+- Scope, spec, or design acceptance is being read as authority to implement →
+  it is not; require a separate, previewed, recorded implementation grant.
+- A rejected proposal is about to be re-offered, or an already-recorded decision
+  re-proposed → stop; report the recorded state and take the next valid action.

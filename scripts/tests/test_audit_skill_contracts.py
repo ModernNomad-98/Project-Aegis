@@ -434,6 +434,47 @@ def test_stage2_malformed_and_leakage() -> None:
     ok("Stage-3 leakage cannot false-clean the ROUTE-003 route-gap condition")
 
 
+def test_route003_branch_aware() -> None:
+    """Thread-12 fix: ROUTE-003 is branch-aware, not co-occurrence. A Stage-2
+    route that reaches the commitments skill is cleared ONLY when it BOTH names
+    the roadmap owner AND carries a readiness / NOT COMMIT-ABLE guard."""
+    gaps = audit_mod.Audit.stage2_commitments_route_gaps
+    # safe: the commitments skill is never reached in this segment
+    assert gaps("route via `prioritization-frame-picker` only") == []
+    # safe: roadmap owner named AND a readiness / NOT COMMIT-ABLE guard present
+    safe = (
+        "`roadmap-under-uncertainty-planner` then `roadmap-to-commitments-translator` "
+        "runs as a readiness assessment; the result is NOT COMMIT-ABLE when the "
+        "evidence a real commitment needs is absent"
+    )
+    assert gaps(safe) == [], "a guarded, owner-named route must be clean"
+    # unsafe: planner ABSENT (the original AEGIS-035 route gap) even with a guard
+    g = gaps("`roadmap-to-commitments-translator` readiness NOT COMMIT-ABLE only")
+    assert g and any("AEGIS-035" in x for x in g), (
+        "commitments reached without the roadmap owner named must fire (AEGIS-035)"
+    )
+    # unsafe: planner NAMED but NO readiness guard — the co-occurrence trap. This
+    # is the case the pre-fix rule wrongly cleared; it MUST fire now.
+    g = gaps(
+        "`roadmap-under-uncertainty-planner` then `roadmap-to-commitments-translator` "
+        "with no guard on fabricating a promise"
+    )
+    assert g and any("AEGIS-044" in x for x in g), (
+        "co-occurrence of the roadmap-planner token must NOT clear ROUTE-003 "
+        "when the readiness / NOT COMMIT-ABLE guard is missing"
+    )
+    # a genuine deadline-only route (roadmap n/a) stays clean because the guard,
+    # not roadmap co-occurrence, is the invariant
+    deadline_only = (
+        "classify each owner independently; roadmap n/a here; "
+        "`roadmap-to-commitments-translator` runs in readiness mode and returns "
+        "NOT COMMIT-ABLE without evidence — `roadmap-under-uncertainty-planner` "
+        "remains the named owner it is classified against"
+    )
+    assert gaps(deadline_only) == [], "a guarded deadline-only route must be clean"
+    ok("ROUTE-003 is branch-aware: co-occurrence alone never clears the commitments route")
+
+
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------
 
 
@@ -1023,6 +1064,7 @@ def main() -> int:
     test_append_decl_scoping()
     test_stage2_segment()
     test_stage2_malformed_and_leakage()
+    test_route003_branch_aware()
     test_rule_inventory_complete(a)
     test_real_inventory_includes_zero_hit_rules()
     test_provenance_snapshot(a)

@@ -89,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.3.0"
+TOOL_VERSION = "1.4.0"
 
 
 class InputContainmentError(Exception):
@@ -640,13 +640,13 @@ RULES: list[dict] = [
      "positive_fixture": "stale-linker", "negative_fixture": "clean-skill",
      "aegis_map": [],
      "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id"},
-    {"id": "ROUTE-003", "purpose": "Stage-2 route reaches commitments without the roadmap owner",
-     "authority": "project-orchestrator (Stage-2 route); roadmap-to-commitments-translator (consumes a roadmap)",
+    {"id": "ROUTE-003", "purpose": "Stage-2 route reaches commitments unsafely — roadmap owner unnamed OR no readiness/NOT-COMMIT-ABLE guard",
+     "authority": "project-orchestrator (Stage-2 route, independent per-owner classification); roadmap-to-commitments-translator (readiness mode returns NOT COMMIT-ABLE when evidence is absent)",
      "severity": "P1", "classification": "mechanical",
      "surfaces": ["skill-body"],
      "positive_fixture": "bad-stage-router", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-035", "AEGIS-045"],
-     "limits": "bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection"},
+     "limits": "branch-aware (v1.4.0, thread-12 fix): a Stage-2 route reaching the commitments skill is cleared ONLY when it BOTH names roadmap-under-uncertainty-planner as an independently-classified owner AND carries a readiness / NOT COMMIT-ABLE guard — so a zero honestly means 'commitments is readiness-guarded and the roadmap owner is named', not merely that the two tokens co-occur; a legitimate deadline-only route (roadmap n/a) stays clean because the guard, not roadmap co-occurrence, is now the invariant. Still bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
      "severity": "P1", "classification": "semantic-candidate",
@@ -1080,19 +1080,20 @@ class Audit:
                         related_skills=[tgt],
                     ))
 
-        # ROUTE-003: the Stage-2 route contract (AEGIS-035, verified on main).
+        # ROUTE-003: the Stage-2 commitments-route contract (AEGIS-035/-044),
+        # branch-aware (thread-12 fix). A ZERO here honestly means the Stage-2
+        # route runs commitments as a guarded readiness assessment with the
+        # roadmap owner named — NOT merely that two tokens co-occur.
         for s in self.skills:
             seg = self.stage2_segment(s.body)
             if seg is None:
                 continue
-            if ("roadmap-to-commitments-translator" in seg
-                    and "roadmap-under-uncertainty-planner" not in seg):
+            gaps = self.stage2_commitments_route_gaps(seg)
+            if gaps:
                 self.findings.append(Finding(
                     "ROUTE-003", "P1", s.rel(), 0, s.name,
-                    "Stage 2 route reaches roadmap-to-commitments-translator without "
-                    "roadmap-under-uncertainty-planner, but the commitments skill "
-                    "declares a roadmap as its input and the prioritization skill "
-                    "hands sequencing to the roadmap planner (AEGIS-035)",
+                    "Stage 2 route reaches roadmap-to-commitments-translator but is "
+                    "not safe: " + "; ".join(gaps),
                     "route", ["AEGIS-035", "AEGIS-045"], s.name, "high", True,
                     related_skills=[
                         "prioritization-frame-picker",
@@ -1130,6 +1131,36 @@ class Audit:
             return None
         m3 = STAGE3_HEADER.search(body, m.end())
         return body[m.start() : m3.start() if m3 else len(body)]
+
+    @staticmethod
+    def stage2_commitments_route_gaps(seg: str) -> list[str]:
+        """Branch-aware ROUTE-003 core (thread-12 fix). Given a Stage-2 body
+        segment, return the safety gaps for a route that REACHES the commitments
+        skill — an EMPTY list when the route is safe (commitments not reached at
+        all, OR both the roadmap owner is named AND a readiness / NOT COMMIT-ABLE
+        guard is present). A non-empty list is the ROUTE-003 defect.
+
+        Under the orchestrator's independent per-owner classification, a
+        deadline-only project legitimately reaches commitments with roadmap
+        `n/a`, so mere co-occurrence of the roadmap-planner token no longer
+        proves safety. Safety now rests on TWO things: the roadmap planner is
+        named as an independently-classifiable owner (closing the AEGIS-035 route
+        gap), AND commitments runs as a READINESS assessment that returns NOT
+        COMMIT-ABLE rather than fabricating a promise (closing AEGIS-044). Either
+        one missing is the defect; both present clears it."""
+        if "roadmap-to-commitments-translator" not in seg:
+            return []
+        gaps: list[str] = []
+        if "roadmap-under-uncertainty-planner" not in seg:
+            gaps.append(
+                "roadmap-under-uncertainty-planner is not named as a Stage-2 "
+                "owner (AEGIS-035 route gap)")
+        if not (re.search(r"(?i)\breadiness\b", seg) and "NOT COMMIT-ABLE" in seg):
+            gaps.append(
+                "no readiness-mode / NOT COMMIT-ABLE guard, so a commitment could "
+                "be fabricated without the evidence a real commitment needs "
+                "(AEGIS-044)")
+        return gaps
 
     # -- family F: vocabulary (AEGIS-039/-044) -------------------------------
 
