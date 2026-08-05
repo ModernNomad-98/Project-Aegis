@@ -10,9 +10,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Separates commit-able items (high-confidence, capacity-backed, dependency-clear) from aspirational, keeping the committed subset visibly smaller than the roadmap.",
-          "Grounds commitments in velocity evidence minus maintenance/interrupts with a buffer, not aspiration.",
+          "Separates commit-able items (high-confidence, capacity-backed, dependency-clear) from aspirational, keeping the commit-able subset visibly smaller than the roadmap.",
+          "Grounds the commit-able items in velocity evidence minus maintenance/interrupts with a buffer, not aspiration.",
           "Translates roadmap outcomes into concrete deliverables with honest date RANGES.",
+          "Because no named human approver or durable approval reference is present, presents the commit-able items as the NON-BINDING Candidate committable set (Commitment status = HUMAN DECISION REQUIRED) and keeps Committed = none; a binding committed set is emitted only once a named human approves it with the approver and approval reference recorded.",
           "States the not-committed gap explicitly with reasons.",
           "Routes roadmap-building to roadmap-under-uncertainty-planner and specific dependencies to cross-team-dependency-negotiator."
         ]
@@ -39,10 +40,11 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Commits with honest date ranges rather than false-precise single dates on multi-week uncertain work.",
+          "Uses honest date RANGES rather than false-precise single dates on multi-week uncertain work.",
           "Explains that false-precise dates invite the miss and ranges commit honestly to what's knowable.",
-          "Keeps the commitments capacity-backed and buffered.",
-          "Offers precision only where confidence genuinely supports it."
+          "Keeps the items capacity-backed and buffered.",
+          "Offers precision only where confidence genuinely supports it.",
+          "Places the dated items in the non-binding Candidate committable set unless a named human has approved a binding commitment (with the approver and approval reference recorded); it does not manufacture a binding committed set with dates for a slide absent that approval."
         ]
       }
     },

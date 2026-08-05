@@ -33,13 +33,15 @@ never in the skills library, and never confused with it.
 
 ## Non-negotiable rules
 
-1. **Two dated entry types.** A log entry is exactly one of: a **DECISION**
-   (a choice made — the decision log) or a **STATE SNAPSHOT** (where the
-   project stands: current stage + next recommended action — the snapshots
-   table). Both go through the same propose → approve → append flow
-   (Capability 4). **Latest snapshot wins:** the newest snapshot row IS the
-   current state; there is no mutable header field, and no immutable row is ever
-   changed in place.
+1. **Three dated immutable entry types.** A log entry is exactly one of: a
+   **DECISION** (a choice made — the decision log), an **APPROVAL** (an `A-*`
+   scope/authority grant — the Approvals table, carrying its ACTIVE status, its
+   allowed scope, and its **FORBIDDEN** scope, each anchored to immutable
+   evidence), or a **STATE SNAPSHOT** (where the project stands: current stage +
+   next recommended action — the snapshots table). All three go through the same
+   propose → approve → append flow (Capability 4). **Latest snapshot wins:** the
+   newest snapshot row IS the current state; there is no mutable header field,
+   and no immutable row is ever changed in place.
 2. **Append-only immutable evidence.** The evidence sections — State snapshots,
    Decision log, Approvals, Deviations — are append-only. Never edit, delete,
    reorder, or silently replace a past row. A correction is a NEW dated entry

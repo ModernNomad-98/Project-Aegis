@@ -195,6 +195,12 @@ Assert ((Invoke-HarnessChild -HarnessArgs @('-WorkDir', $base)).ExitCode -eq 0) 
 Assert (Test-Path -LiteralPath $sentinel) "caller SENTINEL.txt survives"
 Assert (Test-Path -LiteralPath $preFile) "caller pre-existing product-repo/preexisting.txt untouched"
 Assert (@(Get-ChildItem -LiteralPath $base -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -eq 0) "owned run child cleaned up under the caller dir"
+# R5-4: a not-yet-existing -WorkDir INSIDE the repo is rejected BEFORE being created.
+$insideNew = Join-Path $SkillsRepoRoot 'sca-r54-inside-new'
+$ri = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $insideNew)
+Assert ($ri.ExitCode -ne 0) "harness REJECTS a not-yet-existing -WorkDir inside the skills repo"
+Assert (-not (Test-Path -LiteralPath $insideNew)) "the rejected in-repo -WorkDir was NEVER created"
+if (Test-Path -LiteralPath $insideNew) { try { Remove-Item -LiteralPath $insideNew -Force -Recurse } catch { } }
 
 if ($OnWindows) {
     $jparent = New-TmpDir 'junc'
@@ -213,6 +219,15 @@ if ($OnWindows) {
             $rn = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $nested)
             Assert ($rn.ExitCode -ne 0) "harness REJECTS -WorkDir nested BELOW a junction whose target is the repo"
             Assert (@(Get-ChildItem -LiteralPath $SkillsRepoRoot -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -eq 0) "no run dir leaked into the repo via a nested-below-junction WorkDir"
+            # R5-4: a NOT-YET-EXISTING -WorkDir under the junction is rejected BEFORE it is
+            # created - the harness must not create a caller dir inside the repo and only
+            # then reject it.
+            $newUnderLink = Join-Path $junction 'sca-r54-new-child'
+            $physUnderRepo = Join-Path $SkillsRepoRoot 'sca-r54-new-child'
+            $rc = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $newUnderLink)
+            Assert ($rc.ExitCode -ne 0) "harness REJECTS a not-yet-existing -WorkDir under a junction into the repo"
+            Assert (-not (Test-Path -LiteralPath $physUnderRepo)) "the rejected -WorkDir was NEVER created inside the repo (checked physically)"
+            if (Test-Path -LiteralPath $physUnderRepo) { try { Remove-Item -LiteralPath $physUnderRepo -Force -Recurse } catch { } }
         } else {
             Write-Host "  [NOT-A-PASS] junction could not be created here; the Windows link-boundary case was NOT verified" -ForegroundColor Yellow
             $script:fail++; $script:fails.Add("Windows junction link-boundary test could not be created (explicitly NOT counted as a pass)")

@@ -196,10 +196,14 @@ approval, never a silent widening.
       named human's approval — commitments are grounded in velocity evidence
       minus maintenance/interrupts, with a buffer, not aspiration. These
       capacity-backed checks apply ONLY in that mode.
-- [ ] In **readiness mode / `NOT COMMIT-ABLE`**, `Capacity basis` and
-      `Committed` are `none` (missing evidence named) — no capacity figure or
+- [ ] In **readiness mode / `NOT COMMIT-ABLE`**, `Committed` is `none` — no
       commitment is fabricated; `Target dates` stay unverified; incomplete
-      dependency discovery is `unknown`, not "none verified".
+      dependency discovery is `unknown`, not "none verified". `Capacity basis`
+      is `none — missing <named capacity evidence>` ONLY when the capacity
+      evidence itself is absent; when a defensible capacity basis EXISTS but
+      readiness fails on a DIFFERENT missing category, the verified calculation
+      is KEPT (never discarded to `none`) and that other category is named in
+      `Missing evidence`.
 - [ ] `COMMIT-ABLE` alone emits no committed deliverable — `Committed` stays
       `none — awaiting named human decision` until a named human decides.
 - [ ] Readiness sufficiency is judged on TECHNICAL evidence only — a missing

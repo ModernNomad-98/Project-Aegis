@@ -479,12 +479,13 @@ def test_route003_branch_aware() -> None:
     # (5) one guarded and one UNGUARDED commitments route in the same segment ->
     #     the unguarded one still fires (per-route, not per-segment).
     mixed = (
-        "- Roadmap: classify `roadmap-under-uncertainty-planner` (may be n/a).\n"
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
         "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
         "- Shortcut -> route to `roadmap-to-commitments-translator` right now.\n"
     )
     gm = gaps(mixed)
     assert gm and any("AEGIS-044" in x for x in gm), "one unguarded route among several must fire"
+    assert not any("AEGIS-035" in x for x in gm), "a declarative n/a verdict clears the roadmap owner"
 
     # (6) F3 - THE reviewer's case: an unconditional INVOCATION of the planner plus a
     #     separately guarded commitments route. Invocation is NOT classification, so the
@@ -522,8 +523,54 @@ def test_route003_branch_aware() -> None:
         "merely naming the planner an owner (no applicable/n-a verdict) must still fire AEGIS-035"
     )
 
-    ok("ROUTE-003 is per-route AND invocation!=classification: the guard must be on the route line, "
-       "and the roadmap owner needs a real verdict (not a routing marker or the word 'owner')")
+    # (8) R5-3 - a QUESTION about applicability is not a recorded verdict: AEGIS-035 fires.
+    question = (
+        "- Roadmap: is `roadmap-under-uncertainty-planner` applicable?\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    gq = gaps(question)
+    assert any("AEGIS-035" in x for x in gq), "a question ('is it applicable?') is not a recorded verdict -> AEGIS-035"
+    assert not any("AEGIS-044" in x for x in gq), "the commitments route is guarded -> no AEGIS-044"
+
+    # (9) R5-3 - an uncertain MODAL ('may be n/a') is not a recorded verdict: AEGIS-035 fires.
+    modal = (
+        "- Roadmap owner `roadmap-under-uncertainty-planner` may be n/a.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(modal)), "an uncertain modal ('may be n/a') is not a recorded verdict"
+
+    # (10) R5-6 - a route worded with the SHARED grammar ('goes to' / 'delegates to') is a real
+    #      commitments route and must be validated; an unguarded one fires AEGIS-044.
+    goes_to = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness goes to `roadmap-to-commitments-translator` to get the date.\n"
+    )
+    gg = gaps(goes_to)
+    assert any("AEGIS-044" in x for x in gg), "a 'goes to' commitments route is detected and (unguarded) fires AEGIS-044"
+    assert not any("AEGIS-035" in x for x in gg), "the roadmap owner carries a declarative n/a verdict"
+    delegates = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness delegates to `roadmap-to-commitments-translator` for the date.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(delegates)), "a 'delegates to' commitments route is detected and fires AEGIS-044"
+
+    # (11) R5-7 - a NEGATED readiness mention does not count as a guard: AEGIS-044 fires.
+    negated_guard = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` for final commitments, not readiness mode.\n"
+    )
+    gn = gaps(negated_guard)
+    assert any("AEGIS-044" in x for x in gn), "a route that explicitly avoids readiness ('not readiness mode') is NOT guarded"
+
+    # (12) R5-7 sanity - a POSITIVE readiness guard on a 'goes to' route is clean.
+    positive_guard = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness goes to `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(positive_guard) == [], "a positive readiness guard on a shared-grammar route is clean"
+
+    ok("ROUTE-003 v1.7.0: shared routing markers, POSITIVE guard (negated readiness rejected), and a "
+       "RECORDED verdict (question/modal/invocation/naming all rejected) for the roadmap owner")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------

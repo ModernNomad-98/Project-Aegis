@@ -631,20 +631,25 @@ try {
         $baseDir = [System.IO.Path]::GetTempPath()
     } else {
         $baseDir = [System.IO.Path]::GetFullPath($WorkDir)
-        if (-not (Test-Path -LiteralPath $baseDir)) {
-            New-Item -ItemType Directory -Force -Path $baseDir | Out-Null
-        }
     }
     # Containment is checked on the PHYSICAL target, AFTER resolving any symlink / junction /
-    # mount / reparse point. A lexical GetFullPath check alone can be fooled by an
-    # external-looking link whose target is inside the repo. Fail CLOSED if the physical path
-    # cannot be resolved confidently.
+    # mount / reparse point, and BEFORE creating anything (R5-4). A lexical GetFullPath check
+    # alone can be fooled by an external-looking link whose target is inside the repo, and
+    # creating a missing -WorkDir first would put a caller directory inside the repo (or under
+    # a link into the repo) only to reject it afterwards. Resolve-PhysicalDir resolves the
+    # deepest existing ancestor (and any reparse point along it), appending a not-yet-existing
+    # tail lexically, so a path we have NOT created is still checked correctly. Fail CLOSED if
+    # the physical path cannot be resolved confidently.
     $basePhysical = Resolve-PhysicalDir -Path $baseDir
     if ($null -eq $basePhysical) {
         throw "Refusing to run: work dir '$baseDir' contains a symlink/junction/reparse point that cannot be resolved to a physical path (failing closed)."
     }
     if (Path-IsInside -Child $basePhysical -Parent $SkillsRepoRoot) {
         throw "Refusing to run: work dir '$baseDir' resolves (physically) INSIDE the skills repo '$SkillsRepoRoot'. Evidence must live OUTSIDE the skills repo."
+    }
+    # Only now, after the physical boundary is confirmed external, create a missing base.
+    if (-not (Test-Path -LiteralPath $baseDir)) {
+        New-Item -ItemType Directory -Force -Path $baseDir | Out-Null
     }
 
     # ALWAYS create a NEW unique run directory owned by THIS run, under the base.
