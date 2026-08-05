@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.8.0 (engine sha256 `4a0882f28842e040…`)
-- Repo SHA: `289fb9db2539bc686a680caf4ce1379bba8a3bcd` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `714709c400e747c3148572c295a783f0247dc8acc54b7b28ead2fdcfab64bef2` (704 files, 3922077 bytes)
+- Tool: `audit-skill-contracts` v1.9.0 (engine sha256 `30439eb4215a2a79…`)
+- Repo SHA: `9897669039842f118cbd088d6bf7b89e52e934d1` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `c6c4098ce9dce945f6cccec93447b0fe1daed746172690a6307d40e158c04d2c` (704 files, 3921354 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **412** (316 mechanical, 96 semantic-review candidates)
 
@@ -237,7 +237,7 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: accepted×24, approved scope×4, commit-able×9, complete×41, deployed×1, durable×2, proposed×7, ready×3
+- `project-orchestrator`: accepted×20, approved scope×4, commit-able×9, complete×40, deployed×1, durable×2, proposed×7, ready×3
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2

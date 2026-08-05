@@ -1,15 +1,15 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.8.0",
-    "engine_sha256": "4a0882f28842e04041f0a0581216f6120235ce6feb8ff1fc8af5cf3923843989",
-    "repo_sha": "289fb9db2539bc686a680caf4ce1379bba8a3bcd",
+    "version": "1.9.0",
+    "engine_sha256": "30439eb4215a2a79c3c293a598e23760660c4f26843da3537568891afd4d4079",
+    "repo_sha": "9897669039842f118cbd088d6bf7b89e52e934d1",
     "branch": "fix/aegis-stage2-evidence-driven-route",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 704,
-    "audited_byte_count": 3922077,
-    "corpus_content_hash": "714709c400e747c3148572c295a783f0247dc8acc54b7b28ead2fdcfab64bef2",
+    "audited_byte_count": 3921354,
+    "corpus_content_hash": "c6c4098ce9dce945f6cccec93447b0fe1daed746172690a6307d40e158c04d2c",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -346,7 +346,7 @@
         "AEGIS-035",
         "AEGIS-045"
       ],
-      "limits": "PER-ROUTE (v1.8.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE \u2014 a NEGATED mention ('not readiness mode', 'skip readiness') does not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must be independently CLASSIFIED with a RECORDED, declarative verdict \u2014 applicable / not applicable / n/a ONLY \u2014 on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION ('is it applicable?'), an uncertain MODAL ('may be n/a'), and a PENDING/process state ('unclassified', 'a classification step') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes",
+      "limits": "PER-ROUTE (v1.9.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE \u2014 EVERY guard phrase (NOT COMMIT-ABLE included) gets the negation check, so 'not readiness mode' and 'without a NOT COMMIT-ABLE guard' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE \u2014 a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') \u2014 on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of \u2026') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes",
       "hit_count": 0
     },
     {
@@ -7636,10 +7636,10 @@
       "targeted": 1
     },
     "project-orchestrator": {
-      "accepted": 24,
+      "accepted": 20,
       "approved scope": 4,
       "commit-able": 9,
-      "complete": 41,
+      "complete": 40,
       "deployed": 1,
       "durable": 2,
       "proposed": 7,
