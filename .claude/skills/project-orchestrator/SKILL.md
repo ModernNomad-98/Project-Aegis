@@ -467,10 +467,10 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 ## Supporting Files
 
 - [references/project-state-template.md](references/project-state-template.md) —
-  the `docs/project-state.md` schema and a copyable template with exactly two
+  the `docs/project-state.md` schema and a copyable template with exactly three
   append-only dated entry types: STATE SNAPSHOT (current stage + next action,
-  latest-wins, no mutable header field) and DECISION (each carrying its
-  "(chosen over …, because …)" rationale). Composes
+  latest-wins, no mutable header field), DECISION (each carrying its "(chosen
+  over …, because …)" rationale), and APPROVAL (an `A-*` grant — ACTIVE status + allowed + FORBIDDEN scope, anchored to immutable evidence). Composes
   `phased-work-handoff-designer`'s decision-ID register +
   `scoped-approval-register`'s approval-citation pattern + the house
   decision-log format; every entry previewed and explicitly approved before

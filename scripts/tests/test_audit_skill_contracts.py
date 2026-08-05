@@ -569,8 +569,27 @@ def test_route003_branch_aware() -> None:
     )
     assert gaps(positive_guard) == [], "a positive readiness guard on a shared-grammar route is clean"
 
-    ok("ROUTE-003 v1.7.0: shared routing markers, POSITIVE guard (negated readiness rejected), and a "
-       "RECORDED verdict (question/modal/invocation/naming all rejected) for the roadmap owner")
+    # (13) R6-1 - a PENDING state ('unclassified') is not a recorded verdict: AEGIS-035 fires.
+    pending_state = (
+        "- Roadmap owner `roadmap-under-uncertainty-planner` is still unclassified.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(pending_state)), (
+        "'unclassified' is a pending state, not a recorded verdict -> AEGIS-035 must fire"
+    )
+
+    # (14) R6-1 - naming a classification STEP (process, no result) is not a verdict either.
+    process_only = (
+        "- Roadmap: a classification step for `roadmap-under-uncertainty-planner` follows.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(process_only)), (
+        "naming a classification step (no applicable/not-applicable/n-a result) must still fire AEGIS-035"
+    )
+
+    ok("ROUTE-003 v1.8.0: shared routing markers, POSITIVE guard (negated readiness rejected), and a "
+       "RECORDED verdict — applicable/not-applicable/n-a only (question/modal/invocation/naming/"
+       "unclassified/classification-step all rejected) for the roadmap owner")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------

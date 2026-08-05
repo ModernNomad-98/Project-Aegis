@@ -2,14 +2,22 @@
 
 Detail for `roadmap-to-commitments-translator`. Read on demand.
 
-## Commit-able criteria (all three)
+## Commit-able criteria (all three) — then the approval gate
 
-An item becomes a COMMITMENT only if:
+An item is COMMIT-ABLE (it enters the **candidate committable set**) only if:
 1. **High confidence** — the team knows how to build it.
 2. **Capacity-backed** — it fits real available capacity (below).
 3. **Dependency-clear** — no uncommitted external dependency gates it.
 
 Miss any → it stays directional, explicitly.
+
+Meeting all three makes an item commit-able, **not committed**: the three
+technical criteria identify the candidate committable set. An item becomes a
+binding COMMITMENT only in final commitment mode, when a **named human**
+additionally approves it and that approval is recorded — `Authorized by` +
+`Approval reference` + `Approval scope + date`, per `SKILL.md`'s field rules.
+Absent that recorded approval, `Commitment status` stays `HUMAN DECISION
+REQUIRED` and `Committed` stays `none`, however strong the technical evidence.
 
 ## Capacity-math worksheet
 
