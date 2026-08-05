@@ -51,6 +51,14 @@ and the forbidden `SS-003` never appears. Removing a required row from every ver
 a fixture without updating its manifest hash, therefore FAILS the run — the append-only prefix
 check alone can no longer pass an evidence sequence that silently dropped a required owner.
 
+The manifest also pins the **accepted-spec artifact**: the `PS-006` acceptance anchors to a real
+fixture, `scripts/acceptance/scenario-a-fixture/artifact/clinic-appointment-tracker-v1.md`, and the
+manifest's `semantics.spec_artifact` records that file, its normalized SHA-256, the acceptance
+decision id, and the in-product path. The harness recomputes the artifact's digest and FAILS if it
+is missing, if the digest does not match the pin, if the pinned digest is not a well-formed
+`sha256:`+64-hex value, or if the `PS-006` row does not anchor to that exact digest and path — so
+the acceptance can be verified, not merely asserted.
+
 ### The property being proven
 
 - The **immutable evidence** sections — `State snapshots`, `Decision log`, `Approvals`,
@@ -93,9 +101,11 @@ copies), so the recorded SHA-256 values match across editions and machines.
   evidence so you can inspect it, regardless of this switch.
 - `-WorkDir <path>` — **base** directory under which the run creates its own unique child
   ("scenario-a-run-…"). Must be **outside this skills repo**. The containment check first
-  resolves reparse points (symlinks / Windows junctions / mount points) to the PHYSICAL target
-  BEFORE comparing paths, so a link whose real target is inside the skills repo is refused — a
-  lexical path comparison alone would be fooled into writing evidence into the repo. The harness
+  resolves reparse points (symlinks / Windows junctions / mount points) at **every path
+  component** — not only the deepest existing one — to the PHYSICAL target BEFORE comparing paths,
+  so a link whose real target is inside the skills repo is refused even when an ordinary child dir
+  sits under it (e.g. `<junction-into-repo>/docs`); a lexical path comparison alone would be fooled
+  into writing evidence into the repo. The harness
   NEVER deletes or recurses the base or its pre-existing contents: it creates, owns (via an
   ownership marker), and — only on a passing run and only after verifying the marker — removes
   only that child. A `-WorkDir` that already contains a `product-repo`/`evidence` directory is
@@ -119,9 +129,14 @@ The harness exits **0** on all-pass and **non-zero** on any failure.
   (`PS-010`), the user acceptance (`PS-006`), or the owner completion (`PS-007`).
 - **Semantic gates** — the sequence FAILS if the user acceptance (`PS-006`) or a Stage 2 owner is
   missing, or if acceptance does not precede completion; caller-owned directories are never deleted.
-- **External-evidence boundary (F6)** — a `-WorkDir` that is a symlink/junction whose PHYSICAL
-  target is inside the skills repo is REJECTED and no run directory leaks into the repo; a normal
-  external `-WorkDir` with a pre-existing `product-repo`/sentinel survives untouched.
+- **Accepted-spec artifact** — the real fixture passes; a TAMPERED artifact (digest no longer
+  matches the pin), a MISSING artifact, a malformed pinned digest, a wrong pinned digest, and an
+  acceptance row that fails to anchor to the digest/path all FAIL.
+- **External-evidence boundary (F6/R4-3)** — a `-WorkDir` that is a symlink/junction whose PHYSICAL
+  target is inside the skills repo is REJECTED, **including a path nested below such a link**
+  (`<junction-into-repo>/docs`), and no run directory leaks into the repo; a normal external
+  `-WorkDir` with a pre-existing `product-repo`/sentinel survives untouched. An expected-**failure**
+  run (which preserves its evidence) is given a tracked `-WorkDir` so nothing leaks into system temp.
 - **Fail-closed commit count (F5)** — the zero-commit check accepts only git exit 0 with exactly
   one non-negative integer `0`; a non-zero git exit, or empty / non-numeric / multi-line / negative
   / unexpectedly-positive output, all FAIL — a broken Git check never silently certifies "0 commits".

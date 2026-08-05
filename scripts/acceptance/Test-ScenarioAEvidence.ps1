@@ -21,6 +21,7 @@ $HarnessPath    = Join-Path $ScriptDir 'Invoke-ScenarioAEvidence.ps1'
 $FixtureRoot    = Join-Path $ScriptDir 'scenario-a-fixture'
 $RealFixtures   = Join-Path $FixtureRoot 'state-sequence'
 $RealManifest   = Join-Path $FixtureRoot 'manifest.json'
+$RealArtifactDir = Join-Path $FixtureRoot 'artifact'
 $SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\..'))
 $Utf8NoBom      = New-Object System.Text.UTF8Encoding($false)
 
@@ -67,6 +68,9 @@ function New-FixtureCopy { param([string] $Tag)
     Get-ChildItem -LiteralPath $RealFixtures -Filter '*.md' -File | ForEach-Object {
         Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $seq $_.Name) -Force }
     Copy-Item -LiteralPath $RealManifest -Destination (Join-Path $root 'manifest.json') -Force
+    if (Test-Path -LiteralPath $RealArtifactDir) {
+        Copy-Item -LiteralPath $RealArtifactDir -Destination (Join-Path $root 'artifact') -Recurse -Force
+    }
     return $seq
 }
 function Strip-Rows { param([string] $Content, [string] $IdRegex)
@@ -118,26 +122,68 @@ Assert (-not (Test-SemanticGates -Steps (Drop-Id $mf.steps 'PS-010') -Semantics 
 Assert (-not (Test-SemanticGates -Steps (Drop-Id $mf.steps 'PS-006') -Semantics $sem).Ok) "missing user spec acceptance (PS-006) FAILS the semantic gate"
 Assert (-not (Test-SemanticGates -Steps (Drop-Id $mf.steps 'PS-007') -Semantics $sem).Ok) "missing product-spec owner completion (PS-007) FAILS the semantic gate"
 
+# --- Part 2c: spec-artifact verification (R4-1) ---------------------------------------
+Write-Host "`nPart 2c - spec-artifact verification"
+$saSem  = $mf.semantics
+$v08    = [System.IO.File]::ReadAllText((Join-Path $RealFixtures '08-stage3-snapshot.md'))
+$accRow = @(($v08 -split "`r?`n") | Where-Object { $_ -match '^\|\s*PS-006\s*\|' }) -join "`n"
+function New-SaSem { param($File, $Sha, $DecId, $Ipp)
+    return [pscustomobject]@{ spec_artifact = [pscustomobject]@{ file = $File; sha256 = $Sha; decision_id = $DecId; in_product_path = $Ipp } }
+}
+$sa = $saSem.spec_artifact
+Assert ((Test-SpecArtifact -Semantics $saSem -FixtureRoot $FixtureRoot -AcceptanceRowText $accRow).Ok) "spec-artifact verification passes for the real artifact + acceptance row"
+Assert (-not (Test-SpecArtifact -Semantics (New-SaSem $sa.file ($sa.sha256 + 'a') $sa.decision_id $sa.in_product_path) -FixtureRoot $FixtureRoot -AcceptanceRowText $accRow).Ok) "a malformed pinned digest (not sha256:+64-hex) FAILS"
+Assert (-not (Test-SpecArtifact -Semantics (New-SaSem $sa.file ('sha256:' + ('0' * 64)) $sa.decision_id $sa.in_product_path) -FixtureRoot $FixtureRoot -AcceptanceRowText $accRow).Ok) "a well-formed but wrong pinned digest FAILS (recomputed hash mismatch)"
+Assert (-not (Test-SpecArtifact -Semantics $saSem -FixtureRoot $FixtureRoot -AcceptanceRowText '| PS-006 | 2026-03-06 | accepted | user | yes | no anchor here |').Ok) "an acceptance row lacking the digest and artifact path FAILS"
+Assert (-not (Test-SpecArtifact -Semantics (New-SaSem 'artifact/does-not-exist.md' $sa.sha256 $sa.decision_id $sa.in_product_path) -FixtureRoot $FixtureRoot -AcceptanceRowText $accRow).Ok) "a missing artifact file FAILS"
+
 # --- Part 3: bad fixture dirs FAIL the full harness -----------------------------------
 Write-Host "`nPart 3 - bad fixtures fail the full harness"
+# Expected-FAILURE runs preserve their evidence by design; give each a TRACKED -WorkDir so the
+# preserved run child lands under a dir this suite cleans up, never loose in system temp (R4-6).
+function Invoke-BadFixture { param([string] $SeqDir, [string] $Tag)
+    return Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $SeqDir, '-WorkDir', (New-TmpDir "wd-$Tag"))
+}
+function Artifact-Of { param([string] $SeqDir)
+    return Join-Path (Split-Path -Parent $SeqDir) 'artifact\clinic-appointment-tracker-v1.md'
+}
 $badRow = New-FixtureCopy 'badrow'
 foreach ($fn in @('07-commitment-readiness-na.md', '08-stage3-snapshot.md')) {
     $fp = Join-Path $badRow $fn; [System.IO.File]::WriteAllText($fp, (Strip-Rows ([System.IO.File]::ReadAllText($fp)) '^\| PS-010 \|'), $Utf8NoBom) }
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $badRow)).ExitCode -ne 0) "harness FAILS when a required row (PS-010) is removed from every later version"
+Assert ((Invoke-BadFixture $badRow 'badrow').ExitCode -ne 0) "harness FAILS when a required row (PS-010) is removed from every later version"
 $badHash = New-FixtureCopy 'badhash'
 $fp = Join-Path $badHash '03-product-spec-accepted.md'; [System.IO.File]::WriteAllText($fp, ([System.IO.File]::ReadAllText($fp) -replace 'physiotherapy clinic', 'physiotherapy  clinic'), $Utf8NoBom)
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $badHash)).ExitCode -ne 0) "harness FAILS a fixture modified without updating its manifest hash"
+Assert ((Invoke-BadFixture $badHash 'badhash').ExitCode -ne 0) "harness FAILS a fixture modified without updating its manifest hash"
 $badAccept = New-FixtureCopy 'badaccept'
 Get-ChildItem -LiteralPath $badAccept -Filter '*.md' | ForEach-Object { [System.IO.File]::WriteAllText($_.FullName, (Strip-Rows ([System.IO.File]::ReadAllText($_.FullName)) '^\| PS-006 \|'), $Utf8NoBom) }
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $badAccept)).ExitCode -ne 0) "harness FAILS when the product-spec acceptance row (PS-006) is missing"
+Assert ((Invoke-BadFixture $badAccept 'badaccept').ExitCode -ne 0) "harness FAILS when the product-spec acceptance row (PS-006) is missing"
 $badOwner = New-FixtureCopy 'badowner'
 Get-ChildItem -LiteralPath $badOwner -Filter '*.md' | ForEach-Object { [System.IO.File]::WriteAllText($_.FullName, (Strip-Rows ([System.IO.File]::ReadAllText($_.FullName)) '^\| PS-007 \|'), $Utf8NoBom) }
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $badOwner)).ExitCode -ne 0) "harness FAILS when the product-spec owner-completion row (PS-007) is missing"
+Assert ((Invoke-BadFixture $badOwner 'badowner').ExitCode -ne 0) "harness FAILS when the product-spec owner-completion row (PS-007) is missing"
 $badExtra = New-FixtureCopy 'badextra'
 [System.IO.File]::WriteAllText((Join-Path $badExtra '99-unexpected.md'), "# stray`n", $Utf8NoBom)
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $badExtra)).ExitCode -ne 0) "harness FAILS on an unexpected fixture file"
+Assert ((Invoke-BadFixture $badExtra 'badextra').ExitCode -ne 0) "harness FAILS on an unexpected fixture file"
+
+# R4-1: the accepted-spec ARTIFACT is verified. A tampered artifact (its digest no longer matches
+# the manifest pin) and a MISSING artifact both FAIL the full harness.
+$badArt = New-FixtureCopy 'badart'
+[System.IO.File]::AppendAllText((Artifact-Of $badArt), "`nTAMPERED - a line not in the accepted spec.`n", $Utf8NoBom)
+Assert ((Invoke-BadFixture $badArt 'badart').ExitCode -ne 0) "harness FAILS when the accepted-spec artifact is tampered (digest no longer matches the pin)"
+$noArt = New-FixtureCopy 'noart'
+Remove-Item -LiteralPath (Split-Path -Parent (Artifact-Of $noArt)) -Recurse -Force
+Assert ((Invoke-BadFixture $noArt 'noart').ExitCode -ne 0) "harness FAILS when the accepted-spec artifact fixture is missing"
+
+# R4-6: a run that FAILS AFTER creating its evidence (tampered artifact) preserves that evidence
+# under the TRACKED -WorkDir, so nothing leaks into system temp.
+$leakBad = New-FixtureCopy 'leakbad'
+[System.IO.File]::AppendAllText((Artifact-Of $leakBad), "`ntamper`n", $Utf8NoBom)
+$leakWd = New-TmpDir 'leakwd'
+$rl = Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $leakBad, '-WorkDir', $leakWd)
+Assert ($rl.ExitCode -ne 0) "the leak-probe run fails (tampered artifact) after creating evidence"
+Assert (@(Get-ChildItem -LiteralPath $leakWd -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -ge 1) "an expected-failure run's preserved evidence is contained under the tracked -WorkDir (not leaked to temp)"
+
 $good = New-FixtureCopy 'good'
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $good)).ExitCode -eq 0) "harness PASSES the real fixture sequence via -FixtureDir"
+Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $good)).ExitCode -eq 0) "harness PASSES the real fixture sequence (with its accepted-spec artifact) via -FixtureDir"
 
 # --- Part 4: external-WorkDir ownership + physical link resolution (F6) ----------------
 Write-Host "`nPart 4 - external-WorkDir + link resolution"
@@ -160,6 +206,13 @@ if ($OnWindows) {
             $rj = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $junction)
             Assert ($rj.ExitCode -ne 0) "harness REJECTS a junction -WorkDir whose physical target is inside the repo"
             Assert (@(Get-ChildItem -LiteralPath $SkillsRepoRoot -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -eq 0) "no run dir leaked into the skills repo via the junction"
+            # R4-3: a link is resolved at EVERY component. -WorkDir <junction>/<existing-child>
+            # (the junction targets the repo; 'docs' is an ordinary dir under it) must also be
+            # rejected - the deepest existing component alone looks like a plain dir.
+            $nested = Join-Path $junction 'docs'
+            $rn = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $nested)
+            Assert ($rn.ExitCode -ne 0) "harness REJECTS -WorkDir nested BELOW a junction whose target is the repo"
+            Assert (@(Get-ChildItem -LiteralPath $SkillsRepoRoot -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -eq 0) "no run dir leaked into the repo via a nested-below-junction WorkDir"
         } else {
             Write-Host "  [NOT-A-PASS] junction could not be created here; the Windows link-boundary case was NOT verified" -ForegroundColor Yellow
             $script:fail++; $script:fails.Add("Windows junction link-boundary test could not be created (explicitly NOT counted as a pass)")

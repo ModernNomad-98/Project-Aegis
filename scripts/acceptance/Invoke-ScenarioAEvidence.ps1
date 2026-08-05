@@ -194,34 +194,37 @@ function Get-SectionIds {
 function Resolve-PhysicalDir {
     param([Parameter(Mandatory)][string] $Path)
     try {
-        $cur = [System.IO.Path]::GetFullPath($Path)
+        $full = [System.IO.Path]::GetFullPath($Path)
+        $root = [System.IO.Path]::GetPathRoot($full)
+        if ([string]::IsNullOrEmpty($root)) { return $null }
+        $components = @(($full.Substring($root.Length)) -split '[\\/]+' | Where-Object { $_ -ne '' })
+        $cur = $root.TrimEnd('\', '/')
+        if (-not $cur) { $cur = $root }
         $guard = 0
-        while ($true) {
+        # Resolve EVERY path component from the root down, not just the deepest existing one:
+        # if an INTERMEDIATE component is a reparse point (junction/symlink/mount), rewrite the
+        # accumulated physical path to its target before appending the rest. This catches
+        # `-WorkDir <link-inside-repo>/child` where `child` exists and looks like an ordinary dir.
+        foreach ($comp in $components) {
             $guard++
-            if ($guard -gt 64) { return $null }     # link loop / too deep -> fail closed
-            $probe = $cur
-            while ($probe -and -not (Test-Path -LiteralPath $probe)) {
-                $parent = Split-Path -Parent $probe
-                if (-not $parent -or $parent -eq $probe) { $probe = $null; break }
-                $probe = $parent
+            if ($guard -gt 4096) { return $null }        # pathological depth -> fail closed
+            $cur = Join-Path $cur $comp
+            $hops = 0
+            while (Test-Path -LiteralPath $cur) {
+                $item = Get-Item -LiteralPath $cur -Force -ErrorAction Stop
+                if ((($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) -eq 0) { break }
+                $target = $item.Target
+                if ($target -is [System.Array]) { $target = $target[0] }
+                if ([string]::IsNullOrWhiteSpace($target)) { return $null }   # unresolvable -> fail closed
+                if (-not [System.IO.Path]::IsPathRooted($target)) {
+                    $target = Join-Path (Split-Path -Parent $cur) $target
+                }
+                $cur = [System.IO.Path]::GetFullPath($target)
+                $hops++
+                if ($hops -gt 64) { return $null }        # link loop -> fail closed
             }
-            if (-not $probe -or -not (Test-Path -LiteralPath $probe)) {
-                return $cur       # nothing along the chain exists yet; lexical path is physical
-            }
-            $item = Get-Item -LiteralPath $probe -Force -ErrorAction Stop
-            $isReparse = (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
-            if (-not $isReparse) {
-                return $cur       # deepest existing ancestor is a real dir -> physical path known
-            }
-            $target = $item.Target
-            if ($target -is [System.Array]) { $target = $target[0] }
-            if ([string]::IsNullOrWhiteSpace($target)) { return $null }   # unresolvable -> fail closed
-            if (-not [System.IO.Path]::IsPathRooted($target)) {
-                $target = [System.IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $probe) $target))
-            }
-            $rest = $cur.Substring($probe.Length).TrimStart('\', '/')
-            if ($rest) { $cur = Join-Path $target $rest } else { $cur = $target }
         }
+        return [System.IO.Path]::GetFullPath($cur)
     } catch {
         return $null       # anything unexpected -> fail closed
     }
@@ -475,6 +478,52 @@ function Test-SemanticGates {
     if ($ai -ge 0 -and $oi -gt $ai) { $passes.Add("user spec acceptance ($($sem.spec_acceptance_id)) recorded before product-spec owner completion ($($sem.spec_owner_completion_id))") }
     else { $problems.Add("product-spec owner completion ($($sem.spec_owner_completion_id), step $oi) must be recorded AFTER the user's spec acceptance ($($sem.spec_acceptance_id), step $ai)") }
 
+    return [pscustomobject]@{ Ok = ($problems.Count -eq 0); Problems = @($problems); Passes = @($passes) }
+}
+
+# Verify the accepted-spec ARTIFACT is real and is the anchor recorded in the acceptance
+# decision. The manifest's spec_artifact block names the artifact fixture, its pinned normalized
+# SHA-256, the acceptance decision id, and the in-product path. This function: (1) requires a
+# well-formed sha256:+64-hex digest; (2) requires the artifact fixture to exist; (3) recomputes
+# its normalized digest and requires a match; (4) requires the acceptance decision ROW to carry
+# BOTH that exact digest and the in-product path. A missing artifact, a tampered artifact, or a
+# malformed/wrong digest in the fixture all FAIL - so the acceptance can be verified, not asserted.
+function Test-SpecArtifact {
+    param(
+        [Parameter(Mandatory)] $Semantics,
+        [Parameter(Mandatory)][string] $FixtureRoot,
+        [Parameter(Mandatory)][string] $AcceptanceRowText
+    )
+    $problems = New-Object System.Collections.Generic.List[string]
+    $passes   = New-Object System.Collections.Generic.List[string]
+    $sa = $Semantics.spec_artifact
+    if ($null -eq $sa) {
+        $problems.Add("manifest semantics has no spec_artifact block")
+        return [pscustomobject]@{ Ok = $false; Problems = @($problems); Passes = @($passes) }
+    }
+    $expected = [string]$sa.sha256
+    if ($expected -notmatch '^sha256:[0-9a-f]{64}$') {
+        $problems.Add("spec_artifact.sha256 is not a well-formed 'sha256:'+64-lowercase-hex digest: '$expected'")
+    }
+    $artPath = Join-Path $FixtureRoot ([string]$sa.file)
+    if (-not (Test-Path -LiteralPath $artPath)) {
+        $problems.Add("accepted-spec artifact fixture not found: $artPath")
+        return [pscustomobject]@{ Ok = $false; Problems = @($problems); Passes = @($passes) }
+    }
+    $actual = Get-NormalizedSha256 -Path $artPath
+    if ($actual -ne $expected) {
+        $problems.Add("accepted-spec artifact digest mismatch: computed $actual, manifest pins $expected")
+    } else {
+        $passes.Add("accepted-spec artifact $($sa.file) matches its pinned digest")
+    }
+    if ($AcceptanceRowText -notlike ("*" + $expected + "*")) {
+        $problems.Add("acceptance decision row ($($sa.decision_id)) does not carry the pinned digest $expected")
+    }
+    $ipp = [string]$sa.in_product_path
+    if ($ipp -and ($AcceptanceRowText -notlike ("*" + $ipp + "*"))) {
+        $problems.Add("acceptance decision row ($($sa.decision_id)) does not reference the artifact path $ipp")
+    }
+    if ($problems.Count -eq 0) { $passes.Add("acceptance decision $($sa.decision_id) anchors to $ipp @ its verified digest") }
     return [pscustomobject]@{ Ok = ($problems.Count -eq 0); Problems = @($problems); Passes = @($passes) }
 }
 
@@ -770,6 +819,20 @@ try {
     $sg = Test-SemanticGates -Steps $steps -Semantics $sem
     foreach ($p in $sg.Passes)   { Write-Host "[PASS] $p" }
     foreach ($p in $sg.Problems) { $failures.Add($p); Write-Host "[FAIL] $p" -ForegroundColor Red }
+
+    # Accepted-spec artifact: real file, digest matches the pin, and the acceptance decision row
+    # anchors to that exact digest + path (so PS-006/PS-007/Stage-3 cannot pass on an unverifiable
+    # or malformed anchor). The acceptance row is immutable, so the final version carries it.
+    if ($sem.PSObject.Properties.Name -contains 'spec_artifact' -and $null -ne $sem.spec_artifact) {
+        $accId  = [string]$sem.spec_artifact.decision_id
+        $accRow = @(Split-IntoLines $finalText | Where-Object { $_ -match ("^\|\s*" + [regex]::Escape($accId) + "\s*\|") }) -join "`n"
+        $spa = Test-SpecArtifact -Semantics $sem -FixtureRoot (Split-Path -Parent $FixtureDir) -AcceptanceRowText $accRow
+        foreach ($p in $spa.Passes)   { Write-Host "[PASS] $p" }
+        foreach ($p in $spa.Problems) { $failures.Add($p); Write-Host "[FAIL] $p" -ForegroundColor Red }
+    } else {
+        $failures.Add("manifest semantics is missing the required spec_artifact block")
+        Write-Host "[FAIL] manifest semantics is missing the required spec_artifact block" -ForegroundColor Red
+    }
 
     # NO commits may exist in the disposable repo - FAIL CLOSED (see Test-ZeroCommitCount).
     $rev = Invoke-GitCapture -GitArgs @('rev-list', '--count', '--all') -RepoDir $Repo

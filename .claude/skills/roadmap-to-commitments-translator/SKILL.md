@@ -162,11 +162,17 @@ Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific
                cross-team-dependency-negotiator; ranking → prioritization-frame-picker
 ```
 
-**Field rules by mode.** In **readiness mode / `NOT COMMIT-ABLE`**: `Capacity
-basis` is `none` (missing evidence named), `Committed` is `none`, no date range
-is invented, `Target dates` stay unverified, and incomplete dependency
-discovery is `unknown` — never "none verified"; the `Candidate committable
-set` is `none`. In **readiness mode / `COMMIT-ABLE`**: `Committed` is still
+**Field rules by mode.** In **readiness mode / `NOT COMMIT-ABLE`**: `Committed`
+is `none`, no date range is invented, `Target dates` stay unverified, and
+incomplete dependency discovery is `unknown` — never "none verified"; the
+`Candidate committable set` is `none`. **`Capacity basis` reflects the actual
+evidence, not the verdict:** when a defensible capacity basis EXISTS (measured
+velocity minus maintenance/interrupts, with a buffer) but readiness fails on a
+DIFFERENT missing category, KEEP that verified calculation — discarding valid
+capacity evidence would misstate what is known — and name the real missing
+category (e.g. the technical implementation plan) in `Missing evidence`.
+`Capacity basis` is `none — missing <named capacity evidence>` ONLY when the
+capacity evidence itself is what is absent. In **readiness mode / `COMMIT-ABLE`**: `Committed` is still
 `none — awaiting named human decision` (`COMMIT-ABLE` is evidence sufficiency,
 not a promise), and the **`Candidate committable set`** carries the proposed
 deliverables + honest date RANGES the named human is asked to decide on — it is

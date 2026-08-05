@@ -289,9 +289,9 @@ only after the user confirms.
 
 **Capability 4 — Record the outcome (dated) in `docs/project-state.md`, by
 propose → approve → append/refresh (or approved-create at cold start).** Prepare
-the complete dated entry — one of the template's two types: a **DECISION**
+the complete dated entry — one of the template's three types: a **DECISION**
 (carrying its "(chosen over …, because …)" clause — the rejected alternative and
-the plain-language why) or a **STATE SNAPSHOT** (new current stage + next action;
+the plain-language why), an **APPROVAL** (an `A-*` scope/authority grant — its ACTIVE status, allowed scope, and **FORBIDDEN** scope, anchored to immutable evidence), or a **STATE SNAPSHOT** (new current stage + next action;
 a stage advance is a NEW snapshot, latest wins — no header field is edited) — per
 [references/project-state-template.md](references/project-state-template.md). Show
 the exact target path, entry ID, date, and **byte-for-byte** content (no

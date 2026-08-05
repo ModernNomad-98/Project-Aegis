@@ -144,7 +144,8 @@ human durably accepted. Pending, unclassified, and `*-awaiting-record` owner sta
 appear in the orchestrator's current-turn output but are NOT persisted as
 binding decisions. The Stage 3 STATE SNAPSHOT is appended only after all four
 owner DECISION entries are recorded and satisfy the exit gate. This adds NO new
-entry type — it uses DECISION and STATE SNAPSHOT exactly as defined above.
+entry type — it uses the existing DECISION, APPROVAL, and STATE SNAPSHOT entry
+types exactly as defined above.
 
 ---
 
@@ -237,12 +238,13 @@ entry type — it uses DECISION and STATE SNAPSHOT exactly as defined above.
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
 | PS-001 | 2026-02-20 | Ship a small first version: create/assign/complete a job + a customer status link (chosen over a bigger first release, because a small v1 ships sooner and teaches us more). Everything else waits. | user | yes | brief above; unblocks product spec |
-| PS-002 | 2026-02-24 | Product specification complete — Stage 2 can classify the remaining owners (chosen over jumping straight to design, because the spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | spec; unblocks Stage 2 owner classification |
-| PS-003 | 2026-02-25 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-004 | 2026-02-25 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-005 | 2026-02-25 09:10 | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET → design may begin |
-| PS-006 | 2026-02-27 | Build it as one connected system for now (chosen over many separate services, because one system is cheaper and simpler for a small team and a few hundred users). | orchestrator-via-architecture-advisor | yes | advisor output; unblocks data design |
-| PS-007 | 2026-03-04 | Status links stop working when the job closes (chosen over "expire in 30 days" / "last forever", because a closed job's details shouldn't stay reachable). | user | yes | unblocks share-link design |
+| PS-002 | 2026-02-24 | User accepted the product specification — the actual spec content, not merely this row's wording (chosen over proceeding on an unread draft, because Stage 3 must build the spec the user endorsed). | user | yes | accepted artifact `docs/specs/maintenance-job-tracker-v1.md` @ sha256:<64-hex of that file>; accepted by user on 2026-02-24 |
+| PS-003 | 2026-02-24 | Product specification owner complete — Stage 2 can classify the remaining owners (chosen over jumping straight to design, because the accepted spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | references PS-002 (user acceptance) + `docs/specs/maintenance-job-tracker-v1.md`; unblocks Stage 2 owner classification |
+| PS-004 | 2026-02-25 09:00 | Prioritization not applicable (chosen over ranking, because there is one bounded MVP and no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-005 | 2026-02-25 09:05 | Roadmap planning not applicable (chosen over sequencing horizons, because there is one bounded release and no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
+| PS-006 | 2026-02-25 09:10 | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET → design may begin |
+| PS-007 | 2026-02-27 | Build it as one connected system for now (chosen over many separate services, because one system is cheaper and simpler for a small team and a few hundred users). | orchestrator-via-architecture-advisor | yes | advisor output; unblocks data design |
+| PS-008 | 2026-03-04 | Status links stop working when the job closes (chosen over "expire in 30 days" / "last forever", because a closed job's details shouldn't stay reachable). | user | yes | unblocks share-link design |
 
 ## Approvals (irreversible steps & scope grants)
 
@@ -296,10 +298,13 @@ language, never handed to the user as a technical choice. Every decision row
 carries its "(chosen over …, because …)" clause. Where the project stands lives
 in the snapshots table — the stage advance on 2026-03-04 is a NEW snapshot row
 (SS-002), not an edit to a header or to SS-001. SS-002 advances to design only
-after the four Stage 2 owner decisions — PS-002 (product spec complete) and
-PS-003 / PS-004 / PS-005 (prioritization / roadmap / commitment readiness each
-*not applicable*, with a reason) — the Stage 2 exit gate, recorded as ordinary
-append-only DECISION entries, each after its own previewed approval. The
+after the user's own recorded spec acceptance (PS-002, attributed to `user` and
+anchored to the accepted artifact by path + SHA-256 — an append approval is not a
+content acceptance) and the four Stage 2 owner decisions — PS-003 (product-spec
+owner complete, whose Evidence references PS-002) and PS-004 / PS-005 / PS-006
+(prioritization / roadmap / commitment readiness each *not applicable*, with a
+reason) — the Stage 2 exit gate, recorded as ordinary append-only DECISION
+entries, each after its own previewed approval. The
 current-view sections are **projections**: they render today's truth from the
 records and are refreshed at checkpoints, while Approval A-001 makes explicit
 that agreeing the scope is **not** authority to build — implementation is a

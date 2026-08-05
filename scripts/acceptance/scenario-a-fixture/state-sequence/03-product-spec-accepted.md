@@ -18,7 +18,7 @@
 | PS-003 | 2026-03-04 | The schedule screen defaults to today and can step to another day (chosen over today-only, or a full-week grid, because stepping day-by-day covers the need without the complexity of a week view). | user | yes | low-risk batch; folds into current scope |
 | PS-004 | 2026-03-04 | The patient reminder link stops working once the appointment time has passed (chosen over a fixed number of days, or never expiring, because a past appointment's details should not stay reachable). | user | yes | low-risk batch; folds into current scope |
 | PS-005 | 2026-03-04 | Notifications for v1 are just the single reminder link — no automated SMS or email (chosen over adding SMS or email reminders, because one link is enough to ship and test the core flow). | user | yes | low-risk batch; folds into current scope |
-| PS-006 | 2026-03-06 | I accept the product specification as written — it matches the agreed v1 scope and its acceptance criteria (chosen over another spec-revision round, because the spec is ready to build against). | user | yes | accepted artifact `docs/specs/clinic-appointment-tracker-v1.md` (sha256:7c9b1e5a2d4f60318a9c0b7e4d2f1a6c8b3e5d7f9a1c2e4b6d8f0a2c4e6b8d0f2), accepted 2026-03-06; unblocks the product-spec owner record |
+| PS-006 | 2026-03-06 | I accept the product specification as written — it matches the agreed v1 scope and its acceptance criteria (chosen over another spec-revision round, because the spec is ready to build against). | user | yes | accepted artifact `docs/specs/clinic-appointment-tracker-v1.md` (sha256:080d17d4576cdeade9a8549b21183088b5645588aefe8b19445ece37d415b4ca), accepted 2026-03-06; unblocks the product-spec owner record |
 
 ## Approvals (irreversible steps & scope grants)
 

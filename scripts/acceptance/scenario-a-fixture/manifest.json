@@ -51,7 +51,7 @@
     },
     {
       "file": "03-product-spec-accepted.md",
-      "sha256": "sha256:ca39e3d504d089cf989b26453990760c8063bbca76baa54ec89173c4c5fe4a15",
+      "sha256": "sha256:6e663389f3a5f0829479da328de5f7636e5885ecd49d313b4ef20cb0a4126f3b",
       "snapshots": [
         "SS-001"
       ],
@@ -71,7 +71,7 @@
     },
     {
       "file": "04-product-spec-owner-complete.md",
-      "sha256": "sha256:1d78e6ef846f285bab27cedceb58c45fb8f3f4738d0a67ff3a781fbdc2ca2e59",
+      "sha256": "sha256:a92cbb361a258f88c9ae22d5b0b24be6dd1b42d463f746005ddab90817d85b9a",
       "snapshots": [
         "SS-001"
       ],
@@ -92,7 +92,7 @@
     },
     {
       "file": "05-prioritization-na.md",
-      "sha256": "sha256:93da1fa9e8f1b09a3b1e70327999be7cd56c11294c189ba0ba44a59abc88a69c",
+      "sha256": "sha256:5475227d454197aa3f085a32258528c08903325cb2d1fb8c524202a7379dbda3",
       "snapshots": [
         "SS-001"
       ],
@@ -114,7 +114,7 @@
     },
     {
       "file": "06-roadmap-na.md",
-      "sha256": "sha256:f6719f2f089c0253625ce61de0a5bd8d8a5d3759ca89151da6edde9c07196cd7",
+      "sha256": "sha256:9e94fea911328c62b029f3bfdfeb0334c46b29c5140e5348186ffeae6163590e",
       "snapshots": [
         "SS-001"
       ],
@@ -137,7 +137,7 @@
     },
     {
       "file": "07-commitment-readiness-na.md",
-      "sha256": "sha256:e958b2736d861b6a8770a6231938e1924e57020ede247b203b589962e90b3cbd",
+      "sha256": "sha256:4ce05f47df16e2908a3c65a64c5bda0f2f0a6b38bfa1a58fdbbc1baa09217699",
       "snapshots": [
         "SS-001"
       ],
@@ -161,7 +161,7 @@
     },
     {
       "file": "08-stage3-snapshot.md",
-      "sha256": "sha256:cbf2597f56f38376fd4dc5d39319a84c4126919e5e93d8748cdcbbcbea42a85e",
+      "sha256": "sha256:47ab679c463f55d31e0e266b4a89715cb21f011a1029907a9e7504a880edf2a0",
       "snapshots": [
         "SS-001",
         "SS-002"
@@ -218,6 +218,12 @@
     "final_approvals": [
       "(none yet)",
       "A-001"
-    ]
+    ],
+    "spec_artifact": {
+      "file": "artifact/clinic-appointment-tracker-v1.md",
+      "sha256": "sha256:080d17d4576cdeade9a8549b21183088b5645588aefe8b19445ece37d415b4ca",
+      "decision_id": "PS-006",
+      "in_product_path": "docs/specs/clinic-appointment-tracker-v1.md"
+    }
   }
 }

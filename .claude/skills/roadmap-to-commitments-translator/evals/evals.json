@@ -123,7 +123,8 @@
         "assertions": [
           "Returns Readiness = NOT COMMIT-ABLE because one required technical evidence category is absent.",
           "Names the missing category explicitly: the technical implementation plan / technical planning.",
-          "Reflects the NOT COMMIT-ABLE mode in the fields (Committed = none; Capacity basis as specified for that mode); keeps the Q3 target an unverified target only and records when to reassess.",
+          "Reflects the NOT COMMIT-ABLE mode (Committed = none; the Q3 target kept as an unverified target only; records when to reassess) but PRESERVES the verified Capacity basis - the three sprints of measured velocity minus maintenance/interrupts with a buffer are shown as the capacity calculation, NOT discarded to 'none', because capacity is not the missing category.",
+          "Does NOT force Capacity basis to 'none' when a defensible capacity basis exists; 'none - missing <named capacity evidence>' is reserved for when the capacity evidence itself is absent.",
           "Does NOT cite the undecided sponsor as the reason - readiness is judged on technical evidence, and here it is the missing technical plan, not the missing human decision, that forces NOT COMMIT-ABLE."
         ]
       }

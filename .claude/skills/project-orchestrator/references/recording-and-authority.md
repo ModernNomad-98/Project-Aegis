@@ -61,13 +61,17 @@ pending batch of §1):
 - invocation is not a recording: routing to an owning skill, and recording that
   skill's terminal result, are different turns.
 
-**SINGLE-ENTRY form** (any one decision; ALWAYS used for a high-risk action):
+**SINGLE-ENTRY form** (any one immutable entry — a **DECISION**, an **APPROVAL**
+(`A-*`), or a **STATE SNAPSHOT**; ALWAYS used for a high-risk action, and ALWAYS
+for an implementation-authority Approval grant, which is never batched):
 
 - exact target path;
-- exactly one entry ID;
+- exactly one entry ID (a `PS-*` decision, an `A-*` approval, or an `SS-*` snapshot);
 - the entry's date;
 - attribution (`user` | `orchestrator-via-<skill>`);
-- the byte-for-byte full entry (no ellipsis, no omitted column);
+- the byte-for-byte full entry (no ellipsis, no omitted column) — for an APPROVAL
+  entry this includes its ACTIVE status, its allowed scope, AND its **FORBIDDEN**
+  scope, each anchored to immutable evidence, never a mutable projection;
 - ONE approval question for that entry;
 - exact post-write confirmation — the appended entry reproduced, or an exact
   hash + complete path + entry id.
