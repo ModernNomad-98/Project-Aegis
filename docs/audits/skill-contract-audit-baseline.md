@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.6.0 (engine sha256 `b287c96efc95c93d…`)
-- Repo SHA: `ec58df0919ec9833d43482be107c088dcac028d0` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `f0d20f456671c9f6cf42b1cf3043557fc235e234424d1747f00c04df69ca2497` (704 files, 3918109 bytes)
+- Repo SHA: `0b3bb90b846e7e29ac7ec9d88f9640c6517ec0bb` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `296f3fdfe06193b5614bf59eb96fd08b2b209e4669da3c0aa871351cd4e4cf73` (704 files, 3920237 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **412** (316 mechanical, 96 semantic-review candidates)
 
@@ -237,7 +237,7 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: accepted×19, approved scope×4, commit-able×9, complete×41, deployed×1, durable×2, proposed×7, ready×3
+- `project-orchestrator`: accepted×24, approved scope×4, commit-able×9, complete×41, deployed×1, durable×2, proposed×7, ready×3
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2
@@ -246,7 +246,7 @@ mechanically proven defects.
 - `release-readiness-reviewer`: ready×2, verified×2
 - `reviewable-diff-discipline`: verified×1
 - `rls-policy-auditor`: verified×3
-- `roadmap-to-commitments-translator`: approved scope×1, commit-able×32, committed×25, durable×2, proposed×2, verified×7
+- `roadmap-to-commitments-translator`: approved scope×1, commit-able×32, committed×25, durable×2, proposed×2, verified×8
 - `roadmap-under-uncertainty-planner`: committed×9, planned×7, prioritized×2
 - `rollback-runbook-author`: deployed×1, verified×3
 - `saas-cost-architect`: accepted×1, committed×1, complete×1
