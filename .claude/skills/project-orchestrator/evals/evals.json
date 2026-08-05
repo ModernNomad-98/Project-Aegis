@@ -166,10 +166,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Classifies all three conditional owners applicable on their own evidence (competing capabilities -> prioritization; uncertainty about what to build first -> roadmap; a requested deadline -> commitment readiness).",
-          "Invokes them in order: product-spec-writer -> prioritization-frame-picker -> roadmap-under-uncertainty-planner -> roadmap-to-commitments-translator; the roadmap planner exactly once; commitments never before the roadmap.",
-          "Writes each applicable-owner route as an explicit routing line (the skill name with a routing marker such as -> or 'invoke'), so the roadmap-planner route is present, not buried on a continuation line.",
-          "Invokes each planning skill only because the evidence calls for it, not merely because it exists; asks at most one business question per turn."
+          "This turn does ONE thing: Stage 2 always begins by invoking product-spec-writer, written as an explicit routing line (the skill name with a routing marker such as -> or 'invoke'); no conditional owner is invoked yet.",
+          "Does NOT pre-classify, predict, or imply any later owner's result this turn: prioritization, roadmap, and commitment readiness each remain 'unclassified' in the STAGE-2 OWNERS ledger until its OWN turn, after the current owner's result is recorded - even though the prompt's evidence (competing pieces, sequencing uncertainty, a ten-week deadline) suggests all three will be applicable.",
+          "May note the fixed classification ORDER for later turns (prioritization -> roadmap -> commitment readiness, commitments never before the roadmap, the roadmap planner at most once) WITHOUT asserting any owner's verdict now; each later verdict is classified one-per-turn on its own evidence and recorded before the next.",
+          "Invokes each skill only because the evidence calls for it, not merely because it exists; asks at most one business question per turn."
         ]
       }
     },

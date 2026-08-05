@@ -89,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.9.0"
+TOOL_VERSION = "1.10.0"
 
 
 class InputContainmentError(Exception):
@@ -645,8 +645,8 @@ RULES: list[dict] = [
      "severity": "P1", "classification": "mechanical",
      "surfaces": ["skill-body"],
      "positive_fixture": "bad-stage-router", "negative_fixture": "clean-skill",
-     "aegis_map": ["AEGIS-035", "AEGIS-045"],
-     "limits": "PER-ROUTE (v1.9.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE — EVERY guard phrase (NOT COMMIT-ABLE included) gets the negation check, so 'not readiness mode' and 'without a NOT COMMIT-ABLE guard' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE — a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') — on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of …') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes"},
+     "aegis_map": ["AEGIS-035", "AEGIS-044", "AEGIS-045"],
+     "limits": "PER-ROUTE (v1.10.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE — EVERY guard phrase (NOT COMMIT-ABLE included) gets the negation check, so 'not readiness mode' and 'without a NOT COMMIT-ABLE guard' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE — a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') — on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of …') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
      "severity": "P1", "classification": "semantic-candidate",
@@ -1090,11 +1090,17 @@ class Audit:
                 continue
             gaps = self.stage2_commitments_route_gaps(seg)
             if gaps:
+                # aegis_map reflects the ACTUAL gap kinds (R8-3): an unguarded route is
+                # the AEGIS-044 defect family; a missing roadmap-owner verdict is
+                # AEGIS-035; AEGIS-045 anchors the route-graph family either way.
+                gap_ids = sorted(
+                    {gid for gid in ("AEGIS-035", "AEGIS-044")
+                     if any(gid in g for g in gaps)} | {"AEGIS-045"})
                 self.findings.append(Finding(
                     "ROUTE-003", "P1", s.rel(), 0, s.name,
                     "Stage 2 route reaches roadmap-to-commitments-translator but is "
                     "not safe: " + "; ".join(gaps),
-                    "route", ["AEGIS-035", "AEGIS-045"], s.name, "high", True,
+                    "route", gap_ids, s.name, "high", True,
                     related_skills=[
                         "prioritization-frame-picker",
                         "roadmap-under-uncertainty-planner",

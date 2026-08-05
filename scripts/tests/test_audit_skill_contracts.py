@@ -200,7 +200,12 @@ def test_route_rules(a) -> None:
     ok("ROUTE-001 does not flag a real reviewer agent")
     r3 = [f for f in a.findings if f.rule == "ROUTE-003"]
     assert r3 and "AEGIS-035" in r3[0].aegis_map, "ROUTE-003 must map to AEGIS-035"
-    ok("ROUTE-003 (Stage-2 route gap) fires and maps to AEGIS-035")
+    # R8-3: bad-stage-router's route is ALSO unguarded, so the finding's aegis_map is
+    # gap-driven and must carry the guard family too, not only the owner family.
+    assert "AEGIS-044" in r3[0].aegis_map, (
+        "an unguarded commitments route contributes AEGIS-044 to the finding's aegis_map"
+    )
+    ok("ROUTE-003 (Stage-2 route gap) fires with a gap-driven aegis_map (AEGIS-035 + AEGIS-044)")
 
 
 def test_route002_is_unmapped_census(a) -> None:
@@ -625,7 +630,7 @@ def test_route003_branch_aware() -> None:
         "an explicit verdict-recording line (classified applicable / classified n/a) clears the owner check"
     )
 
-    ok("ROUTE-003 v1.9.0: shared routing markers; POSITIVE guard with the negation check on EVERY "
+    ok("ROUTE-003 v1.10.0: shared routing markers; POSITIVE guard with the negation check on EVERY "
        "phrase (negated readiness AND negated NOT COMMIT-ABLE rejected); verdict = a classification "
        "act with its result (criteria bullets, questions, modals, pending states all rejected)")
 

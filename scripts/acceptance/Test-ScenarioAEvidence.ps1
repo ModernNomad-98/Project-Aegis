@@ -22,7 +22,7 @@ $FixtureRoot    = Join-Path $ScriptDir 'scenario-a-fixture'
 $RealFixtures   = Join-Path $FixtureRoot 'state-sequence'
 $RealManifest   = Join-Path $FixtureRoot 'manifest.json'
 $RealArtifactDir = Join-Path $FixtureRoot 'artifact'
-$SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\..'))
+$SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path (Join-Path $ScriptDir '..') '..'))   # platform-neutral (R8-2)
 $Utf8NoBom      = New-Object System.Text.UTF8Encoding($false)
 
 # --- F4: resolve the executable of the CURRENTLY running PowerShell host --------------
@@ -156,7 +156,7 @@ function Invoke-BadFixture { param([string] $SeqDir, [string] $Tag)
     return Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $SeqDir, '-WorkDir', (New-TmpDir "wd-$Tag"))
 }
 function Artifact-Of { param([string] $SeqDir)
-    return Join-Path (Split-Path -Parent $SeqDir) 'artifact\clinic-appointment-tracker-v1.md'
+    return Join-Path (Join-Path (Split-Path -Parent $SeqDir) 'artifact') 'clinic-appointment-tracker-v1.md'
 }
 $badRow = New-FixtureCopy 'badrow'
 foreach ($fn in @('07-commitment-readiness-na.md', '08-stage3-snapshot.md')) {

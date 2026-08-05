@@ -596,9 +596,11 @@ try {
 
     # Resolve the fixture directory relative to this script (READ-only; inside skills repo).
     $ScriptDir      = $PSScriptRoot
-    $SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\..'))
+    # Platform-neutral joins (R8-2): backslash is not a separator on non-Windows
+    # PowerShell, so multi-segment children are built one Join-Path component at a time.
+    $SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path (Join-Path $ScriptDir '..') '..'))
     if ([string]::IsNullOrWhiteSpace($FixtureDir)) {
-        $FixtureDir = Join-Path $ScriptDir 'scenario-a-fixture\state-sequence'
+        $FixtureDir = Join-Path (Join-Path $ScriptDir 'scenario-a-fixture') 'state-sequence'
     }
     $FixtureDir = [System.IO.Path]::GetFullPath($FixtureDir)
     if (-not (Test-Path -LiteralPath $FixtureDir)) {
