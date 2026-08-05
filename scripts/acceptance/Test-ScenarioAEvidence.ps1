@@ -94,6 +94,17 @@ Assert ((Test-AppendOnly -PrevRows $r01 -CurRows (Get-ImmutableRows -Content $v0
 Assert (-not (Test-AppendOnly -PrevRows $r00 -CurRows (Get-ImmutableRows -Content (Strip-Rows $v01 '^\| \(none yet\) \|.*decision has been recorded'))).Ok) "placeholder deletion FAILS append-only"
 Assert (-not (Test-AppendOnly -PrevRows $r01 -CurRows (Get-ImmutableRows -Content ($v01 -replace 'PS-001 \| 2026-03-03', 'PS-001 | 2026-03-99'))).Ok) "immutable row edit FAILS"
 Assert (-not (Test-AppendOnly -PrevRows $r01 -CurRows (Get-ImmutableRows -Content (Strip-Rows $v01 '^\| PS-001 \|'))).Ok) "evidence row deletion FAILS"
+# R7-4: a Deviations bullet that WRAPS onto an indented continuation line is ONE row -
+# editing or deleting the continuation bytes of a past deviation violates append-only.
+$devPrev = "## Deviations (a decision changed course)`n`n- PS-001 superseded by PS-009 on 2026-03-10: scope narrowed after pilot feedback - the old entry`n  stays above, unedited`n"
+$devRowsPrev = Get-ImmutableRows -Content $devPrev
+Assert (@($devRowsPrev['Deviations']).Count -eq 1 -and @($devRowsPrev['Deviations'])[0] -like '*stays above, unedited*') "a wrapped deviation folds into ONE row including its continuation bytes"
+$devAppend = $devPrev + "- PS-002 superseded by PS-010 on 2026-03-12: slot length revisited`n"
+Assert ((Test-AppendOnly -PrevRows $devRowsPrev -CurRows (Get-ImmutableRows -Content $devAppend)).Ok) "appending a NEW deviation after a wrapped one succeeds"
+$devEdited = $devPrev -replace 'stays above, unedited', 'stays above, quietly edited'
+Assert (-not (Test-AppendOnly -PrevRows $devRowsPrev -CurRows (Get-ImmutableRows -Content $devEdited)).Ok) "editing a past deviation's CONTINUATION line FAILS append-only"
+$devTruncated = ($devPrev -split "`n" | Where-Object { $_ -notmatch 'stays above' }) -join "`n"
+Assert (-not (Test-AppendOnly -PrevRows $devRowsPrev -CurRows (Get-ImmutableRows -Content $devTruncated)).Ok) "deleting a past deviation's continuation line FAILS append-only"
 
 # --- Part 2: manifest conformance (hash + exact IDs) ----------------------------------
 Write-Host "`nPart 2 - manifest conformance (hash + IDs)"

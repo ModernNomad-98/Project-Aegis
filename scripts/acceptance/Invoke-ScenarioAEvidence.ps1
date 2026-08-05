@@ -312,18 +312,26 @@ function Get-ImmutableRows {
                 if ([string]::IsNullOrWhiteSpace($ln)) { continue }
                 if ($ln -match '^\s*<!--') { continue }        # marker comment lines
 
+                # EVERY immutable data row - placeholder OR evidence - is kept, in order.
                 if ($sepIdx -ge 0) {
                     # Table section: real rows are pipe-rows AFTER the separator
                     # (indices <= sepIdx are the header row and the separator itself).
                     if ($i -le $sepIdx) { continue }
                     if ($ln -notmatch '^\s*\|') { continue }
+                    $rows.Add($ln.Trim())
                 } else {
-                    # Non-table section (Deviations): bullet lines only.
-                    if ($ln -notmatch '^\s*-\s') { continue }
+                    # Non-table section (Deviations): a '- ' bullet STARTS a row; any other
+                    # non-empty, non-comment line is a wrapped CONTINUATION of the previous
+                    # bullet and is FOLDED into that row (R7-4), so editing or deleting the
+                    # continuation bytes of a past deviation violates the append-only prefix
+                    # check. A stray continuation with no preceding bullet has nothing to
+                    # attach to and is ignored.
+                    if ($ln -match '^\s*-\s') {
+                        $rows.Add($ln.Trim())
+                    } elseif ($rows.Count -gt 0) {
+                        $rows[$rows.Count - 1] = $rows[$rows.Count - 1] + ' ' + $ln.Trim()
+                    }
                 }
-
-                # EVERY immutable data row - placeholder OR evidence - is kept, in order.
-                $rows.Add($ln.Trim())
             }
         }
 

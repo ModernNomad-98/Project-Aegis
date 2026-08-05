@@ -587,9 +587,47 @@ def test_route003_branch_aware() -> None:
         "naming a classification step (no applicable/not-applicable/n-a result) must still fire AEGIS-035"
     )
 
-    ok("ROUTE-003 v1.8.0: shared routing markers, POSITIVE guard (negated readiness rejected), and a "
-       "RECORDED verdict — applicable/not-applicable/n-a only (question/modal/invocation/naming/"
-       "unclassified/classification-step all rejected) for the roadmap owner")
+    # (15) R7-2 - a NEGATED "NOT COMMIT-ABLE" mention is not a guard either: the phrase
+    #      gets the same negation check as readiness-mode language.
+    negated_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` without a NOT COMMIT-ABLE guard.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(negated_nca)), (
+        "'without a NOT COMMIT-ABLE guard' explicitly LACKS the guard -> AEGIS-044 must fire"
+    )
+    positive_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator`, which returns NOT COMMIT-ABLE absent evidence.\n"
+    )
+    assert gaps(positive_nca) == [], "a positive NOT COMMIT-ABLE guard on the route line stays clean"
+
+    # (16) R7-3 - a generic CRITERIA/definition bullet is not a per-project verdict: the
+    #      live-contract shape ("APPLICABLE on evidence of ...") must NOT clear AEGIS-035.
+    criteria_only = (
+        "- **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; NOT APPLICABLE\n"
+        "  for one bounded release. When applicable: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(criteria_only)), (
+        "a criteria bullet states when the owner WOULD be applicable, not that it WAS "
+        "classified -> AEGIS-035 must fire"
+    )
+    # (16b) ... and the contract's explicit verdict-recording line (a classification act
+    #       with its result, no routing marker) clears it.
+    criteria_plus_verdict = (
+        "- **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; NOT APPLICABLE\n"
+        "  for one bounded release. When applicable: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "  Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason).\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(criteria_plus_verdict) == [], (
+        "an explicit verdict-recording line (classified applicable / classified n/a) clears the owner check"
+    )
+
+    ok("ROUTE-003 v1.9.0: shared routing markers; POSITIVE guard with the negation check on EVERY "
+       "phrase (negated readiness AND negated NOT COMMIT-ABLE rejected); verdict = a classification "
+       "act with its result (criteria bullets, questions, modals, pending states all rejected)")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------

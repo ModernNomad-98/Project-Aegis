@@ -172,6 +172,7 @@ here.
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
     applicable. When applicable: → invoke `roadmap-under-uncertainty-planner`.
+    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
@@ -208,8 +209,7 @@ here.
   recorded. `product-spec-writer` runs `pending`, then `complete-awaiting-record`,
   then `complete-recorded` (reached only after the user's OWN acceptance of the spec — anchored to the accepted artifact by path + SHA-256 — is itself a recorded decision per the template; approving a row's wording is not accepting the spec's content); each conditional owner runs `unclassified`, `pending`,
   its `*-awaiting-record` result, then `*-recorded`. `unclassified`, `pending`,
-  `blocked`, and
-  every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
+  `blocked`, and every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
   `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
   satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.

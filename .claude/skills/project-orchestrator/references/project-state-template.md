@@ -169,11 +169,12 @@ types exactly as defined above.
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
 | PS-001 | <date> | <what was decided (chosen over <the main rejected alternative>, because <the plain-language why>)> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
-| PS-002 | <date> | User accepted the product specification — the actual spec content, not merely the wording of this row (chosen over proceeding on an unread draft, because Stage 3 must build the spec the user endorsed). | user | yes | accepted artifact `docs/specs/<product>-v1.md` @ sha256:<64-hex of that file>; accepted by user on <date> |
-| PS-003 | <date> | Product specification owner complete — Stage 2 can classify the remaining owners (chosen over jumping to design, because the accepted spec is the Stage 2 foundation). | orchestrator-via-product-spec-writer | yes | references PS-002 (user acceptance) + `docs/specs/<product>-v1.md`; unblocks Stage 2 owner classification |
-| PS-004 | <date> | Prioritization not applicable (chosen over ranking, because one bounded MVP with no competing initiative to rank). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-005 | <date> | Roadmap planning not applicable (chosen over sequencing horizons, because one bounded release with no sequencing decision). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate |
-| PS-006 | <date> | Commitment readiness not applicable (chosen over a delivery promise, because no deadline or delivery commitment was requested). | orchestrator-via-project-orchestrator | yes | Stage 2 exit gate MET |
+
+<!-- Real entries are APPENDED here one approved decision at a time — a fresh copy starts
+     with NO recorded decisions. Never pre-populate this table: the spec-acceptance
+     lifecycle (user acceptance anchored to the artifact by path + SHA-256 → owner
+     completion referencing it → per-owner n/a verdicts → gate MET) must be EARNED
+     entry by entry; it is demonstrated in the worked example below, not copied. -->
 
 ## Approvals (irreversible steps & scope grants)
 
