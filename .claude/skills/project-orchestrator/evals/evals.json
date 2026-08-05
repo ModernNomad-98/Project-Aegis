@@ -152,8 +152,8 @@
         "triggers": true,
         "assertions": [
           "Selects project-orchestrator first, runs Stage 1 (requirements-gathering-facilitator) then begins Stage 2 by invoking product-spec-writer, one plain-language business question at a time.",
-          "Classifies EACH conditional owner independently on its own evidence and finds all three not applicable: prioritization n/a (one bounded MVP, nothing to rank), roadmap n/a (one release, no sequencing decision), commitment readiness n/a (no deadline or delivery commitment requested) - not by an all-or-nothing branch.",
-          "Records each not-applicable owner as an append-only DECISION entry with its reason; no owner is silently skipped; does NOT invoke prioritization-frame-picker, roadmap-under-uncertainty-planner, or roadmap-to-commitments-translator.",
+          "Classifies exactly ONE remaining owner per turn, in order, each verdict on its own evidence and recorded before the next owner's turn (later owners 'unclassified' until then - not an all-or-nothing branch); across those turns all three are classified n/a: prioritization (one bounded MVP, nothing to rank), roadmap (one release, no sequencing decision), commitment readiness (no deadline or delivery commitment requested).",
+          "Records each not-applicable verdict as an append-only DECISION entry with its reason; no owner is silently skipped; never invokes prioritization-frame-picker, roadmap-under-uncertainty-planner, or roadmap-to-commitments-translator.",
           "Each terminal result first enters *-awaiting-record; EXIT GATE=MET only after product-spec and all three not-applicable decisions are *-recorded (each exact DECISION entry previewed and appended on the user's explicit yes), then proposes Stage 3 - with no unauthorized write, Git, network, deploy, or manual-only invocation.",
           "The docs/project-state.md records all four terminal owner decisions (product-spec complete; prioritization/roadmap/commitment-readiness n/a with reasons, each attributed orchestrator-via-project-orchestrator) BEFORE the Stage 3 STATE SNAPSHOT is appended."
         ]
@@ -180,10 +180,11 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Classifies owners independently: prioritization n/a (one bounded MVP, nothing to rank), roadmap n/a (one release, no sequencing decision - a deadline alone does not require horizons), commitment readiness APPLICABLE (a delivery date was requested).",
-          "Invokes ONLY roadmap-to-commitments-translator among the three (in readiness mode); does NOT invoke prioritization-frame-picker or roadmap-under-uncertainty-planner.",
+          "Classifies exactly ONE remaining owner per turn, in order (prioritization -> roadmap -> commitment readiness), each verdict recorded before the next owner's turn; later owners stay 'unclassified' until their own turn - never pre-judged in one pass.",
+          "Across those successive turns the verdicts, each on its own evidence, are: prioritization classified n/a (one bounded MVP, nothing to rank), roadmap classified n/a (one release, no sequencing decision - a deadline alone does not require horizons), commitment readiness classified applicable (a delivery date was requested).",
+          "Invokes ONLY roadmap-to-commitments-translator among the three (in readiness mode, on its own turn after its applicable verdict is recorded); never invokes prioritization-frame-picker or roadmap-under-uncertainty-planner.",
           "Assesses the six-week date as readiness; with no architecture or throughput evidence the result may be NOT COMMIT-ABLE, naming the missing evidence and keeping the date an unverified target.",
-          "Records prioritization and roadmap n/a with reasons; once all three owners are *-recorded (terminal results appended after approval), Stage 3 may proceed with no delivery promise manufactured from the deadline."
+          "Records the prioritization and roadmap n/a verdicts with reasons; once all owners are *-recorded (terminal results appended after approval), Stage 3 may proceed with no delivery promise manufactured from the deadline."
         ]
       }
     },
@@ -194,9 +195,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Classifies owners independently: prioritization APPLICABLE (many competing requests, a real ranking decision), roadmap n/a (no sequencing or horizon decision surfaced), commitment readiness n/a (nobody asked for a deadline or delivery promise).",
-          "Invokes ONLY prioritization-frame-picker among the three; does NOT invoke roadmap-under-uncertainty-planner or roadmap-to-commitments-translator.",
-          "Records roadmap and commitment readiness each n/a with a reason; competing priorities alone do not pull in commitment readiness.",
+          "Classifies exactly ONE remaining owner per turn, in order (prioritization first), recording each verdict before the next owner's turn; roadmap and commitment readiness stay 'unclassified' until their own turns - no one-pass pre-judgement.",
+          "Across those turns the verdicts, each on its own evidence, are: prioritization classified applicable (many competing requests, a real ranking decision), roadmap classified n/a (no sequencing or horizon decision surfaced), commitment readiness classified n/a (nobody asked for a deadline or delivery promise).",
+          "Invokes ONLY prioritization-frame-picker among the three (on its own turn after its applicable verdict is recorded); never invokes roadmap-under-uncertainty-planner or roadmap-to-commitments-translator; competing priorities alone do not pull in commitment readiness.",
           "Reaches EXIT GATE=MET only after product-spec, prioritization, and the two n/a decisions are all *-recorded (previewed and appended on the user's yes); a terminal result still awaiting its append keeps the gate BLOCKED."
         ]
       }

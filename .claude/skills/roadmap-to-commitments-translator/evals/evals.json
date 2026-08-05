@@ -134,7 +134,7 @@
     {
       "id": "final-commitment-requires-evidence-and-approval",
       "type": "should_trigger",
-      "prompt": "The architecture is signed off, cross-team dependencies are secured, and we have a solid velocity baseline. Dana Ruiz (VP Product) formally approved committing to the Q3 onboarding milestone in the 2026-03-05 planning review, recorded as Approval A-014 (approved scope: the new onboarding flow, weeks 6-8). Produce the final commitment.",
+      "prompt": "Everything is in place for a final commitment: the current product scope is approved and recorded as immutable decision evidence; the architecture is signed off; the technical implementation plan is complete; dependency discovery is complete and cross-team dependencies are secured; we have three sprints of measured velocity giving a defensible capacity basis (net of maintenance and interrupts, with a buffer); risks and uncertainty are assessed with buffers agreed; the target window is Q3. Dana Ruiz (VP Product) formally approved committing to the Q3 onboarding milestone in the 2026-03-05 planning review, recorded as Approval A-014 (approved scope: the new onboarding flow, weeks 6-8). Produce the final commitment.",
       "expect": {
         "triggers": true,
         "assertions": [

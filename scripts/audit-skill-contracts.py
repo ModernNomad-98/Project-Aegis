@@ -89,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.10.0"
+TOOL_VERSION = "1.11.0"
 
 
 class InputContainmentError(Exception):
@@ -646,7 +646,7 @@ RULES: list[dict] = [
      "surfaces": ["skill-body"],
      "positive_fixture": "bad-stage-router", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-035", "AEGIS-044", "AEGIS-045"],
-     "limits": "PER-ROUTE (v1.10.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE — EVERY guard phrase (NOT COMMIT-ABLE included) gets the negation check, so 'not readiness mode' and 'without a NOT COMMIT-ABLE guard' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE — a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') — on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of …') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes"},
+     "limits": "PER-ROUTE (v1.11.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE — EVERY guard phrase (NOT COMMIT-ABLE included) gets a negation check BOTH before and after the phrase, so 'not readiness mode', 'without a NOT COMMIT-ABLE guard', 'readiness mode not required', and 'readiness mode skipped' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE — a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') — on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of …') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
      "severity": "P1", "classification": "semantic-candidate",
@@ -1209,11 +1209,21 @@ class Audit:
         neg_before = re.compile(
             r"(?i)\b(not|no|never|without|lack(?:s|ing)?|avoids?|skips?|bypass(?:es)?|"
             r"instead\s+of|rather\s+than|non-?)\b[\s\w,'/()`-]{0,24}$")
+        # R9-1: negation AFTER the phrase disclaims the guard too — "readiness mode not
+        # required", "NOT COMMIT-ABLE guard is not required", "readiness mode skipped".
+        # Deliberately excludes evidence-state words (absent/missing) that describe WHY
+        # the guard fires ("returns NOT COMMIT-ABLE absent evidence" IS a guard).
+        neg_after = re.compile(
+            r"(?i)^[\s\w,'/()`:;-]{0,16}?\b(not|never|n't|unnecessary|optional|"
+            r"skipp?ed|waived)\b")
 
         def guarded(line: str) -> bool:
             for m in guard_phrase.finditer(line):
-                if not neg_before.search(line[:m.start()]):
-                    return True    # at least one POSITIVE, non-negated guard phrase
+                if neg_before.search(line[:m.start()]):
+                    continue       # negated before the phrase
+                if neg_after.search(line[m.end():]):
+                    continue       # disclaimed after the phrase (R9-1)
+                return True        # at least one POSITIVE, non-negated guard phrase
             return False
 
         def is_recorded_verdict(line: str) -> bool:

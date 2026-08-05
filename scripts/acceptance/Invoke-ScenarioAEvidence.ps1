@@ -599,6 +599,14 @@ try {
     # Platform-neutral joins (R8-2): backslash is not a separator on non-Windows
     # PowerShell, so multi-segment children are built one Join-Path component at a time.
     $SkillsRepoRoot = [System.IO.Path]::GetFullPath((Join-Path (Join-Path $ScriptDir '..') '..'))
+    # R9-3: resolve the repo root PHYSICALLY too, so both sides of every Path-IsInside
+    # containment check use the same representation. If the checkout path (or an ancestor)
+    # is itself a symlink/junction, a -WorkDir under the repo's REAL target must still be
+    # recognised as inside. Fail closed if the root cannot be resolved.
+    $SkillsRepoRoot = Resolve-PhysicalDir -Path $SkillsRepoRoot
+    if ($null -eq $SkillsRepoRoot) {
+        throw "Refusing to run: the skills repo root cannot be resolved to a physical path (failing closed)."
+    }
     if ([string]::IsNullOrWhiteSpace($FixtureDir)) {
         $FixtureDir = Join-Path (Join-Path $ScriptDir 'scenario-a-fixture') 'state-sequence'
     }

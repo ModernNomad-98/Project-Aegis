@@ -630,9 +630,35 @@ def test_route003_branch_aware() -> None:
         "an explicit verdict-recording line (classified applicable / classified n/a) clears the owner check"
     )
 
-    ok("ROUTE-003 v1.10.0: shared routing markers; POSITIVE guard with the negation check on EVERY "
-       "phrase (negated readiness AND negated NOT COMMIT-ABLE rejected); verdict = a classification "
-       "act with its result (criteria bullets, questions, modals, pending states all rejected)")
+    # (17) R9-1 - negation AFTER the guard phrase disclaims it: "readiness mode not
+    #      required" and "NOT COMMIT-ABLE guard is not required" are NOT guards.
+    post_neg_readiness = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Fast lane -> invoke `roadmap-to-commitments-translator`; readiness mode not required here.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_readiness)), (
+        "'readiness mode not required' disclaims the guard -> AEGIS-044 must fire"
+    )
+    post_neg_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Direct -> invoke `roadmap-to-commitments-translator`, the NOT COMMIT-ABLE guard is not required.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_nca)), (
+        "'NOT COMMIT-ABLE guard is not required' disclaims the guard -> AEGIS-044 must fire"
+    )
+    post_neg_skipped = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` (readiness mode skipped).\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_skipped)), (
+        "'readiness mode skipped' disclaims the guard -> AEGIS-044 must fire"
+    )
+    # sanity: evidence-state words after NOT COMMIT-ABLE still describe a REAL guard
+    # ("returns NOT COMMIT-ABLE absent evidence" is case (15) positive_nca, asserted clean above).
+
+    ok("ROUTE-003 v1.11.0: shared routing markers; POSITIVE guard with negation checks BOTH sides of "
+       "every phrase (pre-negated, post-disclaimed, and negated NOT COMMIT-ABLE all rejected); "
+       "verdict = a classification act with its result")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------
