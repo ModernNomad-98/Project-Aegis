@@ -1,15 +1,15 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.6.0",
-    "engine_sha256": "b287c96efc95c93dbc97972db7e3b9540d839b2b092e4fb759a61746f127e8cb",
-    "repo_sha": "0b3bb90b846e7e29ac7ec9d88f9640c6517ec0bb",
+    "version": "1.7.0",
+    "engine_sha256": "44ec5cfa3756b65cabbb5cf87ce3a09fc574d83f011002d8f6ee0058cb81a1ca",
+    "repo_sha": "937b64fec119ff554117e989e0e351065d652555",
     "branch": "fix/aegis-stage2-evidence-driven-route",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 704,
-    "audited_byte_count": 3920237,
-    "corpus_content_hash": "296f3fdfe06193b5614bf59eb96fd08b2b209e4669da3c0aa871351cd4e4cf73",
+    "audited_byte_count": 3921370,
+    "corpus_content_hash": "686dcec0b62a06f8c97f1b65fdd3f767dd74b7e1a1ac3eb633d52305fd7d7f15",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -346,7 +346,7 @@
         "AEGIS-035",
         "AEGIS-045"
       ],
-      "limits": "PER-ROUTE (v1.6.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 the readiness / NOT COMMIT-ABLE guard must be ON THAT LINE, so explanatory text elsewhere in the Stage-2 segment cannot clear a separate unguarded route. The roadmap owner (roadmap-under-uncertainty-planner) must be independently CLASSIFIED with real verdict language (applicable / not applicable / n/a / classif* / unclassified) on a NON-invocation line \u2014 a routing marker or the bare word 'owner' no longer counts (invocation/naming is not classification); classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a real verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes (the contract keeps each real invocation route, with its marker, skill token, and guard, on one line)",
+      "limits": "PER-ROUTE (v1.7.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE \u2014 a NEGATED mention ('not readiness mode', 'skip readiness') does not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must be independently CLASSIFIED with a RECORDED, declarative verdict (applicable / not applicable / n/a / classif* / unclassified) on a NON-invocation line \u2014 a routing marker, the bare word 'owner', a QUESTION ('is it applicable?'), or an uncertain MODAL ('may be n/a') no longer counts; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes",
       "hit_count": 0
     },
     {
@@ -7680,7 +7680,7 @@
       "committed": 25,
       "durable": 2,
       "proposed": 2,
-      "verified": 8
+      "verified": 9
     },
     "roadmap-under-uncertainty-planner": {
       "committed": 9,

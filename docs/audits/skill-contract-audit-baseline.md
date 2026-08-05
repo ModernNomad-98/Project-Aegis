@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.6.0 (engine sha256 `b287c96efc95c93d…`)
-- Repo SHA: `0b3bb90b846e7e29ac7ec9d88f9640c6517ec0bb` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `296f3fdfe06193b5614bf59eb96fd08b2b209e4669da3c0aa871351cd4e4cf73` (704 files, 3920237 bytes)
+- Tool: `audit-skill-contracts` v1.7.0 (engine sha256 `44ec5cfa3756b65c…`)
+- Repo SHA: `937b64fec119ff554117e989e0e351065d652555` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `686dcec0b62a06f8c97f1b65fdd3f767dd74b7e1a1ac3eb633d52305fd7d7f15` (704 files, 3921370 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **412** (316 mechanical, 96 semantic-review candidates)
 
@@ -246,7 +246,7 @@ mechanically proven defects.
 - `release-readiness-reviewer`: ready×2, verified×2
 - `reviewable-diff-discipline`: verified×1
 - `rls-policy-auditor`: verified×3
-- `roadmap-to-commitments-translator`: approved scope×1, commit-able×32, committed×25, durable×2, proposed×2, verified×8
+- `roadmap-to-commitments-translator`: approved scope×1, commit-able×32, committed×25, durable×2, proposed×2, verified×9
 - `roadmap-under-uncertainty-planner`: committed×9, planned×7, prioritized×2
 - `rollback-runbook-author`: deployed×1, verified×3
 - `saas-cost-architect`: accepted×1, committed×1, complete×1
