@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.9.0 (engine sha256 `30439eb4215a2a79…`)
-- Repo SHA: `9897669039842f118cbd088d6bf7b89e52e934d1` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `c6c4098ce9dce945f6cccec93447b0fe1daed746172690a6307d40e158c04d2c` (704 files, 3921354 bytes)
+- Tool: `audit-skill-contracts` v1.10.0 (engine sha256 `ff8ffb0feb1c24d8…`)
+- Repo SHA: `b85d19d0acdeef1a56056b8c7e02c1af9d4f408f` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `a65eeda1108f525afe69e6d83c82c488eef72cf3f4cd28995b913922ef42f649` (704 files, 3921632 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **412** (316 mechanical, 96 semantic-review candidates)
 
