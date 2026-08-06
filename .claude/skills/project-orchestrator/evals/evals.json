@@ -21,12 +21,13 @@
     {
       "id": "edge-midflight-state-file-do-not-restart",
       "type": "should_trigger",
-      "prompt": "We've been building my app for a few weeks. There's a docs/project-state.md that says the current stage is 'Design: how it will be built' and the spec is approved. What do I do next?",
+      "prompt": "We've been building my app for a few weeks. docs/project-state.md's latest STATE SNAPSHOT records the current stage as 'Design: how it will be built'. Its decision log shows my own recorded acceptance of the actual specification, anchored to the accepted spec artifact by its path and a SHA-256 of that file; the product-spec owner completion referencing that acceptance; and recorded prioritization, roadmap, and commitment-readiness verdicts — all four Stage 2 owner decisions satisfy the recorded exit gate. There's no application code yet. What do I do next?",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Reads docs/project-state.md FIRST and continues from the recorded 'Design' stage — does NOT restart discovery or re-run requirements-gathering-facilitator.",
-          "Cross-checks the recorded stage against repo reality (an approved spec but no code = ready for architecture) and surfaces any mismatch instead of trusting the file blindly.",
+          "Reads docs/project-state.md FIRST and continues mid-flight from the recorded 'Design' stage (the latest STATE SNAPSHOT row) — does NOT restart discovery or re-run requirements-gathering-facilitator.",
+          "Verifies the RECORDED Stage 2 exit gate rather than inferring readiness from the spec alone: the user's spec acceptance is recorded and anchored to the accepted artifact (path + SHA-256), the product-spec owner completion references that acceptance, and the prioritization, roadmap, and commitment-readiness verdicts are each recorded — all four Stage 2 owner decisions satisfy the recorded exit gate, and THAT recorded gate (never the bare presence of an approved spec) is what licenses continuing in Design.",
+          "Cross-checks the recorded stage against repo reality — no application code yet is CONSISTENT with a recorded Design stage that has not started implementation — and surfaces any mismatch instead of trusting the file blindly; repo reality alone never advances the stage, only the recorded evidence does.",
           "Routes the next step to the owning architecture skill(s) BY NAME (e.g. domain-modeler / architecture-advisor / architecture-designer).",
           "States the single next recommended action in plain language; any new decision entry is previewed (exact path + content), appended only after the user's explicit yes, and never overwrites a past entry."
         ]
