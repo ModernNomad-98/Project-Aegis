@@ -168,7 +168,7 @@ types exactly as defined above.
 
 | ID | Date | Decision (plain language) | Who decided | Still binding? | Evidence / next gate |
 |----|------|---------------------------|-------------|----------------|----------------------|
-| PS-001 | <date> | <what was decided (chosen over <the main rejected alternative>, because <the plain-language why>)> | user \| orchestrator-via-<skill> | yes | <link / skill output / the gate this unblocks> |
+| (none yet) | — | (none recorded — no decision has been recorded yet) | — | — | — |
 
 <!-- Real entries are APPENDED here one approved decision at a time — a fresh copy starts
      with NO recorded decisions. Never pre-populate this table: the spec-acceptance
@@ -180,7 +180,7 @@ types exactly as defined above.
 
 | ID | Status | Date / who | Scope allowed | Scope FORBIDDEN | Evidence |
 |----|--------|-----------|---------------|-----------------|----------|
-| A-001 | ACTIVE \| SUPERSEDED by <id> \| EXPIRED <date> | <date> / user | <the exact allowed scope stated inline — or referenced to immutable evidence: a DECISION id, or an accepted-artifact path + SHA-256; NEVER a mutable projection> | <adjacent action this does NOT authorize — e.g. this is scope agreement only, NOT authority to implement> | <immutable reference: DECISION id / accepted-artifact path + SHA-256> |
+| (none yet) | — | — | — | — | (none recorded — no approval has been granted yet) |
 
 ## Deviations (a decision changed course)
 

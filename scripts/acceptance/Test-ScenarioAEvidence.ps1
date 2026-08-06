@@ -324,6 +324,52 @@ if ($OnWindows) {
     Write-Host "  [SKIPPED] Windows-only deletion-failure case NOT RUN on this OS (exclusive-share file locking is Windows-specific); explicitly NOT counted as a pass" -ForegroundColor Yellow
 }
 
+# --- Part 7: copyable template parity with the cold-start fixture ---------------------
+# (PR77 Finding 1) The COPYABLE block of project-state-template.md must start EMPTY
+# exactly like the Scenario A cold-start fixture: its Decision-log and Approvals tables
+# carry the fixture's '(none yet)' placeholder rows, it contains NO pre-populated
+# immutable PS-* or A-* data row, and the initial SS-001 snapshot row is preserved.
+# The WORKED EXAMPLE further down the file demonstrates real rows and must never be
+# mistaken for the copyable block.
+Write-Host "`nPart 7 - copyable template parity with the cold-start fixture"
+$TemplatePath = Join-Path (Join-Path (Join-Path (Join-Path (Join-Path $SkillsRepoRoot '.claude') 'skills') 'project-orchestrator') 'references') 'project-state-template.md'
+$templateText = [System.IO.File]::ReadAllText($TemplatePath)
+# Slice at the worked-example heading FIRST, so nothing extracted below can come from
+# the worked example; then take the first fenced block under the '## Template' heading.
+$workedSplit  = $templateText -split '(?m)^## Worked example'
+Assert ($workedSplit.Count -ge 2) "the template file still carries a '## Worked example' section"
+$beforeWorked = [string]$workedSplit[0]
+$tplSplit     = $beforeWorked -split '(?m)^## Template'
+$tplSection   = ''
+if ($tplSplit.Count -ge 2) { $tplSection = [string]$tplSplit[1] }
+Assert ($tplSection -ne '') "the '## Template' (copyable) section exists before the worked example"
+$tplLines = @($tplSection -split "`r?`n")
+$startIdx = -1; $endIdx = -1
+for ($i = 0; $i -lt $tplLines.Count; $i++) {
+    if ($startIdx -lt 0) { if ($tplLines[$i] -match '^```') { $startIdx = $i + 1 } }
+    elseif ($tplLines[$i] -match '^```\s*$') { $endIdx = $i - 1; break }
+}
+$copyBlock = ''
+if (($startIdx -ge 0) -and ($endIdx -ge $startIdx)) { $copyBlock = ($tplLines[$startIdx..$endIdx] -join "`n") }
+Assert ($copyBlock -ne '') "the copyable fenced block was located under '## Template'"
+$fixtureRows = Get-ImmutableRows -Content $v00
+$copyRows    = Get-ImmutableRows -Content $copyBlock
+$fixDecisionRow = [string]@($fixtureRows['Decision log'])[0]
+$fixApprovalRow = [string]@($fixtureRows['Approvals'])[0]
+Assert ($fixDecisionRow -match '^\| \(none yet\) \|') "cold-start fixture's Decision placeholder row is the expected '(none yet)' row"
+Assert ($fixApprovalRow -match '^\| \(none yet\) \|') "cold-start fixture's Approval placeholder row is the expected '(none yet)' row"
+$tplDecisionRow = ''; $arrD = @($copyRows['Decision log']); if ($arrD.Count -ge 1) { $tplDecisionRow = [string]$arrD[0] }
+$tplApprovalRow = ''; $arrA = @($copyRows['Approvals']);    if ($arrA.Count -ge 1) { $tplApprovalRow = [string]$arrA[0] }
+Assert ($tplDecisionRow -ceq $fixDecisionRow) "the copyable template's empty Decision row matches the cold-start fixture exactly"
+Assert ($tplApprovalRow -ceq $fixApprovalRow) "the copyable template's empty Approval row matches the cold-start fixture exactly"
+$prePopulated = @(($copyBlock -split "`r?`n") | Where-Object { $_ -match '^\|\s*(PS|A)-\d' })
+Assert ($prePopulated.Count -eq 0) "the copyable block contains no pre-populated immutable PS-* or A-* data row"
+$snapRows = @($copyRows['State snapshots'])
+Assert (($snapRows.Count -ge 1) -and ([string]$snapRows[0] -match '^\|\s*SS-001\s*\|')) "the copyable block preserves its initial SS-001 snapshot row"
+$workedText = [string]$workedSplit[1]
+Assert ($workedText -match '(?m)^\| PS-001 \|') "the worked example (below the copyable block) still demonstrates real PS-* rows"
+Assert ($copyBlock.IndexOf('Maintenance job-tracking app') -lt 0) "the worked example was not treated as the copyable block"
+
 # --- cleanup + summary ----------------------------------------------------------------
 foreach ($d in $tmp) { try { if (Test-Path -LiteralPath $d) { Remove-Item -LiteralPath $d -Recurse -Force -ErrorAction SilentlyContinue } } catch { } }
 Write-Host ""
