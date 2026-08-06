@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.12.0 (engine sha256 `c886b27aee860aed…`)
-- Repo SHA: `f238cde7c91efb0a054b07b20c865fbac7a9743b` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `c21d284f8e125de9a7e0019a38a02a72dcff9c364b92ee3b2162afbaff188a0a` (704 files, 3923458 bytes)
+- Repo SHA: `c448454e986238219b6e77cc7acfdab7ea56385d` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `08564a6250359790a639637b5bf6575253c5c447d52b34caeb4578e16cdd283f` (704 files, 3938548 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **414** (316 mechanical, 98 semantic-review candidates)
 
@@ -93,7 +93,7 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/product-analytics-instrumenter/SKILL.md` (owner: product-analytics-instrumenter; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchases' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:332` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:352` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:171` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:183` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -240,7 +240,7 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: accepted×18, approved scope×4, commit-able×9, complete×40, deployed×1, durable×2, proposed×7, ready×3
+- `project-orchestrator`: accepted×18, approved scope×4, commit-able×9, complete×39, deployed×1, durable×2, proposed×8, ready×3
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2
