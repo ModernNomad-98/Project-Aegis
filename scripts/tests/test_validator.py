@@ -39,6 +39,7 @@ IMPORT WRINKLE
 from __future__ import annotations
 
 import importlib.util
+import json
 import shutil
 import subprocess
 import sys
@@ -691,6 +692,197 @@ def test_dco_record_parsing():
     expect_clean(rep, "records parsed from the git-log stream feed the rules unchanged")
 
 
+# --- startup workspace-role contract (PR #77 final correction) --------------
+#
+# The repo-root startup instructions (AGENTS.md, CLAUDE.md, README.md) are
+# copied, BY DESIGN, into a user's own product repository (the README's consumer
+# installation), so carrying .claude/skills + AGENTS.md + CLAUDE.md can NEVER by
+# itself prove a workspace is the Project Aegis SOURCE library. This test reads
+# the shipped files and asserts the written startup CONTRACT is role-aware:
+# source-library role is corroborated by the source-package landmarks, a fresh
+# consumer repo stays the current product workspace, and no sibling app folder is
+# proposed merely because the skills are copied in.
+#
+# It is DELIBERATELY structural and deterministic — a text/JSON contract check.
+# It is NOT a model-behavior runner and proves nothing about a live Claude
+# session; the only behavioral proof of the fix is a fresh-session Scenario A
+# rerun, which this suite never executes.
+
+SOURCE_PACKAGE_LANDMARKS = (
+    "README.md",
+    "docs/skills-catalog.md",
+    "scripts/validate-skills.py",
+    "artifacts/audits/skill-contract-audit-baseline.json",
+)
+
+CONSUMER_EVAL_ID = "regression-fresh-consumer-with-copied-aegis-files-stays-product"
+SOURCE_EVAL_ID = "regression-actual-project-aegis-source-landmarks-remain-library"
+
+
+def test_startup_role_contract():
+    """PR #77: the repo-root startup instructions are role-aware (structural)."""
+
+    def ok(label: str) -> None:
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+    agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    claude = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    # --- AGENTS.md role contract -------------------------------------------
+    assert "This repository is a skills library:" not in agents, (
+        "AGENTS.md must drop the unconditional source-only identity sentence "
+        "'This repository is a skills library:' — it is false in a consumer repo"
+    )
+    ok("AGENTS.md: unconditional 'skills library' identity sentence is gone")
+
+    assert "consumer/product repository" in agents, (
+        "AGENTS.md must carry an explicit consumer/product-repository rule"
+    )
+    ok("AGENTS.md: explicit consumer/product-repository rule present")
+
+    assert "does NOT make a workspace the Project Aegis source library" in agents, (
+        "AGENTS.md must state that copied startup files alone do not prove "
+        "source-library role"
+    )
+    for token in (".claude/skills", "AGENTS.md", "CLAUDE.md"):
+        assert token in agents, (
+            f"AGENTS.md's copied-files rule must name {token!r}"
+        )
+    ok("AGENTS.md: copied .claude/skills + AGENTS.md + CLAUDE.md are not source proof")
+
+    for landmark in SOURCE_PACKAGE_LANDMARKS:
+        assert landmark in agents, (
+            f"AGENTS.md must name the source-package landmark {landmark!r}"
+        )
+    ok("AGENTS.md: names all four source-package landmarks")
+
+    assert "never redirect the user into a second/sibling product folder" in agents, (
+        "AGENTS.md must forbid redirecting a consumer into another product folder "
+        "solely because copied skills exist"
+    )
+    ok("AGENTS.md: forbids a second/sibling product-folder redirect")
+
+    # --- CLAUDE.md startup ordering ----------------------------------------
+    assert claude.splitlines()[0].strip() == "@AGENTS.md", (
+        "CLAUDE.md must keep the '@AGENTS.md' import as its first line (D61 bridge)"
+    )
+    role_idx = claude.find("Determine the workspace role")
+    skill_sel_idx = claude.find("list the available skills under `.claude/skills/`")
+    assert role_idx != -1, "CLAUDE.md must add a workspace-role-detection step"
+    assert skill_sel_idx != -1, "CLAUDE.md must keep the skill-selection step"
+    assert role_idx < skill_sel_idx, (
+        "workspace-role detection must appear BEFORE the skill-selection step"
+    )
+    ok("CLAUDE.md: role detection precedes skill selection")
+
+    assert "copied, by design, into consumer/product repositories" in claude, (
+        "CLAUDE.md must recognize the copied root instructions as valid consumer "
+        "installation files"
+    )
+    ok("CLAUDE.md: copied root instructions recognized as consumer install files")
+
+    assert "Do NOT infer source-library role from" in claude, (
+        "CLAUDE.md must say copied .claude/skills alone is not source-library evidence"
+    )
+    ok("CLAUDE.md: copied .claude/skills alone is not source-library evidence")
+
+    assert "treat the CURRENT workspace as the user's consumer/product repository" in claude, (
+        "CLAUDE.md must keep a fresh consumer repo as the current product workspace"
+    )
+    ok("CLAUDE.md: fresh consumer repo stays the current product workspace")
+
+    assert "Never propose a second or sibling app directory" in claude, (
+        "CLAUDE.md must forbid a sibling product-folder redirect by default"
+    )
+    ok("CLAUDE.md: no sibling product-folder redirect by default")
+
+    # --- README.md consumer-installation clarification ---------------------
+    assert "Copy the `.claude/skills" in readme, (
+        "README consumer section must still instruct copying the startup files"
+    )
+    assert "Copying `.claude/skills`, `CLAUDE.md`, and `AGENTS.md`" in readme, (
+        "README must describe copying the startup files as a consumer installation"
+    )
+    ok("README.md: consumer install section still instructs copying the startup files")
+
+    assert "do NOT convert it into the Project Aegis source" in readme, (
+        "README must state that copying the files does not convert the product repo "
+        "into the Project Aegis source library"
+    )
+    ok("README.md: copying does not convert the product repo into the source library")
+
+    assert "open your OWN product repository and work there" in readme, (
+        "README must tell users to continue in the current product workspace"
+    )
+    ok("README.md: tells users to continue in the current product workspace")
+
+    assert "not by the copied skills alone" in readme, (
+        "README must reference the source-package landmark distinction"
+    )
+    for landmark in SOURCE_PACKAGE_LANDMARKS:
+        assert landmark in readme, (
+            f"README must reference the source-package landmark {landmark!r}"
+        )
+    ok("README.md: references the source-package landmark distinction")
+
+    # --- project-orchestrator regression evals -----------------------------
+    evals_path = (
+        REPO_ROOT / ".claude" / "skills" / "project-orchestrator" / "evals" / "evals.json"
+    )
+    data = json.loads(evals_path.read_text(encoding="utf-8"))
+    ids = [c["id"] for c in data["cases"]]
+
+    assert ids.count(CONSUMER_EVAL_ID) == 1, (
+        f"the consumer regression case {CONSUMER_EVAL_ID!r} must exist exactly once"
+    )
+    assert ids.count(SOURCE_EVAL_ID) == 1, (
+        f"the source regression case {SOURCE_EVAL_ID!r} must exist exactly once"
+    )
+    assert len(ids) == len(set(ids)), (
+        "all project-orchestrator eval IDs must be unique; duplicates: "
+        f"{sorted({i for i in ids if ids.count(i) > 1})}"
+    )
+    ok(f"evals: both new IDs present exactly once; all {len(ids)} IDs unique")
+
+    by_id = {c["id"]: c for c in data["cases"]}
+    consumer = by_id[CONSUMER_EVAL_ID]
+    consumer_prompt = consumer["prompt"]
+    for shape in (
+        "zero commits",
+        "no docs",
+        "source-package landmarks",
+        ".claude/skills/",
+        "AGENTS.md",
+        "CLAUDE.md",
+    ):
+        assert shape in consumer_prompt, (
+            f"the consumer case prompt must encode the workspace-shape token {shape!r}"
+        )
+    assert "second/sibling app folder" in json.dumps(consumer), (
+        "the consumer case must forbid a second/sibling product folder"
+    )
+    ok("evals: consumer case has the fresh-copied-no-landmarks shape and forbids a sibling folder")
+
+    source_blob = json.dumps(by_id[SOURCE_EVAL_ID])
+    assert "# Project Aegis" in source_blob, (
+        "the source case must reference the '# Project Aegis' README landmark"
+    )
+    for landmark in (
+        "docs/skills-catalog.md",
+        "scripts/validate-skills.py",
+        "artifacts/audits/skill-contract-audit-baseline.json",
+    ):
+        assert landmark in source_blob, (
+            f"the source case must contain the source-package landmark {landmark!r}"
+        )
+    assert "source-library" in source_blob.lower(), (
+        "the source case must preserve source-library classification"
+    )
+    ok("evals: source case contains every source-package landmark and keeps source-library classification")
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -706,6 +898,7 @@ TESTS = [
     test_dco_signoff_required,
     test_dco_bot_exemption,
     test_dco_record_parsing,
+    test_startup_role_contract,
 ]
 
 

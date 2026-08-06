@@ -597,6 +597,37 @@
           "Records each owner's result before moving to the next owner; it does not classify all remaining owners in one pass."
         ]
       }
+    },
+    {
+      "id": "regression-fresh-consumer-with-copied-aegis-files-stays-product",
+      "type": "should_trigger",
+      "prompt": "My workspace is a freshly initialized Git repository with zero commits: no docs/ directory, no application source of any kind, and none of the Project Aegis source-package landmarks (no '# Project Aegis' README.md, no docs/skills-catalog.md, no scripts/validate-skills.py, no artifacts/audits/skill-contract-audit-baseline.json). It contains only the complete copied .claude/skills/ folder plus copied root AGENTS.md and CLAUDE.md, which I put here so I would have the helpers. I opened this folder as my new product workspace. I run a small physiotherapy clinic; we keep appointments in a paper diary, which causes double bookings and makes no-shows hard to track. I think a simple app may help, but I am not a developer and do not know where to start. Guide me through defining the product until design is the next step. Do not implement the application yet.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the workspace from evidence as the user's FRESH consumer/product repository (zero commits, no application source, no docs/project-state.md, and none of the Project Aegis source-package landmarks) - NOT the Project Aegis skills library, toolbox, or source checkout.",
+          "States plainly that the copied .claude/skills/, AGENTS.md, and CLAUDE.md are insufficient evidence of source-library role: the README instructs copying exactly those files into a product repo, so their presence never identifies the Aegis source; source-library role requires the source-package landmarks (a '# Project Aegis' README.md, docs/skills-catalog.md, scripts/validate-skills.py, artifacts/audits/skill-contract-audit-baseline.json), which are absent here.",
+          "Detects Stage 0 (no docs/project-state.md, no app code) and proposes creating docs/project-state.md INSIDE the current workspace, previewing the COMPLETE initial document (exact path + full initial content, including the first STATE SNAPSHOT) and creating it only after an explicit yes - a decline or ambiguous answer creates nothing.",
+          "Does NOT tell the user this folder is the wrong place, does NOT redirect docs/project-state.md into a sibling directory, and does NOT propose creating a second/sibling app folder or repository merely because the Aegis files are present.",
+          "Routes discovery to requirements-gathering-facilitator BY NAME; once the cold-start file exists, the Stage 1 handoff uses the exact visible invocation line '-> invokes requirements-gathering-facilitator' and asks EXACTLY ONE plain-language business question, then stops for the answer.",
+          "Performs NO implementation, package install, scaffolding, source edit, migration, network action, Git commit, push, or deployment on this reply."
+        ]
+      }
+    },
+    {
+      "id": "regression-actual-project-aegis-source-landmarks-remain-library",
+      "type": "should_trigger",
+      "prompt": "In my current workspace the root README.md opens with the heading '# Project Aegis', and the checkout also contains docs/skills-catalog.md, scripts/validate-skills.py, and artifacts/audits/skill-contract-audit-baseline.json. Is this workspace the Project Aegis skills-library source, or is it a product/consumer repository that just has the skills copied in?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the workspace as the Project Aegis SOURCE-LIBRARY checkout, and explains the decision from the corroborating source-package landmarks that are all present: the '# Project Aegis' README.md, docs/skills-catalog.md, scripts/validate-skills.py, and artifacts/audits/skill-contract-audit-baseline.json.",
+          "Does NOT mistake the source library for a new consumer/product repository despite the absence of application code - for the source library, missing app code is expected and is NOT evidence of a fresh product repo.",
+          "Does NOT create (or propose auto-creating) a product docs/project-state.md merely because there is no app code; the source library is not a Stage 0 product workspace.",
+          "If the user wants to start a product, explains that they should open or create their OWN consumer/product repository (copying the skills in) and does NOT perform that creation, scaffolding, or any write without explicit authorization.",
+          "Reaches the classification from the LOCAL landmarks without requiring a network call, and does not rely on the copied .claude/skills, AGENTS.md, or CLAUDE.md alone as the deciding evidence."
+        ]
+      }
     }
   ]
 }
