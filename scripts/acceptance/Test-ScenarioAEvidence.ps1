@@ -271,6 +271,59 @@ Assert (-not (Test-ZeroCommitCount -ExitCode 0 -StdOut '-1' -StdErr '').Ok) "neg
 Assert (-not (Test-ZeroCommitCount -ExitCode 0 -StdOut '99999999999999999999' -StdErr '').Ok) "overflow value FAILS"
 Assert (-not (Test-ZeroCommitCount -ExitCode 0 -StdOut '3' -StdErr '').Ok) "unexpected positive count FAILS"
 
+# --- Part 6: owned-run-root cleanup proves deletion (PR77 Finding 4) ------------------
+# Remove-OwnedRunRoot may report success ONLY when deletion is proven complete: the
+# ownership/run-id/containment refusals stay intact, a deletion exception returns
+# $false, and after Remove-Item the root must be verified truly absent.
+Write-Host "`nPart 6 - owned-run-root cleanup proves deletion"
+$MarkerFileName = '.scenario-a-run-id'
+function New-OwnedRunRootFixture { param([string] $Tag, [string] $RunId)
+    $base = New-TmpDir "own-$Tag"
+    $root = Join-Path $base 'scenario-a-run-fixture'
+    New-Item -ItemType Directory -Force -Path $root | Out-Null
+    [System.IO.File]::WriteAllText((Join-Path $root $MarkerFileName), "scenario-a-evidence-harness`nrun-id: $RunId`ncreated: fixture`n", $Utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $root 'payload.txt'), "evidence`n", $Utf8NoBom)
+    return $root
+}
+# a correctly marked, owned directory is deleted, and only then is $true returned
+$ridOk = [guid]::NewGuid().ToString('N')
+$rootOk = New-OwnedRunRootFixture 'ok' $ridOk
+$resOk = Remove-OwnedRunRoot -Root $rootOk -ExpectedRunId $ridOk -MarkerName $MarkerFileName -SkillsRepoRoot $SkillsRepoRoot
+Assert ($resOk -eq $true) 'a correctly marked, owned run root is deleted and returns $true'
+Assert (-not (Test-Path -LiteralPath $rootOk)) 'the deleted run root is verified truly absent'
+# a missing ownership marker refuses deletion
+$ridNoMk = [guid]::NewGuid().ToString('N')
+$rootNoMk = New-OwnedRunRootFixture 'nomarker' $ridNoMk
+Remove-Item -LiteralPath (Join-Path $rootNoMk $MarkerFileName) -Force
+$resNoMk = Remove-OwnedRunRoot -Root $rootNoMk -ExpectedRunId $ridNoMk -MarkerName $MarkerFileName -SkillsRepoRoot $SkillsRepoRoot
+Assert ($resNoMk -eq $false) 'a missing ownership marker refuses deletion (returns $false)'
+Assert (Test-Path -LiteralPath $rootNoMk) 'the unmarked directory is left in place'
+# a mismatched marker run-id refuses deletion
+$rootBadId = New-OwnedRunRootFixture 'badid' ([guid]::NewGuid().ToString('N'))
+$resBadId = Remove-OwnedRunRoot -Root $rootBadId -ExpectedRunId ([guid]::NewGuid().ToString('N')) -MarkerName $MarkerFileName -SkillsRepoRoot $SkillsRepoRoot
+Assert ($resBadId -eq $false) 'a mismatched marker run-id refuses deletion (returns $false)'
+Assert (Test-Path -LiteralPath $rootBadId) 'the mismatched-run-id directory is left in place'
+# Windows-specific: a deletion FAILURE (an open exclusive-share handle) must return
+# $false and leave the residual state detectable - success is never reported unproven.
+if ($OnWindows) {
+    $ridLock = [guid]::NewGuid().ToString('N')
+    $rootLock = New-OwnedRunRootFixture 'locked' $ridLock
+    $lockedFile = Join-Path $rootLock 'locked.txt'
+    [System.IO.File]::WriteAllText($lockedFile, "held open`n", $Utf8NoBom)
+    $handle = [System.IO.File]::Open($lockedFile, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::None)
+    try {
+        $resLock = Remove-OwnedRunRoot -Root $rootLock -ExpectedRunId $ridLock -MarkerName $MarkerFileName -SkillsRepoRoot $SkillsRepoRoot
+        Assert ($resLock -eq $false) 'a failed deletion (locked file) returns $false, never unproven success'
+        Assert (Test-Path -LiteralPath $rootLock) 'residual state is detected: the root still exists after the failed deletion'
+    } finally {
+        $handle.Dispose()
+    }
+} else {
+    # Unsupported OS for this case: exclusive-share file locking blocking deletion is
+    # Windows-specific. Report NOT RUN explicitly; never count it as a pass.
+    Write-Host "  [SKIPPED] Windows-only deletion-failure case NOT RUN on this OS (exclusive-share file locking is Windows-specific); explicitly NOT counted as a pass" -ForegroundColor Yellow
+}
+
 # --- cleanup + summary ----------------------------------------------------------------
 foreach ($d in $tmp) { try { if (Test-Path -LiteralPath $d) { Remove-Item -LiteralPath $d -Recurse -Force -ErrorAction SilentlyContinue } } catch { } }
 Write-Host ""

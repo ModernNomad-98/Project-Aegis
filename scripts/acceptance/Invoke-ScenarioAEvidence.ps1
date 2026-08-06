@@ -538,7 +538,12 @@ function Test-SpecArtifact {
 # ---------------------------------------------------------------------------
 # Cleanup: delete ONLY a run directory this run created and can PROVE it owns via
 # a matching ownership marker. Never Remove-Item -Recurse an unverified directory,
-# and never anything inside the skills repo. Returns $true only if it deleted.
+# and never anything inside the skills repo. Returns $true ONLY when the deletion
+# is PROVEN complete: Remove-Item ran with -ErrorAction Stop inside try/catch (a
+# deletion exception is reported and returns $false), and Test-Path then verified
+# the root is truly absent (residual state is reported and returns $false). The
+# function never throws into the caller's finally block, and it never widens the
+# directory it is permitted to remove.
 # ---------------------------------------------------------------------------
 function Remove-OwnedRunRoot {
     param(
@@ -564,7 +569,20 @@ function Remove-OwnedRunRoot {
         Write-Host ("Cleanup REFUSED: ownership marker run-id in '{0}' does not match this run - not deleting." -f $Root)
         return $false
     }
-    Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction SilentlyContinue
+    # Deletion must be PROVEN, never assumed: a swallowed Remove-Item failure must
+    # not report success while residual state remains on disk.
+    try {
+        Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction Stop
+    } catch {
+        Write-Host ("Cleanup FAILED: deleting '{0}' threw: {1} - residual state may remain; reporting failure instead of unproven success." -f $Root, $_.Exception.Message)
+        return $false
+    }
+    $residual = $true
+    try { $residual = [bool](Test-Path -LiteralPath $Root) } catch { $residual = $true }   # cannot verify -> fail closed
+    if ($residual) {
+        Write-Host ("Cleanup INCOMPLETE: '{0}' still exists after Remove-Item - residual state left in place; reporting failure." -f $Root)
+        return $false
+    }
     return $true
 }
 
@@ -909,9 +927,9 @@ finally {
     } else {
         $removed = Remove-OwnedRunRoot -Root $OwnedRunRoot -ExpectedRunId $RunId -MarkerName $MarkerName -SkillsRepoRoot $SkillsRepoRoot
         if ($removed) {
-            Write-Host "Cleaned up the owned run directory (ownership marker verified; run passed; -KeepEvidence not set)."
+            Write-Host "Cleaned up the owned run directory (ownership marker verified; deletion verified complete; run passed; -KeepEvidence not set)."
         } else {
-            Write-Host "Left the work area in place (cleanup found nothing it could prove it owned)."
+            Write-Host "Left the work area in place (cleanup could not prove ownership or could not prove complete deletion - see the message above)."
         }
     }
 }
