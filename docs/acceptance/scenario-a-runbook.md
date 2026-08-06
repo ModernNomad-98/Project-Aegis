@@ -222,7 +222,7 @@ required before any defect is called behaviorally resolved. Evals below live in
 | AR-A-004 unrelated approvals bundled | P1 | F,C | eval `should-not-batch-high-risk-actions`; `recording-and-authority.md` §1 (never-batched list) |
 | AR-A-005 append-only history proposed for rewrite | P1 | G | eval `edge-immutable-history-is-append-only-placeholder-preserved`; template rules 2/§mutability; deterministic audit STATE-002/003; **harness append-only check** |
 | AR-A-006 scope agreement → build authority | P0 | C | eval `should-not-treat-scope-acceptance-as-build-authority`; `recording-and-authority.md` §2; deterministic audit **APPR-002 1→0** on the template |
-| AR-A-007 `(none yet)` placeholder proposed for replacement | P1 | G,D | eval `edge-immutable-history-is-append-only-placeholder-preserved` (placeholder branch); template rule 9; deterministic audit STATE-001 (clean); **harness placeholder handling** |
+| AR-A-007 `(none yet)` placeholder proposed for replacement | P1 | G,D | eval `edge-immutable-history-is-append-only-placeholder-preserved` (placeholder branch); template rule 9; deterministic audit STATE-001 reports 2 semantic-review candidates on the required preserved `(none yet)` rows — human review confirms they are use-versus-mention false positives (rule 9 requires preservation, and the harness proves later records APPEND after them rather than replacing them); **harness placeholder handling** + `Test-ScenarioAEvidence.ps1` Part 7 template parity |
 | AR-A-008 stage claimed before snapshot recorded | P1 | D,H | eval `edge-recorded-stage-lags-until-snapshot-appended`; contract Inputs §2 + template awaiting-record; **harness SS-003-absent check** |
 | AR-A-009 ellipses in "exact" previews | P1 | D | eval `edge-exact-preview-is-byte-for-byte-no-ellipsis`; contract Capability 4 (byte-for-byte) + `recording-and-authority.md` §3 |
 | AR-A-010 discovery exited before durable brief recorded | P1 | D,H | eval `edge-stage1-durable-before-stage2`; contract Capability 2 Stage 1 + Inputs §2 |
@@ -237,6 +237,25 @@ required before any defect is called behaviorally resolved. Evals below live in
 | AR-A-019 acceptance assumed tracked files / empty diffs | P1 | H | **`Invoke-ScenarioAEvidence.ps1`** — untracked enumeration (`git status --short --untracked-files=all` + `git ls-files --others --exclude-standard`) and `git diff --no-index` exit-1 handling; this runbook |
 | AR-A-020 no per-append external evidence | P1 | H | **`Invoke-ScenarioAEvidence.ps1`** — external copy + SHA-256 + prior-vs-current comparison + pass/fail log per append; no commits in the disposable repo |
 | AR-A-021 stale projection contradicts spec/log | P1 | G | eval `edge-stale-projection-refreshed-before-completion`; template §mutability + conflict rule; deterministic audit **STATE-005 2→0** on the template |
+
+**STATE-001 disposition (human semantic review recorded).** The current generated audit
+baseline **intentionally retains two `STATE-001` P0 semantic-review candidates**, anchored
+to the copyable template's required preserved `(none yet)` Decision and Approval
+empty-state rows (`project-state-template.md:171` and `:183`). Semantic-candidate severity
+is a **prioritization signal, not mechanical proof** — the audit tool queues such readings
+and has not semantically reviewed them itself. Both findings **have now been manually
+reviewed by a human**: both are **false positives** of STATE-001's documented
+use-versus-mention limitation, firing on **required preserved empty-state rows** —
+template **rule 9 is the controlling contract** (the empty-state placeholder row is
+preserved; the first real record is appended AFTER it; the placeholder is never edited
+into a real record). `Test-ScenarioAEvidence.ps1` **Part 7** (cold-start placeholder
+parity; no pre-populated `PS-*`/`A-*` data row) and the **append-only harness checks**
+provide the deterministic regression evidence that later records append after those rows
+rather than replacing them. The audit artifacts remain **unchanged** because the findings
+and the detector's output are being **truthfully retained rather than suppressed**, with
+this recorded disposition as the human review of record. **No behavioral proof is
+claimed** by this disposition; the fresh-session Scenario A behavioral acceptance
+(Control I below) remains required.
 
 **Live PR findings (also covered):** stage detection inspects the recorded owner gate →
 eval `edge-resume-spec-recorded-but-owners-missing-stays-stage2`; terminal result awaits
