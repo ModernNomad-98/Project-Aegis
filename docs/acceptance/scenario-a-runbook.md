@@ -91,8 +91,13 @@ pwsh -NoProfile -File "scripts/acceptance/Invoke-ScenarioAEvidence.ps1" -KeepEvi
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Invoke-ScenarioAEvidence.ps1" -KeepEvidence
 ```
 
-Both editions produce byte-identical evidence (no-BOM UTF-8 writes; byte-exact fixture
-copies), so the recorded SHA-256 values match across editions and machines.
+Windows PowerShell 5.1 and PowerShell 7 operating on the **same checkout bytes** produce
+equivalent evidence behavior (no-BOM UTF-8 writes; byte-exact fixture copies). Each
+recorded raw SHA-256 authenticates **that run's exact archived bytes** — the raw archive
+hashes are not normalized, so an LF checkout and a CRLF checkout archive different bytes
+and record **different raw values**. Cross-line-ending equivalence is provided by the
+fixture manifest's **normalized-LF hashes** (which the harness verifies per step), not by
+the raw values; the raw values remain the byte-exact evidence of what that run archived.
 
 ### Parameters
 

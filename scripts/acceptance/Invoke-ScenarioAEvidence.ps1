@@ -78,8 +78,13 @@
     * Every file WRITE uses an explicit no-BOM UTF-8 encoder via
       [System.IO.File]::WriteAllText/AppendAllText, so 5.1 (whose `-Encoding UTF8`
       emits a BOM) and 7 (whose `-Encoding UTF8` is BOM-less) produce byte-identical
-      output. Fixture COPIES use Copy-Item (byte-exact), so archived SHA-256 values are
-      stable across editions and machines.
+      output: operating on the SAME CHECKOUT BYTES, Windows PowerShell 5.1 and
+      PowerShell 7 have equivalent evidence behavior. Fixture COPIES use Copy-Item
+      (byte-exact), so each raw SHA-256 recorded in sha256sums.txt authenticates THAT
+      RUN'S exact archived bytes. The raw archive hashes are NOT normalized: an LF
+      checkout and a CRLF checkout archive different bytes and record different raw
+      values. Cross-line-ending equivalence is provided by the fixture manifest's
+      normalized-LF hashes (Get-NormalizedSha256), not by the raw values.
     * Every file READ uses [System.IO.File]::ReadAllText (BOM auto-detected, UTF-8
       default), so an accidental BOM would not corrupt parsing.
 
