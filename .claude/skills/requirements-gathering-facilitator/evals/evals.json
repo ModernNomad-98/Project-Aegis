@@ -71,6 +71,62 @@
           "Elicitation is complete, so the facilitation phase is over."
         ]
       }
+    },
+    {
+      "id": "regression-clinic-discovery-one-question",
+      "type": "should_trigger",
+      "prompt": "I run a small physiotherapy clinic that tracks appointments in a paper diary, which causes double bookings and lost no-shows. Help me gather what a simple app actually needs to do.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs the interactive cadence contract: asks EXACTLY ONE plain-language discovery question this turn, then stops and waits for the reply.",
+          "Does NOT present the question bank, a numbered questionnaire, or several open questions, and does NOT ask a compound question.",
+          "Treats the elicitation-sheet question bank as an INTERNAL checklist of coverage areas, never displayed to the stakeholder as a questionnaire.",
+          "Produces an INTERACTIVE TURN (discovery status + one next question + explicit stop), not the final requirements brief."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-many-areas-one-highest-value",
+      "type": "should_trigger",
+      "prompt": "For the physiotherapy clinic app a lot is still unknown: who books today, how many therapists, self-booking vs staff-only, reminder timing, no-show tracking, and cancellation rules. Keep gathering.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Chooses the ONE highest-value unanswered item from the internal checklist and asks only that question this turn.",
+          "Does NOT ask the remaining discovery items this turn (no question-bank dump, no numbered list).",
+          "Does NOT produce a final requirements brief while spec-blocking discovery questions remain.",
+          "Updates its internal checklist from the answer and defers the rest to later single-question turns."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-fact-plus-decision-split",
+      "type": "should_trigger",
+      "prompt": "For the clinic app: front-desk staff do all the booking (that's just how it is), and I've decided we should include cancel and reschedule in the first version.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes in its output the FACT (front-desk staff do the booking, which feeds the brief) from the user-owned DECISION (include cancel/reschedule in v1).",
+          "Returns the user-owned decision to the orchestrator for its VISIBLE pending-decision batch rather than recording it itself.",
+          "Asks only ONE next discovery question, then stops.",
+          "Performs NO file write and makes no recording claim - this is an interactive turn, not a recording checkpoint."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-final-brief-when-unblocked",
+      "type": "should_trigger",
+      "prompt": "We've now worked through every blocking question for the clinic app one at a time. Produce the requirements brief.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the FINAL REQUIREMENTS BRIEF only because no spec-blocking discovery question remains unresolved.",
+          "Separates confirmed / assumed / unknown, and any remaining open questions contain no unresolved spec blocker.",
+          "States that the brief feeds product-spec-writer as the next step.",
+          "Does NOT invoke product-spec-writer itself, does NOT advance the recorded project stage, and does NOT authorize implementation."
+        ]
+      }
     }
   ]
 }

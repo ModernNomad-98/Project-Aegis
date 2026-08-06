@@ -524,6 +524,79 @@
           "Does not edit or overwrite the existing A-001 row; any change is a new dated superseding approval."
         ]
       }
+    },
+    {
+      "id": "regression-clinic-stage1-handoff-one-question",
+      "type": "should_trigger",
+      "prompt": "I run a small physiotherapy clinic. We keep appointments in a paper diary, which causes double bookings and makes no-shows hard to track. I think a simple app may help, but I am not a developer and do not know where to start. Guide me through defining the product until design is the next step. Do not implement the application yet. (The cold-start docs/project-state.md has just been previewed, approved, and created this session.)",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Hands Stage 1 to requirements-gathering-facilitator under the interactive delegated-skill protocol while staying the conversational owner; it does NOT hand the turn over for the facilitator to run its own question script.",
+          "Visibly announces the real execution as the exact invocation line '-> invokes requirements-gathering-facilitator' using the exact repository skill name; a friendly gloss never replaces it, and 'the requirements skill' / 'the requirements step' alone is insufficient.",
+          "Asks EXACTLY ONE plain-language stakeholder/business question (one information or decision target) and then stops to wait for the answer.",
+          "Does NOT display the question bank or a numbered questionnaire, does NOT say 'answer whichever' / 'take them in any order', and does NOT bundle several subquestions into one turn.",
+          "Records nothing this turn (RECORDING STATUS: NONE THIS TURN) - the cold-start file already exists and no terminal decision has been reached."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-stage1-many-areas-one-question",
+      "type": "should_trigger",
+      "prompt": "For my physiotherapy clinic app, several discovery areas are open at once: who books appointments today, how many therapists you schedule, what a no-show costs you, whether patients self-book, and reminder expectations. Where do we go from here?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Selects and asks only the SINGLE highest-value unanswered discovery question this turn, then stops for the answer.",
+          "Keeps the remaining discovery checklist INTERNAL - it does not output all remaining questions, a numbered list, or a compound question.",
+          "Does NOT produce the final requirements brief while spec-blocking discovery questions remain unresolved.",
+          "Any progress count (e.g. 'question X of Y') is derived from the internal checklist, not conversational memory."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-low-risk-decisions-facts-vs-decisions-batched",
+      "type": "should_trigger",
+      "prompt": "Answers for the clinic app: front-desk staff do all the booking (that's just how it is); we run three therapists (fact); include cancel/reschedule in v1; exclude recurring appointment series from v1; send an SMS reminder 24 hours before with minimal wording and an email fallback; include a simple no-show report; and treat the clinic as HIPAA-covered for design purposes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates FACTS (who books today, number of therapists) - which feed the requirements brief without becoming DECISION rows - from user-owned DECISIONS (scope, behaviour, privacy, workflow, product trade-offs).",
+          "Adds every user-owned product decision (cancel/reschedule in v1; recurring series excluded from v1; SMS 24h-before minimal-wording with email fallback; simple no-show report; treat clinic as HIPAA-covered for design purposes) to the VISIBLE conversation-only pending-decision batch; none is silently omitted.",
+          "Performs NO immediate per-answer write ceremony; the answers accumulate in the pending batch (RECORDING STATUS: NONE THIS TURN) until the checkpoint.",
+          "Treats 'HIPAA-covered for design purposes' as a user-owned privacy/compliance decision for the batch, not as a legal determination.",
+          "Later, at the Stage 1 checkpoint, previews EVERY pending decision as an exact append-only PS-* row (next available IDs derived from the current file) under ONE approval, and never claims the Decision log should remain empty while confirmed product decisions exist."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-stage1-analysis-not-yet-recorded",
+      "type": "should_trigger",
+      "prompt": "I think you understand the clinic app now and the analysis looks done. Are we in Stage 2 / is Stage 1 complete, and can you start defining the product?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes analytical completion from recorded stage completion and says the required lag explicitly: 'The Stage 1 analysis is complete, but the recorded project stage remains Stage 1 until the approved records are written and confirmed.'",
+          "Does NOT say the project is in Stage 2 and does NOT claim Stage 1 is durably complete.",
+          "Does NOT invoke product-spec-writer and does NOT append or claim the Stage 2 snapshot.",
+          "Previews the required records (the requirements brief, the pending PS-* decision rows, and the next STATE SNAPSHOT) and waits for explicit approval; only after those approved writes are confirmed may the recorded stage advance.",
+          "Treats a proposed row as not yet recorded: approval is not the write, and a successful write must be confirmed before the stage changes."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-stage2-owners-unclassified-no-prejudge",
+      "type": "should_trigger",
+      "prompt": "Before Stage 2 has actually started on the clinic app, tell me: will prioritization, a roadmap, and commitment readiness be needed?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps every later Stage 2 owner exactly 'unclassified' in the STAGE-2 OWNERS ledger; it does not predict or preview any owner's verdict before that owner's own classification turn.",
+          "Uses no hedged preview of a verdict - no 'likely applicable', 'probably n/a', 'most likely not', 'expected n/a', or equivalent.",
+          "States that classification happens one owner per turn, only after product-spec-writer completes and its result is separately accepted and recorded, and that each classification explicitly notes no skill was invoked.",
+          "Records each owner's result before moving to the next owner; it does not classify all remaining owners in one pass."
+        ]
+      }
     }
   ]
 }

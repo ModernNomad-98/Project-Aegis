@@ -54,6 +54,25 @@ design — that `product-spec-writer` turns into a specification.
 
 ## Workflow
 
+**Interactive cadence contract — the default output is an INTERACTIVE TURN, not
+the brief.** While discovery is incomplete this skill asks ONE question at a time,
+and the orchestrator
+([`project-orchestrator`](../project-orchestrator/SKILL.md)) stays the
+conversation owner. The question bank in
+[references/elicitation-sheet.md](references/elicitation-sheet.md) is an INTERNAL
+checklist, never shown as a questionnaire. Each turn selects the single
+highest-value unanswered question from that checklist, asks it in plain language,
+and STOPS for the answer — one question means one information or decision target,
+never several open questions, a numbered list, a compound question, or "answer
+whichever" / "take them in any order". Each answer updates the internal checklist.
+Separate facts from decisions: a purely factual answer feeds the brief, while a
+user-owned scope, behaviour, privacy, workflow, or product trade-off is returned
+to the orchestrator for its VISIBLE pending-decision batch (it is not recorded
+here). The numbered steps below are that checklist's coverage areas, worked one
+question per turn — not a batch to present at once. The exact shape of an
+interactive turn, and the FINAL REQUIREMENTS BRIEF that appears only once no
+spec-blocking question remains, are in Output Format.
+
 1. **Restate the ask as a problem, not a solution.** Take the incoming
    request and ask what outcome it's meant to produce. Push the stated
    solution one level up ("you asked for X — what would X let you do
@@ -83,16 +102,36 @@ design — that `product-spec-writer` turns into a specification.
 7. **Assemble the brief.** Consolidate into the structured requirements
    brief (Output Format): the problem, users/jobs, requirements grouped
    by confidence, non-goals, constraints, success measures, conflicts,
-   and open questions. Mark what is known vs assumed vs unknown.
+   and open questions. Mark what is known vs assumed vs unknown. Assemble
+   this FINAL brief only once no spec-blocking discovery question remains
+   unresolved; until then each turn is a single INTERACTIVE TURN.
 8. **Hand off.** State explicitly that the brief feeds
    `product-spec-writer`, and flag which open questions must be answered
-   before a spec can be written.
+   before a spec can be written. Producing the brief does not itself
+   invoke that skill, advance the recorded project stage, or authorize
+   any building — each is a separate, later, human-gated step.
 
 The elicitation question bank (by discovery area), the problem-vs-
 solution ladder, and the brief template:
 [references/elicitation-sheet.md](references/elicitation-sheet.md).
 
 ## Output Format
+
+While discovery is incomplete every turn is an **INTERACTIVE TURN**, not the
+brief:
+
+```
+INTERACTIVE TURN — requirements discovery
+Discovery status: <one or two lines — confirmed / assumed / still unknown>
+Next question:     <exactly ONE plain-language stakeholder question>
+Stop:              wait for the answer — ask nothing else this turn
+Not in this turn:  no second question; no full question bank; no numbered
+                   list; no compound question; no final brief; no product
+                   specification; no stage-advance claim; no write/recording claim
+```
+
+The **FINAL REQUIREMENTS BRIEF** appears only once no spec-blocking discovery
+question remains:
 
 ```
 REQUIREMENTS BRIEF — <feature/initiative>
@@ -125,6 +164,15 @@ Known / assumed / unknown clearly separated
 - [ ] Every requirement is marked confirmed / assumed / to-confirm.
 - [ ] The brief hands off to `product-spec-writer` with blocking open
       questions flagged; it does not itself become the spec.
+- [ ] While any spec-blocking question remains, each turn is ONE INTERACTIVE
+      TURN — exactly one question, then stop; the elicitation-sheet question
+      bank is used as an INTERNAL checklist, never shown as a questionnaire,
+      numbered list, several open questions, or a compound question.
+- [ ] User-owned scope/behaviour/privacy/workflow/product decisions are handed
+      back to the orchestrator's visible pending-decision batch; purely factual
+      answers feed the brief without becoming decisions; the FINAL brief appears
+      only when no spec-blocking question remains and does not advance the
+      recorded stage or authorize building.
 
 ## Gotchas
 
