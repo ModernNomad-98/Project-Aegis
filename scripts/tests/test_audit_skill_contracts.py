@@ -656,9 +656,121 @@ def test_route003_branch_aware() -> None:
     # sanity: evidence-state words after NOT COMMIT-ABLE still describe a REAL guard
     # ("returns NOT COMMIT-ABLE absent evidence" is case (15) positive_nca, asserted clean above).
 
-    ok("ROUTE-003 v1.11.0: shared routing markers; POSITIVE guard with negation checks BOTH sides of "
+    ok("ROUTE-003 v1.12.0: shared routing markers; POSITIVE guard with negation checks BOTH sides of "
        "every phrase (pre-negated, post-disclaimed, and negated NOT COMMIT-ABLE all rejected); "
-       "verdict = a classification act with its result")
+       "verdict = a classification act with its result, itself negation-checked at match level")
+
+
+def test_route003_verdict_negation() -> None:
+    """PR77 final correction (Finding 3): a NEGATED classification verdict is
+    not a recorded verdict. Negation is checked at MATCH level, before AND
+    after the classification act/result, so 'not classified applicable',
+    'never classify … applicable', 'without classifying … applicable',
+    'classified applicable but not recorded', and 'classified n/a — not
+    actually recorded' no longer clear AEGIS-035 — while the valid forms
+    ('classified applicable', 'classified n/a', 'recorded as n/a',
+    'n/a-recorded') stay clean, and a negated match neither poisons nor
+    validates an unrelated positive match."""
+    gaps = audit_mod.Audit.stage2_commitments_route_gaps
+    guarded_route = (
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` "
+        "(readiness mode).\n"
+    )
+
+    # (1) 'was not classified applicable' negates the classification act.
+    g1 = gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` was not classified applicable.\n"
+        + guarded_route
+    )
+    assert any("AEGIS-035" in x for x in g1), (
+        "'was not classified applicable' is a NEGATED verdict, not a recorded one "
+        "-> AEGIS-035 must fire"
+    )
+    assert not any("AEGIS-044" in x for x in g1), (
+        "the commitments route is guarded -> only the owner gap may fire"
+    )
+
+    # (2) 'never classify … applicable' is a prohibition, not a verdict.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Never classify `roadmap-under-uncertainty-planner` applicable on a "
+        "deadline alone.\n" + guarded_route
+    )), "'never classify … applicable' is a prohibition, not a recorded verdict"
+
+    # (3) 'without classifying … applicable' records nothing.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Proceeds without classifying `roadmap-under-uncertainty-planner` "
+        "applicable.\n" + guarded_route
+    )), "'without classifying … applicable' records nothing -> AEGIS-035 must fire"
+
+    # (4) negation AFTER the act/result: the RECORDING is disclaimed.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified applicable "
+        "but not recorded.\n" + guarded_route
+    )), "'classified applicable but not recorded' disclaims the record -> AEGIS-035"
+
+    # (5) 'classified n/a — not actually recorded' is disclaimed too.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a — not "
+        "actually recorded.\n" + guarded_route
+    )), "'classified n/a — not actually recorded' disclaims the record -> AEGIS-035"
+
+    # (6) the four valid verdict forms remain clean positives.
+    for verdict_line in (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified applicable.\n",
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a (one bounded release).\n",
+        "- Roadmap: `roadmap-under-uncertainty-planner` recorded as n/a (no sequencing decision).\n",
+        "- Roadmap owner ledger: `roadmap-under-uncertainty-planner` n/a-recorded (reason).\n",
+    ):
+        assert gaps(verdict_line + guarded_route) == [], (
+            f"a genuine positive verdict must stay clean: {verdict_line!r}"
+        )
+
+    # (7) a negated match must not POISON a genuine positive beside it: one
+    #     genuine positive, non-negated recorded verdict satisfies the check.
+    assert gaps(
+        "- History: an earlier draft was not classified applicable; this turn "
+        "`roadmap-under-uncertainty-planner` classified applicable and recorded.\n"
+        + guarded_route
+    ) == [], "a negated candidate must not poison the genuine positive beside it"
+
+    # (7b) …nor across lines: a negated mention elsewhere never invalidates a
+    #      clean verdict on its own line.
+    assert gaps(
+        "- Note: `roadmap-under-uncertainty-planner` was not classified applicable at intake.\n"
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a (reason).\n"
+        + guarded_route
+    ) == [], "a negated mention elsewhere must not invalidate the recorded verdict line"
+
+    # (8) …and negated matches alone must never VALIDATE the check.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` was not classified applicable; "
+        "never classify `roadmap-under-uncertainty-planner` applicable here.\n"
+        + guarded_route
+    )), "negated matches alone must never validate the roadmap-owner check"
+
+    # (9) PIN: the exact current project-orchestrator Roadmap verdict line is a
+    #     must-remain-clean positive under the corrected engine.
+    pinned = (
+        "    Either way the turn ends with `roadmap-under-uncertainty-planner` "
+        "classified applicable or classified `n/a` (reason) — the recorded verdict, "
+        "never an implicit skip."
+    )
+    live = (REAL_REPO / ".claude" / "skills" / "project-orchestrator" / "SKILL.md"
+            ).read_text(encoding="utf-8")
+    assert pinned in live, (
+        "the pinned project-orchestrator Roadmap verdict line has drifted from the "
+        "live contract — re-pin it here deliberately"
+    )
+    assert gaps(pinned + "\n" + guarded_route) == [], (
+        "the live project-orchestrator Roadmap verdict line must remain a clean "
+        "ROUTE-003 positive"
+    )
+
+    ok("ROUTE-003 verdict negation: pre-negated (not / never classify / without "
+       "classifying) and post-disclaimed (but not recorded / not actually recorded) "
+       "candidates are rejected; the four valid forms and the pinned live Roadmap "
+       "verdict line stay clean; a negated match neither poisons nor validates an "
+       "unrelated positive")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------
@@ -1251,6 +1363,7 @@ def main() -> int:
     test_stage2_segment()
     test_stage2_malformed_and_leakage()
     test_route003_branch_aware()
+    test_route003_verdict_negation()
     test_rule_inventory_complete(a)
     test_real_inventory_includes_zero_hit_rules()
     test_provenance_snapshot(a)
