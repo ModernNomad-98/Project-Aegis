@@ -1,10 +1,10 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.11.0 (engine sha256 `3dbd5fba714c1711…`)
-- Repo SHA: `5a026112599597f5cb16f3ba800ac32eb6e1f711` (branch `fix/aegis-stage2-evidence-driven-route`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `e800ccf3f04b2ad5827d8887f14381029dada27341684af41edad100fd36108a` (704 files, 3922819 bytes)
+- Tool: `audit-skill-contracts` v1.12.0 (engine sha256 `c886b27aee860aed…`)
+- Repo SHA: `f238cde7c91efb0a054b07b20c865fbac7a9743b` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `c21d284f8e125de9a7e0019a38a02a72dcff9c364b92ee3b2162afbaff188a0a` (704 files, 3923458 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **412** (316 mechanical, 96 semantic-review candidates)
+- Findings: **414** (316 mechanical, 98 semantic-review candidates)
 
 A baseline finding is EXPECTED here: this report freezes the state of
 the corpus BEFORE remediation. A finding below is not a tool failure,
@@ -23,7 +23,7 @@ mechanically proven defects.
 
 | Severity | Count |
 |---|---:|
-| P0 | 0 |
+| P0 | 2 |
 | P1 | 96 |
 | P2 | 5 |
 | info | 311 |
@@ -34,6 +34,7 @@ mechanically proven defects.
 | EVAL-004 | 5 |
 | ROUTE-002 | 311 |
 | SIDE-004 | 82 |
+| STATE-001 | 2 |
 | VOCAB-002 | 4 |
 
 ## Findings (P0/P1 + all semantic-review candidates)
@@ -93,6 +94,8 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:332` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:171` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
+- **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:183` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded database' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/query-plan-reader/SKILL.md` (owner: query-plan-reader; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'execution EXECUTES the write' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -237,7 +240,7 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: accepted×20, approved scope×4, commit-able×9, complete×40, deployed×1, durable×2, proposed×7, ready×3
+- `project-orchestrator`: accepted×18, approved scope×4, commit-able×9, complete×40, deployed×1, durable×2, proposed×7, ready×3
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2

@@ -1,14 +1,14 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.11.0",
-  "engine_sha256": "3dbd5fba714c17114a73b35bb451bd3f8547a761c1c7129c8b5cc2e109dcac01",
-  "repo_sha": "5a026112599597f5cb16f3ba800ac32eb6e1f711",
-  "branch": "fix/aegis-stage2-evidence-driven-route",
+  "version": "1.12.0",
+  "engine_sha256": "c886b27aee860aedab874b1a9b62c5b5ef0d2569b0d073ee512d733b8575233b",
+  "repo_sha": "f238cde7c91efb0a054b07b20c865fbac7a9743b",
+  "branch": "work/pr77-final-correction",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
   "audited_file_count": 704,
-  "audited_byte_count": 3922819,
-  "corpus_content_hash": "e800ccf3f04b2ad5827d8887f14381029dada27341684af41edad100fd36108a",
+  "audited_byte_count": 3923458,
+  "corpus_content_hash": "c21d284f8e125de9a7e0019a38a02a72dcff9c364b92ee3b2162afbaff188a0a",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {

@@ -1,15 +1,15 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.11.0",
-    "engine_sha256": "3dbd5fba714c17114a73b35bb451bd3f8547a761c1c7129c8b5cc2e109dcac01",
-    "repo_sha": "5a026112599597f5cb16f3ba800ac32eb6e1f711",
-    "branch": "fix/aegis-stage2-evidence-driven-route",
+    "version": "1.12.0",
+    "engine_sha256": "c886b27aee860aedab874b1a9b62c5b5ef0d2569b0d073ee512d733b8575233b",
+    "repo_sha": "f238cde7c91efb0a054b07b20c865fbac7a9743b",
+    "branch": "work/pr77-final-correction",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 704,
-    "audited_byte_count": 3922819,
-    "corpus_content_hash": "e800ccf3f04b2ad5827d8887f14381029dada27341684af41edad100fd36108a",
+    "audited_byte_count": 3923458,
+    "corpus_content_hash": "c21d284f8e125de9a7e0019a38a02a72dcff9c364b92ee3b2162afbaff188a0a",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
@@ -39,9 +39,9 @@
     },
     "skill_count": 184,
     "rule_count": 27,
-    "finding_count": 412,
+    "finding_count": 414,
     "by_severity": {
-      "P0": 0,
+      "P0": 2,
       "P1": 96,
       "P2": 5,
       "info": 311
@@ -51,10 +51,11 @@
       "EVAL-004": 5,
       "ROUTE-002": 311,
       "SIDE-004": 82,
+      "STATE-001": 2,
       "VOCAB-002": 4
     },
     "mechanical_count": 316,
-    "semantic_review_candidates": 96
+    "semantic_review_candidates": 98
   },
   "rule_inventory": [
     {
@@ -203,7 +204,7 @@
         "AEGIS-006"
       ],
       "limits": "a placeholder shown as an illustration of what NOT to write fires too (use vs mention)",
-      "hit_count": 0
+      "hit_count": 2
     },
     {
       "id": "STATE-002",
@@ -347,7 +348,7 @@
         "AEGIS-044",
         "AEGIS-045"
       ],
-      "limits": "PER-ROUTE (v1.11.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE \u2014 EVERY guard phrase (NOT COMMIT-ABLE included) gets a negation check BOTH before and after the phrase, so 'not readiness mode', 'without a NOT COMMIT-ABLE guard', 'readiness mode not required', and 'readiness mode skipped' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE \u2014 a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') \u2014 on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of \u2026') all do NOT count; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes",
+      "limits": "PER-ROUTE (v1.12.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker \u2014 reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE \u2014 EVERY guard phrase (NOT COMMIT-ABLE included) gets a negation check BOTH before and after the phrase, so 'not readiness mode', 'without a NOT COMMIT-ABLE guard', 'readiness mode not required', and 'readiness mode skipped' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE \u2014 a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') \u2014 on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of \u2026') all do NOT count; and (v1.12.0) EVERY candidate verdict phrase gets a MATCH-LEVEL negation check on BOTH sides of the classification act/result \u2014 'not classified applicable', 'never classify \u2026 applicable', 'without classifying \u2026 applicable', 'classified applicable but not recorded', and 'classified n/a \u2014 not actually recorded' are all rejected, one genuine positive non-negated recorded verdict still satisfies the check, a negated match neither poisons nor validates an unrelated positive match, and the verdict VALUE token 'not applicable' is never read as act negation; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a genuine recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes; negation windows are bounded (~24 chars), so a negator separated from the act by longer filler is missed",
       "hit_count": 0
     },
     {
@@ -4949,6 +4950,40 @@
       "mechanical": false
     },
     {
+      "rule": "STATE-001",
+      "severity": "P0",
+      "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
+      "line": 171,
+      "owning_skill": "project-orchestrator",
+      "related_skills": [],
+      "evidence": "append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)",
+      "family": "state-append",
+      "aegis_map": [
+        "AEGIS-002",
+        "AEGIS-006"
+      ],
+      "remediation_owner": "project-orchestrator",
+      "confidence": "high",
+      "mechanical": false
+    },
+    {
+      "rule": "STATE-001",
+      "severity": "P0",
+      "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
+      "line": 183,
+      "owning_skill": "project-orchestrator",
+      "related_skills": [],
+      "evidence": "append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)",
+      "family": "state-append",
+      "aegis_map": [
+        "AEGIS-002",
+        "AEGIS-006"
+      ],
+      "remediation_owner": "project-orchestrator",
+      "confidence": "high",
+      "mechanical": false
+    },
+    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/promotion-packet-writer/SKILL.md",
@@ -7637,7 +7672,7 @@
       "targeted": 1
     },
     "project-orchestrator": {
-      "accepted": 20,
+      "accepted": 18,
       "approved scope": 4,
       "commit-able": 9,
       "complete": 40,
