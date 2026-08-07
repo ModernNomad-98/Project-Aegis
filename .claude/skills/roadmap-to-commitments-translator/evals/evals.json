@@ -10,9 +10,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Separates commit-able items (high-confidence, capacity-backed, dependency-clear) from aspirational, keeping the committed subset visibly smaller than the roadmap.",
-          "Grounds commitments in velocity evidence minus maintenance/interrupts with a buffer, not aspiration.",
+          "Separates commit-able items (high-confidence, capacity-backed, dependency-clear) from aspirational, keeping the commit-able subset visibly smaller than the roadmap.",
+          "Grounds the commit-able items in velocity evidence minus maintenance/interrupts with a buffer, not aspiration.",
           "Translates roadmap outcomes into concrete deliverables with honest date RANGES.",
+          "Because no named human approver or durable approval reference is present, presents the commit-able items as the NON-BINDING Candidate committable set (Commitment status = HUMAN DECISION REQUIRED) and keeps Committed = none; a binding committed set is emitted only once a named human approves it with the approver and approval reference recorded.",
           "States the not-committed gap explicitly with reasons.",
           "Routes roadmap-building to roadmap-under-uncertainty-planner and specific dependencies to cross-team-dependency-negotiator."
         ]
@@ -39,10 +40,11 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Commits with honest date ranges rather than false-precise single dates on multi-week uncertain work.",
+          "Uses honest date RANGES rather than false-precise single dates on multi-week uncertain work.",
           "Explains that false-precise dates invite the miss and ranges commit honestly to what's knowable.",
-          "Keeps the commitments capacity-backed and buffered.",
-          "Offers precision only where confidence genuinely supports it."
+          "Keeps the items capacity-backed and buffered.",
+          "Offers precision only where confidence genuinely supports it.",
+          "Places the dated items in the non-binding Candidate committable set unless a named human has approved a binding commitment (with the approver and approval reference recorded); it does not manufacture a binding committed set with dates for a slide absent that approval."
         ]
       }
     },
@@ -69,6 +71,106 @@
         "assertions": [
           "Does not invoke roadmap-to-commitments-translator: building and sequencing the roadmap by horizon/confidence is roadmap-under-uncertainty-planner.",
           "This skill extracts commitments FROM a roadmap; it doesn't build one."
+        ]
+      }
+    },
+    {
+      "id": "edge-readiness-not-commitable-missing-evidence",
+      "type": "should_trigger",
+      "prompt": "We have an approved product idea and the board wants a firm ten-week delivery date. There's no architecture yet, no dependency discovery, and we've never shipped together so there's no velocity to measure. Give me the commitment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs in readiness-assessment mode and returns NOT COMMIT-ABLE because the required evidence (architecture/design, dependency discovery, technical planning, measured throughput, secured dependencies) is absent.",
+          "In the output, Capacity basis is 'none' (naming the missing capacity evidence) and Committed is 'none' - no velocity figure and no date range are invented.",
+          "Reports dependency state as 'unknown - discovery incomplete', NOT 'none verified'; keeps the ten-week date an unverified target; names the missing evidence and the reassessment point.",
+          "Does not manufacture a commitment from approved scope, a target date, gross available hours, nominal team size, or an authorization."
+        ]
+      }
+    },
+    {
+      "id": "should-not-equate-commitable-with-committed",
+      "type": "should_trigger",
+      "prompt": "Architecture is done, dependencies are secured, and we have three sprints of velocity. So the March release is committed now, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States that even with sufficient evidence, COMMIT-ABLE only means a named human may now make the commitment decision - it is not itself a delivery promise.",
+          "Keeps Commitment status = 'HUMAN DECISION REQUIRED' and Committed = 'none - awaiting named human decision'; does not auto-label the March date or scope as committed.",
+          "Does not treat implementation authorization or governance approval as delivery evidence.",
+          "Presents the non-binding Candidate committable set with honest date ranges for the human to decide on, distinct from Committed."
+        ]
+      }
+    },
+    {
+      "id": "readiness-commitable-does-not-require-human-decision",
+      "type": "should_trigger",
+      "prompt": "Readiness question only. The immutable records show an approved current product scope; the architecture and design are signed off; there is a written technical implementation plan; dependency discovery is COMPLETE and the two external dependencies are secured; we have three sprints of measured velocity giving a defensible capacity basis; risk and uncertainty have been assessed; the stakeholder target is a Q3 window. The sponsor has NOT formally approved committing yet. Judged purely on the technical evidence, are we readiness-clear to commit?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "With EVERY required technical evidence category present (approved current scope, architecture/design, a technical implementation plan, completed dependency discovery with dependencies secured, measured velocity giving a defensible capacity basis, and risk/uncertainty evidence), returns Readiness = COMMIT-ABLE.",
+          "Judges readiness on TECHNICAL evidence only - the absence of a human commitment decision does NOT force NOT COMMIT-ABLE.",
+          "Sets Commitment status = HUMAN DECISION REQUIRED and Committed = none (COMMIT-ABLE is evidence sufficiency, not a promise).",
+          "Shows the non-binding Candidate committable set (deliverables + honest date RANGES) for the named human to decide on, distinct from Committed; emits NO final commitment (the human decision is required only before a FINAL commitment)."
+        ]
+      }
+    },
+    {
+      "id": "readiness-not-commitable-when-one-technical-category-missing",
+      "type": "should_trigger",
+      "prompt": "Readiness question only. The immutable records show an approved current product scope; the architecture and design are signed off; dependency discovery is complete and dependencies secured; we have three sprints of measured velocity and a defensible capacity basis; risk is assessed; the target is a Q3 window. There is NO technical implementation plan yet. The sponsor is undecided. Are we readiness-clear to commit?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns Readiness = NOT COMMIT-ABLE because one required technical evidence category is absent.",
+          "Names the missing category explicitly: the technical implementation plan / technical planning.",
+          "Reflects the NOT COMMIT-ABLE mode (Committed = none; the Q3 target kept as an unverified target only; records when to reassess) but PRESERVES the verified Capacity basis - the three sprints of measured velocity minus maintenance/interrupts with a buffer are shown as the capacity calculation, NOT discarded to 'none', because capacity is not the missing category.",
+          "Does NOT force Capacity basis to 'none' when a defensible capacity basis exists; 'none - missing <named capacity evidence>' is reserved for when the capacity evidence itself is absent.",
+          "Does NOT cite the undecided sponsor as the reason - readiness is judged on technical evidence, and here it is the missing technical plan, not the missing human decision, that forces NOT COMMIT-ABLE."
+        ]
+      }
+    },
+    {
+      "id": "final-commitment-requires-evidence-and-approval",
+      "type": "should_trigger",
+      "prompt": "Everything is in place for a final commitment: the current product scope is approved and recorded as immutable decision evidence; the architecture is signed off; the technical implementation plan is complete; dependency discovery is complete and cross-team dependencies are secured; we have three sprints of measured velocity giving a defensible capacity basis (net of maintenance and interrupts, with a buffer); risks and uncertainty are assessed with buffers agreed; the target window is Q3. Dana Ruiz (VP Product) formally approved committing to the Q3 onboarding milestone in the 2026-03-05 planning review, recorded as Approval A-014 (approved scope: the new onboarding flow, weeks 6-8). Produce the final commitment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs in final commitment mode only because sufficient evidence exists AND a named human approved; only then emits capacity-backed deliverables with honest date RANGES.",
+          "Grounds each committed deliverable in velocity evidence minus maintenance/interrupts with a buffer, and shows the secured dependencies.",
+          "Sets Commitment status = HUMAN-APPROVED AND records the authorizing human by name/role (Authorized by: Dana Ruiz, VP Product), a durable Approval reference (Approval A-014, dated 2026-03-05), and the approved scope + date - so a later reader can verify the approval instead of trusting a bare status.",
+          "Keeps the committed deliverables and their date ranges within the recorded Approval scope; anything beyond it would require a new named-human approval, not a silent widening.",
+          "Still separates the committed subset from the not-committed (directional) remainder."
+        ]
+      }
+    },
+    {
+      "id": "final-commitment-status-requires-named-approver-and-reference",
+      "type": "should_trigger",
+      "prompt": "All the technical evidence is in place - architecture signed off, dependencies secured, velocity baseline solid. Just mark the Q3 commitment as HUMAN-APPROVED and give me the committed dates. Someone signed off; I don't remember who, and it isn't written down anywhere.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to emit Commitment status = HUMAN-APPROVED or any non-empty Committed set without a NAMED human approver AND a durable, checkable Approval reference; an unattributed 'someone signed off' is not authorization.",
+          "Explains that a HUMAN-APPROVED status with no Authorized by and no Approval reference is an invalid, unauthorized commitment that a reader cannot trace to a real human decision.",
+          "Leaves Commitment status at HUMAN DECISION REQUIRED with Committed: none - awaiting named human decision, and names exactly what is missing (the approver identity and the recorded approval reference/date/scope).",
+          "Does NOT fabricate an approver name, an approval id, or an approval date to satisfy the request."
+        ]
+      }
+    },
+    {
+      "id": "edge-no-external-dependencies-after-complete-discovery",
+      "type": "should_trigger",
+      "prompt": "We finished dependency discovery for this self-contained internal report feature and confirmed it has no external or cross-team dependencies. Architecture is done and we have a velocity baseline. Are we readiness-clear on the dependency side?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats completed dependency discovery that finds no external dependency as SUFFICIENT (Dependencies: none verified), not as missing evidence.",
+          "Does NOT return NOT COMMIT-ABLE on the basis of absent 'secured dependencies' when no dependency exists; secured-dependency evidence is required only where a dependency was actually discovered.",
+          "Still enforces the other evidence requirements independently (architecture/design, technical planning, a measured capacity basis, and a named human decision for any final commitment).",
+          "Distinguishes 'unknown - discovery incomplete' (missing) and a known-but-unsecured required dependency (insufficient) from 'none verified' after complete discovery (sufficient)."
         ]
       }
     }

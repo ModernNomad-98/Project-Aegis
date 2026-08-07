@@ -39,6 +39,8 @@ IMPORT WRINKLE
 from __future__ import annotations
 
 import importlib.util
+import json
+import re
 import shutil
 import subprocess
 import sys
@@ -691,6 +693,443 @@ def test_dco_record_parsing():
     expect_clean(rep, "records parsed from the git-log stream feed the rules unchanged")
 
 
+# --- startup workspace-role contract (PR #77 final correction) --------------
+#
+# The repo-root startup instructions (AGENTS.md, CLAUDE.md, README.md) are
+# copied, BY DESIGN, into a user's own product repository (the README's consumer
+# installation), so carrying .claude/skills + AGENTS.md + CLAUDE.md can NEVER by
+# itself prove a workspace is the Project Aegis SOURCE library. This test reads
+# the shipped files and asserts the written startup CONTRACT is role-aware:
+# source-library role is corroborated by the source-package landmarks, a fresh
+# consumer repo stays the current product workspace, and no sibling app folder is
+# proposed merely because the skills are copied in.
+#
+# It is DELIBERATELY structural and deterministic — a text/JSON contract check.
+# It is NOT a model-behavior runner and proves nothing about a live Claude
+# session; the only behavioral proof of the fix is a fresh-session Scenario A
+# rerun, which this suite never executes.
+
+SOURCE_PACKAGE_LANDMARKS = (
+    "README.md",
+    "docs/skills-catalog.md",
+    "scripts/validate-skills.py",
+    "artifacts/audits/skill-contract-audit-baseline.json",
+)
+
+CONSUMER_EVAL_ID = "regression-fresh-consumer-with-copied-aegis-files-stays-product"
+SOURCE_EVAL_ID = "regression-actual-project-aegis-source-landmarks-remain-library"
+
+
+def test_startup_role_contract():
+    """PR #77: the repo-root startup instructions are role-aware (structural)."""
+
+    def ok(label: str) -> None:
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+    agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    claude = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    # --- AGENTS.md role contract -------------------------------------------
+    assert "This repository is a skills library:" not in agents, (
+        "AGENTS.md must drop the unconditional source-only identity sentence "
+        "'This repository is a skills library:' — it is false in a consumer repo"
+    )
+    ok("AGENTS.md: unconditional 'skills library' identity sentence is gone")
+
+    assert "consumer/product repository" in agents, (
+        "AGENTS.md must carry an explicit consumer/product-repository rule"
+    )
+    ok("AGENTS.md: explicit consumer/product-repository rule present")
+
+    assert "does NOT make a workspace the Project Aegis source library" in agents, (
+        "AGENTS.md must state that copied startup files alone do not prove "
+        "source-library role"
+    )
+    for token in (".claude/skills", "AGENTS.md", "CLAUDE.md"):
+        assert token in agents, (
+            f"AGENTS.md's copied-files rule must name {token!r}"
+        )
+    ok("AGENTS.md: copied .claude/skills + AGENTS.md + CLAUDE.md are not source proof")
+
+    for landmark in SOURCE_PACKAGE_LANDMARKS:
+        assert landmark in agents, (
+            f"AGENTS.md must name the source-package landmark {landmark!r}"
+        )
+    ok("AGENTS.md: names all four source-package landmarks")
+
+    assert "never redirect the user into a second/sibling product folder" in agents, (
+        "AGENTS.md must forbid redirecting a consumer into another product folder "
+        "solely because copied skills exist"
+    )
+    ok("AGENTS.md: forbids a second/sibling product-folder redirect")
+
+    # --- CLAUDE.md startup ordering ----------------------------------------
+    assert claude.splitlines()[0].strip() == "@AGENTS.md", (
+        "CLAUDE.md must keep the '@AGENTS.md' import as its first line (D61 bridge)"
+    )
+    role_idx = claude.find("Determine the workspace role")
+    skill_sel_idx = claude.find("list the available skills under `.claude/skills/`")
+    assert role_idx != -1, "CLAUDE.md must add a workspace-role-detection step"
+    assert skill_sel_idx != -1, "CLAUDE.md must keep the skill-selection step"
+    assert role_idx < skill_sel_idx, (
+        "workspace-role detection must appear BEFORE the skill-selection step"
+    )
+    ok("CLAUDE.md: role detection precedes skill selection")
+
+    assert "copied, by design, into consumer/product repositories" in claude, (
+        "CLAUDE.md must recognize the copied root instructions as valid consumer "
+        "installation files"
+    )
+    ok("CLAUDE.md: copied root instructions recognized as consumer install files")
+
+    assert "Do NOT infer source-library role from" in claude, (
+        "CLAUDE.md must say copied .claude/skills alone is not source-library evidence"
+    )
+    ok("CLAUDE.md: copied .claude/skills alone is not source-library evidence")
+
+    assert "treat the CURRENT workspace as the user's consumer/product repository" in claude, (
+        "CLAUDE.md must keep a fresh consumer repo as the current product workspace"
+    )
+    ok("CLAUDE.md: fresh consumer repo stays the current product workspace")
+
+    assert "Never propose a second or sibling app directory" in claude, (
+        "CLAUDE.md must forbid a sibling product-folder redirect by default"
+    )
+    ok("CLAUDE.md: no sibling product-folder redirect by default")
+
+    # --- README.md consumer-installation clarification ---------------------
+    assert "Copy the `.claude/skills" in readme, (
+        "README consumer section must still instruct copying the startup files"
+    )
+    assert "Copying `.claude/skills`, `CLAUDE.md`, and `AGENTS.md`" in readme, (
+        "README must describe copying the startup files as a consumer installation"
+    )
+    ok("README.md: consumer install section still instructs copying the startup files")
+
+    assert "do NOT convert it into the Project Aegis source" in readme, (
+        "README must state that copying the files does not convert the product repo "
+        "into the Project Aegis source library"
+    )
+    ok("README.md: copying does not convert the product repo into the source library")
+
+    assert "open your OWN product repository and work there" in readme, (
+        "README must tell users to continue in the current product workspace"
+    )
+    ok("README.md: tells users to continue in the current product workspace")
+
+    assert "not by the copied skills alone" in readme, (
+        "README must reference the source-package landmark distinction"
+    )
+    for landmark in SOURCE_PACKAGE_LANDMARKS:
+        assert landmark in readme, (
+            f"README must reference the source-package landmark {landmark!r}"
+        )
+    ok("README.md: references the source-package landmark distinction")
+
+    # --- project-orchestrator regression evals -----------------------------
+    evals_path = (
+        REPO_ROOT / ".claude" / "skills" / "project-orchestrator" / "evals" / "evals.json"
+    )
+    data = json.loads(evals_path.read_text(encoding="utf-8"))
+    ids = [c["id"] for c in data["cases"]]
+
+    assert ids.count(CONSUMER_EVAL_ID) == 1, (
+        f"the consumer regression case {CONSUMER_EVAL_ID!r} must exist exactly once"
+    )
+    assert ids.count(SOURCE_EVAL_ID) == 1, (
+        f"the source regression case {SOURCE_EVAL_ID!r} must exist exactly once"
+    )
+    assert len(ids) == len(set(ids)), (
+        "all project-orchestrator eval IDs must be unique; duplicates: "
+        f"{sorted({i for i in ids if ids.count(i) > 1})}"
+    )
+    ok(f"evals: both new IDs present exactly once; all {len(ids)} IDs unique")
+
+    by_id = {c["id"]: c for c in data["cases"]}
+    consumer = by_id[CONSUMER_EVAL_ID]
+    consumer_prompt = consumer["prompt"]
+    for shape in (
+        "zero commits",
+        "no docs",
+        "source-package landmarks",
+        ".claude/skills/",
+        "AGENTS.md",
+        "CLAUDE.md",
+    ):
+        assert shape in consumer_prompt, (
+            f"the consumer case prompt must encode the workspace-shape token {shape!r}"
+        )
+    assert "second/sibling app folder" in json.dumps(consumer), (
+        "the consumer case must forbid a second/sibling product folder"
+    )
+    ok("evals: consumer case has the fresh-copied-no-landmarks shape and forbids a sibling folder")
+
+    source_blob = json.dumps(by_id[SOURCE_EVAL_ID])
+    assert "# Project Aegis" in source_blob, (
+        "the source case must reference the '# Project Aegis' README landmark"
+    )
+    for landmark in (
+        "docs/skills-catalog.md",
+        "scripts/validate-skills.py",
+        "artifacts/audits/skill-contract-audit-baseline.json",
+    ):
+        assert landmark in source_blob, (
+            f"the source case must contain the source-package landmark {landmark!r}"
+        )
+    assert "source-library" in source_blob.lower(), (
+        "the source case must preserve source-library classification"
+    )
+    ok("evals: source case contains every source-package landmark and keeps source-library classification")
+
+
+# --- atomic Stage 1 question contract (PR #77 final correction) --------------
+#
+# The written contracts already said "one target", yet a live Scenario A turn
+# still bundled FOUR discovery targets ("walk me through the booking process,
+# who does each step, a recent double booking, and where it went wrong") into a
+# single question. Repeating "one target" prose was demonstrably insufficient:
+# the discovery METHOD (the elicitation question bank) and the orchestrator
+# boundary both had to change. This STRUCTURAL test guards the new written shape
+# — the orchestrator's ATOMIC-QUESTION GATE, the facilitator's one-target
+# contract, and the atomic discovery CARDS that replaced the compound question
+# bank — plus the eval counts and the three regression IDs on each side.
+#
+# It is DELIBERATELY structural and deterministic and proves the written
+# STRUCTURE only. It does NOT prove semantic atomicity and is NOT a model-
+# behavior runner; the sole behavioral proof of the fix is a fresh-session
+# Scenario A rerun, which this suite never executes.
+
+ORCH_SKILL = REPO_ROOT / ".claude" / "skills" / "project-orchestrator" / "SKILL.md"
+FAC_DIR = REPO_ROOT / ".claude" / "skills" / "requirements-gathering-facilitator"
+FAC_SKILL = FAC_DIR / "SKILL.md"
+ELICIT_SHEET = FAC_DIR / "references" / "elicitation-sheet.md"
+ORCH_EVALS = REPO_ROOT / ".claude" / "skills" / "project-orchestrator" / "evals" / "evals.json"
+FAC_EVALS = FAC_DIR / "evals" / "evals.json"
+
+# The one-target definition and the semantic split test — verbatim in BOTH the
+# orchestrator gate and the facilitator contract, so neither can drift alone.
+ATOMIC_TARGET_DEF = "one independently answerable information or decision target"
+ATOMIC_SEMANTIC_TEST = "answer one requested part while another remains unanswered"
+
+# The observed live compound question (FOUR targets: current process + actor +
+# recent incident + failure point). It must appear only as an INVALID example /
+# regression prompt — never as a usable atomic card.
+OBSERVED_COMPOUND = (
+    "Walk me through the booking process, include who does each step, and tell me "
+    "about a recent double booking and where it went wrong."
+)
+# The highest-value first target its decomposition keeps for turn one.
+DECOMP_FIRST_TURN = "What happens today when a patient books an appointment?"
+
+# Compound question-bank entries the fix must split out and delete.
+REMOVED_COMPOUND_ENTRIES = (
+    "Who hits this problem",
+    "Walk me through the last time this happened",
+    "and why does THAT matter",
+    "Which edge cases matter",
+    "Deadlines, platforms, budgets",
+)
+
+NEW_ORCH_EVAL_IDS = (
+    "regression-clinic-observed-compound-question-is-rejected",
+    "regression-orchestrator-atomic-gate-rewrites-delegated-candidate",
+    "regression-one-process-walkthrough-is-one-valid-target",
+)
+NEW_FAC_EVAL_IDS = (
+    "regression-observed-clinic-question-decomposes-atomically",
+    "regression-narrative-process-question-is-atomic",
+    "regression-options-for-same-target-remain-atomic",
+)
+
+# A stable, parseable card convention: a `- Target: <one target>` line followed
+# immediately by a `  Ask: "<one question>"` line.
+CARD_RE = re.compile(r'^- Target: (?P<target>.+)\n  Ask: "(?P<ask>[^"\n]+)"[ \t]*$', re.MULTILINE)
+
+
+def test_atomic_stage1_question_contract():
+    """PR #77: Stage 1 discovery questions are structurally atomic (deterministic)."""
+
+    def ok(label: str) -> None:
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+    # Raw text drives the card line-structure parse (CARD_RE); a whitespace-
+    # flattened view drives every phrase/marker check, so ordinary line wrapping
+    # can never hide a contract phrase the author placed across two source lines.
+    orch_raw = ORCH_SKILL.read_text(encoding="utf-8")
+    fac_raw = FAC_SKILL.read_text(encoding="utf-8")
+    sheet = ELICIT_SHEET.read_text(encoding="utf-8")
+
+    def flat(s: str) -> str:
+        return re.sub(r"\s+", " ", s)
+
+    orch, fac, sheet_flat = flat(orch_raw), flat(fac_raw), flat(sheet)
+
+    # --- orchestrator ATOMIC-QUESTION GATE ---------------------------------
+    assert "ATOMIC-QUESTION GATE" in orch, (
+        "orchestrator SKILL.md must name the ATOMIC-QUESTION GATE marker"
+    )
+    ok("orchestrator: ATOMIC-QUESTION GATE marker present")
+
+    assert ATOMIC_TARGET_DEF in orch, (
+        "orchestrator must define one question = one independently answerable target"
+    )
+    assert ATOMIC_SEMANTIC_TEST in orch, (
+        "orchestrator must carry the semantic split test verbatim"
+    )
+    ok("orchestrator: independently-answerable-target definition + semantic test")
+
+    assert "keep ONLY the highest-value first target" in orch, (
+        "orchestrator must split a multi-target candidate and keep only the first target"
+    )
+    assert "No secondary answer request" in orch, (
+        "orchestrator must forbid a secondary answer request elsewhere in the turn"
+    )
+    assert "atomic question and STOP" in orch, (
+        "orchestrator must display ONE atomic question and STOP"
+    )
+    ok("orchestrator: split-to-first-target, no-secondary-request, one-question-then-STOP")
+
+    assert "invokes requirements-gathering-facilitator" in orch, (
+        "orchestrator must preserve the exact requirements-gathering-facilitator invocation"
+    )
+    ok("orchestrator: exact requirements-gathering-facilitator invocation preserved")
+
+    assert "Open questions" in orch and "one atomic target per bullet" in orch, (
+        "orchestrator must keep the cold-start Open-questions projection atomic"
+    )
+    ok("orchestrator: cold-start Open-questions projection protected from compound bullets")
+
+    assert 'NOT "one binding question"' in orch, (
+        "orchestrator must keep the interview cadence, never weaken to 'one binding question'"
+    )
+    ok('orchestrator: interview cadence kept (not "one binding question")')
+
+    # --- facilitator one-target-per-turn -----------------------------------
+    assert ATOMIC_TARGET_DEF in fac, (
+        "facilitator must carry the same one-target semantic definition"
+    )
+    assert ATOMIC_SEMANTIC_TEST in fac, (
+        "facilitator must carry the same semantic split test verbatim"
+    )
+    ok("facilitator: same one-target definition + semantic test")
+
+    assert "pre-output atomicity check" in fac, (
+        "facilitator must run a pre-output atomicity check before returning a candidate"
+    )
+    assert "secondary answer request" in fac, (
+        "facilitator must forbid a secondary answer request after the primary question"
+    )
+    ok("facilitator: pre-output atomicity check + no secondary answer request")
+
+    for token in ('"include"', '"also"', '"and if you can"'):
+        assert token in fac, (
+            f"facilitator must name {token} as a secondary-target smuggling risk"
+        )
+    ok('facilitator: names "include" / "also" / "and if you can" secondary-target risks')
+
+    assert "alternatives for the same target" in fac, (
+        "facilitator must allow alternatives for the SAME target"
+    )
+    assert "narrative process" in fac, (
+        "facilitator must allow a single narrative process target"
+    )
+    ok("facilitator: allows same-target alternatives and a single narrative process target")
+
+    # --- elicitation sheet: atomic discovery cards -------------------------
+    assert "## Atomic discovery cards" in sheet_flat, (
+        "elicitation sheet must carry the atomic discovery cards section"
+    )
+    cards = list(CARD_RE.finditer(sheet))
+    assert len(cards) >= 14, (
+        f"expected >= 14 atomic cards covering every discovery area; got {len(cards)}"
+    )
+    for m in cards:
+        ask = m.group("ask")
+        assert ask.count("?") == 1, (
+            f"each card's Ask must contain exactly one question mark: {ask!r}"
+        )
+        assert m.group("target").strip(), "each card must name exactly one Target"
+    ok(f"elicitation sheet: {len(cards)} atomic cards, each one Target + one single-question Ask")
+
+    targets_blob = " ".join(m.group("target").lower() for m in cards)
+    for area in ("current", "workaround", "non-goal", "deadline", "budget",
+                 "device", "compliance", "depend", "success"):
+        assert area in targets_blob, (
+            f"the atomic cards must cover the {area!r} discovery area"
+        )
+    ok("elicitation sheet: cards cover users/workaround/scope/constraints/compliance/deps/success")
+
+    for frag in REMOVED_COMPOUND_ENTRIES:
+        assert frag not in sheet_flat, (
+            f"the compound question-bank entry {frag!r} must be gone from the sheet"
+        )
+    ok("elicitation sheet: the five compound question-bank entries are gone")
+
+    assert OBSERVED_COMPOUND in sheet_flat, (
+        "the sheet must show the observed live compound question as an INVALID example"
+    )
+    asks = [m.group("ask") for m in cards]
+    assert not any("booking process, include" in a for a in asks), (
+        "the observed compound must never appear as a usable atomic card Ask"
+    )
+    ok("elicitation sheet: observed compound present only as an INVALID example, not a card")
+
+    assert DECOMP_FIRST_TURN in sheet_flat, (
+        "the sheet must show the decomposition's highest-value first-turn question"
+    )
+    assert "Where in the booking process did that double booking occur?" in sheet_flat, (
+        "the sheet must show a later-turn decomposition question"
+    )
+    ok("elicitation sheet: the observed compound's atomic decomposition is shown")
+
+    # --- eval counts + regression IDs --------------------------------------
+    orch_evals = json.loads(ORCH_EVALS.read_text(encoding="utf-8"))
+    fac_evals = json.loads(FAC_EVALS.read_text(encoding="utf-8"))
+    orch_ids = [c["id"] for c in orch_evals["cases"]]
+    fac_ids = [c["id"] for c in fac_evals["cases"]]
+
+    assert len(orch_ids) == 47, f"project-orchestrator eval count must be 47; got {len(orch_ids)}"
+    assert len(fac_ids) == 12, f"facilitator eval count must be 12; got {len(fac_ids)}"
+    ok("evals: project-orchestrator has 47 cases, facilitator has 12")
+
+    assert len(orch_ids) == len(set(orch_ids)), (
+        "orchestrator eval IDs must be unique; duplicates: "
+        f"{sorted({i for i in orch_ids if orch_ids.count(i) > 1})}"
+    )
+    assert len(fac_ids) == len(set(fac_ids)), (
+        "facilitator eval IDs must be unique; duplicates: "
+        f"{sorted({i for i in fac_ids if fac_ids.count(i) > 1})}"
+    )
+    ok("evals: all orchestrator and facilitator eval IDs are unique")
+
+    for cid in NEW_ORCH_EVAL_IDS:
+        assert orch_ids.count(cid) == 1, f"new orchestrator eval {cid!r} must exist exactly once"
+    for cid in NEW_FAC_EVAL_IDS:
+        assert fac_ids.count(cid) == 1, f"new facilitator eval {cid!r} must exist exactly once"
+    ok("evals: the three new orchestrator IDs and three new facilitator IDs each appear exactly once")
+
+    orch_blob = json.dumps(orch_evals)
+    fac_blob = json.dumps(fac_evals)
+    assert OBSERVED_COMPOUND in orch_blob, (
+        "the orchestrator regression cases must encode the observed compound wording"
+    )
+    assert OBSERVED_COMPOUND in fac_blob, (
+        "the facilitator regression cases must encode the observed compound wording"
+    )
+    ok("evals: the observed compound wording is represented on both sides")
+
+    assert "regression-one-process-walkthrough-is-one-valid-target" in orch_ids, (
+        "the anti-overcorrection one-process case must exist on the orchestrator side"
+    )
+    assert "regression-options-for-same-target-remain-atomic" in fac_ids, (
+        "the same-target-options case must exist on the facilitator side"
+    )
+    ok("evals: anti-overcorrection process case and same-target-options case present")
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -706,6 +1145,8 @@ TESTS = [
     test_dco_signoff_required,
     test_dco_bot_exemption,
     test_dco_record_parsing,
+    test_startup_role_contract,
+    test_atomic_stage1_question_contract,
 ]
 
 

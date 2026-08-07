@@ -200,7 +200,12 @@ def test_route_rules(a) -> None:
     ok("ROUTE-001 does not flag a real reviewer agent")
     r3 = [f for f in a.findings if f.rule == "ROUTE-003"]
     assert r3 and "AEGIS-035" in r3[0].aegis_map, "ROUTE-003 must map to AEGIS-035"
-    ok("ROUTE-003 (Stage-2 route gap) fires and maps to AEGIS-035")
+    # R8-3: bad-stage-router's route is ALSO unguarded, so the finding's aegis_map is
+    # gap-driven and must carry the guard family too, not only the owner family.
+    assert "AEGIS-044" in r3[0].aegis_map, (
+        "an unguarded commitments route contributes AEGIS-044 to the finding's aegis_map"
+    )
+    ok("ROUTE-003 (Stage-2 route gap) fires with a gap-driven aegis_map (AEGIS-035 + AEGIS-044)")
 
 
 def test_route002_is_unmapped_census(a) -> None:
@@ -432,6 +437,340 @@ def test_stage2_malformed_and_leakage() -> None:
         "a leaking segment would hide the Stage-2 route gap (ROUTE-003 false-clean)"
     )
     ok("Stage-3 leakage cannot false-clean the ROUTE-003 route-gap condition")
+
+
+def test_route003_branch_aware() -> None:
+    """Per-route ROUTE-003 (thread-12 follow-up): each detectable commitments
+    route is validated on its OWN line, so unrelated explanatory text elsewhere
+    in the Stage-2 segment cannot clear a separate unguarded route. A commitments
+    route = a physical line naming roadmap-to-commitments-translator WITH a routing
+    marker; its readiness / NOT COMMIT-ABLE guard must be on that line."""
+    gaps = audit_mod.Audit.stage2_commitments_route_gaps
+
+    # (1) commitments not reached by any detectable route -> clean.
+    assert gaps("- classify via `prioritization-frame-picker` on evidence.") == []
+
+    # (2) a per-line-guarded route with roadmap classified n/a (the deadline-only
+    #     shape) -> clean.
+    ok_deadline = (
+        "- Roadmap - NOT APPLICABLE here; classify `roadmap-under-uncertainty-planner` n/a.\n"
+        "- Commitment readiness - when applicable: -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(ok_deadline) == [], "a per-line-guarded route with roadmap n/a must be clean"
+
+    # (3) THE reviewer's case: guard words (readiness, NOT COMMIT-ABLE) and the
+    #     roadmap owner appear in explanatory PROSE, but a SEPARATE line routes
+    #     straight to commitments with no guard on THAT line -> must fire AEGIS-044.
+    gamed = (
+        "Commitment readiness runs in readiness mode and returns NOT COMMIT-ABLE without "
+        "evidence; Roadmap is NOT APPLICABLE so `roadmap-under-uncertainty-planner` is "
+        "classified n/a.\n"
+        "- Then -> invoke `roadmap-to-commitments-translator` to get the date.\n"
+    )
+    g = gaps(gamed)
+    assert g and any("AEGIS-044" in x for x in g), (
+        "an unguarded commitments route must fire even when guard words appear elsewhere"
+    )
+    assert not any("AEGIS-035" in x for x in g), (
+        "the roadmap owner carries a real n/a verdict here, so only the guard gap should fire"
+    )
+
+    # (4) unguarded route AND the roadmap owner never classified anywhere -> BOTH gaps.
+    no_owner = "- spec -> `product-spec-writer` -> invoke `roadmap-to-commitments-translator`.\n"
+    g2 = gaps(no_owner)
+    assert any("AEGIS-044" in x for x in g2), "unguarded route fires AEGIS-044"
+    assert any("AEGIS-035" in x for x in g2), "missing roadmap-owner classification fires AEGIS-035"
+
+    # (5) one guarded and one UNGUARDED commitments route in the same segment ->
+    #     the unguarded one still fires (per-route, not per-segment).
+    mixed = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+        "- Shortcut -> route to `roadmap-to-commitments-translator` right now.\n"
+    )
+    gm = gaps(mixed)
+    assert gm and any("AEGIS-044" in x for x in gm), "one unguarded route among several must fire"
+    assert not any("AEGIS-035" in x for x in gm), "a declarative n/a verdict clears the roadmap owner"
+
+    # (6) F3 - THE reviewer's case: an unconditional INVOCATION of the planner plus a
+    #     separately guarded commitments route. Invocation is NOT classification, so the
+    #     roadmap-owner gap (AEGIS-035) must fire while the guarded route stays clean.
+    invoke_only = (
+        "- Stage 2 owners: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    g6 = gaps(invoke_only)
+    assert any("AEGIS-035" in x for x in g6), (
+        "a bare invocation of the planner is NOT classification -> AEGIS-035 must fire"
+    )
+    assert not any("AEGIS-044" in x for x in g6), (
+        "the commitments route is guarded (readiness mode) -> AEGIS-044 must NOT fire"
+    )
+
+    # (6b) the SAME invocation, now with a real roadmap verdict on its own non-invocation
+    #      line -> clean. Proves it is the missing VERDICT, not the invocation, that the
+    #      check demands (and that a legitimate contract still passes).
+    invoke_plus_verdict = (
+        "- Roadmap - APPLICABLE (sequencing uncertainty); classified applicable.\n"
+        "- Stage 2 owners: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(invoke_plus_verdict) == [], (
+        "an explicit roadmap verdict line + a guarded route is clean, even beside an invocation"
+    )
+
+    # (7) naming the planner "a Stage-2 owner" (no verdict) is not classification either.
+    named_not_classified = (
+        "`roadmap-under-uncertainty-planner` is a Stage-2 owner in this workflow.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(named_not_classified)), (
+        "merely naming the planner an owner (no applicable/n-a verdict) must still fire AEGIS-035"
+    )
+
+    # (8) R5-3 - a QUESTION about applicability is not a recorded verdict: AEGIS-035 fires.
+    question = (
+        "- Roadmap: is `roadmap-under-uncertainty-planner` applicable?\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    gq = gaps(question)
+    assert any("AEGIS-035" in x for x in gq), "a question ('is it applicable?') is not a recorded verdict -> AEGIS-035"
+    assert not any("AEGIS-044" in x for x in gq), "the commitments route is guarded -> no AEGIS-044"
+
+    # (9) R5-3 - an uncertain MODAL ('may be n/a') is not a recorded verdict: AEGIS-035 fires.
+    modal = (
+        "- Roadmap owner `roadmap-under-uncertainty-planner` may be n/a.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(modal)), "an uncertain modal ('may be n/a') is not a recorded verdict"
+
+    # (10) R5-6 - a route worded with the SHARED grammar ('goes to' / 'delegates to') is a real
+    #      commitments route and must be validated; an unguarded one fires AEGIS-044.
+    goes_to = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness goes to `roadmap-to-commitments-translator` to get the date.\n"
+    )
+    gg = gaps(goes_to)
+    assert any("AEGIS-044" in x for x in gg), "a 'goes to' commitments route is detected and (unguarded) fires AEGIS-044"
+    assert not any("AEGIS-035" in x for x in gg), "the roadmap owner carries a declarative n/a verdict"
+    delegates = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness delegates to `roadmap-to-commitments-translator` for the date.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(delegates)), "a 'delegates to' commitments route is detected and fires AEGIS-044"
+
+    # (11) R5-7 - a NEGATED readiness mention does not count as a guard: AEGIS-044 fires.
+    negated_guard = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` for final commitments, not readiness mode.\n"
+    )
+    gn = gaps(negated_guard)
+    assert any("AEGIS-044" in x for x in gn), "a route that explicitly avoids readiness ('not readiness mode') is NOT guarded"
+
+    # (12) R5-7 sanity - a POSITIVE readiness guard on a 'goes to' route is clean.
+    positive_guard = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness goes to `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(positive_guard) == [], "a positive readiness guard on a shared-grammar route is clean"
+
+    # (13) R6-1 - a PENDING state ('unclassified') is not a recorded verdict: AEGIS-035 fires.
+    pending_state = (
+        "- Roadmap owner `roadmap-under-uncertainty-planner` is still unclassified.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(pending_state)), (
+        "'unclassified' is a pending state, not a recorded verdict -> AEGIS-035 must fire"
+    )
+
+    # (14) R6-1 - naming a classification STEP (process, no result) is not a verdict either.
+    process_only = (
+        "- Roadmap: a classification step for `roadmap-under-uncertainty-planner` follows.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(process_only)), (
+        "naming a classification step (no applicable/not-applicable/n-a result) must still fire AEGIS-035"
+    )
+
+    # (15) R7-2 - a NEGATED "NOT COMMIT-ABLE" mention is not a guard either: the phrase
+    #      gets the same negation check as readiness-mode language.
+    negated_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` without a NOT COMMIT-ABLE guard.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(negated_nca)), (
+        "'without a NOT COMMIT-ABLE guard' explicitly LACKS the guard -> AEGIS-044 must fire"
+    )
+    positive_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator`, which returns NOT COMMIT-ABLE absent evidence.\n"
+    )
+    assert gaps(positive_nca) == [], "a positive NOT COMMIT-ABLE guard on the route line stays clean"
+
+    # (16) R7-3 - a generic CRITERIA/definition bullet is not a per-project verdict: the
+    #      live-contract shape ("APPLICABLE on evidence of ...") must NOT clear AEGIS-035.
+    criteria_only = (
+        "- **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; NOT APPLICABLE\n"
+        "  for one bounded release. When applicable: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert any("AEGIS-035" in x for x in gaps(criteria_only)), (
+        "a criteria bullet states when the owner WOULD be applicable, not that it WAS "
+        "classified -> AEGIS-035 must fire"
+    )
+    # (16b) ... and the contract's explicit verdict-recording line (a classification act
+    #       with its result, no routing marker) clears it.
+    criteria_plus_verdict = (
+        "- **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; NOT APPLICABLE\n"
+        "  for one bounded release. When applicable: -> invoke `roadmap-under-uncertainty-planner`.\n"
+        "  Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason).\n"
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` (readiness mode).\n"
+    )
+    assert gaps(criteria_plus_verdict) == [], (
+        "an explicit verdict-recording line (classified applicable / classified n/a) clears the owner check"
+    )
+
+    # (17) R9-1 - negation AFTER the guard phrase disclaims it: "readiness mode not
+    #      required" and "NOT COMMIT-ABLE guard is not required" are NOT guards.
+    post_neg_readiness = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Fast lane -> invoke `roadmap-to-commitments-translator`; readiness mode not required here.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_readiness)), (
+        "'readiness mode not required' disclaims the guard -> AEGIS-044 must fire"
+    )
+    post_neg_nca = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Direct -> invoke `roadmap-to-commitments-translator`, the NOT COMMIT-ABLE guard is not required.\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_nca)), (
+        "'NOT COMMIT-ABLE guard is not required' disclaims the guard -> AEGIS-044 must fire"
+    )
+    post_neg_skipped = (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a.\n"
+        "- Shortcut -> invoke `roadmap-to-commitments-translator` (readiness mode skipped).\n"
+    )
+    assert any("AEGIS-044" in x for x in gaps(post_neg_skipped)), (
+        "'readiness mode skipped' disclaims the guard -> AEGIS-044 must fire"
+    )
+    # sanity: evidence-state words after NOT COMMIT-ABLE still describe a REAL guard
+    # ("returns NOT COMMIT-ABLE absent evidence" is case (15) positive_nca, asserted clean above).
+
+    ok("ROUTE-003 v1.12.0: shared routing markers; POSITIVE guard with negation checks BOTH sides of "
+       "every phrase (pre-negated, post-disclaimed, and negated NOT COMMIT-ABLE all rejected); "
+       "verdict = a classification act with its result, itself negation-checked at match level")
+
+
+def test_route003_verdict_negation() -> None:
+    """PR77 final correction (Finding 3): a NEGATED classification verdict is
+    not a recorded verdict. Negation is checked at MATCH level, before AND
+    after the classification act/result, so 'not classified applicable',
+    'never classify … applicable', 'without classifying … applicable',
+    'classified applicable but not recorded', and 'classified n/a — not
+    actually recorded' no longer clear AEGIS-035 — while the valid forms
+    ('classified applicable', 'classified n/a', 'recorded as n/a',
+    'n/a-recorded') stay clean, and a negated match neither poisons nor
+    validates an unrelated positive match."""
+    gaps = audit_mod.Audit.stage2_commitments_route_gaps
+    guarded_route = (
+        "- Commitment readiness -> invoke `roadmap-to-commitments-translator` "
+        "(readiness mode).\n"
+    )
+
+    # (1) 'was not classified applicable' negates the classification act.
+    g1 = gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` was not classified applicable.\n"
+        + guarded_route
+    )
+    assert any("AEGIS-035" in x for x in g1), (
+        "'was not classified applicable' is a NEGATED verdict, not a recorded one "
+        "-> AEGIS-035 must fire"
+    )
+    assert not any("AEGIS-044" in x for x in g1), (
+        "the commitments route is guarded -> only the owner gap may fire"
+    )
+
+    # (2) 'never classify … applicable' is a prohibition, not a verdict.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Never classify `roadmap-under-uncertainty-planner` applicable on a "
+        "deadline alone.\n" + guarded_route
+    )), "'never classify … applicable' is a prohibition, not a recorded verdict"
+
+    # (3) 'without classifying … applicable' records nothing.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Proceeds without classifying `roadmap-under-uncertainty-planner` "
+        "applicable.\n" + guarded_route
+    )), "'without classifying … applicable' records nothing -> AEGIS-035 must fire"
+
+    # (4) negation AFTER the act/result: the RECORDING is disclaimed.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified applicable "
+        "but not recorded.\n" + guarded_route
+    )), "'classified applicable but not recorded' disclaims the record -> AEGIS-035"
+
+    # (5) 'classified n/a — not actually recorded' is disclaimed too.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a — not "
+        "actually recorded.\n" + guarded_route
+    )), "'classified n/a — not actually recorded' disclaims the record -> AEGIS-035"
+
+    # (6) the four valid verdict forms remain clean positives.
+    for verdict_line in (
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified applicable.\n",
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a (one bounded release).\n",
+        "- Roadmap: `roadmap-under-uncertainty-planner` recorded as n/a (no sequencing decision).\n",
+        "- Roadmap owner ledger: `roadmap-under-uncertainty-planner` n/a-recorded (reason).\n",
+    ):
+        assert gaps(verdict_line + guarded_route) == [], (
+            f"a genuine positive verdict must stay clean: {verdict_line!r}"
+        )
+
+    # (7) a negated match must not POISON a genuine positive beside it: one
+    #     genuine positive, non-negated recorded verdict satisfies the check.
+    assert gaps(
+        "- History: an earlier draft was not classified applicable; this turn "
+        "`roadmap-under-uncertainty-planner` classified applicable and recorded.\n"
+        + guarded_route
+    ) == [], "a negated candidate must not poison the genuine positive beside it"
+
+    # (7b) …nor across lines: a negated mention elsewhere never invalidates a
+    #      clean verdict on its own line.
+    assert gaps(
+        "- Note: `roadmap-under-uncertainty-planner` was not classified applicable at intake.\n"
+        "- Roadmap: `roadmap-under-uncertainty-planner` classified n/a (reason).\n"
+        + guarded_route
+    ) == [], "a negated mention elsewhere must not invalidate the recorded verdict line"
+
+    # (8) …and negated matches alone must never VALIDATE the check.
+    assert any("AEGIS-035" in x for x in gaps(
+        "- Roadmap: `roadmap-under-uncertainty-planner` was not classified applicable; "
+        "never classify `roadmap-under-uncertainty-planner` applicable here.\n"
+        + guarded_route
+    )), "negated matches alone must never validate the roadmap-owner check"
+
+    # (9) PIN: the exact current project-orchestrator Roadmap verdict line is a
+    #     must-remain-clean positive under the corrected engine.
+    pinned = (
+        "    Either way the turn ends with `roadmap-under-uncertainty-planner` "
+        "classified applicable or classified `n/a` (reason) — the recorded verdict, "
+        "never an implicit skip."
+    )
+    live = (REAL_REPO / ".claude" / "skills" / "project-orchestrator" / "SKILL.md"
+            ).read_text(encoding="utf-8")
+    assert pinned in live, (
+        "the pinned project-orchestrator Roadmap verdict line has drifted from the "
+        "live contract — re-pin it here deliberately"
+    )
+    assert gaps(pinned + "\n" + guarded_route) == [], (
+        "the live project-orchestrator Roadmap verdict line must remain a clean "
+        "ROUTE-003 positive"
+    )
+
+    ok("ROUTE-003 verdict negation: pre-negated (not / never classify / without "
+       "classifying) and post-disclaimed (but not recorded / not actually recorded) "
+       "candidates are rejected; the four valid forms and the pinned live Roadmap "
+       "verdict line stay clean; a negated match neither poisons nor validates an "
+       "unrelated positive")
 
 
 # --- complete rule inventory: zero-hit rules are present (fix v1#5/#11) ------
@@ -1023,6 +1362,8 @@ def main() -> int:
     test_append_decl_scoping()
     test_stage2_segment()
     test_stage2_malformed_and_leakage()
+    test_route003_branch_aware()
+    test_route003_verdict_negation()
     test_rule_inventory_complete(a)
     test_real_inventory_includes_zero_hit_rules()
     test_provenance_snapshot(a)

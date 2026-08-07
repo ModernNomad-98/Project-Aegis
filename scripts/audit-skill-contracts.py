@@ -89,7 +89,7 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.3.0"
+TOOL_VERSION = "1.12.0"
 
 
 class InputContainmentError(Exception):
@@ -640,13 +640,13 @@ RULES: list[dict] = [
      "positive_fixture": "stale-linker", "negative_fixture": "clean-skill",
      "aegis_map": [],
      "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id"},
-    {"id": "ROUTE-003", "purpose": "Stage-2 route reaches commitments without the roadmap owner",
-     "authority": "project-orchestrator (Stage-2 route); roadmap-to-commitments-translator (consumes a roadmap)",
+    {"id": "ROUTE-003", "purpose": "a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified",
+     "authority": "project-orchestrator (Stage-2 per-owner routes); roadmap-to-commitments-translator (readiness mode returns NOT COMMIT-ABLE when evidence is absent)",
      "severity": "P1", "classification": "mechanical",
      "surfaces": ["skill-body"],
      "positive_fixture": "bad-stage-router", "negative_fixture": "clean-skill",
-     "aegis_map": ["AEGIS-035", "AEGIS-045"],
-     "limits": "bound to the literal **Stage 2/**Stage 3 markers; a reworded route escapes detection"},
+     "aegis_map": ["AEGIS-035", "AEGIS-044", "AEGIS-045"],
+     "limits": "PER-ROUTE (v1.12.0): validates EACH physical line naming roadmap-to-commitments-translator together with a routing marker — reusing the SHARED ROUTING_LINE grammar (arrow / invoke / route-to / hand off/over/to / delegate to / goes to / belongs to / owned by), so no active commitments route is missed. The readiness / NOT COMMIT-ABLE guard must be ON THAT LINE and POSITIVE — EVERY guard phrase (NOT COMMIT-ABLE included) gets a negation check BOTH before and after the phrase, so 'not readiness mode', 'without a NOT COMMIT-ABLE guard', 'readiness mode not required', and 'readiness mode skipped' do not clear it. The roadmap owner (roadmap-under-uncertainty-planner) must carry a recorded VERDICT PHRASE — a classification act with its result ('classified n/a', 'classify <owner> applicable', 'recorded as n/a', 'n/a-recorded') — on a NON-invocation line: a routing marker, the bare word 'owner', a QUESTION, an uncertain MODAL ('may be n/a'), a PENDING state ('unclassified'), and a bare-token CRITERIA/definition bullet ('APPLICABLE on evidence of …') all do NOT count; and (v1.12.0) EVERY candidate verdict phrase gets a MATCH-LEVEL negation check on BOTH sides of the classification act/result — 'not classified applicable', 'never classify … applicable', 'without classifying … applicable', 'classified applicable but not recorded', and 'classified n/a — not actually recorded' are all rejected, one genuine positive non-negated recorded verdict still satisfies the check, a negated match neither poisons nor validates an unrelated positive match, and the verdict VALUE token 'not applicable' is never read as act negation; classified n/a is valid. A zero honestly means every commitments-reaching route is self-guarded AND the roadmap owner carries a genuine recorded verdict. Bound to the literal **Stage 2/**Stage 3 markers and to single-physical-line routes; negation windows are bounded (~24 chars), so a negator separated from the act by longer filler is missed"},
     {"id": "VOCAB-002", "purpose": "committed used as a roadmap horizon label",
      "authority": "roadmap-to-commitments-translator (reserves 'committed' for capacity-backed promises); AEGIS §F",
      "severity": "P1", "classification": "semantic-candidate",
@@ -1080,20 +1080,27 @@ class Audit:
                         related_skills=[tgt],
                     ))
 
-        # ROUTE-003: the Stage-2 route contract (AEGIS-035, verified on main).
+        # ROUTE-003: the Stage-2 commitments-route contract (AEGIS-035/-044),
+        # branch-aware (thread-12 fix). A ZERO here honestly means the Stage-2
+        # route runs commitments as a guarded readiness assessment with the
+        # roadmap owner named — NOT merely that two tokens co-occur.
         for s in self.skills:
             seg = self.stage2_segment(s.body)
             if seg is None:
                 continue
-            if ("roadmap-to-commitments-translator" in seg
-                    and "roadmap-under-uncertainty-planner" not in seg):
+            gaps = self.stage2_commitments_route_gaps(seg)
+            if gaps:
+                # aegis_map reflects the ACTUAL gap kinds (R8-3): an unguarded route is
+                # the AEGIS-044 defect family; a missing roadmap-owner verdict is
+                # AEGIS-035; AEGIS-045 anchors the route-graph family either way.
+                gap_ids = sorted(
+                    {gid for gid in ("AEGIS-035", "AEGIS-044")
+                     if any(gid in g for g in gaps)} | {"AEGIS-045"})
                 self.findings.append(Finding(
                     "ROUTE-003", "P1", s.rel(), 0, s.name,
-                    "Stage 2 route reaches roadmap-to-commitments-translator without "
-                    "roadmap-under-uncertainty-planner, but the commitments skill "
-                    "declares a roadmap as its input and the prioritization skill "
-                    "hands sequencing to the roadmap planner (AEGIS-035)",
-                    "route", ["AEGIS-035", "AEGIS-045"], s.name, "high", True,
+                    "Stage 2 route reaches roadmap-to-commitments-translator but is "
+                    "not safe: " + "; ".join(gaps),
+                    "route", gap_ids, s.name, "high", True,
                     related_skills=[
                         "prioritization-frame-picker",
                         "roadmap-under-uncertainty-planner",
@@ -1130,6 +1137,172 @@ class Audit:
             return None
         m3 = STAGE3_HEADER.search(body, m.end())
         return body[m.start() : m3.start() if m3 else len(body)]
+
+    @staticmethod
+    def stage2_commitments_route_gaps(seg: str) -> list[str]:
+        """PER-ROUTE ROUTE-003 core (thread-12 fix + follow-up). Validate EACH
+        detectable Stage-2 route that reaches the commitments skill on its OWN
+        line, so unrelated explanatory text elsewhere in the segment can no longer
+        make a separate unguarded route look safe. Returns the safety gaps; an
+        EMPTY list means every commitments-reaching route is guarded AND the
+        roadmap owner is independently classified.
+
+        A commitments ROUTE is a physical line that names
+        `roadmap-to-commitments-translator` together with a routing marker from
+        the SHARED ``ROUTING_LINE`` grammar (arrow, ``invoke``, ``route to``,
+        ``hand off/over/to``, ``delegate to``, ``goes to``, ``belongs to``,
+        ``owned by``) — so no active route is missed (R5-6). Each such route must
+        carry a POSITIVE readiness-mode / ``NOT COMMIT-ABLE`` guard ON THAT LINE;
+        a co-occurrence elsewhere in the segment does not count, and a NEGATED
+        mention (``not readiness mode``, ``skip readiness``) is not a guard
+        (AEGIS-044, R5-7). Separately, the roadmap owner
+        (`roadmap-under-uncertainty-planner`) must be independently CLASSIFIED as
+        its own Stage-2 owner. Invocation is NOT classification (F3), and neither
+        is a QUESTION (``is it applicable?``), an uncertain MODAL (``may be
+        n/a``) (R5-3), a PENDING/process state (``unclassified``, ``a
+        classification step follows``) (R6-1), or a CRITERIA/definition bullet
+        (``- **Roadmap** — APPLICABLE on evidence of …``) (R7-3): classification
+        requires a recorded VERDICT PHRASE — a classification act stated with
+        its result (``classified n/a``, ``classify <owner> applicable``,
+        ``recorded as n/a``, ``n/a-recorded``) — for the roadmap owner on a
+        line that is NOT itself a route to the planner. A NEGATED candidate is
+        not a verdict (PR77 Finding 3, v1.12.0): every candidate phrase gets a
+        MATCH-LEVEL negation check on BOTH sides, so a negated act (``not
+        classified applicable``, ``never classify … applicable``, ``without
+        classifying … applicable``) or a disclaimed record (``classified
+        applicable but not recorded``, ``classified n/a — not actually
+        recorded``) disqualifies THAT candidate only — one genuine positive,
+        non-negated recorded verdict still satisfies the check, a negated match
+        neither poisons nor validates an unrelated positive match, and the
+        verdict VALUE token ``not applicable`` is never itself read as act
+        negation. Classified ``n/a`` is valid, so a deadline-only project
+        legitimately routes to commitments with the roadmap owner classified
+        n/a (AEGIS-035)."""
+        # R5-6: reuse the SHARED routing grammar (ROUTING_LINE) so every commitments
+        # route the rest of the audit recognises - `goes to` / `delegates to` /
+        # `hand over`, not just an arrow / invoke / route-to - is validated here.
+        marker = ROUTING_LINE
+        # Real classification VERDICT grammar: a recorded classification ACT stated with
+        # its RESULT — "classified n/a", "classify <owner> applicable", "recorded as n/a",
+        # "n/a-recorded". Deliberately NOT a routing marker, NOT the bare word "owner",
+        # NOT `unclassified` / bare `classif*` (a pending state / process mention, R6-1),
+        # and (R7-3) NOT a bare APPLICABLE / n/a token either: a generic CRITERIA or
+        # definition bullet ("- **Roadmap** — APPLICABLE on evidence of …; NOT APPLICABLE
+        # for …") states when the owner WOULD be applicable, not that it WAS classified,
+        # and must not clear the owner check.
+        classify = re.compile(
+            r"(?i)(\bclassif\w*\b[^.\n?]{0,60}?\b(?:not\s+applicable|applicable|n/?a)\b"
+            r"|\b(?:not[- ]applicable|applicable|n/?a)-recorded\b"
+            r"|\brecord(?:ed)?\s+as\s+`?(?:not\s+applicable|applicable|n/?a)\b)")
+        # R5-3: a QUESTION ("is the planner applicable?") or an UNCERTAIN MODAL
+        # ("may be n/a", "might be applicable", "tbd") is NOT a recorded verdict and
+        # must not clear AEGIS-035. Deliberately excludes copulas (is/are/does), which
+        # also introduce declarative passives ("is classified n/a").
+        question_or_modal = re.compile(
+            r"(?i)(\?|\b(may|might|could|would|maybe|perhaps|possibly|whether|tbd|"
+            r"to\s+be\s+(?:decided|determined|confirmed))\b[\s\w'/()`.,-]{0,24}\b"
+            r"(applicable|n/?a)\b)")
+        # PR77 Finding 3 (v1.12.0): MATCH-LEVEL verdict negation. A negated
+        # classification candidate is not a recorded verdict — "was not
+        # classified applicable", "never classify <owner> applicable", and
+        # "without classifying <owner> applicable" negate the ACT before the
+        # match, while "classified applicable but not recorded" and
+        # "classified n/a — not actually recorded" disclaim the RECORD after
+        # it. Each candidate is judged independently, so a negated candidate
+        # neither validates the owner check nor poisons a genuine positive
+        # elsewhere on the line. The verdict VALUE token "not applicable" is a
+        # result, never an act negation — it is masked out of the before-window
+        # so "NOT APPLICABLE here; classify <owner> n/a" keeps its verdict.
+        verdict_value_token = re.compile(r"(?i)\bnot[- ]applicable\b")
+        verdict_neg_before = re.compile(
+            r"(?i)\b(?:not|no|never|without|cannot|\w+n['’]t|fail(?:s|ed|ing)?\s+to|"
+            r"refus\w*|declin\w*|avoid(?:s|ed|ing)?|skip(?:s|ped|ping)?|non-?)\b"
+            r"[\s\w,'’/()`-]{0,24}$")
+        verdict_neg_after = re.compile(
+            r"(?i)^[\s\w,'’/()`:;—–-]{0,24}?"
+            r"(?:\b(?:not|never|\w+n['’]t|without)\b[\s\w'’-]{0,16}?\brecord"
+            r"|\bun-?record)")
+        # The roadmap owner, referenced by its planner skill token OR by an explicit
+        # "Roadmap" Stage-2 owner bullet (the label its classification hangs on).
+        roadmap_ref = re.compile(
+            r"(?i)(roadmap-under-uncertainty-planner|^\s*[-*]\s*\*{0,2}roadmap\b)")
+
+        # R5-7 + R7-2: the guard must be POSITIVE readiness-mode / NOT-COMMIT-ABLE guard
+        # LANGUAGE on the route line — the ASSESSMENT phrase ("readiness mode/assessment",
+        # "(readiness …)", "NOT COMMIT-ABLE"), NOT the bare word "readiness" (which also
+        # appears in the owner name "commitment readiness"), and NEVER a negated mention.
+        # EVERY guard-phrase occurrence gets the negation check — "NOT COMMIT-ABLE" is not
+        # exempt, so "… without a NOT COMMIT-ABLE guard" does not count as guarded.
+        guard_phrase = re.compile(
+            r"(?i)(readiness[\s-]?(?:mode|assessment|check|gate)\b|\(\s*readiness\b|"
+            r"\breadiness\s*\)|NOT COMMIT-ABLE)")
+        neg_before = re.compile(
+            r"(?i)\b(not|no|never|without|lack(?:s|ing)?|avoids?|skips?|bypass(?:es)?|"
+            r"instead\s+of|rather\s+than|non-?)\b[\s\w,'/()`-]{0,24}$")
+        # R9-1: negation AFTER the phrase disclaims the guard too — "readiness mode not
+        # required", "NOT COMMIT-ABLE guard is not required", "readiness mode skipped".
+        # Deliberately excludes evidence-state words (absent/missing) that describe WHY
+        # the guard fires ("returns NOT COMMIT-ABLE absent evidence" IS a guard).
+        neg_after = re.compile(
+            r"(?i)^[\s\w,'/()`:;-]{0,16}?\b(not|never|n't|unnecessary|optional|"
+            r"skipp?ed|waived)\b")
+
+        def guarded(line: str) -> bool:
+            for m in guard_phrase.finditer(line):
+                if neg_before.search(line[:m.start()]):
+                    continue       # negated before the phrase
+                if neg_after.search(line[m.end():]):
+                    continue       # disclaimed after the phrase (R9-1)
+                return True        # at least one POSITIVE, non-negated guard phrase
+            return False
+
+        def is_recorded_verdict(line: str) -> bool:
+            # a declarative applicability verdict for the roadmap owner (R5-3)
+            if question_or_modal.search(line):
+                return False
+            # PR77 Finding 3: judge every candidate phrase at MATCH level —
+            # skip negated candidates; accept on the first genuine positive.
+            for m in classify.finditer(line):
+                before = verdict_value_token.sub("verdict", line[: m.start()])
+                if verdict_neg_before.search(before):
+                    continue    # the classification ACT is negated
+                if verdict_neg_after.search(line[m.end():]):
+                    continue    # the RECORD of the result is disclaimed
+                return True     # one genuine positive, non-negated verdict
+            return False
+
+        def routes_to_planner(line: str) -> bool:
+            # a line that INVOKES / routes to the planner — invocation, not classification
+            return "roadmap-under-uncertainty-planner" in line and bool(marker.search(line))
+
+        lines = seg.splitlines()
+        commit_routes = [
+            ln for ln in lines
+            if "roadmap-to-commitments-translator" in ln and marker.search(ln)
+        ]
+        if not commit_routes:
+            return []  # commitments is not reached by any detectable route
+        gaps: list[str] = []
+        for ln in commit_routes:
+            if not guarded(ln):
+                gaps.append(
+                    "a Stage-2 route invokes roadmap-to-commitments-translator "
+                    "without a readiness-mode / NOT COMMIT-ABLE guard ON THAT "
+                    f"ROUTE (AEGIS-044): {ln.strip()[:110]!r}")
+        # The roadmap owner is classified ONLY by a non-invocation line that states a
+        # RECORDED verdict for it - a bare invocation, a naming ("a Stage-2 owner"), a
+        # question, or an uncertain modal ("may be n/a") no longer counts (F3 + R5-3).
+        roadmap_owner_classified = any(
+            roadmap_ref.search(ln) and is_recorded_verdict(ln) and not routes_to_planner(ln)
+            for ln in lines
+        )
+        if not roadmap_owner_classified:
+            gaps.append(
+                "the roadmap owner (roadmap-under-uncertainty-planner) is not "
+                "independently classified — invocation, naming, a question, or an "
+                "uncertain modal is not a recorded verdict; a declarative applicable / "
+                "not applicable / n/a result must be recorded (AEGIS-035 route gap)")
+        return gaps
 
     # -- family F: vocabulary (AEGIS-039/-044) -------------------------------
 

@@ -1,10 +1,10 @@
 # Skill-contract audit — baseline report
 
-- Tool: `audit-skill-contracts` v1.3.0 (engine sha256 `279e64426933d622…`)
-- Repo SHA: `9e7785be64b2dd4905da37ce9367acb787bcb9b6` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `b9b7ca429793369457d544b342d3674ede2e53b56b6036d219e9700a7664f290` (703 files, 3840038 bytes)
+- Tool: `audit-skill-contracts` v1.12.0 (engine sha256 `c886b27aee860aed…`)
+- Repo SHA: `4f361d14930d87d689c5c7495c993a57e35f2609` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `2fe588494dba6cbe11a13739f9e88390af342b35f128642e65d7c1db2ee4cc51` (704 files, 3955703 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **416** (317 mechanical, 99 semantic-review candidates)
+- Findings: **414** (316 mechanical, 98 semantic-review candidates)
 
 A baseline finding is EXPECTED here: this report freezes the state of
 the corpus BEFORE remediation. A finding below is not a tool failure,
@@ -23,20 +23,18 @@ mechanically proven defects.
 
 | Severity | Count |
 |---|---:|
-| P0 | 1 |
-| P1 | 99 |
+| P0 | 2 |
+| P1 | 96 |
 | P2 | 5 |
 | info | 311 |
 
 | Rule | Count |
 |---|---:|
-| APPR-002 | 1 |
 | ARTF-001 | 10 |
 | EVAL-004 | 5 |
 | ROUTE-002 | 311 |
-| ROUTE-003 | 1 |
 | SIDE-004 | 82 |
-| STATE-005 | 2 |
+| STATE-001 | 2 |
 | VOCAB-002 | 4 |
 
 ## Findings (P0/P1 + all semantic-review candidates)
@@ -93,13 +91,11 @@ mechanically proven defects.
 - **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/operational-vs-analytical-splitter/SKILL.md:88` (owner: operational-vs-analytical-splitter; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/phased-work-handoff-designer/SKILL.md` (owner: phased-work-handoff-designer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'stage doesn\'t say "tests' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/product-analytics-instrumenter/SKILL.md` (owner: product-analytics-instrumenter; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchases' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ROUTE-003** [P1/high/mechanical] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-035, AEGIS-045) — Stage 2 route reaches roadmap-to-commitments-translator without roadmap-under-uncertainty-planner, but the commitments skill declares a roadmap as its input and the prioritization skill hands sequencing to the roadmap planner (AEGIS-035)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:262` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
-- **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:71` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
-- **STATE-005** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:122` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file contains narrative section '## MVP scope (approved)' with no defined supersession mechanics (how is it updated without rewriting bytes?)
-- **APPR-002** [P0/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:140` (owner: project-orchestrator; maps: AEGIS-003, AEGIS-008) — scope grant that authorizes BUILDING from a requirements-stage approval: 'Build the v1 scope' (content approval must not become implementation authority)
+- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:354` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:171` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
+- **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:183` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-strategy-architect/SKILL.md` (owner: qa-strategy-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded database' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/query-plan-reader/SKILL.md` (owner: query-plan-reader; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'execution EXECUTES the write' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -244,16 +240,17 @@ mechanically proven defects.
 - `principal-code-analyst`: prioritized×1
 - `prioritization-frame-picker`: prioritized×1
 - `profiling-methodology-designer`: proposed×1, targeted×1
-- `project-orchestrator`: complete×9, deployed×1, durable×2, proposed×2, ready×4
+- `project-orchestrator`: accepted×18, approved scope×4, commit-able×9, complete×39, deployed×1, durable×2, proposed×8, ready×3
 - `promotion-packet-writer`: ready×3
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: proposed×1, sequenced×2, verified×2
 - `readme-craftsman`: complete×1, verified×3
 - `realtime-subscription-architect`: accepted×1, complete×1
 - `release-readiness-reviewer`: ready×2, verified×2
+- `requirements-gathering-facilitator`: complete×2
 - `reviewable-diff-discipline`: verified×1
 - `rls-policy-auditor`: verified×3
-- `roadmap-to-commitments-translator`: commit-able×7, committed×14
+- `roadmap-to-commitments-translator`: approved scope×1, commit-able×34, committed×27, durable×2, proposed×2, verified×9
 - `roadmap-under-uncertainty-planner`: committed×9, planned×7, prioritized×2
 - `rollback-runbook-author`: deployed×1, verified×3
 - `saas-cost-architect`: accepted×1, committed×1, complete×1

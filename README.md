@@ -372,6 +372,13 @@ cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
 
 `cp -r` is the same copy on Mac and Linux (`-r` means "include everything inside the folder").
 
+**Copying the startup files does not make your repo the Project Aegis source.**
+Copying `.claude/skills`, `CLAUDE.md`, and `AGENTS.md` into your own repo is the supported consumer installation, and those copied files stay *tools inside your product repository*.
+They do NOT convert it into the Project Aegis source repository — the copied root instructions are role-aware and say so.
+After copying, open your OWN product repository and work there: for a new project, Claude (via `project-orchestrator`) creates `docs/project-state.md` in that current product repo and starts at Stage 0.
+You do NOT need to create a second project folder just because the Aegis files are present.
+The Project Aegis source repository is identified by its source-package landmarks — a `# Project Aegis` `README.md`, `docs/skills-catalog.md`, `scripts/validate-skills.py`, and `artifacts/audits/skill-contract-audit-baseline.json` — not by the copied skills alone.
+
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
 

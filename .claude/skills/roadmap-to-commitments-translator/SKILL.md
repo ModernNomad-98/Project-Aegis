@@ -1,6 +1,6 @@
 ---
 name: roadmap-to-commitments-translator
-description: Translate a directional, uncertainty-aware roadmap into what a team can actually COMMIT to — the binding delivery promises stakeholders will hold you to. Separate commit-able (high-confidence, capacity-backed, dependency-clear) from aspirational, ground commitments in real capacity (velocity evidence minus maintenance/interrupts, with a buffer), fold in cross-team dependencies and risk, translate outcomes into concrete deliverables with honest date RANGES, and manage the gap explicitly (what's NOT committed, and why). The inverse of roadmap-under-uncertainty-planner, which keeps the roadmap honestly uncertain. Use when converting a roadmap into commitments, quarterly planning, or when stakeholders treat the whole roadmap as a promise. Do NOT use to build/sequence the roadmap itself (roadmap-under-uncertainty-planner), negotiate specific cross-team dependencies (cross-team-dependency-negotiator), or rank the backlog (prioritization-frame-picker).
+description: Translate a directional, uncertainty-aware roadmap into what a team can actually COMMIT to — the binding delivery promises stakeholders will hold you to. Separate commit-able (high-confidence, capacity-backed, dependency-clear) from aspirational, ground commitments in real capacity (velocity evidence minus maintenance/interrupts, with a buffer), fold in cross-team dependencies and risk, translate outcomes into concrete deliverables with honest date RANGES, and manage the gap explicitly (what's NOT committed, and why). The inverse of roadmap-under-uncertainty-planner, which keeps the roadmap honestly uncertain. Use when converting a roadmap into commitments, assessing commitment readiness, quarterly planning, or when stakeholders treat the whole roadmap as a promise. Do NOT use to build/sequence the roadmap itself (roadmap-under-uncertainty-planner), negotiate specific cross-team dependencies (cross-team-dependency-negotiator), or rank the backlog (prioritization-frame-picker).
 ---
 
 # Roadmap to Commitments Translator
@@ -55,6 +55,41 @@ uncertain; this extracts the firm-promise slice from it.
 
 ## Workflow
 
+**Two modes — state which one you are in.** Before the steps below, decide the
+mode, because the lifecycle uses this skill in two different places:
+
+- **Readiness assessment** (used at product-definition time, e.g. a
+  beginner's Stage 2). Decide whether a delivery commitment is even
+  supportable YET. Readiness is judged on TECHNICAL evidence ONLY; a human
+  commitment decision is NOT readiness evidence, and its absence never forces
+  readiness to `NOT COMMIT-ABLE`. Before producing any commitment, inspect
+  whether the evidence a real commitment needs actually exists — an approved,
+  current product scope; an uncertainty-aware roadmap where roadmap planning
+  applies; architecture or design evidence; technical planning and meaningful
+  dependency discovery; measured throughput or another defensible capacity
+  basis; completed dependency discovery (secured where a real dependency
+  exists — `verified-none` is sufficient); and risk/uncertainty evidence. When
+  material evidence is missing, the result is **`NOT COMMIT-ABLE`**, and it
+  names every material missing-evidence category, what evidence should come
+  next, the earliest lifecycle point to reassess, and any stakeholder date as
+  an **unverified target only** — never a promise. When that technical
+  evidence IS sufficient, readiness is **`COMMIT-ABLE`** even though no human
+  has decided yet: the output is `COMMIT-ABLE` with **`Commitment status =
+  HUMAN DECISION REQUIRED`** and a non-binding candidate committable set for
+  the named human to decide on — the human decision is required only before a
+  FINAL commitment is emitted (below), never to reach readiness. A `NOT
+  COMMIT-ABLE` readiness result is a VALID, completed output: it does not block
+  architecture or technical planning; it withholds a promise until the
+  evidence exists. Never manufacture a commitment from approved product scope,
+  a target date, gross available hours, nominal team size, an implementation
+  authorization, a governance approval, a roadmap horizon, or unsupported
+  assumptions.
+- **Final commitment assessment** (used later, once evidence is sufficient).
+  Even then, **`COMMIT-ABLE` means the evidence is sufficient for a human
+  commitment decision — it is not itself a delivery promise**; a named human
+  remains the commitment authority. The steps below produce the committable
+  set and honest date RANGES once that bar is met.
+
 1. **Separate commit-able from aspirational.** Only items that are
    high-confidence, capacity-backed, AND dependency-clear become
    commitments. Everything else stays directional. This split is the whole
@@ -91,23 +126,101 @@ deliverable translation, and the gap-communication format:
 
 ```
 ROADMAP → COMMITMENTS — <team/horizon>
-Capacity basis: velocity evidence; minus maintenance/interrupts; buffer   (not aspiration)
-Committed:      <deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence>
-Dependencies:  <what each commitment needs> → cross-team-dependency-negotiator (secured?)
-NOT committed (directional): <roadmap items excluded — and WHY (capacity/dependency/uncertainty)>
+Mode:          READINESS ASSESSMENT | FINAL COMMITMENT ASSESSMENT
+Readiness:     COMMIT-ABLE | NOT COMMIT-ABLE
+Missing evidence: <named list | none>
+Next evidence needed: <named list | none>
+Reassess after: <stage or evidence milestone>
+Commitment status: NONE | HUMAN DECISION REQUIRED | HUMAN-APPROVED
+Authorized by: <named human approver — role + name/handle — who made the commitment decision;
+                 REQUIRED and non-empty when Commitment status = HUMAN-APPROVED
+                 | n/a — no final commitment approved (status NONE or HUMAN DECISION REQUIRED)>
+Approval reference: <durable evidence of that approval — recorded Approval id / decision-log entry
+                 id / dated message link — so a later reader can verify it, not just read a status;
+                 REQUIRED when HUMAN-APPROVED | n/a>
+Approval scope + date: <exactly which deliverables + date RANGES the named human approved, and the
+                 approval date — bounds the binding commitment; a scope change needs a NEW approval
+                 | n/a>
+Target dates:  <unverified targets | none>
+Capacity basis: <verified velocity evidence + calculation (minus maintenance/interrupts, buffer)
+                 | none — missing <named capacity evidence>>
+Committed:      <deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence
+                 | none — readiness is NOT COMMIT-ABLE
+                 | none — awaiting named human decision>
+Candidate committable set (non-binding): <deliverables + honest date RANGES proposed for the
+                 named human's commitment decision — shown when Readiness = COMMIT-ABLE and
+                 Commitment status = HUMAN DECISION REQUIRED
+                 | none — readiness is NOT COMMIT-ABLE
+                 | n/a — final commitment already HUMAN-APPROVED>
+Dependencies:  <known dependencies + state → cross-team-dependency-negotiator (secured?)
+                 | unknown — discovery incomplete
+                 | none verified>
+NOT committed (directional): <excluded roadmap items + reason (capacity/dependency/uncertainty)
+                 | all delivery items — readiness is NOT COMMIT-ABLE>
 Over-commit tradeoff: <if asked for more: commit-less | add-capacity | accept-lower-confidence>
 Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific dep →
                cross-team-dependency-negotiator; ranking → prioritization-frame-picker
 ```
 
+**Field rules by mode.** In **readiness mode / `NOT COMMIT-ABLE`**: `Committed`
+is `none`, no date range is invented, `Target dates` stay unverified, and
+incomplete dependency discovery is `unknown` — never "none verified"; the
+`Candidate committable set` is `none`. **`Capacity basis` reflects the actual
+evidence, not the verdict:** when a defensible capacity basis EXISTS (measured
+velocity minus maintenance/interrupts, with a buffer) but readiness fails on a
+DIFFERENT missing category, KEEP that verified calculation — discarding valid
+capacity evidence would misstate what is known — and name the real missing
+category (e.g. the technical implementation plan) in `Missing evidence`.
+`Capacity basis` is `none — missing <named capacity evidence>` ONLY when the
+capacity evidence itself is what is absent. In **readiness mode / `COMMIT-ABLE`**: `Committed` is still
+`none — awaiting named human decision` (`COMMIT-ABLE` is evidence sufficiency,
+not a promise), and the **`Candidate committable set`** carries the proposed
+deliverables + honest date RANGES the named human is asked to decide on — it is
+non-binding and is NOT the `Committed` set. Only in **final commitment mode**,
+and only once a named human has approved, are capacity-backed deliverables and
+date RANGES emitted as `Committed` (the candidate set becomes `n/a`). In that
+mode `Commitment status: HUMAN-APPROVED` is valid ONLY when `Authorized by`,
+`Approval reference`, and `Approval scope + date` are all populated: a
+`HUMAN-APPROVED` status — or any non-empty `Committed` set — without a named
+human approver AND a durable, checkable approval reference is an invalid,
+unauthorized commitment (the reader cannot tell an asserted status from a real
+approval). The `Committed` deliverables and their date ranges must fall within
+the recorded `Approval scope`; anything beyond it requires a new named-human
+approval, never a silent widening.
+
 ## Validation Checklist
 
 - [ ] Commit-able items are separated from aspirational by confidence,
       capacity, AND dependency-clarity.
-- [ ] Commitments are grounded in velocity evidence minus maintenance/
-      interrupts, with a buffer — not aspiration.
+- [ ] In **final commitment mode** — and only with sufficient evidence AND a
+      named human's approval — commitments are grounded in velocity evidence
+      minus maintenance/interrupts, with a buffer, not aspiration. These
+      capacity-backed checks apply ONLY in that mode.
+- [ ] In **readiness mode / `NOT COMMIT-ABLE`**, `Committed` is `none` — no
+      commitment is fabricated; `Target dates` stay unverified; incomplete
+      dependency discovery is `unknown`, not "none verified". `Capacity basis`
+      is `none — missing <named capacity evidence>` ONLY when the capacity
+      evidence itself is absent; when a defensible capacity basis EXISTS but
+      readiness fails on a DIFFERENT missing category, the verified calculation
+      is KEPT (never discarded to `none`) and that other category is named in
+      `Missing evidence`.
+- [ ] `COMMIT-ABLE` alone emits no committed deliverable — `Committed` stays
+      `none — awaiting named human decision` until a named human decides.
+- [ ] Readiness sufficiency is judged on TECHNICAL evidence only — a missing
+      human decision never forces `NOT COMMIT-ABLE`; sufficient technical
+      evidence reaches `COMMIT-ABLE` with `Commitment status = HUMAN DECISION
+      REQUIRED`.
+- [ ] In readiness mode / `COMMIT-ABLE`, the non-binding `Candidate committable
+      set` (deliverables + honest date RANGES) is shown for the human's
+      decision, distinct from `Committed` (which stays `none`).
 - [ ] Dependencies are folded in; commitments gated on uncommitted
       external work are not treated as firm.
+- [ ] Dependency STATE drives the verdict, not the mere absence of "secured"
+      entries: `unknown` (incomplete discovery) is missing evidence and a
+      known-but-unsecured required dependency is insufficient, but `none
+      verified` after completed discovery is SUFFICIENT — a self-contained
+      deliverable with no external dependency is not forced to `NOT COMMIT-ABLE`
+      on that basis alone.
 - [ ] Outcomes are translated into concrete deliverables with honest date
       RANGES, not false-precise dates.
 - [ ] The not-committed gap is stated explicitly with reasons.
@@ -150,6 +263,20 @@ Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific
   accept the tradeoff → surface the over-commitment risk explicitly and
   escalate the decision; do not manufacture a commitment by padding or
   by committing the best case.
+- The evidence a real commitment needs is absent → return `NOT COMMIT-ABLE`,
+  name the missing evidence and the reassessment point, and keep any date an
+  unverified target. Dependency evidence is judged by STATE, not by the mere
+  absence of "secured" entries: `unknown — discovery incomplete` is MISSING
+  evidence; a known-but-unsecured REQUIRED dependency is INSUFFICIENT; but
+  `none verified` after COMPLETED dependency discovery is SUFFICIENT — a
+  self-contained deliverable that genuinely has no external dependency is not
+  penalised, and secured-dependency evidence is required only where an actual
+  dependency was discovered. Architecture/design, technical planning, and a
+  measured capacity basis remain independently required. Never convert gross
+  available hours into capacity evidence, approved scope into a promise, or an
+  implementation/governance authorization into delivery evidence; never call a
+  target date a commitment; never create a human commitment automatically —
+  `COMMIT-ABLE` only signals that a named human may now decide.
 
 ## Supporting Files
 

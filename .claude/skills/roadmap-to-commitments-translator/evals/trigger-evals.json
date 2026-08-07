@@ -16,6 +16,14 @@
       "reason": "Extracting firm promises from a directional roadmap is this skill's core scope."
     },
     {
+      "id": "readiness-assessment-wins-here",
+      "prompt": "We have an approved product idea and a stakeholder wants a firm delivery date, but there's no architecture or velocity yet. Is a delivery commitment even supportable yet, or should we hold off?",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": ["roadmap-under-uncertainty-planner", "prioritization-frame-picker"],
+      "note": "READINESS MODE — assessing whether a commitment is supportable YET (before the evidence exists) is this skill's readiness-assessment mode, not building/sequencing a roadmap or ranking a backlog.",
+      "reason": "Commitment readiness — deciding whether a delivery date/commitment is supportable given the evidence — is this skill's readiness-assessment mode; it returns NOT COMMIT-ABLE, naming the missing evidence, when that evidence is absent."
+    },
+    {
       "id": "build-roadmap-goes-to-roadmap-under-uncertainty-planner",
       "prompt": "Build and sequence our roadmap: now/next/later horizons, confidence that fades with distance, and uncertainty-reducing bets first.",
       "expected_skill": "roadmap-under-uncertainty-planner",

@@ -1,0 +1,229 @@
+{
+  "description": "Approved Scenario A fixture sequence. The harness replays these files in order and asserts, per step, the exact immutable IDs below AND a line-ending-agnostic SHA-256 (content normalized to LF before hashing, so an autocrlf smudge does not cause a false failure). Semantic gates: user product-spec acceptance (PS-006) is recorded before the product-spec owner completion (PS-007); the four Stage 2 owner records are recorded before the Stage 3 snapshot (SS-002); SS-003 never appears.",
+  "hash_algorithm": "sha256 over UTF-8 bytes of the file content with CRLF/CR normalized to LF",
+  "steps": [
+    {
+      "file": "00-cold-start.md",
+      "sha256": "sha256:50a63c210c90ac0e438599c0fbcc53c53ccb6307ec81e50404b45140fa868532",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)"
+      ],
+      "approvals": [
+        "(none yet)"
+      ]
+    },
+    {
+      "file": "01-discovery-recorded.md",
+      "sha256": "sha256:da2414393830d3011aac16efb670d31453da180196c26cda4df06c82d580655a",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "02-lowrisk-batch-recorded.md",
+      "sha256": "sha256:2388c03066b83310a554340c243ed7eed3159e6ebc5fd272e57964d27a951c0d",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "03-product-spec-accepted.md",
+      "sha256": "sha256:6e663389f3a5f0829479da328de5f7636e5885ecd49d313b4ef20cb0a4126f3b",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "04-product-spec-owner-complete.md",
+      "sha256": "sha256:a92cbb361a258f88c9ae22d5b0b24be6dd1b42d463f746005ddab90817d85b9a",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006",
+        "PS-007"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "05-prioritization-na.md",
+      "sha256": "sha256:5475227d454197aa3f085a32258528c08903325cb2d1fb8c524202a7379dbda3",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006",
+        "PS-007",
+        "PS-008"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "06-roadmap-na.md",
+      "sha256": "sha256:9e94fea911328c62b029f3bfdfeb0334c46b29c5140e5348186ffeae6163590e",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006",
+        "PS-007",
+        "PS-008",
+        "PS-009"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "07-commitment-readiness-na.md",
+      "sha256": "sha256:4ce05f47df16e2908a3c65a64c5bda0f2f0a6b38bfa1a58fdbbc1baa09217699",
+      "snapshots": [
+        "SS-001"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006",
+        "PS-007",
+        "PS-008",
+        "PS-009",
+        "PS-010"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    },
+    {
+      "file": "08-stage3-snapshot.md",
+      "sha256": "sha256:47ab679c463f55d31e0e266b4a89715cb21f011a1029907a9e7504a880edf2a0",
+      "snapshots": [
+        "SS-001",
+        "SS-002"
+      ],
+      "decisions": [
+        "(none yet)",
+        "PS-001",
+        "PS-002",
+        "PS-003",
+        "PS-004",
+        "PS-005",
+        "PS-006",
+        "PS-007",
+        "PS-008",
+        "PS-009",
+        "PS-010"
+      ],
+      "approvals": [
+        "(none yet)",
+        "A-001"
+      ]
+    }
+  ],
+  "semantics": {
+    "spec_acceptance_id": "PS-006",
+    "spec_owner_completion_id": "PS-007",
+    "stage2_owner_ids": [
+      "PS-007",
+      "PS-008",
+      "PS-009",
+      "PS-010"
+    ],
+    "stage3_snapshot_id": "SS-002",
+    "forbidden_snapshot_ids": [
+      "SS-003"
+    ],
+    "final_decisions": [
+      "(none yet)",
+      "PS-001",
+      "PS-002",
+      "PS-003",
+      "PS-004",
+      "PS-005",
+      "PS-006",
+      "PS-007",
+      "PS-008",
+      "PS-009",
+      "PS-010"
+    ],
+    "final_snapshots": [
+      "SS-001",
+      "SS-002"
+    ],
+    "final_approvals": [
+      "(none yet)",
+      "A-001"
+    ],
+    "spec_artifact": {
+      "file": "artifact/clinic-appointment-tracker-v1.md",
+      "sha256": "sha256:080d17d4576cdeade9a8549b21183088b5645588aefe8b19445ece37d415b4ca",
+      "decision_id": "PS-006",
+      "in_product_path": "docs/specs/clinic-appointment-tracker-v1.md"
+    }
+  }
+}
