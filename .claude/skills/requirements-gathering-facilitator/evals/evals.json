@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "requirements-gathering-facilitator",
-  "description": "Behavior cases for requirements elicitation: unpacking a solution-stated-as-requirement, eliciting users/jobs and non-goals, surfacing stakeholder conflict, and producing a confidence-marked brief that feeds product-spec-writer.",
+  "description": "Behavior cases for requirements elicitation: unpacking a solution-stated-as-requirement, eliciting users/jobs and non-goals, surfacing stakeholder conflict, and producing a confidence-marked brief that feeds product-spec-writer; plus the atomic one-target-per-turn regressions: decomposing the observed compound clinic question, a narrative process walkthrough that stays one atomic target, and same-target options remaining atomic.",
   "cases": [
     {
       "id": "positive-solution-stated-as-requirement",
@@ -125,6 +125,49 @@
           "Separates confirmed / assumed / unknown, and any remaining open questions contain no unresolved spec blocker.",
           "States that the brief feeds product-spec-writer as the next step.",
           "Does NOT invoke product-spec-writer itself, does NOT advance the recorded project stage, and does NOT authorize implementation."
+        ]
+      }
+    },
+    {
+      "id": "regression-observed-clinic-question-decomposes-atomically",
+      "type": "should_trigger",
+      "prompt": "Continue gathering requirements for the physiotherapy clinic app. A draft discovery question on the table is: \"Walk me through the booking process, include who does each step, and tell me about a recent double booking and where it went wrong.\" Give me the next question.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Runs the pre-output atomicity check and identifies the current booking process, the actor for each step, a recent double-booking incident, and the failure point as FOUR separate targets.",
+          "Chooses only ONE target for this turn (e.g. 'What happens today when a patient books an appointment?') and returns that single atomic question.",
+          "Does NOT append 'include', 'also', or 'and if you can' secondary requests, and adds no second imperative after the question.",
+          "Defers the other three targets to later single-question turns and stops for the answer.",
+          "Produces an INTERACTIVE TURN, not the final requirements brief."
+        ]
+      }
+    },
+    {
+      "id": "regression-narrative-process-question-is-atomic",
+      "type": "should_trigger",
+      "prompt": "For the clinic app you want to understand how bookings work today. Is asking 'What happens today when a patient books an appointment?' a valid single question, or do you need to break it into smaller ones?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Confirms that a single narrative process walkthrough question is ONE atomic target and is valid to ask as-is.",
+          "States that narrative depth (an answer that runs to several steps) does not make it multiple semantic targets, so it must not be split into artificial micro-questions.",
+          "Adds no extra actor, example/incident, or cause request to the process question.",
+          "Asks that one question and stops for the answer, producing an INTERACTIVE TURN rather than a brief."
+        ]
+      }
+    },
+    {
+      "id": "regression-options-for-same-target-remain-atomic",
+      "type": "should_trigger",
+      "prompt": "For the clinic app, is 'Who usually records an appointment: reception, the therapist, or both?' an acceptable single question, and what would make it compound?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Confirms this is ONE atomic target (booking ownership - who records the appointment): the listed options are alternatives for the SAME target.",
+          "Does NOT reject the question merely because it contains multiple options; a short option list that clarifies one target is allowed.",
+          "Explains that adding a second question such as 'and how many therapists are there?' would introduce a DIFFERENT target and make the turn compound.",
+          "Keeps the turn to one atomic question and stops for the answer."
         ]
       }
     }

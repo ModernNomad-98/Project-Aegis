@@ -55,23 +55,44 @@ design — that `product-spec-writer` turns into a specification.
 ## Workflow
 
 **Interactive cadence contract — the default output is an INTERACTIVE TURN, not
-the brief.** While discovery is incomplete this skill asks ONE question at a time,
-and the orchestrator
+the brief.** While discovery is incomplete this skill works **ONE TARGET PER
+TURN**, and the orchestrator
 ([`project-orchestrator`](../project-orchestrator/SKILL.md)) stays the
-conversation owner. The question bank in
-[references/elicitation-sheet.md](references/elicitation-sheet.md) is an INTERNAL
-checklist, never shown as a questionnaire. Each turn selects the single
-highest-value unanswered question from that checklist, asks it in plain language,
-and STOPS for the answer — one question means one information or decision target,
-never several open questions, a numbered list, a compound question, or "answer
-whichever" / "take them in any order". Each answer updates the internal checklist.
-Separate facts from decisions: a purely factual answer feeds the brief, while a
-user-owned scope, behaviour, privacy, workflow, or product trade-off is returned
-to the orchestrator for its VISIBLE pending-decision batch (it is not recorded
-here). The numbered steps below are that checklist's coverage areas, worked one
-question per turn — not a batch to present at once. The exact shape of an
-interactive turn, and the FINAL REQUIREMENTS BRIEF that appears only once no
-spec-blocking question remains, are in Output Format.
+conversation owner. The atomic discovery cards in
+[references/elicitation-sheet.md](references/elicitation-sheet.md) are an INTERNAL
+checklist, never shown as a questionnaire. **One question = one independently
+answerable information or decision target.** A turn is NOT atomic when a complete
+answer would require the user to supply two or more independent facts,
+descriptions, actors/owners, examples/incidents, causes/failure points,
+dates/times, metrics, constraints, scope choices, decisions, or exceptions.
+
+**Pre-output atomicity check — run before returning ANY candidate question:**
+
+1. select ONE uncovered discovery target from the internal checklist;
+2. formulate ONE question for that single target;
+3. run the atomicity test — "could the user answer one requested part while
+   another remains unanswered?"; if yes, the draft is compound;
+4. if compound, remove or defer the extra requests, keeping only the
+   highest-value first target for this turn;
+5. confirm there is NO secondary answer request anywhere in the turn — never
+   smuggle a second target with "include", "also", "and if you can", "while
+   you're at it", "as well", or a second imperative that requests more after the
+   question;
+6. return only the atomic candidate, then STOP for the answer.
+
+Explanatory prose may PRECEDE the question but must not itself request an answer; a
+short option list is allowed ONLY when its choices are alternatives for the same
+target (e.g. "reception, the therapist, or both?"), and a single narrative process
+question ("what happens today when a patient books an appointment?") is atomic even
+though its answer may run to several steps — narrative depth is not multiple
+targets. Each answer updates the internal checklist. Separate facts from decisions:
+a purely factual answer feeds the brief, while a user-owned scope, behaviour,
+privacy, workflow, or product trade-off is returned to the orchestrator for its
+VISIBLE pending-decision batch (it is not recorded here). The numbered steps below
+are that checklist's coverage areas, worked one target per turn — not a batch to
+present at once. The exact shape of an interactive turn, and the FINAL REQUIREMENTS
+BRIEF that appears only once no spec-blocking question remains, are in Output
+Format.
 
 1. **Restate the ask as a problem, not a solution.** Take the incoming
    request and ask what outcome it's meant to produce. Push the stated
@@ -111,7 +132,7 @@ spec-blocking question remains, are in Output Format.
    invoke that skill, advance the recorded project stage, or authorize
    any building — each is a separate, later, human-gated step.
 
-The elicitation question bank (by discovery area), the problem-vs-
+The atomic discovery cards (by discovery area), the problem-vs-
 solution ladder, and the brief template:
 [references/elicitation-sheet.md](references/elicitation-sheet.md).
 
@@ -123,11 +144,13 @@ brief:
 ```
 INTERACTIVE TURN — requirements discovery
 Discovery status: <one or two lines — confirmed / assumed / still unknown>
-Next question:     <exactly ONE plain-language stakeholder question>
+Next question:     <ONE plain-language question for exactly ONE atomic answer
+                   target — no second requested answer anywhere else this turn>
 Stop:              wait for the answer — ask nothing else this turn
-Not in this turn:  no second question; no full question bank; no numbered
-                   list; no compound question; no final brief; no product
-                   specification; no stage-advance claim; no write/recording claim
+Not in this turn:  no second question or target; no "include/also/and if you can"
+                   secondary request; no full question bank; no numbered list; no
+                   compound question; no final brief; no product specification; no
+                   stage-advance claim; no write/recording claim
 ```
 
 The **FINAL REQUIREMENTS BRIEF** appears only once no spec-blocking discovery
@@ -164,10 +187,14 @@ Known / assumed / unknown clearly separated
 - [ ] Every requirement is marked confirmed / assumed / to-confirm.
 - [ ] The brief hands off to `product-spec-writer` with blocking open
       questions flagged; it does not itself become the spec.
-- [ ] While any spec-blocking question remains, each turn is ONE INTERACTIVE
-      TURN — exactly one question, then stop; the elicitation-sheet question
-      bank is used as an INTERNAL checklist, never shown as a questionnaire,
-      numbered list, several open questions, or a compound question.
+- [ ] While any spec-blocking question remains, each turn is ONE INTERACTIVE TURN
+      built ONE TARGET PER TURN: the pre-output atomicity check ran ("could one
+      requested part be answered while another remains unanswered?" → split, keep
+      the first target), the atomic discovery cards stayed an INTERNAL checklist
+      (never a questionnaire, numbered list, several open questions, or a compound
+      question), and NO secondary answer request ("include" / "also" / "and if you
+      can", a second imperative) followed the question. Same-target alternatives and
+      a single narrative process question are allowed.
 - [ ] User-owned scope/behaviour/privacy/workflow/product decisions are handed
       back to the orchestrator's visible pending-decision batch; purely factual
       answers feed the brief without becoming decisions; the FINAL brief appears
@@ -215,8 +242,8 @@ Known / assumed / unknown clearly separated
 ## Supporting Files
 
 - [references/elicitation-sheet.md](references/elicitation-sheet.md) —
-  the question bank by discovery area, the problem-vs-solution ladder,
-  the five-whys pattern, and the requirements-brief template.
+  the atomic discovery cards by discovery area, the problem-vs-solution ladder,
+  the one-why-per-turn five-whys pattern, and the requirements-brief template.
 - `evals/evals.json` — behavior cases including the solution-stated-as-
   requirement unpacking, the conflict-surfacing case, and the non-goal
   elicitation.

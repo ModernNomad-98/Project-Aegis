@@ -145,30 +145,32 @@ authority, and evidence for each stage are CITED from
 `ai-sdlc-operating-model`'s `references/stage-gate-map.md`, never reproduced
 here.
 
-- **Stage 1 — Understand the need.** → `requirements-gathering-facilitator`
-  (produces the requirements brief), run under the **interactive delegated-skill
-  protocol** (which governs any interactive stage skill): the orchestrator stays
-  the conversation owner and delegates only method — it announces the exact
-  invocation line `→ invokes requirements-gathering-facilitator` (the exact name,
-  never a "requirements skill/step" alias), presents ONLY the single
-  highest-value unanswered discovery question, and STOPS. One question = one
-  target — never the question bank, a numbered questionnaire, several open
-  questions, "answer whichever" / "take them in any order", or a compound question
-  (this one-question-and-stop cadence is the interview itself, NOT "one binding
-  question"); the remaining checklist stays INTERNAL (recording-and-authority §3).
-  Each answer feeds FACTS to the brief, while each user-owned
-  scope/behaviour/privacy/workflow/product decision joins the VISIBLE pending
-  batch (recording-and-authority §1 — no per-answer write); the final brief
-  appears only once no spec-blocking question remains. **Recorded Stage 1 lags the
-  analysis** (as the Stage 2 gate lags a terminal result — AR-A-008/AR-A-010):
-  with the analysis done but nothing recorded, say exactly "The Stage 1 analysis
-  is complete, but the recorded project stage remains Stage 1 until the approved
-  records are written and confirmed" — do not invoke product-spec-writer, say the
-  project is in Stage 2, or claim the Stage 2 snapshot; preview the pending
-  decisions (exact `PS-*` entries, next IDs from the current state) with the brief
-  as ONE batch under ONE approval, never claiming the Decision log stays empty;
-  the recorded stage advances only after that batch and the next STATE SNAPSHOT
-  are recorded and confirmed (a proposed row is not a recorded row).
+- **Stage 1 — Understand the need.** → `requirements-gathering-facilitator` (produces the
+  requirements brief), under the **interactive delegated-skill protocol** (governs any interactive
+  stage skill): the orchestrator stays the conversation owner and delegates only method — announcing
+  the exact invocation line `→ invokes requirements-gathering-facilitator` (the exact name, never a
+  "requirements skill/step" alias); the facilitator supplies method and ONE candidate target. Before
+  displaying it, the orchestrator applies a final **ATOMIC-QUESTION GATE**: one question = one
+  independently answerable information or decision target; run the test "could the user answer one
+  requested part while another remains unanswered?" — if yes the candidate is compound, so split it,
+  keep ONLY the highest-value first target this turn, and hold every other target INTERNAL for a later
+  turn (recording-and-authority §3). No secondary answer request may appear elsewhere in the turn — no
+  "include…/also…/and if you can…" rider, no second imperative, and status/next-action prose may
+  restate the SAME target but never request another. Display the ONE atomic question and STOP — never a
+  question-bank dump, a numbered questionnaire, several open or "answer-any" questions, or a compound
+  question (this cadence IS the interview, NOT "one binding question"). The same one-target rule
+  governs any next/open discovery question written into the cold-start `Open questions` projection —
+  one atomic target per bullet, never a bundled process+actor+incident+cause question. Each answer
+  feeds FACTS to the brief, while each user-owned scope/behaviour/privacy/workflow/product decision
+  joins the VISIBLE pending batch (recording-and-authority §1 — no per-answer write); the final brief
+  appears only once no spec-blocking question remains. **Recorded Stage 1 lags the analysis**
+  (AR-A-008/AR-A-010): with the analysis done but nothing recorded, say exactly "The Stage 1 analysis
+  is complete, but the recorded project stage remains Stage 1 until the approved records are written
+  and confirmed" — do not invoke product-spec-writer, say the project is in Stage 2, or claim the
+  Stage 2 snapshot; preview the pending decisions (exact `PS-*` entries, next IDs from the current
+  state) with the brief as ONE batch under ONE approval, never claiming the Decision log stays empty;
+  the recorded stage advances only after that batch and the next STATE SNAPSHOT are recorded and
+  confirmed (a proposed row is not a recorded row).
 - **Stage 2 — Define the product.** ALWAYS begins → invoke `product-spec-writer`.
   After the spec, classify the remaining owners **one at a time, in the order
   below, independently by evidence** — exactly ONE per turn (a read-only judgement
@@ -369,12 +371,10 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - [ ] Every technical decision reached the user as ONE plain-language business
       question (no engineering mechanics pushed onto them); every DECISION carried
       its "(chosen over …, because …)" rationale.
-- [ ] **Interactive Stage 1 protocol:** orchestrator stayed the conversation
-      owner; announced `→ invokes requirements-gathering-facilitator`; asked ONE
-      discovery question then stopped (no bank dump/numbered/multiple/compound);
-      checklist internal; facts fed the brief while user-owned decisions joined the
-      VISIBLE batch; recorded Stage 1 held until the brief + decisions + SNAPSHOT
-      were written and confirmed.
+- [ ] **Interactive Stage 1 / ATOMIC-QUESTION GATE:** orchestrator owned the chat, announced `→ invokes
+      requirements-gathering-facilitator`, applied the one-target gate — a candidate answerable in parts
+      split to ONE atomic question (no bank-dump/numbered/compound, no "include/also" secondary request;
+      cold-start `Open questions` bullets atomic), then STOP; recorded Stage 1 lagged until confirmed.
 - [ ] Routing named the OWNING skill; conditional skills invoked only on evidence;
       every manual-only target handed to the USER by name (never auto-invoked).
 - [ ] **Stage 2 owners classified independently:** Stage 2 began by invoking

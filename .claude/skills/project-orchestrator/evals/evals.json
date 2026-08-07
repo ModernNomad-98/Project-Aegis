@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "project-orchestrator",
-  "description": "Behavior cases for the beginner-facing lifecycle router: the cold vague-idea happy path (detect stage zero, preview-and-approve the COMPLETE initial project-state before creating it, route to discovery, ask ONE business question), the mid-flight edge (existing state file → detect the recorded stage from the latest STATE SNAPSHOT, do NOT restart), the stage-8 decision-driven routing edges (managed tier without a cloud mapper, GCP missing-mapper pause, iac-reviewer only on an actual IaC artifact, manual-only skills handed to the user rather than auto-chained), and the refusals (never auto-merge/deploy or apply a migration on inferred consent; never decide a business-scope question for the user; never treat a business answer as approval to write the project-state log; a proposed DECISION entry carries its chosen-over rationale), and the Scenario A shared-control cases (AR-A-001..021): consumer-repo-vs-skills-library identity, scope/spec acceptance is not implementation authority, the low-risk decision batch vs never-batched high-risk actions, append-only immutable history with placeholder preservation, recorded-stage lag until the snapshot is appended, byte-for-byte previews with no ellipsis, durable Stage 1 before Stage 2, rejected-proposal and already-recorded idempotency, no pre-judging later Stage 2 owners, and stale mutable-projection refresh before stage completion.",
+  "description": "Behavior cases for the beginner-facing lifecycle router: the cold vague-idea happy path (detect stage zero, preview-and-approve the COMPLETE initial project-state before creating it, route to discovery, ask ONE business question), the mid-flight edge (existing state file → detect the recorded stage from the latest STATE SNAPSHOT, do NOT restart), the stage-8 decision-driven routing edges (managed tier without a cloud mapper, GCP missing-mapper pause, iac-reviewer only on an actual IaC artifact, manual-only skills handed to the user rather than auto-chained), and the refusals (never auto-merge/deploy or apply a migration on inferred consent; never decide a business-scope question for the user; never treat a business answer as approval to write the project-state log; a proposed DECISION entry carries its chosen-over rationale), and the Scenario A shared-control cases (AR-A-001..021): consumer-repo-vs-skills-library identity, scope/spec acceptance is not implementation authority, the low-risk decision batch vs never-batched high-risk actions, append-only immutable history with placeholder preservation, recorded-stage lag until the snapshot is appended, byte-for-byte previews with no ellipsis, durable Stage 1 before Stage 2, rejected-proposal and already-recorded idempotency, no pre-judging later Stage 2 owners, and stale mutable-projection refresh before stage completion; plus the atomic Stage 1 question regressions: the observed four-target clinic question rejected by the ATOMIC-QUESTION GATE, the orchestrator rewriting a compound delegated candidate down to one target, and the anti-overcorrection single process walkthrough that stays one valid target.",
   "cases": [
     {
       "id": "positive-cold-vague-idea",
@@ -626,6 +626,51 @@
           "Does NOT create (or propose auto-creating) a product docs/project-state.md merely because there is no app code; the source library is not a Stage 0 product workspace.",
           "If the user wants to start a product, explains that they should open or create their OWN consumer/product repository (copying the skills in) and does NOT perform that creation, scaffolding, or any write without explicit authorization.",
           "Reaches the classification from the LOCAL landmarks without requiring a network call, and does not rely on the copied .claude/skills, AGENTS.md, or CLAUDE.md alone as the deciding evidence."
+        ]
+      }
+    },
+    {
+      "id": "regression-clinic-observed-compound-question-is-rejected",
+      "type": "should_trigger",
+      "prompt": "Physiotherapy clinic app (paper diary, double bookings). The consumer/product repo is correctly identified, the cold-start docs/project-state.md was previewed, approved, and created this session, and Stage 1 is active with requirements-gathering-facilitator invoked. The facilitator's candidate discovery question came back as: \"Walk me through the booking process, include who does each step, and tell me about a recent double booking and where it went wrong.\" Continue.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Applies the ATOMIC-QUESTION GATE and recognizes FOUR independent targets in the candidate: the current booking process, who does each step (actor/owner), a recent double-booking incident, and where in the process it went wrong (failure point).",
+          "REJECTS the compound candidate rather than displaying it, using the semantic test (could one requested part be answered while another remains unanswered?) rather than question-mark or 'and' counting.",
+          "Displays only ONE atomic target this turn - a valid first question is 'What happens today when a patient books an appointment?' - and keeps the exact visible invocation '-> invokes requirements-gathering-facilitator'.",
+          "Defers the actor, recent-incident, and failure-point targets to later turns and keeps them INTERNAL; no second requested answer appears in the prose, the status block, or the next-action line.",
+          "Stops after the one atomic question and records nothing this turn (RECORDING STATUS: NONE THIS TURN)."
+        ]
+      }
+    },
+    {
+      "id": "regression-orchestrator-atomic-gate-rewrites-delegated-candidate",
+      "type": "should_trigger",
+      "prompt": "Stage 1 is active for the clinic app. requirements-gathering-facilitator handed back a single delegated candidate that bundles the current booking process, who performs each step, and a recent double-booking incident and its cause. As the orchestrator, what do you show the user this turn?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does NOT forward the delegated candidate verbatim; the orchestrator stays the conversational owner and applies the final semantic ATOMIC-QUESTION GATE before anything is displayed.",
+          "Uses the 'could one part be answered while another remains unanswered?' test to detect that the candidate carries more than one independently answerable target, and splits it.",
+          "Keeps only ONE highest-value target for this turn (e.g. the current booking process) and defers the actor and incident/cause targets to later turns.",
+          "Does not expose the internal target label or the atomicity lint reasoning to the user; the exact visible invocation stays '-> invokes requirements-gathering-facilitator'.",
+          "Displays exactly one atomic question and stops, with no secondary answer request anywhere else in the turn."
+        ]
+      }
+    },
+    {
+      "id": "regression-one-process-walkthrough-is-one-valid-target",
+      "type": "should_trigger",
+      "prompt": "For the clinic app's Stage 1 you are about to ask: 'What happens today when a patient books an appointment?' You worry it is too broad because the answer could describe several steps. Is that one atomic question, and should you break it up?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats 'What happens today when a patient books an appointment?' as ONE valid atomic target (the current booking process) even though a complete answer may narrate several steps - narrative depth is not multiple targets.",
+          "Does NOT over-correct by splitting the single process question into artificial micro-questions merely because the answer can be detailed.",
+          "Notes that ADDING 'who performs each step?' would introduce a SECOND target (actor/owner) and must be deferred to a later turn, not appended here.",
+          "Issues exactly one user-response request this turn and then stops.",
+          "Passes the semantic test: no requested part could be answered while another requested part remains unanswered, because there is only one requested target."
         ]
       }
     }
