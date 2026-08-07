@@ -1,8 +1,8 @@
 # Skill-contract audit — baseline report
 
 - Tool: `audit-skill-contracts` v1.12.0 (engine sha256 `c886b27aee860aed…`)
-- Repo SHA: `e212be636e5c5db2b23856625a8446a8a35271bb` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `8dbbfb6aebafd9bc77d8869553690cba33f2a926da22cea8e3dcc5e293d30d2c` (704 files, 3943226 bytes)
+- Repo SHA: `4f361d14930d87d689c5c7495c993a57e35f2609` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `2fe588494dba6cbe11a13739f9e88390af342b35f128642e65d7c1db2ee4cc51` (704 files, 3955703 bytes)
 - Skills scanned: **184**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **414** (316 mechanical, 98 semantic-review candidates)
 
@@ -93,7 +93,7 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/product-analytics-instrumenter/SKILL.md` (owner: product-analytics-instrumenter; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchases' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md` (owner: project-orchestrator; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
-- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:352` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
+- **ARTF-001** [P1/medium/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/SKILL.md:354` (owner: project-orchestrator; maps: AEGIS-056, AEGIS-049) — claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:171` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **STATE-001** [P0/high/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/project-orchestrator/references/project-state-template.md:183` (owner: project-orchestrator; maps: AEGIS-002, AEGIS-006) — append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/qa-automation-architect/SKILL.md` (owner: qa-automation-architect; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
@@ -247,6 +247,7 @@ mechanically proven defects.
 - `readme-craftsman`: complete×1, verified×3
 - `realtime-subscription-architect`: accepted×1, complete×1
 - `release-readiness-reviewer`: ready×2, verified×2
+- `requirements-gathering-facilitator`: complete×2
 - `reviewable-diff-discipline`: verified×1
 - `rls-policy-auditor`: verified×3
 - `roadmap-to-commitments-translator`: approved scope×1, commit-able×34, committed×27, durable×2, proposed×2, verified×9
