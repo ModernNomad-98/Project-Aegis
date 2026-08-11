@@ -51,7 +51,8 @@ successor that names this file.
 These rules bind every use of this register:
 
 1. A backlog entry is **not implementation authority**.
-2. Work may begin only after **explicit, phase-specific owner authorization**.
+2. Work may begin only after **explicit, phase-specific owner authorization**, made
+   durable per the work-package authorization protocol below.
 3. Every implementation phase uses a **separate branch and reviewed PR**.
 4. **No entry may be silently deleted.**
 5. Completed, rejected, or replaced work remains visible with: final status; evidence;
@@ -64,20 +65,91 @@ These rules bind every use of this register:
 11. **Auto-merge remains prohibited** unless separately and explicitly authorized.
 12. **Phase 2B-0 must not begin until this backlog is merged.**
 
+### Work-package authorization protocol (binding)
+
+1. **The work-package record (§7 of this file) is the governing execution-authority
+   record.** Execution authority attaches to work packages and to nothing else in this
+   register.
+2. **Before any phase work begins, a reviewed and merged repository change must:**
+   append an immutable BER-DEC authorization entry to the governance log (§13 of this
+   file); identify the authorizing owner; record the exact scope; record the
+   repository; record the branch; record the budget and its enforceable units; record
+   the evidence path; record the evidence-handling terms (for WP-2B-0, the minimum
+   spike-evidence-handling terms below); record the stop conditions; and change the
+   governing work-package record from BLOCKED or BACKLOG to AUTHORIZED.
+3. **A chat message, assistant memory, temporary file, or unmerged branch is not
+   sufficient implementation authority.** Authority exists only once the authorization
+   change is merged.
+4. **Child evidence and backlog records do NOT independently move to AUTHORIZED.**
+   R1–R5 remain EVIDENCE_REQUIRED until their dispositions are recorded; BER-BKL
+   records remain BACKLOG until their own normal lifecycle changes them; both may be
+   worked only when explicitly included in the recorded scope of an AUTHORIZED work
+   package.
+5. **"Only AUTHORIZED work may proceed" means:** the governing work package must be
+   AUTHORIZED; child records may be executed only within that authorization's recorded
+   scope; a child record's own status never grants authority.
+6. **After the authorization is merged, implementation may begin** — on the separately
+   named phase branch the authorization records, and nowhere else.
+7. **Completion, rejection, or supersession is recorded through a later reviewed
+   backlog update.** Prior BER-DEC authorization history is never edited (§13
+   append-only rules of this file).
+
+### Minimum Phase 2B-0 spike-evidence-handling terms (mandatory authorization content)
+
+WP-2B-0 will create potentially sensitive evidence about configuration scopes,
+managed/user instructions, hooks/plugins/MCP servers, auto-memory, filesystem and tool
+confinement, provider/cost observability, activation event streams, and judge
+calibration prompts and outputs. A minimum temporary spike-evidence policy is therefore
+mandatory content of the WP-2B-0 authorization itself and must be in force before any
+probe or model call runs. The authorization's recorded terms must fix:
+
+1. the exact external evidence root;
+2. the authorized evidence readers;
+3. the sensitivity / data classification of the spike evidence;
+4. an explicit prohibition on storing provider credentials, access tokens, passwords,
+   private keys, unrestricted environment dumps, or any real secret;
+5. the redaction and sanitization rules;
+6. whether encryption at rest is required for the spike evidence;
+7. the retention or expiration date;
+8. the deletion and cleanup procedure;
+9. the preserve-on-failure rule;
+10. the ownership-marker and verified-cleanup requirements;
+11. the repository-safe summary, evidence manifest, and hashes that must be committed
+    after the spike;
+12. how evidence integrity is checked before owner review.
+
+Phase split (binding): these terms are temporary and specific to the authorized spike —
+mandatory before WP-2B-0 work, and never a substitute for the final policy. BER-BKL-009
+delivers the final production-grade retention / access / encryption / redaction /
+deletion policy and its evidence-writer integration in Phase 2B-1. This register fixes
+no permanent retention periods, access groups, or encryption technology here; those
+remain the owner decisions recorded in §9 of this file.
+
 ## 3. Status vocabulary
 
 Every record in this register carries exactly one status:
 
 - **EVIDENCE_REQUIRED** — a Phase 2B-0 gate item: its disposition can only be produced by
   host evidence gathered under an authorized spike, never by assumption. It is not
-  startable work in itself; it is resolved inside WP-2B-0 once WP-2B-0 is AUTHORIZED.
+  startable work in itself; it is resolved inside WP-2B-0 once WP-2B-0 is AUTHORIZED. An
+  R record retains EVIDENCE_REQUIRED while it is investigated inside AUTHORIZED WP-2B-0
+  scope; it never independently becomes AUTHORIZED (work-package authorization protocol,
+  §2 of this file).
 - **BACKLOG** — recorded and traceable, but neither ready for owner review nor authorized.
-  The default state of future work.
+  The default state of future work. A BER-BKL record never moves to AUTHORIZED; while it
+  is included within the recorded scope of an AUTHORIZED work package, reviewed lifecycle
+  updates may move it to another applicable non-authority status such as IN_PROGRESS,
+  READY_FOR_OWNER_REVIEW, DONE, REJECTED, or SUPERSEDED. No child-record status grants
+  execution authority; authority remains with the governing work package.
 - **READY_FOR_OWNER_REVIEW** — the item's deliverable or decision package exists and awaits
   owner review or ratification.
 - **AUTHORIZED** — the owner has explicitly authorized this item with a stated scope.
-  **Only the owner (Peter Nguyen) may move an item to AUTHORIZED**, and only through a
-  reviewed repository change or a recorded owner decision this file then registers.
+  **Only the owner (Peter Nguyen) may move an item to AUTHORIZED**, and only through the
+  work-package authorization protocol (§2 of this file): a reviewed and **merged**
+  repository change that appends the immutable BER-DEC authorization entry and moves the
+  governing work-package record to AUTHORIZED. Execution authority attaches to
+  work-package records only; a chat message, assistant memory, temporary file, or
+  unmerged branch is never sufficient implementation authority.
 - **IN_PROGRESS** — authorized work actively underway on its own branch.
 - **BLOCKED** — the item may not begin or continue: a named dependency, gate, or required
   authorization is missing. BLOCKED records why work cannot proceed; it does not imply any
@@ -132,7 +204,11 @@ Every record in §6 (evidence gates), §7 (work packages), §8 (backlog inventor
 
 Prohibited-pattern records populate the same fields with standing-prohibition semantics
 (e.g. *Trigger to begin: none — never scheduled*), so a reader can never mistake a
-prohibition for schedulable work. The owner-decision register (§9), future-consideration
+prohibition for schedulable work. Prohibited-pattern records may populate the shared
+Phase, Priority, Status, Dependencies, Trigger to begin, Owner decision required,
+Completion evidence, and Supersedes / superseded by fields through the explicit
+shared-field declaration in §11 of this file; those inherited values count as populated
+required fields. The owner-decision register (§9), future-consideration
 register (§10), and append-only governance log (§13) use the explicit field sets defined
 in their own sections.
 
@@ -362,8 +438,9 @@ existence**.
 One work package per merged-design implementation phase (design §19). Dependencies follow
 the design's corrected implementation order (§20a-S7): every minimum guardrail lands in
 2B-1, before any live phase; no later phase may erase an earlier phase's evidence
-boundary. Statuses: WP-2B-0 is BLOCKED (it stays blocked on explicit owner authorization
-even after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
+boundary. Statuses: WP-2B-0 is BLOCKED (it stays blocked until a merged authorization per
+the work-package authorization protocol, §2 of this file, moves it to AUTHORIZED — even
+after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
 
 ### WP-2B-0 — Capability and evidence spike
 
@@ -372,18 +449,24 @@ even after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
   gate)
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** BLOCKED — awaiting explicit owner authorization, which this backlog's merge
-  does not grant.
+- **Status:** BLOCKED — awaiting a merged authorization per the work-package
+  authorization protocol (§2 of this file): an appended immutable BER-DEC entry moving
+  this record to AUTHORIZED. This backlog's merge does not grant it.
 - **Source / evidence:** Merged design §17a and §19 (2B-0 row); §20 R1–R5; owner
   backlog-creation directive of 2026-08-10.
 - **Why it matters:** The design forbids building a runner around assumed telemetry, an
   assumed sandbox, an assumed configuration-isolation switch, or an unmeasured judge. The
   spike converts each assumption into evidence or an owner-approved limitation before any
   general construction or broad execution.
-- **Dependencies:** This backlog reviewed and merged (governance rule 12; BER-DEC-002).
-- **Trigger to begin:** An explicit owner authorization naming: exact scope, repository,
-  branch, evidence path, budget (with enforceable units), and stop conditions
-  (continuation instructions §14, item 7).
+- **Dependencies:** This backlog reviewed and merged (governance rule 12; BER-DEC-002);
+  the minimum Phase 2B-0 spike-evidence-handling terms (§2 of this file) recorded in the
+  authorization and in force before any probe or model call.
+- **Trigger to begin:** A merged authorization per the work-package authorization
+  protocol (§2 of this file): an appended immutable BER-DEC entry identifying the owner
+  and recording the exact scope, repository, branch, budget (with enforceable units),
+  evidence path, the minimum Phase 2B-0 spike-evidence-handling terms (§2 of this file),
+  and stop conditions — and this record moved from BLOCKED to AUTHORIZED in that same
+  merged change (continuation instructions §14, item 7).
 - **Expected deliverable:** The activation observability report (R1); the containment
   capability report (R4); the execution-profile isolation report (R5); the
   cost-observability report (R3); the measured judge-calibration report (R2); and an
@@ -391,17 +474,23 @@ even after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
 - **Acceptance criteria:** R1–R5 each receive an evidence-backed disposition; unknowns
   remain explicitly unknown (classified proven / owner-approved limitation /
   unavailable-unknown); no broad corpus execution occurs; no host capability is invented;
-  spike spend stays within its authorized budget and stop conditions.
-- **Owner decision required:** The authorization itself; OD-1 threshold ratification; the
+  spike spend stays within its authorized budget and stop conditions; every probe and
+  model call runs under the authorization's minimum spike-evidence-handling terms, and
+  all spike evidence is created, stored, redacted, retained, and cleaned up per those
+  terms.
+- **Owner decision required:** The authorization itself, including the minimum
+  spike-evidence-handling terms (§2 of this file); OD-1 threshold ratification; the
   go / no-go / limited-scope outcome decision; approval of any narrower claim scope.
 - **Explicit non-goals:** No runner core construction; no Scenario A or corpus execution;
   no CI wiring; no judge production use; no modification of skills, evals, the validator,
   or the merged design.
 - **Related design sections:** §6, §8, §11, §15, §5e, §17a, §19 (2B-0), §20 (OD-1,
   R1–R5).
-- **Completion evidence:** The five reports at the authorized evidence path plus the
-  recorded owner outcome decision; statuses of R1–R5 and WP-2B-0 updated through a
-  reviewed PR to this file.
+- **Completion evidence:** The five reports at the authorized evidence path; the
+  repository-safe summary, evidence manifest, and hashes the authorization's
+  evidence-handling terms require, with evidence integrity verified before owner review;
+  the recorded owner outcome decision; and statuses of R1–R5 and WP-2B-0 updated through
+  a reviewed PR to this file.
 - **Supersedes / superseded by:** None.
 
 ### WP-2B-1 — Runner core and versioned contracts
@@ -960,7 +1049,10 @@ risking forking) its requirements.
 - **Why it matters:** External never means ungoverned. The design requires the classes
   and procedures to exist but deliberately does not fix the exact periods, access
   groups, or encryption mechanism — those are owner decisions that must be recorded
-  before evidence accumulates at scale.
+  before evidence accumulates at scale. Phase split: WP-2B-0 runs under the minimum
+  temporary spike-evidence-handling terms fixed in its authorization (§2 of this file) —
+  mandatory before any probe or model call; this item delivers the final
+  production-grade policy in 2B-1, and the spike terms never substitute for it.
 - **Dependencies:** WP-2B-1 AUTHORIZED (the evidence writer implements the classes).
 - **Trigger to begin:** WP-2B-1 evidence-writer implementation begins.
 - **Expected deliverable:** A written evidence-governance policy fixing: retention
@@ -971,7 +1063,8 @@ risking forking) its requirements.
 - **Acceptance criteria:** Every artifact class in the §13 bundle contract maps to a
   retention class with a concrete period and procedure; preserve-on-failure behavior is
   retained; raw transcripts remain external and never auto-committed (D6); the policy is
-  reviewable in the repository.
+  reviewable in the repository; and the final policy explicitly reviews the WP-2B-0
+  spike-evidence-handling terms and absorbs or retires them.
 - **Owner decision required:** The exact retention periods, access groups, and encryption
   mechanism (owner-decision register §9, unnumbered item; deliberately not invented in
   the design or here).
@@ -1222,6 +1315,10 @@ backlog.
 
 - WP-2B-0 authorization itself, and the 2B-0 **go / no-go / limited-scope** outcome
   decision (design §17a item 10: outcome A or B).
+- The **minimum Phase 2B-0 spike-evidence-handling terms** (§2 of this file): mandatory
+  content of the WP-2B-0 authorization, in force before any probe or model call runs;
+  temporary and spike-specific, superseded for later phases by the final BER-BKL-009
+  policy delivered in 2B-1.
 - Explicit owner approval of any **Tier-2 signature promotion** and its claim scope
   (design §6).
 - Owner approval of any **narrower containment/claim scope** when the host cannot provide
@@ -1495,7 +1592,9 @@ PR #78 merged design (main @ c61aca8)
 Durable backlog merged (this file, via reviewed PR)   <-- Phase 2B-0 may not begin before this
         |
         v
-Owner explicitly authorizes WP-2B-0 (scope, budget, evidence path, stop conditions)
+Owner authorization for WP-2B-0 merged per the work-package authorization protocol
+(immutable BER-DEC entry: owner, scope, budget + units, evidence path,
+evidence-handling terms, stop conditions; WP-2B-0 -> AUTHORIZED)
         |
         v
 R1-R5 evidence dispositions (WP-2B-0 reports)
@@ -1532,9 +1631,11 @@ human approval) — NOT part of v1, NOT scheduled by this backlog
 Explicit statements about this map:
 
 - **Merging this backlog does not authorize WP-2B-0.** It only removes one named blocker
-  (governance rule 12); the owner's explicit authorization remains a separate act.
+  (governance rule 12); the owner's explicit authorization remains a separate act —
+  itself a reviewed and merged change per the work-package authorization protocol (§2 of
+  this file).
 - **Merging a phase PR does not authorize the next phase.** Every phase begins only with
-  its own owner authorization on its own branch.
+  its own merged owner authorization (§2 protocol of this file) on its own branch.
 - **Each arrow requires its own evidence and its own owner decision.** No arrow is
   crossed by momentum, and no later phase may erase an earlier phase's evidence boundary
   (design §19).
@@ -1591,14 +1692,20 @@ before doing anything else:
    — it is authoritative for architecture and controls.
 4. **Read this backlog** — it is authoritative for continuation and deferred work.
 5. **Determine whether the requested item is authorized**: find its record here, check
-   its Status, and check the owner-decision register. Only AUTHORIZED work may proceed,
-   within its recorded scope.
+   its Status, and check the owner-decision register. Only AUTHORIZED work may proceed —
+   meaning the governing WORK-PACKAGE record is AUTHORIZED through the work-package
+   authorization protocol's merged BER-DEC entry (§2 of this file), and the requested
+   item is either that work package or a child record explicitly inside its recorded
+   scope. A child record's own status never grants authority.
 6. **Do not infer authorization from an item being present.** Presence in this register
-   is a record, not a grant (BER-DEC-003).
+   is a record, not a grant (BER-DEC-003). A chat message, assistant memory, temporary
+   file, or unmerged branch is never sufficient implementation authority.
 7. **Do not begin Phase 2B-0 unless ALL of the following hold:** this backlog is merged
-   (BER-DEC-002); the owner has explicitly authorized WP-2B-0; and the exact scope,
-   repository, branch, evidence path, budget, and stop conditions of that authorization
-   are stated.
+   (BER-DEC-002); a WP-2B-0 authorization is merged per the work-package authorization
+   protocol (§2 of this file), appending its immutable BER-DEC entry and moving WP-2B-0
+   to AUTHORIZED; and that authorization records the exact scope, repository, branch,
+   budget with enforceable units, evidence path, minimum Phase 2B-0
+   spike-evidence-handling terms, and stop conditions.
 8. **Record all phase outcomes durably** through reviewed repository artifacts — evidence
    reports at their authorized paths and reviewed PRs updating this register — never
    through conversation memory alone.
