@@ -470,12 +470,14 @@ after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
 - **Dependencies:** PR #79's backlog is merged; BER-DEC-005 is the governing
   authorization; no probe or model call begins until the authorization PR containing
   BER-DEC-005 is merged and all of its evidence-handling controls are active.
-- **Trigger to begin:** This authorization PR — the reviewed PR containing
+- **Trigger to begin:** This authorization PR (#80) — the reviewed PR containing
   BER-DEC-005 — is merged; execution occurs only on
-  `spike/behavioral-eval-runner-2b-0`; the source repository and execution branch
-  start from the then-current reviewed main; the evidence root is absent or validly
-  owned; the minimum evidence policy of BER-DEC-005 is active; and R3 pre-dispatch
-  enforcement is established before any model call.
+  `spike/behavioral-eval-runner-2b-0`; the execution branch is created directly
+  from PR #80's exact GitHub merge commit (`merge_commit_sha`), per
+  BER-DEC-005's authorized source baseline — never from a later moving `main`;
+  the evidence root is absent or validly owned; the minimum evidence policy of
+  BER-DEC-005 is active; and R3 pre-dispatch enforcement is established before
+  any model call.
 - **Expected deliverable:** The activation observability report (R1); the containment
   capability report (R4); the execution-profile isolation report (R5); the
   cost-observability report (R3); the measured judge-calibration report (R2); and an
@@ -1718,6 +1720,24 @@ verbatim.
 - **Repository:** `ModernNomad-98/Project-Aegis`
 - **Authorized work package:** `WP-2B-0`
 - **Authorized execution branch:** `spike/behavioral-eval-runner-2b-0`
+- **Authorization PR:** `#80`
+- **Authorized source baseline:** the immutable GitHub merge commit recorded
+  for PR #80 after its manual merge, plus that commit's Git tree SHA. Binding
+  baseline rules:
+  1. the execution session must resolve PR #80's GitHub `merge_commit_sha`;
+  2. it must verify that PR #80 is merged and that the merge commit contains
+     this reviewed authorization;
+  3. it must create `spike/behavioral-eval-runner-2b-0` directly from that
+     exact merge commit — not from a later moving `main`;
+  4. it must record in the ownership marker and repository-safe summary: the
+     authorization PR number; the authorization merge SHA; the authorization
+     merge tree SHA; the execution branch base SHA; and the execution branch
+     base tree SHA;
+  5. all five SHA/tree values must agree where applicable before any evidence
+     collection;
+  6. if a later main commit is desired, a new reviewed and merged
+     authorization is required — the execution session may not silently adopt
+     it.
 - **Authorized scope:**
   - R1 activation-observation evidence and truthful claim-scope report;
   - R2 pinned-judge selection and bounded calibration evidence;
@@ -1744,21 +1764,47 @@ verbatim.
 - **Repository-safe closeout artifacts required after the spike:**
   - `docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`
   - `artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`
-- **Budget and enforceable units:**
-  - hard monetary ceiling: USD `$5.00` total;
+- **Budget and enforceable units — monetary rule:**
+  - owner monetary ceiling: USD `$5.00` total;
+  - USD `$5.00` may be called a HARD monetary ceiling only if R3 proves
+    direct, pre-dispatch monetary reservation;
+  - if direct monetary reservation is unavailable: monetary spend is reported
+    `UNKNOWN`; no statement may claim that USD $5 was technically enforced;
+    and model work may proceed only under the complete enforceable proxy
+    envelope below.
+- **Budget and enforceable units — mandatory pre-dispatch proxy envelope:**
+  before any model call, prove that ALL of the following are enforceable:
   - maximum model dispatches: `20`;
   - maximum assistant turns: `60`;
-  - maximum observable input tokens: `400000`;
-  - maximum observable output tokens: `80000`;
   - maximum concurrency: `1`;
   - maximum session duration: `15 minutes`;
-  - maximum total wall-clock duration: `4 hours`;
-  - no model dispatch may occur until R3 proves that at least one applicable
-    monetary or proxy unit can be enforced before dispatch;
-  - where monetary cost is unavailable, report monetary cost as `UNKNOWN`;
-  - if none of the stated monetary or proxy limits can be enforced before
-    dispatch, no model call is authorized and WP-2B-0 must stop with R3 recorded
-    as unavailable/unknown.
+  - maximum total authorization wall-clock duration: `4 hours`;
+  - and either direct monetary reservation within USD `$5.00`, or enforceable
+    input/output token ceilings (maximum observable input tokens: `400000`;
+    maximum observable output tokens: `80000`) plus the call/turn/session
+    limits above;
+  - a control that is only observable after use is not a hard cap;
+  - if the complete applicable envelope cannot be enforced before dispatch: no
+    model call is authorized; R3 is recorded unavailable/unknown; and WP-2B-0
+    stops with a bounded non-model report.
+- **Budget and enforceable units — cumulative authorization ledger:**
+  - required ledger, created before any model call:
+    `C:\temp\Project-Aegis-BER-WP-2B-0-Evidence\budget-ledger.json`;
+  - the ledger must record: authorization ID; authorization merge SHA;
+    execution-session ID; started_at; the absolute wall-clock deadline;
+    monetary reservation status; monetary reserved / actual / released /
+    `UNKNOWN`; dispatches reserved and consumed; assistant turns consumed;
+    input/output tokens reserved and consumed where available; current
+    in-flight reservations; remaining authorized units; and every denial
+    caused by a cap;
+  - the ledger is cumulative for BER-DEC-005 and may never reset;
+  - exactly one Claude Code control session is authorized under BER-DEC-005;
+    the ownership marker must record that execution-session ID and the
+    budget-ledger path;
+  - if that control session terminates before closeout: evidence is preserved;
+    the spike stops incomplete/blocked; no second session or refreshed budget
+    is authorized; and resumption requires another reviewed and merged
+    authorization.
 - **Execution order:**
   1. establish the evidence root and evidence-handling controls;
   2. perform non-model, read-only R3 capability inspection;
@@ -1769,13 +1815,19 @@ verbatim.
      R2 calibration work;
   6. stop and prepare the repository-safe owner decision package.
 - **Stop conditions:**
-  - repository, branch, or main SHA differs from the authorized state;
+  - PR #80 is not merged;
+  - PR #80's merge SHA or merge tree SHA cannot be resolved;
+  - the execution branch base differs from PR #80's merge SHA/tree;
+  - the repository or execution branch differs from BER-DEC-005;
   - evidence root exists without the correct ownership marker;
   - evidence-handling terms cannot be enforced;
   - encryption-at-rest requirements cannot be met for sensitive raw evidence;
   - any secret, token, password, credential, private key, or unrestricted
     environment dump would be collected;
-  - no pre-dispatch monetary or proxy limit is enforceable;
+  - the complete applicable pre-dispatch budget envelope (monetary or proxy)
+    cannot be enforced before dispatch;
+  - the cumulative budget ledger is absent, unwritable, or would be reset;
+  - the single authorized control session has terminated before closeout;
   - budget, token, dispatch, turn, concurrency, session, or wall-clock cap is
     reached;
   - any relevant tool path cannot be contained;
@@ -1802,10 +1854,37 @@ model call, and evidence artifact.
    `C:\temp\Project-Aegis-BER-WP-2B-0-Evidence\.aegis-owned-evidence.json` —
    the marker must record: authorization ID (`BER-DEC-005`); work package
    (`WP-2B-0`); owner (Peter Nguyen); repository; execution branch; creation
-   timestamp; the exact evidence root; and the expiration timestamp.
-3. **Authorized readers:** Peter Nguyen; the one explicitly authorized local
-   Claude Code process/session performing WP-2B-0; no other person, service,
-   plugin, MCP server, or cloud-sync process.
+   timestamp; the exact evidence root; the expiration timestamp; the
+   authorization PR number (`#80`); the authorization merge SHA; the
+   authorization merge tree SHA; the execution branch base SHA; the execution
+   branch base tree SHA; the single authorized execution-session ID; and the
+   budget-ledger path.
+3. **Evidence recipients (three explicit classes; no wider access):**
+   - **A. Raw/confidential evidence readers:** only Peter Nguyen and the
+     single authorized local Claude Code control session identified in the
+     ownership marker. No plugin, MCP server, hook, cloud-sync process,
+     unrelated service, or other person may read raw/confidential evidence.
+   - **B. Narrow model/provider recipients:** the system-under-test
+     provider/model used for R1 and the separately configured independent
+     judge provider/model used for R2 may receive ONLY the minimum synthetic
+     or redacted prompt/evidence envelope required for that specific call,
+     after redaction and sanitization, with no credential, no token, no
+     private key, no raw configuration dump, no private path, no unrelated
+     evidence, and no private chain-of-thought. For every provider call the
+     evidence manifest must record: purpose (R1 or R2); provider;
+     model/version where observable; system-under-test versus judge role;
+     payload SHA-256; payload byte count; redaction status; dispatch
+     timestamp; response artifact reference; and the budget-ledger
+     reservation reference. The R2 judge must remain a separate independent
+     call/session, receive only the minimum verified calibration envelope,
+     and have no tools. Provider receipt of the minimum sanitized payload
+     does not authorize provider access to the external evidence root.
+   - **C. Repository/public readers:** only after owner review may the public
+     repository receive the sanitized summary, the sanitized evidence
+     manifest, and hashes and dispositions — no raw transcript, no
+     confidential artifact, no personal path, and no secret or credential.
+     The repository-safe closeout files are intentionally public-safe
+     outputs, not raw/confidential evidence.
 4. **Data classification:** CONFIDENTIAL — INTERNAL TECHNICAL EVIDENCE.
 5. **Forbidden evidence content:** credentials; access tokens; passwords;
    private keys; authentication cookies; complete environment-variable dumps;
