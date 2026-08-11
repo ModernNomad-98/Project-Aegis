@@ -446,9 +446,10 @@ existence**.
 One work package per merged-design implementation phase (design §19). Dependencies follow
 the design's corrected implementation order (§20a-S7): every minimum guardrail lands in
 2B-1, before any live phase; no later phase may erase an earlier phase's evidence
-boundary. Statuses: WP-2B-0 is BLOCKED (it stays blocked until a merged authorization per
-the work-package authorization protocol, §2 of this file, moves it to AUTHORIZED — even
-after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
+boundary. Statuses: WP-2B-0 is AUTHORIZED by BER-DEC-005 (§13 of this file) — the
+authorization becomes effective only after PR #80 is reviewed and merged, and execution
+remains limited to BER-DEC-005's exact scope, branch, budget, evidence root, evidence
+policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
 
 ### WP-2B-0 — Capability and evidence spike
 
@@ -1761,9 +1762,11 @@ verbatim.
   - authorization of WP-2B-1 or any later work package.
 - **External evidence root:**
   `C:\temp\Project-Aegis-BER-WP-2B-0-Evidence`
-- **Repository-safe closeout artifacts required after the spike:**
+- **Repository-safe closeout artifacts required after the spike (exactly
+  these):**
   - `docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`
   - `artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`
+  - `artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`
 - **Budget and enforceable units — monetary rule:**
   - owner monetary ceiling: USD `$5.00` total;
   - USD `$5.00` may be called a HARD monetary ceiling only if R3 proves
@@ -1806,14 +1809,30 @@ verbatim.
     is authorized; and resumption requires another reviewed and merged
     authorization.
 - **Execution order:**
-  1. establish the evidence root and evidence-handling controls;
+  1. establish and validate the evidence root, ownership marker, physical-path
+     controls, evidence-handling controls, and the cumulative budget ledger;
   2. perform non-model, read-only R3 capability inspection;
-  3. perform non-model R4/R5 confinement and execution-profile inspection;
-  4. only if the budget and boundary prerequisites are satisfied, conduct the
-     bounded R1 activation-observation work;
-  5. only if the preceding prerequisites remain satisfied, conduct the bounded
-     R2 calibration work;
-  6. stop and prepare the repository-safe owner decision package.
+  3. perform non-model R4/R5 configuration and capability inspection;
+  4. only after R3's complete pre-dispatch envelope is proven, and only inside
+     a disposable synthetic probe workspace, conduct bounded model-driven R4
+     per-tool-path probes and R5 effective-profile probes where non-model
+     inspection cannot prove actual behavior;
+  5. conduct the bounded R1 activation-observation work only if the
+     established boundary safely supports it;
+  6. conduct the bounded R2 calibration work only if all preceding
+     prerequisites remain satisfied;
+  7. stop and prepare the repository-safe owner-decision package.
+- **Bounded model-driven R4/R5 probe constraints:** the model-driven R4/R5
+  probes must:
+  - use synthetic canaries only;
+  - never target real credentials, user files, private repositories, or
+    unrestricted directories;
+  - be ledger-reserved before dispatch;
+  - run under concurrency `1` and all existing call/token/turn/session/time
+    limits;
+  - stop on the first unsafe, escaped, or ambiguous tool path;
+  - record unavailable/unknown rather than bypassing an unprovable boundary;
+  - never become Scenario A or corpus execution.
 - **Stop conditions:**
   - PR #80 is not merged;
   - PR #80's merge SHA or merge tree SHA cannot be resolved;
@@ -1836,6 +1855,8 @@ verbatim.
   - a package install, broad corpus execution, deployment, or later-phase task
     would be required;
   - evidence integrity cannot be verified;
+  - finalization evidence is circular, incomplete, mismatched, or
+    unverifiable;
   - any unexpected condition makes a claim uncertain.
 - **Authority boundary:** This authorization grants WP-2B-0 only after merge.
   It does not authorize WP-2B-1, runner implementation, corpus execution, CI
@@ -1865,20 +1886,26 @@ model call, and evidence artifact.
      ownership marker. No plugin, MCP server, hook, cloud-sync process,
      unrelated service, or other person may read raw/confidential evidence.
    - **B. Narrow model/provider recipients:** the system-under-test
-     provider/model used for R1 and the separately configured independent
-     judge provider/model used for R2 may receive ONLY the minimum synthetic
-     or redacted prompt/evidence envelope required for that specific call,
-     after redaction and sanitization, with no credential, no token, no
-     private key, no raw configuration dump, no private path, no unrelated
-     evidence, and no private chain-of-thought. For every provider call the
-     evidence manifest must record: purpose (R1 or R2); provider;
-     model/version where observable; system-under-test versus judge role;
-     payload SHA-256; payload byte count; redaction status; dispatch
+     provider/model used for R1 and for the bounded model-driven R4/R5
+     capability probes, and the separately configured independent judge
+     provider/model used for R2, may receive ONLY the minimum synthetic or
+     redacted prompt/evidence envelope required for that specific call, after
+     redaction and sanitization, with no credential, no token, no private
+     key, no raw configuration dump, no private path, no unrelated evidence,
+     and no private chain-of-thought. For every provider call the evidence
+     manifest must record: purpose (exactly one of `R1`, `R2`, `R4`, `R5`);
+     provider; model/version where observable; system-under-test versus judge
+     role; payload SHA-256; payload byte count; redaction status; dispatch
      timestamp; response artifact reference; and the budget-ledger
-     reservation reference. The R2 judge must remain a separate independent
-     call/session, receive only the minimum verified calibration envelope,
-     and have no tools. Provider receipt of the minimum sanitized payload
-     does not authorize provider access to the external evidence root.
+     reservation reference. For every R4/R5 probe call the manifest must
+     additionally record: the tool path or execution-profile property under
+     test; the synthetic canary ID; the expected boundary; the observed
+     result; the response artifact reference; and the budget-ledger
+     reservation reference. The R2 judge must remain a separate, independent,
+     minimum-context, no-tools call/session and receive only the minimum
+     verified calibration envelope. Provider receipt of the minimum sanitized
+     payload does not authorize provider access to the external evidence
+     root.
    - **C. Repository/public readers:** only after owner review may the public
      repository receive the sanitized summary, the sanitized evidence
      manifest, and hashes and dispositions — no raw transcript, no
@@ -1913,14 +1940,66 @@ model call, and evidence artifact.
     cleanup result in the repository-safe closeout summary. Do not use broad
     `git clean`, wildcard deletion, or deletion outside the marked root.
 11. **Repository-safe closeout:** the closeout PR after WP-2B-0 must contain:
-    the sanitized summary; the evidence manifest; SHA-256 hashes of retained
-    evidence artifacts; R1–R5 dispositions; the owner decision package; the
-    resulting WP-2B-0 outcome; no raw transcript; no credential; no personal
-    path; and no unrestricted configuration dump.
-12. **Integrity:** every retained evidence artifact must be listed in a
-    canonical manifest with: relative path; byte count; SHA-256; sensitivity;
-    redaction state; and creation timestamp. Owner review must verify the
-    manifest before relying on the evidence.
+    the sanitized summary; the evidence manifest; the detached finalization
+    marker
+    (`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`);
+    SHA-256 hashes of retained evidence artifacts; R1–R5 dispositions; the
+    owner decision package; the resulting WP-2B-0 outcome; no raw transcript;
+    no credential; no personal path; and no unrestricted configuration dump.
+    The repository-safe closeout artifacts are exactly the three files named
+    in BER-DEC-005.
+12. **Integrity — binding finalization protocol (non-circular):**
+    1. finalize the sanitized summary first;
+    2. create the canonical evidence manifest over: every retained
+       raw/confidential evidence artifact, listed by sanitized relative
+       identifier; every retained sanitized evidence artifact; and the
+       repository-safe summary — each entry carrying byte count, SHA-256,
+       sensitivity, redaction state, and creation timestamp;
+    3. the evidence manifest MUST NOT list itself, and MUST NOT list the
+       detached finalization marker;
+    4. hash the finalized summary and the finalized manifest;
+    5. write the detached finalization marker
+       (`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`)
+       containing: authorization ID; authorization PR number; authorization
+       merge SHA; execution-session ID; evidence-manifest SHA-256;
+       repository-safe summary SHA-256; final spike status; and the
+       finalized_at timestamp;
+    6. the detached marker is not included in the evidence manifest;
+    7. the repository-safe summary must not contain the final manifest hash
+       or the finalization-marker hash;
+    8. no artifact may directly or indirectly contain a hash computed over
+       itself;
+    9. owner review must independently verify every manifest-listed artifact,
+       the manifest hash, the summary hash, and the detached marker;
+    10. the marker's own SHA-256 is recorded externally by the consuming
+        review record or Git repository object, never inside the marker or
+        the manifest. SHA-256 provides tamper evidence after finalization
+        only; no cryptographic authenticity beyond that is claimed.
+13. **Reparse-safe physical-path validation (binding):** before evidence-root
+    creation, before every evidence read, every evidence write, and every
+    evidence hash, and again before cleanup:
+    1. resolve every existing path component from the volume root through
+       `C:\temp`, the evidence root, and the exact target path;
+    2. reject any symlink, junction, mount, or other reparse point anywhere
+       in that path chain;
+    3. fail closed if any path component cannot be resolved unambiguously;
+    4. verify the resolved evidence root is physically beneath the resolved
+       `C:\temp` directory;
+    5. verify the evidence root is outside every Project Aegis checkout, the
+       source repository, the execution repository, and any Git repository;
+    6. verify every target remains physically beneath the validated evidence
+       root;
+    7. reject any child path that introduces a reparse point after root
+       creation;
+    8. repeat the complete physical-path validation immediately before
+       deletion;
+    9. stop if: the resolved physical path changes; a reparse point appears;
+       the root resolves outside `C:\temp`; the root or target resolves
+       inside a repository; or physical-path verification becomes
+       unavailable or ambiguous.
+    Cleanup still targets only the exact ownership-marker-bound root; all
+    existing marker, retention, encryption, and deletion rules remain in
+    force.
 
 ---
 
