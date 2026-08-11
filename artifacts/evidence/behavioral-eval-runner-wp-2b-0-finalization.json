@@ -1,0 +1,12 @@
+{
+  "finalization_type": "wp-2b-0-detached-finalization-marker",
+  "authorization_id": "BER-DEC-005",
+  "authorization_pr": 80,
+  "authorization_merge_sha": "11f45f2b3fe4774f519a4153767587532e027e79",
+  "execution_session_id": "BER-2B0-20260811T143734Z-a38548",
+  "evidence_manifest_sha256": "ec3b0ded2077096830924916aa67ded7a8b14c257bf3be75beb90bbfaeefbd9d",
+  "repository_safe_summary_sha256": "43bcd19d3f6314d101acf1b475ca3b0ffd21e2b86a61bb5c068775394400e07a",
+  "final_spike_status": "INCOMPLETE_BLOCKED_EVIDENCE_BOUNDED_NON_MODEL_REPORT",
+  "finalized_at": "2026-08-11T14:46:56Z",
+  "note": "Detached marker per the BER-DEC-005 non-circular protocol: not listed in the manifest it names; contains no hash of itself; its own SHA-256 is recorded externally by the consuming review record or Git object store. SHA-256 is tamper evidence only."
+}

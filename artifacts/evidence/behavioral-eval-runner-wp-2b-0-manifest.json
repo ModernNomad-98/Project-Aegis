@@ -1,0 +1,159 @@
+{
+  "manifest_type": "wp-2b-0-evidence-manifest",
+  "authorization_id": "BER-DEC-005",
+  "authorization_pr": 80,
+  "authorization_merge_sha": "11f45f2b3fe4774f519a4153767587532e027e79",
+  "authorization_merge_tree_sha": "882c0b6c8d5eb906df9e7d9d8576937b4c545db7",
+  "work_package": "WP-2B-0",
+  "execution_session_id": "BER-2B0-20260811T143734Z-a38548",
+  "created_at": "2026-08-11T14:45:34Z",
+  "finalization_protocol_note": "Per the BER-DEC-005 non-circular finalization protocol this manifest lists every retained raw/confidential evidence artifact (by sanitized relative identifier), the disposable probe-workspace artifacts, and the finalized repository-safe summary. It deliberately does NOT list itself and does NOT list the detached finalization marker. No artifact in the chain contains a hash computed over itself. SHA-256 is tamper evidence after finalization only, not authenticity against a compromised control plane.",
+  "external_evidence_access": "Raw/confidential artifacts remain external under the authorized evidence root; readers are Peter Nguyen and the single authorized control session only. No provider received filesystem access to the evidence root.",
+  "provider_calls": [],
+  "provider_calls_note": "ZERO model dispatches occurred (structural envelope denial recorded in budget-ledger.json); therefore no per-call purpose/provider/model/payload-hash/reservation records exist.",
+  "artifacts": [
+    {
+      "relative_identifier": ".aegis-owned-evidence.json",
+      "location": "external-evidence-root",
+      "bytes": 1529,
+      "sha256": "74e1bce962e8ee348df78d5626405f0b986b954f89ed4ede7656951ee12e3343",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction (no secrets, no personal emails, no user-profile paths)",
+      "created_at": "2026-08-11T14:37:34Z",
+      "purpose": "ownership marker binding the evidence root to BER-DEC-005 and the single authorized session",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "budget-ledger.json",
+      "location": "external-evidence-root",
+      "bytes": 4298,
+      "sha256": "4c8c70a25ba5e583f469c40d11b30550f78390284ed86f53142d92b5dfacb542",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:37:34Z",
+      "purpose": "cumulative authorization budget ledger (never reset); records the envelope determination and the structural denial of all dispatches",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "budget-ledger.sha256",
+      "location": "external-evidence-root",
+      "bytes": 84,
+      "sha256": "74c5e60f6b631f9aa71c57d9e8acfddabb5d85c18ca856f10fb5a410c6ad001d",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:45:34Z",
+      "purpose": "sidecar SHA-256 of the final budget ledger",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "dispatch-allocation-plan.json",
+      "location": "external-evidence-root",
+      "bytes": 949,
+      "sha256": "0c58b291c076c6466b64fbb998232e56fd91e8ad6232708e8d5dc2d5eba2d2e1",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:41:00Z (approximate; bounded by verified clock reads)",
+      "purpose": "predeclared dispatch allocation plan (20-call cap; all categories blocked; 0 consumed)",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "raw/r1-activation-observation-report.md",
+      "location": "external-evidence-root",
+      "bytes": 2423,
+      "sha256": "6dee366d23be65fe2c408be44f07e5b2f459178ad87304b7e93e34e143370764",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:42:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "R1 activation-observation evidence report (probes not run; limitation recorded)",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "raw/r2-judge-calibration-report.md",
+      "location": "external-evidence-root",
+      "bytes": 1522,
+      "sha256": "d43262b35bcf880eb7c3eb004d7dcb086098071d7f5312c09a0b6ff7592eed4e",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:42:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "R2 judge-calibration evidence report (calibration not run; blocked upstream)",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "raw/r3-cost-observability-report.md",
+      "location": "external-evidence-root",
+      "bytes": 4271,
+      "sha256": "8ed31fac775a3a8b53b1f4810159f5410bc8aefed707700945c2d5e2934cf043",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:41:00Z (approximate; bounded by verified clock reads)",
+      "purpose": "R3 cost-observability / envelope-enforceability report (the gate-deciding evidence)",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "raw/r4-containment-inspection-report.md",
+      "location": "external-evidence-root",
+      "bytes": 4701,
+      "sha256": "3cd56810028395e0b0c8ce044c31b281ceb3c3ac08f0e2bd0297104f99c6d329",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:42:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "R4 per-tool-path confinement non-model inspection report (probes not run)",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "raw/r5-execution-profile-report.md",
+      "location": "external-evidence-root",
+      "bytes": 3403,
+      "sha256": "dbb0c599df2a8f65dc954049dd176715b5d5e9dc4769333eeee85e17ad91f2cb",
+      "sensitivity": "CONFIDENTIAL - INTERNAL TECHNICAL EVIDENCE",
+      "redaction_state": "sanitized-by-construction",
+      "created_at": "2026-08-11T14:42:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "R5 execution-profile observability/isolation non-model inspection report",
+      "status": "retained"
+    },
+    {
+      "relative_identifier": "probe-workspace/.aegis-probe-workspace.json",
+      "location": "disposable-probe-workspace",
+      "bytes": 481,
+      "sha256": "ed9a989de7d4f1cb142a3d3a9b34beda5204b6408127f7e88a89f36005cdcfa5",
+      "sensitivity": "SYNTHETIC - NON-CONFIDENTIAL",
+      "redaction_state": "synthetic only",
+      "created_at": "2026-08-11T14:40:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "probe-workspace ownership marker (workspace never used; zero dispatches)",
+      "status": "retained pending marker-gated cleanup after owner review"
+    },
+    {
+      "relative_identifier": "probe-workspace/canary-read-target.txt",
+      "location": "disposable-probe-workspace",
+      "bytes": 157,
+      "sha256": "67b822449eae95d04ed4ef8b641403389e749b31b6ffb0a74b5b0684eb8014f6",
+      "sensitivity": "SYNTHETIC - NON-CONFIDENTIAL",
+      "redaction_state": "synthetic only",
+      "created_at": "2026-08-11T14:40:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "synthetic read canary (unused)",
+      "status": "retained pending marker-gated cleanup after owner review"
+    },
+    {
+      "relative_identifier": "probe-workspace/canary-write-target.txt",
+      "location": "disposable-probe-workspace",
+      "bytes": 66,
+      "sha256": "50840151541a4022350825e97ad84a2da4f38c3996a0429257aa3f74843e128d",
+      "sensitivity": "SYNTHETIC - NON-CONFIDENTIAL",
+      "redaction_state": "synthetic only",
+      "created_at": "2026-08-11T14:40:30Z (approximate; bounded by verified clock reads)",
+      "purpose": "synthetic write canary (unused)",
+      "status": "retained pending marker-gated cleanup after owner review"
+    },
+    {
+      "relative_identifier": "repo:docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md",
+      "location": "repository (this change)",
+      "bytes": 10796,
+      "sha256": "43bcd19d3f6314d101acf1b475ca3b0ffd21e2b86a61bb5c068775394400e07a",
+      "sensitivity": "PUBLIC-SAFE",
+      "redaction_state": "sanitized (scanned; no personal paths, credentials, hostnames, or raw transcripts)",
+      "created_at": "2026-08-11T14:45:00Z (approximate; bounded by verified clock reads)",
+      "purpose": "the finalized repository-safe summary this manifest binds",
+      "status": "retained (committed)"
+    }
+  ]
+}
