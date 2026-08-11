@@ -223,8 +223,12 @@ unless the text says otherwise.
 The merged design defers exactly five items to Phase 2B-0 as evidence-required (design
 §20 "Remaining — DEFERRED TO 2B-0 — EVIDENCE REQUIRED"). Their identifiers and meanings
 are preserved here exactly. For every R record: Phase = 2B-0; Priority = GATE; Status =
-EVIDENCE_REQUIRED; **no implementation authorization is implied by the record's
-existence**.
+DONE with an explicit evidence-result qualifier — DONE means the authorized WP-2B-0
+evidence-gathering task and owner disposition are complete under Outcome B / Limited
+Scope ([PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)); it does NOT
+mean the underlying host capability is proven or technically solved, and the recorded
+limitations remain binding on later phases; **no implementation authorization is implied
+by the record's existence**.
 
 ### R1 — Activation-observation mechanism and truthful v1 claim scope
 
@@ -232,7 +236,9 @@ existence**.
 - **Title:** Activation-observation mechanism and the truthful scope of v1's claims
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** DONE — WP-2B-0 evidence disposition accepted as UNAVAILABLE / UNKNOWN under
+  Outcome B. Activation-identifying evidence was not proven. Activation-dependent
+  implementation and live-routing claims remain blocked pending later evidence.
 - **Source / evidence:** Merged design §6 (evidence tiers; ambiguity ⇒ `ERROR` /
   `AMBIGUOUS_ACTIVATION`), §17a items 1–5, §20 R1. Carried into this register by the
   owner's backlog-creation directive of 2026-08-10.
@@ -240,9 +246,11 @@ existence**.
   hard problem. Model prose such as `→ invokes X` is a claim, not proof. Without a proven
   activation-identifying mechanism, no positive or negative routing verdict is truthful,
   in either direction.
-- **Dependencies:** This backlog merged; WP-2B-0 AUTHORIZED by the owner.
-- **Trigger to begin:** The owner explicitly authorizes WP-2B-0 with stated scope, budget,
-  evidence path, and stop conditions.
+- **Dependencies:** This backlog merged; WP-2B-0 DONE under Outcome B / Limited Scope —
+  the owner accepted R1's disposition with PR #81; BER-DEC-005 is executed and closed.
+- **Trigger to begin:** CLOSED — no further WP-2B-0 work is authorized by BER-DEC-005;
+  the R1 evidence task is complete. Any follow-up activation probe requires a new
+  reviewed and merged authorization.
 - **Expected deliverable:** An activation observability report that determines, by evidence
   on the real host, whether Claude Code exposes a reliable, structured,
   activation-identifying signal (Tier 1), and/or whether any specific Tier-2 output
@@ -262,18 +270,23 @@ existence**.
   (§17a item 10). Broad general-corpus execution remains blocked. No Claude Code API,
   event stream, hook, or telemetry source is assumed; ambiguous evidence remains
   `ERROR` / `AMBIGUOUS_ACTIVATION`, never a verdict.
-- **Owner decision required:** Ratification of R1's activation-specific disposition —
-  the bounded proven claim scope (disposition 1), the Tier-2 signature claim scope
-  (disposition 2), or the recorded limitation (disposition 3); the WP-2B-0 outcome A/B
-  decision is separate and follows only after R1–R5 all have dispositions.
+- **Owner decision required:** RESOLVED for WP-2B-0 — the owner accepted R1's
+  disposition 3 (limitation recorded: activation-identifying evidence UNAVAILABLE /
+  UNKNOWN) together with the Outcome B / Limited Scope decision. Any later
+  activation-mechanism proof, Tier-2 signature promotion, or narrower claim-scope
+  approval remains a separate future owner decision.
 - **Explicit non-goals:** No runner construction; no broad corpus execution; no invented
   host telemetry; no treatment of routing prose or name mentions as activation evidence.
 - **Related design sections:** §6, §17a (items 1–5, 10), §19 (2B-0 row), §20 R1, §22
   (activation risk row), §24.
-- **Completion evidence:** The activation observability report at the evidence path named
-  in the WP-2B-0 authorization, plus the owner's recorded activation-specific disposition
-  (1, 2, or 3), registered through a reviewed update to this file; the separate WP-2B-0
-  outcome A/B decision is recorded under WP-2B-0.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)
+  (merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`); the repository-safe summary
+  [`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md);
+  the evidence manifest
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json);
+  the detached finalization marker
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json);
+  and the owner-side integrity gate PASS.
 - **Supersedes / superseded by:** None.
 
 ### R2 — Exact judge model/version and measured calibration result
@@ -282,7 +295,9 @@ existence**.
 - **Title:** Exact pinned judge model/version and its measured calibration result
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** DONE — WP-2B-0 evidence disposition accepted as INCOMPLETE / BLOCKED under
+  Outcome B. No judge was pinned or calibrated. OD-1 remains OPEN, and baseline-eligible
+  semantic judging remains blocked.
 - **Source / evidence:** Merged design §8 (measurable judge calibration; §20a-S28), §17a
   item 9, §20 D1 and R2, OD-1. Carried into this register by the owner's backlog-creation
   directive of 2026-08-10.
@@ -291,11 +306,13 @@ existence**.
   re-verified. Until a concrete judge identity produces a measured result that meets
   owner-ratified thresholds, no baseline-eligible semantic verdict may exist — and
   critical safety assertions carry a separately approved critical false-PASS bound.
-- **Dependencies:** This backlog merged; WP-2B-0 AUTHORIZED; the versioned human-labeled
-  calibration dataset (including the adversarial prompt-injection set) assembled within
-  WP-2B-0's approved scope.
-- **Trigger to begin:** WP-2B-0 authorization (the spike selects the judge and runs the
-  calibration).
+- **Dependencies:** This backlog merged; WP-2B-0 DONE under Outcome B / Limited Scope —
+  the owner accepted R2's disposition with PR #81; no calibration dataset was assembled
+  and none exists; BER-DEC-005 is executed and closed.
+- **Trigger to begin:** CLOSED — no further WP-2B-0 work is authorized by BER-DEC-005;
+  the R2 evidence task ended with zero calibration dispatches. Any future judge
+  selection and calibration requires a new reviewed and merged authorization (WP-2B-3
+  remains unauthorized).
 - **Expected deliverable:** A pinned judge identity (model/version); a versioned,
   human-labeled calibration dataset (`calibration_dataset_version/hash`); and a measured
   calibration report containing the full confusion matrix, accuracy/agreement, false-PASS
@@ -307,16 +324,23 @@ existence**.
   met; judge failure paths resolve to `JUDGE_ERROR`, never PASS/FAIL; any later judge,
   rubric-derivation, or dataset change is recorded as requiring re-calibration and
   behavioral re-baselining.
-- **Owner decision required:** OD-1 — Peter Nguyen approves the initial numeric thresholds
-  and the measured calibration result during 2B-0.
+- **Owner decision required:** RESOLVED for WP-2B-0 — the owner accepted R2's
+  INCOMPLETE / BLOCKED disposition. OD-1 (numeric thresholds and the measured
+  calibration ratification) remains OPEN and pending for a later authorized phase; no
+  thresholds were proposed or ratified.
 - **Explicit non-goals:** No invented threshold numbers (the design deliberately invents
   none); no production semantic judging; no hard-coded model name in the design.
 - **Related design sections:** §8, §13 (calibration-dataset identity in
   `baseline_identity`), §17 criterion 9, §17a item 9, §20 D1/OD-1/R2, §22 (judge risk
   rows).
-- **Completion evidence:** The calibration report and dataset identity at the WP-2B-0
-  evidence path; the owner's OD-1 ratification recorded and registered through a reviewed
-  update to this file.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)
+  (merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`); the repository-safe summary
+  [`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md);
+  the evidence manifest
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json);
+  the detached finalization marker
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json);
+  and the owner-side integrity gate PASS.
 - **Supersedes / superseded by:** None.
 
 ### R3 — Monetary-cost observability versus enforceable proxies
@@ -325,7 +349,11 @@ existence**.
 - **Title:** Monetary-cost observability versus enforceable proxy reservation
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** DONE — WP-2B-0 evidence disposition accepted as UNAVAILABLE / UNKNOWN under
+  Outcome B. The ordinary Claude Code control session did not prove direct monetary
+  reservation or a complete pre-dispatch proxy envelope. WP-2B-1 may build and
+  deterministically test runner-owned enforcement, but no live enforcement claim is
+  authorized.
 - **Source / evidence:** Merged design §11 (pre-dispatch reservation; monetary-`UNKNOWN`
   fallback), §17a (closing constraint), §20 D3 (as corrected by §20a-S3) and R3. Carried
   into this register by the owner's backlog-creation directive of 2026-08-10.
@@ -334,8 +362,11 @@ existence**.
   before dispatch in units the provider surface actually exposes. Whether monetary cost is
   observable — or only token/call/turn/session proxies are — is a host-evidence question,
   and fabricated dollar accounting is prohibited.
-- **Dependencies:** This backlog merged; WP-2B-0 AUTHORIZED.
-- **Trigger to begin:** WP-2B-0 authorization.
+- **Dependencies:** This backlog merged; WP-2B-0 DONE under Outcome B / Limited Scope —
+  the owner accepted R3's disposition with PR #81; BER-DEC-005 is executed and closed.
+- **Trigger to begin:** CLOSED — no further WP-2B-0 work is authorized by BER-DEC-005;
+  the R3 evidence task is complete (zero dispatches; envelope not provable in-session).
+  Any follow-up cost probe requires a new reviewed and merged authorization.
 - **Expected deliverable:** A cost-observability report establishing whether cost can be
   enforced through direct monetary reservation, or must be enforced through
   provider-enforced token/call/turn/session ceilings with monetary cost reported
@@ -345,15 +376,22 @@ existence**.
   unavailable, the recorded disposition adopts the design's decided fallback (proxy
   reservation + monetary `UNKNOWN` + stop at the enforceable cap) with no fabricated
   dollar figures anywhere.
-- **Owner decision required:** Acceptance of the recorded disposition (direct monetary
-  enforcement, or proxy units + `UNKNOWN` reporting) as the basis for WP-2B-1's
-  reservation implementation.
+- **Owner decision required:** RESOLVED for WP-2B-0 — the owner accepted R3's
+  UNAVAILABLE / UNKNOWN disposition as the basis for WP-2B-1's non-live, runner-owned
+  reservation implementation. No live host/provider enforcement claim is authorized;
+  later live phases require their own evidence and authorization.
 - **Explicit non-goals:** No spend beyond WP-2B-0's own approved spike budget; no
   reservation implementation (that is WP-2B-1); no cost prediction presented as fact.
 - **Related design sections:** §11, §11a, §13 (cost accounting fields), §17a, §20 D3/R3,
   §22 (cost risk rows).
-- **Completion evidence:** The cost-observability report at the WP-2B-0 evidence path and
-  the owner's recorded disposition, registered through a reviewed update to this file.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)
+  (merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`); the repository-safe summary
+  [`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md);
+  the evidence manifest
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json);
+  the detached finalization marker
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json);
+  and the owner-side integrity gate PASS.
 - **Supersedes / superseded by:** None.
 
 ### R4 — OS/host isolation and per-tool-path confinement
@@ -362,7 +400,9 @@ existence**.
 - **Title:** OS/host isolation mechanism and per-tool-path confinement evidence
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** DONE — WP-2B-0 evidence disposition accepted as INCOMPLETE / BLOCKED under
+  Outcome B. Effective per-tool-path confinement was not proven. Live execution remains
+  blocked pending later evidence.
 - **Source / evidence:** Merged design §15 (containment-first model; eleven enumerated
   tool paths; §20a-S13/S20), §5a (control-plane inaccessibility), §17a items 6–7, §18
   (benchmark-contamination probes), §20 R4. Carried into this register by the owner's
@@ -372,8 +412,12 @@ existence**.
   boundary proven per tool path, live behavioral execution cannot be contained, and the
   control-plane eval corpus (case definitions, expectations, rubrics, answer banks) cannot
   be proven unreachable from the system under test.
-- **Dependencies:** This backlog merged; WP-2B-0 AUTHORIZED.
-- **Trigger to begin:** WP-2B-0 authorization.
+- **Dependencies:** This backlog merged; WP-2B-0 DONE under Outcome B / Limited Scope —
+  the owner accepted R4's disposition with PR #81; BER-DEC-005 is executed and closed.
+- **Trigger to begin:** CLOSED — no further WP-2B-0 work is authorized by BER-DEC-005;
+  the R4 evidence task is complete (effective per-tool-path probes did not run under the
+  envelope gate). Any follow-up containment probe requires a new reviewed and merged
+  authorization.
 - **Expected deliverable:** A containment capability report proving, by probe against the
   real host (never config inspection alone), effective confinement for every design-
   enumerated path: shell/subprocess execution; built-in Read; built-in Edit/Write;
@@ -388,16 +432,23 @@ existence**.
   unavailable; benchmark-contamination probes fail closed; an unconfinable path blocks
   broad execution or the host adapter entirely, with owner approval required for any
   narrower claim.
-- **Owner decision required:** Approval of any narrower v1 claim scope if the host cannot
-  provide the full required boundary.
+- **Owner decision required:** RESOLVED for WP-2B-0 — the owner accepted R4's
+  INCOMPLETE / BLOCKED disposition. Approval of any narrower v1 claim scope remains a
+  later owner decision, available only when live evidence exists; no such approval is
+  granted here.
 - **Explicit non-goals:** No assumption that a sandboxed shell confines non-shell tool
   paths; no invented sandbox feature; no broad live execution while any relevant path is
   unproven.
 - **Related design sections:** §5a, §15, §17a items 6–7, §18 (containment and
   contamination tests), §20 R4, §22 (containment risk rows).
-- **Completion evidence:** The containment capability report at the WP-2B-0 evidence path
-  and the owner's recorded disposition, registered through a reviewed update to this
-  file.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)
+  (merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`); the repository-safe summary
+  [`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md);
+  the evidence manifest
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json);
+  the detached finalization marker
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json);
+  and the owner-side integrity gate PASS.
 - **Supersedes / superseded by:** None.
 
 ### R5 — Execution-profile observability and isolation
@@ -406,7 +457,9 @@ existence**.
 - **Title:** Execution-profile observability and isolation
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** DONE — WP-2B-0 evidence disposition accepted as INCOMPLETE / BLOCKED under
+  Outcome B. Execution-profile isolation was not proven. Baseline eligibility and live
+  execution remain blocked pending later evidence.
 - **Source / evidence:** Merged design §5e (pinned execution-profile contract; §20a-S19),
   §13 (`baseline_identity` includes the execution profile), §17a item 8, §20 R5. Carried
   into this register by the owner's backlog-creation directive of 2026-08-10.
@@ -415,8 +468,12 @@ existence**.
   skills and subagents, plugins, hooks, and MCP servers can load from outside the
   materialized workspace and silently change behavior. Runs whose configuration surface
   cannot be observed and isolated are non-baseline-eligible by design.
-- **Dependencies:** This backlog merged; WP-2B-0 AUTHORIZED.
-- **Trigger to begin:** WP-2B-0 authorization.
+- **Dependencies:** This backlog merged; WP-2B-0 DONE under Outcome B / Limited Scope —
+  the owner accepted R5's disposition with PR #81; BER-DEC-005 is executed and closed.
+- **Trigger to begin:** CLOSED — no further WP-2B-0 work is authorized by BER-DEC-005;
+  the R5 evidence task is complete (partial existence-level observability recorded;
+  isolation not proven). Any follow-up profile probe requires a new reviewed and merged
+  authorization.
 - **Expected deliverable:** An execution-profile isolation report establishing, for the
   real host, whether each element of the configuration surface can be controlled or
   accurately observed: configuration scopes (managed/user/project/local settings);
@@ -428,15 +485,21 @@ existence**.
   unavailable/unknown — never assumed — and affected runs are marked
   non-baseline-eligible, excluded from stability windows and promotion accounting. No
   configuration-isolation flag is invented.
-- **Owner decision required:** Acceptance of the recorded limitations and their
-  baseline-eligibility consequences.
+- **Owner decision required:** RESOLVED for WP-2B-0 — the owner accepted R5's
+  INCOMPLETE / BLOCKED disposition and its baseline-eligibility consequences (affected
+  runs remain non-baseline-eligible until isolation is proven by later evidence).
 - **Explicit non-goals:** No assumption of any Claude Code isolation switch; no silent
   inheritance of developer-personal configuration into recorded baselines.
 - **Related design sections:** §5e, §13, §17 criterion 1, §17a item 8, §18
   (execution-profile tests), §20 R5, §22 (hidden-configuration risk row).
-- **Completion evidence:** The execution-profile isolation report at the WP-2B-0 evidence
-  path and the owner's recorded disposition, registered through a reviewed update to this
-  file.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)
+  (merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`); the repository-safe summary
+  [`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md);
+  the evidence manifest
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json);
+  the detached finalization marker
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json);
+  and the owner-side integrity gate PASS.
 - **Supersedes / superseded by:** None.
 
 ---
@@ -446,10 +509,11 @@ existence**.
 One work package per merged-design implementation phase (design §19). Dependencies follow
 the design's corrected implementation order (§20a-S7): every minimum guardrail lands in
 2B-1, before any live phase; no later phase may erase an earlier phase's evidence
-boundary. Statuses: WP-2B-0 is AUTHORIZED by BER-DEC-005 (§13 of this file) — the
-authorization becomes effective only after PR #80 is reviewed and merged, and execution
-remains limited to BER-DEC-005's exact scope, branch, budget, evidence root, evidence
-policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
+boundary. Statuses: WP-2B-0 is DONE — Outcome B / Limited Scope accepted (BER-DEC-005
+executed; evidence and owner decision merged through
+[PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)); WP-2B-1 is
+AUTHORIZED by BER-DEC-006 (§13 of this file), effective only after the governance PR
+containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BACKLOG.
 
 ### WP-2B-0 — Capability and evidence spike
 
@@ -458,27 +522,21 @@ policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
   gate)
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** AUTHORIZED — authorized by BER-DEC-005. Authorization becomes effective
-  only after the PR containing BER-DEC-005 is reviewed and merged. Execution is
-  limited to BER-DEC-005's exact scope, branch, budget, evidence root,
-  evidence-handling terms, and stop conditions.
+- **Status:** DONE — Outcome B / Limited Scope accepted by Peter Nguyen. The capability
+  spike and evidence package are complete. R1/R3 remain unavailable/unknown; R2/R4/R5
+  remain incomplete/blocked. Outcome A is not claimed. Live behavioral execution
+  remains blocked.
 - **Source / evidence:** Merged design §17a and §19 (2B-0 row); §20 R1–R5; owner
   backlog-creation directive of 2026-08-10.
 - **Why it matters:** The design forbids building a runner around assumed telemetry, an
   assumed sandbox, an assumed configuration-isolation switch, or an unmeasured judge. The
   spike converts each assumption into evidence or an owner-approved limitation before any
   general construction or broad execution.
-- **Dependencies:** PR #79's backlog is merged; BER-DEC-005 is the governing
-  authorization; no probe or model call begins until the authorization PR containing
-  BER-DEC-005 is merged and all of its evidence-handling controls are active.
-- **Trigger to begin:** This authorization PR (#80) — the reviewed PR containing
-  BER-DEC-005 — is merged; execution occurs only on
-  `spike/behavioral-eval-runner-2b-0`; the execution branch is created directly
-  from PR #80's exact GitHub merge commit (`merge_commit_sha`), per
-  BER-DEC-005's authorized source baseline — never from a later moving `main`;
-  the evidence root is absent or validly owned; the minimum evidence policy of
-  BER-DEC-005 is active; and R3 pre-dispatch enforcement is established before
-  any model call.
+- **Dependencies:** SATISFIED for WP-2B-0 completion through
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) and the owner
+  integrity gate.
+- **Trigger to begin:** CLOSED — no additional work is authorized under BER-DEC-005.
+  Any follow-up probe requires a new reviewed and merged authorization.
 - **Expected deliverable:** The activation observability report (R1); the containment
   capability report (R4); the execution-profile isolation report (R5); the
   cost-observability report (R3); the measured judge-calibration report (R2); and an
@@ -490,19 +548,20 @@ policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
   model call runs under the authorization's minimum spike-evidence-handling terms, and
   all spike evidence is created, stored, redacted, retained, and cleaned up per those
   terms.
-- **Owner decision required:** The WP-2B-0 authorization is recorded by BER-DEC-005;
-  OD-1 threshold ratification, the final R1–R5 dispositions, and the aggregate
-  WP-2B-0 outcome decision (go / no-go / limited-scope) remain pending.
+- **Owner decision required:** RESOLVED for the WP-2B-0 aggregate outcome: Outcome B /
+  Limited Scope accepted. OD-1 remains OPEN.
 - **Explicit non-goals:** No runner core construction; no Scenario A or corpus execution;
   no CI wiring; no judge production use; no modification of skills, evals, the validator,
   or the merged design.
 - **Related design sections:** §6, §8, §11, §15, §5e, §17a, §19 (2B-0), §20 (OD-1,
   R1–R5).
-- **Completion evidence:** The five reports at the authorized evidence path; the
-  repository-safe summary, evidence manifest, and hashes the authorization's
-  evidence-handling terms require, with evidence integrity verified before owner review;
-  the recorded owner outcome decision; and statuses of R1–R5 and WP-2B-0 updated through
-  a reviewed PR to this file.
+- **Completion evidence:** [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81);
+  merge commit `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`; the three merged evidence
+  files ([`docs/evidence/behavioral-eval-runner-wp-2b-0-summary.md`](../evidence/behavioral-eval-runner-wp-2b-0-summary.md),
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-manifest.json),
+  [`artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json`](../../artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json));
+  the owner-side integrity gate PASS; and the final detached-marker SHA-256
+  `c33bd26edac562c12578ff1b2231c440718d2bbbd1b19ad7e365f60b862b543c`.
 - **Supersedes / superseded by:** None.
 
 ### WP-2B-1 — Runner core and versioned contracts
@@ -511,7 +570,9 @@ policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
 - **Title:** Runner core, minimum guardrails, and versioned contracts
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** AUTHORIZED — authorized by BER-DEC-006, effective only after the PR
+  containing BER-DEC-006 is reviewed and manually merged. Scope is limited to the
+  non-live runner core and minimum guardrails recorded by BER-DEC-006.
 - **Source / evidence:** Merged design §19 (2B-1 row) and the sections it delivers (§3
   census items a–k, §5, §5a, §5b, §5e, §10, §11, §11a, §13, §14, §15); owner
   backlog-creation directive of 2026-08-10.
@@ -519,10 +580,15 @@ policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
   any live phase: containment, timeouts, emergency kill, budget reservation, attempt
   recording, aggregate semantics, and bounded concurrency. 2B-1 is where the runner's
   honest result model and evidence machinery become code.
-- **Dependencies:** WP-2B-0 DONE with R1–R5 dispositions recorded; the owner's go or
-  limited-scope decision; separate owner authorization for WP-2B-1.
-- **Trigger to begin:** Owner authorizes WP-2B-1 on its own branch after reviewing 2B-0's
-  evidence.
+- **Dependencies:** WP-2B-0 is DONE under Outcome B / Limited Scope;
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) evidence and the
+  owner decision are merged; R1–R5 limitations remain binding; BER-DEC-006 is the
+  governing authorization.
+- **Trigger to begin:** This governance PR (the reviewed PR containing BER-DEC-006) is
+  manually merged; implementation occurs only on `feat/behavioral-eval-runner-2b-1`;
+  the implementation branch starts from this governance PR's exact squash-merge commit
+  and tree; the build-evidence root is absent or validly owned; all implementation
+  remains offline and non-live; and no package installation is required.
 - **Expected deliverable:** The runner core entry point; versioned attempt/aggregate/run
   schemas (`attempt_state`; `aggregate_verdict` + `aggregate_blocker`; coverage metrics);
   case and fixture manifest schemas (capability/fixture fields of §5b, keyed by
@@ -540,9 +606,13 @@ policy, and stop conditions; WP-2B-1 through WP-2B-7 remain BACKLOG.
   the §18 test strategy without spending live model tokens by default; every §5b concept
   remains addressed in the final schemas; no live behavioral execution occurs in this
   phase beyond any separately-approved smoke budget; the structural validator remains
-  untouched.
-- **Owner decision required:** Phase authorization; ratification of census-proposed risk
-  classes (OD-3) when presented; acceptance of the final schema shapes (BER-BKL-007).
+  untouched. Outcome B constraint: WP-2B-1 passes only when its code and tests honestly
+  represent unproven capabilities as unavailable/unknown and keep every live-dispatch
+  path disabled. Unit tests may prove runner-owned control logic; they do not prove
+  host/provider enforcement or containment.
+- **Owner decision required:** WP-2B-1 authorization is recorded by BER-DEC-006. Final
+  schema-shape acceptance (BER-BKL-007) and OD-3 risk-class ratification remain owner
+  decisions at implementation review. No later phase is authorized.
 - **Explicit non-goals:** No semantic judging in production; no Scenario A live suite; no
   generic corpus execution; no CI integration; no relaxation of any 2B-0 evidence
   boundary.
@@ -891,24 +961,35 @@ risking forking) its requirements.
 - **Title:** Activation-observability evidence and claim-scope implementation
 - **Phase:** 2B-0 / 2B-2
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** BLOCKED — R1's WP-2B-0 disposition is accepted as unavailable/unknown.
+  Activation-observer implementation cannot proceed until the later phase has a truthful
+  mechanism or separately accepted limitation. WP-2B-2 remains unauthorized.
 - **Source / evidence:** Cross-reference: **R1** (authoritative record, §6 of this file).
   Merged design §6, §17a, §20 R1.
 - **Why it matters:** Inventory visibility for the R1 gate; see R1.
-- **Dependencies:** As R1 (backlog merged; WP-2B-0 AUTHORIZED) for the gate half;
-  WP-2B-2 AUTHORIZED for the implementation half.
-- **Trigger to begin:** As R1 (gate half); WP-2B-2 authorization (implementation half).
+- **Dependencies:** The gate half is DONE — R1's disposition (unavailable/unknown) is
+  recorded and owner-accepted under Outcome B via
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The implementation
+  half requires WP-2B-2 AUTHORIZED plus a truthful activation mechanism or a separately
+  accepted limitation.
+- **Trigger to begin:** Gate half CLOSED — no further WP-2B-0 work is authorized by
+  BER-DEC-005. The implementation half awaits WP-2B-2 authorization; it remains BLOCKED
+  until a truthful mechanism or separately accepted limitation exists.
 - **Expected deliverable:** R1's activation observability report — evidence/report work
   occurring only inside AUTHORIZED WP-2B-0 scope — then the 2B-2 activation observer —
   implemented only inside AUTHORIZED WP-2B-2 scope — built only on the proven mechanism
   within the recorded claim scope.
-- **Acceptance criteria:** As R1; implementation additionally satisfies design §23 item 6.
+- **Acceptance criteria:** As R1 (disposition recorded and accepted); the future
+  implementation additionally satisfies design §23 item 6 and never treats R1 as
+  technically solved.
 - **Owner decision required:** As R1.
 - **Explicit non-goals:** As R1; this record adds no requirement beyond R1 and WP-2B-2.
 - **Related design sections:** §6, §17a, §19, §20 R1, §23 item 6.
-- **Completion evidence:** Recorded as two distinct events: the R1 gate disposition
-  (WP-2B-0 evidence path + reviewed status update, as R1); then, separately, the merged
-  WP-2B-2 activation-observer implementation PR.
+- **Completion evidence:** Gate half: as R1 —
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
+  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update.
+  Implementation half: the future merged WP-2B-2 activation-observer implementation PR
+  (still required).
 - **Supersedes / superseded by:** None (tracks R1; R1's record is authoritative for the
   gate's requirements).
 
@@ -918,28 +999,40 @@ risking forking) its requirements.
 - **Title:** Configuration isolation and effective per-tool-path confinement
 - **Phase:** 2B-0 / 2B-1
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** BACKLOG — WP-2B-0 recorded R4/R5 as incomplete/blocked. The non-live
+  containment and execution-profile scaffolding may be built inside authorized WP-2B-1,
+  but no effective-containment or baseline-eligibility claim is allowed until later
+  evidence proves it.
 - **Source / evidence:** Cross-reference: **R4 and R5** (authoritative records, §6 of this
   file). Merged design §5e, §15, §17a items 6–8.
 - **Why it matters:** Inventory visibility for the containment and configuration gates;
   see R4 and R5.
-- **Dependencies:** As R4/R5 for the gate half; WP-2B-1 AUTHORIZED for the
-  implementation half.
-- **Trigger to begin:** As R4/R5 (gate half); WP-2B-1 authorization (implementation
-  half).
+- **Dependencies:** The gate half is DONE — R4/R5 dispositions (incomplete/blocked) are
+  recorded and owner-accepted under Outcome B via
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The non-live
+  scaffolding half requires WP-2B-1's BER-DEC-006 authorization to be effective (the
+  governance PR containing BER-DEC-006 merged); effective-containment evidence remains
+  a later-phase requirement.
+- **Trigger to begin:** Gate half CLOSED — no further WP-2B-0 work is authorized by
+  BER-DEC-005. The non-live scaffolding half begins only after the governance PR
+  containing BER-DEC-006 is merged, on `feat/behavioral-eval-runner-2b-1`.
 - **Expected deliverable:** R4's containment capability report and R5's execution-profile
   isolation report — evidence work occurring only inside AUTHORIZED WP-2B-0 scope — then
   the 2B-1 containment integration and execution-profile capture — implemented only
   inside AUTHORIZED WP-2B-1 scope — built on the proven mechanisms.
-- **Acceptance criteria:** As R4 and R5; implementation additionally satisfies design §23
-  items 12 and 15.
+- **Acceptance criteria:** As R4 and R5 (dispositions recorded and accepted); the
+  WP-2B-1 scaffolding additionally satisfies the non-live, deterministically tested
+  subset of design §23 items 12 and 15, and makes no effective-containment or
+  baseline-eligibility claim until later evidence proves it.
 - **Owner decision required:** As R4/R5 (including any narrower-claim approval).
 - **Explicit non-goals:** As R4/R5; this record adds no requirement beyond them and
   WP-2B-1.
 - **Related design sections:** §5a, §5e, §13, §15, §17a, §18, §20 R4/R5, §23 items 12/15.
-- **Completion evidence:** Recorded as distinct events: the R4/R5 gate dispositions
-  (WP-2B-0 evidence path + reviewed status updates, as R4/R5); then, separately, the
-  merged WP-2B-1 containment/profile implementation PRs.
+- **Completion evidence:** Gate half: as R4/R5 —
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
+  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update.
+  Scaffolding half: the future merged WP-2B-1 containment/profile scaffolding PRs
+  (non-live; still required).
 - **Supersedes / superseded by:** None (tracks R4/R5; their records are authoritative).
 
 ### BER-BKL-005 — Judge selection, measurable calibration, and owner thresholds
@@ -948,13 +1041,21 @@ risking forking) its requirements.
 - **Title:** Judge selection, measurable calibration, and owner thresholds
 - **Phase:** 2B-0 / 2B-3
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** BLOCKED — R2 remains incomplete/blocked and OD-1 remains open. WP-2B-3 is
+  unauthorized.
 - **Source / evidence:** Cross-reference: **R2** (authoritative record, §6 of this file)
   and OD-1 (§9 of this file). Merged design §8, §17a item 9, §20 D1/OD-1/R2.
 - **Why it matters:** Inventory visibility for the judge gate; see R2. The 2B-3
   implementation (WP-2B-3) then operationalizes the ratified thresholds.
-- **Dependencies:** As R2; WP-2B-3 for the implementation half.
-- **Trigger to begin:** As R2 (spike half); WP-2B-3 authorization (implementation half).
+- **Dependencies:** The WP-2B-0 evidence half is DONE — R2's disposition
+  (incomplete/blocked) is recorded and owner-accepted under Outcome B via
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81); no judge was pinned
+  and no calibration exists. The remaining halves require a new reviewed and merged
+  authorization for the calibration evidence plus WP-2B-3 authorization.
+- **Trigger to begin:** Spike half CLOSED — no further WP-2B-0 work is authorized by
+  BER-DEC-005. Otherwise BLOCKED: judge selection and calibration require a new
+  reviewed and merged authorization, WP-2B-3 remains unauthorized, and OD-1 remains
+  open.
 - **Expected deliverable:** R2's pinned judge identity + measured calibration report; then
   WP-2B-3's calibration-enforcing judge harness.
 - **Acceptance criteria:** As R2 and WP-2B-3; design §23 items 7 and 19 hold.
@@ -963,7 +1064,11 @@ risking forking) its requirements.
   semantic verdict before ratification.
 - **Related design sections:** §8, §13, §17 criterion 9, §17a item 9, §20 D1/OD-1/R2,
   §23 items 7/19.
-- **Completion evidence:** As R2; then the merged WP-2B-3 PR(s).
+- **Completion evidence:** Evidence half: as R2 —
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
+  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update. The
+  measured calibration result, OD-1 ratification, and merged WP-2B-3 PR(s) remain
+  future requirements.
 - **Supersedes / superseded by:** None (tracks R2 + WP-2B-3; those records are
   authoritative).
 
@@ -973,21 +1078,35 @@ risking forking) its requirements.
 - **Title:** Cost observability and enforceable reservation units
 - **Phase:** 2B-0 / 2B-1
 - **Priority:** GATE
-- **Status:** EVIDENCE_REQUIRED
+- **Status:** BACKLOG — R3's limitation is accepted. Authorized WP-2B-1 may build and
+  deterministically test runner-owned reservation and budget enforcement, but no live
+  host/provider enforcement claim is allowed.
 - **Source / evidence:** Cross-reference: **R3** (authoritative record, §6 of this file).
   Merged design §11, §11a, §20 D3/R3.
 - **Why it matters:** Inventory visibility for the cost gate; see R3. WP-2B-1 then
   implements pre-dispatch reservation in the proven units.
-- **Dependencies:** As R3; WP-2B-1 for the implementation half.
-- **Trigger to begin:** As R3 (spike half); WP-2B-1 authorization (implementation half).
+- **Dependencies:** The gate half is DONE — R3's disposition (unavailable/unknown) is
+  recorded and owner-accepted under Outcome B via
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The runner-owned,
+  non-live implementation half requires WP-2B-1's BER-DEC-006 authorization to be
+  effective (the governance PR containing BER-DEC-006 merged).
+- **Trigger to begin:** Spike half CLOSED — no further WP-2B-0 work is authorized by
+  BER-DEC-005. The runner-owned reservation half begins only after the governance PR
+  containing BER-DEC-006 is merged, on `feat/behavioral-eval-runner-2b-1`.
 - **Expected deliverable:** R3's cost-observability report; then WP-2B-1's reservation,
   bounded concurrency, reconciliation, and kill-switch implementation in those units.
-- **Acceptance criteria:** As R3 and WP-2B-1; design §23 item 10 holds; no fabricated
-  dollar accounting anywhere.
+- **Acceptance criteria:** As R3 (disposition recorded and accepted) and WP-2B-1; the
+  non-live, deterministically tested subset of design §23 item 10 holds; no fabricated
+  dollar accounting anywhere; and no live host/provider enforcement claim is made until
+  later evidence proves it.
 - **Owner decision required:** As R3; WP-2B-1 authorization.
 - **Explicit non-goals:** As R3; no spend outside approved budgets.
 - **Related design sections:** §11, §11a, §13, §17a, §20 D3/R3, §23 item 10.
-- **Completion evidence:** As R3; then the merged WP-2B-1 budget-guard PR.
+- **Completion evidence:** Gate half: as R3 —
+  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
+  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update.
+  Implementation half: the future merged WP-2B-1 budget-guard PR (non-live; still
+  required).
 - **Supersedes / superseded by:** None (tracks R3; R3's record is authoritative).
 
 ### BER-BKL-007 — Final production JSON/YAML schemas and schema-migration policy
@@ -1620,24 +1739,29 @@ tests and review keep proving its absence. **Supersedes / superseded by:** none.
 ## 12. Dependency and sequence map
 
 ```
-PR #78 merged design (main @ c61aca8)
+PR #78 merged design (main @ c61aca8) — MERGED
         |
         v
-Durable backlog merged (this file, via reviewed PR)   <-- Phase 2B-0 may not begin before this
+Durable backlog merged (this file, via reviewed PR #79) — MERGED   <-- Phase 2B-0 may not begin before this
         |
         v
 Owner authorization for WP-2B-0 merged per the work-package authorization protocol
 (immutable BER-DEC entry: owner, scope, budget + units, evidence path,
 evidence-handling terms, stop conditions; WP-2B-0 -> AUTHORIZED)
+— MERGED: BER-DEC-005 via PR #80
         |
         v
 R1-R5 evidence dispositions (WP-2B-0 reports)
+— MERGED: PR #81 WP-2B-0 evidence + Outcome B
         |
         v
 Owner go / no-go / limited-scope decision (design 17a outcome A or B)
+— DONE: WP-2B-0 closed as Outcome B / Limited Scope
         |
         v
 WP-2B-1  runner core + minimum guardrails
+— AUTHORIZED by BER-DEC-006, effective after the governance PR containing
+  BER-DEC-006 is merged
         |
         v
 WP-2B-2  deterministic graders
@@ -1673,6 +1797,14 @@ Explicit statements about this map:
 - **Each arrow requires its own evidence and its own owner decision.** No arrow is
   crossed by momentum, and no later phase may erase an earlier phase's evidence boundary
   (design §19).
+- **Current state (recorded 2026-08-11):** PR #78 (design), PR #79 (backlog), PR #80
+  (WP-2B-0 authorization), and PR #81 (WP-2B-0 evidence + Outcome B) are MERGED;
+  WP-2B-0 is DONE — Outcome B / Limited Scope; WP-2B-1 is AUTHORIZED by BER-DEC-006,
+  effective only after the governance PR containing BER-DEC-006 is merged. WP-2B-2
+  through WP-2B-7 remain governed by their existing dependencies and separate
+  authorization requirements — merging the WP-2B-1 authorization does not authorize
+  WP-2B-2, completing WP-2B-1 does not authorize WP-2B-2, and live phases remain
+  blocked pending their own evidence and owner authorization.
 
 ---
 
@@ -2000,6 +2132,117 @@ model call, and evidence artifact.
     Cleanup still targets only the exact ownership-marker-bound root; all
     existing marker, retention, encryption, and deletion rules remain in
     force.
+
+### BER-DEC-006
+
+- **Date:** 2026-08-11
+- **Decision:** Close WP-2B-0 under the owner-accepted Outcome B / Limited
+  Scope and authorize WP-2B-1 to build the non-live Behavioral Eval Runner
+  control plane and minimum guardrails under the exact limitations, scope,
+  evidence terms, and stop conditions below. Authorization becomes effective
+  only after the reviewed PR containing BER-DEC-006 is manually merged.
+- **Owner:** Peter Nguyen
+- **Repository:** `ModernNomad-98/Project-Aegis`
+- **Evidence basis:**
+  - PR #81;
+  - merge commit
+    `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`;
+  - owner-accepted Outcome B / Limited Scope;
+  - owner-side integrity gate PASS;
+  - detached-marker SHA-256
+    `c33bd26edac562c12578ff1b2231c440718d2bbbd1b19ad7e365f60b862b543c`.
+- **Closed work package:** `WP-2B-0`
+- **Authorized work package:** `WP-2B-1`
+- **Authorized implementation branch:**
+  `feat/behavioral-eval-runner-2b-1`
+- **Authorized source baseline:** the immutable GitHub squash-merge commit of
+  the reviewed PR containing BER-DEC-006. The future implementation session
+  must resolve that merge SHA and tree and create the implementation branch
+  directly from them, never from a later moving `main`.
+- **Authorized scope:**
+  - non-live runner core;
+  - versioned attempt, aggregate, run, case, fixture, materialization,
+    execution-profile, and evidence schemas;
+  - immutable workspace materializer;
+  - separation of agent-visible runtime and control-plane surfaces;
+  - sanitized runtime-surface builder;
+  - implementation-time corpus census;
+  - capability and fixture preflight;
+  - fail-closed containment interfaces and guards;
+  - timeout and process-tree emergency-kill controls;
+  - bounded concurrency machinery;
+  - runner-owned pre-dispatch dispatch/call/turn/token/session reservation
+    machinery;
+  - deterministic budget-aware scheduler;
+  - evidence writer and non-circular finalization machinery;
+  - attempt and N/quorum controller;
+  - host-adapter interface;
+  - non-live Claude Code adapter scaffolding that denies unavailable or
+    unproven capabilities;
+  - report generator with honest UNRUN/ERROR/default states and complete
+    coverage metrics;
+  - deterministic unit, integration, schema, scheduler, evidence, and
+    containment tests using mocks and synthetic fixtures;
+  - a sanitized WP-2B-1 implementation closeout summary.
+- **Outcome B constraints:**
+  - no implementation may claim R1, R2, R3, R4, or R5 is technically solved;
+  - live dispatch remains disabled by default;
+  - all unproven host capabilities deny or report unavailable/unknown;
+  - the Claude Code adapter must not expose a live-dispatch path in this phase;
+  - no baseline, routing, containment, semantic-judge, or promotion claim may
+    result from WP-2B-1;
+  - later live phases require their own evidence and authorization.
+- **Explicitly forbidden scope:**
+  - model/provider dispatch by the new runner;
+  - live Claude Code session spawning by the runner;
+  - Scenario A execution;
+  - generic eval execution;
+  - deterministic grader implementation owned by WP-2B-2;
+  - semantic judge implementation owned by WP-2B-3;
+  - CI/workflow wiring;
+  - skill or eval modification;
+  - validator or gate modification;
+  - deployment;
+  - package installation or dependency addition without another reviewed
+    authorization;
+  - authorization of WP-2B-2 or any later work package.
+- **Model and spend budget:**
+  - runner-generated model/provider dispatches: `0`;
+  - runner-generated live sessions: `0`;
+  - external model/API spend: USD `$0`;
+  - package installations: `0`;
+  - no network use except Git/GitHub operations required for the reviewed PR;
+  - all tests must use mocks, recorded synthetic fixtures, or local
+    deterministic harnesses.
+- **External build-evidence root:**
+  `C:\temp\Project-Aegis-BER-WP-2B-1-Implementation-Evidence`
+- **Build-evidence handling:**
+  - classification: INTERNAL TECHNICAL BUILD EVIDENCE;
+  - permitted content: test logs, schema-validation results, local coverage
+    summaries, timing records, validator output, DCO output;
+  - forbidden content: credentials, tokens, passwords, private keys, personal
+    paths, unrestricted environment/configuration dumps, raw model
+    transcripts, real customer/patient data;
+  - retention: 30 calendar days from first creation;
+  - an ownership marker must bind the root to BER-DEC-006 and the exact
+    implementation branch/base;
+  - cleanup must be marker-gated and physically reparse-safe;
+  - repository-safe outputs may contain only sanitized implementation evidence.
+- **Stop conditions:**
+  - repository, authorization merge SHA/tree, branch base, or scope differs;
+  - any runner/model/provider dispatch would occur;
+  - a package installation or dependency addition is required;
+  - an existing skill, eval, workflow, validator, gate, design, or unrelated
+    roadmap would need modification;
+  - a capability would need to be claimed without evidence;
+  - a test cannot remain deterministic and offline;
+  - an unauthorized file path would be changed;
+  - structural validation fails;
+  - an unexpected condition makes a claim uncertain.
+- **Authority boundary:** This authorizes WP-2B-1 only after merge. It does not
+  authorize WP-2B-2, live execution, Scenario A, corpus execution, CI
+  promotion, deployment, auto-merge, or merge.
+- **Supersedes / superseded by:** None.
 
 ---
 
