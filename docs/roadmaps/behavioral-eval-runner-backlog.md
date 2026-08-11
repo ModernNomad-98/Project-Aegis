@@ -250,22 +250,30 @@ existence**.
   set, base-model-imitation resistance, other-skill-emission resistance, fresh-session
   stability, measured false-positive/false-negative rates, explicit owner approval of the
   claim scope).
-- **Acceptance criteria:** The gate ends in exactly one of the design's two outcomes:
-  (A) a proven mechanism with a bounded, owner-understood claim scope; or (B) an explicit
-  owner-approved limitation defining exactly what v1 can and cannot truthfully claim.
-  Broad corpus execution remains blocked until one outcome is recorded. No Claude Code
-  API, event stream, hook, or telemetry source is assumed; ambiguous evidence remains
+- **Acceptance criteria:** R1 ends in exactly one activation-specific disposition:
+  (1) an activation-identifying mechanism proven with a bounded, evidence-backed claim
+  scope; or (2) an owner-approved Tier-2 signature claim scope after the full §6
+  signature-promotion proof; or (3) activation-identifying evidence recorded as
+  unavailable/unknown, with the limitation recorded. R1's disposition alone does NOT
+  establish WP-2B-0 outcome A or B: outcome A/B is decided only by WP-2B-0 after R1–R5
+  all have evidence-backed dispositions, and outcome A requires the activation
+  mechanism plus the isolation boundary and per-tool-path confinement (R4) and
+  execution-profile observability/isolation (R5), as defined in the merged design
+  (§17a item 10). Broad general-corpus execution remains blocked. No Claude Code API,
+  event stream, hook, or telemetry source is assumed; ambiguous evidence remains
   `ERROR` / `AMBIGUOUS_ACTIVATION`, never a verdict.
-- **Owner decision required:** Ratification of the resulting claim scope (outcome A) or of
-  the explicit limitation (outcome B); approval of any Tier-2 signature promotion and its
-  claim scope.
+- **Owner decision required:** Ratification of R1's activation-specific disposition —
+  the bounded proven claim scope (disposition 1), the Tier-2 signature claim scope
+  (disposition 2), or the recorded limitation (disposition 3); the WP-2B-0 outcome A/B
+  decision is separate and follows only after R1–R5 all have dispositions.
 - **Explicit non-goals:** No runner construction; no broad corpus execution; no invented
   host telemetry; no treatment of routing prose or name mentions as activation evidence.
 - **Related design sections:** §6, §17a (items 1–5, 10), §19 (2B-0 row), §20 R1, §22
   (activation risk row), §24.
 - **Completion evidence:** The activation observability report at the evidence path named
-  in the WP-2B-0 authorization, plus the owner's recorded disposition, registered through
-  a reviewed update to this file.
+  in the WP-2B-0 authorization, plus the owner's recorded activation-specific disposition
+  (1, 2, or 3), registered through a reviewed update to this file; the separate WP-2B-0
+  outcome A/B decision is recorded under WP-2B-0.
 - **Supersedes / superseded by:** None.
 
 ### R2 — Exact judge model/version and measured calibration result
@@ -757,7 +765,8 @@ after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
 - **Priority:** REQUIRED
 - **Status:** BACKLOG
 - **Source / evidence:** Merged design §19 (2B-7 row), §16 (CI posture; protected-surface
-  governance), §17 (promotion criteria remain proposals); the live merge gate
+  governance), §17 (promotion-to-gate criteria — DECIDED and binding; promotion itself
+  remains a separate later owner decision); the live merge gate
   [`.github/workflows/validate-skills.yml`](../../.github/workflows/validate-skills.yml)
   (gate-guard protected-surface path); owner backlog-creation directive of 2026-08-10.
 - **Why it matters:** The behavioral lane must attach to CI as advisory/non-blocking
@@ -776,12 +785,16 @@ after this backlog merges); WP-2B-1 through WP-2B-7 are BACKLOG.
   the operator runbook; and rollback and escalation procedures.
 - **Acceptance criteria:** The lane is non-blocking; `validate-skills` and `gate-guard`
   remain required and independent; the runner runtime provably never edits workflows,
-  CODEOWNERS, the validator, or gate scripts; promotion criteria (§17) remain proposals
-  requiring OD-2 and durable human approval — nothing in this phase activates blocking
-  CI.
+  CODEOWNERS, the validator, or gate scripts; the §17 promotion criteria are DECIDED,
+  binding prerequisites that the 2B-7 implementation team may not reopen; OD-2's numeric
+  minimum coverage threshold and the final durable human promotion approval remain
+  pending; meeting the criteria does not itself authorize promotion — WP-2B-7 implements
+  advisory CI only, and a separate later owner decision is still required to promote the
+  lane; nothing in this phase activates blocking CI.
 - **Owner decision required:** Phase authorization; review/merge of the protected-surface
-  workflow PR; any later promotion decision is separate (OD-2 + §17 criteria + durable
-  human approval).
+  workflow PR; and the separate later promotion decision — pending OD-2 ratification and
+  the durable human promotion approval under the DECIDED §17 criteria, which meeting the
+  criteria never self-authorizes.
 - **Explicit non-goals:** No blocking CI; no auto-merge; no weakening or replacement of
   the structural validator; no automatic full-corpus scheduling.
 - **Related design sections:** §16, §17, §19 (2B-7), §20 D5.
@@ -872,22 +885,26 @@ risking forking) its requirements.
 
 - **ID:** BER-BKL-003
 - **Title:** Activation-observability evidence and claim-scope implementation
-- **Phase:** 2B-0
+- **Phase:** 2B-0 / 2B-2
 - **Priority:** GATE
 - **Status:** EVIDENCE_REQUIRED
 - **Source / evidence:** Cross-reference: **R1** (authoritative record, §6 of this file).
   Merged design §6, §17a, §20 R1.
 - **Why it matters:** Inventory visibility for the R1 gate; see R1.
-- **Dependencies:** As R1 (backlog merged; WP-2B-0 AUTHORIZED).
-- **Trigger to begin:** As R1.
-- **Expected deliverable:** R1's activation observability report, then (post-gate) the
-  2B-2 activation observer built only on the proven mechanism within the recorded claim
-  scope.
+- **Dependencies:** As R1 (backlog merged; WP-2B-0 AUTHORIZED) for the gate half;
+  WP-2B-2 AUTHORIZED for the implementation half.
+- **Trigger to begin:** As R1 (gate half); WP-2B-2 authorization (implementation half).
+- **Expected deliverable:** R1's activation observability report — evidence/report work
+  occurring only inside AUTHORIZED WP-2B-0 scope — then the 2B-2 activation observer —
+  implemented only inside AUTHORIZED WP-2B-2 scope — built only on the proven mechanism
+  within the recorded claim scope.
 - **Acceptance criteria:** As R1; implementation additionally satisfies design §23 item 6.
 - **Owner decision required:** As R1.
 - **Explicit non-goals:** As R1; this record adds no requirement beyond R1 and WP-2B-2.
 - **Related design sections:** §6, §17a, §19, §20 R1, §23 item 6.
-- **Completion evidence:** As R1; then the merged WP-2B-2 activation-observer PR.
+- **Completion evidence:** Recorded as two distinct events: the R1 gate disposition
+  (WP-2B-0 evidence path + reviewed status update, as R1); then, separately, the merged
+  WP-2B-2 activation-observer implementation PR.
 - **Supersedes / superseded by:** None (tracks R1; R1's record is authoritative for the
   gate's requirements).
 
@@ -895,25 +912,30 @@ risking forking) its requirements.
 
 - **ID:** BER-BKL-004
 - **Title:** Configuration isolation and effective per-tool-path confinement
-- **Phase:** 2B-0
+- **Phase:** 2B-0 / 2B-1
 - **Priority:** GATE
 - **Status:** EVIDENCE_REQUIRED
 - **Source / evidence:** Cross-reference: **R4 and R5** (authoritative records, §6 of this
   file). Merged design §5e, §15, §17a items 6–8.
 - **Why it matters:** Inventory visibility for the containment and configuration gates;
   see R4 and R5.
-- **Dependencies:** As R4/R5.
-- **Trigger to begin:** As R4/R5.
+- **Dependencies:** As R4/R5 for the gate half; WP-2B-1 AUTHORIZED for the
+  implementation half.
+- **Trigger to begin:** As R4/R5 (gate half); WP-2B-1 authorization (implementation
+  half).
 - **Expected deliverable:** R4's containment capability report and R5's execution-profile
-  isolation report, then (post-gate) the 2B-1 containment integration and
-  execution-profile capture built on the proven mechanisms.
+  isolation report — evidence work occurring only inside AUTHORIZED WP-2B-0 scope — then
+  the 2B-1 containment integration and execution-profile capture — implemented only
+  inside AUTHORIZED WP-2B-1 scope — built on the proven mechanisms.
 - **Acceptance criteria:** As R4 and R5; implementation additionally satisfies design §23
   items 12 and 15.
 - **Owner decision required:** As R4/R5 (including any narrower-claim approval).
 - **Explicit non-goals:** As R4/R5; this record adds no requirement beyond them and
   WP-2B-1.
 - **Related design sections:** §5a, §5e, §13, §15, §17a, §18, §20 R4/R5, §23 items 12/15.
-- **Completion evidence:** As R4/R5; then the merged WP-2B-1 containment/profile PRs.
+- **Completion evidence:** Recorded as distinct events: the R4/R5 gate dispositions
+  (WP-2B-0 evidence path + reviewed status updates, as R4/R5); then, separately, the
+  merged WP-2B-1 containment/profile implementation PRs.
 - **Supersedes / superseded by:** None (tracks R4/R5; their records are authoritative).
 
 ### BER-BKL-005 — Judge selection, measurable calibration, and owner thresholds
@@ -1167,8 +1189,11 @@ risking forking) its requirements.
   scheduler tests.
 - **Acceptance criteria:** Determinism invariants hold (same policy version + selection +
   seed ⇒ same queue); priority order never demotes CRITICAL work below the §11a v1
-  order; every policy change is versioned and hashed in `baseline_identity`-adjacent
-  provenance per §13.
+  order; `scheduling_policy_version` and `scheduling_policy_hash` are direct
+  `baseline_identity` fields (§13); every scheduling-policy change segments or resets
+  the stability window; runs from different scheduling-policy identities are never
+  combined in one stability window; and re-baselining occurs where the merged design
+  requires it (§13, §17).
 - **Owner decision required:** None beyond WP-2B-6 authorization and normal PR review.
 - **Explicit non-goals:** No nondeterministic ordering; no silent policy drift (every
   change is a versioned artifact).
@@ -1218,16 +1243,21 @@ risking forking) its requirements.
   an adapter is implemented and behaviorally verified** against the same
   activation-observation contract (§6) on its real host.
 - **Dependencies:** v1 complete on the Claude Code adapter; a per-host capability spike
-  equivalent to the R1/R4/R5 evidence for that host; owner authorization per adapter.
+  equivalent to the R1/R3/R4/R5 evidence for that host — including the host's own
+  monetary-cost observability or enforceable token/call/turn/session proxy reservation
+  units; owner authorization per adapter.
 - **Trigger to begin:** An explicit owner decision to target a specific additional host.
 - **Expected deliverable:** Per adopted host: an adapter implementing
   `spawn_fresh_session` / `stream_events` / `capability_report`; host-evidence reports
-  equivalent to the 2B-0 gates for that host; and behaviorally verified execution before
-  any claim is made.
+  equivalent to the 2B-0 gates for that host, including an R3-equivalent per-host
+  cost-observability disposition (direct monetary reservation, or enforceable
+  token/call/turn/session proxy units with monetary cost reported `UNKNOWN` where
+  unavailable); and behaviorally verified execution before any claim is made.
 - **Acceptance criteria:** No parity or support claim for any host before its adapter is
   implemented and behaviorally verified; capability reports deny by default on unknown;
   every host-specific limitation is recorded exactly as the Claude Code limitations
-  were.
+  were; no live case executes on a host until its pre-dispatch reservation units are
+  evidence-backed; and no cross-provider cost or safety parity is assumed.
 - **Owner decision required:** Per-host adoption decision and budget.
 - **Explicit non-goals:** Never blocks any v1 phase; no speculative compatibility
   matrices; no invented host capabilities.
