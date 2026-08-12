@@ -11,8 +11,15 @@ import sys
 import time
 import unittest
 
+import math
+
 from tools.behavioral_eval_runner.errors import ProcessControlError
-from tools.behavioral_eval_runner.process_control import SessionWatchdog, TimeoutController, kill_process_tree
+from tools.behavioral_eval_runner.process_control import (
+    SessionWatchdog,
+    TimeoutController,
+    kill_process_tree,
+    popen_isolation_kwargs,
+)
 
 #: A synthetic child that spawns ONE grandchild, reports its pid, then sleeps.
 _CHILD_WITH_GRANDCHILD = (
@@ -43,7 +50,8 @@ class TestTimeoutController(unittest.TestCase):
         self.assertEqual(controller.remaining(), 0.0)
 
     def test_invalid_limit_rejected(self) -> None:
-        for bad in (0, -1, "5"):
+        # E7: bool, NaN, ±inf, zero, negative, and non-numeric all rejected.
+        for bad in (0, -1, "5", True, False, math.nan, math.inf, -math.inf):
             with self.assertRaises(ProcessControlError):
                 TimeoutController(bad)  # type: ignore[arg-type]
 
@@ -55,10 +63,13 @@ class TestProcessTreeKill(unittest.TestCase):
                 kill_process_tree(bad)  # type: ignore[arg-type]
 
     def test_watchdog_kills_synthetic_child_tree(self) -> None:
+        # E8: give the child its own process group on POSIX so the emergency
+        # killpg cannot reach the runner's / test harness's own group.
         process = subprocess.Popen(
             [sys.executable, "-c", _CHILD_WITH_GRANDCHILD],
             shell=False,
             stdout=subprocess.PIPE,
+            **popen_isolation_kwargs(),
         )
         try:
             assert process.stdout is not None

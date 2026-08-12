@@ -11,13 +11,16 @@ cost may honestly be UNKNOWN, and no dispatch function exists to call.
 from __future__ import annotations
 
 import json
+import math
 import os
 import threading
+import time
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Mapping
 
 from . import SCHEMA_VERSION
-from .canonical import canonical_json, sha256_hex_text as sha256_hex_of_text
+from .canonical import canonical_json, sha256_hex, sha256_hex_text as sha256_hex_of_text
 from .enums import CapabilityState, ReasonCode
 from .errors import BudgetError, LedgerIntegrityError, ReservationDeniedError
 
@@ -59,6 +62,12 @@ class BudgetCaps:
     wall_clock_deadline_seconds: int | None = None
     concurrency_capability: CapabilityState = CapabilityState.UNAVAILABLE
 
+    def __post_init__(self) -> None:
+        # E1/A8: freeze the caps at construction so mutating the caller's
+        # original dict cannot change the ceilings the ledger enforces.
+        validated = _validate_amounts(self.limits, "BudgetCaps.limits")
+        object.__setattr__(self, "limits", MappingProxyType(dict(validated)))
+
     def validate(self) -> None:
         _validate_amounts(self.limits, "BudgetCaps.limits")
         if (
@@ -67,6 +76,16 @@ class BudgetCaps:
             or self.concurrency_cap < 1
         ):
             raise BudgetError("concurrency_cap must be an int >= 1")
+        if self.wall_clock_deadline_seconds is not None:
+            if (
+                isinstance(self.wall_clock_deadline_seconds, bool)
+                or not isinstance(self.wall_clock_deadline_seconds, (int, float))
+                or not math.isfinite(self.wall_clock_deadline_seconds)
+                or self.wall_clock_deadline_seconds <= 0
+            ):
+                raise BudgetError(
+                    "wall_clock_deadline_seconds must be a finite positive number"
+                )
 
     @property
     def effective_concurrency_cap(self) -> int:
@@ -124,10 +143,13 @@ class BudgetLedger:
         caps: BudgetCaps,
         store_path: str | None = None,
         _resume: bool = False,
+        clock=None,
     ) -> None:
         caps.validate()
         self.caps = caps
         self.store_path = store_path
+        self.checkpoint_path = (store_path + ".checkpoint.json") if store_path else None
+        self._clock = clock if clock is not None else time.time
         self._lock = threading.Lock()
         self._events: list[dict[str, Any]] = []
         self._reserved_totals: dict[str, int] = {d: 0 for d in DIMENSIONS}
@@ -138,6 +160,13 @@ class BudgetLedger:
         self._kill_switch_engaged = False
         self._sequence = 0
         self._chain_head = "GENESIS"
+        # The absolute deadline is set for in-memory AND persisted ledgers so a
+        # deadline is enforced regardless of whether a store is attached (E6).
+        self._deadline_at: float | None = None
+        opened_at: float | None = None
+        if not _resume and caps.wall_clock_deadline_seconds is not None:
+            opened_at = float(self._clock())
+            self._deadline_at = opened_at + float(caps.wall_clock_deadline_seconds)
         if store_path is not None and not _resume:
             if os.path.exists(store_path) and os.path.getsize(store_path) > 0:
                 raise LedgerIntegrityError(
@@ -145,7 +174,11 @@ class BudgetLedger:
                     "must load the existing ledger, never silently reset it "
                     "(use BudgetLedger.load)"
                 )
-            self._append_event({"event": "LEDGER_OPENED", "caps": caps.to_dict()})
+            opened: dict[str, Any] = {"event": "LEDGER_OPENED", "caps": caps.to_dict()}
+            if opened_at is not None:
+                opened["opened_at"] = opened_at
+                opened["deadline_at"] = self._deadline_at
+            self._append_event(opened)
 
     # ------------------------------------------------------------------ events
     def _append_event(self, event: dict[str, Any]) -> None:
@@ -160,6 +193,43 @@ class BudgetLedger:
             line = canonical_json(event)
             with open(self.store_path, "a", encoding="utf-8", newline="\n") as handle:
                 handle.write(line + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            self._write_checkpoint()
+
+    def _write_checkpoint(self) -> None:
+        """E5: atomically update the terminal checkpoint after each event.
+
+        The rolling ``prev`` chain alone cannot detect removal of a valid
+        SUFFIX (the truncated file still self-verifies). The checkpoint pins the
+        final sequence, chain head, caps hash, and whole-ledger SHA-256 in an
+        independent sidecar; ``load`` requires and verifies it, so tail
+        truncation or a rollback to an earlier ledger is caught. This is
+        tamper/truncation EVIDENCE, not authenticity against an attacker able to
+        rewrite both the ledger and its independent anchor.
+        """
+        if self.store_path is None or self.checkpoint_path is None:
+            return
+        with open(self.store_path, "rb") as handle:
+            ledger_bytes = handle.read()
+        checkpoint = {
+            "checkpoint_kind": "budget-ledger-checkpoint",
+            "schema_version": SCHEMA_VERSION,
+            "final_sequence": self._sequence,
+            "chain_head": self._chain_head,
+            "caps_sha256": sha256_hex_of_text(canonical_json(self.caps.to_dict())),
+            "ledger_sha256": sha256_hex(ledger_bytes),
+            "ledger_bytes": len(ledger_bytes),
+        }
+        temp = f"{self.checkpoint_path}.tmp-{os.getpid()}"
+        with open(temp, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(canonical_json(checkpoint))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, self.checkpoint_path)
+
+    def _deadline_exceeded_locked(self) -> bool:
+        return self._deadline_at is not None and float(self._clock()) >= self._deadline_at
 
     @property
     def events(self) -> tuple[Mapping[str, Any], ...]:
@@ -205,8 +275,25 @@ class BudgetLedger:
         """Reserve BEFORE dispatch; denial means the attempt is never launched."""
         validated = _validate_amounts(amounts, "reserve")
         with self._lock:
+            if self._deadline_exceeded_locked():
+                # E6: the deadline engages the fail-closed state, then denies.
+                if not self._kill_switch_engaged:
+                    self._kill_switch_engaged = True
+                    self._append_event(
+                        {"event": "KILL_SWITCH", "reason": "wall-clock deadline exceeded"}
+                    )
+                self._deny(
+                    request_label, validated, "wall-clock deadline exceeded"
+                )
             if self._kill_switch_engaged:
                 self._deny(request_label, validated, "kill switch engaged")
+            # E2: an empty or all-zero reservation is never "reserved".
+            if not any(amount > 0 for amount in validated.values()):
+                self._deny(
+                    request_label,
+                    validated,
+                    "empty or all-zero reservation request",
+                )
             cap = self.caps.effective_concurrency_cap
             if len(self._inflight) >= cap:
                 self._deny(
@@ -247,22 +334,49 @@ class BudgetLedger:
         )
 
     def reconcile(self, reservation: Reservation, actuals: Mapping[str, int]) -> None:
-        """Record actual use and release the unused remainder."""
+        """Record actual use and release the unused remainder.
+
+        E3: the in-flight reservation is NOT removed until every actual is
+        validated. On a drift (actual > reserved) the reservation is preserved,
+        a deterministic DRIFT event is recorded, the kill switch engages, and no
+        further reservation is granted — in-memory and replayed state agree.
+        """
         validated = _validate_amounts(actuals, "reconcile")
         with self._lock:
-            held = self._inflight.pop(reservation.reservation_id, None)
+            held = self._inflight.get(reservation.reservation_id)
             if held is None:
                 raise BudgetError(
                     f"unknown or already-reconciled reservation "
                     f"{reservation.reservation_id!r}"
                 )
-            for dimension, actual in validated.items():
-                reserved = held.get(dimension, 0)
-                if actual > reserved:
-                    raise BudgetError(
-                        f"actual {dimension}={actual} exceeds its reservation "
-                        f"{reserved} (reservation must be a conservative maximum)"
+            overruns = {
+                dimension: {"actual": actual, "reserved": held.get(dimension, 0)}
+                for dimension, actual in validated.items()
+                if actual > held.get(dimension, 0)
+            }
+            if overruns:
+                # Validate-before-mutate: the reservation stays in-flight.
+                self._append_event(
+                    {
+                        "event": "DRIFT",
+                        "reservation_id": reservation.reservation_id,
+                        "overruns": {
+                            k: dict(v) for k, v in sorted(overruns.items())
+                        },
+                    }
+                )
+                if not self._kill_switch_engaged:
+                    self._kill_switch_engaged = True
+                    self._append_event(
+                        {"event": "KILL_SWITCH", "reason": "reservation overrun (drift)"}
                     )
+                raise BudgetError(
+                    f"actual usage exceeds reservation "
+                    f"{reservation.reservation_id!r}: {sorted(overruns)} — drift "
+                    "recorded and kill switch engaged (reservation preserved)"
+                )
+            # All actuals validated: commit atomically.
+            self._inflight.pop(reservation.reservation_id)
             for dimension, reserved in held.items():
                 actual = validated.get(dimension, 0)
                 self._actual_totals[dimension] += actual
@@ -301,18 +415,49 @@ class BudgetLedger:
 
     # ------------------------------------------------------------- persistence
     @classmethod
-    def load(cls, store_path: str, caps: BudgetCaps) -> "BudgetLedger":
+    def load(cls, store_path: str, caps: BudgetCaps, clock=None) -> "BudgetLedger":
         """Reconstruct a ledger from its append-only store (never a reset).
 
-        Verifies the rolling hash chain, contiguous monotonic sequence, and
-        reservation-id uniqueness; any tamper, gap, truncation, or corrupt
-        line fails closed as LedgerIntegrityError rather than resuming with a
-        silently reduced budget.
+        Verifies the E5 terminal checkpoint, the rolling hash chain, contiguous
+        monotonic sequence, and reservation-id uniqueness; any tamper, gap,
+        tail-truncation, checkpoint rollback, or corrupt line fails closed as
+        LedgerIntegrityError rather than resuming with a silently reduced budget.
         """
         if not os.path.exists(store_path):
             raise LedgerIntegrityError(f"no ledger store at {store_path!r}")
-        ledger = cls(caps, store_path=None, _resume=True)
+        ledger = cls(caps, store_path=None, _resume=True, clock=clock)
         ledger.store_path = None  # replay first, then reattach
+
+        # E5: the checkpoint is REQUIRED and verified before trusting the ledger.
+        checkpoint_path = store_path + ".checkpoint.json"
+        if not os.path.exists(checkpoint_path):
+            raise LedgerIntegrityError(
+                f"missing ledger checkpoint at {checkpoint_path!r}; the ledger "
+                "cannot be trusted without its terminal anchor"
+            )
+        with open(store_path, "rb") as handle:
+            ledger_bytes = handle.read()
+        try:
+            with open(checkpoint_path, encoding="utf-8") as handle:
+                checkpoint = json.loads(handle.read())
+        except ValueError as exc:
+            raise LedgerIntegrityError(f"corrupt ledger checkpoint: {exc}") from exc
+        if not isinstance(checkpoint, dict) or checkpoint.get(
+            "checkpoint_kind"
+        ) != "budget-ledger-checkpoint":
+            raise LedgerIntegrityError("ledger checkpoint has the wrong kind")
+        if checkpoint.get("caps_sha256") != sha256_hex_of_text(
+            canonical_json(caps.to_dict())
+        ):
+            raise LedgerIntegrityError(
+                "checkpoint caps hash differs from the recorded caps"
+            )
+        if checkpoint.get("ledger_sha256") != sha256_hex(ledger_bytes):
+            raise LedgerIntegrityError(
+                "ledger bytes do not match the checkpoint (tail truncation, "
+                "rollback, or tamper)"
+            )
+
         with open(store_path, encoding="utf-8") as handle:
             lines = [line for line in handle.read().splitlines() if line.strip()]
         if not lines:
@@ -357,6 +502,9 @@ class BudgetLedger:
                         "ledger caps differ from the recorded caps; a restart "
                         "cannot silently change or reset the budget"
                     )
+                # Restore the absolute deadline; a reload never resets it (E6).
+                if "deadline_at" in event:
+                    ledger._deadline_at = float(event["deadline_at"])
                 ledger._events.append(event)
                 continue
             ledger._events.append(event)
@@ -379,12 +527,22 @@ class BudgetLedger:
                         f"{event.get('reservation_id')!r}"
                     )
                 actuals = _validate_amounts(event.get("actuals", {}), "replay")
+                for dimension, actual in actuals.items():
+                    if actual > held.get(dimension, 0):
+                        raise LedgerIntegrityError(
+                            f"replayed RECONCILE actual {dimension}={actual} "
+                            f"exceeds its reservation {held.get(dimension, 0)}"
+                        )
                 for dimension, reserved in held.items():
                     actual = actuals.get(dimension, 0)
                     ledger._actual_totals[dimension] += actual
                     unused = reserved - actual
                     ledger._released_totals[dimension] += unused
                     ledger._reserved_totals[dimension] -= unused
+            elif kind == "DRIFT":
+                # A recorded overrun; accounting is unchanged (the reservation
+                # stayed in-flight). Presence is enough for the audit trail.
+                pass
             elif kind == "DENY":
                 ledger._denials.append(
                     DenialRecord(
@@ -400,7 +558,17 @@ class BudgetLedger:
                 raise LedgerIntegrityError("duplicate LEDGER_OPENED event")
             else:
                 raise LedgerIntegrityError(f"unknown ledger event kind {kind!r}")
+        # E5: the checkpoint's terminal anchor must match the replayed tail.
+        if checkpoint.get("final_sequence") != expected_sequence - 1:
+            raise LedgerIntegrityError(
+                "checkpoint final_sequence does not match the ledger tail"
+            )
+        if checkpoint.get("chain_head") != chain_head:
+            raise LedgerIntegrityError(
+                "checkpoint chain head does not match the replayed ledger"
+            )
         ledger._sequence = expected_sequence - 1
         ledger._chain_head = chain_head
         ledger.store_path = store_path
+        ledger.checkpoint_path = store_path + ".checkpoint.json"
         return ledger

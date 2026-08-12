@@ -118,17 +118,32 @@ class TestSyntheticMaterialization(unittest.TestCase):
         self.assertIn(".claude/agents/reviewer-agent.md", self._runtime_paths())
 
     def test_source_library_includes_landmarks(self) -> None:
+        # Use a clean corpus (no ambiguous supporting file) so this test isolates
+        # landmark inclusion and clean-source baseline eligibility.
+        clean = {
+            k: v for k, v in synthetic_corpus_files().items() if not k.endswith("notes.bin")
+        }
         record = materialize(
-            _request(
-                self.dest,
+            MaterializationRequest(
+                snapshot=SyntheticSnapshot(clean),
                 profile=MaterializationProfile.SOURCE_LIBRARY,
-                role=WorkspaceRole.SOURCE_LIBRARY,
+                workspace_role=WorkspaceRole.SOURCE_LIBRARY,
+                claim_scope=ClaimScope.FULL_LIBRARY,
+                destination_root=self.dest,
             )
         )
         runtime = self._runtime_paths()
         for landmark in SOURCE_LANDMARK_PATHS:
             self.assertIn(landmark, runtime)
         self.assertTrue(record.baseline_eligible)
+
+    def test_ambiguous_material_makes_baseline_ineligible(self) -> None:
+        # C5: the ambiguous notes.bin is excluded AND marks the run ineligible.
+        record = materialize(_request(self.dest))
+        self.assertFalse(record.baseline_eligible)
+        self.assertTrue(
+            any("ambiguous" in r for r in record.baseline_ineligibility_reasons)
+        )
 
     def test_role_profile_mismatch_fails_closed(self) -> None:
         with self.assertRaises(RoleMismatchError):

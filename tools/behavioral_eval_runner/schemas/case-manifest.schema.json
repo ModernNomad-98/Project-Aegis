@@ -61,5 +61,26 @@
     "manual_only_target": {"type": "boolean"},
     "explicit_invocation_authorized": {"type": "boolean"},
     "schema_version": {"const": "1.0.0-wp2b1"}
-  }
+  },
+  "allOf": [
+    {
+      "comment": "A6: a subagent target requires delegated_subagent mode, the '(subagent)' annotation, and a subagent-capable profile. Python cross-field validation is authoritative; this expresses what draft-07 can.",
+      "if": {"properties": {"target": {"properties": {"target_kind": {"const": "subagent"}}}}},
+      "then": {
+        "properties": {
+          "activation_mode_expected": {"const": "delegated_subagent"},
+          "materialization_profile_id": {"enum": ["consumer_with_subagents", "source_library"]},
+          "target": {"properties": {"target_annotation": {"const": "(subagent)"}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"target": {"properties": {"target_kind": {"const": "skill"}}}}},
+      "then": {
+        "properties": {
+          "activation_mode_expected": {"not": {"const": "delegated_subagent"}}
+        }
+      }
+    }
+  ]
 }

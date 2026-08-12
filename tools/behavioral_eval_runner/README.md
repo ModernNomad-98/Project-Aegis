@@ -32,7 +32,7 @@ implementing the 2B-1 row of
 | `preflight.py` | Capability/fixture preflight — missing setup never becomes behavioral FAIL |
 | `execution_profile.py` | §5e profile representation; real host honestly UNAVAILABLE/UNKNOWN; baseline-eligibility marking |
 | `containment.py`, `process_control.py` | Fail-closed containment interfaces, mock/synthetic test boundary, timeout + process-tree emergency kill |
-| `budget.py`, `scheduler.py` | Pre-dispatch reservation ledger (append-only, restart-safe, kill switch) + deterministic risk-aware scheduler |
+| `budget.py`, `scheduler.py` | Pre-dispatch reservation ledger (hash-chained + checkpoint-anchored, restart-safe, empty/uncapped-dimension denial, atomic reconcile with drift fail-safe, enforced wall-clock deadline, kill switch) + deterministic risk-aware, prefix-exhaustion-safe scheduler with typed reverse edges |
 | `aggregation.py` | Immutable attempts, N/quorum truth table, blocker precedence, orthogonal quarantine |
 | `evidence.py` | Two-stage finalization with detached marker; fail-closed integrity verification |
 | `reporting.py` | Deterministic reports with complete coverage metrics and no-unearned-PASS enforcement |

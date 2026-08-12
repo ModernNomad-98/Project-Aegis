@@ -12,13 +12,14 @@ reason. No automatic reprioritization exists.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
 from . import SCHEDULING_POLICY_VERSION
 from .canonical import sha256_hex_text, sha256_of_obj
 from .enums import InclusionReason, ReasonCode, SchedulingPriority
 from .errors import ReservationDeniedError, SchedulerError
-from .budget import BudgetLedger
+from .budget import DIMENSIONS, BudgetLedger
 from .identity import parse_case_uid
 
 
@@ -66,12 +67,33 @@ class SelectionItem:
     inclusion_reason: InclusionReason
     reservation_request: Mapping[str, int] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        # A8: freeze the reservation request so a later mutation of the caller's
+        # dict cannot change what gets reserved.
+        frozen: dict[str, int] = {}
+        for key, value in dict(self.reservation_request).items():
+            frozen[key] = value
+        object.__setattr__(self, "reservation_request", MappingProxyType(frozen))
+
     def validate(self) -> None:
         parse_case_uid(self.case_uid)
         if not isinstance(self.priority, SchedulingPriority):
             raise SchedulerError("priority must be a SchedulingPriority")
         if not isinstance(self.inclusion_reason, InclusionReason):
             raise SchedulerError("inclusion_reason must be an InclusionReason")
+        for key, value in self.reservation_request.items():
+            if key not in DIMENSIONS:
+                raise SchedulerError(
+                    f"reservation dimension {key!r} is not a known budget dimension"
+                )
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise SchedulerError(
+                    f"reservation amount for {key!r} must be a non-negative int"
+                )
+
+    def is_real_reservation(self) -> bool:
+        """E2: a dispatchable item carries at least one positive amount."""
+        return any(amount > 0 for amount in self.reservation_request.values())
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,12 +215,46 @@ def schedule_with_reservation(
     queue = build_queue(policy, materialized)
     items = {item.case_uid: item for item in materialized}
     decisions: list[DispatchDecision] = []
+    budget_exhausted = False
     for entry in queue:
         item = items[entry.case_uid]
+        if budget_exhausted:
+            # E4: once the budget is exhausted, NO later (lower-priority) entry
+            # is reserved — the reserved set stays a prefix of the queue. No
+            # misleading reservation attempt is recorded.
+            decisions.append(
+                DispatchDecision(
+                    case_uid=entry.case_uid,
+                    priority=entry.priority,
+                    queue_position=entry.queue_position,
+                    inclusion_reason=entry.inclusion_reason,
+                    reservation_result="denied",
+                    reservation_id=None,
+                    denial_detail="prefix exhausted: budget consumed by earlier queue entries",
+                    unrun_reason_code=ReasonCode.BUDGET_CAP.value,
+                )
+            )
+            continue
+        if not item.is_real_reservation():
+            # E2: an empty / all-zero reservation is denied, never reserved.
+            decisions.append(
+                DispatchDecision(
+                    case_uid=entry.case_uid,
+                    priority=entry.priority,
+                    queue_position=entry.queue_position,
+                    inclusion_reason=entry.inclusion_reason,
+                    reservation_result="denied",
+                    reservation_id=None,
+                    denial_detail="empty or all-zero reservation request",
+                    unrun_reason_code=ReasonCode.BUDGET_CAP.value,
+                )
+            )
+            continue
         try:
             reservation = ledger.reserve(entry.case_uid, item.reservation_request)
             ledger.reconcile(reservation, dict(reservation.amounts))
         except ReservationDeniedError as denial:
+            budget_exhausted = True
             decisions.append(
                 DispatchDecision(
                     case_uid=entry.case_uid,
@@ -233,31 +289,46 @@ def schedule_with_reservation(
     )
 
 
+def typed_target_key(target_kind: str, target_name: str) -> str:
+    """C3: the stable typed key used to index reverse edges — skill `X` and
+    subagent `X` map to DISTINCT keys and never collapse."""
+    if target_kind not in ("skill", "subagent"):
+        raise SchedulerError(f"unknown target kind {target_kind!r}")
+    return f"{target_kind}::{target_name}"
+
+
 def build_selection_with_reverse_edges(
-    changed_skills: Iterable[str],
+    changed_target_keys: Iterable[str],
     own_cases: Mapping[str, list[str]],
     reverse_index: Mapping[str, list[str]],
     priority_for_own: SchedulingPriority = SchedulingPriority.CHANGED_SKILL,
+    reservation_request: Mapping[str, int] | None = None,
 ) -> list[SelectionItem]:
     """PR-tier selection helper: own cases PLUS every incoming reverse edge.
 
-    ``own_cases`` maps skill -> its case_uids; ``reverse_index`` maps
-    skill -> case_uids elsewhere in the corpus that name it (the §12 reverse
-    negative-neighbor index). Symmetry is never assumed.
+    Keys are TYPED (``skill::name`` / ``subagent::name``, from
+    ``typed_target_key``): a changed skill and a changed subagent definition of
+    the same name select DISTINCT incoming edges (C3). ``own_cases`` and
+    ``reverse_index`` are both keyed by the typed key. Symmetry is never
+    assumed. A per-item reservation request is attached so the resulting items
+    are dispatchable (E2).
     """
+    request = dict(reservation_request or {"calls": 1})
     selected: dict[str, SelectionItem] = {}
-    for skill in sorted(set(changed_skills)):
-        for case_uid in sorted(own_cases.get(skill, ())):
+    for key in sorted(set(changed_target_keys)):
+        for case_uid in sorted(own_cases.get(key, ())):
             selected[case_uid] = SelectionItem(
                 case_uid=case_uid,
                 priority=priority_for_own,
                 inclusion_reason=InclusionReason.OWN_CASE,
+                reservation_request=request,
             )
-        for case_uid in sorted(reverse_index.get(skill, ())):
+        for case_uid in sorted(reverse_index.get(key, ())):
             if case_uid not in selected:
                 selected[case_uid] = SelectionItem(
                     case_uid=case_uid,
                     priority=SchedulingPriority.REVERSE_NEIGHBOR_EDGE,
                     inclusion_reason=InclusionReason.REVERSE_EDGE,
+                    reservation_request=request,
                 )
     return sorted(selected.values(), key=lambda item: item.case_uid)

@@ -7,7 +7,9 @@ invariants (UNRUN default, no defaulted PASS/FAIL, blocker discipline).
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Mapping
 
 from . import SCHEMA_VERSION
@@ -28,7 +30,7 @@ from .enums import (
     WorkspaceRole,
 )
 from .errors import SchemaValidationError
-from .identity import parse_case_uid
+from .identity import build_assertion_uid, parse_case_uid
 
 MONETARY_UNKNOWN = "UNKNOWN"
 
@@ -49,6 +51,68 @@ def _non_negative_int(value: Any, where: str) -> int:
         f"{where} must be a non-negative int, got {value!r}",
     )
     return value
+
+
+def _require_bool(value: Any, where: str) -> bool:
+    """Require an actual boolean — never coerce a truthy/falsey value (A7)."""
+    _require(
+        isinstance(value, bool),
+        f"{where} must be a JSON boolean, got {value!r}",
+    )
+    return value
+
+
+def _opt_bool(payload: Mapping[str, Any], key: str, default: bool) -> bool:
+    """Strict boolean from a payload: absent -> default; present -> must be bool."""
+    if key not in payload:
+        return default
+    return _require_bool(payload[key], key)
+
+
+def _finite_number(value: Any, where: str, allow_none: bool = False) -> float | int | None:
+    """Require a finite real number (reject bool, NaN, ±inf); optionally None (A10)."""
+    if value is None:
+        _require(allow_none, f"{where} must not be null")
+        return None
+    _require(
+        isinstance(value, (int, float)) and not isinstance(value, bool),
+        f"{where} must be a finite number, got {value!r}",
+    )
+    _require(math.isfinite(value), f"{where} must be finite, got {value!r}")
+    return value
+
+
+def _deep_freeze(obj: Any) -> Any:
+    """Deep-copy into immutable structures (Mapping->MappingProxyType, list->tuple).
+
+    Mutating the source afterward cannot change the frozen copy, and the frozen
+    copy itself rejects mutation (A8).
+    """
+    if isinstance(obj, Mapping):
+        return MappingProxyType({str(k): _deep_freeze(v) for k, v in obj.items()})
+    if isinstance(obj, (list, tuple)):
+        return tuple(_deep_freeze(v) for v in obj)
+    return obj  # str/int/float/bool/None are already immutable
+
+
+def _to_plain(obj: Any) -> Any:
+    """Convert a deep-frozen structure back to plain JSON-serializable data."""
+    if isinstance(obj, Mapping):
+        return {k: _to_plain(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_plain(v) for v in obj]
+    return obj
+
+
+def _frozen_int_map(mapping: Any, where: str) -> "MappingProxyType[str, int]":
+    """Validate a str->non-negative-int mapping and return an immutable copy."""
+    _require(isinstance(mapping, Mapping), f"{where} must be a mapping, got {mapping!r}")
+    frozen: dict[str, int] = {}
+    for key, value in mapping.items():
+        _require(isinstance(key, str), f"{where} keys must be strings, got {key!r}")
+        _non_negative_int(value, f"{where}[{key}]")
+        frozen[key] = value
+    return MappingProxyType(frozen)
 
 
 def _str_tuple(value: Any, where: str) -> tuple[str, ...]:
@@ -173,12 +237,27 @@ class AssertionRecord:
 
 @dataclass(frozen=True, slots=True)
 class CostUsage:
-    """Reserved-vs-actual accounting; monetary may be honestly UNKNOWN."""
+    """Reserved-vs-actual accounting; monetary may be honestly UNKNOWN.
+
+    Buckets are deep-frozen at construction (A8): mutating a source dict after
+    construction cannot change this record's output or hashes.
+    """
 
     reserved_max: Mapping[str, int] = field(default_factory=dict)
     actual: Mapping[str, int] = field(default_factory=dict)
     released: Mapping[str, int] = field(default_factory=dict)
     monetary: str | int = MONETARY_UNKNOWN
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "reserved_max", _frozen_int_map(self.reserved_max, "CostUsage.reserved_max")
+        )
+        object.__setattr__(
+            self, "actual", _frozen_int_map(self.actual, "CostUsage.actual")
+        )
+        object.__setattr__(
+            self, "released", _frozen_int_map(self.released, "CostUsage.released")
+        )
 
     def validate(self) -> None:
         for name, bucket in (
@@ -246,6 +325,17 @@ class AttemptRecord:
     evidence_pointer: str | None = None
     schema_version: str = SCHEMA_VERSION
 
+    def __post_init__(self) -> None:
+        # Deep-freeze nested evidence so a mutation of the caller's source dict
+        # after construction cannot change this record's output or hashes (A8).
+        if self.activation_evidence is not None:
+            object.__setattr__(
+                self, "activation_evidence", _deep_freeze(self.activation_evidence)
+            )
+        object.__setattr__(
+            self, "assertion_results", _deep_freeze(tuple(self.assertion_results))
+        )
+
     def validate(self) -> None:
         _require(isinstance(self.run_id, str) and bool(self.run_id), "run_id required")
         parse_case_uid(self.case_uid)
@@ -285,12 +375,11 @@ class AttemptRecord:
                 "an ERROR attempt must carry a reason code",
             )
         self.cost_usage.validate()
+        _finite_number(self.duration_seconds, "duration_seconds", allow_none=True)
         if self.duration_seconds is not None:
             _require(
-                isinstance(self.duration_seconds, (int, float))
-                and not isinstance(self.duration_seconds, bool)
-                and self.duration_seconds >= 0,
-                "duration_seconds must be >= 0",
+                self.duration_seconds >= 0,
+                f"duration_seconds must be >= 0, got {self.duration_seconds!r}",
             )
         _require(
             self.schema_version == SCHEMA_VERSION,
@@ -312,11 +401,11 @@ class AttemptRecord:
             ),
             "model_runtime_id": self.model_runtime_id,
             "activation_evidence": (
-                dict(self.activation_evidence)
+                _to_plain(self.activation_evidence)
                 if self.activation_evidence is not None
                 else None
             ),
-            "assertion_results": [dict(r) for r in self.assertion_results],
+            "assertion_results": [_to_plain(r) for r in self.assertion_results],
             "cost_usage": self.cost_usage.to_dict(),
             "duration_seconds": self.duration_seconds,
             "evidence_pointer": self.evidence_pointer,
@@ -411,26 +500,8 @@ class AggregateRecord:
             isinstance(self.aggregate_blocker, AggregateBlocker),
             "aggregate_blocker must be AggregateBlocker",
         )
-        if self.aggregate_verdict in (AggregateVerdict.PASS, AggregateVerdict.FAIL):
-            _require(
-                self.aggregate_blocker is AggregateBlocker.NONE,
-                "PASS/FAIL aggregates carry blocker NONE",
-            )
-            _require(
-                self.derived_from_executed_quorum,
-                "a PASS/FAIL aggregate requires an executed quorum; "
-                "no code path may default an unexecuted case to PASS or FAIL",
-            )
-            _require(self.wins >= 1, "a PASS/FAIL aggregate requires executed wins")
-            _require(
-                self.attempts_run >= self.wins,
-                "attempts_run must cover the winning attempts",
-            )
-        else:
-            _require(
-                self.aggregate_blocker is not AggregateBlocker.NONE,
-                "an INCONCLUSIVE aggregate must carry a non-NONE blocker",
-            )
+        _require_bool(self.execution_degraded, "execution_degraded")
+        _require_bool(self.derived_from_executed_quorum, "derived_from_executed_quorum")
         _non_negative_int(self.wins, "wins")
         _non_negative_int(self.attempts_planned, "attempts_planned")
         _non_negative_int(self.attempts_run, "attempts_run")
@@ -438,6 +509,46 @@ class AggregateRecord:
             self.attempts_run <= self.attempts_planned,
             "attempts_run cannot exceed attempts_planned",
         )
+        if self.aggregate_verdict in (AggregateVerdict.PASS, AggregateVerdict.FAIL):
+            # A1: the quorum is re-derived here from the numbers, independent of
+            # any caller-provided boolean — a one-of-three aggregate cannot be
+            # laundered into PASS/FAIL by setting derived_from_executed_quorum.
+            _require(
+                self.aggregate_blocker is AggregateBlocker.NONE,
+                "PASS/FAIL aggregates carry blocker NONE",
+            )
+            _require(
+                self.attempts_planned >= 1,
+                "a PASS/FAIL aggregate requires attempts_planned >= 1",
+            )
+            required_quorum = self.attempts_planned // 2 + 1
+            _require(
+                self.wins >= required_quorum,
+                f"a PASS/FAIL aggregate requires wins >= quorum "
+                f"({required_quorum} of {self.attempts_planned}); got wins={self.wins}",
+            )
+            _require(
+                self.attempts_run >= self.wins,
+                "attempts_run must cover the winning attempts",
+            )
+            _require(
+                self.derived_from_executed_quorum,
+                "a PASS/FAIL aggregate requires an executed quorum; "
+                "no code path may default an unexecuted case to PASS or FAIL",
+            )
+        else:
+            _require(
+                self.aggregate_blocker is not AggregateBlocker.NONE,
+                "an INCONCLUSIVE aggregate must carry a non-NONE blocker",
+            )
+            _require(
+                not self.derived_from_executed_quorum,
+                "an INCONCLUSIVE aggregate must not claim an executed quorum",
+            )
+            _require(
+                self.wins == 0,
+                "an INCONCLUSIVE aggregate has no wins (it reached no quorum)",
+            )
         if self.reason_code is not None:
             _require(
                 isinstance(self.reason_code, ReasonCode),
@@ -447,14 +558,29 @@ class AggregateRecord:
             isinstance(self.quarantine_status, QuarantineStatus),
             "quarantine_status must be QuarantineStatus",
         )
+        # A9: whenever quarantine metadata (or a latest_* field) is present, the
+        # latest_* fields must equal the current aggregate result — quarantine
+        # never rewrites the current verdict/blocker.
+        has_quarantine_context = (
+            self.quarantine_status is QuarantineStatus.ACTIVE
+            or self.latest_aggregate_verdict is not None
+            or self.latest_aggregate_blocker is not None
+            or self.quarantine_reason is not None
+            or self.quarantine_since is not None
+        )
+        if has_quarantine_context:
+            _require(
+                self.latest_aggregate_verdict is self.aggregate_verdict,
+                "latest_aggregate_verdict must equal the current aggregate_verdict",
+            )
+            _require(
+                self.latest_aggregate_blocker is self.aggregate_blocker,
+                "latest_aggregate_blocker must equal the current aggregate_blocker",
+            )
         if self.quarantine_status is QuarantineStatus.ACTIVE:
             _require(
                 self.quarantine_reason is not None and self.quarantine_since is not None,
                 "an ACTIVE quarantine must carry a dated reason",
-            )
-            _require(
-                self.latest_aggregate_verdict is not None,
-                "quarantine never erases latest_aggregate_verdict",
             )
         _require(
             self.schema_version == SCHEMA_VERSION,
@@ -522,13 +648,13 @@ class AggregateRecord:
             case_uid=payload.get("case_uid", ""),
             aggregate_verdict=AggregateVerdict.parse(payload.get("aggregate_verdict")),
             aggregate_blocker=AggregateBlocker.parse(payload.get("aggregate_blocker")),
-            execution_degraded=bool(payload.get("execution_degraded", False)),
+            execution_degraded=_opt_bool(payload, "execution_degraded", False),
             reason_code=_opt(ReasonCode.parse, "reason_code"),
             wins=payload.get("wins", 0),
             attempts_planned=payload.get("attempts_planned", 0),
             attempts_run=payload.get("attempts_run", 0),
-            derived_from_executed_quorum=bool(
-                payload.get("derived_from_executed_quorum", False)
+            derived_from_executed_quorum=_opt_bool(
+                payload, "derived_from_executed_quorum", False
             ),
             quarantine_status=QuarantineStatus.parse(
                 payload.get("quarantine_status", QuarantineStatus.INACTIVE.value)
@@ -548,13 +674,21 @@ class AggregateRecord:
         return record
 
 
-def default_unselected_aggregate(case_uid: str) -> AggregateRecord:
-    """The DEFAULT aggregate of every authored case outside a run's selection."""
+def default_unselected_aggregate(
+    case_uid: str, attempts_planned: int = 0
+) -> AggregateRecord:
+    """The DEFAULT aggregate of every authored case outside a run's selection.
+
+    ``attempts_planned`` records how many UNRUN attempt records exist for the
+    case so the report can enforce planned-attempt completeness (A2).
+    """
     record = AggregateRecord(
         case_uid=case_uid,
         aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
         aggregate_blocker=AggregateBlocker.NOT_SELECTED,
         reason_code=ReasonCode.NOT_SELECTED,
+        attempts_planned=attempts_planned,
+        attempts_run=0,
     )
     record.validate()
     return record
@@ -609,6 +743,12 @@ class CaseManifestRecord:
         )
         self.target.validate()
         _require(isinstance(self.risk_class, RiskClass), "risk_class enum")
+        # A7: strict booleans — never coerce a truthy/falsey value.
+        _require_bool(self.risk_class_ratified, "risk_class_ratified")
+        _require_bool(self.manual_only_target, "manual_only_target")
+        _require_bool(
+            self.explicit_invocation_authorized, "explicit_invocation_authorized"
+        )
         _require(
             self.risk_class_ratified is False,
             "WP-2B-1 risk classes are PROPOSED / NOT OWNER-RATIFIED; "
@@ -624,6 +764,47 @@ class CaseManifestRecord:
             isinstance(self.activation_mode_expected, InvocationMode),
             "activation_mode_expected enum",
         )
+        # A5: the case_uid must agree with the display metadata it encodes.
+        parts = parse_case_uid(self.case_uid)
+        _require(
+            parts.target_owner == self.owner,
+            f"case_uid owner {parts.target_owner!r} != owner {self.owner!r}",
+        )
+        _require(
+            parts.case_id == self.case_id,
+            f"case_uid case-id {parts.case_id!r} != case_id {self.case_id!r}",
+        )
+        _require(
+            parts.eval_file_kind is self.eval_file_kind,
+            f"case_uid eval-file-kind {parts.eval_file_kind.value!r} != "
+            f"eval_file_kind {self.eval_file_kind.value!r}",
+        )
+        # A6: typed-target cross-field contract.
+        if self.target.target_kind is TargetKind.SUBAGENT:
+            _require(
+                self.activation_mode_expected is InvocationMode.DELEGATED_SUBAGENT,
+                "a subagent target requires activation_mode_expected "
+                "delegated_subagent",
+            )
+            _require(
+                self.target.target_annotation == "(subagent)",
+                "a subagent target must preserve the '(subagent)' annotation",
+            )
+            _require(
+                self.materialization_profile_id
+                in (
+                    MaterializationProfile.CONSUMER_WITH_SUBAGENTS,
+                    MaterializationProfile.SOURCE_LIBRARY,
+                ),
+                "a subagent target requires a materialization profile that can "
+                "carry subagents (consumer_with_subagents or source_library)",
+            )
+        else:
+            _require(
+                self.activation_mode_expected is not InvocationMode.DELEGATED_SUBAGENT,
+                "a skill target must not use activation_mode_expected "
+                "delegated_subagent",
+            )
         _require(
             self.required_network_posture in ("none", "loopback-fixture-only"),
             f"required_network_posture invalid: {self.required_network_posture!r} "
@@ -649,8 +830,29 @@ class CaseManifestRecord:
                 "the consumer_partial_install profile requires claim_scope "
                 "partial_install",
             )
+        # A4: assertion identities must be exactly reconstructible, and unique.
+        seen_indexes: set[int] = set()
+        seen_uids: set[str] = set()
         for assertion in self.assertions:
             assertion.validate()
+            _require(
+                assertion.index not in seen_indexes,
+                f"duplicate assertion index {assertion.index}",
+            )
+            seen_indexes.add(assertion.index)
+            expected_uid = build_assertion_uid(
+                self.case_uid, assertion.index, assertion.text
+            )
+            _require(
+                assertion.assertion_uid == expected_uid,
+                f"assertion_uid {assertion.assertion_uid!r} does not match the "
+                f"recomputed identity for index {assertion.index}",
+            )
+            _require(
+                assertion.assertion_uid not in seen_uids,
+                f"duplicate assertion_uid {assertion.assertion_uid!r}",
+            )
+            seen_uids.add(assertion.assertion_uid)
         _require(
             self.schema_version == SCHEMA_VERSION,
             f"schema_version must be {SCHEMA_VERSION}",
@@ -741,7 +943,7 @@ class CaseManifestRecord:
             prompt_sha256=payload.get("prompt_sha256", ""),
             target=TypedTarget.from_dict(payload.get("target", {})),
             risk_class=RiskClass.parse(payload.get("risk_class")),
-            risk_class_ratified=bool(payload.get("risk_class_ratified", False)),
+            risk_class_ratified=_opt_bool(payload, "risk_class_ratified", False),
             claim_scope=ClaimScope.parse(payload.get("claim_scope")),
             workspace_role=WorkspaceRole.parse(payload.get("workspace_role")),
             materialization_profile_id=MaterializationProfile.parse(
@@ -784,9 +986,9 @@ class CaseManifestRecord:
                 payload.get("should_not_trigger", ()), "should_not_trigger"
             ),
             overlaps_with=_str_tuple(payload.get("overlaps_with", ()), "overlaps_with"),
-            manual_only_target=bool(payload.get("manual_only_target", False)),
-            explicit_invocation_authorized=bool(
-                payload.get("explicit_invocation_authorized", False)
+            manual_only_target=_opt_bool(payload, "manual_only_target", False),
+            explicit_invocation_authorized=_opt_bool(
+                payload, "explicit_invocation_authorized", False
             ),
             schema_version=payload.get("schema_version", SCHEMA_VERSION),
         )
@@ -838,6 +1040,18 @@ class CoverageMetrics:
     unrun_totals_by_reason: Mapping[str, int] = field(default_factory=dict)
     excluded_totals_by_reason: Mapping[str, int] = field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unrun_totals_by_reason",
+            _frozen_int_map(self.unrun_totals_by_reason, "unrun_totals_by_reason"),
+        )
+        object.__setattr__(
+            self,
+            "excluded_totals_by_reason",
+            _frozen_int_map(self.excluded_totals_by_reason, "excluded_totals_by_reason"),
+        )
 
     def validate(self) -> None:
         for name in (

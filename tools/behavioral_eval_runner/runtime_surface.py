@@ -118,14 +118,17 @@ def classify_skill_file(relative_path: str) -> ClassifiedFile:
         )
 
     # Rule 3: expected-answer/rubric/manifest/selection/expectation content is
-    # control-plane regardless of directory.
-    for fragment in _CONTROL_PLANE_NAME_FRAGMENTS:
-        if fragment in filename:
-            return ClassifiedFile(
-                relative_path,
-                RuntimeClassification.CONTROL_PLANE_ONLY,
-                f"control-plane-name-fragment:{fragment}",
-            )
+    # control-plane regardless of directory — matched across the FULL relative
+    # path (C4), so `references/rubric/criteria.md` or `assets/answer-bank/x.json`
+    # can never leak through a directory name.
+    for segment in lower_parts:
+        for fragment in _CONTROL_PLANE_NAME_FRAGMENTS:
+            if fragment in segment:
+                return ClassifiedFile(
+                    relative_path,
+                    RuntimeClassification.CONTROL_PLANE_ONLY,
+                    f"control-plane-path-fragment:{fragment}",
+                )
 
     # Rule 4: SKILL.md at the package root is the runtime entry point.
     if len(parts) == 1 and parts[0] == "SKILL.md":

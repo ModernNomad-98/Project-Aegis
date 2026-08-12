@@ -30,6 +30,7 @@ from .enums import (
 )
 from .errors import PreflightError
 from .models import CaseManifestRecord
+from .pathsafe import UnsafePathError, normalize_relative_path
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +46,10 @@ class PreflightEnvironment:
     available_fixtures: frozenset[str] = frozenset({"empty-consumer"})
     available_network_postures: frozenset[str] = frozenset({"none"})
     unjudgeable_assertion_uids: frozenset[str] = frozenset()
+    #: Fixture-relative files present in the product-fixture overlay.
+    available_fixture_files: frozenset[str] = frozenset()
+    #: Tool permissions the sandbox allowlist grants.
+    available_tool_permissions: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -195,6 +200,43 @@ def evaluate_case(
                 "missing_prerequisite",
                 f"required {label}(s) unavailable: {missing}",
             )
+
+    # Group B: required fixture-relative files must be present in the overlay.
+    normalized_required: list[str] = []
+    for raw in case.required_files:
+        try:
+            normalized_required.append(normalize_relative_path(raw))
+        except UnsafePathError as exc:
+            return _excluded(
+                case,
+                ReasonCode.MISSING_PREREQUISITE,
+                "unsafe_required_file_path",
+                f"required file path {raw!r} is unsafe: {exc}",
+            )
+    available_files = {
+        normalize_relative_path(p) for p in environment.available_fixture_files
+    }
+    missing_files = sorted(set(normalized_required) - available_files)
+    if missing_files:
+        return _excluded(
+            case,
+            ReasonCode.MISSING_PREREQUISITE,
+            "missing_required_file",
+            f"required file(s) absent from the fixture: {missing_files}",
+        )
+
+    # Group B: required tool permissions must be granted by the sandbox.
+    missing_permissions = sorted(
+        set(case.required_tool_permissions) - set(environment.available_tool_permissions)
+    )
+    if missing_permissions:
+        return _excluded(
+            case,
+            ReasonCode.MISSING_PREREQUISITE,
+            "missing_tool_permission",
+            f"required tool permission(s) not granted: {missing_permissions}",
+        )
+
     if case.required_network_posture not in environment.available_network_postures:
         return _excluded(
             case,

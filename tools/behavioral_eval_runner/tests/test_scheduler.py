@@ -13,6 +13,7 @@ from tools.behavioral_eval_runner.scheduler import (
     build_queue,
     build_selection_with_reverse_edges,
     schedule_with_reservation,
+    typed_target_key,
 )
 from tools.behavioral_eval_runner.tests.helpers import make_case_uid
 
@@ -155,12 +156,11 @@ class TestBudgetAwareDispatchPrefix(unittest.TestCase):
 
 class TestReverseEdgeInclusion(unittest.TestCase):
     def test_incoming_edges_included_with_reason(self) -> None:
-        own = {"vite-build-qa-engineer": [make_case_uid(owner="vite-build-qa-engineer")]}
+        skill_key = typed_target_key("skill", "vite-build-qa-engineer")
+        own = {skill_key: [make_case_uid(owner="vite-build-qa-engineer")]}
         incoming = make_case_uid(owner="frontend-perf-engineer", case_id="edge")
-        reverse = {"vite-build-qa-engineer": [incoming]}
-        selection = build_selection_with_reverse_edges(
-            ["vite-build-qa-engineer"], own, reverse
-        )
+        reverse = {skill_key: [incoming]}
+        selection = build_selection_with_reverse_edges([skill_key], own, reverse)
         by_uid = {item.case_uid: item for item in selection}
         self.assertIn(incoming, by_uid)
         self.assertIs(
@@ -170,11 +170,23 @@ class TestReverseEdgeInclusion(unittest.TestCase):
             by_uid[incoming].priority, SchedulingPriority.REVERSE_NEIGHBOR_EDGE
         )
 
+    def test_skill_and_subagent_edges_are_distinct(self) -> None:
+        skill_key = typed_target_key("skill", "release-readiness-reviewer")
+        subagent_key = typed_target_key("subagent", "release-readiness-reviewer")
+        self.assertNotEqual(skill_key, subagent_key)
+        skill_case = make_case_uid(owner="a", case_id="skill-edge")
+        subagent_case = make_case_uid(owner="b", case_id="subagent-edge")
+        reverse = {skill_key: [skill_case], subagent_key: [subagent_case]}
+        # A changed SKILL selects only the skill-edge, not the subagent-edge.
+        selection = build_selection_with_reverse_edges([skill_key], {}, reverse)
+        uids = {item.case_uid for item in selection}
+        self.assertIn(skill_case, uids)
+        self.assertNotIn(subagent_case, uids)
+
     def test_own_case_wins_over_reverse_when_same_case(self) -> None:
         uid = make_case_uid(owner="skill-x")
-        selection = build_selection_with_reverse_edges(
-            ["skill-x"], {"skill-x": [uid]}, {"skill-x": [uid]}
-        )
+        key = typed_target_key("skill", "skill-x")
+        selection = build_selection_with_reverse_edges([key], {key: [uid]}, {key: [uid]})
         self.assertEqual(len(selection), 1)
         self.assertIs(selection[0].inclusion_reason, InclusionReason.OWN_CASE)
 

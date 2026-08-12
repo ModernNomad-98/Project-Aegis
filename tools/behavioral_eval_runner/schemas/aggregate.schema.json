@@ -33,15 +33,23 @@
     {
       "if": {"properties": {"aggregate_verdict": {"enum": ["PASS", "FAIL"]}}},
       "then": {
+        "required": ["derived_from_executed_quorum", "wins", "attempts_planned", "attempts_run"],
         "properties": {
           "aggregate_blocker": {"const": "NONE"},
-          "derived_from_executed_quorum": {"const": true}
+          "derived_from_executed_quorum": {"const": true},
+          "attempts_planned": {"minimum": 1},
+          "wins": {"minimum": 1}
         }
       }
     },
     {
       "if": {"properties": {"aggregate_verdict": {"const": "INCONCLUSIVE"}}},
-      "then": {"properties": {"aggregate_blocker": {"not": {"const": "NONE"}}}}
+      "then": {
+        "properties": {
+          "aggregate_blocker": {"not": {"const": "NONE"}},
+          "derived_from_executed_quorum": {"const": false}
+        }
+      }
     }
   ]
 }

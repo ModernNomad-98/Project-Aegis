@@ -23,7 +23,7 @@ from typing import Any, Mapping
 
 from . import RUNNER_VERSION, SCHEMA_VERSION
 from .canonical import sha256_hex_text
-from .enums import CaseType, EvalFileKind, RiskClass, RuntimeClassification
+from .enums import CaseType, EvalFileKind, RiskClass, RuntimeClassification, TargetKind
 from .errors import CensusBaselineMismatchError, CensusError
 from .identity import build_assertion_uid, build_case_uid
 from .materialize import (
@@ -513,11 +513,24 @@ def build_census(
                             ),
                         }
                     )
-                # Reverse negative-neighbor index: every edge inverted.
-                for edge_target in {target.target_name, *neighbors, *file_overlaps}:
-                    normalized = edge_target.removesuffix(" (subagent)").strip()
-                    if normalized and normalized != skill:
-                        reverse_index.setdefault(normalized, []).append(case_uid)
+                # Reverse negative-neighbor index: every edge inverted, keyed by
+                # the TYPED target (C3) so skill `X` and subagent `X` never
+                # collapse into one edge set.
+                edge_targets = [target]
+                for raw in [*neighbors, *file_overlaps]:
+                    edge_targets.append(parse_target(raw))
+                seen_keys: set[str] = set()
+                for edge in edge_targets:
+                    if (
+                        edge.target_kind is TargetKind.SKILL
+                        and edge.target_name == skill
+                    ):
+                        continue  # skip the owning skill's self-edge
+                    key = f"{edge.target_kind.value}::{edge.target_name}"
+                    if key in seen_keys:
+                        continue
+                    seen_keys.add(key)
+                    reverse_index.setdefault(key, []).append(case_uid)
                 _note_dependency(case_uid, skill, prompt, [])
                 case_type = (
                     CaseType.DISCRIMINATION_EMPTY_NEIGHBOR

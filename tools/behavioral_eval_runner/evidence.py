@@ -29,7 +29,12 @@ from . import SCHEMA_VERSION
 from .canonical import canonical_bytes, sha256_hex
 from .enums import RedactionState, RetentionClass, Sensitivity
 from .errors import CircularEvidenceError, EvidenceError, EvidenceIntegrityError
-from .pathsafe import UnsafePathError, normalize_relative_path
+from .pathsafe import (
+    UnsafePathError,
+    normalize_relative_path,
+    refuse_reparse_ancestors,
+    refuse_reparse_chain,
+)
 
 INPUT_MANIFEST_NAME = "input_evidence_manifest.json"
 FINAL_MANIFEST_NAME = "final_evidence_manifest.json"
@@ -48,10 +53,18 @@ def _utc_now_iso() -> str:
 
 
 def _expiration_for(created_at: str, retention: RetentionClass) -> str:
+    # D3: require a timezone-aware timestamp; convert to UTC before arithmetic
+    # rather than silently assigning an unstated timezone to a naive value.
     try:
         created = _dt.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
     except ValueError as exc:
         raise EvidenceError(f"created_at is not ISO-8601: {created_at!r}") from exc
+    if created.tzinfo is None:
+        raise EvidenceError(
+            f"created_at {created_at!r} is timezone-naive; a timezone-aware "
+            "timestamp is required"
+        )
+    created = created.astimezone(_dt.timezone.utc)
     expires = created + _dt.timedelta(days=_RETENTION_DAYS[retention])
     return expires.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -98,13 +111,28 @@ def _atomic_write(root: str, relative_path: str, content: bytes) -> str:
     if os.path.commonpath([root_real, target]) != root_real:
         raise EvidenceError(f"{relative_path!r} escapes evidence root {root!r}")
     parent = os.path.dirname(target) or root_real
+    # D1: refuse a reparse point planted anywhere between the root and the
+    # target before creating parents.
+    try:
+        refuse_reparse_chain(parent, root_real)
+    except UnsafePathError as exc:
+        raise EvidenceError(str(exc)) from exc
     os.makedirs(parent, exist_ok=True)
     import tempfile
 
+    # Re-check after parent creation and immediately before os.replace.
+    try:
+        refuse_reparse_chain(parent, root_real)
+    except UnsafePathError as exc:
+        raise EvidenceError(str(exc)) from exc
     fd, temp = tempfile.mkstemp(dir=parent, prefix=".tmp-evidence-")
     try:
         with os.fdopen(fd, "wb") as handle:
             handle.write(content)
+        try:
+            refuse_reparse_chain(target, root_real)
+        except UnsafePathError as exc:
+            raise EvidenceError(str(exc)) from exc
         os.replace(temp, target)  # atomic replacement where the platform allows
     except BaseException:
         if os.path.exists(temp):  # pragma: no cover - cleanup guard
@@ -163,6 +191,11 @@ class EvidenceWriter:
             raise EvidenceError("run_id required")
         self.root = os.path.abspath(root)
         self.run_id = run_id
+        # D1: refuse a reparse point anywhere in the ancestor chain of the root.
+        try:
+            refuse_reparse_ancestors(self.root)
+        except UnsafePathError as exc:
+            raise EvidenceError(str(exc)) from exc
         os.makedirs(self.root, exist_ok=True)
 
     # ------------------------------------------------------------- stage A
@@ -204,6 +237,13 @@ class EvidenceWriter:
         final_status: str,
         finalized_at: str | None = None,
     ) -> FinalEvidenceBundle:
+        # D2: the report must belong to THIS run — a report for another run is
+        # rejected at finalization.
+        if final_report.get("run_id") != self.run_id:
+            raise EvidenceError(
+                f"final report run_id {final_report.get('run_id')!r} does not "
+                f"match the writer's run_id {self.run_id!r}"
+            )
         binding = final_report.get("run_evidence_binding")
         if (
             not isinstance(binding, Mapping)
@@ -384,18 +424,28 @@ def _verify_input_evidence_full(root: str) -> tuple[str, dict[str, str]]:
 
 def verify_final_bundle(root: str) -> dict[str, str]:
     """Verify stage B, its detached-marker binding, AND its binding to the
-    already-verified stage-A input manifest. Fails closed."""
-    input_manifest_sha, _ = _verify_input_evidence_full(root)
+    already-verified stage-A input manifest. Fails closed. D2: every artifact
+    must carry the SAME non-empty run_id — a cross-run mixture is rejected even
+    when all hashes are individually valid."""
+    input_manifest, _ = _load_json_bytes(root, INPUT_MANIFEST_NAME)
+    input_manifest_sha, _verified = _verify_input_evidence_full(root)
+    run_id = input_manifest.get("run_id")
+    if not run_id:
+        raise EvidenceIntegrityError("input manifest has no run_id")
 
     manifest, manifest_bytes = _load_json_bytes(root, FINAL_MANIFEST_NAME)
     if manifest.get("manifest_kind") != "final_evidence":
         raise EvidenceIntegrityError("wrong manifest kind for final evidence")
+    if manifest.get("run_id") != run_id:
+        raise EvidenceIntegrityError("final manifest run_id differs (cross-run)")
     _verify_manifest_artifacts(root, manifest, allow_final_report=True)
     manifest_sha = sha256_hex(manifest_bytes)
 
     marker, marker_bytes = _load_json_bytes(root, MARKER_NAME)
     if marker.get("marker_kind") != "detached_finalization_marker":
         raise EvidenceIntegrityError("missing detached finalization marker")
+    if marker.get("run_id") != run_id:
+        raise EvidenceIntegrityError("marker run_id differs (cross-run)")
     if marker.get("final_evidence_manifest_sha256") != manifest_sha:
         raise EvidenceIntegrityError(
             "marker does not bind the final manifest (hash mismatch)"
@@ -413,6 +463,8 @@ def verify_final_bundle(root: str) -> dict[str, str]:
         raise CircularEvidenceError(
             "final report contains the final-manifest hash (circular)"
         )
+    if report.get("run_id") != run_id:
+        raise EvidenceIntegrityError("final report run_id differs (cross-run)")
     binding = report.get("run_evidence_binding", {})
     bound_input_sha = binding.get("input_evidence_manifest_sha256")
     if not bound_input_sha:

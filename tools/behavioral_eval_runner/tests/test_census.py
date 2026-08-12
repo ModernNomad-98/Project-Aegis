@@ -103,6 +103,15 @@ class TestPinnedCorpusCensus(unittest.TestCase):
         self.assertGreater(len(reverse), 0)
         for target, uids in reverse.items():
             self.assertEqual(uids, sorted(uids), target)
+            # C3: keys are TYPED (skill::name / subagent::name).
+            self.assertRegex(target, r"^(skill|subagent)::.+")
+
+    def test_reverse_index_keeps_skill_and_subagent_distinct(self) -> None:
+        reverse = _census()["reverse_negative_neighbor_index"]
+        # release-readiness-reviewer exists as BOTH a skill and a subagent;
+        # both typed keys must be present and distinct.
+        self.assertIn("subagent::release-readiness-reviewer", reverse)
+        self.assertIn("skill::release-readiness-reviewer", reverse)
 
     def test_risk_classes_are_proposed_not_ratified(self) -> None:
         census = _census()

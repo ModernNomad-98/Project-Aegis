@@ -9,6 +9,13 @@ secret, no environment dump, no raw test log, and no private machine detail. Ful
 build evidence (test logs, validation logs, timing) is retained externally under the
 BER-DEC-006 build-evidence root and is not committed.
 
+> **Revision — comprehensive core-hardening pass (PR #83 second commit).** After the
+> initial offline core landed, a consolidated hardening pass corrected confirmed
+> exact-head review findings and additional integrity defects across record/report
+> integrity, preflight completeness, materialization/census, evidence binding, and
+> budget/scheduler/deadline/process control. §9 records the specific corrections; the test
+> count and census hash above reflect the hardened state.
+
 ## 1. Authorization
 
 | Item | Value |
@@ -58,8 +65,8 @@ no dependency file, no package installation, no network library, no live-provide
 
 ## 3. Changed-file inventory (all under the authorized scope)
 
-New Python package (24 modules incl. `__init__`/`__main__`), 8 JSON schemas, 19 test
-modules + `__init__`/`helpers`, and a package README, all beneath
+New Python package (24 runtime modules incl. `__init__`/`__main__`/`pathsafe`), 8 JSON
+schemas, 22 test modules + `__init__`/`helpers`, and a package README, all beneath
 `tools/behavioral_eval_runner/**`, plus exactly the two repository-safe generated
 artifacts:
 
@@ -94,10 +101,17 @@ are untouched.
   real-host capability report (UNAVAILABLE/UNKNOWN).
 - **Timeout and process-tree emergency-kill controls** (Windows `taskkill /T /F` from
   System32; POSIX `killpg` that refuses the runner's own group; never `shell=True`).
-- **Runner-owned budget reservation and reconciliation** — pre-dispatch reservation,
-  bounded concurrency (default 1 while capability unproven), monetary-UNKNOWN honesty,
-  a hash-chained append-only ledger that fails closed on tamper/truncation and never
-  silently resets on restart, and a kill switch.
+- **Runner-owned budget reservation and reconciliation** — pre-dispatch reservation
+  (empty/all-zero and uncapped-dimension requests denied), bounded concurrency (default 1
+  while capability unproven), monetary-UNKNOWN honesty, atomic reconciliation with a
+  drift/overrun fail-safe (the reservation is preserved and the kill switch engages), an
+  enforced wall-clock deadline (injected clock for tests; not reset on reload), and a kill
+  switch. The append-only ledger carries a rolling hash chain AND a separately anchored,
+  atomically-replaced terminal checkpoint (final sequence, chain head, caps hash,
+  whole-ledger SHA-256): the hash chain alone cannot detect removal of a valid suffix, so
+  the checkpoint is what catches tail truncation and checkpoint rollback on load. This is
+  tamper/truncation EVIDENCE, not authenticity against an attacker able to rewrite both the
+  ledger and its independent anchor.
 - **Deterministic budget-aware scheduler** — versioned risk-aware priority order,
   canonical or seeded-rotation within-priority ordering, reproducible dispatched prefix
   under a cap, full scheduling evidence, no automatic reprioritization.
@@ -119,22 +133,33 @@ are untouched.
 
 ## 5. Tests and validation
 
+**Local runner tests are developer/CI-machine evidence — they are NOT executed by the
+project's GitHub CI.** GitHub CI validates only the repository gates: `gate-guard`, the
+validator self-tests, `validate-skills`, and DCO. The runner unit-test suite below is run
+locally and reported as evidence, not as a GitHub CI result.
+
 - Test command: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
-- Test modules: 19 (`test_*.py`) plus `helpers.py`.
-- Test methods: **237**; result: **OK (237 passed, 0 failed, 0 errors)**.
+- Test methods: **295**; result: **OK (295 passed, 0 failed, 0 errors)** — after the
+  Group A–E hardening pass.
+- **Runner test platform actually run:** Windows (win32), CPython 3.14. A POSIX runtime run
+  is reported **UNRUN**: no general-purpose WSL/POSIX Python environment is available in
+  this environment and installing one is out of scope; no POSIX test pass is claimed. The
+  POSIX-specific `killpg` same-group refusal and `popen_isolation_kwargs()` isolation are
+  covered by code and by Windows-side tests, but their POSIX runtime path was not exercised.
 - Runner self-check: `python -m tools.behavioral_eval_runner self-check` ⇒ **PASS**
   (8/8 checks: enum closure, canonical stability, identity behavior, adapter denial,
   schema/code enum agreement, no-forbidden-source AST scan, real-host capability honesty,
   aggregation spot checks).
-- Census reproducibility: a second census over the pinned snapshot produced byte-identical
-  canonical output (census SHA-256 `7bd40aaee823e41bf2f7e9135802f73fac6eaa431e1625d032d72d7064a26d65`).
+- Census reproducibility: two independent regenerations over the pinned snapshot produced
+  byte-identical canonical output (census SHA-256
+  `28747cc1dc696b7758e9a8d5affe8cf58bd648a7ac235ef6ba7ccdabc02e38ab`).
 - Validator self-tests: `python scripts/tests/test_validator.py` ⇒ OK (untouched).
 - Skill validator: `python scripts/validate-skills.py` ⇒ **184 skills valid, 0 warnings** (untouched).
 
-The tests are deterministic and offline: mocks, synthetic fixtures, local subprocesses
-that the tests spawn themselves for timeout/kill coverage only, and temporary directories
-below the process-local TMP/TEMP path. No network, no package installation, no model
-dispatch.
+The tests are deterministic and offline: mocks, synthetic fixtures, an injected clock for
+deadline tests, local subprocesses that the tests spawn themselves for timeout/kill
+coverage only, and temporary directories below the process-local TMP/TEMP path. No network,
+no package installation, no model dispatch.
 
 ## 6. Corpus-census results (static implementation evidence — NOT a behavioral result)
 
@@ -157,9 +182,11 @@ Generated by `census.py` from the pinned snapshot; no eval case was executed.
 
 The census also enumerates fixture-, service-, and credential-dependent cases; source-role
 cases; unjudgeable-as-written candidates; MANUAL-ONLY positive incompatibilities; the
-reverse negative-neighbor index; and per-case author-facing findings. Risk classes,
-runnability figures, and findings are PROPOSED and feed the OD-2/OD-3 owner decisions;
-none is owner-ratified and none controls live behavior or promotion.
+**typed** reverse negative-neighbor index (keyed `skill::name` / `subagent::name`, so a
+skill and a same-named subagent are distinct edges); and per-case author-facing findings.
+Risk classes, runnability figures, and findings are PROPOSED and feed the OD-2/OD-3 owner
+decisions; none is owner-ratified and none controls live behavior or promotion. Census file
+SHA-256: `28747cc1dc696b7758e9a8d5affe8cf58bd648a7ac235ef6ba7ccdabc02e38ab`.
 
 ## 7. Model and spend usage
 
@@ -211,6 +238,44 @@ Confirmed findings were remediated within the authorized package and pinned by n
 - The static-safety scan is AST-based (imports/calls, not substrings) and cannot be
   bypassed by a comment or string; evidence artifact paths cannot be named `final_report.json`.
 
+### Comprehensive core-hardening pass (PR #83 second commit)
+
+A consolidated correction pass followed, adding **58** regression tests (295 total) and
+these fixes, each pinned by a test:
+
+- **Records / report integrity (A):** aggregate PASS/FAIL now re-derives the quorum
+  (`wins ≥ floor(planned/2)+1`) independently — a caller boolean cannot manufacture a
+  verdict; report construction validates attempt identity (same run, unique repetitions,
+  every planned attempt present, no attempt without an aggregate) and RECOMPUTES coverage
+  from the records, rejecting any caller mismatch (a fabricated 100%-coverage empty run is
+  refused); `case_uid`/`assertion_uid` are re-derived and bound to the record's display
+  metadata; subagent vs skill cross-fields are enforced; every boolean field requires an
+  actual JSON boolean; nested record fields are deep-frozen (source mutation cannot change
+  output/hashes); quarantine `latest_*` must equal the current aggregate; NaN/±inf are
+  rejected for durations/timeouts/deadlines.
+- **Preflight completeness (B):** `required_files` (path-normalized) and
+  `required_tool_permissions` now participate in preflight; a missing file or permission
+  keeps the case UNRUN / INCONCLUSIVE / PRECHECK_EXCLUDED with a finding.
+- **Materialization / census (C):** the three manifests are persisted as control-plane
+  evidence (never under the runtime root) with a reload-and-verify helper; a shipped skill
+  requires its `SKILL.md` entry point; the reverse-neighbor index is typed
+  (`skill::` vs `subagent::`); control-plane path fragments are matched across the full
+  path (`references/rubric/…`, `assets/answer-bank/…`); ambiguous material makes a run
+  baseline-ineligible with named reasons; the immutable snapshot API returns a read-only
+  view.
+- **Evidence (D):** reparse-safe writes/reads (chain checked before create, after parent
+  creation, and before atomic replace); same-run binding required across input manifest,
+  final report, final manifest, and marker (cross-run mixtures rejected at finalize and
+  verify); timezone-aware timestamps required (naive rejected).
+- **Budget / scheduler / process (E):** immutable frozen caps; real-reservation rule
+  (empty/all-zero denied); atomic reconcile with drift fail-safe (reservation preserved,
+  kill switch engaged, replay enforces `actual ≤ reserved`); deterministic dispatched
+  prefix (no lower-priority case runs after budget exhaustion); a durable terminal
+  checkpoint that catches tail truncation and rollback on load; an enforced wall-clock
+  deadline (injected clock; not reset on reload); `TimeoutController` rejects
+  bool/NaN/±inf/zero/negative; Windows `taskkill` resolved only from an absolute,
+  reparse-checked System32 path (no PATH fallback).
+
 ## 10. Owner decisions required at implementation review
 
 - Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
@@ -226,12 +291,17 @@ Confirmed findings were remediated within the authorized package and pinned by n
 - No real-host capability is proven; all default UNAVAILABLE/UNKNOWN.
 - The JSON Schemas are the portable specification; the runtime contract is enforced by
   the dataclass validators (`validate` / `from_dict`), not by a schema validator (adding
-  one would require a forbidden dependency). `self-check` cross-checks the schema enum
-  sets against the code enums.
+  one would require a forbidden dependency). Cross-field constraints that draft-07 cannot
+  express safely (e.g. the exact quorum relation `wins ≥ floor(planned/2)+1`, or
+  `latest_* == current`) stay authoritative in the Python validators; the schemas encode
+  what draft-07 can (verdict→blocker, subagent→mode/profile/annotation, quorum floor
+  `wins ≥ 1`). `self-check` cross-checks the schema enum sets against the code enums.
+- The POSIX runtime path (killpg same-group refusal, `popen_isolation_kwargs`) is covered
+  by code and Windows-side tests but was not exercised on a POSIX interpreter (none
+  available without installation); a POSIX test pass is not claimed.
 - Non-blocking follow-ups recorded for later phases (not in WP-2B-1 scope): optional
-  runtime JSON-Schema enforcement; a rolling ledger head-pointer for tail-truncation
-  detection beyond the hash chain; further redaction of operator-local paths in ad-hoc
-  CLI stdout.
+  runtime JSON-Schema enforcement; cryptographic authenticity for evidence/ledger beyond
+  tamper-evidence; further redaction of operator-local paths in ad-hoc CLI stdout.
 
 ## 12. Evidence-root and timing
 

@@ -12,9 +12,10 @@ themselves; nothing here touches unrelated processes.
 
 from __future__ import annotations
 
+import math
 import os
-import shutil
 import signal
+import stat
 import subprocess
 import sys
 import time
@@ -35,9 +36,15 @@ class TimeoutController:
     """Monotonic wall-clock deadline for one attempt/session."""
 
     def __init__(self, limit_seconds: float) -> None:
-        if not isinstance(limit_seconds, (int, float)) or limit_seconds <= 0:
+        # E7: reject bool, NaN, ±inf, zero, negative, and non-numeric limits.
+        if (
+            isinstance(limit_seconds, bool)
+            or not isinstance(limit_seconds, (int, float))
+            or not math.isfinite(limit_seconds)
+            or limit_seconds <= 0
+        ):
             raise ProcessControlError(
-                f"limit_seconds must be > 0, got {limit_seconds!r}"
+                f"limit_seconds must be a finite number > 0, got {limit_seconds!r}"
             )
         self.limit_seconds = float(limit_seconds)
         self._started_at = time.monotonic()
@@ -58,16 +65,33 @@ def _validate_pid(pid: int) -> int:
     return pid
 
 
+def _trusted_taskkill_path() -> str:
+    """E9: resolve taskkill ONLY from an absolute System32 path, verified not a
+    reparse point. Never fall back to a PATH-resolved binary (which the current
+    directory could shadow); fail closed when it cannot be established."""
+    system_root = os.environ.get("SystemRoot") or os.environ.get("windir") or r"C:\Windows"
+    taskkill = os.path.join(system_root, "System32", "taskkill.exe")
+    if not os.path.isabs(taskkill) or not os.path.isfile(taskkill):
+        raise ProcessControlError(
+            f"trusted taskkill.exe not found at {taskkill!r}; refusing a "
+            "PATH-resolved fallback (fail closed)"
+        )
+    info = os.lstat(taskkill)
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    if stat.S_ISLNK(info.st_mode) or (
+        getattr(info, "st_file_attributes", 0) & reparse_flag
+    ):
+        raise ProcessControlError(
+            f"trusted taskkill path {taskkill!r} is a reparse point; fail closed"
+        )
+    return taskkill
+
+
 def kill_process_tree(pid: int) -> KillResult:
     """Emergency kill of a process AND its entire child tree. Fail closed."""
     pid = _validate_pid(pid)
     if sys.platform == "win32":
-        # Resolve taskkill from System32 (never a bare name) so a planted
-        # taskkill.exe in the current directory cannot be executed instead.
-        system_root = os.environ.get("SystemRoot", r"C:\Windows")
-        taskkill = os.path.join(system_root, "System32", "taskkill.exe")
-        if not os.path.exists(taskkill):
-            taskkill = shutil.which("taskkill") or taskkill
+        taskkill = _trusted_taskkill_path()
         argv = [taskkill, "/PID", str(pid), "/T", "/F"]
         try:
             completed = subprocess.run(  # noqa: S603 - fixed argv, shell=False

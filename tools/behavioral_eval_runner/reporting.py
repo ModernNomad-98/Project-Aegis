@@ -146,6 +146,89 @@ def _enforce_honesty(
                 )
 
 
+def _validate_report_records(
+    run_id: str,
+    attempts_list: list[AttemptRecord],
+    aggregates_list: list[AggregateRecord],
+) -> None:
+    """A2: enforce attempt-identity and aggregate-completeness before a report.
+
+    Rejects cross-run attempts, duplicate repetitions, out-of-range repetition
+    numbers, duplicate aggregates, attempts for a case without an aggregate,
+    and an aggregate missing exactly its planned attempt identities. Duplicate
+    or cross-run attempts can never count as evidence.
+    """
+    aggregate_by_case: dict[str, AggregateRecord] = {}
+    for aggregate in aggregates_list:
+        if aggregate.case_uid in aggregate_by_case:
+            raise DishonestReportError(
+                f"duplicate aggregate for case {aggregate.case_uid}"
+            )
+        aggregate_by_case[aggregate.case_uid] = aggregate
+
+    reps_by_case: dict[str, set[int]] = {}
+    for attempt in attempts_list:
+        if attempt.run_id != run_id:
+            raise DishonestReportError(
+                f"attempt {attempt.identity} belongs to a different run than "
+                f"the report ({run_id})"
+            )
+        aggregate = aggregate_by_case.get(attempt.case_uid)
+        if aggregate is None:
+            raise DishonestReportError(
+                f"attempt for case {attempt.case_uid} has no aggregate"
+            )
+        if not (1 <= attempt.repetition_number <= aggregate.attempts_planned):
+            raise DishonestReportError(
+                f"attempt repetition {attempt.repetition_number} for "
+                f"{attempt.case_uid} outside 1..{aggregate.attempts_planned}"
+            )
+        seen = reps_by_case.setdefault(attempt.case_uid, set())
+        if attempt.repetition_number in seen:
+            raise DishonestReportError(
+                f"duplicate attempt repetition {attempt.repetition_number} for "
+                f"{attempt.case_uid} — duplicates never count as evidence"
+            )
+        seen.add(attempt.repetition_number)
+
+    attempts_by_case: dict[str, list[AttemptRecord]] = {}
+    for attempt in attempts_list:
+        attempts_by_case.setdefault(attempt.case_uid, []).append(attempt)
+
+    for case_uid, aggregate in aggregate_by_case.items():
+        present = reps_by_case.get(case_uid, set())
+        expected = set(range(1, aggregate.attempts_planned + 1))
+        if present != expected:
+            raise DishonestReportError(
+                f"aggregate {case_uid} expects planned attempts {sorted(expected)} "
+                f"but the report carries {sorted(present)}"
+            )
+        case_attempts = attempts_by_case.get(case_uid, [])
+        executed = sum(
+            1 for a in case_attempts if a.attempt_state is not AttemptState.UNRUN
+        )
+        if aggregate.attempts_run != executed:
+            raise DishonestReportError(
+                f"aggregate {case_uid} claims attempts_run={aggregate.attempts_run} "
+                f"but {executed} of its attempts actually executed"
+            )
+        if aggregate.aggregate_verdict is AggregateVerdict.PASS:
+            actual_wins = sum(
+                1 for a in case_attempts if a.attempt_state is AttemptState.PASS
+            )
+        elif aggregate.aggregate_verdict is AggregateVerdict.FAIL:
+            actual_wins = sum(
+                1 for a in case_attempts if a.attempt_state is AttemptState.FAIL
+            )
+        else:
+            actual_wins = 0
+        if aggregate.wins != actual_wins:
+            raise DishonestReportError(
+                f"aggregate {case_uid} claims wins={aggregate.wins} but "
+                f"{actual_wins} attempts actually won"
+            )
+
+
 def build_run_report(
     run_id: str,
     baseline_identity: Mapping[str, Any],
@@ -160,16 +243,50 @@ def build_run_report(
     execution_profile: Mapping[str, Any] | None = None,
     findings: Iterable[Mapping[str, Any]] = (),
     risk_classes: Mapping[str, str] | None = None,
+    *,
+    selected_case_uids: Iterable[str] = (),
+    preflight_results: Iterable[PreflightResult] = (),
+    critical_case_uids: Iterable[str] = (),
+    assertions_selected_total: int = 0,
+    assertions_accounted_total: int = 0,
+    assertions_actually_graded_total: int = 0,
 ) -> dict[str, Any]:
-    """Assemble the deterministic run report (sorted, canonicalizable)."""
+    """Assemble the deterministic run report (sorted, canonicalizable).
+
+    Coverage is RECOMPUTED from the run's own records and required to equal the
+    caller-supplied ``coverage`` (A3): a fabricated coverage — e.g. 100% over an
+    empty run — is rejected, never published.
+    """
+    if not run_id:
+        raise DishonestReportError("run_id required")
     attempts_list = sorted(
         attempts, key=lambda a: (a.case_uid, a.repetition_number)
     )
     aggregates_list = sorted(aggregates, key=lambda a: a.case_uid)
     for attempt in attempts_list:
         attempt.validate()
+    _validate_report_records(run_id, attempts_list, aggregates_list)
     _enforce_honesty(attempts_list, aggregates_list)
     coverage.validate()
+
+    # A3: derive coverage from the records and reject any caller mismatch.
+    recomputed = compute_coverage(
+        authored_units_total=coverage.authored_units_total,
+        selected_case_uids=selected_case_uids,
+        preflight_results=preflight_results,
+        attempts=attempts_list,
+        aggregates=aggregates_list,
+        assertions_selected_total=assertions_selected_total,
+        assertions_accounted_total=assertions_accounted_total,
+        assertions_actually_graded_total=assertions_actually_graded_total,
+        critical_case_uids=critical_case_uids,
+    )
+    if recomputed.to_dict() != coverage.to_dict():
+        raise DishonestReportError(
+            "supplied coverage metrics do not match the coverage recomputed "
+            "from selection/preflight/attempts/aggregates — coverage is "
+            "evidence, not a caller assertion"
+        )
 
     quarantine_inventory = [
         {
@@ -255,7 +372,9 @@ def build_demonstration_report(
             attempts.append(
                 planned_unrun_attempt(run_id, uid, repetition, ReasonCode.NOT_SELECTED)
             )
-        aggregates.append(default_unselected_aggregate(uid))
+        aggregates.append(
+            default_unselected_aggregate(uid, attempts_planned=attempts_planned_per_case)
+        )
     coverage = compute_coverage(
         authored_units_total=authored_units_total,
         selected_case_uids=[],

@@ -273,6 +273,25 @@ class TestStaticScanCannotBeBypassedByComment(unittest.TestCase):
                 any(v["kind"] == "dynamic-or-shell-exec" for v in violations)
             )
 
+    def test_extended_dynamic_exec_forms_flagged(self) -> None:
+        # eval/exec/compile and the os.execl*/os.spawn* families are covered.
+        snippets = (
+            "eval('1+1')\n",
+            "exec('x=1')\n",
+            "compile('1', '<s>', 'eval')\n",
+            "import os\nos.execlp('x', 'x')\n",
+            "import os\nos.spawnv(os.P_WAIT, 'x', ['x'])\n",
+        )
+        for i, src in enumerate(snippets):
+            with tempfile.TemporaryDirectory() as root:
+                with open(os.path.join(root, f"m{i}.py"), "w", encoding="utf-8") as fh:
+                    fh.write(src)
+                violations = scan_package_sources(root)
+                self.assertTrue(
+                    any(v["kind"] == "dynamic-or-shell-exec" for v in violations),
+                    src,
+                )
+
     def test_real_package_is_clean(self) -> None:
         self.assertEqual(scan_package_sources(), [])
 

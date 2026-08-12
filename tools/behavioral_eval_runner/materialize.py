@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import tarfile
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Mapping
 
 from . import SCHEMA_VERSION
@@ -214,7 +215,9 @@ class GitSnapshot(SnapshotSource):
                         continue
                     extracted[member.name] = handle.read()
             self._files = extracted
-        return self._files
+        # C6: return an immutable view — a caller mutation can never alter the
+        # verified internal mapping used by later materialization/census.
+        return MappingProxyType(self._files)
 
 
 class SyntheticSnapshot(SnapshotSource):
@@ -230,8 +233,9 @@ class SyntheticSnapshot(SnapshotSource):
         self.source_commit = source_commit
         self.source_tree = source_tree
 
-    def files(self) -> dict[str, bytes]:
-        return dict(self._files)
+    def files(self) -> Mapping[str, bytes]:
+        # C6: immutable view over the internal mapping.
+        return MappingProxyType(self._files)
 
 
 @dataclass(frozen=True, slots=True)
@@ -320,13 +324,17 @@ def _manifest(
 
 
 def discover_shipped_skills(snapshot_files: Mapping[str, bytes]) -> list[str]:
-    """Every shipped skill directory at the snapshot, ``_template`` excluded."""
+    """Every shipped skill at the snapshot, ``_template`` excluded.
+
+    C2: a shipped skill is a directory that actually contains ``SKILL.md`` —
+    a directory holding only a supporting file is NOT a valid shipped skill.
+    """
     names: set[str] = set()
     for path in snapshot_files:
         if path.startswith(SKILLS_PREFIX):
             remainder = path[len(SKILLS_PREFIX) :]
-            skill = remainder.split("/", 1)[0]
-            if skill and skill != TEMPLATE_SKILL:
+            skill, _, inner = remainder.partition("/")
+            if skill and skill != TEMPLATE_SKILL and inner == "SKILL.md":
                 names.add(skill)
     return sorted(names)
 
@@ -352,6 +360,7 @@ class MaterializationRecord:
     product_fixture_manifest_sha256: str
     baseline_eligible: bool
     baseline_ineligibility_reasons: tuple[str, ...]
+    manifest_paths: Mapping[str, str] = field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
 
     def to_dict(self) -> dict[str, Any]:
@@ -371,7 +380,73 @@ class MaterializationRecord:
             "product_fixture_manifest_sha256": self.product_fixture_manifest_sha256,
             "baseline_eligible": self.baseline_eligible,
             "baseline_ineligibility_reasons": list(self.baseline_ineligibility_reasons),
+            "manifest_paths": {
+                k: v.replace("\\", "/") for k, v in self.manifest_paths.items()
+            },
         }
+
+
+#: Where each manifest's listed files physically live, by manifest kind.
+_MANIFEST_AREA = {
+    "authored_eval_corpus": "control_plane",
+    "sanitized_runtime_surface": "runtime_surface",
+    "product_fixture": "product_fixture",
+}
+
+
+def verify_materialization_manifests(destination_root: str) -> dict[str, Any]:
+    """Reload the three persisted manifests and verify every listed file's byte
+    count and SHA-256 against the materialized surface on disk (C1). Fails
+    closed on any mismatch, and refuses a control-plane manifest that leaked
+    into the agent-visible runtime root."""
+    import json
+
+    manifest_dir = os.path.join(destination_root, "materialization_manifests")
+    runtime_root = os.path.realpath(os.path.join(destination_root, "runtime_surface"))
+    result: dict[str, Any] = {"manifests": {}, "verified": True}
+    for name in (
+        "control_plane_manifest.json",
+        "runtime_surface_manifest.json",
+        "product_fixture_manifest.json",
+    ):
+        path = os.path.join(manifest_dir, name)
+        if not os.path.exists(path):
+            raise MaterializationError(f"missing persisted manifest {name!r}")
+        # A persisted control-plane manifest must never sit under the runtime root.
+        if os.path.commonpath(
+            [runtime_root, os.path.realpath(path)]
+        ) == runtime_root:
+            raise ControlPlaneLeakageError(
+                f"manifest {name!r} resides in the agent-visible runtime root"
+            )
+        with open(path, "rb") as handle:
+            body_bytes = handle.read()
+        manifest = json.loads(body_bytes.decode("utf-8"))
+        kind = manifest.get("manifest_kind")
+        area = _MANIFEST_AREA.get(kind)
+        if area is None:
+            raise MaterializationError(f"unknown manifest kind {kind!r} in {name!r}")
+        area_root = os.path.join(destination_root, area)
+        checked = 0
+        for entry in manifest.get("files", []):
+            target = _safe_join(area_root, entry["path"])
+            if not os.path.exists(target):
+                raise MaterializationError(
+                    f"manifest {name!r} lists a missing file {entry['path']!r}"
+                )
+            with open(target, "rb") as handle:
+                content = handle.read()
+            if len(content) != entry["bytes"] or sha256_hex(content) != entry["sha256"]:
+                raise MaterializationError(
+                    f"manifest {name!r} file {entry['path']!r} failed byte/hash "
+                    "verification"
+                )
+            checked += 1
+        result["manifests"][name] = {
+            "sha256": sha256_hex(body_bytes),
+            "files_verified": checked,
+        }
+    return result
 
 
 def _check_role_profile(request: MaterializationRequest) -> None:
@@ -532,12 +607,20 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
         for path in runtime_surface
         if path.startswith(SKILLS_PREFIX)
     }
+    # C2: a skill counts as materialized only when its SKILL.md entry point is
+    # present in the runtime surface — never merely a supporting file.
+    skills_with_entry_point = {
+        path[len(SKILLS_PREFIX) :].split("/", 1)[0]
+        for path in runtime_surface
+        if path.startswith(SKILLS_PREFIX)
+        and path[len(SKILLS_PREFIX) :].partition("/")[2] == "SKILL.md"
+    }
     if request.claim_scope is ClaimScope.FULL_LIBRARY:
-        missing = sorted(set(shipped_skills) - materialized_skills)
+        missing = sorted(set(shipped_skills) - skills_with_entry_point)
         if missing:
             raise PartialSurfaceViolationError(
-                f"full-library claim but skills missing from the runtime surface: "
-                f"{missing[:5]}{'...' if len(missing) > 5 else ''}"
+                f"full-library claim but skill entry point(s) missing from the "
+                f"runtime surface: {missing[:5]}{'...' if len(missing) > 5 else ''}"
             )
 
     # Write the three physical areas.
@@ -568,11 +651,35 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     fixture_manifest["fixture_id"] = request.fixture.fixture_id
     fixture_manifest["fixture_version"] = request.fixture.fixture_version
 
+    # C1: persist the three canonical manifest bodies as CONTROL-PLANE evidence,
+    # under a dedicated directory that is NOT the agent-visible runtime root.
+    manifest_dir = os.path.join(request.destination_root, "materialization_manifests")
+    os.makedirs(manifest_dir, exist_ok=True)
+    manifest_files = {
+        "control_plane_manifest.json": control_manifest,
+        "runtime_surface_manifest.json": runtime_manifest,
+        "product_fixture_manifest.json": fixture_manifest,
+    }
+    manifest_paths: dict[str, str] = {}
+    for name, body in manifest_files.items():
+        target = os.path.join(manifest_dir, name)
+        with open(target, "wb") as handle:
+            handle.write(canonical_bytes(body))
+        manifest_paths[name] = target
+
     ineligibility: list[str] = []
     if request.claim_scope is ClaimScope.PARTIAL_INSTALL:
         ineligibility.append(
             "partial_install results are ineligible for baseline, stability, "
             "full-corpus coverage, and promotion accounting (design §5a)"
+        )
+    # C5: ambiguous material may never be silently excluded while claiming
+    # baseline eligibility.
+    if ambiguous_excluded:
+        ineligibility.append(
+            "ambiguous_needs_owner_review files were excluded from the runtime "
+            f"surface: {sorted(ambiguous_excluded)[:5]}"
+            f"{'...' if len(ambiguous_excluded) > 5 else ''}"
         )
 
     return MaterializationRecord(
@@ -582,7 +689,7 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
         workspace_role=request.workspace_role,
         claim_scope=request.claim_scope,
         shipped_skill_count=len(shipped_skills),
-        materialized_skill_count=len(materialized_skills),
+        materialized_skill_count=len(skills_with_entry_point),
         subagent_count=len(subagent_names),
         ambiguous_excluded=tuple(sorted(ambiguous_excluded)),
         control_plane_manifest=control_manifest,
@@ -593,4 +700,5 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
         product_fixture_manifest_sha256=sha256_hex(canonical_bytes(fixture_manifest)),
         baseline_eligible=not ineligibility,
         baseline_ineligibility_reasons=tuple(ineligibility),
+        manifest_paths=manifest_paths,
     )

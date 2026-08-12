@@ -168,15 +168,7 @@ def _scan_ast(relative: str, source: str) -> list[dict[str, str]]:
                     _record("shell=True", "shell-true")
             target = node.func
             dotted = _dotted_name(target)
-            if dotted in (
-                "os.system",
-                "os.popen",
-                "os.execv",
-                "os.execve",
-                "os.execvp",
-                "os.execvpe",
-                "importlib.import_module",
-            ) or dotted == "__import__":
+            if _is_dynamic_exec(dotted):
                 _record(dotted, "dynamic-or-shell-exec")
         elif isinstance(node, ast.Constant) and isinstance(node.value, str):
             if relative != _SELF_RELATIVE and not in_tests:
@@ -197,6 +189,28 @@ def _dotted_name(node: ast.AST) -> str:  # type: ignore[name-defined]
     if isinstance(node, ast.Name):
         parts.append(node.id)
     return ".".join(reversed(parts))
+
+
+#: Bare builtins that execute arbitrary code / import dynamically.
+_DYNAMIC_EXEC_BARE = frozenset({"eval", "exec", "compile", "__import__"})
+#: Dotted calls that execute a command, replace/spawn a process, or import.
+_DYNAMIC_EXEC_DOTTED = frozenset(
+    {
+        "os.system",
+        "os.popen",
+        "importlib.import_module",
+        *(f"os.{name}" for name in (
+            "execl", "execle", "execlp", "execlpe",
+            "execv", "execve", "execvp", "execvpe",
+            "spawnl", "spawnle", "spawnlp", "spawnlpe",
+            "spawnv", "spawnve", "spawnvp", "spawnvpe",
+        )),
+    }
+)
+
+
+def _is_dynamic_exec(dotted: str) -> bool:
+    return dotted in _DYNAMIC_EXEC_BARE or dotted in _DYNAMIC_EXEC_DOTTED
 
 
 def scan_package_sources(package_root: str | None = None) -> list[dict[str, str]]:
@@ -328,6 +342,12 @@ def _cmd_preflight(args: argparse.Namespace) -> int:
             ),
             unjudgeable_assertion_uids=frozenset(
                 env_payload.get("unjudgeable_assertion_uids", ())
+            ),
+            available_fixture_files=frozenset(
+                env_payload.get("available_fixture_files", ())
+            ),
+            available_tool_permissions=frozenset(
+                env_payload.get("available_tool_permissions", ())
             ),
         )
     results = [
