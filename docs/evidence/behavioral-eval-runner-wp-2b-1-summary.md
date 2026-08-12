@@ -1,0 +1,254 @@
+# Behavioral Eval Runner — WP-2B-1 offline runner core: sanitized implementation summary
+
+**Scope: the authorized non-live Behavioral Eval Runner control plane and minimum
+guardrails. NO live model/provider dispatch, NO live Claude Code session, NO Scenario A,
+NO generic eval execution, NO graders (WP-2B-2), NO semantic judge (WP-2B-3).**
+
+This file is repository-safe: it contains no personal username, no personal path, no
+secret, no environment dump, no raw test log, and no private machine detail. Full
+build evidence (test logs, validation logs, timing) is retained externally under the
+BER-DEC-006 build-evidence root and is not committed.
+
+## 1. Authorization
+
+| Item | Value |
+| --- | --- |
+| Authorization record | BER-DEC-006 |
+| Authorization PR | [#82](https://github.com/ModernNomad-98/Project-Aegis/pull/82) — MERGED |
+| Authorization merge SHA | `fc98ee6bf59bb516064be62ed8c5dc8861c92697` |
+| Authorization merge tree SHA | `def17d77fa2cd9c854bd4b16687f0b0350ebdefe` |
+| Authorized work package | WP-2B-1 |
+| Implementation branch | `feat/behavioral-eval-runner-2b-1` |
+| Implementation base SHA | `fc98ee6bf59bb516064be62ed8c5dc8861c92697` |
+| Implementation base tree SHA | `def17d77fa2cd9c854bd4b16687f0b0350ebdefe` |
+| Authoritative design | `docs/design/behavioral-eval-runner-v1.md` (§19 2B-1 row) |
+| Authoritative continuation register | `docs/roadmaps/behavioral-eval-runner-backlog.md` |
+
+The implementation branch was created directly from the authorization squash-merge
+commit and tree, never from a later moving `main`.
+
+## 2. Package path and layout
+
+Python package root: `tools/behavioral_eval_runner/` — Python standard library only,
+no dependency file, no package installation, no network library, no live-provider SDK.
+
+| Module | Responsibility (design refs) |
+| --- | --- |
+| `enums.py` | Closed, versioned enum sets (unknown value ⇒ rejection) |
+| `canonical.py` | Canonical JSON + SHA-256; stable hashing under no-op serialization |
+| `identity.py` | `case_uid` / `assertion_uid` / attempt identity (§13, §20a-S25) |
+| `models.py` | Strict versioned records + coverage metrics (§10, §13) |
+| `runtime_surface.py` | Fail-closed runtime-file classification (§5a) |
+| `census.py` | Implementation-time corpus census (§3 items a–k) |
+| `materialize.py` | Immutable Git-object materializer, two surfaces + fixture (§5a) |
+| `pathsafe.py` | Shared strict path validation + reparse-safe joins |
+| `preflight.py` | Capability/fixture preflight (§5b) |
+| `execution_profile.py` | Execution-profile representation + baseline eligibility (§5e) |
+| `containment.py` | Fail-closed containment interfaces + mock boundary (§15) |
+| `process_control.py` | Timeout + process-tree emergency kill |
+| `budget.py` | Pre-dispatch reservation ledger, reconciliation, kill switch (§11) |
+| `scheduler.py` | Deterministic risk-aware, budget-aware scheduler (§11a) |
+| `aggregation.py` | Immutable attempts, N/quorum truth table, quarantine (§10) |
+| `evidence.py` | Two-stage finalization + detached marker + verification (§13) |
+| `reporting.py` | Deterministic reports + coverage metrics (§13) |
+| `adapters/base.py` | Abstract host-adapter interface (§14) |
+| `adapters/claude_code.py` | NON-LIVE Claude Code adapter (denies all live dispatch) |
+| `cli.py` | Safe local CLI (`python -m tools.behavioral_eval_runner`) |
+| `schemas/*.json` | 8 versioned JSON Schemas (portable spec for the records) |
+
+## 3. Changed-file inventory (all under the authorized scope)
+
+New Python package (24 modules incl. `__init__`/`__main__`), 8 JSON schemas, 19 test
+modules + `__init__`/`helpers`, and a package README, all beneath
+`tools/behavioral_eval_runner/**`, plus exactly the two repository-safe generated
+artifacts:
+
+- `artifacts/evidence/behavioral-eval-runner-wp-2b-1-census.json`
+- `docs/evidence/behavioral-eval-runner-wp-2b-1-summary.md` (this file)
+
+No existing repository file was modified. The structural validator, workflows, skills,
+evals, design, backlog, README, catalog, Scenario A files, agents, and audit artifacts
+are untouched.
+
+## 4. Architecture delivered
+
+- **Versioned schemas and canonical identities.** Attempt/aggregate/run/case-manifest/
+  fixture-manifest/materialization/execution-profile/evidence-manifest schemas
+  (`schema_version 1.0.0-wp2b1`); canonical JSON encoding; globally unique
+  `case_uid`/`assertion_uid`/attempt identities with case-definition-hash invalidation.
+- **Implementation-time corpus census** from the pinned Git snapshot (see §6).
+- **Immutable Git-object workspace materialization** with two separated surfaces
+  (trusted control-plane corpus vs sanitized agent-visible runtime surface), a product
+  fixture overlay as the only writable area, three separately-hashed manifests, the
+  binding full-shipped-corpus rule for full-library claims, and `partial_install`
+  scoping that is ineligible for baseline/stability/coverage/promotion.
+- **Fail-closed runtime-file classification** (`runtime_required` / `control_plane_only`
+  / `ambiguous_needs_owner_review`; ambiguity never agent-visible; no extension-only
+  decision).
+- **Capability/fixture preflight** — missing setup never becomes a behavioral FAIL;
+  every exclusion carries an author-facing finding.
+- **Execution-profile representation** — the real Claude Code profile reports every
+  required field UNAVAILABLE/UNKNOWN and is never baseline-eligible.
+- **Fail-closed containment interfaces**, a deterministic mock/synthetic boundary used
+  only by offline tests, path-containment and reparse-point refusal, and a truthful
+  real-host capability report (UNAVAILABLE/UNKNOWN).
+- **Timeout and process-tree emergency-kill controls** (Windows `taskkill /T /F` from
+  System32; POSIX `killpg` that refuses the runner's own group; never `shell=True`).
+- **Runner-owned budget reservation and reconciliation** — pre-dispatch reservation,
+  bounded concurrency (default 1 while capability unproven), monetary-UNKNOWN honesty,
+  a hash-chained append-only ledger that fails closed on tamper/truncation and never
+  silently resets on restart, and a kill switch.
+- **Deterministic budget-aware scheduler** — versioned risk-aware priority order,
+  canonical or seeded-rotation within-priority ordering, reproducible dispatched prefix
+  under a cap, full scheduling evidence, no automatic reprioritization.
+- **Immutable attempt aggregation and N/quorum** (default N=3, quorum 2-of-3, N
+  configurable) — full §10 truth table, blocker precedence, `execution_degraded`, no
+  replacement attempts, orthogonal quarantine that never erases the latest verdict.
+- **Two-stage evidence finalization** — pre-judging input snapshot the (future) judge
+  must verify before reading, post-aggregation final bundle, a detached finalization
+  marker, no self-referential hashes, and fail-closed integrity verification that binds
+  stage B back to a re-verified stage A.
+- **Honest reporting and coverage accounting** — every report carries the complete
+  coverage metrics, distinguishes assertion accounting coverage from assertions actually
+  graded coverage, and refuses to state PASS without executed quorum.
+- **Host-adapter interface** and a **non-live Claude Code adapter** that denies every
+  live dispatch with `LIVE_DISPATCH_DISABLED` and reports all real-host capabilities
+  disabled/unavailable.
+- **A safe CLI** with no command that starts a live session, dispatch, Scenario A, or
+  generic eval execution.
+
+## 5. Tests and validation
+
+- Test command: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
+- Test modules: 19 (`test_*.py`) plus `helpers.py`.
+- Test methods: **237**; result: **OK (237 passed, 0 failed, 0 errors)**.
+- Runner self-check: `python -m tools.behavioral_eval_runner self-check` ⇒ **PASS**
+  (8/8 checks: enum closure, canonical stability, identity behavior, adapter denial,
+  schema/code enum agreement, no-forbidden-source AST scan, real-host capability honesty,
+  aggregation spot checks).
+- Census reproducibility: a second census over the pinned snapshot produced byte-identical
+  canonical output (census SHA-256 `7bd40aaee823e41bf2f7e9135802f73fac6eaa431e1625d032d72d7064a26d65`).
+- Validator self-tests: `python scripts/tests/test_validator.py` ⇒ OK (untouched).
+- Skill validator: `python scripts/validate-skills.py` ⇒ **184 skills valid, 0 warnings** (untouched).
+
+The tests are deterministic and offline: mocks, synthetic fixtures, local subprocesses
+that the tests spawn themselves for timeout/kill coverage only, and temporary directories
+below the process-local TMP/TEMP path. No network, no package installation, no model
+dispatch.
+
+## 6. Corpus-census results (static implementation evidence — NOT a behavioral result)
+
+Generated by `census.py` from the pinned snapshot; no eval case was executed.
+
+| Metric | Value |
+| --- | --- |
+| Shipped skills (`_template` excluded) | 184 |
+| `evals.json` behavior cases | 882 |
+| `trigger-evals.json` discrimination cases | 858 |
+| Authored single-prompt cases | 1,740 |
+| Conversation suites (Scenario A) | 1 |
+| Potential execution units | 1,741 |
+| Total eval assertions | 2,834 |
+| MANUAL-ONLY skills (frontmatter-parsed) | 18 |
+| Subagent-target cases / distinct subagent targets | 4 / 2 |
+| Runtime-required files / control-plane-only / ambiguous | 341 / 367 / 0 |
+| Proposed risk classes (CRITICAL / HIGH / STANDARD) | 419 / 352 / 969 (PROPOSED, not ratified) |
+| Proposed empty-consumer-runnable single-prompt cases | 1,557 (PROPOSED preflight candidate) |
+
+The census also enumerates fixture-, service-, and credential-dependent cases; source-role
+cases; unjudgeable-as-written candidates; MANUAL-ONLY positive incompatibilities; the
+reverse negative-neighbor index; and per-case author-facing findings. Risk classes,
+runnability figures, and findings are PROPOSED and feed the OD-2/OD-3 owner decisions;
+none is owner-ratified and none controls live behavior or promotion.
+
+## 7. Model and spend usage
+
+- runner-generated model/provider dispatches: **0**
+- runner-generated live Claude Code sessions: **0**
+- external model/API spend: **USD $0**
+- package installations: **0**
+- network use: none except the read-only Git/GitHub operations required to clone, push,
+  and open the PR.
+
+## 8. Outcome B boundaries (binding)
+
+- **R1** (activation observation): not technically solved — UNAVAILABLE/UNKNOWN.
+- **R2** (judge calibration): **BLOCKED** — WP-2B-1 neither selects nor calibrates a
+  judge; **OD-1 remains OPEN**.
+- **R3** (cost observability): not technically solved — reservation units UNAVAILABLE/
+  UNKNOWN; monetary spend may be UNKNOWN; no fabricated dollar value.
+- **R4** (containment): not technically solved — real-host containment UNAVAILABLE/UNKNOWN;
+  no code claims the real host is contained.
+- **R5** (execution-profile isolation): not technically solved — real-host profile
+  UNAVAILABLE/UNKNOWN; affected runs are baseline-ineligible.
+- Every live-dispatch path is disabled; the Claude Code adapter denies all live dispatch.
+- Proposed risk classes are NOT ratified (OD-3 pending).
+- No Scenario A, no generic corpus execution, no WP-2B-2 work.
+
+## 9. Self-review and remediation
+
+A self-review over the actual package (code-review, security, and governance lenses,
+including two independent adversarial reviews) was completed before final validation.
+Confirmed findings were remediated within the authorized package and pinned by new tests:
+
+- POSIX `killpg` now refuses the runner's own process group (fail closed) and supervised
+  processes are spawned in their own session.
+- The judge-input gate now serves only manifest-listed artifacts and re-hashes on read;
+  manifest verification validates every (untrusted) artifact path and refuses bundle-root
+  escapes; final-bundle verification re-verifies stage A and requires the report's
+  recorded input-manifest hash to match (stage-A substitution is caught).
+- The scheduler runs the duplicate-selection gate before indexing, so a repeated case is
+  refused rather than silently collapsed order-dependently.
+- The materializer refuses reparse points planted below the destination, uses realpath
+  containment, requires a fresh destination, and fails closed on a required subagent that
+  is absent or requested under a non-subagent profile.
+- Git invocations resolve the binary, disable remote protocols and system/global config,
+  require 40-char hex SHAs, validate the ref charset, and pass `--end-of-options`.
+- The budget ledger denies uncapped dimensions by default and carries a rolling hash
+  chain verified on load (tamper/gap/corruption fail closed).
+- Aggregation fails closed on an UNRUN reason the blocker precedence does not classify,
+  rather than mislabeling it `NOT_SELECTED`.
+- The static-safety scan is AST-based (imports/calls, not substrings) and cannot be
+  bypassed by a comment or string; evidence artifact paths cannot be named `final_report.json`.
+
+## 10. Owner decisions required at implementation review
+
+- Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
+- Ratify, revise, or defer the proposed OD-3 risk-class assignments and CRITICAL category.
+- Accept or reject the WP-2B-1 implementation as satisfying the offline scope.
+
+## 11. Intentionally not done / limitations
+
+- No deterministic graders (WP-2B-2), no semantic judge or calibration (WP-2B-3), no
+  judge selection.
+- No Scenario A driver, no generic eval executor, no live provider adapter.
+- No CI/workflow wiring; no live smoke test.
+- No real-host capability is proven; all default UNAVAILABLE/UNKNOWN.
+- The JSON Schemas are the portable specification; the runtime contract is enforced by
+  the dataclass validators (`validate` / `from_dict`), not by a schema validator (adding
+  one would require a forbidden dependency). `self-check` cross-checks the schema enum
+  sets against the code enums.
+- Non-blocking follow-ups recorded for later phases (not in WP-2B-1 scope): optional
+  runtime JSON-Schema enforcement; a rolling ledger head-pointer for tail-truncation
+  detection beyond the hash chain; further redaction of operator-local paths in ad-hoc
+  CLI stdout.
+
+## 12. Evidence-root and timing
+
+- External build-evidence root: `C:\temp\Project-Aegis-BER-WP-2B-1-Implementation-Evidence`
+  (created under the BER-DEC-006 physical-path + least-privilege ACL gate:
+  inheritance disabled, current authorized account + SYSTEM only, no broad principals,
+  no reparse point in the validated chain; sanitized ACL result recorded in the ownership
+  marker with no personal username or profile path).
+- Retention: 30 calendar days from first creation; cleanup is marker-gated and
+  reparse-safe and does not occur before owner review.
+- Timing is recorded in the PR/closeout; no timing value is invented.
+
+## 13. Non-claims
+
+- This implementation does not run behavioral evals and claims no eval passes.
+- It calls no model or provider and creates no live session.
+- It does not prove real-host containment, live cost enforcement, or live execution-profile
+  isolation.
+- It does not authorize or implement WP-2B-2, and does not authorize Scenario A.
+- It enables no auto-merge and performs no merge; manual owner merge remains required.

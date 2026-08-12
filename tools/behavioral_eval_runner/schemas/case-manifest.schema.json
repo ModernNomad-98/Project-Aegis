@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/case-manifest/1.0.0-wp2b1",
+  "title": "Control-plane case manifest record (WP-2B-1)",
+  "description": "Runner-side control-plane metadata per case (design §5b), keyed by case_uid. Surface A only — never agent-visible. Every §5b concept is addressed; risk classes are PROPOSED until OD-3 (risk_class_ratified must be false in WP-2B-1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_uid", "case_id", "owner", "eval_file_kind", "case_type", "prompt_sha256", "target", "risk_class", "risk_class_ratified", "claim_scope", "workspace_role", "materialization_profile_id", "activation_mode_expected", "schema_version"],
+  "properties": {
+    "case_uid": {"type": "string", "pattern": "^[^:]+::(behavior_eval|trigger_eval|conversation_suite)::[^:]+::[0-9a-f]{64}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "owner": {"type": "string", "minLength": 1},
+    "eval_file_kind": {"enum": ["behavior_eval", "trigger_eval", "conversation_suite"]},
+    "case_type": {"enum": ["should_trigger", "should_not_trigger", "should_not_do", "discrimination", "discrimination_empty_neighbor", "conversation_suite"]},
+    "prompt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_kind", "target_name"],
+      "properties": {
+        "target_kind": {"enum": ["skill", "subagent"]},
+        "target_name": {"type": "string", "minLength": 1},
+        "target_annotation": {"type": ["string", "null"]}
+      }
+    },
+    "risk_class": {"enum": ["CRITICAL", "HIGH", "STANDARD"]},
+    "risk_class_ratified": {"const": false},
+    "claim_scope": {"enum": ["full_library", "partial_install"]},
+    "workspace_role": {"enum": ["consumer", "source_library"]},
+    "materialization_profile_id": {"enum": ["consumer_skills_only", "consumer_with_startup_routing", "consumer_with_subagents", "source_library", "consumer_partial_install"]},
+    "activation_mode_expected": {"enum": ["model_selected", "explicit_skill_invocation", "delegated_subagent"]},
+    "workspace_fixture_id": {"type": "string", "minLength": 1},
+    "fixture_version": {"type": "string", "minLength": 1},
+    "required_files": {"type": "array", "items": {"type": "string"}},
+    "required_language_runtime": {"type": "array", "items": {"type": "string"}},
+    "required_framework": {"type": "array", "items": {"type": "string"}},
+    "required_commands": {"type": "array", "items": {"type": "string"}},
+    "required_services": {"type": "array", "items": {"type": "string"}},
+    "required_database": {"type": "array", "items": {"type": "string"}},
+    "required_network_posture": {"enum": ["none", "loopback-fixture-only"]},
+    "required_credentials_class": {"enum": ["none", "synthetic-test-only"]},
+    "required_tool_permissions": {"type": "array", "items": {"type": "string"}},
+    "setup_provenance": {"type": ["string", "null"]},
+    "setup_hash": {"type": ["string", "null"]},
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["assertion_uid", "index", "text"],
+        "properties": {
+          "assertion_uid": {"type": "string"},
+          "index": {"type": "integer", "minimum": 0},
+          "text": {"type": "string", "minLength": 1},
+          "proposed_classification": {"anyOf": [{"type": "null"}, {"enum": ["deterministic_candidate", "semantic_candidate", "unjudgeable_candidate"]}]}
+        }
+      }
+    },
+    "should_not_trigger": {"type": "array", "items": {"type": "string"}},
+    "overlaps_with": {"type": "array", "items": {"type": "string"}},
+    "manual_only_target": {"type": "boolean"},
+    "explicit_invocation_authorized": {"type": "boolean"},
+    "schema_version": {"const": "1.0.0-wp2b1"}
+  }
+}

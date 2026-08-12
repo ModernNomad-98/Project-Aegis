@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/materialization/1.0.0-wp2b1",
+  "title": "Materialization record (WP-2B-1)",
+  "description": "Evidence record of one materialization: pinned Git identity, profile/role/claim scope, and the three separately-hashed manifests (control-plane corpus / sanitized runtime surface / product fixture). partial_install is never baseline-eligible.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_commit", "source_tree", "materialization_profile", "workspace_role", "claim_scope", "shipped_skill_count", "materialized_skill_count", "control_plane_manifest_sha256", "runtime_surface_manifest_sha256", "product_fixture_manifest_sha256", "baseline_eligible"],
+  "properties": {
+    "schema_version": {"const": "1.0.0-wp2b1"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "materialization_profile": {"enum": ["consumer_skills_only", "consumer_with_startup_routing", "consumer_with_subagents", "source_library", "consumer_partial_install"]},
+    "workspace_role": {"enum": ["consumer", "source_library"]},
+    "claim_scope": {"enum": ["full_library", "partial_install"]},
+    "shipped_skill_count": {"type": "integer", "minimum": 0},
+    "materialized_skill_count": {"type": "integer", "minimum": 0},
+    "subagent_count": {"type": "integer", "minimum": 0},
+    "ambiguous_excluded": {"type": "array", "items": {"type": "string"}},
+    "control_plane_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runtime_surface_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "product_fixture_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "baseline_eligible": {"type": "boolean"},
+    "baseline_ineligibility_reasons": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"claim_scope": {"const": "partial_install"}}},
+      "then": {"properties": {"baseline_eligible": {"const": false}}}
+    }
+  ]
+}

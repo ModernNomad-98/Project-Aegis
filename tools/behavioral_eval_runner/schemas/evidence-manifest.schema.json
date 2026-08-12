@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/evidence-manifest/1.0.0-wp2b1",
+  "title": "Evidence manifest (WP-2B-1 two-stage protocol)",
+  "description": "Canonical manifest for either finalization stage. A manifest never lists itself, never lists the detached finalization marker, and every artifact carries integrity + governance metadata (retention, sensitivity, redaction, access policy, expiration). SHA-256 is tamper evidence after finalization only.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_kind", "run_id", "artifacts"],
+  "properties": {
+    "schema_version": {"const": "1.0.0-wp2b1"},
+    "manifest_kind": {"enum": ["input_evidence", "final_evidence"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256", "sensitivity", "redaction_state", "retention_class", "created_at", "expiration_at", "access_policy_ref", "preserve_on_failure"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "not": {"enum": ["input_evidence_manifest.json", "final_evidence_manifest.json", "finalization_marker.json"]}
+          },
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "sensitivity": {"enum": ["PUBLIC_SAFE", "INTERNAL", "CONFIDENTIAL", "SYNTHETIC"]},
+          "redaction_state": {"enum": ["sanitized_by_construction", "redacted", "unredacted_internal_only"]},
+          "retention_class": {"enum": ["days_30", "days_90", "days_365"]},
+          "created_at": {"type": "string", "minLength": 1},
+          "expiration_at": {"type": "string", "minLength": 1},
+          "access_policy_ref": {"type": "string", "minLength": 1},
+          "preserve_on_failure": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

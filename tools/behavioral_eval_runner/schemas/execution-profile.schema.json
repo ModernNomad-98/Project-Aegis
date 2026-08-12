@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/execution-profile/1.0.0-wp2b1",
+  "title": "Execution-profile record (WP-2B-1)",
+  "description": "Versioned execution-profile representation (design §5e). WP-2B-1 may not claim these values are observable on the real host (R5): unobservable values are the honest sentinels UNAVAILABLE/UNKNOWN, never silent defaults, and any required unknown/unisolatable value makes the record baseline_eligible=false.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_id", "runtime_version", "managed_settings_status", "user_settings_status", "project_settings_status", "local_settings_status", "claude_md_scopes", "auto_memory_state", "user_skill_scope", "project_skill_scope", "subagent_scope", "plugin_scope", "hook_scope", "mcp_scope", "permission_policy", "sandbox_tool_policy", "auto_update_state", "schema_version"],
+  "properties": {
+    "profile_id": {"type": "string", "minLength": 1},
+    "runtime_version": {"type": "string", "minLength": 1},
+    "managed_settings_status": {"type": "string", "minLength": 1},
+    "user_settings_status": {"type": "string", "minLength": 1},
+    "project_settings_status": {"type": "string", "minLength": 1},
+    "local_settings_status": {"type": "string", "minLength": 1},
+    "claude_md_scopes": {"type": "string", "minLength": 1},
+    "auto_memory_state": {"type": "string", "minLength": 1},
+    "user_skill_scope": {"type": "string", "minLength": 1},
+    "project_skill_scope": {"type": "string", "minLength": 1},
+    "subagent_scope": {"type": "string", "minLength": 1},
+    "plugin_scope": {"type": "string", "minLength": 1},
+    "hook_scope": {"type": "string", "minLength": 1},
+    "mcp_scope": {"type": "string", "minLength": 1},
+    "permission_policy": {"type": "string", "minLength": 1},
+    "sandbox_tool_policy": {"type": "string", "minLength": 1},
+    "auto_update_state": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "1.0.0-wp2b1"},
+    "baseline_eligible": {"type": "boolean"},
+    "baseline_ineligibility_reasons": {"type": "array", "items": {"type": "string"}},
+    "execution_profile_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

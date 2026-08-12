@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/aggregate/1.0.0-wp2b1",
+  "title": "Behavioral Eval Runner case aggregate (WP-2B-1)",
+  "description": "Case-level aggregate: three-valued verdict + versioned blocker + orthogonal quarantine metadata. PASS/FAIL require derived_from_executed_quorum; quarantine never erases latest_aggregate_verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_uid", "aggregate_verdict", "aggregate_blocker", "schema_version"],
+  "properties": {
+    "case_uid": {"type": "string", "pattern": "^[^:]+::(behavior_eval|trigger_eval|conversation_suite)::[^:]+::[0-9a-f]{64}$"},
+    "aggregate_verdict": {"enum": ["PASS", "FAIL", "INCONCLUSIVE"]},
+    "aggregate_blocker": {"enum": ["NONE", "ERROR", "JUDGE_ERROR", "INSUFFICIENT_ATTEMPTS", "PRECHECK_EXCLUDED", "BUDGET_EXHAUSTED", "NOT_SELECTED"]},
+    "execution_degraded": {"type": "boolean"},
+    "reason_code": {
+      "anyOf": [
+        {"type": "null"},
+        {"enum": ["AMBIGUOUS_ACTIVATION", "MISSING_PREREQUISITE", "MISSING_FIXTURE", "FIXTURE_SETUP_FAILED", "INCOMPATIBLE_INVOCATION_MODE", "UNJUDGEABLE_ASSERTION", "BUDGET_CAP", "EVIDENCE_INTEGRITY_FAILURE", "LIVE_DISPATCH_DISABLED", "NOT_SELECTED"]}
+      ]
+    },
+    "wins": {"type": "integer", "minimum": 0},
+    "attempts_planned": {"type": "integer", "minimum": 0},
+    "attempts_run": {"type": "integer", "minimum": 0},
+    "derived_from_executed_quorum": {"type": "boolean"},
+    "quarantine_status": {"enum": ["ACTIVE", "INACTIVE"]},
+    "latest_aggregate_verdict": {"anyOf": [{"type": "null"}, {"enum": ["PASS", "FAIL", "INCONCLUSIVE"]}]},
+    "latest_aggregate_blocker": {"anyOf": [{"type": "null"}, {"enum": ["NONE", "ERROR", "JUDGE_ERROR", "INSUFFICIENT_ATTEMPTS", "PRECHECK_EXCLUDED", "BUDGET_EXHAUSTED", "NOT_SELECTED"]}]},
+    "quarantine_reason": {"type": ["string", "null"]},
+    "quarantine_since": {"type": ["string", "null"]},
+    "waiver_ref": {"type": ["string", "null"]},
+    "schema_version": {"const": "1.0.0-wp2b1"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"aggregate_verdict": {"enum": ["PASS", "FAIL"]}}},
+      "then": {
+        "properties": {
+          "aggregate_blocker": {"const": "NONE"},
+          "derived_from_executed_quorum": {"const": true}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"aggregate_verdict": {"const": "INCONCLUSIVE"}}},
+      "then": {"properties": {"aggregate_blocker": {"not": {"const": "NONE"}}}}
+    }
+  ]
+}
