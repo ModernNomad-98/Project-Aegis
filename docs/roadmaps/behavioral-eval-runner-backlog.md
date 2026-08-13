@@ -2474,7 +2474,7 @@ model call, and evidence artifact.
   effective only after the reviewed PR containing BER-DEC-007 is manually merged.
 - **Owner:** Peter Nguyen
 - **Repository:** `ModernNomad-98/Project-Aegis`
-- **Authorization PR:** AUTHORIZATION_PR_PENDING
+- **Authorization PR:** [#84](https://github.com/ModernNomad-98/Project-Aegis/pull/84)
 - **Evidence basis:**
   - WP-2B-1 DONE — [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83), merge
     commit `72e74af6f0183fef25e353ec2bf3a851d83b5df6` (offline runner core + minimum
