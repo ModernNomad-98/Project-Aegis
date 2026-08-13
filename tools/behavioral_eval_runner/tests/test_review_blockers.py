@@ -27,6 +27,8 @@ from tools.behavioral_eval_runner.enums import (
 from tools.behavioral_eval_runner.errors import (
     MaterializationError,
     ProcessControlError,
+    ProfileError,
+    ReparsePointError,
 )
 from tools.behavioral_eval_runner.execution_profile import (
     REQUIRED_FOR_BASELINE,
@@ -394,6 +396,214 @@ class TestTrustedTaskkill(unittest.TestCase):
             ):
                 with self.assertRaises(ProcessControlError):
                     _trusted_taskkill_path()
+
+
+# =============================================================== Fresh finding A
+class TestExecutionProfileDerivedClaims(unittest.TestCase):
+    """A: from_dict must reject supplied derived fields that disagree with the
+    authoritative recomputation, not silently discard them."""
+
+    def _unsafe_serialized(self) -> dict:
+        base = synthetic_isolated_profile().to_dict(include_derived=False)
+        base["permission_policy"] = "allow-all"  # not an approved isolated state
+        prof = ExecutionProfile.from_dict(base)
+        self.assertFalse(prof.baseline_eligible)  # authoritative truth = False
+        payload = prof.to_dict(include_derived=True)
+        return payload
+
+    def test_fabricated_baseline_eligible_rejected(self) -> None:
+        payload = self._unsafe_serialized()
+        payload["baseline_eligible"] = True  # contradicts recomputed False
+        payload["baseline_ineligibility_reasons"] = []
+        with self.assertRaises(ProfileError):
+            ExecutionProfile.from_dict(payload)
+
+    def test_fabricated_hash_rejected(self) -> None:
+        payload = synthetic_isolated_profile().to_dict(include_derived=True)
+        payload["execution_profile_hash"] = "0" * 64
+        with self.assertRaises(ProfileError):
+            ExecutionProfile.from_dict(payload)
+
+    def test_matching_derived_fields_accepted(self) -> None:
+        payload = synthetic_isolated_profile().to_dict(include_derived=True)
+        prof = ExecutionProfile.from_dict(payload)  # must not raise
+        self.assertTrue(prof.baseline_eligible)
+
+
+# =============================================================== Fresh finding B
+class TestMaterializationRecordClaimBinding(TestMaterializationManifestIntegrity):
+    """B: verification must recompute the record's derivable claims from the
+    verified file sets and enforce cross-field invariants, not trust them."""
+
+    def test_inflated_materialized_skill_count_rejected(self) -> None:
+        bad = replace(self.record, materialized_skill_count=999)
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_inflated_subagent_count_rejected(self) -> None:
+        bad = replace(self.record, subagent_count=999)
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_false_baseline_eligible_with_ambiguity_rejected(self) -> None:
+        bad = replace(
+            self.record, ambiguous_excluded=("x/ambiguous.bin",), baseline_eligible=True
+        )
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_partial_install_claiming_baseline_eligible_rejected(self) -> None:
+        bad = replace(
+            self.record,
+            claim_scope=ClaimScope.PARTIAL_INSTALL,
+            baseline_eligible=True,
+        )
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+
+# =============================================================== Fresh finding D
+class TestEnumerationFailsClosed(TestMaterializationManifestIntegrity):
+    """D: an os.walk/scandir enumeration failure must fail closed, never be
+    silently skipped (which would omit an extra unlisted subtree)."""
+
+    def test_walk_error_is_fail_closed(self) -> None:
+        import tools.behavioral_eval_runner.materialize as materialize_module
+
+        real_walk = os.walk
+
+        def exploding_walk(top, topdown=True, onerror=None, followlinks=False):
+            # Simulate an unreadable subtree: the real walk yields the top, then
+            # a scandir error occurs on a child that os.walk reports via onerror.
+            yielded = False
+            for entry in real_walk(top, topdown=topdown, onerror=onerror, followlinks=followlinks):
+                yield entry
+                if not yielded and onerror is not None:
+                    err = OSError("simulated scandir permission error")
+                    err.filename = os.path.join(top, "unreadable-subtree")
+                    onerror(err)
+                yielded = True
+
+        with mock.patch.object(materialize_module.os, "walk", exploding_walk):
+            with self.assertRaises(MaterializationError) as ctx:
+                verify_materialization_manifests(self.root, self.record)
+        self.assertIn("enumerat", str(ctx.exception).lower())
+
+
+# =============================================================== Fresh finding F
+class TestManifestPathsPortability(TestMaterializationManifestIntegrity):
+    """F: the schema-governed record must not carry operator-local absolute
+    manifest paths (privacy) and must satisfy its additionalProperties:false
+    schema."""
+
+    def test_to_dict_omits_absolute_manifest_paths(self) -> None:
+        payload = self.record.to_dict()
+        # No operator-local absolute path may leak into the portable record.
+        blob = json.dumps(payload)
+        self.assertNotIn(self.root.replace("\\", "/"), blob)
+        self.assertNotIn(":\\", blob)  # windows drive-absolute
+        self.assertNotIn("manifest_paths", payload)
+
+    def test_to_dict_keys_subset_of_schema(self) -> None:
+        schema_path = os.path.join(
+            os.path.dirname(materialize_schema_dir()),
+            "schemas",
+            "materialization.schema.json",
+        )
+        with open(schema_path, encoding="utf-8") as handle:
+            schema = json.load(handle)
+        self.assertFalse(schema.get("additionalProperties", True))
+        allowed = set(schema["properties"])
+        self.assertTrue(
+            set(self.record.to_dict()).issubset(allowed),
+            f"record emits keys outside the schema: {set(self.record.to_dict()) - allowed}",
+        )
+
+
+def materialize_schema_dir() -> str:
+    import tools.behavioral_eval_runner.materialize as m
+
+    return m.__file__
+
+
+# =============================================================== Fresh finding C
+class TestMaterializationWriteReparse(unittest.TestCase):
+    """C (concrete gap): every write, INCLUDING the persisted-manifest writes,
+    must go through the reparse-checked write path. The residual cross-platform
+    TOCTOU window is documented as a platform non-claim, not silently claimed."""
+
+    def test_write_file_refuses_symlinked_parent(self) -> None:
+        from tools.behavioral_eval_runner.materialize import _write_file
+
+        with tempfile.TemporaryDirectory() as root:
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+            link_parent = os.path.join(root, "dest", "nested")
+            os.makedirs(os.path.join(root, "dest"))
+            try:
+                os.symlink(outside, link_parent, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink creation unavailable")
+            with self.assertRaises(ReparsePointError):
+                _write_file(os.path.join(root, "dest"), "nested/escaped.txt", b"x")
+
+    def test_manifest_writes_use_reparse_checked_path(self) -> None:
+        # The persisted-manifest writes must route through _write_file (not a
+        # raw open); assert by source inspection that materialize() no longer
+        # opens manifest targets with a bare open().
+        import inspect
+        import tools.behavioral_eval_runner.materialize as m
+
+        src = inspect.getsource(m.materialize)
+        self.assertNotIn('open(target, "wb")', src, "manifest write bypasses _write_file")
+
+
+# =============================================================== Fresh finding E
+class TestSupervisorDescendantCleanup(unittest.TestCase):
+    """E: the supervised session must clean up its process group even when the
+    leader exits normally (not only on timeout)."""
+
+    def test_cleanup_runs_on_normal_leader_exit(self) -> None:
+        from tools.behavioral_eval_runner.process_control import SessionWatchdog
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        finished = types.SimpleNamespace(pid=4321, poll=lambda: 0)
+        with mock.patch.object(
+            watchdog, "_terminate_session_group", return_value=None
+        ) as cleanup:
+            result = watchdog.supervise(finished)
+        self.assertIsNone(result)
+        cleanup.assert_called_once()
+
+    @unittest.skipUnless(os.name == "posix", "POSIX process-group semantics")
+    def test_posix_background_child_terminated_after_leader_exit(self) -> None:  # pragma: no cover - POSIX only
+        import subprocess
+        from tools.behavioral_eval_runner.process_control import (
+            SessionWatchdog,
+            popen_isolation_kwargs,
+        )
+
+        leader_src = (
+            "import subprocess,sys,os\n"
+            "c=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'])\n"
+            "print(c.pid, flush=True)\n"
+        )
+        proc = subprocess.Popen(
+            [sys.executable, "-c", leader_src],
+            stdout=subprocess.PIPE,
+            **popen_isolation_kwargs(),
+        )
+        child_pid = int(proc.stdout.readline().decode().strip())
+        SessionWatchdog(timeout_seconds=30).supervise(proc)
+        import time as _t
+
+        _t.sleep(0.5)
+        alive = True
+        try:
+            os.kill(child_pid, 0)
+        except ProcessLookupError:
+            alive = False
+        self.assertFalse(alive, "background child must be terminated after leader exit")
 
 
 if __name__ == "__main__":  # pragma: no cover

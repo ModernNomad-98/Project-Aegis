@@ -13,6 +13,16 @@ Each surface gets its own canonical manifest with per-file SHA-256. The
 materializer fails closed on hash/tree mismatch, ambiguous runtime files,
 path escapes, reparse points, role mismatch, and any partial surface used
 for a full-library claim. No model or agent is launched.
+
+Platform non-claim (Finding C): every write routes through ``_write_file``,
+which rechecks the reparse chain before and after parent creation, opens the
+leaf with ``O_CREAT|O_EXCL|O_NOFOLLOW`` (a real POSIX no-follow/exclusive
+guarantee), and re-verifies physical containment after writing. On Windows the
+stdlib has no ``O_NOFOLLOW``, so a reparse point planted in the final
+create->open window cannot be provably prevented in stdlib; a full Windows
+guarantee needs native no-follow handles (ctypes), out of WP-2B-1's stdlib-only
+scope. That residual is NOT claimed solved and is recorded as an owner decision
+in the implementation summary.
 """
 
 from __future__ import annotations
@@ -292,14 +302,55 @@ def _refuse_read_reparse(path: str, boundary_root: str) -> None:
 
 
 def _write_file(root: str, relative_path: str, content: bytes) -> None:
+    root_real = os.path.realpath(root)
     target = _safe_join(root, relative_path)
+    parent = os.path.dirname(target)
+    # Refuse a reparse point in the chain BEFORE creating parents...
     try:
-        refuse_reparse_chain(target, os.path.realpath(root))
+        refuse_reparse_chain(target, root_real)
     except UnsafePathError as exc:
         raise ReparsePointError(str(exc)) from exc
-    os.makedirs(os.path.dirname(target), exist_ok=True)
-    with open(target, "wb") as handle:
-        handle.write(content)
+    os.makedirs(parent, exist_ok=True)
+    # ...and again AFTER parent creation, immediately before opening the file,
+    # to narrow the create->open window (Finding C).
+    try:
+        refuse_reparse_chain(parent, root_real)
+    except UnsafePathError as exc:
+        raise ReparsePointError(str(exc)) from exc
+    # On POSIX, open the final component no-follow + exclusive-create so a
+    # symlink planted at the leaf cannot be followed and an existing target is
+    # never overwritten. O_NOFOLLOW/O_EXCL are POSIX guarantees; on Windows
+    # these flags are absent (0) and the residual leaf-race is a documented
+    # platform non-claim (see module docstring / summary — a full Windows
+    # guarantee needs native no-follow handles, out of WP-2B-1 scope).
+    open_flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    binary = getattr(os, "O_BINARY", 0)
+    try:
+        fd = os.open(target, open_flags | binary, 0o600)
+    except FileExistsError as exc:
+        raise MaterializationError(
+            f"refusing to overwrite an existing target {relative_path!r}"
+        ) from exc
+    except OSError as exc:
+        raise ReparsePointError(
+            f"could not open {relative_path!r} no-follow: {exc}"
+        ) from exc
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(content)
+    finally:
+        # Post-write containment recheck: if a race redirected the path, detect
+        # it and fail closed rather than trusting the write silently.
+        try:
+            refuse_reparse_chain(target, root_real)
+        except UnsafePathError as exc:
+            raise ReparsePointError(
+                f"reparse detected after writing {relative_path!r}: {exc}"
+            ) from exc
+    if os.path.commonpath([root_real, os.path.realpath(target)]) != root_real:
+        raise ReparsePointError(
+            f"{relative_path!r} resolved outside the destination after write"
+        )
 
 
 def _manifest(
@@ -376,9 +427,11 @@ class MaterializationRecord:
             "product_fixture_manifest_sha256": self.product_fixture_manifest_sha256,
             "baseline_eligible": self.baseline_eligible,
             "baseline_ineligibility_reasons": list(self.baseline_ineligibility_reasons),
-            "manifest_paths": {
-                k: v.replace("\\", "/") for k, v in self.manifest_paths.items()
-            },
+            # Finding F: `manifest_paths` holds operator-local ABSOLUTE paths.
+            # It is deliberately kept OUT of the schema-governed portable record
+            # (materialization.schema.json is additionalProperties:false) so no
+            # operator-private path leaks into committed/portable evidence. The
+            # paths remain available as an in-memory attribute for the verifier.
         }
 
 
@@ -411,9 +464,20 @@ def _enumerate_materialized_files(
     _refuse_read_reparse(area_root, destination_real)
     if not os.path.isdir(area_root):
         raise MaterializationError(f"missing materialized area {area_root!r}")
+
+    def _walk_failed(error: OSError) -> None:
+        # Finding D: an unreadable/undirable subtree must FAIL CLOSED, never be
+        # silently skipped — otherwise an extra unlisted subtree could be
+        # omitted from the on-disk comparison while verification reports the
+        # file set complete.
+        raise MaterializationError(
+            f"cannot enumerate materialized subtree "
+            f"{getattr(error, 'filename', area_root)!r}: {error}"
+        )
+
     found: set[str] = set()
     for current, directories, files in os.walk(
-        area_root, topdown=True, followlinks=False
+        area_root, topdown=True, onerror=_walk_failed, followlinks=False
     ):
         _refuse_read_reparse(current, destination_real)
         for name in list(directories):
@@ -588,6 +652,66 @@ def verify_materialization_manifests(
             "sha256": expected_hash,
             "files_verified": len(listed),
         }
+
+    # Finding B: recompute the record's DERIVABLE claims from the verified
+    # runtime-surface file set and enforce the cross-field invariants, so a
+    # caller-supplied record cannot publish a false workspace_role / claim_scope
+    # / count / ambiguity / baseline_eligible through a self-consistent bundle.
+    runtime_files = [
+        entry["path"]
+        for entry in expected_record.runtime_surface_manifest.get("files", [])
+    ]
+    materialized_skills = {
+        path[len(SKILLS_PREFIX):].split("/", 1)[0]
+        for path in runtime_files
+        if path.startswith(SKILLS_PREFIX)
+        and path[len(SKILLS_PREFIX):].partition("/")[2] == "SKILL.md"
+    }
+    subagents = {
+        path[len(AGENTS_PREFIX):].removesuffix(".md")
+        for path in runtime_files
+        if path.startswith(AGENTS_PREFIX) and path.endswith(".md")
+    }
+    if expected_record.materialized_skill_count != len(materialized_skills):
+        raise MaterializationError(
+            f"record materialized_skill_count "
+            f"{expected_record.materialized_skill_count} != recomputed "
+            f"{len(materialized_skills)} from the verified runtime surface"
+        )
+    if expected_record.subagent_count != len(subagents):
+        raise MaterializationError(
+            f"record subagent_count {expected_record.subagent_count} != "
+            f"recomputed {len(subagents)} from the verified runtime surface"
+        )
+    if expected_record.shipped_skill_count < expected_record.materialized_skill_count:
+        raise MaterializationError(
+            "record shipped_skill_count is below materialized_skill_count"
+        )
+    # claim_scope <-> profile invariant.
+    partial = expected_record.claim_scope is ClaimScope.PARTIAL_INSTALL
+    if partial != (
+        expected_record.profile is MaterializationProfile.CONSUMER_PARTIAL_INSTALL
+    ):
+        raise MaterializationError(
+            "record claim_scope and materialization profile are inconsistent"
+        )
+    # workspace_role <-> profile invariant.
+    source_role = expected_record.workspace_role is WorkspaceRole.SOURCE_LIBRARY
+    if source_role != (
+        expected_record.profile is MaterializationProfile.SOURCE_LIBRARY
+    ):
+        raise MaterializationError(
+            "record workspace_role and materialization profile are inconsistent"
+        )
+    # baseline_eligible invariant: ineligible iff partial_install OR any ambiguity.
+    derived_baseline_eligible = not (partial or bool(expected_record.ambiguous_excluded))
+    if expected_record.baseline_eligible != derived_baseline_eligible:
+        raise MaterializationError(
+            f"record baseline_eligible {expected_record.baseline_eligible} != "
+            f"derived {derived_baseline_eligible} (partial_install or ambiguity "
+            "makes a run baseline-ineligible)"
+        )
+    result["record_claims_verified"] = True
     return result
 
 
@@ -768,8 +892,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     fixture_manifest["fixture_id"] = request.fixture.fixture_id
     fixture_manifest["fixture_version"] = request.fixture.fixture_version
 
-    manifest_dir = os.path.join(request.destination_root, "materialization_manifests")
-    os.makedirs(manifest_dir, exist_ok=True)
     manifest_files = {
         "control_plane_manifest.json": control_manifest,
         "runtime_surface_manifest.json": runtime_manifest,
@@ -777,10 +899,11 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     }
     manifest_paths: dict[str, str] = {}
     for name, body in manifest_files.items():
-        target = os.path.join(manifest_dir, name)
-        with open(target, "wb") as handle:
-            handle.write(canonical_bytes(body))
-        manifest_paths[name] = target
+        # Finding C: the persisted-manifest writes route through the SAME
+        # reparse-checked write path as every surface write — no raw open().
+        relative = f"materialization_manifests/{name}"
+        _write_file(request.destination_root, relative, canonical_bytes(body))
+        manifest_paths[name] = _safe_join(request.destination_root, relative)
 
     ineligibility: list[str] = []
     if request.claim_scope is ClaimScope.PARTIAL_INSTALL:

@@ -8,6 +8,12 @@ Platform-specific, standard-library-only process-tree termination:
 
 Tests use controlled synthetic child processes spawned by the tests
 themselves; nothing here touches unrelated processes.
+
+Platform non-claim (Finding E): the supervised-session cleanup terminates the
+retained process group at every exit — a genuine POSIX guarantee. On Windows,
+reliably reaping descendants after the leader PID has exited requires a native
+Job Object (ctypes), which is out of WP-2B-1's stdlib-only scope and is NOT
+claimed here; it is recorded as an owner decision in the implementation summary.
 """
 
 from __future__ import annotations
@@ -220,15 +226,57 @@ class SessionWatchdog:
 
     def __init__(self, timeout_seconds: float) -> None:
         self.controller = TimeoutController(timeout_seconds)
+        self._session_pgid: int | None = None
+
+    def _capture_session_group(self, process: subprocess.Popen) -> None:
+        """Record the session/process-group id WHILE the leader is still alive.
+
+        Finding E: the group identity must be retained independently of the
+        leader PID so descendants can be reaped even after the leader exits.
+        """
+        if sys.platform == "win32":
+            return
+        try:
+            self._session_pgid = os.getpgid(process.pid)
+        except (ProcessLookupError, OSError):
+            self._session_pgid = None
+
+    def _terminate_session_group(self, process: subprocess.Popen) -> None:
+        """Best-effort termination of the whole supervised session at exit.
+
+        POSIX: SIGKILL the retained process group (never the runner's own
+        group). Windows: taskkill the tree WHILE the leader is still pollable;
+        once the leader has exited, reliably reaping surviving descendants
+        requires a native Job Object (out of WP-2B-1 stdlib scope) — this is a
+        documented platform NON-CLAIM, not a fabricated guarantee.
+        """
+        if sys.platform == "win32":
+            if process.poll() is None:
+                try:
+                    kill_process_tree(process.pid)
+                except ProcessControlError:
+                    pass
+            return
+        pgid = self._session_pgid
+        if pgid is None or pgid == os.getpgid(0):
+            return  # never signal the runner's own group
+        try:
+            os.killpg(pgid, signal.SIGKILL)
+        except (ProcessLookupError, OSError):
+            pass
 
     def supervise(self, process: subprocess.Popen) -> KillResult | None:
-        """Wait for ``process``; on deadline expiry, kill its whole tree.
+        """Wait for ``process``; clean up the whole session at EVERY exit.
 
-        Returns the KillResult when an emergency kill fired, else None.
+        Returns the KillResult when an emergency kill fired, else None. On a
+        normal leader exit the session group is still cleaned up so a
+        background descendant cannot survive (Finding E).
         """
+        self._capture_session_group(process)
         poll_interval = min(0.05, self.controller.limit_seconds / 10)
         while True:
             if process.poll() is not None:
+                self._terminate_session_group(process)
                 return None
             if self.controller.expired():
                 result = kill_process_tree(process.pid)
@@ -238,5 +286,6 @@ class SessionWatchdog:
                     raise ProcessControlError(
                         f"process {process.pid} survived emergency kill"
                     ) from exc
+                self._terminate_session_group(process)
                 return result
             time.sleep(poll_interval)

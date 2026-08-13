@@ -139,13 +139,15 @@ validator self-tests, `validate-skills`, and DCO. The runner unit-test suite bel
 locally and reported as evidence, not as a GitHub CI result.
 
 - Test command: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
-- Test methods: **295**; result: **OK (295 passed, 0 failed, 0 errors)** — after the
-  Group A–E hardening pass.
+- Test methods: **347**; result: **OK (347 passed, 0 failed, 1 skipped [POSIX-only], 0 errors)**
+  — after the exact-code reconciliation pass (§9a) on top of the Group A–E hardening.
 - **Runner test platform actually run:** Windows (win32), CPython 3.14. A POSIX runtime run
   is reported **UNRUN**: no general-purpose WSL/POSIX Python environment is available in
   this environment and installing one is out of scope; no POSIX test pass is claimed. The
-  POSIX-specific `killpg` same-group refusal and `popen_isolation_kwargs()` isolation are
-  covered by code and by Windows-side tests, but their POSIX runtime path was not exercised.
+  POSIX-specific `killpg` same-group refusal, `popen_isolation_kwargs()` isolation, the
+  process-group session cleanup, and the `O_NOFOLLOW` leaf-write guarantee are covered by
+  code and by Windows-side tests, but their POSIX runtime path was not exercised (the one
+  skipped test is the POSIX background-child-cleanup case).
 - Runner self-check: `python -m tools.behavioral_eval_runner self-check` ⇒ **PASS**
   (8/8 checks: enum closure, canonical stability, identity behavior, adapter denial,
   schema/code enum agreement, no-forbidden-source AST scan, real-host capability honesty,
@@ -276,7 +278,67 @@ these fixes, each pinned by a test:
   bool/NaN/±inf/zero/negative; Windows `taskkill` resolved only from an absolute,
   reparse-checked System32 path (no PATH fallback).
 
+### 9a. Exact-code reconciliation pass (PR #83 third commit)
+
+A ChatGPT/Codex control-layer session pushed candidate commit `bd63d0a6`
+(`fix: close PR83 exact-code review blockers`) directly onto the PR branch. That candidate
+correctly fixed the original taskkill-environment finding (System32 resolved from the HKLM
+registry, not `SystemRoot`/`windir`), the baseline-eligibility unsafe-observed-value finding
+(a per-field approved-isolated-state allowlist), and much of the self-certifying-manifest
+finding (file-set binding to the record's manifest hashes). Those parts were **kept**. This
+pass reconciled the six **fresh** Codex P1 findings raised against `bd63d0a6`, each
+reproduced with a failing test first (`tests/test_review_blockers.py`):
+
+- **A — derived execution-profile claims (CONFIRMED, fixed):** `ExecutionProfile.from_dict`
+  now compares every supplied derived field (`baseline_eligible`,
+  `baseline_ineligibility_reasons`, `execution_profile_hash`) against the authoritative
+  recomputation and rejects any mismatch, instead of silently discarding them.
+- **B — materialization record claims (CONFIRMED, fixed):** `verify_materialization_manifests`
+  now recomputes `materialized_skill_count` and `subagent_count` from the verified
+  runtime-surface file set and enforces the cross-field invariants
+  (`claim_scope`↔profile, `workspace_role`↔profile, `shipped_skill_count ≥
+  materialized_skill_count`, and `baseline_eligible` ⇔ not (partial_install or any
+  ambiguity)) — a caller-supplied record can no longer publish false counts/scope/eligibility.
+- **D — directory enumeration (CONFIRMED, fixed):** the on-disk enumeration passes an
+  `onerror` handler to `os.walk` that converts every traversal failure into a fail-closed
+  `MaterializationError`, so an unreadable extra subtree can never be silently omitted.
+- **F — manifest_paths schema contract (CONFIRMED, fixed):** the operator-local ABSOLUTE
+  `manifest_paths` are removed from the schema-governed `MaterializationRecord.to_dict()`
+  (kept as an in-memory attribute for the verifier), so the CLI record satisfies its
+  `additionalProperties:false` schema and no operator-private path leaks into portable
+  evidence.
+- **C — reparse/TOCTOU write window (CONFIRMED, PARTIALLY fixed — owner decision):** the
+  persisted-manifest writes now route through the same reparse-checked `_write_file` as
+  every surface write (the previously unchecked raw `open()` gap is closed); `_write_file`
+  rechecks the reparse chain before and after parent creation, opens the leaf with
+  `O_CREAT|O_EXCL|O_NOFOLLOW` (a genuine POSIX no-follow/exclusive-create guarantee), and
+  re-verifies physical containment after writing. **Residual platform non-claim:** on
+  Windows the stdlib has no `O_NOFOLLOW`, so a symlink/junction planted in the final
+  create→open window cannot be provably prevented in stdlib; a full Windows guarantee needs
+  native no-follow handles (`CreateFileW` + `FILE_FLAG_OPEN_REPARSE_POINT` via ctypes),
+  which is outside WP-2B-1's stdlib-only scope. This residual is **not** claimed solved.
+- **E — descendants after leader exit (CONFIRMED, PARTIALLY fixed — owner decision):**
+  `SessionWatchdog` now captures the session process-group id while the leader is alive and
+  terminates that group at **every** supervise exit (normal or timeout), not only on
+  timeout — a genuine POSIX guarantee that a background descendant is reaped after the
+  leader exits. **Residual platform non-claim:** on Windows, once the leader PID is gone,
+  reliably reaping surviving descendants requires a native **Job Object** (ctypes), outside
+  WP-2B-1's stdlib-only scope. The POSIX guarantee was not executed here (no POSIX
+  interpreter available) and is reported UNRUN; the Windows residual is **not** claimed
+  solved.
+
 ## 10. Owner decisions required at implementation review
+
+- Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
+- Ratify, revise, or defer the proposed OD-3 risk-class assignments and CRITICAL category.
+- Accept or reject the WP-2B-1 implementation as satisfying the offline scope.
+- **(New) Finding C — Windows reparse/TOCTOU write-race:** decide whether to accept the
+  documented stdlib residual (POSIX `O_NOFOLLOW` + rechecks + post-write containment) with
+  the Windows leaf-race as a non-claim, or authorize native no-follow handles (ctypes) in a
+  later phase. WP-2B-1 does not add native FFI.
+- **(New) Finding E — Windows descendant cleanup after leader exit:** decide whether to
+  accept the POSIX process-group guarantee with the Windows residual as a non-claim, or
+  authorize native Windows Job Objects (ctypes) in a later phase.
 
 - Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
 - Ratify, revise, or defer the proposed OD-3 risk-class assignments and CRITICAL category.

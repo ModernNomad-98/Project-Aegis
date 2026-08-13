@@ -172,6 +172,28 @@ class ExecutionProfile:
             raise ProfileError(f"ExecutionProfile: unknown keys {sorted(unknown)}")
         profile = cls(**{k: v for k, v in payload.items() if k in field_names})
         profile.validate()
+        # Finding A: supplied derived fields are NOT silently discarded — each
+        # is compared against the authoritative recomputation and any mismatch
+        # is rejected, so a serialized record cannot claim a false
+        # baseline_eligible / reasons / hash.
+        if "baseline_eligible" in payload and payload["baseline_eligible"] != profile.baseline_eligible:
+            raise ProfileError(
+                f"supplied baseline_eligible={payload['baseline_eligible']!r} does "
+                f"not match the recomputed value {profile.baseline_eligible!r}"
+            )
+        if "baseline_ineligibility_reasons" in payload and list(
+            payload["baseline_ineligibility_reasons"]
+        ) != list(profile.baseline_ineligibility_reasons()):
+            raise ProfileError(
+                "supplied baseline_ineligibility_reasons do not match the "
+                "recomputed reasons"
+            )
+        if "execution_profile_hash" in payload and payload[
+            "execution_profile_hash"
+        ] != profile.profile_hash:
+            raise ProfileError(
+                "supplied execution_profile_hash does not match the recomputed hash"
+            )
         return profile
 
 
