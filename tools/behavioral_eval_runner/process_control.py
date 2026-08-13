@@ -22,6 +22,11 @@ import time
 from dataclasses import dataclass
 
 from .errors import ProcessControlError
+from .pathsafe import (
+    UnsafePathError,
+    refuse_reparse_ancestors,
+    refuse_reparse_chain,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,16 +70,76 @@ def _validate_pid(pid: int) -> int:
     return pid
 
 
+def _windows_system_directory() -> str:
+    """Resolve System32 from the machine HKLM registry, never environment.
+
+    ``SystemRoot``/``windir`` are caller-controlled process environment and are
+    therefore not trust anchors. The machine-level Windows NT ``SystemRoot``
+    value is read from HKLM using the 64-bit view, and expandable-string values
+    are refused so environment substitution cannot re-enter the path.
+    """
+    if sys.platform != "win32":
+        raise ProcessControlError(
+            "Windows system directory requested on a non-Windows host"
+        )
+    try:
+        import winreg
+
+        access = winreg.KEY_READ | getattr(winreg, "KEY_WOW64_64KEY", 0)
+        with winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            r"SOFTWARE\Microsoft\Windows NT\CurrentVersion",
+            0,
+            access,
+        ) as key:
+            system_root, value_type = winreg.QueryValueEx(key, "SystemRoot")
+        if value_type != winreg.REG_SZ:
+            raise ProcessControlError(
+                f"SystemRoot registry value has unsafe type {value_type!r}"
+            )
+    except ProcessControlError:
+        raise
+    except (ImportError, OSError) as exc:
+        raise ProcessControlError(
+            f"cannot resolve Windows system directory from HKLM: {exc}"
+        ) from exc
+    if (
+        not isinstance(system_root, str)
+        or not system_root
+        or not os.path.isabs(system_root)
+    ):
+        raise ProcessControlError(
+            f"registry SystemRoot is not an absolute path: {system_root!r}"
+        )
+    return os.path.normpath(os.path.join(system_root, "System32"))
+
+
 def _trusted_taskkill_path() -> str:
-    """E9: resolve taskkill ONLY from an absolute System32 path, verified not a
-    reparse point. Never fall back to a PATH-resolved binary (which the current
-    directory could shadow); fail closed when it cannot be established."""
-    system_root = os.environ.get("SystemRoot") or os.environ.get("windir") or r"C:\Windows"
-    taskkill = os.path.join(system_root, "System32", "taskkill.exe")
+    """Resolve taskkill only from the OS-established System32 directory.
+
+    The entire System32 ancestor chain and the final executable path are
+    reparse-checked. There is no environment or PATH fallback; inability to
+    establish the trusted path fails closed.
+    """
+    system_directory = _windows_system_directory()
+    try:
+        refuse_reparse_ancestors(system_directory)
+    except UnsafePathError as exc:
+        raise ProcessControlError(
+            f"Windows system directory is reparse-unsafe: {exc}"
+        ) from exc
+
+    taskkill = os.path.join(system_directory, "taskkill.exe")
+    try:
+        refuse_reparse_chain(taskkill, system_directory)
+    except UnsafePathError as exc:
+        raise ProcessControlError(
+            f"trusted taskkill path is reparse-unsafe: {exc}"
+        ) from exc
     if not os.path.isabs(taskkill) or not os.path.isfile(taskkill):
         raise ProcessControlError(
-            f"trusted taskkill.exe not found at {taskkill!r}; refusing a "
-            "PATH-resolved fallback (fail closed)"
+            f"trusted taskkill.exe not found at {taskkill!r}; refusing "
+            "environment/PATH fallback (fail closed)"
         )
     info = os.lstat(taskkill)
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)

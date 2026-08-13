@@ -132,12 +132,12 @@ class TestMaterializationCensus(unittest.TestCase):
             ):
                 self.assertIn(name, record.manifest_paths)
                 self.assertTrue(os.path.exists(record.manifest_paths[name]))
-            result = verify_materialization_manifests(dest)
+            result = verify_materialization_manifests(dest, record)
             self.assertTrue(result["verified"])
 
     def test_manifest_verification_fails_on_tamper(self) -> None:
         with tempfile.TemporaryDirectory() as dest:
-            materialize(_full_request(dest))
+            record = materialize(_full_request(dest))
             # Tamper a materialized runtime file after manifest write.
             skill_md = os.path.join(
                 dest, "runtime_surface", ".claude", "skills", "skill-a", "SKILL.md"
@@ -145,7 +145,7 @@ class TestMaterializationCensus(unittest.TestCase):
             with open(skill_md, "ab") as fh:
                 fh.write(b" TAMPERED")
             with self.assertRaises(MaterializationError):
-                verify_materialization_manifests(dest)
+                verify_materialization_manifests(dest, record)
 
     def test_control_plane_manifest_not_under_runtime_root(self) -> None:
         with tempfile.TemporaryDirectory() as dest:

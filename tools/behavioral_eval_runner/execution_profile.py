@@ -9,6 +9,7 @@ any required unknown/unisolatable value makes the record
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, fields
 from typing import Any, Mapping
 
@@ -41,12 +42,36 @@ REQUIRED_FOR_BASELINE = (
     "auto_update_state",
 )
 
-#: auto_memory_state values compatible with a baseline-eligible run.
-_BASELINE_SAFE_MEMORY_STATES = frozenset(
-    {"disabled", "isolated", "deterministically_empty"}
+#: WP-2B-1 is an OFFLINE synthetic runner. A baseline-eligible runtime must be
+#: an explicitly pinned synthetic runtime; an arbitrary observed host version
+#: is evidence, but is not isolated baseline evidence in this phase.
+_BASELINE_SAFE_RUNTIME_VERSION = re.compile(
+    r"^synthetic-[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"
 )
-#: auto_update_state values compatible with a baseline-eligible run.
-_BASELINE_SAFE_AUTO_UPDATE = frozenset({"pinned", "disabled"})
+
+#: Explicit isolated states accepted for every other baseline-critical field.
+#: Values outside these sets remain representable as observed evidence, but
+#: they make the profile baseline-ineligible. This prevents a non-empty string
+#: such as ``allow-all``/``global``/``unrestricted`` from being treated as safe.
+_BASELINE_SAFE_VALUES: Mapping[str, frozenset[str]] = {
+    "managed_settings_status": frozenset({"absent", "pinned"}),
+    "user_settings_status": frozenset({"absent", "suppressed"}),
+    "project_settings_status": frozenset({"pinned"}),
+    "local_settings_status": frozenset({"absent"}),
+    "claude_md_scopes": frozenset({"none", "project-only"}),
+    "auto_memory_state": frozenset(
+        {"disabled", "isolated", "deterministically_empty"}
+    ),
+    "user_skill_scope": frozenset({"none", "suppressed"}),
+    "project_skill_scope": frozenset({"none", "pinned-manifest"}),
+    "subagent_scope": frozenset({"none", "pinned-manifest"}),
+    "plugin_scope": frozenset({"none", "pinned-manifest"}),
+    "hook_scope": frozenset({"none", "pinned-manifest"}),
+    "mcp_scope": frozenset({"none", "pinned-manifest"}),
+    "permission_policy": frozenset({"deny-by-default"}),
+    "sandbox_tool_policy": frozenset({"isolated", "synthetic-mock"}),
+    "auto_update_state": frozenset({"pinned", "disabled"}),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,25 +123,24 @@ class ExecutionProfile:
             f"{name} is {getattr(self, name)}" for name in self.unobserved_fields()
         ]
         if (
-            self.auto_memory_state not in _SENTINELS
-            and self.auto_memory_state not in _BASELINE_SAFE_MEMORY_STATES
+            self.runtime_version not in _SENTINELS
+            and _BASELINE_SAFE_RUNTIME_VERSION.fullmatch(self.runtime_version) is None
         ):
             reasons.append(
-                f"auto_memory_state {self.auto_memory_state!r} is not "
-                "disabled/isolated/deterministically_empty"
+                f"runtime_version {self.runtime_version!r} is not an approved "
+                "pinned synthetic runtime"
             )
-        if (
-            self.auto_update_state not in _SENTINELS
-            and self.auto_update_state not in _BASELINE_SAFE_AUTO_UPDATE
-        ):
-            reasons.append(
-                f"auto_update_state {self.auto_update_state!r} is not pinned/disabled"
-            )
+        for name, allowed in _BASELINE_SAFE_VALUES.items():
+            value = getattr(self, name)
+            if value not in _SENTINELS and value not in allowed:
+                reasons.append(
+                    f"{name} {value!r} is not an approved isolated state"
+                )
         return tuple(reasons)
 
     @property
     def baseline_eligible(self) -> bool:
-        """Eligible only when every required value is observed AND isolatable."""
+        """Eligible only when every required value is observed AND isolated."""
         return not self.baseline_ineligibility_reasons()
 
     @property

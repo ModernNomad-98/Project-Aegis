@@ -84,6 +84,7 @@ _PROFILE_INCLUDES_SUBAGENTS = {
 
 
 _HEX40 = frozenset("0123456789abcdef")
+_HEX64 = frozenset("0123456789abcdef")
 
 
 def is_full_sha(value: str) -> bool:
@@ -195,8 +196,6 @@ class GitSnapshot(SnapshotSource):
 
     def files(self) -> dict[str, bytes]:
         if self._files is None:
-            # source_commit is a verified 40-char hex SHA (never option-shaped);
-            # --end-of-options additionally forbids it being read as a flag.
             tar_bytes = _run_git(
                 self.repo_path,
                 ["archive", "--format=tar", "--end-of-options", self.source_commit],
@@ -215,8 +214,6 @@ class GitSnapshot(SnapshotSource):
                         continue
                     extracted[member.name] = handle.read()
             self._files = extracted
-        # C6: return an immutable view — a caller mutation can never alter the
-        # verified internal mapping used by later materialization/census.
         return MappingProxyType(self._files)
 
 
@@ -234,7 +231,6 @@ class SyntheticSnapshot(SnapshotSource):
         self.source_tree = source_tree
 
     def files(self) -> Mapping[str, bytes]:
-        # C6: immutable view over the internal mapping.
         return MappingProxyType(self._files)
 
 
@@ -287,11 +283,16 @@ def _safe_join(root: str, relative_path: str) -> str:
         raise PathEscapeError(str(exc)) from exc
 
 
+def _refuse_read_reparse(path: str, boundary_root: str) -> None:
+    """Refuse a reparse point immediately before a verification read."""
+    try:
+        refuse_reparse_chain(path, boundary_root)
+    except UnsafePathError as exc:
+        raise ReparsePointError(str(exc)) from exc
+
+
 def _write_file(root: str, relative_path: str, content: bytes) -> None:
     target = _safe_join(root, relative_path)
-    # Refuse any reparse point planted BELOW the root before writing: a
-    # pre-existing junction inside the destination must never redirect the
-    # write outside the containment root.
     try:
         refuse_reparse_chain(target, os.path.realpath(root))
     except UnsafePathError as exc:
@@ -311,7 +312,7 @@ def _manifest(
         {"path": path, "bytes": len(content), "sha256": sha256_hex(content)}
         for path, content in sorted(entries.items())
     ]
-    manifest = {
+    return {
         "schema_version": SCHEMA_VERSION,
         "manifest_kind": kind,
         "source_commit": snapshot.source_commit,
@@ -320,15 +321,10 @@ def _manifest(
         "file_count": len(files),
         "files": files,
     }
-    return manifest
 
 
 def discover_shipped_skills(snapshot_files: Mapping[str, bytes]) -> list[str]:
-    """Every shipped skill at the snapshot, ``_template`` excluded.
-
-    C2: a shipped skill is a directory that actually contains ``SKILL.md`` —
-    a directory holding only a supporting file is NOT a valid shipped skill.
-    """
+    """Every shipped skill at the snapshot, ``_template`` excluded."""
     names: set[str] = set()
     for path in snapshot_files:
         if path.startswith(SKILLS_PREFIX):
@@ -386,65 +382,211 @@ class MaterializationRecord:
         }
 
 
-#: Where each manifest's listed files physically live, by manifest kind.
-_MANIFEST_AREA = {
-    "authored_eval_corpus": "control_plane",
-    "sanitized_runtime_surface": "runtime_surface",
-    "product_fixture": "product_fixture",
+_MANIFEST_SPECS = {
+    "control_plane_manifest.json": (
+        "authored_eval_corpus",
+        "control_plane",
+        "control_plane_manifest_sha256",
+        "control_plane_manifest",
+    ),
+    "runtime_surface_manifest.json": (
+        "sanitized_runtime_surface",
+        "runtime_surface",
+        "runtime_surface_manifest_sha256",
+        "runtime_surface_manifest",
+    ),
+    "product_fixture_manifest.json": (
+        "product_fixture",
+        "product_fixture",
+        "product_fixture_manifest_sha256",
+        "product_fixture_manifest",
+    ),
 }
 
 
-def verify_materialization_manifests(destination_root: str) -> dict[str, Any]:
-    """Reload the three persisted manifests and verify every listed file's byte
-    count and SHA-256 against the materialized surface on disk (C1). Fails
-    closed on any mismatch, and refuses a control-plane manifest that leaked
-    into the agent-visible runtime root."""
+def _enumerate_materialized_files(
+    area_root: str, destination_real: str
+) -> set[str]:
+    """Return the exact regular-file set, refusing every reparse component."""
+    _refuse_read_reparse(area_root, destination_real)
+    if not os.path.isdir(area_root):
+        raise MaterializationError(f"missing materialized area {area_root!r}")
+    found: set[str] = set()
+    for current, directories, files in os.walk(
+        area_root, topdown=True, followlinks=False
+    ):
+        _refuse_read_reparse(current, destination_real)
+        for name in list(directories):
+            _refuse_read_reparse(os.path.join(current, name), destination_real)
+        for name in files:
+            target = os.path.join(current, name)
+            _refuse_read_reparse(target, destination_real)
+            if not os.path.isfile(target):
+                raise MaterializationError(
+                    f"non-regular materialized file {target!r}"
+                )
+            relative = os.path.relpath(target, area_root).replace("\\", "/")
+            relative = _validate_relative_path(relative)
+            if relative in found:
+                raise MaterializationError(
+                    f"duplicate on-disk materialized path {relative!r}"
+                )
+            found.add(relative)
+    return found
+
+
+def verify_materialization_manifests(
+    destination_root: str, expected_record: MaterializationRecord
+) -> dict[str, Any]:
+    """Verify persisted manifests against the expected materialization record.
+
+    Verification is not self-certifying: every manifest body is bound to the
+    immutable hash carried by ``expected_record``; identity fields and paths
+    must match the record; listed paths must be unique; ``file_count`` must be
+    exact; and the listed file set must equal the complete on-disk file set.
+    Every manifest and materialized-file read is reparse-checked immediately
+    before opening.
+    """
     import json
 
-    manifest_dir = os.path.join(destination_root, "materialization_manifests")
-    runtime_root = os.path.realpath(os.path.join(destination_root, "runtime_surface"))
+    if not isinstance(expected_record, MaterializationRecord):
+        raise MaterializationError("expected MaterializationRecord required")
+    _refuse_reparse_points(destination_root)
+    destination_real = os.path.realpath(destination_root)
+    manifest_dir = _safe_join(destination_real, "materialization_manifests")
+    _refuse_read_reparse(manifest_dir, destination_real)
+    runtime_root = _safe_join(destination_real, "runtime_surface")
     result: dict[str, Any] = {"manifests": {}, "verified": True}
-    for name in (
-        "control_plane_manifest.json",
-        "runtime_surface_manifest.json",
-        "product_fixture_manifest.json",
-    ):
-        path = os.path.join(manifest_dir, name)
-        if not os.path.exists(path):
+
+    for name, (
+        expected_kind,
+        area,
+        hash_attribute,
+        manifest_attribute,
+    ) in _MANIFEST_SPECS.items():
+        path = _safe_join(manifest_dir, name)
+        _refuse_read_reparse(path, destination_real)
+        if not os.path.isfile(path):
             raise MaterializationError(f"missing persisted manifest {name!r}")
-        # A persisted control-plane manifest must never sit under the runtime root.
+        recorded_path = expected_record.manifest_paths.get(name)
+        if recorded_path is None:
+            raise MaterializationError(
+                f"expected record missing manifest path {name!r}"
+            )
+        if os.path.normcase(os.path.abspath(recorded_path)) != os.path.normcase(
+            os.path.abspath(path)
+        ):
+            raise MaterializationError(f"manifest path mismatch for {name!r}")
         if os.path.commonpath(
-            [runtime_root, os.path.realpath(path)]
-        ) == runtime_root:
+            [os.path.realpath(runtime_root), os.path.realpath(path)]
+        ) == os.path.realpath(runtime_root):
             raise ControlPlaneLeakageError(
                 f"manifest {name!r} resides in the agent-visible runtime root"
             )
+
+        _refuse_read_reparse(path, destination_real)
         with open(path, "rb") as handle:
             body_bytes = handle.read()
-        manifest = json.loads(body_bytes.decode("utf-8"))
-        kind = manifest.get("manifest_kind")
-        area = _MANIFEST_AREA.get(kind)
-        if area is None:
-            raise MaterializationError(f"unknown manifest kind {kind!r} in {name!r}")
-        area_root = os.path.join(destination_root, area)
-        checked = 0
-        for entry in manifest.get("files", []):
-            target = _safe_join(area_root, entry["path"])
-            if not os.path.exists(target):
+        expected_hash = getattr(expected_record, hash_attribute)
+        if sha256_hex(body_bytes) != expected_hash:
+            raise MaterializationError(
+                f"manifest {name!r} hash does not match MaterializationRecord"
+            )
+        try:
+            manifest = json.loads(body_bytes.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise MaterializationError(
+                f"invalid persisted manifest {name!r}"
+            ) from exc
+        if not isinstance(manifest, dict) or canonical_bytes(manifest) != body_bytes:
+            raise MaterializationError(f"manifest {name!r} is not canonical")
+        expected_manifest = getattr(expected_record, manifest_attribute)
+        if manifest != dict(expected_manifest):
+            raise MaterializationError(
+                f"manifest {name!r} body does not match MaterializationRecord"
+            )
+
+        expected_identity = {
+            "schema_version": expected_record.schema_version,
+            "manifest_kind": expected_kind,
+            "source_commit": expected_record.source_commit,
+            "source_tree": expected_record.source_tree,
+            "materialization_profile": expected_record.profile.value,
+        }
+        for key, expected_value in expected_identity.items():
+            if manifest.get(key) != expected_value:
                 raise MaterializationError(
-                    f"manifest {name!r} lists a missing file {entry['path']!r}"
+                    f"manifest {name!r} {key} mismatch: expected "
+                    f"{expected_value!r}, got {manifest.get(key)!r}"
                 )
+
+        entries = manifest.get("files")
+        if not isinstance(entries, list):
+            raise MaterializationError(f"manifest {name!r} files must be a list")
+        file_count = manifest.get("file_count")
+        if (
+            isinstance(file_count, bool)
+            or not isinstance(file_count, int)
+            or file_count != len(entries)
+        ):
+            raise MaterializationError(f"manifest {name!r} file_count mismatch")
+
+        listed: dict[str, tuple[int, str]] = {}
+        for entry in entries:
+            if not isinstance(entry, dict) or set(entry) != {
+                "path",
+                "bytes",
+                "sha256",
+            }:
+                raise MaterializationError(
+                    f"manifest {name!r} contains a malformed file entry"
+                )
+            relative = _validate_relative_path(entry["path"])
+            if relative in listed:
+                raise MaterializationError(
+                    f"manifest {name!r} contains duplicate path {relative!r}"
+                )
+            byte_count = entry["bytes"]
+            digest = entry["sha256"]
+            if (
+                isinstance(byte_count, bool)
+                or not isinstance(byte_count, int)
+                or byte_count < 0
+            ):
+                raise MaterializationError(
+                    f"manifest {name!r} has invalid byte count for {relative!r}"
+                )
+            if (
+                not isinstance(digest, str)
+                or len(digest) != 64
+                or any(character not in _HEX64 for character in digest)
+            ):
+                raise MaterializationError(
+                    f"manifest {name!r} has invalid sha256 for {relative!r}"
+                )
+            listed[relative] = (byte_count, digest)
+
+        area_root = _safe_join(destination_real, area)
+        on_disk = _enumerate_materialized_files(area_root, destination_real)
+        if on_disk != set(listed):
+            raise MaterializationError(
+                f"manifest {name!r} file-set mismatch: "
+                f"missing={sorted(set(listed) - on_disk)}, "
+                f"extra={sorted(on_disk - set(listed))}"
+            )
+        for relative, (byte_count, digest) in listed.items():
+            target = _safe_join(area_root, relative)
+            _refuse_read_reparse(target, destination_real)
             with open(target, "rb") as handle:
                 content = handle.read()
-            if len(content) != entry["bytes"] or sha256_hex(content) != entry["sha256"]:
+            if len(content) != byte_count or sha256_hex(content) != digest:
                 raise MaterializationError(
-                    f"manifest {name!r} file {entry['path']!r} failed byte/hash "
+                    f"manifest {name!r} file {relative!r} failed byte/hash "
                     "verification"
                 )
-            checked += 1
         result["manifests"][name] = {
-            "sha256": sha256_hex(body_bytes),
-            "files_verified": checked,
+            "sha256": expected_hash,
+            "files_verified": len(listed),
         }
     return result
 
@@ -483,9 +625,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     _check_role_profile(request)
     request.fixture.validate()
     _refuse_reparse_points(request.destination_root)
-    # Require a fresh/empty destination: re-materializing over a used root
-    # would leave prior-run files the returned manifests do not list (on-disk
-    # surface != hashed manifest), so a stale destination is refused.
     if os.path.exists(request.destination_root) and os.listdir(
         request.destination_root
     ):
@@ -508,7 +647,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             )
         selected_skills = sorted(set(request.partial_skill_subset))
     else:
-        # Binding full-surface rule (§5a/§20a-S32): the FULL shipped corpus.
         selected_skills = shipped_skills
 
     include_startup = _PROFILE_INCLUDES_STARTUP[request.profile]
@@ -527,15 +665,11 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             if not inner:
                 continue
             if skill == TEMPLATE_SKILL:
-                # _template is excluded from every shipped surface; its eval
-                # content is still staged control-plane-side for completeness.
                 classified = classify_skill_file(inner)
                 if classified.classification is RuntimeClassification.CONTROL_PLANE_ONLY:
                     control_plane[path] = content
                 continue
             if skill not in selected_skills:
-                # Only reachable under the partial profile; the excluded
-                # skill's control-plane data is still staged runner-side.
                 classified = classify_skill_file(inner)
                 if classified.classification is RuntimeClassification.CONTROL_PLANE_ONLY:
                     control_plane[path] = content
@@ -546,7 +680,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             elif classified.classification is RuntimeClassification.RUNTIME_REQUIRED:
                 runtime_surface[path] = content
             else:
-                # Ambiguity fails closed: never agent-visible, recorded for review.
                 ambiguous_excluded.append(path)
             continue
         if path.startswith(AGENTS_PREFIX):
@@ -567,13 +700,7 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             if include_landmarks:
                 runtime_surface[path] = content
             continue
-        # Any other repository file is not part of a materialized case
-        # workspace in WP-2B-1 (docs, scripts, workflows stay out of both
-        # surfaces; the control plane reads them from the snapshot directly).
 
-    # Fail closed on a required subagent that was requested but not
-    # materialized: a case targeting a subagent must never silently get a
-    # workspace missing that .claude/agents/ definition.
     if request.required_subagents:
         if not include_subagents:
             raise MaterializationError(
@@ -586,7 +713,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
                 f"required subagents absent from the snapshot: {missing_subagents}"
             )
 
-    # Leakage guard: no control-plane-classified path may be agent-visible.
     leaked = sorted(set(runtime_surface) & set(control_plane))
     if leaked:
         raise ControlPlaneLeakageError(f"control-plane files in runtime surface: {leaked}")
@@ -601,14 +727,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
                     f"non-runtime file classified into runtime surface: {path}"
                 )
 
-    # Full-surface enforcement for full-library claims.
-    materialized_skills = {
-        path[len(SKILLS_PREFIX) :].split("/", 1)[0]
-        for path in runtime_surface
-        if path.startswith(SKILLS_PREFIX)
-    }
-    # C2: a skill counts as materialized only when its SKILL.md entry point is
-    # present in the runtime surface — never merely a supporting file.
     skills_with_entry_point = {
         path[len(SKILLS_PREFIX) :].split("/", 1)[0]
         for path in runtime_surface
@@ -623,7 +741,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
                 f"runtime surface: {missing[:5]}{'...' if len(missing) > 5 else ''}"
             )
 
-    # Write the three physical areas.
     control_root = os.path.join(request.destination_root, "control_plane")
     runtime_root = os.path.join(request.destination_root, "runtime_surface")
     fixture_root = os.path.join(request.destination_root, "product_fixture")
@@ -651,8 +768,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     fixture_manifest["fixture_id"] = request.fixture.fixture_id
     fixture_manifest["fixture_version"] = request.fixture.fixture_version
 
-    # C1: persist the three canonical manifest bodies as CONTROL-PLANE evidence,
-    # under a dedicated directory that is NOT the agent-visible runtime root.
     manifest_dir = os.path.join(request.destination_root, "materialization_manifests")
     os.makedirs(manifest_dir, exist_ok=True)
     manifest_files = {
@@ -673,8 +788,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             "partial_install results are ineligible for baseline, stability, "
             "full-corpus coverage, and promotion accounting (design §5a)"
         )
-    # C5: ambiguous material may never be silently excluded while claiming
-    # baseline eligibility.
     if ambiguous_excluded:
         ineligibility.append(
             "ambiguous_needs_owner_review files were excluded from the runtime "
