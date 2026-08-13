@@ -28,6 +28,17 @@ finalization marker), separation of `baseline_identity` from run-specific
 full-shipped-skill-surface rule for full-library routing claims (partial_install
 separately scoped, never baseline evidence).
 
+> **Partial supersession (v1.1 fast-track successor, 2026-08-13).** The phase structure of
+> §19 and the directly dependent scope of §7–§9 are **partially superseded** by
+> [`behavioral-eval-runner-v1-fast-track-successor.md`](behavioral-eval-runner-v1-fast-track-successor.md)
+> under **BER-DEC-007**: the former WP-2B-2 (deterministic graders) and the **non-live**
+> subset of the former WP-2B-3 (semantic judge) are combined into a single non-live
+> **WP-2B-2 "Scenario A Grading Stack"**; the former WP-2B-3 is marked **superseded**;
+> WP-2B-4 becomes a separate, **blocked** Scenario A limited-scope live suite; and generic
+> breadth moves to WP-2B-5. This notice changes no other part of this design. Measured judge
+> calibration, OD-1 ratification, and live execution remain **required and unauthorized**
+> here.
+
 This document specifies how Project Aegis's **structural-only** eval corpus *would* be
 executed against live agent behavior, and how the first canonical behavioral suite
 (Scenario A) *would* run. It follows the owning skill's Output Format, Validation

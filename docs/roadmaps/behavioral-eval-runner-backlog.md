@@ -17,6 +17,11 @@ what authority.
 - **Repository:** ModernNomad-98/Project-Aegis
 - **Authoritative design:**
   [`docs/design/behavioral-eval-runner-v1.md`](../design/behavioral-eval-runner-v1.md)
+- **Authoritative design successor (partial — WP-2B-2 grading-stack fast track):**
+  [`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)
+  — authoritative for the revised phase structure and the directly dependent §7–§9/§19 scope
+  under BER-DEC-007 (2026-08-13); the v1 design remains authoritative for everything it does
+  not change.
 - **Design merge source:** [PR #78](https://github.com/ModernNomad-98/Project-Aegis/pull/78)
 - **Design merge commit:** `c61aca84554dbc38d08b8acb2bc3b0b428f3bf01`
 - **Reviewed design blob:** `94ba583a92b2150036ab3efc35e8fa838ecba4da`
@@ -515,9 +520,16 @@ the design's corrected implementation order (§20a-S7): every minimum guardrail 
 2B-1, before any live phase; no later phase may erase an earlier phase's evidence
 boundary. Statuses: WP-2B-0 is DONE — Outcome B / Limited Scope accepted (BER-DEC-005
 executed; evidence and owner decision merged through
-[PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)); WP-2B-1 is
-AUTHORIZED by BER-DEC-006 (§13 of this file), effective only after the governance PR
-containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BACKLOG.
+[PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81)); WP-2B-1 is DONE —
+authorized by BER-DEC-006 ([PR #82](https://github.com/ModernNomad-98/Project-Aegis/pull/82))
+and completed through the merged offline runner core
+([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83), merge commit
+`72e74af6f0183fef25e353ec2bf3a851d83b5df6`); WP-2B-2 is the revised **Scenario A Grading
+Stack** (combined non-live deterministic + semantic grading), AUTHORIZED by BER-DEC-007 (§13
+of this file), effective only after the governance PR containing BER-DEC-007 is reviewed and
+merged; WP-2B-3 is SUPERSEDED BY WP-2B-2 (historical record retained); WP-2B-4 is the
+separate, BLOCKED Scenario A Limited-Scope Live Suite; and WP-2B-5 through WP-2B-7 remain
+BACKLOG.
 
 ### WP-2B-0 — Capability and evidence spike
 
@@ -590,9 +602,13 @@ containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BA
 - **Title:** Runner core, minimum guardrails, and versioned contracts
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** AUTHORIZED — authorized by BER-DEC-006, effective only after the PR
-  containing BER-DEC-006 is reviewed and manually merged. Scope is limited to the
-  non-live runner core and minimum guardrails recorded by BER-DEC-006.
+- **Status:** DONE — authorized by BER-DEC-006 (merged via
+  [PR #82](https://github.com/ModernNomad-98/Project-Aegis/pull/82)) and completed through the
+  reviewed and merged offline runner core
+  ([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83), merge commit
+  `72e74af6f0183fef25e353ec2bf3a851d83b5df6`). Scope was limited to the non-live runner core
+  and minimum guardrails recorded by BER-DEC-006; no live dispatch, no Scenario A, no
+  graders, no semantic judge.
 - **Source / evidence:** Merged design §19 (2B-1 row) and the sections it delivers (§3
   census items a–k, §5, §5a, §5b, §5e, §10, §11, §11a, §13, §14, §15); owner
   backlog-creation directive of 2026-08-10.
@@ -649,62 +665,106 @@ containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BA
   boundary.
 - **Related design sections:** §3, §5, §5a–§5e, §10, §11, §11a, §13, §14, §15, §18, §19
   (2B-1).
-- **Completion evidence:** Reviewed and merged WP-2B-1 PR(s) with passing runner
-  self-tests; status updated here through a reviewed PR.
+- **Completion evidence:** [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83)
+  (merge commit `72e74af6f0183fef25e353ec2bf3a851d83b5df6`) — the reviewed and merged offline
+  runner core with passing runner self-tests; sanitized summary at
+  [`docs/evidence/behavioral-eval-runner-wp-2b-1-summary.md`](../evidence/behavioral-eval-runner-wp-2b-1-summary.md)
+  (post-merge record appended, §14). Status updated here through this reviewed governance PR.
 - **Supersedes / superseded by:** None.
 
-### WP-2B-2 — Deterministic graders
+### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 
 - **ID:** WP-2B-2
-- **Title:** Deterministic graders
+- **Title:** Scenario A Grading Stack — combined non-live deterministic + semantic grading
 - **Phase:** 2B-2
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
-- **Source / evidence:** Merged design §19 (2B-2 row), §6, §7, §9 (content-agnostic
-  oracles), §5d; owner backlog-creation directive of 2026-08-10.
-- **Why it matters:** Everything gradable by code must be graded by code — activation
-  evidence, discrimination pairs, artifact oracles, mutation checks — with no model in
-  the loop, so semantic judging stays scoped to what genuinely needs it.
-- **Dependencies:** WP-2B-1 DONE; R1 disposition (the graders' activation matcher is built
-  only on the 2B-0-proven mechanism); owner authorization for WP-2B-2.
-- **Trigger to begin:** Owner authorizes WP-2B-2 after WP-2B-1 review.
-- **Expected deliverable:** The activation observer/matcher using only the R1-proven
-  mechanism (ambiguity ⇒ `ERROR` / `AMBIGUOUS_ACTIVATION`); the typed skill/subagent
-  activation graph (kind + name + evidence tier + observed invocation mode per node);
-  invocation-mode verification (§5c); mutation graders (no network egress, no package
-  install, no git mutation, no deploy/migration — verified from the contained sandbox);
-  approval/recording boundary graders; run-local preview-versus-created hashing and
-  append-only checks reusing the mechanical harness's content-agnostic oracles (never the
-  fixture manifest's pinned digests on live output); and the deterministic failure
-  taxonomy (versioned reason codes).
-- **Acceptance criteria:** §18 grader tests pass over recorded good/bad fixture
-  transcripts; a skill node never satisfies a subagent expectation; prose-only evidence
-  yields `ERROR`, never a verdict; fixture-pin comparison against live output is provably
-  absent; results carry evidence pointers and are reproducible from the same transcript.
-- **Owner decision required:** Phase authorization only.
-- **Explicit non-goals:** No semantic judging; no live corpus execution; no weakening of
-  the mechanical Scenario A harness (which stays unchanged).
-- **Related design sections:** §5c, §5d, §6, §7, §9, §18, §19 (2B-2).
-- **Completion evidence:** Reviewed and merged WP-2B-2 PR(s) with passing grader tests;
-  status updated here through a reviewed PR.
-- **Supersedes / superseded by:** None.
+- **Status:** AUTHORIZED — authorized by BER-DEC-007 (§13 of this file), effective only after
+  the governance PR containing BER-DEC-007 is reviewed and manually merged. Scope is limited
+  to the non-live deterministic + semantic grading recorded by BER-DEC-007 and the v1.1
+  fast-track successor.
+- **Source / evidence:** The v1.1 fast-track successor
+  [`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)
+  (authoritative for this revised scope); merged design §5c, §5d, §6, §7, §8, §9, §13, §18,
+  §19 (2B-2/2B-3 rows); owner clarification of 2026-08-13.
+- **Why it matters:** The fast track combines everything gradable for Scenario A — the
+  Scenario-A-required deterministic graders and the NON-LIVE semantic-judge scaffold — into a
+  single reviewed work package, so Scenario A grading is built and tested offline before any
+  live phase, while the measured calibration and live judge use stay gated ahead of WP-2B-4.
+- **Dependencies:** WP-2B-1 DONE ([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83));
+  R1 disposition (the activation matcher is built only on the 2B-0-proven mechanism, else
+  `ERROR` / `AMBIGUOUS_ACTIVATION`); owner authorization for WP-2B-2 (BER-DEC-007).
+- **Trigger to begin:** The governance PR containing BER-DEC-007 is manually merged;
+  implementation occurs only on `feat/behavioral-eval-runner-2b-2-scenario-a-grading-stack`;
+  the implementation branch starts from that governance PR's exact squash-merge commit and
+  tree; the build-evidence root is absent or validly owned; all implementation remains
+  offline and non-live; and no package installation is required.
+- **Expected deliverable:** (A) the Scenario-A-required deterministic graders —
+  stage-transition validation; authorization/approval-boundary validation; prohibited-action
+  and mutation checks (no network egress, no package install, no git mutation, no
+  deploy/migration — verified from the contained sandbox); append-only evidence checks;
+  run-local preview-versus-created hashing (never fixture-pin digests on live output);
+  recording-state checks; typed skill/subagent target handling (§5d); invocation-mode
+  validation where evidence supports it (§5c); deterministic Scenario A controls A–Q;
+  versioned deterministic reason codes; evidence pointers; deterministic recorded good/bad
+  fixtures; and unit/integration/schema tests. (B) the NON-LIVE semantic grading scaffold —
+  an independent judge interface; pinned judge-identity representation; injection-resistant
+  system policy; transcript treated as delimited untrusted data; no judge tools;
+  least-context input envelope; schema-validated structured verdict; `JUDGE_ERROR`
+  fail-closed behavior; the coherent-topic grading contract; the other Scenario A assertions
+  that cannot be mechanically graded; a minimum versioned human-labeled calibration-dataset
+  structure; a deterministic/mock calibration harness; threshold-enforcement logic over
+  recorded/mock results; a drift/recalibration trigger representation; and
+  unit/integration/injection-defense/schema tests. All semantic behavior is exercised with
+  deterministic mocks and recorded fixtures only.
+- **Acceptance criteria:** §18 grader tests pass over recorded good/bad fixture transcripts;
+  a skill node never satisfies a subagent expectation; prose-only activation evidence yields
+  `ERROR`, never a verdict; fixture-pin comparison against live output is provably absent; the
+  semantic scaffold passes with a mock judge (injection-defense probes; threshold enforcement
+  rejecting an under-threshold mock result) and its contracts consume only stage-A
+  input-manifest-verified artifacts (§13); zero model/provider/judge dispatch occurs; no
+  measured calibration result is produced or claimed; results carry evidence pointers and are
+  reproducible from the same transcript. Non-live constraint: WP-2B-2 passes only when its
+  code and tests keep every live-dispatch path disabled and represent measured calibration
+  and R1/R2/R4/R5 as unproven.
+- **Owner decision required:** Phase authorization (BER-DEC-007). Assertion-classification
+  sign-off (D9 authority, Peter Nguyen) applies to the rubric-derivation contracts at
+  implementation review. No later phase is authorized; OD-1 is not ratified here.
+- **Explicit non-goals:** No actual model/provider/judge call; no measured judge calibration;
+  no OD-1 ratification; no Scenario A live execution; no WP-2B-4 implementation; no generic
+  corpus execution or generic grader/judge breadth (deferred to WP-2B-5); no CI integration;
+  no weakening of the mechanical Scenario A harness (which stays unchanged); no
+  skill/eval/validator/gate/design modification beyond the four authorized governance docs.
+- **Related design sections:** §5c, §5d, §6, §7, §8, §9, §13, §18, §19 (2B-2/2B-3); v1.1
+  fast-track successor §3–§6.
+- **Completion evidence:** Reviewed and merged WP-2B-2 PR(s) with passing grader and
+  mock-judge harness tests; status updated here through a reviewed PR.
+- **Supersedes / superseded by:** Supersedes the former WP-2B-3 (semantic judge) by absorbing
+  its non-live scaffold; the measured-calibration and live portion of the former WP-2B-3
+  remains a future requirement gated ahead of WP-2B-4.
 
-### WP-2B-3 — Semantic judge
+### WP-2B-3 — Semantic judge (SUPERSEDED BY WP-2B-2)
 
 - **ID:** WP-2B-3
 - **Title:** Independent injection-resistant semantic judge
 - **Phase:** 2B-3
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** SUPERSEDED BY WP-2B-2 (v1.1 fast-track successor; BER-DEC-007, 2026-08-13) —
+  historical record retained (governance rule 5). The NON-LIVE injection-resistant judge
+  scaffold, calibration-harness structure, threshold-enforcement logic, and `JUDGE_ERROR`
+  handling are delivered inside WP-2B-2 (non-live; mock/recorded only). The measured
+  calibration, OD-1 ratification, and any live judge use remain a future requirement gated
+  ahead of WP-2B-4. No separate WP-2B-3 implementation is scheduled.
 - **Source / evidence:** Merged design §19 (2B-3 row), §8, §13 (stage-A input-manifest
   verification); §20 D1/D9, OD-1; owner backlog-creation directive of 2026-08-10.
 - **Why it matters:** Semantic assertions ("one coherent discovery topic per turn",
   refusal quality) cannot be regex-graded. The judge must be pinned, independent, and
   injection-defended, and may produce baseline-eligible verdicts only under the
   owner-ratified measured calibration (R2/OD-1).
-- **Dependencies:** WP-2B-1 and WP-2B-2 DONE; R2 disposition with OD-1 ratified; owner
-  authorization for WP-2B-3.
-- **Trigger to begin:** Owner authorizes WP-2B-3.
+- **Dependencies (historical, superseded):** WP-2B-1 and WP-2B-2 DONE; R2 disposition with
+  OD-1 ratified; owner authorization for WP-2B-3.
+- **Trigger to begin:** SUPERSEDED — no separate WP-2B-3 authorization is scheduled. The
+  non-live scaffold is delivered under WP-2B-2 (BER-DEC-007); measured calibration and OD-1
+  ratification are required before WP-2B-4 and are not authorized by BER-DEC-007.
 - **Expected deliverable:** The injection-resistant judge interface (separate system-level
   judge policy; delimited data envelope; no judge tools; least-context input; structured
   schema-validated verdicts; no private chain-of-thought in evidence); the versioned
@@ -727,17 +787,22 @@ containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BA
   re-calibration; no exposure of expected answers beyond the rubric; no multi-judge
   arbitration (a FUTURE consideration, BER-BKL-011).
 - **Related design sections:** §8, §13, §17 criterion 9, §18, §19 (2B-3), §20 D1/D9/OD-1.
-- **Completion evidence:** Reviewed and merged WP-2B-3 PR(s) with passing judge-harness
-  tests and the enforced calibration gate; status updated here through a reviewed PR.
-- **Supersedes / superseded by:** None.
+- **Completion evidence:** SUPERSEDED BY WP-2B-2. The non-live scaffold's completion evidence
+  is WP-2B-2's reviewed and merged PR(s); the measured-calibration gate remains a future
+  requirement recorded against WP-2B-4 and BER-BKL-005/011.
+- **Supersedes / superseded by:** SUPERSEDED BY WP-2B-2 (v1.1 fast-track successor;
+  BER-DEC-007). Historical record retained per governance rule 5.
 
-### WP-2B-4 — Scenario A live behavioral suite
+### WP-2B-4 — Scenario A Limited-Scope Live Suite
 
 - **ID:** WP-2B-4
-- **Title:** Adaptive Scenario A live behavioral suite
+- **Title:** Scenario A Limited-Scope Live Suite (separate first-live phase)
 - **Phase:** 2B-4
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** BLOCKED — separate first-live phase; NOT authorized by BER-DEC-007. Unblocks
+  only when every dependency below exists, including a separate reviewed and merged WP-2B-4
+  authorization with a live-token budget, a live external evidence root, evidence-handling and
+  retention terms, and live stop conditions.
 - **Source / evidence:** Merged design §19 (2B-4 row), §9 (state machine; controls A–Q;
   live behavioral manifest), §8 (coherent-topic rubric);
   [`docs/acceptance/scenario-a-runbook.md`](../acceptance/scenario-a-runbook.md)
@@ -746,22 +811,33 @@ containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BA
   the runner's own first end-to-end self-proof. It automates the currently-manual
   fresh-session acceptance while complementing — never replacing — the mechanical
   evidence harness.
-- **Dependencies:** ALL of: (1) WP-2B-1, WP-2B-2, and WP-2B-3 DONE (this is the first
-  live phase: the §19 hard precondition requires containment, timeouts, emergency kill,
-  budget reservation, attempt recording, aggregate semantics, and bounded concurrency
-  implemented and tested first); (2) a truthful R1 activation-identifying mechanism or
-  an explicitly owner-approved bounded activation claim scope sufficient for Scenario
-  A's claims; (3) R2 measured calibration completed and OD-1 ratified through
-  WP-2B-3's required gate; (4) R4 effective per-tool-path confinement proven for the
-  selected live host, including control-plane corpus inaccessibility; (5) R5
-  execution-profile observability and isolation proven for the selected live host, or
-  an explicit owner-approved narrower live claim scope that defines exactly what
-  remains unobservable and excludes affected runs from baseline claims; and (6) a
-  separate WP-2B-4 authorization with live-token budget, evidence terms, and stop
-  conditions.
+- **Dependencies:** ALL of: (1) WP-2B-1 and WP-2B-2 DONE (the former WP-2B-3 is superseded by
+  WP-2B-2; this is the first live phase: the §19 hard precondition requires containment,
+  timeouts, emergency kill, budget reservation, attempt recording, aggregate semantics, and
+  bounded concurrency implemented and tested first, and the Scenario A grading stack built
+  non-live in WP-2B-2); (2) a truthful R1 activation-identifying mechanism or an explicitly
+  owner-approved bounded activation claim scope sufficient for Scenario A's claims; (3) R2
+  measured calibration completed and OD-1 ratified through the required measured-calibration
+  gate (formerly WP-2B-3; now a future requirement ahead of WP-2B-4, not authorized by
+  BER-DEC-007); (4) R4 effective per-tool-path confinement proven for the selected live host,
+  including control-plane corpus inaccessibility; (5) R5 execution-profile observability and
+  isolation proven for the selected live host, or an explicit owner-approved narrower live
+  claim scope that defines exactly what remains unobservable and excludes affected runs from
+  baseline claims; and (6) a separate reviewed and merged WP-2B-4 authorization with
+  live-token budget, live external evidence root, evidence terms, and stop conditions.
 - **Trigger to begin:** Owner authorizes WP-2B-4 with its live-token budget, evidence
   terms, and stop conditions. WP-2B-4 may not be authorized while R1, R2/OD-1, R4, or
   R5 remains unresolved for the selected live execution profile.
+- **Future initial claim scope (documented by the v1.1 successor; NOT authorized here):**
+  Scenario A only; explicit invocation of `project-orchestrator`; one pinned Project Aegis
+  version; one pinned execution profile; one selected host configuration; one approved
+  synthetic answer set; Scenario A controls A–Q; NO claim that the model independently
+  selected `project-orchestrator`; NO general model-selected routing claim; NO generic corpus
+  claim; NO baseline claim; NO stability-window claim; NO promotion claim; NO
+  production-readiness claim. Explicit invocation proves only that the named target was
+  intentionally invoked; it does not prove independent routing selection. See
+  [`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)
+  §7.
 - **Expected deliverable:** A versioned live Scenario A behavioral manifest (run-local
   hashes only; never fixture-pin comparison on live output); the adaptive conversation
   state machine; the turn/topic classifier; the canonical synthetic answer bank (trusted
@@ -803,6 +879,13 @@ containing BER-DEC-006 is reviewed and merged; WP-2B-2 through WP-2B-7 remain BA
 - **Why it matters:** This phase makes the 1,740 authored single-prompt cases executable
   as designed — honestly: runnable units are the per-run preflight output, never an
   assumed 1,740, and every exclusion carries a reason code and an author-facing finding.
+- **Receives generic breadth deferred by the WP-2B-2 fast track (BER-DEC-007):** generic
+  deterministic grader mappings for the complete authored corpus; generic semantic rubric
+  mappings; generic corpus judge configuration; generic activation-observer breadth; generic
+  fixture-library breadth; integration with all 1,740 authored single-prompt cases (runnable
+  units remain the per-run preflight output, never an assumed 1,740); corpus-wide execution;
+  corpus-wide calibration; generic-corpus evidence runs; and CI integration. None of these is
+  authorized here; WP-2B-5 remains BACKLOG and separately owner-authorized.
 - **Dependencies:** WP-2B-4 DONE; the 2B-0 gate resolved to outcome A or an
   owner-approved limitation (broad general-corpus execution precondition, §19); owner
   authorization for WP-2B-5.
@@ -1087,38 +1170,48 @@ risking forking) its requirements.
 
 - **ID:** BER-BKL-005
 - **Title:** Judge selection, measurable calibration, and owner thresholds
-- **Phase:** 2B-0 / 2B-3
+- **Phase:** 2B-0 / 2B-2 (non-live scaffold) / pre-2B-4 (measured calibration)
 - **Priority:** GATE
-- **Status:** BLOCKED — R2 remains incomplete/blocked and OD-1 remains open. WP-2B-3 is
-  unauthorized.
+- **Status:** BLOCKED — R2 remains incomplete/blocked and OD-1 remains open. The former
+  WP-2B-3 is SUPERSEDED BY WP-2B-2: the NON-LIVE judge/calibration scaffold and
+  threshold-enforcement logic move into WP-2B-2 (BER-DEC-007; mock/recorded only), while the
+  MEASURED calibration and OD-1 ratification remain unauthorized and required ahead of
+  WP-2B-4.
 - **Source / evidence:** Cross-reference: **R2** (authoritative record, §6 of this file)
-  and OD-1 (§9 of this file). Merged design §8, §17a item 9, §20 D1/OD-1/R2.
-- **Why it matters:** Inventory visibility for the judge gate; see R2. The 2B-3
-  implementation (WP-2B-3) then operationalizes the ratified thresholds.
+  and OD-1 (§9 of this file). Merged design §8, §17a item 9, §20 D1/OD-1/R2; v1.1 fast-track
+  successor §4–§5.
+- **Why it matters:** Inventory visibility for the judge gate; see R2. WP-2B-2 delivers the
+  non-live calibration harness and threshold-enforcement logic (mock/recorded only); the
+  ratified thresholds are then applied once the measured calibration is completed and OD-1 is
+  ratified ahead of WP-2B-4.
 - **Dependencies:** The WP-2B-0 evidence half is DONE — R2's disposition
   (incomplete/blocked) is recorded and owner-accepted under Outcome B via
   [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81); no judge was pinned
-  and no calibration exists. The remaining halves require a new reviewed and merged
-  authorization for the calibration evidence plus WP-2B-3 authorization.
+  and no calibration exists. The non-live scaffold half is delivered by WP-2B-2
+  (BER-DEC-007). The measured-calibration half requires a new reviewed and merged
+  authorization ahead of WP-2B-4 (the former separate WP-2B-3 authorization is superseded).
 - **Trigger to begin:** Spike half CLOSED — no further WP-2B-0 work is authorized by
-  BER-DEC-005. Otherwise BLOCKED: judge selection and calibration require a new
-  reviewed and merged authorization, WP-2B-3 remains unauthorized, and OD-1 remains
-  open.
-- **Expected deliverable:** R2's pinned judge identity + measured calibration report; then
-  WP-2B-3's calibration-enforcing judge harness.
-- **Acceptance criteria:** As R2 and WP-2B-3; design §23 items 7 and 19 hold.
-- **Owner decision required:** OD-1 (during 2B-0); WP-2B-3 authorization.
-- **Explicit non-goals:** As R2/WP-2B-3; no invented thresholds; no baseline-eligible
-  semantic verdict before ratification.
+  BER-DEC-005. The non-live scaffold is delivered under WP-2B-2 (BER-DEC-007). Otherwise
+  BLOCKED: measured judge selection and calibration require a new reviewed and merged
+  authorization ahead of WP-2B-4, and OD-1 remains open.
+- **Expected deliverable:** the WP-2B-2 non-live calibration-harness scaffold and
+  threshold-enforcement logic (mock/recorded); then, ahead of WP-2B-4, R2's pinned judge
+  identity + measured calibration report enforcing the OD-1-ratified thresholds.
+- **Acceptance criteria:** As R2, WP-2B-2 (non-live scaffold), and the future
+  measured-calibration gate; design §23 items 7 and 19 hold.
+- **Owner decision required:** WP-2B-2 phase authorization (BER-DEC-007) for the non-live
+  scaffold; OD-1 (measured calibration, ahead of WP-2B-4).
+- **Explicit non-goals:** No invented thresholds; no baseline-eligible semantic verdict
+  before ratification; no measured calibration under WP-2B-2 (non-live only).
 - **Related design sections:** §8, §13, §17 criterion 9, §17a item 9, §20 D1/OD-1/R2,
   §23 items 7/19.
 - **Completion evidence:** Evidence half: as R2 —
   [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
-  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update. The
-  measured calibration result, OD-1 ratification, and merged WP-2B-3 PR(s) remain
-  future requirements.
-- **Supersedes / superseded by:** None (tracks R2 + WP-2B-3; those records are
-  authoritative).
+  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update. The non-live
+  scaffold's evidence is WP-2B-2's merged PR(s); the measured calibration result and OD-1
+  ratification (formerly WP-2B-3) remain future requirements ahead of WP-2B-4.
+- **Supersedes / superseded by:** None (tracks R2 + WP-2B-2 non-live scaffold + the future
+  measured-calibration gate; those records are authoritative).
 
 ### BER-BKL-006 — Cost observability and enforceable reservation units
 
@@ -1313,21 +1406,25 @@ risking forking) its requirements.
 - **ID:** BER-BKL-011
 - **Title:** Judge dataset operations, agreement measurement, drift monitoring, and
   possible multi-judge arbitration
-- **Phase:** 2B-3 / FUTURE
+- **Phase:** 2B-2 (non-live trigger representation) / FUTURE (measured operation)
 - **Priority:** IMPORTANT
 - **Status:** BACKLOG
 - **Source / evidence:** Merged design §8 (calibration dataset versioning; re-calibration
   on any judge/rubric/dataset change; human label owner) and §13 (calibration-dataset
   identity pinned in `baseline_identity`); multi-judge arbitration appears in no design
   section and is therefore strictly a future consideration. Owner backlog-creation
-  directive of 2026-08-10.
+  directive of 2026-08-10; v1.1 fast-track successor §4.
 - **Why it matters:** A calibrated judge decays: datasets grow, models change, agreement
   drifts. Ongoing dataset operations and measured agreement keep OD-1's ratified
   thresholds meaningful over time.
-- **Dependencies:** WP-2B-3 DONE for the operational half; a reviewed design successor
-  for any multi-judge arbitration (it would extend §8).
-- **Trigger to begin:** WP-2B-3 operation begins (dataset/drift half); an owner-approved
-  design successor (arbitration half).
+- **Dependencies:** WP-2B-2 DONE for the non-live drift/recalibration-trigger representation
+  and dataset-structure half (the former WP-2B-3 is superseded by WP-2B-2); the measured
+  dataset-operations half requires the future measured-calibration authorization ahead of
+  WP-2B-4; a reviewed design successor for any multi-judge arbitration (it would extend §8).
+- **Trigger to begin:** WP-2B-2 delivers the non-live drift/recalibration trigger
+  representation and calibration-dataset structure; measured dataset operations begin after
+  the future measured-calibration authorization; an owner-approved design successor
+  (arbitration half).
 - **Expected deliverable:** Dataset-operations procedures (labeling, versioning, growth,
   re-baselining triggers); periodic agreement measurement against the ratified
   thresholds; drift monitoring with recorded re-calibration events; and — only if the
@@ -1492,14 +1589,18 @@ backlog.
   false-PASS rate, false-FAIL rate, abstention rate) **and the separate critical
   false-PASS threshold**, together with the measured calibration result, before the judge
   produces any baseline-eligible semantic verdict (design §8, §17a). The design invents
-  no numbers; so does this backlog. Tracked by: R2, BER-BKL-005, WP-2B-0/WP-2B-3.
+  no numbers; so does this backlog. Tracked by: R2, BER-BKL-005, WP-2B-0, WP-2B-2 (non-live
+  scaffold), and the future measured-calibration gate (formerly WP-2B-3).
   **Post-2B-0 status (2026-08-11): OPEN — not completed during 2B-0.** The design's
   during-2B-0 timing requirement above is preserved as written, not rewritten; it was
   not met because the BER-DEC-005 model-dispatch envelope denied the calibration calls
   (zero dispatches), so no measured calibration input exists. OD-1 remains OPEN, and
   semantic judging, WP-2B-3 completion, and WP-2B-4 semantic use remain blocked until a
   later reviewed and merged authorization completes the measured calibration and owner
-  ratification.
+  ratification. **Post-supersession note (2026-08-13):** the former WP-2B-3 is SUPERSEDED BY
+  WP-2B-2 (BER-DEC-007); its NON-LIVE judge/calibration scaffold is delivered inside WP-2B-2,
+  while the measured calibration and OD-1 ratification remain the future gate ahead of
+  WP-2B-4. OD-1 stays OPEN; BER-DEC-007 does not ratify it.
 - **OD-2 — Minimum promotion coverage threshold.** OWNER DECISION REQUIRED **BEFORE CI
   PROMOTION**. After the implementation-time census (BER-BKL-008) establishes the honest
   runnable denominator, Peter Nguyen ratifies the minimum authored execution/assertion
@@ -1822,19 +1923,22 @@ Owner go / no-go / limited-scope decision (design 17a outcome A or B)
         |
         v
 WP-2B-1  runner core + minimum guardrails
-— AUTHORIZED by BER-DEC-006, effective after the governance PR containing
-  BER-DEC-006 is merged
+— DONE: PR #83 merged (main @ 72e74af); authorized by BER-DEC-006 (PR #82)
         |
         v
-WP-2B-2  deterministic graders
+WP-2B-2  Scenario A Grading Stack (non-live deterministic + semantic scaffold)
+— AUTHORIZED by BER-DEC-007, effective after the governance PR containing
+  BER-DEC-007 is merged; combines the former WP-2B-2 + non-live WP-2B-3 scope
         |
         v
-WP-2B-3  semantic judge (OD-1 thresholds in force)
+WP-2B-3  SUPERSEDED BY WP-2B-2 (non-live judge scaffold absorbed; historical
+  record retained; measured calibration + OD-1 remain future, ahead of WP-2B-4)
         |
         v
-WP-2B-4  Scenario A live suite (first live phase; guardrails already tested;
-may not be authorized while R1, R2/OD-1, R4, or R5 remains unresolved for the
-selected live execution profile)
+WP-2B-4  Scenario A Limited-Scope Live Suite (first live phase; BLOCKED and NOT
+authorized by BER-DEC-007; requires WP-2B-2 DONE, measured calibration, OD-1
+ratified, selected-host R4, selected-profile R5, residual R1 disposition, and a
+separate merged WP-2B-4 authorization with live budget/evidence/stop terms)
         |
         v
 WP-2B-5  generic corpus execution (requires 2B-0 outcome A or B)
@@ -1869,6 +1973,17 @@ Explicit statements about this map:
   authorization requirements — merging the WP-2B-1 authorization does not authorize
   WP-2B-2, completing WP-2B-1 does not authorize WP-2B-2, and live phases remain
   blocked pending their own evidence and owner authorization.
+- **Current state (recorded 2026-08-13):** PR #82 (WP-2B-1 authorization / BER-DEC-006) and
+  PR #83 (WP-2B-1 offline runner core) are MERGED; `main` is at
+  `72e74af6f0183fef25e353ec2bf3a851d83b5df6`; WP-2B-1 is DONE. Under the v1.1 fast-track
+  successor and BER-DEC-007 (this governance PR, pending review and manual merge): WP-2B-2 is
+  redefined as the non-live **Scenario A Grading Stack** and AUTHORIZED (effective only after
+  this PR is merged); the former WP-2B-3 is SUPERSEDED BY WP-2B-2 with its historical record
+  retained; WP-2B-4 is the separate, BLOCKED Scenario A Limited-Scope Live Suite; and WP-2B-5
+  through WP-2B-7 remain governed by their existing dependencies and separate authorization
+  requirements. No arrow is crossed by momentum: measured judge calibration, OD-1
+  ratification, and every live phase remain blocked pending their own evidence and owner
+  authorization; BER-DEC-007 authorizes WP-2B-2 only.
 
 ---
 
@@ -2346,6 +2461,121 @@ model call, and evidence artifact.
   authorize WP-2B-2, live execution, Scenario A, corpus execution, CI
   promotion, deployment, auto-merge, or merge.
 - **Supersedes / superseded by:** None.
+
+### BER-DEC-007
+
+- **Date:** 2026-08-13
+- **Decision:** Adopt the Behavioral Eval Runner **v1.1 fast-track successor**
+  ([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)).
+  Combine the NON-LIVE implementation scope of the former WP-2B-2 (deterministic graders) and
+  the former WP-2B-3 (semantic judge) into the revised **WP-2B-2 — Scenario A Grading Stack**.
+  Mark the former WP-2B-3 **SUPERSEDED BY WP-2B-2** (historical record retained). **Authorize
+  WP-2B-2 only.** Keep **WP-2B-4 BLOCKED and unauthorized.** This authorization becomes
+  effective only after the reviewed PR containing BER-DEC-007 is manually merged.
+- **Owner:** Peter Nguyen
+- **Repository:** `ModernNomad-98/Project-Aegis`
+- **Authorization PR:** AUTHORIZATION_PR_PENDING
+- **Evidence basis:**
+  - WP-2B-1 DONE — [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83), merge
+    commit `72e74af6f0183fef25e353ec2bf3a851d83b5df6` (offline runner core + minimum
+    guardrails);
+  - WP-2B-1 authorization — [PR #82](https://github.com/ModernNomad-98/Project-Aegis/pull/82),
+    BER-DEC-006, merge commit `fc98ee6bf59bb516064be62ed8c5dc8861c92697`;
+  - the v1.1 fast-track successor design (this governance PR).
+- **Closed / updated work packages:** WP-2B-1 → DONE; former WP-2B-3 → SUPERSEDED BY WP-2B-2.
+- **Authorized work package:** `WP-2B-2` (Scenario A Grading Stack — non-live).
+- **Authorized implementation branch:**
+  `feat/behavioral-eval-runner-2b-2-scenario-a-grading-stack`
+- **Authorized source baseline:** the future exact manual merge/squash commit and Git tree of
+  this governance PR. The implementation session must resolve and verify those values before
+  creating or using the implementation branch, and never branch from a later moving `main`.
+- **Authorized scope (NON-LIVE only — v1.1 successor §4):**
+  - **Deterministic Scenario A graders:** stage-transition validation; authorization and
+    approval-boundary validation; prohibited-action and mutation checks; append-only evidence
+    checks; preview-versus-created hashing (run-local only); recording-state checks; typed
+    skill/subagent target handling; invocation-mode validation when supported by available
+    evidence; deterministic Scenario A controls A–Q; versioned deterministic reason codes;
+    evidence pointers; deterministic recorded good/bad fixtures; unit, integration, and schema
+    tests.
+  - **Semantic Scenario A grading scaffolding:** an independent judge interface; pinned
+    judge-identity representation; injection-resistant system policy; transcript treated as
+    delimited untrusted data; no judge tools; least-context input envelope; schema-validated
+    structured verdict; `JUDGE_ERROR` fail-closed behavior; the coherent-topic grading
+    contract; other Scenario A assertions that cannot be mechanically graded; a minimum
+    versioned human-labeled calibration-dataset structure; a deterministic/mock calibration
+    harness; threshold-enforcement logic using recorded/mock results; a drift/recalibration
+    trigger representation; unit, integration, injection-defense, and schema tests.
+  - The semantic scaffold must be testable with deterministic mocks and recorded fixtures
+    only. **No actual model or provider call is authorized. No measured calibration result
+    may be claimed.**
+- **Model and spend budget:**
+  - runner-generated model/provider dispatches: `0`;
+  - runner-generated live sessions: `0`;
+  - actual judge/provider calls: `0`;
+  - external model/API spend: USD `$0`;
+  - package installations: `0`.
+- **External build-evidence root:**
+  `C:\temp\Project-Aegis-BER-WP-2B-2-Scenario-A-Grading-Stack-Evidence`
+- **Evidence classification:** INTERNAL TECHNICAL BUILD EVIDENCE.
+- **Permitted evidence:** test logs; deterministic fixture outputs; schema-validation
+  results; mock judge results; recorded human-labeled calibration fixtures; mock
+  calibration-harness output; timing; validator output; DCO output; scope verification;
+  static/security scans.
+- **Forbidden evidence:** credentials; tokens; passwords; private keys; unrestricted
+  environment dumps; private source unrelated to Project Aegis; real user/customer/patient
+  data; actual live judge responses; actual provider transcripts; personal paths in
+  repository-safe outputs; private chain-of-thought.
+- **Retention:** 30 calendar days from first evidence creation unless another reviewed and
+  merged authorization changes it.
+- **Ownership and ACL (same least-privilege principles recorded by BER-DEC-006):**
+  - an ownership marker binding the root to BER-DEC-007, WP-2B-2, the implementation branch,
+    the base SHA, and the expiration;
+  - ACL inheritance disabled;
+  - only Peter Nguyen's authorized Windows account and SYSTEM retain required access;
+  - no Everyone, Users, or Authenticated Users broad access;
+  - evidence root outside every Git repository and Project Aegis checkout;
+  - fail closed on symlink, junction, mount, reparse, identity, or ACL ambiguity;
+  - marker-gated, physically reparse-safe cleanup.
+- **Explicitly forbidden scope:**
+  - actual model/provider/judge dispatch;
+  - measured judge calibration;
+  - OD-1 ratification by an agent;
+  - live Claude Code session spawning by the runner;
+  - Scenario A live execution;
+  - generic corpus execution;
+  - WP-2B-4 implementation;
+  - WP-2B-5 implementation;
+  - CI/workflow wiring;
+  - skill modification;
+  - authored-eval modification;
+  - validator or gate modification;
+  - deployment;
+  - package or dependency installation;
+  - native FFI;
+  - automatic authorization of later phases;
+  - merge or auto-merge.
+- **Stop conditions:** Stop if —
+  - repository, base, branch, authorization, or scope differs;
+  - the source baseline cannot be verified;
+  - any model/provider/judge call would occur;
+  - a package or dependency is required;
+  - a skill, eval, workflow, validator, gate, or unrelated design file must change;
+  - the evidence root cannot satisfy its marker, ACL, path, or retention terms;
+  - a test cannot remain deterministic and offline;
+  - an unauthorized repository path must change;
+  - generic corpus or live Scenario A work becomes necessary;
+  - WP-2B-4 work becomes necessary;
+  - a capability would have to be claimed without evidence;
+  - DCO, validation, scope, or evidence integrity fails;
+  - force-push, reset, rebase, amend, auto-merge, or merge is required;
+  - an unexpected condition makes a claim uncertain.
+- **Authority boundary:** BER-DEC-007 becomes effective only after its governance PR is
+  reviewed and manually merged. It authorizes **WP-2B-2 only**. It does not authorize:
+  actual calibration; OD-1 ratification; WP-2B-4; live execution; WP-2B-5; generic corpus
+  execution; CI; deployment; promotion; or merge of an implementation PR.
+- **Supersedes / superseded by:** Supersedes the former WP-2B-3 (semantic judge) by absorbing
+  its NON-LIVE scaffold into the revised WP-2B-2 (via the v1.1 fast-track successor).
+  BER-DEC-001 through BER-DEC-006 are unchanged. Superseded by: None.
 
 ---
 
