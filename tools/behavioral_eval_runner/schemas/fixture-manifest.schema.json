@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/fixture-manifest/1.0.0-wp2b1",
+  "title": "Product-fixture manifest (WP-2B-1)",
+  "description": "The case's fixture overlay manifest — the only writable logical area of a materialized workspace. Hashed separately from the control-plane corpus and the sanitized runtime surface.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_kind", "source_commit", "source_tree", "materialization_profile", "file_count", "files", "fixture_id", "fixture_version"],
+  "properties": {
+    "schema_version": {"const": "1.0.0-wp2b1"},
+    "manifest_kind": {"const": "product_fixture"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "materialization_profile": {"enum": ["consumer_skills_only", "consumer_with_startup_routing", "consumer_with_subagents", "source_library", "consumer_partial_install"]},
+    "fixture_id": {"type": "string", "minLength": 1},
+    "fixture_version": {"type": "string", "minLength": 1},
+    "file_count": {"type": "integer", "minimum": 0},
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

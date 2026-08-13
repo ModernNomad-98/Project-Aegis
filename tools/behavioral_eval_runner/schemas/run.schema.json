@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/run/1.0.0-wp2b1",
+  "title": "Behavioral Eval Runner run report (WP-2B-1)",
+  "description": "Run report with the three separated field groups (baseline_identity / run_provenance / run_evidence_binding), complete coverage metrics, scheduling and budget evidence, and honest defaults. run_evidence_binding carries only the stage-A input manifest hash; final hashes live in the detached marker.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_kind", "schema_version", "runner_version", "run_id", "baseline_identity", "run_provenance", "run_evidence_binding", "coverage_metrics", "aggregates", "attempts"],
+  "properties": {
+    "report_kind": {"const": "behavioral_eval_run_report"},
+    "schema_version": {"const": "1.0.0-wp2b1"},
+    "runner_version": {"type": "string"},
+    "run_id": {"type": "string", "minLength": 1},
+    "baseline_identity": {"type": "object"},
+    "run_provenance": {"type": "object"},
+    "run_evidence_binding": {
+      "type": "object",
+      "properties": {
+        "input_evidence_manifest_sha256": {"type": ["string", "null"]},
+        "status": {"type": "string"}
+      },
+      "not": {
+        "anyOf": [
+          {"required": ["final_evidence_manifest_sha256"]},
+          {"required": ["final_report_sha256"]}
+        ]
+      }
+    },
+    "coverage_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authored_units_total", "selected_units_total", "preflight_accounted_total",
+        "runnable_units_total", "attempted_units_total", "completed_units_total",
+        "authored_coverage", "selected_coverage", "runnable_coverage",
+        "execution_coverage", "assertion_accounting_coverage",
+        "assertions_actually_graded_coverage", "critical_case_coverage",
+        "unrun_totals_by_reason", "excluded_totals_by_reason"
+      ],
+      "properties": {
+        "authored_units_total": {"type": "integer", "minimum": 0},
+        "selected_units_total": {"type": "integer", "minimum": 0},
+        "preflight_accounted_total": {"type": "integer", "minimum": 0},
+        "runnable_units_total": {"type": "integer", "minimum": 0},
+        "attempted_units_total": {"type": "integer", "minimum": 0},
+        "completed_units_total": {"type": "integer", "minimum": 0},
+        "authored_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "selected_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "runnable_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "execution_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "assertion_accounting_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "assertions_actually_graded_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "critical_case_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "unrun_totals_by_reason": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "excluded_totals_by_reason": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "schema_version": {"const": "1.0.0-wp2b1"}
+      }
+    },
+    "scheduling": {"type": "object"},
+    "budget_totals": {"type": "object"},
+    "materialization": {"type": "object"},
+    "execution_profile": {"type": "object"},
+    "risk_class_governance": {"type": "string"},
+    "aggregates": {"type": "array", "items": {"$ref": "aegis-ber://schemas/aggregate/1.0.0-wp2b1"}},
+    "attempts": {"type": "array", "items": {"$ref": "aegis-ber://schemas/attempt/1.0.0-wp2b1"}},
+    "quarantine_inventory": {"type": "array", "items": {"type": "object"}},
+    "author_facing_findings": {"type": "array", "items": {"type": "object"}},
+    "non_claims": {"type": "array", "items": {"type": "string"}}
+  }
+}
