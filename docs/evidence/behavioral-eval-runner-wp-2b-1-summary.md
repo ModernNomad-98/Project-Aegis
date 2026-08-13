@@ -499,13 +499,20 @@ were reviewed and **manually merged**:
 
 **Governance successor.** The next authorized step is the **v1.1 fast-track successor**
 ([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)),
-which combines the former WP-2B-2 (deterministic graders) and the **non-live** subset of the
-former WP-2B-3 (semantic judge) into a single non-live **WP-2B-2 "Scenario A Grading
-Stack,"** authorized by **BER-DEC-007** (backlog §13). That authorization is **non-live**
-(zero model/provider/judge dispatch) and becomes effective only after its governance PR is
-reviewed and manually merged. It does **not** ratify OD-1, does **not** perform measured
-judge calibration, and does **not** authorize WP-2B-4 (the separate, blocked Scenario A
-limited-scope live suite).
+which combines the former WP-2B-2 (deterministic graders) and the former WP-2B-3's
+**non-live** semantic-judge scaffold scope into a single non-live **WP-2B-2 "Scenario A
+Grading Stack,"** authorized by **BER-DEC-007** (backlog §13). WP-2B-3 itself is redefined
+as the **Measured Judge Calibration and OD-1 Ratification Gate** — BLOCKED and not
+authorized by BER-DEC-007. The WP-2B-2 authorization is **non-live** (zero runner-generated,
+grading-stack-generated, or test-harness-generated model/provider dispatch and zero
+actual judge/provider calls; implementation-session AI activity is separately disclosed
+and is not runner dispatch) and becomes effective only
+after its governance PR is reviewed and manually merged. It does **not** ratify OD-1, does
+**not** perform measured judge calibration, and does **not** authorize WP-2B-3
+measured-calibration work or WP-2B-4 (the separate, blocked Scenario A limited-scope live
+suite).
 
-The §13 non-claims above remain true after merge: WP-2B-1 ran no model or provider, proved
-no real-host containment or live enforcement, and authorized no later phase.
+The §13 non-claims above remain true after merge: the merged WP-2B-1 implementation
+generated no runner model/provider dispatch and no live session, proved no real-host
+containment or live enforcement, and authorized no later phase (implementation-session AI
+activity was separately disclosed in this summary and is not runner dispatch).
