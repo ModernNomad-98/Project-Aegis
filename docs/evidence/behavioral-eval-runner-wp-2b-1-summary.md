@@ -139,22 +139,31 @@ validator self-tests, `validate-skills`, and DCO. The runner unit-test suite bel
 locally and reported as evidence, not as a GitHub CI result.
 
 - Test command: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
-- Test methods: **347**; result: **OK (347 passed, 0 failed, 1 skipped [POSIX-only], 0 errors)**
-  — after the exact-code reconciliation pass (§9a) on top of the Group A–E hardening.
+- Test methods: **363**; result: **OK (363 passed, 0 failed, 2 skipped [POSIX-only], 0 errors)**
+  — after the second reconciliation pass (§9b) on top of §9a and the Group A–E hardening.
 - **Runner test platform actually run:** Windows (win32), CPython 3.14. A POSIX runtime run
   is reported **UNRUN**: no general-purpose WSL/POSIX Python environment is available in
   this environment and installing one is out of scope; no POSIX test pass is claimed. The
   POSIX-specific `killpg` same-group refusal, `popen_isolation_kwargs()` isolation, the
-  process-group session cleanup, and the `O_NOFOLLOW` leaf-write guarantee are covered by
-  code and by Windows-side tests, but their POSIX runtime path was not exercised (the one
-  skipped test is the POSIX background-child-cleanup case).
+  creation-bound process-group session cleanup with empty-group verification, and the POSIX
+  descriptor-relative no-follow write path (`_write_file_dirfd`) are covered by code and by
+  Windows-side tests, but their POSIX runtime path was not exercised — reported
+  IMPLEMENTED_BUT_UNRUN. The two skipped tests are the POSIX background-child-cleanup case
+  and the POSIX parent-swap-fails-closed case.
 - Runner self-check: `python -m tools.behavioral_eval_runner self-check` ⇒ **PASS**
   (8/8 checks: enum closure, canonical stability, identity behavior, adapter denial,
   schema/code enum agreement, no-forbidden-source AST scan, real-host capability honesty,
   aggregation spot checks).
 - Census reproducibility: two independent regenerations over the pinned snapshot produced
   byte-identical canonical output (census SHA-256
-  `28747cc1dc696b7758e9a8d5affe8cf58bd648a7ac235ef6ba7ccdabc02e38ab`).
+  `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`, `sha256_of_obj` of
+  the census over base `fc98ee6`; equal to the committed
+  `artifacts/evidence/behavioral-eval-runner-wp-2b-1-census.json`). **Correction (§9b):** an
+  earlier draft cited `28747cc1…`, which was the PRE-hardening census; commit `58bd6f7` made
+  the reverse negative-neighbor index key kind-qualified (`skill::name` / `subagent::name`),
+  changing the census content and regenerating the artifact to `674017e9…`. The stale figure
+  was never updated until now; this pass does not touch the census inputs, so the value is
+  unchanged from the committed artifact.
 - Validator self-tests: `python scripts/tests/test_validator.py` ⇒ OK (untouched).
 - Skill validator: `python scripts/validate-skills.py` ⇒ **184 skills valid, 0 warnings** (untouched).
 
@@ -188,7 +197,8 @@ cases; unjudgeable-as-written candidates; MANUAL-ONLY positive incompatibilities
 skill and a same-named subagent are distinct edges); and per-case author-facing findings.
 Risk classes, runnability figures, and findings are PROPOSED and feed the OD-2/OD-3 owner
 decisions; none is owner-ratified and none controls live behavior or promotion. Census file
-SHA-256: `28747cc1dc696b7758e9a8d5affe8cf58bd648a7ac235ef6ba7ccdabc02e38ab`.
+SHA-256: `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a` (corrected from the
+stale pre-`58bd6f7` `28747cc1…`; see §5).
 
 ## 7. Model and spend usage
 
@@ -293,12 +303,15 @@ reproduced with a failing test first (`tests/test_review_blockers.py`):
   now compares every supplied derived field (`baseline_eligible`,
   `baseline_ineligibility_reasons`, `execution_profile_hash`) against the authoritative
   recomputation and rejects any mismatch, instead of silently discarding them.
-- **B — materialization record claims (CONFIRMED, fixed):** `verify_materialization_manifests`
-  now recomputes `materialized_skill_count` and `subagent_count` from the verified
-  runtime-surface file set and enforces the cross-field invariants
-  (`claim_scope`↔profile, `workspace_role`↔profile, `shipped_skill_count ≥
-  materialized_skill_count`, and `baseline_eligible` ⇔ not (partial_install or any
-  ambiguity)) — a caller-supplied record can no longer publish false counts/scope/eligibility.
+- **B — materialization record claims (CONFIRMED, fixed in §9a, tightened in §9b):**
+  `verify_materialization_manifests` recomputes `materialized_skill_count` and
+  `subagent_count` from the verified runtime-surface file set and enforces the cross-field
+  invariants (`claim_scope`↔profile, `workspace_role`↔profile, and `baseline_eligible` ⇔
+  not (partial_install or any ambiguity)). The §9a wording implied full binding; §9b shows
+  the shipped-count and ambiguity claims were NOT fully bound (the old `shipped ≥
+  materialized` floor let an inflated count through, and the excluded-file ambiguity
+  inventory is absent from all three manifests). §9b binds what is derivable and classifies
+  the rest UNVERIFIED rather than certifying it.
 - **D — directory enumeration (CONFIRMED, fixed):** the on-disk enumeration passes an
   `onerror` handler to `os.walk` that converts every traversal failure into a fail-closed
   `MaterializationError`, so an unreadable extra subtree can never be silently omitted.
@@ -308,41 +321,87 @@ reproduced with a failing test first (`tests/test_review_blockers.py`):
   `additionalProperties:false` schema and no operator-private path leaks into portable
   evidence.
 - **C — reparse/TOCTOU write window (CONFIRMED, PARTIALLY fixed — owner decision):** the
-  persisted-manifest writes now route through the same reparse-checked `_write_file` as
-  every surface write (the previously unchecked raw `open()` gap is closed); `_write_file`
-  rechecks the reparse chain before and after parent creation, opens the leaf with
-  `O_CREAT|O_EXCL|O_NOFOLLOW` (a genuine POSIX no-follow/exclusive-create guarantee), and
-  re-verifies physical containment after writing. **Residual platform non-claim:** on
-  Windows the stdlib has no `O_NOFOLLOW`, so a symlink/junction planted in the final
-  create→open window cannot be provably prevented in stdlib; a full Windows guarantee needs
-  native no-follow handles (`CreateFileW` + `FILE_FLAG_OPEN_REPARSE_POINT` via ctypes),
-  which is outside WP-2B-1's stdlib-only scope. This residual is **not** claimed solved.
+  persisted-manifest writes route through the same reparse-checked `_write_file` as every
+  surface write (the previously unchecked raw `open()` gap is closed). The third commit's
+  wording that leaf `O_NOFOLLOW` was "a genuine POSIX no-follow/exclusive-create guarantee"
+  **overstated** the protection and is withdrawn (see §9b): a leaf-only `O_NOFOLLOW` guards
+  ONLY the final component; a symlink swapped into a PARENT component is still followed.
 - **E — descendants after leader exit (CONFIRMED, PARTIALLY fixed — owner decision):**
-  `SessionWatchdog` now captures the session process-group id while the leader is alive and
-  terminates that group at **every** supervise exit (normal or timeout), not only on
-  timeout — a genuine POSIX guarantee that a background descendant is reaped after the
-  leader exits. **Residual platform non-claim:** on Windows, once the leader PID is gone,
-  reliably reaping surviving descendants requires a native **Job Object** (ctypes), outside
-  WP-2B-1's stdlib-only scope. The POSIX guarantee was not executed here (no POSIX
-  interpreter available) and is reported UNRUN; the Windows residual is **not** claimed
-  solved.
+  `SessionWatchdog` cleans up the session group at **every** supervise exit (normal or
+  timeout), not only on timeout. The third commit's wording that this was "a genuine POSIX
+  guarantee that a background descendant is reaped" **overstated** the result and is
+  withdrawn (see §9b): the group id was discovered by a late `getpgid` that can miss the
+  group after the leader exits, and cleanup failures were swallowed without verification.
+
+### 9b. Second reconciliation pass (PR #83 fourth commit)
+
+An independent control-layer review of exact head `4b3673d` found the §9a B/C/E claims
+still incomplete or overstated. This pass corrects each with a failing test first
+(`tests/test_review_blockers.py`), never claiming a defect solved while an exploitable
+window remains. Test count 347 → **363**.
+
+- **B — record-claim binding TIGHTENED (fixed for the derivable claims; the rest classified
+  UNVERIFIED, not certified):** a FULL_LIBRARY record now requires `shipped_skill_count ==
+  materialized_skill_count` (the old `≥` floor accepted an inflated `999`); the
+  `baseline_ineligibility_reasons` are recomputed from a single source of truth and compared
+  EXACTLY (empty-reasons-with-ineligible, spurious-reasons-with-eligible, and fabricated
+  reason text are rejected). The verifier reads only the persisted destination, never the
+  source library, so the one shipped-related claim it proves is the enforced `shipped ==
+  materialized` equality invariant (`full_library_shipped_equals_materialized`) — a
+  necessary consistency check, NOT proof of completeness against the real library. The
+  **shipped TOTAL** (both full-library and partial) and the **excluded-file ambiguity
+  inventory** are NOT bindable here, so they are disclosed via `record_claims_unverifiable`
+  and the overall `record_claims_verified` is `false` while they remain unbound — the
+  verifier no longer emits a blanket `record_claims_verified = true`.
+  `record_derivable_claims_verified` reports that every BINDABLE claim held. Fully binding the ambiguity inventory would need a
+  fourth hashed manifest or a manifest-schema change — an **OPEN owner decision**, out of
+  WP-2B-1 scope; the classify-unverified path is taken instead.
+- **C — reparse/TOCTOU claim CORRECTED + POSIX prevention IMPLEMENTED-BUT-UNRUN:** the
+  overstated leaf-`O_NOFOLLOW` "guarantee" is withdrawn. On POSIX hosts with dir-fd +
+  `O_DIRECTORY` + `O_NOFOLLOW`, writes now route through `_write_file_dirfd`, which creates
+  and reopens EVERY component under the destination with `O_NOFOLLOW` relative to a directory
+  descriptor — no symlink in any parent OR the leaf can be traversed, closing the
+  parent-chain TOCTOU window. This path is **IMPLEMENTED_BUT_UNRUN** on the Windows evidence
+  host (reported by `reparse_write_capability()`; a POSIX parent-swap-fails-closed test is
+  authored and skipped here). On Windows the stdlib fallback DETECTS a pre-existing reparse
+  but cannot PREVENT a mid-operation parent swap: the **atomic no-reparse write on Windows is
+  UNAVAILABLE / NON-BASELINE**, needs native no-follow handles (`CreateFileW`/ctypes) out of
+  scope, is **not** claimed solved, and stays an OPEN owner decision.
+- **E — process group bound at CREATION + cleanup VERIFIED + fail-closed:** `spawn_supervised`
+  binds the session pgid at creation (POSIX `start_new_session` ⇒ pgid == pid, no late
+  `getpgid` race). At every exit the group is terminated and, on POSIX, bounded-polled with
+  `killpg(pg, 0)` until confirmed empty (`VERIFIED_EMPTY`); a still-populated group or a
+  `killpg` error is `FAILED_NONEMPTY` and **fails the supervision closed** — never swallowed,
+  never reported as success. On Windows, post-leader descendant reaping cannot be verified in
+  stdlib, so it is reported **UNAVAILABLE** (not `VERIFIED`), needs a native Job Object out of
+  scope, is **not** claimed solved, and stays an OPEN owner decision. The POSIX
+  end-to-end path is UNRUN here.
+- **Execution-profile strict typing (§7):** `ExecutionProfile.from_dict` now strictly TYPES
+  the serialized derived fields before comparison — `baseline_eligible` must be a JSON
+  boolean (a JSON `1` is rejected despite `1 == True`), `baseline_ineligibility_reasons` a
+  JSON list of strings (an empty string/dict is rejected despite `list({}) == []`), and
+  `execution_profile_hash` a lowercase 64-hex digest.
 
 ## 10. Owner decisions required at implementation review
 
 - Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
 - Ratify, revise, or defer the proposed OD-3 risk-class assignments and CRITICAL category.
 - Accept or reject the WP-2B-1 implementation as satisfying the offline scope.
-- **(New) Finding C — Windows reparse/TOCTOU write-race:** decide whether to accept the
-  documented stdlib residual (POSIX `O_NOFOLLOW` + rechecks + post-write containment) with
-  the Windows leaf-race as a non-claim, or authorize native no-follow handles (ctypes) in a
-  later phase. WP-2B-1 does not add native FFI.
-- **(New) Finding E — Windows descendant cleanup after leader exit:** decide whether to
-  accept the POSIX process-group guarantee with the Windows residual as a non-claim, or
-  authorize native Windows Job Objects (ctypes) in a later phase.
-
-- Accept or reject the final WP-2B-1 schema shapes (BER-BKL-007).
-- Ratify, revise, or defer the proposed OD-3 risk-class assignments and CRITICAL category.
-- Accept or reject the WP-2B-1 implementation as satisfying the offline scope.
+- **(New) Finding B — ambiguity-inventory / shipped-total binding:** the excluded-file
+  ambiguity inventory and the shipped TOTAL against the source library (the verifier reads
+  only the destination) are not derivable from the three include-only manifests, so they are
+  classified UNVERIFIED. Decide whether to authorize a fourth hashed manifest (or a
+  manifest-schema change) to bind them, or accept the classify-unverified disclosure.
+  WP-2B-1 does not change the three-manifest architecture.
+- **(New) Finding C — Windows reparse/TOCTOU write-race:** POSIX parent-chain prevention is
+  implemented (descriptor-relative no-follow) but UNRUN here; the **Windows atomic no-reparse
+  write is UNAVAILABLE / NON-BASELINE**. Decide whether to accept the Windows residual as a
+  non-claim, or authorize native no-follow handles (`CreateFileW`/ctypes) in a later phase.
+  WP-2B-1 does not add native FFI.
+- **(New) Finding E — Windows descendant cleanup after leader exit:** the group is bound at
+  creation and POSIX cleanup is verified/fail-closed (UNRUN here); Windows post-leader
+  descendant reaping is **UNAVAILABLE**. Decide whether to accept the Windows residual as a
+  non-claim, or authorize native Windows Job Objects (ctypes) in a later phase.
 
 ## 11. Intentionally not done / limitations
 

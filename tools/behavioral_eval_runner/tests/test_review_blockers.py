@@ -36,7 +36,9 @@ from tools.behavioral_eval_runner.execution_profile import (
     synthetic_isolated_profile,
 )
 from tools.behavioral_eval_runner.materialize import (
+    _POSIX_NOFOLLOW_WRITE,
     MaterializationRecord,
+    reparse_write_capability,
     verify_materialization_manifests,
 )
 from tools.behavioral_eval_runner.process_control import (
@@ -429,6 +431,35 @@ class TestExecutionProfileDerivedClaims(unittest.TestCase):
         prof = ExecutionProfile.from_dict(payload)  # must not raise
         self.assertTrue(prof.baseline_eligible)
 
+    # --- Round 2 §7: serialized derived fields must be strictly TYPED before the
+    # value comparison, so a JSON int/collection/mis-cased hash cannot slip past
+    # Python's loose equality (1 == True, list({}) == []). ----------------------
+    def test_nonbool_baseline_eligible_rejected(self) -> None:
+        payload = synthetic_isolated_profile().to_dict(include_derived=True)
+        # Recomputed value is True; a JSON int 1 must NOT be accepted as the bool
+        # (1 == True would otherwise sneak past the value comparison).
+        payload["baseline_eligible"] = 1
+        with self.assertRaises(ProfileError):
+            ExecutionProfile.from_dict(payload)
+
+    def test_reasons_empty_nonlist_rejected(self) -> None:
+        # For an eligible profile the recomputed reasons are []; an empty string
+        # or empty dict must NOT be accepted just because list("")/list({}) == [].
+        for bad in ("", {}, ["a", 123]):
+            payload = synthetic_isolated_profile().to_dict(include_derived=True)
+            payload["baseline_ineligibility_reasons"] = bad
+            with self.assertRaises(ProfileError):
+                ExecutionProfile.from_dict(payload)
+
+    def test_hash_wrong_format_rejected(self) -> None:
+        base = synthetic_isolated_profile().to_dict(include_derived=True)
+        good = base["execution_profile_hash"]
+        for bad in (good.upper(), good[:63], good + "a", "z" * 64, 123):
+            payload = dict(base)
+            payload["execution_profile_hash"] = bad
+            with self.assertRaises(ProfileError):
+                ExecutionProfile.from_dict(payload)
+
 
 # =============================================================== Fresh finding B
 class TestMaterializationRecordClaimBinding(TestMaterializationManifestIntegrity):
@@ -460,6 +491,88 @@ class TestMaterializationRecordClaimBinding(TestMaterializationManifestIntegrity
         )
         with self.assertRaises(MaterializationError):
             verify_materialization_manifests(self.root, bad)
+
+    # --- Round 2 §4: the derivable claims must be BOUND, and the claims that
+    # cannot be bound from the three manifests must be classified UNVERIFIED,
+    # never silently certified. -------------------------------------------------
+    _AMBIGUITY_REASON = (
+        "ambiguous_needs_owner_review files were excluded from the runtime "
+        "surface: ['x/amb.bin']"
+    )
+
+    def test_full_library_inflated_shipped_count_rejected(self) -> None:
+        # A full-library record materializes EVERY shipped skill, so the shipped
+        # total must equal the materialized count; 999 is unbound inflation the
+        # >=-floor let through.
+        bad = replace(self.record, shipped_skill_count=999)
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_fabricated_ineligibility_reasons_rejected(self) -> None:
+        # Ineligible for a real (ambiguity) cause, but the reason TEXT is a
+        # fabrication that does not match the recomputed reason.
+        bad = replace(
+            self.record,
+            ambiguous_excluded=("x/amb.bin",),
+            baseline_eligible=False,
+            baseline_ineligibility_reasons=("totally fabricated reason",),
+        )
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_ineligible_record_with_empty_reasons_rejected(self) -> None:
+        bad = replace(
+            self.record,
+            ambiguous_excluded=("x/amb.bin",),
+            baseline_eligible=False,
+            baseline_ineligibility_reasons=(),
+        )
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_eligible_record_with_spurious_reasons_rejected(self) -> None:
+        bad = replace(
+            self.record,
+            baseline_eligible=True,
+            baseline_ineligibility_reasons=("spurious reason on an eligible record",),
+        )
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_ambiguity_inventory_is_classified_unverified(self) -> None:
+        # Even a fully self-consistent record cannot have its ambiguity inventory
+        # bound from the three (include-only) manifests, so it must NOT be
+        # certified — only the derivable claims are.
+        result = verify_materialization_manifests(self.root, self.record)
+        self.assertFalse(result["record_claims_verified"])
+        self.assertTrue(result["record_derivable_claims_verified"])
+        self.assertIn(
+            "ambiguous_excluded_inventory", result["record_claims_unverifiable"]
+        )
+        # The verifier reads only the destination, so the shipped TOTAL against
+        # the source library is disclosed unverified even for a full-library run.
+        self.assertIn(
+            "shipped_skill_count_total", result["record_claims_unverifiable"]
+        )
+        self.assertTrue(
+            result["record_claims"]["shipped_skill_count_total"].startswith("unverified")
+        )
+
+    def test_fabricated_ambiguity_inventory_not_certified(self) -> None:
+        # A fabricated/deleted ambiguity list that is internally self-consistent
+        # cannot be refuted from the manifests, so it is disclosed UNVERIFIED
+        # rather than silently certified.
+        rebound = replace(
+            self.record,
+            ambiguous_excluded=("x/amb.bin",),
+            baseline_eligible=False,
+            baseline_ineligibility_reasons=(self._AMBIGUITY_REASON,),
+        )
+        result = verify_materialization_manifests(self.root, rebound)
+        self.assertFalse(result["record_claims_verified"])
+        self.assertIn(
+            "ambiguous_excluded_inventory", result["record_claims_unverifiable"]
+        )
 
 
 # =============================================================== Fresh finding D
@@ -557,30 +670,190 @@ class TestMaterializationWriteReparse(unittest.TestCase):
         src = inspect.getsource(m.materialize)
         self.assertNotIn('open(target, "wb")', src, "manifest write bypasses _write_file")
 
+    # --- Round 2 §5: the parent-chain TOCTOU claim is corrected. On a host
+    # without dir-fd no-follow (Windows here) the mid-operation parent swap is
+    # honestly reported UNAVAILABLE / NON-BASELINE; on POSIX it is PREVENTED. ---
+    def test_reparse_write_capability_matches_platform(self) -> None:
+        from tools.behavioral_eval_runner.materialize import (
+            _POSIX_NOFOLLOW_WRITE,
+            reparse_write_capability,
+        )
+
+        report = reparse_write_capability()
+        if _POSIX_NOFOLLOW_WRITE:
+            self.assertEqual(report["parent_component_toctou"], "PREVENTED")
+            self.assertEqual(report["baseline_status"], "IMPLEMENTED_BUT_UNRUN")
+        else:
+            # Windows evidence host: no dir-fd no-follow, so a mid-operation
+            # parent swap cannot be prevented in stdlib — NOT claimed solved.
+            self.assertEqual(report["parent_component_toctou"], "UNAVAILABLE")
+            self.assertEqual(report["baseline_status"], "NON_BASELINE")
+
+    def test_windows_host_has_no_dirfd_nofollow_write(self) -> None:
+        if os.name != "nt":
+            self.skipTest("Windows-only residual assertion")
+        from tools.behavioral_eval_runner.materialize import _POSIX_NOFOLLOW_WRITE
+
+        self.assertFalse(
+            _POSIX_NOFOLLOW_WRITE,
+            "Windows stdlib has no dir-fd O_NOFOLLOW; the atomic no-reparse write "
+            "must stay UNAVAILABLE / NON-BASELINE (Finding C), not claimed solved",
+        )
+
+    @unittest.skipUnless(
+        _POSIX_NOFOLLOW_WRITE,
+        "descriptor-relative no-follow write is POSIX-only (UNRUN on Windows)",
+    )
+    def test_posix_parent_swap_between_check_and_open_fails_closed(self) -> None:
+        # IMPLEMENTED BUT UNRUN in the WP-2B-1 Windows evidence environment.
+        # Interleave an attacker that replaces a freshly-created parent component
+        # with a symlink; the no-follow reopen relative to the dir fd must refuse
+        # it, so the write fails closed rather than escaping the destination.
+        from tools.behavioral_eval_runner.materialize import _write_file
+
+        real_mkdir = os.mkdir
+
+        with tempfile.TemporaryDirectory() as root:
+            dest = os.path.join(root, "dest")
+            os.makedirs(dest)
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+
+            def swapping_mkdir(name, mode=0o777, *, dir_fd=None):
+                # Simulate the TOCTOU: instead of a real directory, an attacker
+                # plants a symlink to an outside directory at this component.
+                os.symlink(outside, name, dir_fd=dir_fd)
+
+            with mock.patch("os.mkdir", side_effect=swapping_mkdir):
+                with self.assertRaises((ReparsePointError, MaterializationError)):
+                    _write_file(dest, "nested/escaped.txt", b"x")
+            # And the attack must not have produced a file outside the root.
+            self.assertFalse(os.path.exists(os.path.join(outside, "escaped.txt")))
+            self.assertEqual(real_mkdir, os.mkdir)  # patch fully reverted
+
 
 # =============================================================== Fresh finding E
 class TestSupervisorDescendantCleanup(unittest.TestCase):
-    """E: the supervised session must clean up its process group even when the
-    leader exits normally (not only on timeout)."""
+    """E (Round 2): the process group is bound at CREATION, cleanup is VERIFIED,
+    and an unverifiable/failed cleanup is never reported as success."""
+
+    @staticmethod
+    def _exited_process(pid: int = 777):
+        return types.SimpleNamespace(
+            pid=pid, poll=lambda: 0, wait=lambda timeout=None: 0
+        )
 
     def test_cleanup_runs_on_normal_leader_exit(self) -> None:
-        from tools.behavioral_eval_runner.process_control import SessionWatchdog
+        from tools.behavioral_eval_runner.process_control import (
+            SessionCleanupResult,
+            SessionWatchdog,
+            SupervisedProcess,
+        )
 
         watchdog = SessionWatchdog(timeout_seconds=30)
-        finished = types.SimpleNamespace(pid=4321, poll=lambda: 0)
+        supervised = SupervisedProcess(
+            process=self._exited_process(4321), session_pgid=4321, isolated=True
+        )
+        verified = SessionCleanupResult(
+            "posix_killpg", True, "VERIFIED_EMPTY", "group empty"
+        )
         with mock.patch.object(
-            watchdog, "_terminate_session_group", return_value=None
+            watchdog, "_terminate_and_verify_session", return_value=verified
         ) as cleanup:
-            result = watchdog.supervise(finished)
+            result = watchdog.supervise(supervised)
         self.assertIsNone(result)
         cleanup.assert_called_once()
+        self.assertTrue(watchdog.last_cleanup.is_confirmed_clean)
+
+    def test_group_is_bound_at_creation_not_by_late_getpgid(self) -> None:
+        # spawn_supervised must record the session pgid at creation. On POSIX,
+        # start_new_session=True makes the child its own group leader, so
+        # pgid == pid with no getpgid race window (leader may already be gone).
+        import subprocess
+        from tools.behavioral_eval_runner.process_control import spawn_supervised
+
+        fake_proc = types.SimpleNamespace(pid=4242)
+        with (
+            mock.patch.object(sys, "platform", "linux"),
+            mock.patch.object(subprocess, "Popen", return_value=fake_proc),
+        ):
+            supervised = spawn_supervised([sys.executable, "-c", "pass"])
+        self.assertEqual(supervised.session_pgid, 4242)
+        self.assertTrue(supervised.isolated)
+
+    def test_descendants_remaining_after_kill_fails_closed(self) -> None:
+        # Cleanup was attempted, but the group is still non-empty on every
+        # bounded check: this MUST fail closed, never report success.
+        from tools.behavioral_eval_runner.process_control import (
+            ProcessControlError,
+            SessionWatchdog,
+            SupervisedProcess,
+        )
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        watchdog._verify_attempts = 3
+        watchdog._verify_interval = 0.0
+        supervised = SupervisedProcess(
+            process=self._exited_process(), session_pgid=555, isolated=True
+        )
+        with (
+            mock.patch.object(sys, "platform", "linux"),
+            mock.patch.object(watchdog, "_posix_kill_group", return_value=None),
+            mock.patch.object(watchdog, "_posix_group_alive", return_value=True),
+        ):
+            with self.assertRaises(ProcessControlError):
+                watchdog.supervise(supervised)
+        self.assertEqual(watchdog.last_cleanup.verification, "FAILED_NONEMPTY")
+
+    def test_killpg_failure_is_not_swallowed(self) -> None:
+        from tools.behavioral_eval_runner.process_control import (
+            ProcessControlError,
+            SessionWatchdog,
+            SupervisedProcess,
+        )
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        supervised = SupervisedProcess(
+            process=self._exited_process(), session_pgid=556, isolated=True
+        )
+        with (
+            mock.patch.object(sys, "platform", "linux"),
+            mock.patch.object(
+                watchdog, "_posix_kill_group", side_effect=OSError("EPERM")
+            ),
+        ):
+            with self.assertRaises(ProcessControlError):
+                watchdog.supervise(supervised)
+        self.assertEqual(watchdog.last_cleanup.verification, "FAILED_NONEMPTY")
+
+    def test_windows_post_leader_cleanup_is_unavailable_not_success(self) -> None:
+        # On Windows, once the leader has exited, descendant reaping cannot be
+        # verified in stdlib. The result must be UNAVAILABLE (NOT confirmed
+        # clean) — honest NON-BASELINE — and must not raise (it is not a failure,
+        # it is unverifiable) and must not claim verified success.
+        if os.name != "nt":
+            self.skipTest("Windows-only residual assertion")
+        from tools.behavioral_eval_runner.process_control import (
+            SessionWatchdog,
+            SupervisedProcess,
+        )
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        supervised = SupervisedProcess(
+            process=self._exited_process(), session_pgid=None, isolated=True
+        )
+        result = watchdog.supervise(supervised)
+        self.assertIsNone(result)
+        self.assertEqual(watchdog.last_cleanup.verification, "UNAVAILABLE")
+        self.assertFalse(watchdog.last_cleanup.is_confirmed_clean)
 
     @unittest.skipUnless(os.name == "posix", "POSIX process-group semantics")
     def test_posix_background_child_terminated_after_leader_exit(self) -> None:  # pragma: no cover - POSIX only
         import subprocess
+
         from tools.behavioral_eval_runner.process_control import (
             SessionWatchdog,
-            popen_isolation_kwargs,
+            spawn_supervised,
         )
 
         leader_src = (
@@ -588,13 +861,11 @@ class TestSupervisorDescendantCleanup(unittest.TestCase):
             "c=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'])\n"
             "print(c.pid, flush=True)\n"
         )
-        proc = subprocess.Popen(
-            [sys.executable, "-c", leader_src],
-            stdout=subprocess.PIPE,
-            **popen_isolation_kwargs(),
+        supervised = spawn_supervised(
+            [sys.executable, "-c", leader_src], stdout=subprocess.PIPE
         )
-        child_pid = int(proc.stdout.readline().decode().strip())
-        SessionWatchdog(timeout_seconds=30).supervise(proc)
+        child_pid = int(supervised.process.stdout.readline().decode().strip())
+        SessionWatchdog(timeout_seconds=30).supervise(supervised)
         import time as _t
 
         _t.sleep(0.5)

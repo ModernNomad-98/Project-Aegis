@@ -22,6 +22,9 @@ UNAVAILABLE = CapabilityState.UNAVAILABLE.value
 UNKNOWN = CapabilityState.UNKNOWN.value
 _SENTINELS = frozenset({UNAVAILABLE, UNKNOWN})
 
+#: A canonical SHA-256 hex digest: exactly 64 lowercase hex characters.
+_SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+
 #: Fields whose value must be OBSERVED and ISOLATED for baseline eligibility.
 REQUIRED_FOR_BASELINE = (
     "runtime_version",
@@ -172,6 +175,33 @@ class ExecutionProfile:
             raise ProfileError(f"ExecutionProfile: unknown keys {sorted(unknown)}")
         profile = cls(**{k: v for k, v in payload.items() if k in field_names})
         profile.validate()
+        # Round 2 §7: strictly TYPE the serialized derived fields BEFORE any value
+        # comparison. Python's loose equality (1 == True, list({}) == list("") ==
+        # [] ) would otherwise let a JSON int, empty dict, or empty string pass as
+        # a bool / reason list, and a mis-cased or wrong-length hash is never a
+        # canonical digest.
+        if "baseline_eligible" in payload and type(payload["baseline_eligible"]) is not bool:
+            raise ProfileError(
+                "baseline_eligible must be a JSON boolean, got "
+                f"{type(payload['baseline_eligible']).__name__}"
+            )
+        if "baseline_ineligibility_reasons" in payload:
+            reasons = payload["baseline_ineligibility_reasons"]
+            if not isinstance(reasons, list) or not all(
+                isinstance(reason, str) for reason in reasons
+            ):
+                raise ProfileError(
+                    "baseline_ineligibility_reasons must be a JSON list of strings"
+                )
+        if "execution_profile_hash" in payload:
+            supplied_hash = payload["execution_profile_hash"]
+            if not isinstance(supplied_hash, str) or _SHA256_HEX.fullmatch(
+                supplied_hash
+            ) is None:
+                raise ProfileError(
+                    "execution_profile_hash must be a lowercase 64-character hex "
+                    "SHA-256 digest"
+                )
         # Finding A: supplied derived fields are NOT silently discarded — each
         # is compared against the authoritative recomputation and any mismatch
         # is rejected, so a serialized record cannot claim a false

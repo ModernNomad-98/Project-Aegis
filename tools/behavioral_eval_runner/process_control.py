@@ -9,11 +9,23 @@ Platform-specific, standard-library-only process-tree termination:
 Tests use controlled synthetic child processes spawned by the tests
 themselves; nothing here touches unrelated processes.
 
-Platform non-claim (Finding E): the supervised-session cleanup terminates the
-retained process group at every exit — a genuine POSIX guarantee. On Windows,
-reliably reaping descendants after the leader PID has exited requires a native
-Job Object (ctypes), which is out of WP-2B-1's stdlib-only scope and is NOT
-claimed here; it is recorded as an owner decision in the implementation summary.
+Platform posture (Finding E — corrected in Round 2). The supervised process group
+is bound at CREATION via ``spawn_supervised`` (POSIX ``start_new_session`` makes
+the child its own group leader, so the group id equals the pid and is known before
+the leader can exit — no late ``getpgid`` race). At every exit the runner
+terminates the group AND verifies the outcome:
+
+- POSIX: after ``killpg(SIGKILL)`` the group is bounded-polled with ``killpg(pg, 0)``
+  until it is confirmed empty (``VERIFIED_EMPTY``); a still-populated group or a
+  ``killpg`` error is ``FAILED_NONEMPTY`` and fails the supervision CLOSED — never
+  swallowed, never reported as success. Exercised on POSIX CI; UNRUN in the
+  WP-2B-1 Windows evidence environment.
+- Windows: ``taskkill /T`` is issued WHILE the leader is still pollable, but once
+  the leader PID has exited there is no stdlib way to enumerate or verify the
+  surviving descendant tree. That completeness is reported ``UNAVAILABLE`` (NOT
+  ``VERIFIED``); reliable post-leader reaping needs a native Job Object (ctypes),
+  OUT of WP-2B-1's stdlib-only scope. It is NOT claimed solved and remains an OPEN
+  owner decision in the implementation summary.
 """
 
 from __future__ import annotations
@@ -216,67 +228,202 @@ def popen_isolation_kwargs() -> dict:
     return {"start_new_session": True}
 
 
+@dataclass(frozen=True, slots=True)
+class SupervisedProcess:
+    """Runner-owned handle binding a supervised child to its kill scope.
+
+    ``session_pgid`` is captured at CREATION (Finding E), so descendant cleanup
+    no longer depends on a late ``getpgid`` that races the leader's exit. On
+    Windows there is no process-group id, so it is ``None`` and ``taskkill /T``
+    scopes by the pid tree while the leader is still alive.
+    """
+
+    process: subprocess.Popen
+    session_pgid: int | None
+    isolated: bool
+
+
+@dataclass(frozen=True, slots=True)
+class SessionCleanupResult:
+    """Outcome of a supervised-session cleanup, with an HONEST verification state.
+
+    ``verification`` is one of:
+
+    - ``VERIFIED_EMPTY``  — the session group was confirmed to hold no live member;
+    - ``FAILED_NONEMPTY`` — cleanup ran but the group is still populated / errored;
+    - ``UNAVAILABLE``     — the platform cannot verify completeness (Windows, after
+      the leader has exited); neither confirmed nor denied;
+    - ``NOT_ATTEMPTED``   — no group was bound / the target was the runner's group.
+    """
+
+    mechanism: str
+    attempted: bool
+    verification: str
+    detail: str
+
+    @property
+    def is_confirmed_clean(self) -> bool:
+        return self.verification == "VERIFIED_EMPTY"
+
+
+def spawn_supervised(argv: list[str], **popen_kwargs) -> SupervisedProcess:
+    """Spawn a supervised child in its own kill scope, binding the group at
+    creation. Control-plane only: never launches a model session (live dispatch
+    is disabled in WP-2B-1)."""
+    kwargs = dict(popen_isolation_kwargs())
+    kwargs.update(popen_kwargs)
+    process = subprocess.Popen(argv, **kwargs)  # noqa: S603 - caller-fixed argv
+    if sys.platform == "win32":
+        return SupervisedProcess(process, None, isolated=True)
+    # pgid == pid ONLY holds if the child actually became its own session/group
+    # leader. If a caller overrode start_new_session, do NOT assert a bound pgid:
+    # a wrong pgid could later be reported as a false VERIFIED_EMPTY. In that case
+    # the group is unbound (NOT_ATTEMPTED cleanup) — honest, not falsely clean.
+    if kwargs.get("start_new_session"):
+        return SupervisedProcess(process, process.pid, isolated=True)
+    return SupervisedProcess(process, None, isolated=False)
+
+
 class SessionWatchdog:
     """Bounded supervision of ONE runner-owned synthetic subprocess.
 
     This is control-plane machinery for the runner's own deterministic tests;
     it never launches a model session (live dispatch is disabled in WP-2B-1).
-    Spawn supervised processes with ``popen_isolation_kwargs()``.
+    Prefer ``spawn_supervised`` so the session group is bound at creation; a raw
+    Popen can still be ``adopt``-ed with a best-effort late binding.
     """
 
     def __init__(self, timeout_seconds: float) -> None:
         self.controller = TimeoutController(timeout_seconds)
-        self._session_pgid: int | None = None
+        self.last_cleanup: SessionCleanupResult | None = None
+        self._verify_attempts = 25
+        self._verify_interval = 0.02
 
-    def _capture_session_group(self, process: subprocess.Popen) -> None:
-        """Record the session/process-group id WHILE the leader is still alive.
+    def adopt(self, process: subprocess.Popen) -> SupervisedProcess:
+        """Wrap a raw Popen with a best-effort LATE group binding (NOT isolated).
 
-        Finding E: the group identity must be retained independently of the
-        leader PID so descendants can be reaped even after the leader exits.
+        Prefer ``spawn_supervised``: a late ``getpgid`` can miss the group if the
+        leader has already exited, which is exactly the race Finding E fixes.
         """
         if sys.platform == "win32":
-            return
+            return SupervisedProcess(process, None, isolated=False)
         try:
-            self._session_pgid = os.getpgid(process.pid)
+            pgid = os.getpgid(process.pid)
         except (ProcessLookupError, OSError):
-            self._session_pgid = None
+            pgid = None
+        return SupervisedProcess(process, pgid, isolated=False)
 
-    def _terminate_session_group(self, process: subprocess.Popen) -> None:
-        """Best-effort termination of the whole supervised session at exit.
+    def _posix_kill_group(self, pgid: int) -> None:
+        os.killpg(pgid, signal.SIGKILL)
 
-        POSIX: SIGKILL the retained process group (never the runner's own
-        group). Windows: taskkill the tree WHILE the leader is still pollable;
-        once the leader has exited, reliably reaping surviving descendants
-        requires a native Job Object (out of WP-2B-1 stdlib scope) — this is a
-        documented platform NON-CLAIM, not a fabricated guarantee.
+    def _posix_group_alive(self, pgid: int) -> bool:
+        """True if the process group still has at least one live member."""
+        try:
+            os.killpg(pgid, 0)
+        except ProcessLookupError:
+            return False
+        except OSError:
+            # EPERM: members exist but we cannot signal them -> treat as alive.
+            return True
+        return True
+
+    def _terminate_and_verify_session(
+        self, supervised: SupervisedProcess
+    ) -> SessionCleanupResult:
+        """Terminate the supervised session group and VERIFY the outcome.
+
+        Never swallows a failure and never claims an unverifiable cleanup as
+        success (Finding E).
         """
+        process = supervised.process
         if sys.platform == "win32":
+            attempted = False
+            detail = (
+                "leader already exited; Windows descendant reaping needs a native "
+                "Job Object (out of WP-2B-1 stdlib scope)"
+            )
             if process.poll() is None:
                 try:
                     kill_process_tree(process.pid)
-                except ProcessControlError:
-                    pass
-            return
-        pgid = self._session_pgid
-        if pgid is None or pgid == os.getpgid(0):
-            return  # never signal the runner's own group
+                    attempted = True
+                    detail = "taskkill /T issued while the leader was still alive"
+                except ProcessControlError as exc:
+                    attempted = True
+                    detail = f"taskkill failed: {exc}"
+            # Descendant-reaping completeness is UNVERIFIABLE in stdlib on Windows
+            # -> reported UNAVAILABLE, never VERIFIED (honest NON-BASELINE).
+            return SessionCleanupResult(
+                "windows_taskkill_tree", attempted, "UNAVAILABLE", detail
+            )
+        pgid = supervised.session_pgid
+        if pgid is None:
+            return SessionCleanupResult(
+                "posix_killpg",
+                False,
+                "NOT_ATTEMPTED",
+                "no session pgid was bound at creation; cannot target the group",
+            )
+        own_group = os.getpgid(0) if hasattr(os, "getpgid") else None
+        if own_group is not None and pgid == own_group:
+            return SessionCleanupResult(
+                "posix_killpg",
+                False,
+                "NOT_ATTEMPTED",
+                "refusing to signal the runner's own process group",
+            )
         try:
-            os.killpg(pgid, signal.SIGKILL)
-        except (ProcessLookupError, OSError):
-            pass
+            self._posix_kill_group(pgid)
+        except ProcessLookupError:
+            return SessionCleanupResult(
+                "posix_killpg", True, "VERIFIED_EMPTY", "group already empty"
+            )
+        except OSError as exc:
+            return SessionCleanupResult(
+                "posix_killpg", True, "FAILED_NONEMPTY", f"killpg failed: {exc}"
+            )
+        for _ in range(self._verify_attempts):
+            if not self._posix_group_alive(pgid):
+                return SessionCleanupResult(
+                    "posix_killpg", True, "VERIFIED_EMPTY", f"pgid {pgid} empty"
+                )
+            if self._verify_interval:
+                time.sleep(self._verify_interval)
+        return SessionCleanupResult(
+            "posix_killpg",
+            True,
+            "FAILED_NONEMPTY",
+            f"pgid {pgid} still has live members after {self._verify_attempts} checks",
+        )
 
-    def supervise(self, process: subprocess.Popen) -> KillResult | None:
-        """Wait for ``process``; clean up the whole session at EVERY exit.
+    def _enforce_cleanup(self, cleanup: SessionCleanupResult) -> None:
+        # Fail closed ONLY on a confirmed failure. UNAVAILABLE (Windows) and
+        # NOT_ATTEMPTED are surfaced via last_cleanup but are never reported as a
+        # verified success and never silently swallowed.
+        if cleanup.verification == "FAILED_NONEMPTY":
+            raise ProcessControlError(
+                "supervised session cleanup could not be verified clean: "
+                f"{cleanup.detail}"
+            )
 
-        Returns the KillResult when an emergency kill fired, else None. On a
-        normal leader exit the session group is still cleaned up so a
-        background descendant cannot survive (Finding E).
+    def supervise(self, target: "SupervisedProcess | subprocess.Popen") -> KillResult | None:
+        """Wait for the leader; terminate AND verify the session at EVERY exit.
+
+        Accepts a ``SupervisedProcess`` (preferred: group bound at creation) or a
+        raw Popen (``adopt``-ed with a best-effort late binding). Returns the
+        KillResult when an emergency kill fired, else None. A confirmed-failed
+        cleanup raises ``ProcessControlError`` — an unverified/failed session is
+        never reported as a clean success (Finding E). The honest cleanup state
+        is always available on ``self.last_cleanup``.
         """
-        self._capture_session_group(process)
+        supervised = (
+            target if isinstance(target, SupervisedProcess) else self.adopt(target)
+        )
+        process = supervised.process
         poll_interval = min(0.05, self.controller.limit_seconds / 10)
         while True:
             if process.poll() is not None:
-                self._terminate_session_group(process)
+                self.last_cleanup = self._terminate_and_verify_session(supervised)
+                self._enforce_cleanup(self.last_cleanup)
                 return None
             if self.controller.expired():
                 result = kill_process_tree(process.pid)
@@ -286,6 +433,7 @@ class SessionWatchdog:
                     raise ProcessControlError(
                         f"process {process.pid} survived emergency kill"
                     ) from exc
-                self._terminate_session_group(process)
+                self.last_cleanup = self._terminate_and_verify_session(supervised)
+                self._enforce_cleanup(self.last_cleanup)
                 return result
             time.sleep(poll_interval)

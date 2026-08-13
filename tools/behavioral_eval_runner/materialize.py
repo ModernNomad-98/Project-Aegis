@@ -14,15 +14,29 @@ materializer fails closed on hash/tree mismatch, ambiguous runtime files,
 path escapes, reparse points, role mismatch, and any partial surface used
 for a full-library claim. No model or agent is launched.
 
-Platform non-claim (Finding C): every write routes through ``_write_file``,
-which rechecks the reparse chain before and after parent creation, opens the
-leaf with ``O_CREAT|O_EXCL|O_NOFOLLOW`` (a real POSIX no-follow/exclusive
-guarantee), and re-verifies physical containment after writing. On Windows the
-stdlib has no ``O_NOFOLLOW``, so a reparse point planted in the final
-create->open window cannot be provably prevented in stdlib; a full Windows
-guarantee needs native no-follow handles (ctypes), out of WP-2B-1's stdlib-only
-scope. That residual is NOT claimed solved and is recorded as an owner decision
-in the implementation summary.
+Platform reparse/TOCTOU posture (Finding C — corrected in Round 2). A leaf-only
+``O_NOFOLLOW`` protects ONLY the final component; a symlink swapped into a PARENT
+component between the check and the open is still followed. That is why the
+earlier "real POSIX no-follow guarantee" wording was an overstatement, now
+withdrawn. Every write still routes through ``_write_file``, which then splits by
+platform capability:
+
+- POSIX with ``dir_fd`` + ``O_DIRECTORY`` + ``O_NOFOLLOW`` (``_POSIX_NOFOLLOW_WRITE``):
+  writes route through ``_write_file_dirfd``, which creates and reopens EVERY
+  path component under the destination with ``O_NOFOLLOW`` relative to a directory
+  descriptor. No symlink planted in any component — parent OR leaf — can be
+  traversed, closing the parent-chain TOCTOU window. This path is IMPLEMENTED BUT
+  UNRUN in the WP-2B-1 evidence environment (POSIX is not executed here); it is
+  reported ``IMPLEMENTED_BUT_UNRUN`` via ``reparse_write_capability()``, never
+  proven.
+- Windows / hosts without dir-fd no-follow: writes fall back to a leaf-only
+  ``O_NOFOLLOW`` (absent on Windows, so ``0``) plus pre/post reparse-chain checks.
+  These DETECT a reparse point already present in the chain, but cannot PREVENT a
+  reparse point planted mid-operation (the create->open window, or a parent swap).
+  An atomic no-reparse write on Windows needs native no-follow handles
+  (``CreateFileW``/ctypes), OUT of WP-2B-1's stdlib-only scope. The Windows atomic
+  no-reparse write is therefore reported UNAVAILABLE / NON-BASELINE, is NOT claimed
+  solved, and remains an OPEN owner decision in the implementation summary.
 """
 
 from __future__ import annotations
@@ -95,6 +109,47 @@ _PROFILE_INCLUDES_SUBAGENTS = {
 
 _HEX40 = frozenset("0123456789abcdef")
 _HEX64 = frozenset("0123456789abcdef")
+
+#: True only on POSIX hosts whose stdlib can do descriptor-relative no-follow
+#: traversal (openat-style). When True, ``_write_file`` PREVENTS parent-chain
+#: reparse traversal; when False (Windows, and POSIX without dir_fd/O_NOFOLLOW)
+#: it can only DETECT a pre-existing reparse and is NON-BASELINE for the
+#: mid-operation swap (Finding C).
+_POSIX_NOFOLLOW_WRITE = (
+    os.name == "posix"
+    and hasattr(os, "O_DIRECTORY")
+    and hasattr(os, "O_NOFOLLOW")
+    and os.open in getattr(os, "supports_dir_fd", frozenset())
+    and os.mkdir in getattr(os, "supports_dir_fd", frozenset())
+)
+
+
+def reparse_write_capability() -> Mapping[str, str]:
+    """Honest capability report for the reparse-safe materialization write path.
+
+    POSIX with dir-fd no-follow → parent-chain TOCTOU is PREVENTED but the path is
+    UNRUN in this Windows evidence environment. Otherwise the mid-operation parent
+    swap is UNAVAILABLE to prevent in stdlib and reported NON-BASELINE (Finding C).
+    """
+    if _POSIX_NOFOLLOW_WRITE:
+        return MappingProxyType(
+            {
+                "platform": "posix",
+                "mechanism": "descriptor-relative no-follow traversal "
+                "(O_NOFOLLOW per component via dir_fd)",
+                "parent_component_toctou": "PREVENTED",
+                "baseline_status": "IMPLEMENTED_BUT_UNRUN",
+            }
+        )
+    return MappingProxyType(
+        {
+            "platform": os.name,
+            "mechanism": "leaf O_NOFOLLOW where available + pre/post reparse-chain "
+            "checks (detection, not prevention)",
+            "parent_component_toctou": "UNAVAILABLE",
+            "baseline_status": "NON_BASELINE",
+        }
+    )
 
 
 def is_full_sha(value: str) -> bool:
@@ -301,28 +356,99 @@ def _refuse_read_reparse(path: str, boundary_root: str) -> None:
         raise ReparsePointError(str(exc)) from exc
 
 
+def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> None:
+    """POSIX descriptor-relative no-follow write (Finding C).
+
+    Creates and reopens every path component under ``root_real`` with
+    ``O_NOFOLLOW`` relative to a directory descriptor, so a symlink planted in
+    ANY component — parent or leaf — cannot be traversed. This closes the
+    parent-chain TOCTOU window a leaf-only ``O_NOFOLLOW`` leaves open. Only
+    invoked when ``_POSIX_NOFOLLOW_WRITE`` is True; UNRUN on Windows.
+    """
+    parts = [component for component in relative_path.split("/") if component not in ("", ".")]
+    if not parts or any(component == ".." for component in parts):
+        # Callers pass a pre-validated relative path, but self-guard anyway so
+        # this fail-closed primitive never traverses upward.
+        raise MaterializationError(f"unsafe relative path {relative_path!r}")
+    *directories, leaf = parts
+    open_dirs: list[int] = []
+    open_dirs.append(os.open(root_real, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW))
+    try:
+        current = open_dirs[0]
+        for component in directories:
+            try:
+                os.mkdir(component, 0o700, dir_fd=current)
+            except FileExistsError:
+                pass
+            try:
+                child = os.open(
+                    component,
+                    os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                    dir_fd=current,
+                )
+            except OSError as exc:
+                raise ReparsePointError(
+                    f"path component {component!r} under {relative_path!r} is not a "
+                    f"real directory (no-follow open refused): {exc}"
+                ) from exc
+            open_dirs.append(child)
+            current = child
+        try:
+            leaf_fd = os.open(
+                leaf,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                0o600,
+                dir_fd=current,
+            )
+        except FileExistsError as exc:
+            raise MaterializationError(
+                f"refusing to overwrite an existing target {relative_path!r}"
+            ) from exc
+        except OSError as exc:
+            raise ReparsePointError(
+                f"could not create {relative_path!r} no-follow: {exc}"
+            ) from exc
+        try:
+            handle = os.fdopen(leaf_fd, "wb")
+        except OSError:
+            os.close(leaf_fd)  # fdopen failed to take ownership; close the raw fd
+            raise
+        with handle:
+            handle.write(content)
+    finally:
+        for fd in reversed(open_dirs):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+
+
 def _write_file(root: str, relative_path: str, content: bytes) -> None:
     root_real = os.path.realpath(root)
     target = _safe_join(root, relative_path)
-    parent = os.path.dirname(target)
-    # Refuse a reparse point in the chain BEFORE creating parents...
+    # Refuse a reparse point already present in the chain BEFORE any create.
+    # On all platforms this DETECTS a pre-existing reparse; on POSIX the dir-fd
+    # path below additionally PREVENTS mid-operation parent-swap traversal.
     try:
         refuse_reparse_chain(target, root_real)
     except UnsafePathError as exc:
         raise ReparsePointError(str(exc)) from exc
+
+    if _POSIX_NOFOLLOW_WRITE:
+        _write_file_dirfd(root_real, _validate_relative_path(relative_path), content)
+        return
+
+    # Fallback (Windows, and POSIX without dir_fd/O_NOFOLLOW): leaf-only
+    # O_NOFOLLOW (absent on Windows -> 0) plus a pre/post reparse-chain recheck.
+    # This DETECTS a reparse in the chain but cannot PREVENT a reparse planted
+    # mid-operation (create->open window or a parent swap) — a documented
+    # NON-BASELINE residual (Finding C; see reparse_write_capability()).
+    parent = os.path.dirname(target)
     os.makedirs(parent, exist_ok=True)
-    # ...and again AFTER parent creation, immediately before opening the file,
-    # to narrow the create->open window (Finding C).
     try:
         refuse_reparse_chain(parent, root_real)
     except UnsafePathError as exc:
         raise ReparsePointError(str(exc)) from exc
-    # On POSIX, open the final component no-follow + exclusive-create so a
-    # symlink planted at the leaf cannot be followed and an existing target is
-    # never overwritten. O_NOFOLLOW/O_EXCL are POSIX guarantees; on Windows
-    # these flags are absent (0) and the residual leaf-race is a documented
-    # platform non-claim (see module docstring / summary — a full Windows
-    # guarantee needs native no-follow handles, out of WP-2B-1 scope).
     open_flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     binary = getattr(os, "O_BINARY", 0)
     try:
@@ -339,8 +465,8 @@ def _write_file(root: str, relative_path: str, content: bytes) -> None:
         with os.fdopen(fd, "wb") as handle:
             handle.write(content)
     finally:
-        # Post-write containment recheck: if a race redirected the path, detect
-        # it and fail closed rather than trusting the write silently.
+        # Post-write containment recheck: detect a race that redirected the path
+        # and fail closed rather than trusting the write silently.
         try:
             refuse_reparse_chain(target, root_real)
         except UnsafePathError as exc:
@@ -384,6 +510,38 @@ def discover_shipped_skills(snapshot_files: Mapping[str, bytes]) -> list[str]:
             if skill and skill != TEMPLATE_SKILL and inner == "SKILL.md":
                 names.add(skill)
     return sorted(names)
+
+
+_PARTIAL_INSTALL_INELIGIBILITY_REASON = (
+    "partial_install results are ineligible for baseline, stability, "
+    "full-corpus coverage, and promotion accounting (design §5a)"
+)
+
+
+def _ineligibility_reasons(
+    partial_install: bool, ambiguous_excluded: "tuple[str, ...] | list[str]"
+) -> list[str]:
+    """Single source of truth for baseline-ineligibility reasons.
+
+    Both ``materialize()`` and ``verify_materialization_manifests()`` derive the
+    reason list from here so a persisted record's reasons can be recomputed and
+    compared EXACTLY (Round 2 §4). The partial_install reason is fully bound
+    (claim_scope is bound to the manifest profile); the ambiguity reason TEXT is
+    a function of the record's own ``ambiguous_excluded`` list, which is itself
+    NOT bindable from the three include-only manifests — see the verifier, which
+    classifies the ambiguity inventory UNVERIFIED rather than certifying it.
+    """
+    reasons: list[str] = []
+    if partial_install:
+        reasons.append(_PARTIAL_INSTALL_INELIGIBILITY_REASON)
+    ambiguous = sorted(ambiguous_excluded)
+    if ambiguous:
+        reasons.append(
+            "ambiguous_needs_owner_review files were excluded from the runtime "
+            f"surface: {ambiguous[:5]}"
+            f"{'...' if len(ambiguous) > 5 else ''}"
+        )
+    return reasons
 
 
 @dataclass(frozen=True, slots=True)
@@ -683,10 +841,6 @@ def verify_materialization_manifests(
             f"record subagent_count {expected_record.subagent_count} != "
             f"recomputed {len(subagents)} from the verified runtime surface"
         )
-    if expected_record.shipped_skill_count < expected_record.materialized_skill_count:
-        raise MaterializationError(
-            "record shipped_skill_count is below materialized_skill_count"
-        )
     # claim_scope <-> profile invariant.
     partial = expected_record.claim_scope is ClaimScope.PARTIAL_INSTALL
     if partial != (
@@ -703,6 +857,32 @@ def verify_materialization_manifests(
         raise MaterializationError(
             "record workspace_role and materialization profile are inconsistent"
         )
+    # shipped_skill_count binding. The verifier has NO access to the source
+    # library — it reads only the persisted destination — so it can prove INTERNAL
+    # consistency against the materialized surface, NOT the true shipped total. A
+    # FULL_LIBRARY run materializes every shipped skill's entry point, so shipped
+    # MUST EQUAL materialized (the previous >= floor let an inflated 999 through);
+    # a partial_install keeps the >= floor. Either way the shipped TOTAL against
+    # the real library is not verifiable here and is classified UNVERIFIED below.
+    full_library = expected_record.claim_scope is ClaimScope.FULL_LIBRARY
+    if full_library:
+        if (
+            expected_record.shipped_skill_count
+            != expected_record.materialized_skill_count
+        ):
+            raise MaterializationError(
+                "full-library record shipped_skill_count must equal the "
+                f"materialized skill count; got "
+                f"{expected_record.shipped_skill_count} != "
+                f"{expected_record.materialized_skill_count}"
+            )
+    elif (
+        expected_record.shipped_skill_count
+        < expected_record.materialized_skill_count
+    ):
+        raise MaterializationError(
+            "record shipped_skill_count is below materialized_skill_count"
+        )
     # baseline_eligible invariant: ineligible iff partial_install OR any ambiguity.
     derived_baseline_eligible = not (partial or bool(expected_record.ambiguous_excluded))
     if expected_record.baseline_eligible != derived_baseline_eligible:
@@ -711,7 +891,70 @@ def verify_materialization_manifests(
             f"derived {derived_baseline_eligible} (partial_install or ambiguity "
             "makes a run baseline-ineligible)"
         )
-    result["record_claims_verified"] = True
+    # baseline_ineligibility_reasons must be a list of strings, structurally
+    # consistent with baseline_eligible, and EXACTLY equal to the reasons
+    # recomputed from the bound partial flag and the record's ambiguity list.
+    recorded_reasons = expected_record.baseline_ineligibility_reasons
+    if not all(isinstance(reason, str) for reason in recorded_reasons):
+        raise MaterializationError(
+            "record baseline_ineligibility_reasons must all be strings"
+        )
+    if expected_record.baseline_eligible and recorded_reasons:
+        raise MaterializationError(
+            "a baseline_eligible record must carry no ineligibility reasons"
+        )
+    if not expected_record.baseline_eligible and not recorded_reasons:
+        raise MaterializationError(
+            "a baseline-ineligible record must state at least one reason"
+        )
+    expected_reasons = _ineligibility_reasons(
+        partial, expected_record.ambiguous_excluded
+    )
+    if list(recorded_reasons) != expected_reasons:
+        raise MaterializationError(
+            "record baseline_ineligibility_reasons do not match the reasons "
+            "recomputed from claim_scope and the ambiguity inventory"
+        )
+    # Honest claim classification. The verifier reads only the persisted
+    # destination, never the source library, and the three manifests list
+    # INCLUDED files only. So the EXCLUDED ambiguity inventory and the shipped
+    # TOTAL against the real library cannot be bound here — they are disclosed
+    # UNVERIFIED, never certified. `full_library_shipped_equals_materialized` is
+    # the one shipped-related claim actually proven: the enforced `shipped ==
+    # materialized` invariant, a necessary consistency check, not completeness.
+    # Binding the rest would require a fourth hashed manifest or a manifest-schema
+    # change (an OPEN owner decision), out of WP-2B-1 scope.
+    unverifiable: list[str] = [
+        "ambiguous_excluded_inventory",
+        "shipped_skill_count_total",
+    ]
+    if expected_record.ambiguous_excluded:
+        unverifiable.append("ambiguity_derived_ineligibility_reason_text")
+    result["record_claims"] = {
+        "materialized_skill_count": "verified",
+        "subagent_count": "verified",
+        "claim_scope_profile_invariant": "verified",
+        "workspace_role_profile_invariant": "verified",
+        "baseline_eligible_invariant": "verified",
+        "baseline_ineligibility_reasons": "verified",
+        "full_library_shipped_equals_materialized": (
+            "verified" if full_library else "n/a"
+        ),
+        "shipped_skill_count_total": (
+            "unverified: the verifier does not read the source library; equality "
+            "to the materialized count is a necessary consistency check, not proof "
+            "of completeness"
+        ),
+        "ambiguous_excluded_inventory": (
+            "unverified: excluded files are absent from all three manifests"
+        ),
+    }
+    result["record_claims_unverifiable"] = unverifiable
+    # Reaching here means every BINDABLE claim held (any failure raised above).
+    result["record_derivable_claims_verified"] = True
+    # The overall flag is True only when NOTHING is left unverifiable; while the
+    # ambiguity inventory stays unbindable it is False (honest, not an overclaim).
+    result["record_claims_verified"] = not unverifiable
     return result
 
 
@@ -905,18 +1148,9 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
         _write_file(request.destination_root, relative, canonical_bytes(body))
         manifest_paths[name] = _safe_join(request.destination_root, relative)
 
-    ineligibility: list[str] = []
-    if request.claim_scope is ClaimScope.PARTIAL_INSTALL:
-        ineligibility.append(
-            "partial_install results are ineligible for baseline, stability, "
-            "full-corpus coverage, and promotion accounting (design §5a)"
-        )
-    if ambiguous_excluded:
-        ineligibility.append(
-            "ambiguous_needs_owner_review files were excluded from the runtime "
-            f"surface: {sorted(ambiguous_excluded)[:5]}"
-            f"{'...' if len(ambiguous_excluded) > 5 else ''}"
-        )
+    ineligibility = _ineligibility_reasons(
+        request.claim_scope is ClaimScope.PARTIAL_INSTALL, ambiguous_excluded
+    )
 
     return MaterializationRecord(
         source_commit=request.snapshot.source_commit,
