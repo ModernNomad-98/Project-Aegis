@@ -485,3 +485,34 @@ capability is NON_BASELINE; no false-clean path remains.
   isolation.
 - It does not authorize or implement WP-2B-2, and does not authorize Scenario A.
 - It enables no auto-merge and performs no merge; manual owner merge remains required.
+
+## 14. Post-merge record (WP-2B-1 / PR #83)
+
+WP-2B-1 is now **DONE**. The offline runner core and minimum guardrails summarized above
+were reviewed and **manually merged**:
+
+| Item | Value |
+| --- | --- |
+| Implementation PR | [#83](https://github.com/ModernNomad-98/Project-Aegis/pull/83) — MERGED |
+| Merge commit (`main`) | `72e74af6f0183fef25e353ec2bf3a851d83b5df6` |
+| Status | WP-2B-1 DONE — recorded in the backlog §7 register through the reviewed governance PR that appends BER-DEC-007 |
+
+**Governance successor.** The next authorized step is the **v1.1 fast-track successor**
+([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md)),
+which combines the former WP-2B-2 (deterministic graders) and the former WP-2B-3's
+**non-live** semantic-judge scaffold scope into a single non-live **WP-2B-2 "Scenario A
+Grading Stack,"** authorized by **BER-DEC-007** (backlog §13). WP-2B-3 itself is redefined
+as the **Measured Judge Calibration and OD-1 Ratification Gate** — BLOCKED and not
+authorized by BER-DEC-007. The WP-2B-2 authorization is **non-live** (zero runner-generated,
+grading-stack-generated, or test-harness-generated model/provider dispatch and zero
+actual judge/provider calls; implementation-session AI activity is separately disclosed
+and is not runner dispatch) and becomes effective only
+after its governance PR is reviewed and manually merged. It does **not** ratify OD-1, does
+**not** perform measured judge calibration, and does **not** authorize WP-2B-3
+measured-calibration work or WP-2B-4 (the separate, blocked Scenario A limited-scope live
+suite).
+
+The §13 non-claims above remain true after merge: the merged WP-2B-1 implementation
+generated no runner model/provider dispatch and no live session, proved no real-host
+containment or live enforcement, and authorized no later phase (implementation-session AI
+activity was separately disclosed in this summary and is not runner dispatch).
