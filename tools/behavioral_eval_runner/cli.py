@@ -52,17 +52,23 @@ from .errors import (
     RunnerError,
     UnknownEnumValueError,
 )
-from .evidence import verify_final_bundle, verify_input_evidence
+from .evidence import (
+    evidence_write_capability,
+    verify_final_bundle,
+    verify_input_evidence,
+)
 from .execution_profile import ExecutionProfile, RealClaudeCodeProfileSource
 from .identity import build_assertion_uid, build_case_uid
 from .materialize import (
     FixtureDefinition,
     GitSnapshot,
     MaterializationRequest,
+    materialization_write_capability,
     materialize,
 )
 from .models import AggregateRecord, AttemptRecord, CaseManifestRecord
 from .preflight import PreflightEnvironment, evaluate_case
+from .process_control import descendant_cleanup_capability
 from .scheduler import SchedulingPolicy, SelectionItem, schedule_with_reservation
 
 #: The full command surface. Live/run/dispatch verbs are deliberately absent.
@@ -438,6 +444,12 @@ def _cmd_capabilities(_args: argparse.Namespace) -> int:
                 "baseline_eligible": profile.baseline_eligible,
                 "unobserved_fields": list(profile.unobserved_fields()),
             },
+            # §8: truthfully expose the three write/cleanup integrity capabilities —
+            # platform, implementation state, runtime-evidence state, baseline
+            # status, and the live-dispatch consequence. All are NON_BASELINE here.
+            "materialization_write_integrity": dict(materialization_write_capability()),
+            "evidence_writer_integrity": dict(evidence_write_capability()),
+            "process_descendant_cleanup": dict(descendant_cleanup_capability()),
             "dispatch_budget": {
                 "model_provider_dispatches": 0,
                 "live_sessions": 0,

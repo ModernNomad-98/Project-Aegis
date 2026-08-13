@@ -11,6 +11,7 @@ import unittest
 from tools.behavioral_eval_runner.canonical import sha256_hex
 from tools.behavioral_eval_runner.errors import CircularEvidenceError, EvidenceError, EvidenceIntegrityError
 from tools.behavioral_eval_runner.evidence import (
+    _POSIX_EVIDENCE_ATOMIC,
     EvidenceArtifact,
     EvidenceWriter,
     FINAL_MANIFEST_NAME,
@@ -256,6 +257,61 @@ class TestStageB(_BundleCase):
         self.writer.finalize_input_evidence(_artifacts())
         with self.assertRaises(EvidenceIntegrityError):
             verify_final_bundle(self.root)
+
+
+# =============================================================== Round 3 §5
+class TestEvidenceWriterTrustedRoot(unittest.TestCase):
+    """§5: the evidence writer must anchor to a trusted root, refuse a symlink
+    root, never write/replace outside it, and never claim fail-closed prevention
+    on a platform where the atomic no-reparse guarantee is unavailable."""
+
+    def test_atomic_write_refuses_symlink_root(self) -> None:
+        from tools.behavioral_eval_runner.evidence import _atomic_write
+
+        with tempfile.TemporaryDirectory() as root:
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+            link_root = os.path.join(root, "linkroot")
+            try:
+                os.symlink(outside, link_root, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink creation unavailable")
+            with self.assertRaises(EvidenceError):
+                _atomic_write(link_root, "escaped.json", b"{}")
+            # The write must NOT have landed in the symlink target.
+            self.assertFalse(os.path.exists(os.path.join(outside, "escaped.json")))
+
+    def test_evidence_write_capability_non_baseline(self) -> None:
+        from tools.behavioral_eval_runner.evidence import evidence_write_capability
+
+        report = evidence_write_capability()
+        self.assertEqual(report["baseline_status"], "NON_BASELINE")
+        if os.name == "nt":
+            self.assertEqual(report["implementation_state"], "UNAVAILABLE")
+            self.assertEqual(report["root_anchor"], "UNTRUSTED_REALPATH_DERIVED")
+
+    @unittest.skipUnless(
+        _POSIX_EVIDENCE_ATOMIC,
+        "dir-fd atomic evidence write is POSIX-only (UNRUN on Windows)",
+    )
+    def test_posix_parent_swap_fails_closed(self) -> None:  # pragma: no cover - POSIX only
+        from unittest import mock
+
+        from tools.behavioral_eval_runner.evidence import _atomic_write
+
+        with tempfile.TemporaryDirectory() as root:
+            dest = os.path.join(root, "evroot")
+            os.makedirs(dest)
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+
+            def swapping_mkdir(name, mode=0o777, *, dir_fd=None):
+                os.symlink(outside, name, dir_fd=dir_fd)
+
+            with mock.patch("os.mkdir", side_effect=swapping_mkdir):
+                with self.assertRaises(EvidenceError):
+                    _atomic_write(dest, "sub/escaped.json", b"{}")
+            self.assertFalse(os.path.exists(os.path.join(outside, "escaped.json")))
 
 
 if __name__ == "__main__":  # pragma: no cover

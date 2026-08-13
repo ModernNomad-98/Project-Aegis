@@ -44,6 +44,7 @@ from __future__ import annotations
 import io
 import os
 import shutil
+import stat
 import subprocess
 import tarfile
 from dataclasses import dataclass, field
@@ -150,6 +151,78 @@ def reparse_write_capability() -> Mapping[str, str]:
             "baseline_status": "NON_BASELINE",
         }
     )
+
+
+#: The proven-write-integrity token a caller may inject on a synthetic request so
+#: a deterministic offline test can exercise a baseline-eligible materialization.
+#: A real-host default NEVER carries it, so a real-host materialization can never
+#: silently become baseline-eligible (§6.A / Outcome B).
+WRITE_INTEGRITY_BASELINE = "BASELINE"
+
+
+def materialization_write_capability() -> Mapping[str, str]:
+    """Truthful capability report for the materialization write path (§4/§8).
+
+    The trust anchor is the destination-root descriptor, re-opened ``O_NOFOLLOW``
+    per write (so a swapped destination root fails closed each time);
+    ``_write_at_root_fd`` then creates every component — INCLUDING the area root —
+    relative to it, so a swapped root or area child cannot redirect a write. On
+    POSIX this PREVENTS the root/parent/leaf swap but is UNRUN in this Windows
+    evidence environment; on Windows the anchor is realpath-derived (detection
+    only) and the containment is UNAVAILABLE. Never BASELINE here.
+    """
+    if _POSIX_NOFOLLOW_WRITE:
+        return MappingProxyType(
+            {
+                "platform": "posix",
+                "mechanism": "no-follow destination-root descriptor (re-opened "
+                "no-follow per write) + descriptor-relative no-follow traversal",
+                "root_anchor": "TRUSTED_RETAINED_DESCRIPTOR",
+                "implementation_state": "IMPLEMENTED",
+                "runtime_evidence_state": "UNRUN",
+                "baseline_status": "NON_BASELINE",
+                "live_dispatch_consequence": "not baseline / not verified-clean until "
+                "actually executed on a POSIX host (IMPLEMENTED_BUT_UNRUN here)",
+            }
+        )
+    return MappingProxyType(
+        {
+            "platform": os.name,
+            "mechanism": "detection only (realpath + reparse-chain checks); no atomic "
+            "no-reparse containment",
+            "root_anchor": "UNTRUSTED_REALPATH_DERIVED",
+            "implementation_state": "UNAVAILABLE",
+            "runtime_evidence_state": "N/A",
+            "baseline_status": "NON_BASELINE",
+            "live_dispatch_consequence": "materialization write containment UNAVAILABLE; "
+            "NON_BASELINE",
+        }
+    )
+
+
+def _platform_write_integrity_is_baseline() -> bool:
+    """True only if the PLATFORM's proven write-integrity is baseline (never here)."""
+    return materialization_write_capability()["baseline_status"] == WRITE_INTEGRITY_BASELINE
+
+
+def _refuse_symlink_root(root: str) -> None:
+    """Refuse a materialization root that is itself a symlink/reparse point (§4).
+
+    ``os.path.realpath`` would silently resolve a symlinked root to its target and
+    convert a mutable child into the trusted anchor. Detect and fail closed before
+    that. On POSIX the retained-root-fd path additionally PREVENTS a swap.
+    """
+    try:
+        info = os.lstat(root)
+    except OSError:
+        return
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    if stat.S_ISLNK(info.st_mode) or (
+        getattr(info, "st_file_attributes", 0) & reparse
+    ):
+        raise ReparsePointError(
+            f"refusing a symlink/reparse materialization root: {root!r}"
+        )
 
 
 def is_full_sha(value: str) -> bool:
@@ -324,6 +397,12 @@ class MaterializationRequest:
     fixture: FixtureDefinition = field(default_factory=FixtureDefinition)
     partial_skill_subset: tuple[str, ...] = ()
     required_subagents: tuple[str, ...] = ()
+    #: §6.A — a caller may inject ``WRITE_INTEGRITY_BASELINE`` on a SYNTHETIC
+    #: request to exercise a baseline-eligible materialization deterministically.
+    #: Empty (the real-host default) derives the platform capability, which is
+    #: NON_BASELINE here, so a real-host materialization can never silently
+    #: become baseline-eligible.
+    write_integrity_capability: str = ""
 
 
 def _validate_relative_path(path: str) -> str:
@@ -356,14 +435,28 @@ def _refuse_read_reparse(path: str, boundary_root: str) -> None:
         raise ReparsePointError(str(exc)) from exc
 
 
-def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> None:
-    """POSIX descriptor-relative no-follow write (Finding C).
+def _open_trusted_root_fd(destination_root: str) -> int:
+    """Open the destination root as the trusted no-follow anchor (POSIX only, §4).
 
-    Creates and reopens every path component under ``root_real`` with
-    ``O_NOFOLLOW`` relative to a directory descriptor, so a symlink planted in
-    ANY component — parent or leaf — cannot be traversed. This closes the
-    parent-chain TOCTOU window a leaf-only ``O_NOFOLLOW`` leaves open. Only
-    invoked when ``_POSIX_NOFOLLOW_WRITE`` is True; UNRUN on Windows.
+    Opened with ``O_DIRECTORY|O_NOFOLLOW`` so the root itself cannot be a symlink,
+    and used as the trust anchor for the descendant writes of ONE
+    ``_write_under_destination`` call. Because each write re-opens the root
+    no-follow, a swap of the root between writes fails closed; a mutable area child
+    can never redirect a write because it is created relative to this descriptor.
+    The ancestor chain above the destination is validated separately by the caller
+    (``refuse_reparse_ancestors``). The anchor is NEVER re-derived from a mutable
+    child path via ``realpath``.
+    """
+    return os.open(destination_root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+
+
+def _write_at_root_fd(root_fd: int, relative_path: str, content: bytes) -> None:
+    """Write one file at ``relative_path`` under an already-open trusted root fd.
+
+    Every component — INCLUDING the first (area root) — is created and reopened
+    ``O_NOFOLLOW`` relative to ``root_fd`` (or a descendant dir fd), so no symlink
+    in any component can be traversed. ``root_fd`` is the trust anchor supplied by
+    the caller; this function never opens the root by path (§4). POSIX only.
     """
     parts = [component for component in relative_path.split("/") if component not in ("", ".")]
     if not parts or any(component == ".." for component in parts):
@@ -372,9 +465,8 @@ def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> Non
         raise MaterializationError(f"unsafe relative path {relative_path!r}")
     *directories, leaf = parts
     open_dirs: list[int] = []
-    open_dirs.append(os.open(root_real, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW))
     try:
-        current = open_dirs[0]
+        current = root_fd
         for component in directories:
             try:
                 os.mkdir(component, 0o700, dir_fd=current)
@@ -423,7 +515,51 @@ def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> Non
                 pass
 
 
+def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> None:
+    """Open a trusted root fd for ``root_real`` and write one file under it.
+
+    Thin wrapper retained for the direct-call POSIX regression; ``materialize``
+    itself writes through ``_write_under_destination`` so the destination root is
+    the retained anchor for the whole operation. POSIX only; UNRUN on Windows.
+    """
+    root_fd = _open_trusted_root_fd(root_real)
+    try:
+        _write_at_root_fd(root_fd, _validate_relative_path(relative_path), content)
+    finally:
+        os.close(root_fd)
+
+
+def _write_under_destination(destination_root: str, relative_path: str, content: bytes) -> None:
+    """Write one file under the destination root using a TRUSTED root anchor (§4).
+
+    POSIX (``_POSIX_NOFOLLOW_WRITE``): open the destination root no-follow
+    (refusing a symlinked/swapped destination root), and create every component of
+    ``relative_path`` — including the AREA root — relative to that descriptor, so
+    neither a swapped root nor a swapped area child can redirect the write.
+    Windows / no dir-fd: fall back to the detection-only ``_write_file``
+    (NON_BASELINE; see ``materialization_write_capability``).
+    """
+    if _POSIX_NOFOLLOW_WRITE:
+        rel = _validate_relative_path(relative_path)
+        try:
+            root_fd = _open_trusted_root_fd(destination_root)
+        except OSError as exc:
+            raise ReparsePointError(
+                f"destination root is not a real directory (no-follow open "
+                f"refused): {exc}"
+            ) from exc
+        try:
+            _write_at_root_fd(root_fd, rel, content)
+        finally:
+            os.close(root_fd)
+        return
+    _write_file(destination_root, relative_path, content)
+
+
 def _write_file(root: str, relative_path: str, content: bytes) -> None:
+    # §4: refuse a symlink/reparse ROOT before realpath can silently resolve it
+    # and turn a mutable child into the trusted anchor.
+    _refuse_symlink_root(root)
     root_real = os.path.realpath(root)
     target = _safe_join(root, relative_path)
     # Refuse a reparse point already present in the chain BEFORE any create.
@@ -517,21 +653,31 @@ _PARTIAL_INSTALL_INELIGIBILITY_REASON = (
     "full-corpus coverage, and promotion accounting (design §5a)"
 )
 
+_WRITE_INTEGRITY_INELIGIBILITY_REASON = (
+    "materialization write-integrity is not proven baseline (§4/§6.A): the "
+    "trusted-root no-follow write path is UNAVAILABLE or IMPLEMENTED_BUT_UNRUN on "
+    "this host, so real-host materialization is NON_BASELINE under Outcome B"
+)
+
 
 def _ineligibility_reasons(
-    partial_install: bool, ambiguous_excluded: "tuple[str, ...] | list[str]"
+    partial_install: bool,
+    ambiguous_excluded: "tuple[str, ...] | list[str]",
+    write_integrity_baseline: bool = True,
 ) -> list[str]:
     """Single source of truth for baseline-ineligibility reasons.
 
     Both ``materialize()`` and ``verify_materialization_manifests()`` derive the
     reason list from here so a persisted record's reasons can be recomputed and
-    compared EXACTLY (Round 2 §4). The partial_install reason is fully bound
-    (claim_scope is bound to the manifest profile); the ambiguity reason TEXT is
-    a function of the record's own ``ambiguous_excluded`` list, which is itself
-    NOT bindable from the three include-only manifests — see the verifier, which
-    classifies the ambiguity inventory UNVERIFIED rather than certifying it.
+    compared EXACTLY (Round 2 §4). The partial_install and write-integrity reasons
+    are fully bound (claim_scope↔manifest profile; write-integrity carried on the
+    record). The ambiguity reason TEXT is a function of the record's own
+    ``ambiguous_excluded`` list, which is NOT bindable from the three include-only
+    manifests — the verifier classifies the ambiguity inventory UNVERIFIED.
     """
     reasons: list[str] = []
+    if not write_integrity_baseline:
+        reasons.append(_WRITE_INTEGRITY_INELIGIBILITY_REASON)
     if partial_install:
         reasons.append(_PARTIAL_INSTALL_INELIGIBILITY_REASON)
     ambiguous = sorted(ambiguous_excluded)
@@ -565,6 +711,10 @@ class MaterializationRecord:
     product_fixture_manifest_sha256: str
     baseline_eligible: bool
     baseline_ineligibility_reasons: tuple[str, ...]
+    #: §6.A — True only when a PROVEN baseline write-integrity capability produced
+    #: this materialization. A real-host default is False (NON_BASELINE), and the
+    #: verifier enforces baseline_eligible=False whenever this is False.
+    write_integrity_baseline: bool = False
     manifest_paths: Mapping[str, str] = field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
 
@@ -585,6 +735,7 @@ class MaterializationRecord:
             "product_fixture_manifest_sha256": self.product_fixture_manifest_sha256,
             "baseline_eligible": self.baseline_eligible,
             "baseline_ineligibility_reasons": list(self.baseline_ineligibility_reasons),
+            "write_integrity_baseline": self.write_integrity_baseline,
             # Finding F: `manifest_paths` holds operator-local ABSOLUTE paths.
             # It is deliberately kept OUT of the schema-governed portable record
             # (materialization.schema.json is additionalProperties:false) so no
@@ -883,13 +1034,26 @@ def verify_materialization_manifests(
         raise MaterializationError(
             "record shipped_skill_count is below materialized_skill_count"
         )
-    # baseline_eligible invariant: ineligible iff partial_install OR any ambiguity.
-    derived_baseline_eligible = not (partial or bool(expected_record.ambiguous_excluded))
+    # §6.A: write_integrity_baseline is a strict bool, and baseline eligibility
+    # REQUIRES it. A record cannot publish baseline_eligible=true when write
+    # integrity is not proven baseline (real-host default under Outcome B).
+    if type(expected_record.write_integrity_baseline) is not bool:
+        raise MaterializationError(
+            "record write_integrity_baseline must be a JSON boolean"
+        )
+    write_integrity_baseline = expected_record.write_integrity_baseline
+    # baseline_eligible invariant: ineligible iff partial_install OR any ambiguity
+    # OR write-integrity is not proven baseline (§6.A).
+    derived_baseline_eligible = not (
+        partial
+        or bool(expected_record.ambiguous_excluded)
+        or not write_integrity_baseline
+    )
     if expected_record.baseline_eligible != derived_baseline_eligible:
         raise MaterializationError(
             f"record baseline_eligible {expected_record.baseline_eligible} != "
-            f"derived {derived_baseline_eligible} (partial_install or ambiguity "
-            "makes a run baseline-ineligible)"
+            f"derived {derived_baseline_eligible} (partial_install, ambiguity, or "
+            "unproven write-integrity makes a run baseline-ineligible)"
         )
     # baseline_ineligibility_reasons must be a list of strings, structurally
     # consistent with baseline_eligible, and EXACTLY equal to the reasons
@@ -908,7 +1072,7 @@ def verify_materialization_manifests(
             "a baseline-ineligible record must state at least one reason"
         )
     expected_reasons = _ineligibility_reasons(
-        partial, expected_record.ambiguous_excluded
+        partial, expected_record.ambiguous_excluded, write_integrity_baseline
     )
     if list(recorded_reasons) != expected_reasons:
         raise MaterializationError(
@@ -930,6 +1094,12 @@ def verify_materialization_manifests(
     ]
     if expected_record.ambiguous_excluded:
         unverifiable.append("ambiguity_derived_ineligibility_reason_text")
+    # §6/honesty: when a record asserts a proven write capability, the CONSISTENCY
+    # (baseline requires it) is verified, but the PROVENANCE of that true value is
+    # a self-declaration not bindable from the persisted include-only manifests —
+    # disclose it as unverifiable, symmetrically with the ambiguity inventory.
+    if write_integrity_baseline:
+        unverifiable.append("write_integrity_baseline_provenance")
     result["record_claims"] = {
         "materialized_skill_count": "verified",
         "subagent_count": "verified",
@@ -937,6 +1107,13 @@ def verify_materialization_manifests(
         "workspace_role_profile_invariant": "verified",
         "baseline_eligible_invariant": "verified",
         "baseline_ineligibility_reasons": "verified",
+        "write_integrity_baseline_consistency": "verified",
+        "write_integrity_baseline_provenance": (
+            "verified: false (real-host NON_BASELINE)"
+            if not write_integrity_baseline
+            else "unverified: a self-declared platform capability, not bindable "
+            "from the persisted manifests"
+        ),
         "full_library_shipped_equals_materialized": (
             "verified" if full_library else "n/a"
         ),
@@ -955,6 +1132,32 @@ def verify_materialization_manifests(
     # The overall flag is True only when NOTHING is left unverifiable; while the
     # ambiguity inventory stays unbindable it is False (honest, not an overclaim).
     result["record_claims_verified"] = not unverifiable
+    # §6.B: disambiguate scopes. `verified` (set True at entry) covers manifest +
+    # file-set + derivable-claim integrity ONLY — it must NEVER be read as
+    # complete-record verification. `complete_record_verified` is the honest
+    # all-claims flag, and it is False whenever anything is unverifiable.
+    manifests_verified = bool(result.get("verified"))
+    result["manifests_verified"] = manifests_verified
+    result["complete_record_verified"] = (
+        manifests_verified and result["record_claims_verified"]
+    )
+    result["verification_scope"] = {
+        "top_level_verified_covers": [
+            "manifest hash binding",
+            "manifest body",
+            "identity fields",
+            "file-set equality",
+            "per-file bytes+sha256",
+            "derivable record claims",
+        ],
+        "top_level_verified_excludes": list(unverifiable),
+        "note": (
+            "top-level 'verified' is manifest + file-set + derivable-claim "
+            "integrity ONLY; it does NOT imply complete-record verification. A "
+            "caller MUST check 'complete_record_verified' (and "
+            "'record_claims_unverifiable') to accept the complete record."
+        ),
+    }
     return result
 
 
@@ -1108,17 +1311,19 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
                 f"runtime surface: {missing[:5]}{'...' if len(missing) > 5 else ''}"
             )
 
-    control_root = os.path.join(request.destination_root, "control_plane")
-    runtime_root = os.path.join(request.destination_root, "runtime_surface")
-    fixture_root = os.path.join(request.destination_root, "product_fixture")
-    for area_root, entries in (
-        (control_root, control_plane),
-        (runtime_root, runtime_surface),
-        (fixture_root, dict(request.fixture.files)),
+    # §4: every surface write goes under the destination root through the
+    # trusted-root anchor (POSIX retained no-follow descriptor; Windows detection
+    # fallback), so the AREA root is created relative to the trusted root and a
+    # swapped area child cannot redirect a write.
+    for area_name, entries in (
+        ("control_plane", control_plane),
+        ("runtime_surface", runtime_surface),
+        ("product_fixture", dict(request.fixture.files)),
     ):
-        os.makedirs(area_root, exist_ok=True)
         for path, content in sorted(entries.items()):
-            _write_file(area_root, path, content)
+            _write_under_destination(
+                request.destination_root, f"{area_name}/{path}", content
+            )
 
     control_manifest = _manifest(
         "authored_eval_corpus", request.snapshot, request.profile, control_plane
@@ -1142,14 +1347,30 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     }
     manifest_paths: dict[str, str] = {}
     for name, body in manifest_files.items():
-        # Finding C: the persisted-manifest writes route through the SAME
-        # reparse-checked write path as every surface write — no raw open().
+        # Finding C / §4: manifest writes route through the SAME trusted-root
+        # write path as every surface write — no raw open(), no per-call realpath
+        # of a mutable child.
         relative = f"materialization_manifests/{name}"
-        _write_file(request.destination_root, relative, canonical_bytes(body))
+        _write_under_destination(
+            request.destination_root, relative, canonical_bytes(body)
+        )
         manifest_paths[name] = _safe_join(request.destination_root, relative)
 
+    # §6.A: write-integrity is baseline ONLY when a proven capability is present.
+    # A real-host default derives the platform capability (NON_BASELINE here); a
+    # synthetic request may inject WRITE_INTEGRITY_BASELINE explicitly. This makes
+    # a real-host materialization non-baseline under Outcome B, and it can never
+    # silently become eligible.
+    if request.write_integrity_capability:
+        write_integrity_baseline = (
+            request.write_integrity_capability == WRITE_INTEGRITY_BASELINE
+        )
+    else:
+        write_integrity_baseline = _platform_write_integrity_is_baseline()
     ineligibility = _ineligibility_reasons(
-        request.claim_scope is ClaimScope.PARTIAL_INSTALL, ambiguous_excluded
+        request.claim_scope is ClaimScope.PARTIAL_INSTALL,
+        ambiguous_excluded,
+        write_integrity_baseline,
     )
 
     return MaterializationRecord(
@@ -1170,5 +1391,6 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
         product_fixture_manifest_sha256=sha256_hex(canonical_bytes(fixture_manifest)),
         baseline_eligible=not ineligibility,
         baseline_ineligibility_reasons=tuple(ineligibility),
+        write_integrity_baseline=write_integrity_baseline,
         manifest_paths=manifest_paths,
     )

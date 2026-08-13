@@ -21,12 +21,21 @@
     "runtime_surface_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "product_fixture_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "baseline_eligible": {"type": "boolean"},
-    "baseline_ineligibility_reasons": {"type": "array", "items": {"type": "string"}}
+    "baseline_ineligibility_reasons": {"type": "array", "items": {"type": "string"}},
+    "write_integrity_baseline": {"type": "boolean", "description": "True only when a PROVEN baseline write-integrity capability produced this materialization; a real-host default is false (NON_BASELINE) under Outcome B (§4/§6.A)."}
   },
   "allOf": [
     {
       "if": {"properties": {"claim_scope": {"const": "partial_install"}}},
       "then": {"properties": {"baseline_eligible": {"const": false}}}
+    },
+    {
+      "if": {"required": ["write_integrity_baseline"], "properties": {"write_integrity_baseline": {"const": false}}},
+      "then": {"properties": {"baseline_eligible": {"const": false}}}
+    },
+    {
+      "if": {"required": ["baseline_eligible"], "properties": {"baseline_eligible": {"const": true}}},
+      "then": {"required": ["write_integrity_baseline"], "properties": {"write_integrity_baseline": {"const": true}}}
     }
   ]
 }

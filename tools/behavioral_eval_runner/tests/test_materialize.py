@@ -17,6 +17,7 @@ from tools.behavioral_eval_runner.errors import (
     SnapshotVerificationError,
 )
 from tools.behavioral_eval_runner.materialize import (
+    WRITE_INTEGRITY_BASELINE,
     FixtureDefinition,
     GitSnapshot,
     MaterializationRequest,
@@ -65,6 +66,18 @@ class TestSyntheticMaterialization(unittest.TestCase):
                 full = os.path.join(directory, name)
                 found.add(os.path.relpath(full, runtime_root).replace("\\", "/"))
         return found
+
+    def test_real_host_default_materialization_is_non_baseline(self) -> None:
+        # §6.A: with no injected write-integrity capability, a real-host
+        # materialization must NOT be baseline-eligible — write-integrity is
+        # NON_BASELINE on this host and the record must say so, machine-readably.
+        record = materialize(_request(self.dest))
+        self.assertFalse(record.write_integrity_baseline)
+        self.assertFalse(record.baseline_eligible)
+        self.assertTrue(
+            any("write-integrity" in r for r in record.baseline_ineligibility_reasons),
+            record.baseline_ineligibility_reasons,
+        )
 
     def test_full_library_materializes_every_shipped_skill(self) -> None:
         record = materialize(_request(self.dest))
@@ -130,12 +143,17 @@ class TestSyntheticMaterialization(unittest.TestCase):
                 workspace_role=WorkspaceRole.SOURCE_LIBRARY,
                 claim_scope=ClaimScope.FULL_LIBRARY,
                 destination_root=self.dest,
+                # §6.A: inject a PROVEN synthetic write-integrity capability so this
+                # deterministic offline test can exercise a baseline-eligible run.
+                # A real-host default omits it and is NON_BASELINE.
+                write_integrity_capability=WRITE_INTEGRITY_BASELINE,
             )
         )
         runtime = self._runtime_paths()
         for landmark in SOURCE_LANDMARK_PATHS:
             self.assertIn(landmark, runtime)
         self.assertTrue(record.baseline_eligible)
+        self.assertTrue(record.write_integrity_baseline)
 
     def test_ambiguous_material_makes_baseline_ineligible(self) -> None:
         # C5: the ambiguous notes.bin is excluded AND marks the run ineligible.

@@ -22,7 +22,9 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
+import stat
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Mapping
 
 from . import SCHEMA_VERSION
@@ -50,6 +52,78 @@ _RETENTION_DAYS = {
 
 def _utc_now_iso() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+#: True only on POSIX hosts whose stdlib can create + atomically replace relative
+#: to a retained no-follow directory descriptor (openat/renameat-style). When
+#: True, ``_atomic_write`` PREVENTS a root/parent swap; when False (Windows, and
+#: POSIX without dir_fd) it can only DETECT a pre-existing reparse and is
+#: NON_BASELINE for the mid-operation swap (§5).
+_POSIX_EVIDENCE_ATOMIC = (
+    os.name == "posix"
+    and hasattr(os, "O_NOFOLLOW")
+    and hasattr(os, "O_DIRECTORY")
+    and os.open in getattr(os, "supports_dir_fd", frozenset())
+    and os.replace in getattr(os, "supports_dir_fd", frozenset())
+    and os.mkdir in getattr(os, "supports_dir_fd", frozenset())
+)
+
+
+def evidence_write_capability() -> Mapping[str, str]:
+    """Truthful capability report for the evidence-writer integrity path (§5/§8).
+
+    POSIX with dir-fd no-follow + renameat: the evidence root is opened no-follow
+    (re-opened per write, so a swapped root fails closed) and the temp create +
+    atomic replace happen relative to it, so a root/parent swap cannot redirect a
+    write — but this path is UNRUN in this Windows evidence environment. Windows / no dir-fd: the write is
+    detection-only (mkstemp + os.replace with reparse-chain checks); a
+    mid-operation swap CANNOT be prevented, so the atomic no-reparse guarantee is
+    UNAVAILABLE / NON_BASELINE and is NOT claimed as fail-closed prevention.
+    """
+    if _POSIX_EVIDENCE_ATOMIC:
+        return MappingProxyType(
+            {
+                "platform": "posix",
+                "mechanism": "retained no-follow root descriptor + dir-fd relative "
+                "temp create + renameat atomic replace",
+                "root_anchor": "TRUSTED_RETAINED_DESCRIPTOR",
+                "implementation_state": "IMPLEMENTED",
+                "runtime_evidence_state": "UNRUN",
+                "baseline_status": "NON_BASELINE",
+                "live_dispatch_consequence": "evidence-writer atomic no-reparse "
+                "containment not proven until executed on POSIX",
+            }
+        )
+    return MappingProxyType(
+        {
+            "platform": os.name,
+            "mechanism": "mkstemp + os.replace with reparse-chain checks (detection, "
+            "not prevention)",
+            "root_anchor": "UNTRUSTED_REALPATH_DERIVED",
+            "implementation_state": "UNAVAILABLE",
+            "runtime_evidence_state": "N/A",
+            "baseline_status": "NON_BASELINE",
+            "live_dispatch_consequence": "evidence-writer atomic no-reparse "
+            "containment UNAVAILABLE; NON_BASELINE",
+        }
+    )
+
+
+def _refuse_symlink_root(root: str) -> None:
+    """Refuse an evidence root that is itself a symlink/reparse point (§5).
+
+    ``os.path.realpath`` would silently resolve a symlinked root and make a mutable
+    child the trusted anchor. Detect and fail closed before that.
+    """
+    try:
+        info = os.lstat(root)
+    except OSError:
+        return
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    if stat.S_ISLNK(info.st_mode) or (
+        getattr(info, "st_file_attributes", 0) & reparse
+    ):
+        raise EvidenceError(f"refusing a symlink/reparse evidence root: {root!r}")
 
 
 def _expiration_for(created_at: str, retention: RetentionClass) -> str:
@@ -105,7 +179,94 @@ def _validate_artifact_path(relative_path: str, allow_final_report: bool = False
     return normalized
 
 
+def _atomic_write_dirfd(root: str, relative_path: str, content: bytes) -> str:
+    """POSIX evidence write under a RETAINED trusted no-follow root fd (§5).
+
+    The evidence root is opened once no-follow (refusing a symlinked root); every
+    component — including the temp and the atomic ``renameat`` — is created
+    relative to a dir fd with ``O_NOFOLLOW``, so a root/parent swap cannot redirect
+    the write and cleanup only ever unlinks OUR temp relative to the trusted
+    parent (never an unrelated outside file). POSIX only; UNRUN on Windows.
+    """
+    rel = normalize_relative_path(relative_path)
+    parts = [p for p in rel.split("/") if p not in ("", ".")]
+    if not parts or any(p == ".." for p in parts):
+        raise EvidenceError(f"unsafe evidence path {relative_path!r}")
+    *directories, leaf = parts
+    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    open_dirs: list[int] = []
+    try:
+        current = root_fd
+        for component in directories:
+            try:
+                os.mkdir(component, 0o700, dir_fd=current)
+            except FileExistsError:
+                pass
+            try:
+                child = os.open(
+                    component,
+                    os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                    dir_fd=current,
+                )
+            except OSError as exc:
+                raise EvidenceError(
+                    f"evidence path component {component!r} is not a real "
+                    f"directory (no-follow open refused): {exc}"
+                ) from exc
+            open_dirs.append(child)
+            current = child
+        temp_name = f".tmp-evidence-{leaf}"
+        try:
+            temp_fd = os.open(
+                temp_name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                0o600,
+                dir_fd=current,
+            )
+        except OSError as exc:
+            raise EvidenceError(
+                f"could not create evidence temp no-follow: {exc}"
+            ) from exc
+        try:
+            handle = os.fdopen(temp_fd, "wb")
+        except OSError:
+            os.close(temp_fd)  # fdopen failed to take ownership; close the raw fd
+            try:
+                os.unlink(temp_name, dir_fd=current)
+            except OSError:
+                pass
+            raise
+        replaced = False
+        try:
+            with handle:
+                handle.write(content)
+            os.replace(temp_name, leaf, src_dir_fd=current, dst_dir_fd=current)
+            replaced = True
+        finally:
+            if not replaced:
+                try:
+                    os.unlink(temp_name, dir_fd=current)
+                except OSError:
+                    pass
+        return os.path.join(os.path.abspath(root), *parts)
+    finally:
+        for fd in reversed(open_dirs):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        os.close(root_fd)
+
+
 def _atomic_write(root: str, relative_path: str, content: bytes) -> str:
+    # §5: refuse a symlink/reparse ROOT before realpath can silently resolve it
+    # and turn a mutable child into the trusted anchor.
+    _refuse_symlink_root(root)
+    if _POSIX_EVIDENCE_ATOMIC:
+        return _atomic_write_dirfd(root, relative_path, content)
+    # Windows / no dir-fd: detection-only (NON_BASELINE; see
+    # evidence_write_capability). A mid-operation root/parent swap cannot be
+    # prevented in stdlib — this is NOT claimed as fail-closed prevention.
     root_real = os.path.realpath(root)
     target = os.path.abspath(os.path.join(root_real, *relative_path.split("/")))
     if os.path.commonpath([root_real, target]) != root_real:

@@ -38,6 +38,7 @@ from tools.behavioral_eval_runner.execution_profile import (
 from tools.behavioral_eval_runner.materialize import (
     _POSIX_NOFOLLOW_WRITE,
     MaterializationRecord,
+    materialization_write_capability,
     reparse_write_capability,
     verify_materialization_manifests,
 )
@@ -191,6 +192,7 @@ class TestMaterializationManifestIntegrity(unittest.TestCase):
             ],
             baseline_eligible=True,
             baseline_ineligibility_reasons=(),
+            write_integrity_baseline=True,
             manifest_paths=paths,
         )
 
@@ -574,6 +576,40 @@ class TestMaterializationRecordClaimBinding(TestMaterializationManifestIntegrity
             "ambiguous_excluded_inventory", result["record_claims_unverifiable"]
         )
 
+    # --- Round 3 §6: baseline requires proven write-integrity; top-level
+    # 'verified' must not imply complete-record verification. -------------------
+    def test_baseline_without_proven_write_integrity_rejected(self) -> None:
+        # A record cannot publish baseline_eligible=true when write-integrity is
+        # not proven baseline (§6.A). The reasons also must carry the write reason.
+        bad = replace(self.record, write_integrity_baseline=False)
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_non_bool_write_integrity_rejected(self) -> None:
+        bad = replace(self.record, write_integrity_baseline=1)  # not a bool
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.root, bad)
+
+    def test_top_level_verified_does_not_imply_complete_record(self) -> None:
+        # A caller must NOT be able to accept the complete record by checking the
+        # top-level 'verified' alone: it is manifest+file-set+derivable scope only.
+        result = verify_materialization_manifests(self.root, self.record)
+        self.assertTrue(result["verified"])            # manifest/file-set integrity
+        self.assertTrue(result["manifests_verified"])
+        self.assertFalse(result["complete_record_verified"])  # NOT complete
+        self.assertFalse(result["record_claims_verified"])
+        self.assertIn("verification_scope", result)
+        self.assertIn(
+            "shipped_skill_count_total",
+            result["verification_scope"]["top_level_verified_excludes"],
+        )
+        # A record asserting a proven write capability discloses its provenance as
+        # unverifiable (self-declared, not bindable from the manifests).
+        self.assertIn(
+            "write_integrity_baseline_provenance",
+            result["record_claims_unverifiable"],
+        )
+
 
 # =============================================================== Fresh finding D
 class TestEnumerationFailsClosed(TestMaterializationManifestIntegrity):
@@ -700,6 +736,60 @@ class TestMaterializationWriteReparse(unittest.TestCase):
             "must stay UNAVAILABLE / NON-BASELINE (Finding C), not claimed solved",
         )
 
+    # --- Round 3 §4: the trusted-root anchor. A symlink/reparse ROOT must be
+    # refused before realpath can convert a mutable child into the anchor. ------
+    def test_write_file_refuses_symlink_root(self) -> None:
+        from tools.behavioral_eval_runner.materialize import _write_file
+
+        with tempfile.TemporaryDirectory() as root:
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+            link_root = os.path.join(root, "linkroot")
+            try:
+                os.symlink(outside, link_root, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink creation unavailable")
+            with self.assertRaises(ReparsePointError):
+                _write_file(link_root, "escaped.txt", b"x")
+            # The write must NOT have landed in the symlink target.
+            self.assertFalse(os.path.exists(os.path.join(outside, "escaped.txt")))
+
+    def test_materialization_write_capability_non_baseline(self) -> None:
+        report = materialization_write_capability()
+        # Never BASELINE in this evidence environment (Windows UNAVAILABLE, POSIX
+        # IMPLEMENTED_BUT_UNRUN) — a real-host materialization is NON_BASELINE.
+        self.assertEqual(report["baseline_status"], "NON_BASELINE")
+        if os.name == "nt":
+            self.assertEqual(report["implementation_state"], "UNAVAILABLE")
+            self.assertEqual(report["root_anchor"], "UNTRUSTED_REALPATH_DERIVED")
+
+    @unittest.skipUnless(
+        _POSIX_NOFOLLOW_WRITE,
+        "descriptor-relative no-follow write is POSIX-only (UNRUN on Windows)",
+    )
+    def test_posix_area_root_swap_fails_closed(self) -> None:
+        # IMPLEMENTED BUT UNRUN on Windows. An attacker swaps the freshly-created
+        # AREA root ("control_plane") for a symlink; because every component is
+        # created relative to the retained trusted destination-root fd with
+        # O_NOFOLLOW, the swap is refused and no outside file is created.
+        from tools.behavioral_eval_runner.materialize import _write_under_destination
+
+        real_mkdir = os.mkdir
+        with tempfile.TemporaryDirectory() as root:
+            dest = os.path.join(root, "dest")
+            os.makedirs(dest)
+            outside = os.path.join(root, "outside")
+            os.makedirs(outside)
+
+            def swapping_mkdir(name, mode=0o777, *, dir_fd=None):
+                os.symlink(outside, name, dir_fd=dir_fd)
+
+            with mock.patch("os.mkdir", side_effect=swapping_mkdir):
+                with self.assertRaises((ReparsePointError, MaterializationError)):
+                    _write_under_destination(dest, "control_plane/x/SKILL.md", b"x")
+            self.assertFalse(os.path.exists(os.path.join(outside, "SKILL.md")))
+            self.assertEqual(real_mkdir, os.mkdir)
+
     @unittest.skipUnless(
         _POSIX_NOFOLLOW_WRITE,
         "descriptor-relative no-follow write is POSIX-only (UNRUN on Windows)",
@@ -761,9 +851,58 @@ class TestSupervisorDescendantCleanup(unittest.TestCase):
             watchdog, "_terminate_and_verify_session", return_value=verified
         ) as cleanup:
             result = watchdog.supervise(supervised)
-        self.assertIsNone(result)
+        # §7.C: the structured result carries the state (no need to read last_cleanup).
+        self.assertEqual(result.outcome, "LEADER_COMPLETED")
+        self.assertIsNone(result.kill_result)
+        self.assertTrue(result.verified_clean)
+        self.assertTrue(result.baseline_eligible)
         cleanup.assert_called_once()
-        self.assertTrue(watchdog.last_cleanup.is_confirmed_clean)
+
+    def test_supervise_rejects_raw_popen(self) -> None:
+        # §7.A: a raw Popen must be refused (it would rely on late group discovery).
+        from tools.behavioral_eval_runner.process_control import SessionWatchdog
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        with self.assertRaises(ProcessControlError):
+            watchdog.supervise(self._exited_process())  # type: ignore[arg-type]
+
+    def test_spawn_supervised_rejects_disabled_session(self) -> None:
+        # §7.B: on POSIX, start_new_session=False cannot yield a verified-clean
+        # supervision and must be refused before spawning.
+        from tools.behavioral_eval_runner.process_control import (
+            ProcessControlError,
+            spawn_supervised,
+        )
+
+        with mock.patch.object(sys, "platform", "linux"):
+            with self.assertRaises(ProcessControlError):
+                spawn_supervised([sys.executable, "-c", "pass"], start_new_session=False)
+
+    def test_unavailable_cleanup_is_not_clean_or_baseline(self) -> None:
+        # §7.C/D: an UNAVAILABLE cleanup (Windows post-leader) is distinguishable
+        # from a verified-clean success and is neither clean nor baseline-eligible,
+        # read straight from the RETURNED result.
+        from tools.behavioral_eval_runner.process_control import (
+            SessionCleanupResult,
+            SessionWatchdog,
+            SupervisedProcess,
+        )
+
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        supervised = SupervisedProcess(
+            process=self._exited_process(), session_pgid=None, isolated=True
+        )
+        unavailable = SessionCleanupResult(
+            "windows_taskkill_tree", False, "UNAVAILABLE", "post-leader; no verify"
+        )
+        with mock.patch.object(
+            watchdog, "_terminate_and_verify_session", return_value=unavailable
+        ):
+            result = watchdog.supervise(supervised)
+        self.assertEqual(result.cleanup.verification, "UNAVAILABLE")
+        self.assertFalse(result.verified_clean)
+        self.assertFalse(result.baseline_eligible)
+        self.assertFalse(result.live_dispatch_eligible)
 
     def test_group_is_bound_at_creation_not_by_late_getpgid(self) -> None:
         # spawn_supervised must record the session pgid at creation. On POSIX,
@@ -843,9 +982,11 @@ class TestSupervisorDescendantCleanup(unittest.TestCase):
             process=self._exited_process(), session_pgid=None, isolated=True
         )
         result = watchdog.supervise(supervised)
-        self.assertIsNone(result)
-        self.assertEqual(watchdog.last_cleanup.verification, "UNAVAILABLE")
-        self.assertFalse(watchdog.last_cleanup.is_confirmed_clean)
+        self.assertEqual(result.outcome, "LEADER_COMPLETED")
+        self.assertIsNone(result.kill_result)  # no emergency kill; not a failure
+        self.assertEqual(result.cleanup.verification, "UNAVAILABLE")
+        self.assertFalse(result.verified_clean)
+        self.assertFalse(result.baseline_eligible)
 
     @unittest.skipUnless(os.name == "posix", "POSIX process-group semantics")
     def test_posix_background_child_terminated_after_leader_exit(self) -> None:  # pragma: no cover - POSIX only

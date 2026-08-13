@@ -75,6 +75,14 @@ class TestCommandSurface(unittest.TestCase):
             },
         )
         self.assertFalse(payload["real_host_execution_profile"]["baseline_eligible"])
+        # §8: the three integrity capabilities are exposed and NON_BASELINE here.
+        for key in (
+            "materialization_write_integrity",
+            "evidence_writer_integrity",
+            "process_descendant_cleanup",
+        ):
+            self.assertIn(key, payload, key)
+            self.assertEqual(payload[key]["baseline_status"], "NON_BASELINE", key)
 
     def test_self_check_passes(self) -> None:
         code, payload = _run_cli(["self-check"])

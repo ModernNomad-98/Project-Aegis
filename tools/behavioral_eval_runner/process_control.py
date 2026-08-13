@@ -18,8 +18,9 @@ terminates the group AND verifies the outcome:
 - POSIX: after ``killpg(SIGKILL)`` the group is bounded-polled with ``killpg(pg, 0)``
   until it is confirmed empty (``VERIFIED_EMPTY``); a still-populated group or a
   ``killpg`` error is ``FAILED_NONEMPTY`` and fails the supervision CLOSED — never
-  swallowed, never reported as success. Exercised on POSIX CI; UNRUN in the
-  WP-2B-1 Windows evidence environment.
+  swallowed, never reported as success. This path is IMPLEMENTED_BUT_UNRUN in this
+  work package: the GitHub workflow does NOT run the runner's POSIX suite, and no
+  POSIX runtime execution is produced here, so it is never claimed proven.
 - Windows: ``taskkill /T`` is issued WHILE the leader is still pollable, but once
   the leader PID has exited there is no stdlib way to enumerate or verify the
   surviving descendant tree. That completeness is reported ``UNAVAILABLE`` (NOT
@@ -37,6 +38,8 @@ import stat
 import subprocess
 import sys
 import time
+from types import MappingProxyType
+from typing import Mapping
 from dataclasses import dataclass
 
 from .errors import ProcessControlError
@@ -266,22 +269,96 @@ class SessionCleanupResult:
         return self.verification == "VERIFIED_EMPTY"
 
 
+@dataclass(frozen=True, slots=True)
+class SupervisionResult:
+    """Structured supervision outcome carried in the RETURN value (§7.C).
+
+    A caller must NOT need to inspect mutable ``watchdog.last_cleanup`` to learn
+    whether cleanup was verified. ``UNAVAILABLE`` and ``NOT_ATTEMPTED`` are
+    distinguishable from a verified-clean success, and an unverified/failed
+    cleanup is never reported as clean or baseline/live-eligible (§7.D).
+    """
+
+    outcome: str  # "LEADER_COMPLETED" | "TIMEOUT_KILLED"
+    isolated: bool  # creation-bound (spawn_supervised), not late-adopted
+    kill_result: KillResult | None
+    cleanup: SessionCleanupResult
+
+    @property
+    def verified_clean(self) -> bool:
+        return self.cleanup.verification == "VERIFIED_EMPTY"
+
+    @property
+    def baseline_eligible(self) -> bool:
+        # §7.D: only a creation-bound, VERIFIED-empty cleanup is baseline-eligible.
+        return self.isolated and self.verified_clean
+
+    @property
+    def live_dispatch_eligible(self) -> bool:
+        return self.baseline_eligible
+
+
+def descendant_cleanup_capability() -> Mapping[str, str]:
+    """Truthful capability report for supervised descendant cleanup (§7/§8).
+
+    Windows: ``taskkill /T`` runs while the leader is alive but post-leader tree
+    reaping is UNVERIFIABLE in stdlib — reported UNAVAILABLE / NON_BASELINE. POSIX:
+    creation-bound pgid + bounded empty-group verification is IMPLEMENTED but UNRUN
+    in this work package (no POSIX runtime execution is produced here).
+    """
+    if sys.platform == "win32":
+        return MappingProxyType(
+            {
+                "platform": "win32",
+                "mechanism": "taskkill /T while leader alive; no post-leader tree "
+                "verification",
+                "post_leader_reaping": "UNAVAILABLE",
+                "implementation_state": "PARTIAL",
+                "runtime_evidence_state": "RUN",
+                "baseline_status": "NON_BASELINE",
+                "live_dispatch_consequence": "post-leader descendant reaping "
+                "UNVERIFIABLE; NON_BASELINE",
+            }
+        )
+    return MappingProxyType(
+        {
+            "platform": "posix",
+            "mechanism": "creation-bound pgid + killpg + bounded empty-group "
+            "verification",
+            "post_leader_reaping": "VERIFIED_WHEN_EXECUTED",
+            "implementation_state": "IMPLEMENTED",
+            "runtime_evidence_state": "UNRUN",
+            "baseline_status": "NON_BASELINE",
+            "live_dispatch_consequence": "not baseline / not verified-clean until "
+            "actually executed on a POSIX host (IMPLEMENTED_BUT_UNRUN here)",
+        }
+    )
+
+
 def spawn_supervised(argv: list[str], **popen_kwargs) -> SupervisedProcess:
     """Spawn a supervised child in its own kill scope, binding the group at
     creation. Control-plane only: never launches a model session (live dispatch
     is disabled in WP-2B-1)."""
     kwargs = dict(popen_isolation_kwargs())
     kwargs.update(popen_kwargs)
+    if (
+        sys.platform != "win32"
+        and "start_new_session" in kwargs
+        and not kwargs["start_new_session"]
+    ):
+        # §7.B: a POSIX caller that disables its own session/group leadership
+        # cannot get a verified-clean supervision (the group id would not be
+        # bindable at creation). Reject the configuration BEFORE spawning.
+        raise ProcessControlError(
+            "start_new_session=False disables the creation-bound process group; "
+            "verified session cleanup is impossible — refusing to spawn"
+        )
     process = subprocess.Popen(argv, **kwargs)  # noqa: S603 - caller-fixed argv
     if sys.platform == "win32":
         return SupervisedProcess(process, None, isolated=True)
-    # pgid == pid ONLY holds if the child actually became its own session/group
-    # leader. If a caller overrode start_new_session, do NOT assert a bound pgid:
-    # a wrong pgid could later be reported as a false VERIFIED_EMPTY. In that case
-    # the group is unbound (NOT_ATTEMPTED cleanup) — honest, not falsely clean.
-    if kwargs.get("start_new_session"):
-        return SupervisedProcess(process, process.pid, isolated=True)
-    return SupervisedProcess(process, None, isolated=False)
+    # start_new_session=True -> the child leads its own process group, so pgid ==
+    # pid and is known now, with no getpgid race (Finding E).
+    return SupervisedProcess(process, process.pid, isolated=True)
 
 
 class SessionWatchdog:
@@ -405,35 +482,46 @@ class SessionWatchdog:
                 f"{cleanup.detail}"
             )
 
-    def supervise(self, target: "SupervisedProcess | subprocess.Popen") -> KillResult | None:
+    def supervise(self, target: SupervisedProcess) -> SupervisionResult:
         """Wait for the leader; terminate AND verify the session at EVERY exit.
 
-        Accepts a ``SupervisedProcess`` (preferred: group bound at creation) or a
-        raw Popen (``adopt``-ed with a best-effort late binding). Returns the
-        KillResult when an emergency kill fired, else None. A confirmed-failed
-        cleanup raises ``ProcessControlError`` — an unverified/failed session is
-        never reported as a clean success (Finding E). The honest cleanup state
-        is always available on ``self.last_cleanup``.
+        REQUIRES a ``SupervisedProcess`` (§7.A) — a raw Popen would rely on late
+        process-group discovery and is refused; wrap it with ``spawn_supervised``
+        (creation-bound, preferred) or ``watchdog.adopt`` (explicit late binding,
+        never reported as baseline-clean). Returns a ``SupervisionResult`` carrying
+        the outcome AND the cleanup state, so a caller never has to read the
+        mutable ``last_cleanup`` to know whether cleanup was verified (§7.C). A
+        confirmed-failed cleanup raises ``ProcessControlError``; UNAVAILABLE and
+        NOT_ATTEMPTED are surfaced as non-clean, never as success (§7.D).
         """
-        supervised = (
-            target if isinstance(target, SupervisedProcess) else self.adopt(target)
-        )
+        if not isinstance(target, SupervisedProcess):
+            raise ProcessControlError(
+                "supervise() requires a SupervisedProcess; use spawn_supervised(...) "
+                "or watchdog.adopt(...) — a raw Popen relies on late group discovery"
+            )
+        supervised = target
         process = supervised.process
         poll_interval = min(0.05, self.controller.limit_seconds / 10)
         while True:
             if process.poll() is not None:
-                self.last_cleanup = self._terminate_and_verify_session(supervised)
-                self._enforce_cleanup(self.last_cleanup)
-                return None
+                cleanup = self._terminate_and_verify_session(supervised)
+                self.last_cleanup = cleanup
+                self._enforce_cleanup(cleanup)
+                return SupervisionResult(
+                    "LEADER_COMPLETED", supervised.isolated, None, cleanup
+                )
             if self.controller.expired():
-                result = kill_process_tree(process.pid)
+                kill_result = kill_process_tree(process.pid)
                 try:
                     process.wait(timeout=30)
                 except subprocess.TimeoutExpired as exc:
                     raise ProcessControlError(
                         f"process {process.pid} survived emergency kill"
                     ) from exc
-                self.last_cleanup = self._terminate_and_verify_session(supervised)
-                self._enforce_cleanup(self.last_cleanup)
-                return result
+                cleanup = self._terminate_and_verify_session(supervised)
+                self.last_cleanup = cleanup
+                self._enforce_cleanup(cleanup)
+                return SupervisionResult(
+                    "TIMEOUT_KILLED", supervised.isolated, kill_result, cleanup
+                )
             time.sleep(poll_interval)

@@ -139,8 +139,10 @@ validator self-tests, `validate-skills`, and DCO. The runner unit-test suite bel
 locally and reported as evidence, not as a GitHub CI result.
 
 - Test command: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
-- Test methods: **363**; result: **OK (363 passed, 0 failed, 2 skipped [POSIX-only], 0 errors)**
-  — after the second reconciliation pass (§9b) on top of §9a and the Group A–E hardening.
+- Test methods: **377**; result: **OK (377 passed, 0 failed, 4 skipped [POSIX-only], 0 errors)**
+  — after the boundary-enforcement pass (§9c) on top of §9a/§9b and the Group A–E hardening.
+  GitHub CI runs only the repository gates (`gate-guard`, validator self-tests, `validate-skills`,
+  DCO); it does NOT run this runner suite or any POSIX runner path.
 - **Runner test platform actually run:** Windows (win32), CPython 3.14. A POSIX runtime run
   is reported **UNRUN**: no general-purpose WSL/POSIX Python environment is available in
   this environment and installing one is out of scope; no POSIX test pass is claimed. The
@@ -381,6 +383,46 @@ window remains. Test count 347 → **363**.
   boolean (a JSON `1` is rejected despite `1 == True`), `baseline_ineligibility_reasons` a
   JSON list of strings (an empty string/dict is rejected despite `list({}) == []`), and
   `execution_profile_hash` a lowercase 64-hex digest.
+
+### 9c. Boundary-enforcement pass (PR #83 sixth commit)
+
+Independent control-layer review of `2d5c582` found the nonclaims needed machine-readable
+enforcement, not prose. This pass enforces them, test-first (347 → **377**). Every unproven
+capability is NON_BASELINE; no false-clean path remains.
+
+- **§4 — trusted materialization root:** `_write_file` re-derived `root_real` via `realpath`
+  per call, so a swapped area/destination root could become the accepted anchor. Now the
+  destination root is opened ONCE as a retained no-follow descriptor and every component —
+  including the AREA root — is created relative to it (`_write_at_root_fd` /
+  `_write_under_destination`); a symlink/reparse root is refused up-front. POSIX PREVENTS the
+  root/area/parent swap (IMPLEMENTED_BUT_UNRUN here); Windows is detection-only and reported
+  **UNAVAILABLE / NON_BASELINE** by `materialization_write_capability()`.
+- **§5 — evidence-writer TOCTOU:** `_atomic_write` had the same realpath-per-call anchor +
+  `mkstemp`/`os.replace` race. POSIX now writes under a retained no-follow root fd with a
+  dir-fd-relative temp + `renameat` atomic replace, and cleanup unlinks only OUR temp relative
+  to the trusted parent (never an unrelated outside file); a symlink root is refused. Windows
+  is detection-only and reported **UNAVAILABLE / NON_BASELINE** by `evidence_write_capability()`
+  — the atomic no-reparse guarantee is NOT claimed as fail-closed prevention there.
+- **§6 — machine-readable baseline + verification:** a materialization now carries
+  `write_integrity_baseline` (schema-enforced: `false ⇒ baseline_eligible=false`). A real-host
+  default is `false` (NON_BASELINE under Outcome B) and can never silently become eligible; a
+  synthetic test may inject `WRITE_INTEGRITY_BASELINE`. The verifier disambiguates scope:
+  `manifests_verified` + `record_claims_verified` + `complete_record_verified` + an explicit
+  `verification_scope`; top-level `verified` is manifest/file-set/derivable scope ONLY and can
+  never be read as complete-record verification (regression-locked).
+- **§7 — no false-clean supervision:** `supervise()` now REQUIRES a `SupervisedProcess`
+  (a raw Popen is refused — it would reintroduce late group discovery); `spawn_supervised`
+  refuses `start_new_session=False` on POSIX; and it returns a structured `SupervisionResult`
+  carrying `outcome` (LEADER_COMPLETED / TIMEOUT_KILLED) and the cleanup verification, so
+  UNAVAILABLE / NOT_ATTEMPTED are distinguishable from VERIFIED_EMPTY and an unverified cleanup
+  is never `baseline_eligible` / `live_dispatch_eligible`.
+- **§8 — capability report + honesty:** the `capabilities` CLI now exposes
+  `materialization_write_integrity`, `evidence_writer_integrity`, and
+  `process_descendant_cleanup` (platform / implementation-state / runtime-evidence-state /
+  baseline-status / live-dispatch-consequence — all NON_BASELINE here). The false
+  "Exercised on POSIX CI" wording in `process_control` is **withdrawn**: GitHub CI runs only
+  the repository gates and never the runner's POSIX suite — the POSIX paths are
+  IMPLEMENTED_BUT_UNRUN.
 
 ## 10. Owner decisions required at implementation review
 

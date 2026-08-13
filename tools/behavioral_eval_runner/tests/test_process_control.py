@@ -16,9 +16,11 @@ import math
 from tools.behavioral_eval_runner.errors import ProcessControlError
 from tools.behavioral_eval_runner.process_control import (
     SessionWatchdog,
+    SupervisedProcess,
     TimeoutController,
     kill_process_tree,
     popen_isolation_kwargs,
+    spawn_supervised,
 )
 
 #: A synthetic child that spawns ONE grandchild, reports its pid, then sleeps.
@@ -64,21 +66,23 @@ class TestProcessTreeKill(unittest.TestCase):
 
     def test_watchdog_kills_synthetic_child_tree(self) -> None:
         # E8: give the child its own process group on POSIX so the emergency
-        # killpg cannot reach the runner's / test harness's own group.
-        process = subprocess.Popen(
+        # killpg cannot reach the runner's / test harness's own group. §7: the
+        # watchdog is driven from a creation-bound SupervisedProcess.
+        supervised = spawn_supervised(
             [sys.executable, "-c", _CHILD_WITH_GRANDCHILD],
             shell=False,
             stdout=subprocess.PIPE,
-            **popen_isolation_kwargs(),
         )
+        process = supervised.process
         try:
             assert process.stdout is not None
             grandchild_pid = int(process.stdout.readline().decode("ascii").strip())
             watchdog = SessionWatchdog(timeout_seconds=0.5)
-            result = watchdog.supervise(process)
-            self.assertIsNotNone(result, "the watchdog must fire on expiry")
-            assert result is not None
-            self.assertTrue(result.succeeded, result.detail)
+            result = watchdog.supervise(supervised)
+            self.assertEqual(result.outcome, "TIMEOUT_KILLED")
+            self.assertIsNotNone(result.kill_result, "the watchdog must fire on expiry")
+            assert result.kill_result is not None
+            self.assertTrue(result.kill_result.succeeded, result.kill_result.detail)
             self.assertIsNotNone(process.poll(), "child must be terminated")
             if sys.platform == "win32":
                 deadline = time.monotonic() + 10
@@ -98,13 +102,20 @@ class TestProcessTreeKill(unittest.TestCase):
                 process.stdout.close()
 
     def test_watchdog_returns_none_when_process_finishes(self) -> None:
-        process = subprocess.Popen(
-            [sys.executable, "-c", "pass"], shell=False
-        )
+        supervised = spawn_supervised([sys.executable, "-c", "pass"], shell=False)
         watchdog = SessionWatchdog(timeout_seconds=30)
-        result = watchdog.supervise(process)
-        self.assertIsNone(result)
-        self.assertEqual(process.poll(), 0)
+        result = watchdog.supervise(supervised)
+        self.assertEqual(result.outcome, "LEADER_COMPLETED")
+        self.assertIsNone(result.kill_result)
+        self.assertEqual(supervised.process.poll(), 0)
+
+    def test_supervise_rejects_raw_popen(self) -> None:
+        # §7.A: a raw Popen relies on late group discovery and must be refused.
+        process = subprocess.Popen([sys.executable, "-c", "pass"], shell=False)
+        process.wait()
+        watchdog = SessionWatchdog(timeout_seconds=30)
+        with self.assertRaises(ProcessControlError):
+            watchdog.supervise(process)  # type: ignore[arg-type]
 
 
 if __name__ == "__main__":  # pragma: no cover
