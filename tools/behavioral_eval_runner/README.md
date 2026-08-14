@@ -1,10 +1,15 @@
-# Behavioral Eval Runner — WP-2B-1 offline core
+# Behavioral Eval Runner — WP-2B-1 offline core + WP-2B-2 grading stack
 
 The NON-LIVE control plane and minimum guardrails of the Project Aegis
 Behavioral Eval Runner, authorized by **BER-DEC-006**
 (authorization PR #82, squash merge `fc98ee6bf59bb516064be62ed8c5dc8861c92697`),
 implementing the 2B-1 row of
-[`docs/design/behavioral-eval-runner-v1.md`](../../docs/design/behavioral-eval-runner-v1.md) §19.
+[`docs/design/behavioral-eval-runner-v1.md`](../../docs/design/behavioral-eval-runner-v1.md) §19 —
+plus the NON-LIVE **WP-2B-2 Scenario A Grading Stack**, authorized by
+**BER-DEC-007** (authorization PR #84, squash merge
+`1145cb75d79bc6ab13876438527235c93320278b`), implementing the v1.1
+fast-track successor
+([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../../docs/design/behavioral-eval-runner-v1-fast-track-successor.md)) §3–§4.
 
 ## Hard boundaries (Outcome B)
 
@@ -15,9 +20,16 @@ implementing the 2B-1 row of
   (R1), judge calibration (R2, BLOCKED; OD-1 OPEN), cost observability (R3),
   containment (R4), and execution-profile isolation (R5) all remain
   UNAVAILABLE/UNKNOWN and are reported that way.
-- **No graders (WP-2B-2), no judge (WP-2B-3), no Scenario A, no generic eval
-  execution, no CI wiring.** Python standard library only; no dependencies.
+- **No live Scenario A, no generic eval execution, no CI wiring.** Python
+  standard library only; no dependencies.
 - Census-proposed risk classes are **PROPOSED / NOT OWNER-RATIFIED** (OD-3).
+- **WP-2B-2 grading stack is NON-LIVE:** deterministic graders grade RECORDED
+  synthetic evidence only; the semantic judge is a scaffold with NO provider
+  implementation (the only provider object denies with
+  `LIVE_DISPATCH_DISABLED`); calibration is a deterministic/mock harness with
+  MOCK/UNRATIFIED thresholds only. Zero runner-, grading-stack-, or
+  test-harness-generated model/provider dispatches; zero actual judge calls;
+  **no measured calibration; OD-1 OPEN; R2 BLOCKED; WP-2B-3/2B-4 not started.**
 
 ## What is here
 
@@ -37,7 +49,10 @@ implementing the 2B-1 row of
 | `evidence.py` | Two-stage finalization with detached marker; fail-closed integrity verification |
 | `reporting.py` | Deterministic reports with complete coverage metrics and no-unearned-PASS enforcement |
 | `adapters/` | Host-adapter interface + the non-live Claude Code adapter |
-| `cli.py` | `census`, `validate-record`, `materialize`, `preflight`, `schedule`, `aggregate-fixture`, `verify-evidence`, `capabilities`, `version`, `self-check` — no live-run command exists |
+| `cli.py` | `census`, `validate-record`, `materialize`, `preflight`, `schedule`, `aggregate-fixture`, `verify-evidence`, `capabilities`, `version`, `self-check`, plus the offline WP-2B-2 commands `validate-grading-contract`, `grade-fixture`, `build-judge-envelope`, `validate-judge-verdict`, `mock-calibration`, `grading-capabilities` — no live-run command exists |
+| `graders/` (WP-2B-2) | Scenario A control A–Q classification contract (`contract.py`); typed hash-bound results (`records.py`); deterministic graders over recorded synthetic evidence: state/transitions (`state_machine.py`), approval boundaries (`approval.py`), prohibited mutations + fail-closed zero-commit (`mutation.py`), append-only/ordering gates (`append_only.py`), run-local preview-vs-created hashing (`hashing.py`; never fixture pins), typed target/invocation-mode activation (`activation.py`), role/stage/questionnaire/capture oracles + control dispatch (`controls.py`; composite/semantic controls never PASS deterministically) |
+| `judge/` (WP-2B-2) | NON-LIVE judge scaffold: pinned-identity interface with a deny-all provider placeholder (`interface.py`), versioned injection-resistant system policy (`policy.py`), delimited base64 untrusted-data envelope built only from stage-A-verified artifacts (`envelope.py`), the exact coherent-topic rubric contract (`rubric.py`), recorded-fixture mock client (`mock.py`), schema-validated verdicts with fail-closed `JUDGE_ERROR` (`verdict.py`), deterministic/mock calibration harness with MOCK/UNRATIFIED thresholds and drift invalidation (`calibration.py`) |
+| `fixtures/scenario_a/` (WP-2B-2) | Recorded SYNTHETIC good/bad grading fixtures, the injection-defense suite, mock verdicts, and the synthetic/mock calibration dataset |
 
 Note on the final bundle: the stage-A input manifest is bound through the
 final report's `run_evidence_binding.input_evidence_manifest_sha256`; the

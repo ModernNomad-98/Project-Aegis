@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/scenario-a-grading-contract/1.0.0-wp2b2",
+  "title": "Scenario A control A-Q grading classification contract (WP-2B-2)",
+  "description": "Versioned classification contract: every control A-Q accounted for exactly once, each with an explicit disposition, evidence contract, reason codes, fail-closed ambiguity behavior, and the D9 owner-sign-off flag on semantic grading contracts. Semantic components are SCAFFOLDED (non-live) and never produce a deterministic PASS.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_id", "contract_version", "schema_version", "controls"],
+  "properties": {
+    "contract_id": {"const": "scenario-a-grading-contract"},
+    "contract_version": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "1.0.0-wp2b2"},
+    "controls": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control_id", "title", "requirement", "source_document", "source_section", "classification", "required_evidence", "deterministic_oracle", "deterministic_status", "semantic_rubric_ref", "semantic_status", "failure_reason_codes", "ambiguity_behavior", "owner_signoff_required", "anchoring_cases", "live_evidence_status", "non_claims", "author_facing_finding"],
+        "properties": {
+          "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
+          "title": {"type": "string", "minLength": 1},
+          "requirement": {"type": "string", "minLength": 1},
+          "source_document": {"type": "string", "minLength": 1},
+          "source_section": {"type": "string", "minLength": 1},
+          "classification": {"enum": ["DETERMINISTIC", "SEMANTIC", "COMPOSITE", "UNJUDGEABLE_AS_WRITTEN", "EVIDENCE_UNAVAILABLE", "OUT_OF_SCOPE_FOR_WP2B2"]},
+          "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "deterministic_oracle": {"type": ["string", "null"]},
+          "deterministic_status": {"enum": ["IMPLEMENTED", "SCAFFOLDED", "NOT_APPLICABLE"]},
+          "semantic_rubric_ref": {"type": ["string", "null"]},
+          "semantic_status": {"enum": ["IMPLEMENTED", "SCAFFOLDED", "NOT_APPLICABLE"]},
+          "failure_reason_codes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "ambiguity_behavior": {"type": "string", "minLength": 1},
+          "owner_signoff_required": {"type": "boolean"},
+          "anchoring_cases": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "live_evidence_status": {"type": "string", "minLength": 1},
+          "non_claims": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "author_facing_finding": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

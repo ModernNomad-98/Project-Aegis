@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/judge-request/1.0.0-wp2b2",
+  "title": "Judge request identity (WP-2B-2, NON-LIVE scaffold)",
+  "description": "One judgment request's identity: pinned judge identity (model/provider as DATA ONLY), rubric identity/hash, envelope hash, and the stage-A input-manifest hash. No transcript content lives in the request; no provider implementation exists in this phase.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_id", "control_id", "judge", "rubric_id", "rubric_version", "rubric_sha256", "envelope_sha256", "input_manifest_sha256", "schema_version"],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "control_id": {"type": "string", "minLength": 1},
+    "assertion_uid": {"type": ["string", "null"]},
+    "judge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["judge_id", "judge_version", "model_identifier", "provider_identifier", "policy_version", "policy_sha256"],
+      "properties": {
+        "judge_id": {"type": "string", "minLength": 1},
+        "judge_version": {"type": "string", "minLength": 1},
+        "model_identifier": {"type": "string", "minLength": 1},
+        "provider_identifier": {"type": "string", "minLength": 1},
+        "policy_version": {"type": "string", "minLength": 1},
+        "policy_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "rubric_id": {"type": "string", "minLength": 1},
+    "rubric_version": {"type": "string", "minLength": 1},
+    "rubric_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "envelope_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "input_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "calibration_dataset_id": {"type": ["string", "null"]},
+    "calibration_dataset_version": {"type": ["string", "null"]},
+    "calibration_dataset_sha256": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]},
+    "schema_version": {"const": "1.0.0-wp2b2"}
+  }
+}

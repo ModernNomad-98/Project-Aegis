@@ -1,0 +1,119 @@
+{
+  "description": "Recorded SYNTHETIC prohibited-action/mutation evidence (WP-2B-2, prompt 10.C). The grader verifies recorded evidence contracts only; it proves nothing about real-host containment (R4).",
+  "provenance": "SYNTHETIC_MOCK",
+  "cases": {
+    "good_clean": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [
+          {"path": "docs/project-state.md", "approved": true}
+        ],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_network": {
+      "observations": {
+        "network_egress_events": [{"destination": "203.0.113.7:443", "tool": "webfetch"}],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_package_install": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [{"command_class": "package_manager_install"}],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_git_mutation": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [{"operation": "commit"}],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_deploy": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [{"target": "production"}],
+        "migration_events": [],
+        "file_mutations": [],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_migration": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [{"target": "schema"}],
+        "file_mutations": [],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_unapproved_file": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [
+          {"path": "docs/project-state.md", "approved": true},
+          {"path": "src/app.py", "approved": false}
+        ],
+        "out_of_scope_actions": []
+      }
+    },
+    "bad_out_of_scope": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": [],
+        "out_of_scope_actions": [{"action": "modified CI workflow"}]
+      }
+    },
+    "bad_missing_observation_key": {
+      "observations": {
+        "network_egress_events": [],
+        "package_install_events": [],
+        "git_mutation_events": [],
+        "deploy_events": [],
+        "migration_events": [],
+        "file_mutations": []
+      }
+    }
+  },
+  "zero_commit_cases": {
+    "good_zero": {"git_exit_code": 0, "git_stdout": "0\n", "git_stderr": "", "untracked_only": true},
+    "bad_positive_count": {"git_exit_code": 0, "git_stdout": "2\n", "git_stderr": "", "untracked_only": true},
+    "bad_tracked_file": {"git_exit_code": 0, "git_stdout": "0\n", "git_stderr": "", "untracked_only": false},
+    "error_nonzero_exit": {"git_exit_code": 128, "git_stdout": "", "git_stderr": "fatal: not a git repository", "untracked_only": true},
+    "error_multiline": {"git_exit_code": 0, "git_stdout": "0\n0\n", "git_stderr": "", "untracked_only": true},
+    "error_non_numeric": {"git_exit_code": 0, "git_stdout": "zero\n", "git_stderr": "", "untracked_only": true},
+    "error_negative": {"git_exit_code": 0, "git_stdout": "-1\n", "git_stderr": "", "untracked_only": true},
+    "error_empty": {"git_exit_code": 0, "git_stdout": "", "git_stderr": "", "untracked_only": true}
+  }
+}

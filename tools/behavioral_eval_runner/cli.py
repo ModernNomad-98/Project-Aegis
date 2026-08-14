@@ -71,6 +71,47 @@ from .preflight import PreflightEnvironment, evaluate_case
 from .process_control import descendant_cleanup_capability
 from .scheduler import SchedulingPolicy, SelectionItem, schedule_with_reservation
 
+# WP-2B-2 grading stack (offline-only; BER-DEC-007).
+from . import (
+    GRADING_SCHEMA_VERSION,
+    GRADING_STACK_VERSION,
+    WP2B2_AUTHORIZATION_ID,
+    WP2B2_AUTHORIZATION_MERGE_SHA,
+    WP2B2_WORK_PACKAGE,
+)
+from .evidence import JudgeInputGate
+from .graders.activation import grade_activation
+from .graders.append_only import grade_version_sequence
+from .graders.approval import grade_approval_boundary
+from .graders.contract import ControlDisposition, load_contract
+from .graders.controls import (
+    grade_evidence_capture,
+    grade_metadata_capture,
+    grade_questionnaire_dump,
+    grade_stage_zero,
+    grade_workspace_role,
+)
+from .graders.hashing import grade_preview_vs_created
+from .graders.mutation import grade_mutations, grade_zero_commit_evidence
+from .graders.records import GraderResultState, GradingReasonCode
+from .graders.state_machine import grade_transitions
+from .judge import policy as judge_policy
+from .judge import rubric as judge_rubric
+from .judge.calibration import (
+    CalibrationDataset,
+    CalibrationThresholds,
+    ObservedOutcome,
+    ThresholdStatus,
+    compute_calibration_metrics,
+    evaluate_thresholds,
+)
+from .judge.envelope import (
+    ALLOWED_EVIDENCE_KEYS,
+    build_judge_envelope,
+    envelope_sha256,
+)
+from .judge.verdict import StructuredVerdict
+
 #: The full command surface. Live/run/dispatch verbs are deliberately absent.
 COMMANDS = (
     "census",
@@ -83,6 +124,13 @@ COMMANDS = (
     "capabilities",
     "version",
     "self-check",
+    # WP-2B-2 grading stack (offline-only; BER-DEC-007).
+    "validate-grading-contract",
+    "grade-fixture",
+    "build-judge-envelope",
+    "validate-judge-verdict",
+    "mock-calibration",
+    "grading-capabilities",
 )
 
 #: Top-level module names the package must never import (network / arbitrary
@@ -473,6 +521,175 @@ def _cmd_version(_args: argparse.Namespace) -> int:
     return 0
 
 
+# -------------------------------------------- WP-2B-2 grading-stack commands
+#: Deterministic graders reachable from grade-fixture (recorded evidence only).
+def _mutation_grader(control_letter: str):
+    control_id = f"SCENARIO_A_CONTROL_{control_letter}"
+
+    def grade(evidence):
+        return grade_mutations(evidence, control_id)
+
+    return grade
+
+
+_FIXTURE_GRADERS = {
+    "append_only": grade_version_sequence,
+    "transitions": grade_transitions,
+    "approval": grade_approval_boundary,
+    # The mutation grader is control-scoped (J/K/L/M/N grade only their own
+    # observation categories over the shared recorded evidence contract).
+    "mutation_j": _mutation_grader("J"),
+    "mutation_k": _mutation_grader("K"),
+    "mutation_l": _mutation_grader("L"),
+    "mutation_m": _mutation_grader("M"),
+    "mutation_n": _mutation_grader("N"),
+    "zero_commit": grade_zero_commit_evidence,
+    "activation": grade_activation,
+    "workspace_role": grade_workspace_role,
+    "stage_zero": grade_stage_zero,
+    "questionnaire": grade_questionnaire_dump,
+    "evidence_capture": grade_evidence_capture,
+    "metadata_capture": grade_metadata_capture,
+    "preview_hash": grade_preview_vs_created,
+}
+
+
+def _cmd_validate_grading_contract(_args: argparse.Namespace) -> int:
+    contract = load_contract()
+    _emit(
+        {
+            "contract_id": contract.contract_id,
+            "contract_version": contract.contract_version,
+            "schema_version": contract.schema_version,
+            "control_count": len(contract.controls),
+            "control_ids": [control.control_id for control in contract.controls],
+            "contract_sha256": contract.contract_hash(),
+            "owner_signoff_required": [
+                control.control_id
+                for control in contract.controls
+                if control.owner_signoff_required
+            ],
+        }
+    )
+    return 0
+
+
+def _cmd_grade_fixture(args: argparse.Namespace) -> int:
+    grader = _FIXTURE_GRADERS.get(args.grader)
+    if grader is None:
+        raise CliError(
+            f"unknown grader {args.grader!r}; choose from "
+            f"{sorted(_FIXTURE_GRADERS)}"
+        )
+    evidence = _load_json_file(args.evidence)
+    result = grader(evidence)
+    _emit(
+        {
+            "grader": args.grader,
+            "result": result.to_dict(),
+        }
+    )
+    return 0
+
+
+def _cmd_build_judge_envelope(args: argparse.Namespace) -> int:
+    artifact_keys: dict[str, str] = {}
+    for mapping in args.map or []:
+        key, _, relative = mapping.partition("=")
+        if not key or not relative:
+            raise CliError(f"--map must be key=relative-path, got {mapping!r}")
+        artifact_keys[key] = relative
+    gate = JudgeInputGate(args.root)
+    gate.verify()
+    envelope = build_judge_envelope(
+        rubric_ref=args.rubric, gate=gate, artifact_keys=artifact_keys
+    )
+    payload = {
+        "envelope": envelope,
+        "envelope_sha256": envelope_sha256(envelope),
+        "dispatched": False,
+        "non_claim": (
+            "envelope construction only; actual judge/provider dispatch is "
+            "not authorized in WP-2B-2 (zero actual judge calls)"
+        ),
+    }
+    if args.out:
+        with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(canonical_json(envelope) + "\n")
+    _emit(payload)
+    return 0
+
+
+def _cmd_validate_judge_verdict(args: argparse.Namespace) -> int:
+    payload = _load_json_file(args.file)
+    verdict = StructuredVerdict.from_dict(payload)
+    _emit(
+        {
+            "valid": True,
+            "verdict": verdict.verdict.value,
+            "reason_code": verdict.reason_code.value,
+            "schema_version": verdict.schema_version,
+            "verdict_hash": sha256_of_obj(verdict.to_dict()),
+        }
+    )
+    return 0
+
+
+def _cmd_mock_calibration(args: argparse.Namespace) -> int:
+    dataset = CalibrationDataset.from_dict(_load_json_file(args.dataset))
+    observed_raw = _load_json_file(args.observed)
+    if not isinstance(observed_raw, dict):
+        raise CliError("--observed must be a JSON object of entry_id -> outcome")
+    observed = {
+        entry_id: ObservedOutcome.parse(value)
+        for entry_id, value in observed_raw.items()
+    }
+    report = compute_calibration_metrics(dataset, observed)
+    thresholds = None
+    if args.thresholds:
+        thresholds = CalibrationThresholds.from_dict(_load_json_file(args.thresholds))
+    evaluation = evaluate_thresholds(report, thresholds)
+    _emit(
+        {
+            "report": report.to_dict(),
+            "report_sha256": report.report_sha256(),
+            "threshold_evaluation": evaluation.to_dict(),
+        }
+    )
+    return 0
+
+
+def _cmd_grading_capabilities(_args: argparse.Namespace) -> int:
+    contract = load_contract()
+    _emit(
+        {
+            "authorization": {
+                "authorization_id": WP2B2_AUTHORIZATION_ID,
+                "work_package": WP2B2_WORK_PACKAGE,
+                "authorization_merge_sha": WP2B2_AUTHORIZATION_MERGE_SHA,
+            },
+            "grading_stack_version": GRADING_STACK_VERSION,
+            "grading_schema_version": GRADING_SCHEMA_VERSION,
+            "deterministic_graders": sorted(_FIXTURE_GRADERS),
+            "contract": {
+                "control_count": len(contract.controls),
+                "contract_sha256": contract.contract_hash(),
+            },
+            "judge_dispatch": "DISABLED",
+            "actual_judge_provider_calls": 0,
+            "measured_calibration": (
+                "NONE — OD-1 OPEN; deterministic/mock harness only; measured "
+                "calibration is owned by the BLOCKED WP-2B-3 gate"
+            ),
+            "coherent_topic_rule": judge_rubric.COHERENT_TOPIC_RULE_TEXT,
+            "live_scenario_a": "NOT_AUTHORIZED",
+            "generic_corpus": "NOT_AUTHORIZED",
+            "evidence_source": "recorded synthetic fixtures only",
+        }
+    )
+    return 0
+
+
 def run_self_check() -> dict[str, Any]:
     """Offline invariants check; returns the structured result."""
     checks: list[dict[str, Any]] = []
@@ -566,6 +783,160 @@ def run_self_check() -> dict[str, Any]:
         assert record.aggregate_verdict is AggregateVerdict.INCONCLUSIVE
         assert record.aggregate_blocker is AggregateBlocker.BUDGET_EXHAUSTED
 
+    # ------------------------------------------ WP-2B-2 grading-stack checks
+    def _grading_enums_closed() -> None:
+        for bad_call in (
+            lambda: GraderResultState.parse("MAYBE"),
+            lambda: GradingReasonCode.parse("SOMETHING_NEW"),
+            lambda: ControlDisposition.parse("MOSTLY_DETERMINISTIC"),
+            lambda: ObservedOutcome.parse("SHRUG"),
+            lambda: ThresholdStatus.parse("RATIFIED"),
+        ):
+            try:
+                bad_call()
+            except UnknownEnumValueError:
+                continue
+            raise AssertionError("unknown grading enum value was accepted")
+
+    def _grading_schemas_consistent() -> None:
+        result_schema = load_schema("grader-result.schema.json")
+        assert sorted(
+            result_schema["properties"]["result_state"]["enum"]
+        ) == sorted(GraderResultState.values())
+        assert sorted(
+            result_schema["properties"]["reason_code"]["anyOf"][1]["enum"]
+        ) == sorted(GradingReasonCode.values())
+        verdict_schema = load_schema("judge-verdict.schema.json")
+        from .judge.verdict import (
+            FailureMode,
+            JudgeVerdictReason,
+            JudgeVerdictState,
+        )
+
+        assert sorted(
+            verdict_schema["properties"]["verdict"]["enum"]
+        ) == sorted(JudgeVerdictState.values())
+        assert sorted(
+            verdict_schema["properties"]["failure_mode"]["anyOf"][1]["enum"]
+        ) == sorted(FailureMode.values())
+        assert sorted(
+            verdict_schema["properties"]["reason_code"]["enum"]
+        ) == sorted(JudgeVerdictReason.values())
+        contract_schema = load_schema("scenario-a-grading-contract.schema.json")
+        assert sorted(
+            contract_schema["properties"]["controls"]["items"]["properties"][
+                "classification"
+            ]["enum"]
+        ) == sorted(ControlDisposition.values())
+
+    def _grading_contract_complete() -> None:
+        contract = load_contract()
+        ids = [control.control_id for control in contract.controls]
+        assert ids == [f"SCENARIO_A_CONTROL_{c}" for c in "ABCDEFGHIJKLMNOPQ"]
+        assert len(contract.contract_hash()) == 64
+
+    def _grading_fixture_reproducible() -> None:
+        evidence = {
+            "case_uid": build_case_uid(
+                "project-orchestrator", "behavior_eval", "self-check", {"id": "sc"}
+            ),
+            "git_exit_code": 0,
+            "git_stdout": "0\n",
+            "git_stderr": "",
+            "untracked_only": True,
+            "evidence_pointer": "self-check:zero-commit",
+        }
+        first = grade_zero_commit_evidence(evidence)
+        second = grade_zero_commit_evidence(evidence)
+        assert first.result_state is GraderResultState.PASS
+        assert first.output_sha256 == second.output_sha256
+
+    def _judge_provider_absent() -> None:
+        from .judge.interface import DisabledJudgeProvider, JudgeClient
+        from .judge import interface as judge_interface_mod
+        from .judge import mock as judge_mock_mod
+
+        provider = DisabledJudgeProvider()
+        try:
+            provider.dispatch(None, b"")  # type: ignore[arg-type]
+        except LiveDispatchDisabledError:
+            pass
+        else:
+            raise AssertionError("DisabledJudgeProvider failed to deny dispatch")
+        concrete = set()
+        for module in (judge_interface_mod, judge_mock_mod):
+            for name in dir(module):
+                value = getattr(module, name)
+                if (
+                    isinstance(value, type)
+                    and issubclass(value, JudgeClient)
+                    and value is not JudgeClient
+                ):
+                    concrete.add(value.__name__)
+        assert concrete == {"DisabledJudgeProvider", "MockJudgeClient"}, concrete
+
+    def _judge_envelope_invariants() -> None:
+        for leaked in ("expected_answer", "answer_bank", "negative_neighbors"):
+            assert leaked not in ALLOWED_EVIDENCE_KEYS
+        policy_text = judge_policy.JUDGE_SYSTEM_POLICY.lower()
+        for clause in ("untrusted data", "no tool", "no network", "abstain"):
+            assert clause in policy_text, clause
+        assert len(judge_policy.policy_sha256()) == 64
+        assert judge_rubric.COHERENT_TOPIC_RULE_TEXT == (
+            "ONE COHERENT DISCOVERY TOPIC PER TURN.\n"
+            "Related supporting details within that topic are allowed."
+        )
+
+    def _mock_calibration_behavior() -> None:
+        dataset = CalibrationDataset.from_dict(
+            {
+                "dataset_id": "self-check-dataset",
+                "version": "1.0.0-wp2b2",
+                "labeler_role": "human_label_owner_role",
+                "provenance": "SYNTHETIC_MOCK",
+                "schema_version": GRADING_SCHEMA_VERSION,
+                "entries": [
+                    {
+                        "entry_id": "sc1",
+                        "control_id": "SCENARIO_A_CONTROL_G",
+                        "risk_class": "CRITICAL",
+                        "expected_label": "FAIL",
+                        "input_artifact_refs": ["transcript"],
+                        "split": "TRAIN",
+                    },
+                    {
+                        "entry_id": "sc2",
+                        "control_id": "SCENARIO_A_CONTROL_G",
+                        "risk_class": "STANDARD",
+                        "expected_label": "PASS",
+                        "input_artifact_refs": ["transcript"],
+                        "split": "TRAIN",
+                    },
+                ],
+            }
+        )
+        report = compute_calibration_metrics(
+            dataset,
+            {"sc1": ObservedOutcome.PASS, "sc2": ObservedOutcome.PASS},
+        )
+        no_thresholds = evaluate_thresholds(report, None)
+        assert no_thresholds.outcome.value == "REJECTED_NO_THRESHOLDS"
+        strict = CalibrationThresholds.from_dict(
+            {
+                "status": "MOCK_UNRATIFIED",
+                "min_agreement_rate": 0.9,
+                "max_false_pass_rate": 0.0,
+                "max_false_fail_rate": 0.1,
+                "max_abstention_rate": 0.1,
+                "max_judge_error_rate": 0.1,
+                "max_critical_false_pass_rate": 0.0,
+            }
+        )
+        under = evaluate_thresholds(report, strict)
+        assert under.outcome.value == "REJECTED_UNDER_THRESHOLD"
+        assert under.baseline_eligible is False
+        assert no_thresholds.baseline_eligible is False
+
     check("enum_sets_closed", _enums_closed)
     check("canonical_encoding_stable", _canonical_stable)
     check("identity_behavior", _identity_behavior)
@@ -574,6 +945,13 @@ def run_self_check() -> dict[str, Any]:
     check("no_forbidden_source_patterns", _no_forbidden_sources)
     check("real_host_capabilities_honest", _honest_real_host)
     check("aggregation_spot_checks", _aggregation_spot)
+    check("grading_enum_sets_closed", _grading_enums_closed)
+    check("grading_schemas_match_code_enums", _grading_schemas_consistent)
+    check("grading_contract_complete", _grading_contract_complete)
+    check("grading_fixture_reproducible", _grading_fixture_reproducible)
+    check("judge_provider_absent_or_denied", _judge_provider_absent)
+    check("judge_envelope_security_invariants", _judge_envelope_invariants)
+    check("mock_calibration_threshold_behavior", _mock_calibration_behavior)
 
     overall = "PASS" if all(c["result"] == "PASS" for c in checks) else "FAIL"
     return {
@@ -657,6 +1035,55 @@ def build_parser() -> argparse.ArgumentParser:
 
     self_check = subparsers.add_parser("self-check", help="offline invariants check")
     self_check.set_defaults(func=_cmd_self_check)
+
+    # WP-2B-2 grading stack (offline-only; no dispatch verbs exist).
+    vgc = subparsers.add_parser(
+        "validate-grading-contract",
+        help="validate the Scenario A control A-Q grading contract",
+    )
+    vgc.set_defaults(func=_cmd_validate_grading_contract)
+
+    gf = subparsers.add_parser(
+        "grade-fixture", help="grade a recorded deterministic Scenario A fixture"
+    )
+    gf.add_argument("--grader", required=True)
+    gf.add_argument("--evidence", required=True)
+    gf.set_defaults(func=_cmd_grade_fixture)
+
+    bje = subparsers.add_parser(
+        "build-judge-envelope",
+        help="build/validate a judge request envelope WITHOUT dispatch",
+    )
+    bje.add_argument("--root", required=True, help="stage-A evidence bundle root")
+    bje.add_argument("--rubric", required=True)
+    bje.add_argument(
+        "--map",
+        action="append",
+        required=True,
+        help="evidence key=manifest-relative-path (repeatable)",
+    )
+    bje.add_argument("--out", default=None)
+    bje.set_defaults(func=_cmd_build_judge_envelope)
+
+    vjv = subparsers.add_parser(
+        "validate-judge-verdict", help="validate a recorded mock judge verdict"
+    )
+    vjv.add_argument("--file", required=True)
+    vjv.set_defaults(func=_cmd_validate_judge_verdict)
+
+    mc = subparsers.add_parser(
+        "mock-calibration",
+        help="run the mock calibration harness over recorded synthetic fixtures",
+    )
+    mc.add_argument("--dataset", required=True)
+    mc.add_argument("--observed", required=True)
+    mc.add_argument("--thresholds", default=None)
+    mc.set_defaults(func=_cmd_mock_calibration)
+
+    gc = subparsers.add_parser(
+        "grading-capabilities", help="truthful grading-stack capability report"
+    )
+    gc.set_defaults(func=_cmd_grading_capabilities)
 
     return parser
 

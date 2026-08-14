@@ -1,0 +1,86 @@
+{
+  "description": "Recorded SYNTHETIC typed activation evidence (WP-2B-2, prompt 10.F; design sections 5c/5d/6). Every node carries target kind/name, evidence tier, invocation mode, and source RECORDED_SYNTHETIC. R1 remains UNAVAILABLE/UNKNOWN on the real host: prose-only or ambiguous evidence yields ERROR, never a verdict, and nothing here is live evidence.",
+  "provenance": "SYNTHETIC_MOCK",
+  "cases": {
+    "good_tier1_skill": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "good_tier1_subagent_with_composed_skill": {
+      "expectation": {"target_kind": "subagent", "target_name": "release-readiness-reviewer", "invocation_mode": "delegated_subagent"},
+      "observed_nodes": [
+        {"target_kind": "subagent", "target_name": "release-readiness-reviewer", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "delegated_subagent", "source": "RECORDED_SYNTHETIC",
+         "children": [
+           {"target_kind": "skill", "target_name": "release-readiness-reviewer", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "delegated_subagent", "source": "RECORDED_SYNTHETIC"}
+         ]}
+      ]
+    },
+    "bad_skill_for_subagent_expectation": {
+      "expectation": {"target_kind": "subagent", "target_name": "release-readiness-reviewer", "invocation_mode": "delegated_subagent"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "release-readiness-reviewer", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "bad_subagent_for_skill_expectation": {
+      "expectation": {"target_kind": "skill", "target_name": "release-readiness-reviewer", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "subagent", "target_name": "release-readiness-reviewer", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "delegated_subagent", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "bad_wrong_mode": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "explicit_skill_invocation", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "error_prose_only": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER3_PROSE", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "error_unpromoted_tier2_only": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER2_OUTPUT_SIGNATURE", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "good_promoted_tier2": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER2_OUTPUT_SIGNATURE", "tier2_promoted": true, "promotion_ref": "OWNER-APPROVED-SYNTHETIC-SCOPE-1", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "error_promoted_tier2_without_ref": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER2_OUTPUT_SIGNATURE", "tier2_promoted": true, "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "error_no_nodes": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": []
+    },
+    "error_conflicting_modes": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC"},
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER1_STRUCTURED_EVENT", "invocation_mode": "explicit_skill_invocation", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "error_missing_mode": {
+      "expectation": {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "requirements-gathering-facilitator", "evidence_tier": "TIER1_STRUCTURED_EVENT", "source": "RECORDED_SYNTHETIC"}
+      ]
+    },
+    "bad_name_mention_only_is_not_activation": {
+      "expectation": {"target_kind": "skill", "target_name": "code-reviewer", "invocation_mode": "model_selected"},
+      "observed_nodes": [
+        {"target_kind": "skill", "target_name": "code-reviewer", "evidence_tier": "TIER3_PROSE", "invocation_mode": "model_selected", "source": "RECORDED_SYNTHETIC", "note": "prose said 'you could use code-reviewer'"}
+      ]
+    }
+  }
+}

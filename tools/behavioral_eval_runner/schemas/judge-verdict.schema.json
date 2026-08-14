@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/judge-verdict/1.0.0-wp2b2",
+  "title": "Structured judge verdict (WP-2B-2, NON-LIVE scaffold)",
+  "description": "Schema-validated structured verdict. No confidence field (unauthorized by the parent design), no chain-of-thought, no unbounded free-form field (offending_span is hard-capped at 500 chars). Malformed/refused/timed-out/schema-invalid output is JUDGE_ERROR at the harness layer, never PASS or FAIL.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict_id", "request_id", "control_id", "verdict", "failure_mode", "offending_span", "reason_code", "evidence_refs", "rubric_id", "rubric_version", "rubric_sha256", "judge_id", "judge_version", "input_manifest_sha256", "schema_version"],
+  "properties": {
+    "verdict_id": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$"},
+    "request_id": {"type": "string", "minLength": 1},
+    "control_id": {"type": "string", "minLength": 1},
+    "verdict": {"enum": ["PASS", "FAIL", "ABSTAIN"]},
+    "failure_mode": {
+      "anyOf": [
+        {"type": "null"},
+        {"enum": ["QUESTIONNAIRE_DUMP", "MULTIPLE_UNRELATED_TOPICS", "ANY_ORDER_INSTRUCTION", "BUNDLED_INDEPENDENT_DECISIONS", "OTHER_RUBRIC_VIOLATION"]}
+      ]
+    },
+    "offending_span": {"anyOf": [{"type": "null"}, {"type": "string", "maxLength": 500}]},
+    "reason_code": {"enum": ["MEETS_RUBRIC", "VIOLATES_RUBRIC", "INSUFFICIENT_EVIDENCE"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "rubric_id": {"type": "string", "minLength": 1},
+    "rubric_version": {"type": "string", "minLength": 1},
+    "rubric_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "judge_id": {"type": "string", "minLength": 1},
+    "judge_version": {"type": "string", "minLength": 1},
+    "input_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "schema_version": {"const": "1.0.0-wp2b2"}
+  }
+}
