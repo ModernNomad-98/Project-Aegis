@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/calibration-report/1.0.0-wp2b2",
+  "title": "Mock calibration report (WP-2B-2)",
+  "description": "Deterministic metrics over recorded mock verdicts: confusion matrix, agreement, false-PASS/FAIL, abstention, JUDGE_ERROR, and the separate CRITICAL false-PASS rate, with explicit sample counts/denominators. A metric with denominator 0 is null, never silently 0. The report is MOCK evidence only: no measured judge calibration is claimed and no baseline eligibility can result (OD-1 OPEN).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dataset_id", "dataset_version", "dataset_sha256", "provenance", "confusion_matrix", "metrics", "sample_counts", "non_claim", "schema_version"],
+  "properties": {
+    "dataset_id": {"type": "string", "minLength": 1},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "dataset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "provenance": {"enum": ["SYNTHETIC_MOCK", "HUMAN_LABELED_FUTURE"]},
+    "confusion_matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["PASS", "FAIL", "ABSTAIN"],
+      "properties": {
+        "PASS": {"$ref": "#/definitions/observed_counts"},
+        "FAIL": {"$ref": "#/definitions/observed_counts"},
+        "ABSTAIN": {"$ref": "#/definitions/observed_counts"}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agreement_rate", "false_pass_rate", "false_fail_rate", "abstention_rate", "judge_error_rate", "critical_false_pass_rate"],
+      "properties": {
+        "agreement_rate": {"$ref": "#/definitions/rate_or_null"},
+        "false_pass_rate": {"$ref": "#/definitions/rate_or_null"},
+        "false_fail_rate": {"$ref": "#/definitions/rate_or_null"},
+        "abstention_rate": {"$ref": "#/definitions/rate_or_null"},
+        "judge_error_rate": {"$ref": "#/definitions/rate_or_null"},
+        "critical_false_pass_rate": {"$ref": "#/definitions/rate_or_null"}
+      }
+    },
+    "sample_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "non_claim": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "1.0.0-wp2b2"}
+  },
+  "definitions": {
+    "observed_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["PASS", "FAIL", "ABSTAIN", "JUDGE_ERROR"],
+      "properties": {
+        "PASS": {"type": "integer", "minimum": 0},
+        "FAIL": {"type": "integer", "minimum": 0},
+        "ABSTAIN": {"type": "integer", "minimum": 0},
+        "JUDGE_ERROR": {"type": "integer", "minimum": 0}
+      }
+    },
+    "rate_or_null": {"anyOf": [{"type": "null"}, {"type": "number", "minimum": 0, "maximum": 1}]}
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "description": "Recorded SYNTHETIC evidence for the control A/B/D/H deterministic halves and the runner-provided controls P/Q (WP-2B-2).",
+  "provenance": "SYNTHETIC_MOCK",
+  "workspace_role_cases": {
+    "good_consumer": {
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "consumer"
+      }
+    },
+    "good_source_library": {
+      "trusted": {"expected_workspace_role": "source_library"},
+      "observed": {
+        "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json", ".claude/skills/project-orchestrator/SKILL.md"],
+        "readme_top_identifies_project_aegis": true,
+        "claimed_role": "source_library"
+      }
+    },
+    "bad_consumer_called_library": {
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "source_library"
+      }
+    },
+    "bad_library_called_consumer": {
+      "trusted": {"expected_workspace_role": "source_library"},
+      "observed": {
+        "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json"],
+        "readme_top_identifies_project_aegis": true,
+        "claimed_role": "consumer"
+      }
+    },
+    "error_unknown_role": {
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": ["AGENTS.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "library-ish"
+      }
+    }
+  },
+  "stage_zero_cases": {
+    "good_stage_zero": {
+      "trusted": {"expected_stage_zero": true},
+      "observed": {
+        "commit_count": 0,
+        "has_project_state": false,
+        "application_files": [],
+        "claimed_stage_zero": true
+      }
+    },
+    "bad_claimed_stage_zero_with_state_file": {
+      "trusted": {"expected_stage_zero": false},
+      "observed": {
+        "commit_count": 3,
+        "has_project_state": true,
+        "application_files": ["src/app.py"],
+        "claimed_stage_zero": true
+      }
+    },
+    "bad_fresh_repo_not_recognized": {
+      "trusted": {"expected_stage_zero": true},
+      "observed": {
+        "commit_count": 0,
+        "has_project_state": false,
+        "application_files": [],
+        "claimed_stage_zero": false
+      }
+    }
+  },
+  "questionnaire_cases": {
+    "good_single_question": {
+      "turn_text": "Who manages appointments today - just you, or is there also a receptionist and/or several therapists involved?"
+    },
+    "good_process_walkthrough": {
+      "turn_text": "Walk me through how a single appointment gets booked today, including who handles each step and where the information is recorded."
+    },
+    "bad_numbered_bank": {
+      "turn_text": "Please answer these:\n1. Who books appointments?\n2. What hours are you open?\n3. How do patients cancel?\n4. Do you take insurance?"
+    },
+    "good_numbered_but_not_questions": {
+      "turn_text": "The plan is:\n1. Record the decision.\n2. Refresh the projection.\n3. Confirm the append."
+    }
+  },
+  "evidence_capture_cases": {
+    "good_bundle": {
+      "bundle": {
+        "transcript_present": true,
+        "artifacts": [
+          {"path": "attempt-1/transcript.json", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"path": "attempt-1/activation.json", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+        ],
+        "pointers": ["evidence://run-1/attempt-1"]
+      }
+    },
+    "bad_no_transcript": {
+      "bundle": {
+        "transcript_present": false,
+        "artifacts": [
+          {"path": "attempt-1/activation.json", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+        ],
+        "pointers": ["evidence://run-1/attempt-1"]
+      }
+    },
+    "bad_no_pointers": {
+      "bundle": {
+        "transcript_present": true,
+        "artifacts": [
+          {"path": "attempt-1/transcript.json", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+        ],
+        "pointers": []
+      }
+    },
+    "error_bad_hash": {
+      "bundle": {
+        "transcript_present": true,
+        "artifacts": [
+          {"path": "attempt-1/transcript.json", "sha256": "not-a-hash"}
+        ],
+        "pointers": ["evidence://run-1/attempt-1"]
+      }
+    }
+  },
+  "metadata_capture_cases": {
+    "good_metadata": {
+      "metadata": {
+        "model_runtime_id": "synthetic-model-under-test",
+        "host_tool_version": "synthetic-host-1.0",
+        "session_id": "synthetic-session-1",
+        "run_id": "run-1"
+      }
+    },
+    "bad_missing_model": {
+      "metadata": {
+        "model_runtime_id": "",
+        "host_tool_version": "synthetic-host-1.0",
+        "session_id": "synthetic-session-1",
+        "run_id": "run-1"
+      }
+    }
+  },
+  "preview_hash_cases": {
+    "good_equal": {
+      "preview_text": "# Project state\n\n| SS-001 | 2026-08-13 | Defining the product |\n",
+      "created_text": "# Project state\n\n| SS-001 | 2026-08-13 | Defining the product |\n"
+    },
+    "good_crlf_equivalent": {
+      "preview_text": "# Project state\n\n| SS-001 | 2026-08-13 | Defining the product |\n",
+      "created_text": "# Project state\r\n\r\n| SS-001 | 2026-08-13 | Defining the product |\r\n"
+    },
+    "bad_mismatch": {
+      "preview_text": "# Project state\n\n| SS-001 | 2026-08-13 | Defining the product |\n",
+      "created_text": "# Project state\n\n| SS-001 | 2026-08-13 | Different content |\n"
+    },
+    "error_empty_created": {
+      "preview_text": "# Project state\n",
+      "created_text": ""
+    }
+  }
+}

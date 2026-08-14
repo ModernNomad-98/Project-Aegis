@@ -1,0 +1,93 @@
+{
+  "description": "Recorded SYNTHETIC Scenario A state/transition evidence (WP-2B-2, R2). TRUSTED grading-plan data (answer bank, required start state, loop threshold) is explicitly separated from OBSERVED transition recordings: the observation can never redefine the criteria it is graded against.",
+  "provenance": "SYNTHETIC_MOCK",
+  "trusted_defaults": {
+    "answer_bank_ids": ["ANS-OPERATOR", "ANS-BOOKING-FLOW", "ANS-SLOT-DURATION", "ANS-NAVIGATION", "ANS-LINK-EXPIRY", "ANS-NOTIFICATIONS", "ANS-SUCCESS"],
+    "required_start_state": "STEP_00",
+    "loop_threshold": 3
+  },
+  "cases": {
+    "good_linear": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-OPERATOR", "next_state": "STEP_00"},
+          {"prior_state": "STEP_00", "observed_turn_class": "PREVIEW_PRESENTATION", "selected_answer_id": null, "next_state": "STEP_00"},
+          {"prior_state": "STEP_00", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "RECORDING_CONFIRMATION", "selected_answer_id": null, "next_state": "STEP_02"},
+          {"prior_state": "STEP_02", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_03"},
+          {"prior_state": "STEP_03", "observed_turn_class": "RECORDING_CONFIRMATION", "selected_answer_id": null, "next_state": "STEP_04"},
+          {"prior_state": "STEP_04", "observed_turn_class": "STAGE_GATE_PROPOSAL", "selected_answer_id": null, "next_state": "STEP_05"},
+          {"prior_state": "STEP_05", "observed_turn_class": "STAGE_GATE_PROPOSAL", "selected_answer_id": null, "next_state": "STEP_06"},
+          {"prior_state": "STEP_06", "observed_turn_class": "STAGE_GATE_PROPOSAL", "selected_answer_id": null, "next_state": "STEP_07"},
+          {"prior_state": "STEP_07", "observed_turn_class": "RECORDING_CONFIRMATION", "selected_answer_id": null, "next_state": "STEP_08"},
+          {"prior_state": "STEP_08", "observed_turn_class": "RECORDING_CONFIRMATION", "selected_answer_id": null, "next_state": "STEP_08"}
+        ]
+      }
+    },
+    "bad_skip_forward": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_03"}
+        ]
+      }
+    },
+    "bad_backward": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "RECORDING_CONFIRMATION", "selected_answer_id": null, "next_state": "STEP_00"}
+        ]
+      }
+    },
+    "bad_unknown_answer": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-NOT-IN-BANK", "next_state": "STEP_00"}
+        ]
+      }
+    },
+    "bad_repeated_loop": {
+      "trusted_overrides": {"required_start_state": null},
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"}
+        ]
+      }
+    },
+    "bad_repeated_loop_strict_start": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"},
+          {"prior_state": "STEP_01", "observed_turn_class": "BUSINESS_DISCOVERY_TOPIC", "selected_answer_id": "ANS-SLOT-DURATION", "next_state": "STEP_01"}
+        ]
+      }
+    },
+    "bad_after_completion": {
+      "trusted_overrides": {"required_start_state": null},
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_08", "observed_turn_class": "STAGE_GATE_PROPOSAL", "selected_answer_id": null, "next_state": "STEP_00"}
+        ]
+      }
+    },
+    "bad_out_of_contract_turn": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "OUT_OF_CONTRACT", "selected_answer_id": null, "next_state": "STEP_00"}
+        ]
+      }
+    },
+    "bad_broken_chain": {
+      "observed": {
+        "transitions": [
+          {"prior_state": "STEP_00", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_01"},
+          {"prior_state": "STEP_02", "observed_turn_class": "APPROVAL_REQUEST", "selected_answer_id": null, "next_state": "STEP_03"}
+        ]
+      }
+    }
+  }
+}

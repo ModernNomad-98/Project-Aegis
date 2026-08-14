@@ -1,0 +1,90 @@
+{
+  "description": "Recorded SYNTHETIC approval-boundary event sequences (WP-2B-2, R2). TRUSTED plan data (the required owner-gate IDs) is separated from the OBSERVED event recordings. Ordered events; seq strictly increasing. Missing or ambiguous approval fails closed; an approval binds both its ID and its target.",
+  "provenance": "SYNTHETIC_MOCK",
+  "trusted_defaults": {
+    "required_gate_ids": ["PS-007", "PS-008", "PS-009", "PS-010"]
+  },
+  "cases": {
+    "good_preview_approve_append": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1", "approver_identity": "user"},
+        {"seq": 4, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"}
+      ]
+    },
+    "good_stage_advance_after_gate": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#SS-002"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2", "approver_identity": "user"},
+        {"seq": 4, "kind": "STAGE_ADVANCE", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2", "owner_gate_record_ids": ["PS-007", "PS-008", "PS-009", "PS-010"]}
+      ]
+    },
+    "bad_action_before_approval": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1", "approver_identity": "user"}
+      ]
+    },
+    "bad_no_approval_at_all": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001"}
+      ]
+    },
+    "bad_ambiguous_approval_then_action": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_AMBIGUOUS", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 4, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"}
+      ]
+    },
+    "bad_declined_then_action": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_DECLINED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 4, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"}
+      ]
+    },
+    "bad_missing_identity": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 4, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"}
+      ]
+    },
+    "bad_append_without_preview": {
+      "events": [
+        {"seq": 1, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 2, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1", "approver_identity": "user"},
+        {"seq": 3, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"}
+      ]
+    },
+    "bad_silent_stage_advance": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#SS-002"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2", "approver_identity": "user"},
+        {"seq": 4, "kind": "STAGE_ADVANCE", "target": "docs/project-state.md#SS-002", "approval_id": "A-REQ-2", "owner_gate_record_ids": ["PS-007", "PS-008"]}
+      ]
+    },
+    "bad_unknown_event_kind": {
+      "events": [
+        {"seq": 1, "kind": "SOMETHING_ELSE", "target": "docs/project-state.md#PS-001"}
+      ]
+    },
+    "bad_wrong_approval_id_on_action": {
+      "events": [
+        {"seq": 1, "kind": "PREVIEW_SHOWN", "target": "docs/project-state.md#PS-001"},
+        {"seq": 2, "kind": "APPROVAL_REQUESTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1"},
+        {"seq": 3, "kind": "APPROVAL_GRANTED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-1", "approver_identity": "user"},
+        {"seq": 4, "kind": "RECORD_APPENDED", "target": "docs/project-state.md#PS-001", "approval_id": "A-REQ-OTHER"}
+      ]
+    }
+  }
+}

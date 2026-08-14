@@ -1,0 +1,112 @@
+{
+  "description": "Recorded SYNTHETIC Scenario A project-state version sequences for the append-only/recording grader (WP-2B-2, R2). TRUSTED plan data (the semantic gates and expected final IDs) is separated from the OBSERVED version recordings. Versions are arrays of lines joined with LF. These are grading-stack test fixtures, not the mechanical harness's approved fixture sequence, and pin no live output.",
+  "provenance": "SYNTHETIC_MOCK",
+  "trusted_defaults": {
+    "semantic_gates": {
+      "spec_acceptance_id": "PS-006",
+      "spec_owner_completion_id": "PS-007",
+      "stage2_owner_ids": ["PS-007", "PS-008", "PS-009", "PS-010"],
+      "stage3_snapshot_id": "SS-002",
+      "forbidden_snapshot_ids": ["SS-003"]
+    }
+  },
+  "sections_header": ["# Project state (synthetic fixture)", "", "## Current product summary", "(mutable projection - freely refreshed)", ""],
+  "snapshot_table_header": ["## State snapshots", "| ID | Date | Stage |", "| --- | --- | --- |"],
+  "decision_table_header": ["## Decision log", "| ID | Date | Decision |", "| --- | --- | --- |"],
+  "approval_table_header": ["## Approvals", "| ID | Date | Approval |", "| --- | --- | --- |"],
+  "deviations_header": ["## Deviations"],
+  "rows": {
+    "ss1": "| SS-001 | 2026-08-13 | Defining the product |",
+    "ss2": "| SS-002 | 2026-08-13 | Design: how it will be built |",
+    "ss3": "| SS-003 | 2026-08-13 | Forbidden stage |",
+    "d_placeholder": "| (none yet) |  |  |",
+    "ps1": "| PS-001 | 2026-08-13 | Scope: solo-operator MVP (chosen over multi-tenant, because simplest) |",
+    "ps2": "| PS-002 | 2026-08-13 | Slot duration 30m (chosen over 60m, because typical visit) |",
+    "ps3": "| PS-003 | 2026-08-13 | Multi-day navigation (chosen over single-day, because planning) |",
+    "ps4": "| PS-004 | 2026-08-13 | Link expiry 7d (chosen over none, because privacy) |",
+    "ps5": "| PS-005 | 2026-08-13 | No notifications in v1 (chosen over email, because scope) |",
+    "ps6": "| PS-006 | 2026-08-13 | User accepted spec sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa at docs/specs/spec-v1.md |",
+    "ps7": "| PS-007 | 2026-08-13 | Product spec owner complete (references PS-006) |",
+    "ps8": "| PS-008 | 2026-08-13 | Prioritization not applicable (chosen over ranking, because one feature) |",
+    "ps9": "| PS-009 | 2026-08-13 | Roadmap not applicable (chosen over horizon plan, because MVP) |",
+    "ps10": "| PS-010 | 2026-08-13 | Commitment readiness not applicable (chosen over commitments, because no deadline) |",
+    "a_placeholder": "| (none yet) |  |  |",
+    "a1": "| A-001 | 2026-08-13 | Scope agreement ACTIVE - scope frozen to PS-001; FORBIDDEN: implementation |",
+    "dev_placeholder": "- (none recorded - deviations are logged here)"
+  },
+  "cases": {
+    "good_sequence": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v02", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v03", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v04", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6", "ps7"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v05", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6", "ps7", "ps8", "ps9", "ps10"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v06", "snapshots": ["ss1", "ss2"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6", "ps7", "ps8", "ps9", "ps10"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ],
+      "trusted_overrides": {
+        "expected_final_ids": {
+          "State snapshots": ["SS-001", "SS-002"],
+          "Decision log": ["(none yet)", "PS-001", "PS-002", "PS-003", "PS-004", "PS-005", "PS-006", "PS-007", "PS-008", "PS-009", "PS-010"],
+          "Approvals": ["(none yet)", "A-001"]
+        }
+      }
+    },
+    "bad_placeholder_deleted": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["ps1"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_row_edited": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps2"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_rows_reordered": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps2"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps2", "ps1"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_forbidden_snapshot": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1", "ss2"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6", "ps7", "ps8", "ps9", "ps10"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1", "ss2", "ss3"], "decisions": ["d_placeholder", "ps1", "ps2", "ps3", "ps4", "ps5", "ps6", "ps7", "ps8", "ps9", "ps10"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_owner_completion_before_acceptance": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps7"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v02", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps7", "ps6"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_stage3_before_owners": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1", "ps6"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1", "ss2"], "decisions": ["d_placeholder", "ps1", "ps6"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ]
+    },
+    "bad_expected_record_missing": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder", "ps1"], "approvals": ["a_placeholder", "a1"], "deviations": ["dev_placeholder"]}
+      ],
+      "trusted_overrides": {
+        "expected_final_ids": {
+          "State snapshots": ["SS-001"],
+          "Decision log": ["(none yet)", "PS-001", "PS-006"],
+          "Approvals": ["(none yet)", "A-001"]
+        }
+      }
+    },
+    "good_deviation_continuation_folded": {
+      "versions": [
+        {"version_id": "v00", "snapshots": ["ss1"], "decisions": ["d_placeholder"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder"]},
+        {"version_id": "v01", "snapshots": ["ss1"], "decisions": ["d_placeholder"], "approvals": ["a_placeholder"], "deviations": ["dev_placeholder", "- DV-001 recorded deviation", "  wrapped continuation line"], "raw_deviations": true}
+      ]
+    }
+  }
+}

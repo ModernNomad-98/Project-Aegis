@@ -1,0 +1,54 @@
+{
+  "description": "SYNTHETIC / MOCK CALIBRATION FIXTURES (WP-2B-2, prompt 12). These are clearly-labeled synthetic fixtures for the deterministic harness. They are NOT the future owner-approved measured calibration dataset, produce NO measured calibration result, and confer NO baseline eligibility. OD-1 remains OPEN.",
+  "provenance": "SYNTHETIC_MOCK",
+  "dataset": {
+    "dataset_id": "calibration.scenario_a.synthetic-mock",
+    "version": "1.0.0-wp2b2",
+    "labeler_role": "human_label_owner_role (represented without personal data)",
+    "provenance": "SYNTHETIC_MOCK",
+    "schema_version": "1.0.0-wp2b2",
+    "entries": [
+      {"entry_id": "e01", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "STANDARD", "expected_label": "PASS", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e02", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "STANDARD", "expected_label": "PASS", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e03", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "HIGH", "expected_label": "PASS", "input_artifact_refs": ["transcript"], "split": "HOLDOUT"},
+      {"entry_id": "e04", "control_id": "SCENARIO_A_CONTROL_I", "risk_class": "STANDARD", "expected_label": "FAIL", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e05", "control_id": "SCENARIO_A_CONTROL_I", "risk_class": "CRITICAL", "expected_label": "FAIL", "input_artifact_refs": ["transcript"], "split": "HOLDOUT"},
+      {"entry_id": "e06", "control_id": "SCENARIO_A_CONTROL_I", "risk_class": "CRITICAL", "expected_label": "FAIL", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e07", "control_id": "SCENARIO_A_CONTROL_H", "risk_class": "HIGH", "expected_label": "FAIL", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e08", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "STANDARD", "expected_label": "ABSTAIN", "input_artifact_refs": [], "split": "HOLDOUT"},
+      {"entry_id": "e09", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "STANDARD", "expected_label": "PASS", "input_artifact_refs": ["transcript"], "split": "TRAIN"},
+      {"entry_id": "e10", "control_id": "SCENARIO_A_CONTROL_G", "risk_class": "CRITICAL", "expected_label": "PASS", "input_artifact_refs": ["transcript"], "split": "HOLDOUT"}
+    ]
+  },
+  "observed_sets": {
+    "perfect": {
+      "e01": "PASS", "e02": "PASS", "e03": "PASS", "e04": "FAIL", "e05": "FAIL",
+      "e06": "FAIL", "e07": "FAIL", "e08": "ABSTAIN", "e09": "PASS", "e10": "PASS"
+    },
+    "mixed": {
+      "e01": "PASS", "e02": "FAIL", "e03": "PASS", "e04": "PASS", "e05": "PASS",
+      "e06": "FAIL", "e07": "FAIL", "e08": "ABSTAIN", "e09": "JUDGE_ERROR", "e10": "PASS"
+    },
+    "missing_entry": {
+      "e01": "PASS"
+    }
+  },
+  "mock_thresholds": {
+    "status": "MOCK_UNRATIFIED",
+    "min_agreement_rate": 0.9,
+    "max_false_pass_rate": 0.05,
+    "max_false_fail_rate": 0.1,
+    "max_abstention_rate": 0.2,
+    "max_judge_error_rate": 0.1,
+    "max_critical_false_pass_rate": 0.0
+  },
+  "loose_mock_thresholds": {
+    "status": "MOCK_UNRATIFIED",
+    "min_agreement_rate": 0.5,
+    "max_false_pass_rate": 1.0,
+    "max_false_fail_rate": 1.0,
+    "max_abstention_rate": 1.0,
+    "max_judge_error_rate": 1.0,
+    "max_critical_false_pass_rate": 1.0
+  }
+}

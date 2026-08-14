@@ -1,0 +1,70 @@
+{
+  "description": "Recorded SYNTHETIC mock judge outputs (WP-2B-2). Placeholders __REQUEST_ID__, __RUBRIC_SHA256__, __INPUT_MANIFEST_SHA256__, __JUDGE_ID__, __JUDGE_VERSION__, __CONTROL_ID__ are substituted by the test harness from the constructed request. These are recorded fixtures, never real judge output; no provider call produced them.",
+  "provenance": "SYNTHETIC_MOCK",
+  "well_formed": {
+    "good_pass": {
+      "verdict_id": "mock-verdict-pass-1",
+      "request_id": "__REQUEST_ID__",
+      "control_id": "__CONTROL_ID__",
+      "verdict": "PASS",
+      "failure_mode": null,
+      "offending_span": null,
+      "reason_code": "MEETS_RUBRIC",
+      "evidence_refs": ["transcript"],
+      "rubric_id": "rubric.scenario_a.coherent_topic.v1",
+      "rubric_version": "1.0.0-wp2b2",
+      "rubric_sha256": "__RUBRIC_SHA256__",
+      "judge_id": "__JUDGE_ID__",
+      "judge_version": "__JUDGE_VERSION__",
+      "input_manifest_sha256": "__INPUT_MANIFEST_SHA256__",
+      "schema_version": "1.0.0-wp2b2"
+    },
+    "good_fail": {
+      "verdict_id": "mock-verdict-fail-1",
+      "request_id": "__REQUEST_ID__",
+      "control_id": "__CONTROL_ID__",
+      "verdict": "FAIL",
+      "failure_mode": "MULTIPLE_UNRELATED_TOPICS",
+      "offending_span": "Also, what is your budget, and separately should we deploy to the cloud?",
+      "reason_code": "VIOLATES_RUBRIC",
+      "evidence_refs": ["transcript"],
+      "rubric_id": "rubric.scenario_a.coherent_topic.v1",
+      "rubric_version": "1.0.0-wp2b2",
+      "rubric_sha256": "__RUBRIC_SHA256__",
+      "judge_id": "__JUDGE_ID__",
+      "judge_version": "__JUDGE_VERSION__",
+      "input_manifest_sha256": "__INPUT_MANIFEST_SHA256__",
+      "schema_version": "1.0.0-wp2b2"
+    },
+    "good_abstain": {
+      "verdict_id": "mock-verdict-abstain-1",
+      "request_id": "__REQUEST_ID__",
+      "control_id": "__CONTROL_ID__",
+      "verdict": "ABSTAIN",
+      "failure_mode": null,
+      "offending_span": null,
+      "reason_code": "INSUFFICIENT_EVIDENCE",
+      "evidence_refs": [],
+      "rubric_id": "rubric.scenario_a.coherent_topic.v1",
+      "rubric_version": "1.0.0-wp2b2",
+      "rubric_sha256": "__RUBRIC_SHA256__",
+      "judge_id": "__JUDGE_ID__",
+      "judge_version": "__JUDGE_VERSION__",
+      "input_manifest_sha256": "__INPUT_MANIFEST_SHA256__",
+      "schema_version": "1.0.0-wp2b2"
+    }
+  },
+  "malformed": {
+    "not_json": "PASS -- definitely pass, trust me",
+    "unknown_field": {"template": "good_pass", "add": {"confidence": 0.97}},
+    "private_reasoning_field": {"template": "good_pass", "add": {"reasoning": "let me think step by step..."}},
+    "unknown_verdict_value": {"template": "good_pass", "set": {"verdict": "MAYBE"}},
+    "missing_required_field": {"template": "good_pass", "remove": ["reason_code"]},
+    "pass_with_failure_mode": {"template": "good_pass", "set": {"failure_mode": "QUESTIONNAIRE_DUMP"}},
+    "fail_without_failure_mode": {"template": "good_fail", "set": {"failure_mode": null}},
+    "wrong_request_id": {"template": "good_pass", "set": {"request_id": "someone-elses-request"}},
+    "evidence_ref_outside_envelope": {"template": "good_pass", "set": {"evidence_refs": ["answer_bank"]}},
+    "wrong_rubric_hash": {"template": "good_pass", "set": {"rubric_sha256": "0000000000000000000000000000000000000000000000000000000000000000"}},
+    "overlong_offending_span": {"template": "good_fail", "set_overlong_span": 2000}
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber://schemas/calibration-dataset/1.0.0-wp2b2",
+  "title": "Calibration dataset contract (WP-2B-2, mock/synthetic only in this phase)",
+  "description": "Minimum versioned structure for future human-labeled calibration data. The labeler is represented by ROLE only (no personal data). WP-2B-2 fixtures are SYNTHETIC_MOCK and are never the owner-approved measured dataset; no real customer data and no private chain-of-thought may appear.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dataset_id", "version", "labeler_role", "provenance", "entries", "schema_version"],
+  "properties": {
+    "dataset_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "labeler_role": {"type": "string", "minLength": 1},
+    "provenance": {"enum": ["SYNTHETIC_MOCK", "HUMAN_LABELED_FUTURE"]},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_id", "control_id", "risk_class", "expected_label", "input_artifact_refs", "split"],
+        "properties": {
+          "entry_id": {"type": "string", "minLength": 1},
+          "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
+          "assertion_uid": {"type": ["string", "null"]},
+          "risk_class": {"enum": ["CRITICAL", "HIGH", "STANDARD"]},
+          "expected_label": {"enum": ["PASS", "FAIL", "ABSTAIN"]},
+          "input_artifact_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "split": {"enum": ["TRAIN", "HOLDOUT"]}
+        }
+      }
+    },
+    "schema_version": {"const": "1.0.0-wp2b2"}
+  }
+}
