@@ -532,11 +532,14 @@ squash-merged implementation
 [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85) (final reviewed head
 `5d16bace5fec9f7c394ad7f3b4147ac9d4ad74f2`, merge commit
 `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`, shared tree
-`81404d350a26e8349d3c869209ae04f8628e0a95`; NON-LIVE / recorded-mock only); WP-2B-3 is
+`81404d350a26e8349d3c869209ae04f8628e0a95`; NON-LIVE / recorded-mock only); WP-2B-3 —
 redefined as the **Measured Judge Calibration and OD-1 Ratification
-Gate** — BLOCKED and NOT authorized by BER-DEC-007 (only its former NON-LIVE scaffold scope
-is absorbed by WP-2B-2; historical record retained) — an owner decision package for its
-future authorization is PREPARED but grants no authority, and no BER-DEC-008 exists;
+Gate** (only its former NON-LIVE scaffold scope is absorbed by WP-2B-2; historical record
+retained) — is AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
+AUTHORIZATION_PR_PENDING), **effective only after that governance PR is reviewed and
+manually merged** — before that merge it remains a proposed authorization and no WP-2B-3
+implementation may begin (Peter Nguyen approved the complete 35-decision owner package on
+2026-08-14; OD-1 remains OPEN and is NOT pre-ratified);
 WP-2B-4 is the separate, BLOCKED
 Scenario A Limited-Scope Live Suite; and WP-2B-5 through WP-2B-7 remain BACKLOG (WP-2B-7 is
 the sole owner of actual advisory CI integration).
@@ -805,19 +808,24 @@ the sole owner of actual advisory CI integration).
   BER-DEC-007, 2026-08-13; former title: Independent injection-resistant semantic judge)
 - **Phase:** 2B-3
 - **Priority:** GATE
-- **Status:** BLOCKED — NOT authorized by BER-DEC-007. Requires a future, separate,
-  reviewed and merged BER-DEC authorization recording its own exact branch, its actual
-  judge/provider-call budget, its external evidence root, its evidence-handling terms, its
-  retention, its stop conditions, and its owner review. **OWNER DECISION PACKAGE PREPARED
-  — NOT AUTHORIZED (2026-08-14):** a WP-2B-3 authorization decision package exists at
+- **Status:** AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
+  AUTHORIZATION_PR_PENDING) — **effective only after the governance PR containing
+  BER-DEC-008 is reviewed and manually merged. Before that merge, this branch/PR is a
+  proposed authorization only, and no WP-2B-3 implementation, provider or model call,
+  credential access, implementation clone, implementation branch, or evidence-root
+  creation may occur.** BER-DEC-008 records the exact branch, the actual
+  judge/provider-call budget, the external evidence root, the evidence-handling terms,
+  the retention, the stop conditions, and the owner review this record previously
+  required. **OWNER DECISION PACKAGE APPROVED (2026-08-14):** Peter Nguyen approved the
+  complete WP-2B-3 authorization decision package at
   [`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md)
-  for owner review. The package is a proposal only — it grants no authority, and **no
-  BER-DEC-008 exists yet**. WP-2B-3 may begin only after ALL of: (1) Peter Nguyen
-  explicitly selects or approves the judge provider and the exact immutable model/snapshot
-  identity; (2) Peter approves the calibration dataset size and composition; (3) Peter
-  pre-registers the numeric thresholds; (4) Peter approves the provider-call, token, and
-  dollar ceilings; (5) Peter approves credential and evidence handling; and (6) a reviewed
-  and manually merged BER-DEC-008 records those exact terms. **Historical note (governance rule
+  — all 35 decisions carry his recorded disposition. Of the former begin conditions:
+  (1) judge provider and exact immutable model/snapshot identity (OpenAI API;
+  `gpt-5.5-2026-04-23`), (2) calibration dataset size and composition, (3)
+  pre-registered numeric thresholds, (4) provider-call, token, and dollar ceilings, and
+  (5) credential and evidence handling are decided and recorded; condition (6) — a
+  reviewed and manually merged BER-DEC-008 recording those exact terms — is satisfied at
+  the moment the governance PR carrying this entry is manually merged, and not before. **Historical note (governance rule
   5 — this record is redefined, not deleted):** the former WP-2B-3 NON-LIVE semantic-judge
   scaffold scope — the injection-resistant judge interface and system policy, delimited
   untrusted-data envelope, no-judge-tools and least-context rules, schema-validated
@@ -845,12 +853,15 @@ the sole owner of actual advisory CI integration).
   [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85), merge commit
   `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (the non-live scaffold and calibration
   harness this gate exercises); the versioned human-labeled calibration dataset (does not
-  exist yet; owner-approved size and composition required); a future, separate,
-  reviewed and merged WP-2B-3 BER-DEC authorization; owner availability for OD-1
-  ratification.
-- **Trigger to begin:** A future reviewed and merged WP-2B-3 authorization per the
-  work-package authorization protocol (§2 of this file). BER-DEC-007 does not authorize
-  this work.
+  exist yet; the owner-approved size and composition — 160 items, 40 development / 120
+  sealed holdout — is recorded by BER-DEC-008); the reviewed and manually merged
+  BER-DEC-008 authorization (governance PR AUTHORIZATION_PR_PENDING); owner availability
+  for OD-1 ratification.
+- **Trigger to begin:** The governance PR containing BER-DEC-008
+  (AUTHORIZATION_PR_PENDING) is manually merged; implementation then begins on
+  `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly from
+  the exact authorization merge commit per BER-DEC-008's source-baseline terms — never
+  from a later moving `main`. BER-DEC-007 does not authorize this work.
 - **Expected deliverable (owned by this gate):** actual pinned-judge selection or
   confirmation; execution against the versioned human-labeled calibration dataset;
   confusion-matrix measurement; aggregate agreement/accuracy measurement; false-PASS
@@ -864,9 +875,12 @@ the sole owner of actual advisory CI integration).
   full confusion matrix (design §8); the measured result is presented to Peter Nguyen and
   OD-1 is ratified (or explicitly declined) on that measured result; no baseline-eligible
   semantic verdict is produced before ratification.
-- **Owner decision required:** The future WP-2B-3 phase authorization; OD-1
-  numeric-threshold and measured-result ratification (design §8, §17a; OD-1 in §9 of this
-  file).
+- **Owner decision required:** The WP-2B-3 phase authorization is recorded by
+  BER-DEC-008 (owner approval 2026-08-14; effective only on manual merge of its
+  governance PR). OD-1 numeric-threshold and measured-result ratification remains
+  pending on the measured sealed-holdout result — BER-DEC-008 pre-registers the
+  owner-approved thresholds but does not pre-ratify OD-1 (design §8, §17a; OD-1 in §9 of
+  this file).
 - **Explicit non-goals:** Must not run the Scenario A system under test; must not
   authorize WP-2B-4; must not produce a baseline-eligible semantic verdict before OD-1 is
   ratified; no generic corpus execution; no CI integration.
@@ -1728,6 +1742,13 @@ backlog.
   quality, and creates no baseline eligibility. OD-1 remains owned by the redefined
   WP-2B-3 gate; the owner's numeric-threshold pre-registration and measured-result
   ratification remain pending, and no BER-DEC-008 exists.
+  **Post-authorization note (2026-08-14): OPEN — unchanged by BER-DEC-008.** BER-DEC-008
+  (§13 of this file; governance PR AUTHORIZATION_PR_PENDING, effective only on manual
+  merge) authorizes the measured calibration and records Peter Nguyen's pre-registered
+  numeric thresholds for the sealed holdout, but it does **not** ratify OD-1 and does
+  not pre-approve any measured result. OD-1 is ratified or explicitly declined by Peter
+  Nguyen only after the measured sealed-holdout evidence is reviewed (backlog §7
+  WP-2B-3; BER-DEC-008 OD-1 terms).
 - **OD-2 — Minimum promotion coverage threshold.** OWNER DECISION REQUIRED **BEFORE CI
   PROMOTION**. After the implementation-time census (BER-BKL-008) establishes the honest
   runnable denominator, Peter Nguyen ratifies the minimum authored execution/assertion
@@ -2059,13 +2080,14 @@ WP-2B-2  Scenario A Grading Stack (non-live deterministic + semantic scaffold)
   scope; NON-LIVE / recorded-mock only — no measured calibration
         |
         v
-WP-2B-3  Measured Judge Calibration + OD-1 Ratification Gate — BLOCKED; NOT
-authorized by BER-DEC-007; requires its own future reviewed and merged
-BER-DEC authorization (own branch, actual judge/provider-call budget,
-evidence root, evidence terms, retention, stop conditions); former NON-LIVE
-scaffold scope absorbed by WP-2B-2; historical record retained; owner
-decision package PREPARED (a proposal, never authority); no BER-DEC-008
-exists
+WP-2B-3  Measured Judge Calibration + OD-1 Ratification Gate — AUTHORIZED by
+BER-DEC-008 (governance PR AUTHORIZATION_PR_PENDING), effective ONLY upon
+manual merge of that governance PR; owner-approved decision package (all 35
+decisions, 2026-08-14) recorded; own branch, provider-call/token/dollar
+budget, evidence root, evidence terms, retention, deadlines, and stop
+conditions fixed in BER-DEC-008; former NON-LIVE scaffold scope absorbed by
+WP-2B-2; historical record retained; OD-1 NOT pre-ratified — ratification
+follows the measured sealed-holdout result
         |
         v
 WP-2B-4  Scenario A Limited-Scope Live Suite (first live phase; BLOCKED and NOT
@@ -2125,7 +2147,10 @@ Explicit statements about this map:
   measured judge calibration, OD-1 ratification, and every live phase remain blocked
   pending their own evidence and owner authorization; BER-DEC-007 authorizes WP-2B-2 only
   and authorizes no WP-2B-3 calibration work.
-- **Current state (recorded 2026-08-14):** PR #84 (WP-2B-2 authorization / BER-DEC-007)
+- **Prior state (recorded 2026-08-14, pre-BER-DEC-008; superseded by the entry below —
+  the WP-2B-2 governance closeout PR #86 has since merged, Peter Nguyen has since
+  approved the complete WP-2B-3 owner-decision package, and the governance PR carrying
+  BER-DEC-008 has since been opened):** PR #84 (WP-2B-2 authorization / BER-DEC-007)
   and PR #85 (WP-2B-2 Scenario A Grading Stack implementation) are MERGED; `main` is at
   `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (tree
   `81404d350a26e8349d3c869209ae04f8628e0a95`); **WP-2B-2 is DONE — NON-LIVE /
@@ -2141,6 +2166,30 @@ Explicit statements about this map:
   ratification, and every live phase remain blocked pending their own evidence and owner
   authorization, and no WP-2B-3 implementation may begin before a reviewed and manually
   merged BER-DEC-008.
+- **Current state (recorded 2026-08-14 — BER-DEC-008 governance PR
+  AUTHORIZATION_PR_PENDING, this governance PR, pending review and manual merge):** the
+  WP-2B-2 governance closeout PR #86 is MERGED; `main` is at
+  `048644084b2e7a080120d984b8f77fb21d662315` (tree
+  `fb64b711f6def3109c3f7e399ba744380447b1fe` — PR #86's manual squash merge), which is
+  also this governance branch's exact base. Peter Nguyen approved the complete WP-2B-3
+  owner-decision package (all 35 decisions) on 2026-08-14; this governance PR appends
+  BER-DEC-008 transcribing those terms and updates the decision package to the
+  owner-approved record. **WP-2B-3 is AUTHORIZED by BER-DEC-008, effective only after
+  this governance PR is manually merged** — before that merge it remains a proposed
+  authorization, and no implementation branch, implementation clone, evidence root,
+  credential access, package installation, or provider/model call is permitted. The
+  judge remains pinned to `gpt-5.5-2026-04-23` (public documentation re-verified
+  2026-08-14: no dated immutable GPT-5.6 Sol snapshot is documented; `gpt-5.6-sol` and
+  `gpt-5.6-terra` remain moving aliases; GPT-5.5 pricing unchanged at USD $5 / $30 per
+  1M tokens). **OD-1 remains OPEN** — BER-DEC-008 pre-registers the owner-approved
+  thresholds but does not pre-ratify OD-1 or pre-approve any measured result. WP-2B-4
+  remains the separate, BLOCKED Scenario A Limited-Scope Live Suite; WP-2B-5 through
+  WP-2B-7 remain governed by their existing dependencies and separate authorization
+  requirements (WP-2B-7 remains the sole owner of actual advisory CI integration). No
+  arrow is crossed by momentum: after the manual merge, implementation begins only on
+  `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly from
+  the exact authorization merge commit, within BER-DEC-008's recorded budget, evidence,
+  deadline, and stop terms.
 
 ---
 
@@ -2756,6 +2805,234 @@ model call, and evidence artifact.
   and OD-1 Ratification Gate. BER-DEC-001 through BER-DEC-006 are unchanged. Superseded by:
   None.
 
+### BER-DEC-008
+
+- **Date:** 2026-08-14
+- **Decision:** Authorize WP-2B-3 — the **Measured Judge Calibration and OD-1
+  Ratification Gate** — under the exact owner-approved provider, model, endpoint,
+  dataset, threshold, budget, credential, evidence, retention, deadline, and stop terms
+  below, transcribed from the owner-approved WP-2B-3 authorization decision package
+  ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md);
+  all 35 decisions approved by Peter Nguyen on 2026-08-14). This authorization becomes
+  effective **only after the reviewed PR containing BER-DEC-008 is manually merged**;
+  before that merge it is a proposed authorization only. BER-DEC-008 does **not** ratify
+  OD-1, does not pre-approve any measured result, and does not authorize WP-2B-4 or any
+  later phase.
+- **Owner:** Peter Nguyen
+- **Repository:** `ModernNomad-98/Project-Aegis`
+- **Authorization PR:** AUTHORIZATION_PR_PENDING
+- **Owner-decision record:** the decision package named above — every §F row carries the
+  owner-approved disposition dated 2026-08-14; PENDING rows remaining: none. The owner
+  approval is a decision record; execution authority arises only from the manual merge
+  of the PR containing this entry.
+- **Authorization base:**
+  `048644084b2e7a080120d984b8f77fb21d662315`
+  (tree `fb64b711f6def3109c3f7e399ba744380447b1fe`) — PR #86's manual squash-merge
+  commit; verified equal to remote `main` when this entry was authored, and the exact
+  commit this governance branch was created from.
+- **Authorized work package:** `WP-2B-3` (Measured Judge Calibration and OD-1
+  Ratification Gate)
+- **Authorized implementation branch:**
+  `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`
+- **Authorized implementation clone:**
+  `C:\src\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Implementation`
+- **Authorized external evidence root:**
+  `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence`
+- **Authorized source baseline:** the future exact manual merge/squash commit and Git
+  tree of the reviewed PR containing this BER-DEC-008. The implementation session must
+  resolve and verify those values before creating or using the implementation branch or
+  clone, must create the implementation branch directly from that exact merge commit —
+  never from a later moving `main` — and must record them in the evidence ownership
+  marker. **No implementation branch, implementation clone, or external evidence root
+  may be created before that manual merge.**
+- **Provider and pinned judge (decisions 1–2):** OpenAI API; exact immutable judge
+  model/snapshot `gpt-5.5-2026-04-23`. **Owner model-reconsideration rule:** before
+  BER-DEC-008 was written, the current official OpenAI model documentation was required
+  to be re-read; if a dated immutable GPT-5.6 Sol snapshot had been documented, this
+  entry was NOT to be written and the model decision was to be returned to Peter Nguyen
+  — with no silent substitution of GPT-5.6 Sol, GPT-5.6 Terra, an alias, or any other
+  model. **Re-verification (2026-08-14, read-only public documentation; no API call, no
+  credential):** `gpt-5.5-2026-04-23` remains the sole documented dated GPT-5.5
+  snapshot (Responses API, structured outputs, and reasoning-effort
+  none/low/medium(default)/high/xhigh supported); the official GPT-5.6 Sol page
+  documents only the moving alias `gpt-5.6-sol` with no dated snapshot; GPT-5.6 Terra
+  remains alias-only (`gpt-5.6-terra`); published GPT-5.5 pricing is unchanged at USD
+  $5 / 1M input, USD $0.50 / 1M cached input, USD $30 / 1M output. At implementation
+  preflight: if the authorized project cannot access the exact pinned snapshot, or a
+  requested-versus-returned model identity mismatch occurs, STOP and return to Peter
+  Nguyen — never substitute.
+- **Endpoint and metadata boundary (decision 3):** judgments use the OpenAI Responses
+  API. Exactly ONE read-only model-availability metadata request is authorized, at
+  implementation preflight: `GET /v1/models/gpt-5.5-2026-04-23`, whose sole purpose is
+  verifying project access to the exact pinned model. It may include no calibration
+  prompt, transcript, label, rubric content, evidence, or model generation. Any request
+  that invokes generation or submits calibration content counts inside the 200
+  judgment-attempt budget whatever endpoint carried it. Any other metadata/control
+  endpoint is prohibited absent new owner approval.
+- **Request settings and timeouts (decision 4):** no tools; no web search; no file
+  search; no code execution; no functions; `store: false`; `background: false`; no
+  `previous_response_id`; no conversation object; one independent request per item;
+  structured JSON-schema output (the existing judge-verdict schema contract); reasoning
+  effort medium; the pinned model's supported/documented default sampling posture;
+  connection timeout 15 seconds; per-request total timeout 300 seconds; timeouts fail
+  closed as `JUDGE_ERROR`.
+- **Calibration dataset (decisions 5–10):** 160 human-approved labeled items over the
+  ten semantic-bearing Scenario A controls (A, B, C, D, G, H, I, J, N, O); 16 items per
+  control (4 development + 12 sealed holdout); development set 40 items (2 expected
+  PASS + 2 expected FAIL per control); sealed holdout 120 items (6 expected PASS + 6
+  expected FAIL per control; 60 expected PASS and 60 expected FAIL total); at least 40
+  sealed-holdout items with `risk_class = CRITICAL` and `expected_label = FAIL`; at
+  least 40 sealed-holdout injection/role-confusion items (at least 20 expected PASS and
+  at least 20 expected FAIL); CRITICAL/adversarial overlap is allowed but must be
+  reported separately with no double-counting of the 120 distinct holdout items; split
+  40 development / 120 sealed holdout; no customer data, personal data, credentials,
+  secrets, or private reasoning.
+- **Pre-registered sealed-holdout thresholds (decisions 11–16):** overall agreement at
+  least 95% (at least 114/120); false-PASS at most 2% (at most 1 of 60 expected-FAIL);
+  CRITICAL false-PASS exactly 0% (0 false PASSes, denominator at least 40 CRITICAL
+  expected-FAIL); false-FAIL at most 5% (at most 3 of 60 expected-PASS); abstention at
+  most 5% (at most 6/120); `JUDGE_ERROR` at most 1% (at most 1/120). These are observed
+  sealed-holdout gates, not population-wide statistical guarantees. No post-hoc
+  threshold relaxation is allowed.
+- **Provider-call, token, and dollar budget (decisions 17–20):** maximum 200 judgment
+  attempts, inclusive of transport retries; maximum 1 read-only metadata availability
+  request; **maximum total external provider requests: 201**; maximum 8,000 input
+  tokens per judgment; development-stage `max_output_tokens` 25,000 with the
+  **mid-package owner freeze gate** — after the 40-item development stage, STOP in an
+  explicit OWNER_WAIT state; before the sealed holdout opens, Peter Nguyen reviews the
+  development total-output-token distribution, the reasoning-token distribution, the
+  incomplete/`JUDGE_ERROR` outcomes, and the proposed safety margin, then explicitly
+  freezes the holdout `max_output_tokens` within [8,192, 25,000]; no holdout call is
+  authorized before that owner freeze. Maximum total external API spend USD $175;
+  maximum single-day spend USD $175; stop BEFORE any cap is exceeded; worst permitted
+  token path USD $158 at the verified published price ($5/$30 per 1M tokens); if
+  published pricing materially changes before implementation, STOP and return revised
+  worst-path math to Peter Nguyen.
+- **Retry and concurrency (decisions 21–22):** one retry for connection/transport
+  failure only, counted within the 200; a request timeout may use that one retry only
+  if no usable provider judgment was received; no retry for semantic disagreement, a
+  FAIL verdict, a threshold miss, incomplete model output, or malformed semantic
+  content; never retry-until-green (BER-PROH-001); concurrency 1.
+- **Credential handling (decision 23):** dedicated project-scoped service-account
+  credential; process-scoped ephemeral secret injection into the single authorized
+  calibration process only. Prohibited: persistent user environment variables;
+  persistent machine environment variables; CLI arguments; repository files; evidence
+  files; logs; crash dumps; PR bodies/comments; inheritance by unrelated processes. The
+  secret context is destroyed/cleared when the authorized process terminates. A missing
+  credential is a STOP condition, never a workaround.
+- **External evidence root and handling (decision 24):** root
+  `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence`;
+  classification INTERNAL TECHNICAL CALIBRATION EVIDENCE; outside every Git repository;
+  physical/reparse-safe path validation; ACL inheritance disabled; only Peter Nguyen's
+  authorized account and SYSTEM (no Everyone, no Users, no Authenticated Users);
+  encrypted volume required — if encryption cannot be verified, STOP before provider
+  execution; the ownership marker binds BER-DEC-008, WP-2B-3, the repository, the
+  branch, the base SHA/tree, the provider/model snapshot, creation, expiration,
+  classification, and cleanup policy; the repository receives sanitized summaries only.
+  Permitted evidence: sanitized requests/envelopes, outputs, human labels, hashes,
+  usage/cost metadata, validation logs, timing, inventories/manifests. Forbidden
+  evidence: credentials, secrets, passwords, private keys, unrestricted environment
+  dumps, customer data, personal data, unrelated private source, private
+  chain-of-thought.
+- **Retention and cleanup (decision 25):** 30 calendar days from first evidence
+  creation; preserve on failure; collision-safe append-only evidence filenames; a final
+  SHA-256 evidence inventory; owner review before cleanup; marker-gated and
+  reparse-safe cleanup only; the deletion timestamp and a cleanup report are recorded;
+  no automatic cleanup merely because a Claude session ends.
+- **Deadlines and stop conditions (decision 26):** connection timeout 15 seconds;
+  per-request total timeout 300 seconds; development-stage active-execution deadline 90
+  minutes; sealed-holdout active-execution deadline 4 hours; complete WP-2B-3
+  active-execution deadline 6 hours. Time spent in an explicit OWNER_WAIT state between
+  development characterization and the holdout freeze decision does not consume the
+  active provider-execution clock, because no provider execution is allowed during
+  OWNER_WAIT. Timeout behavior: fail closed; the judgment becomes `JUDGE_ERROR`; it
+  counts against attempts, and against tokens where the provider charged them; a stage
+  deadline stops new dispatch; evidence is preserved. Additional STOP conditions
+  include: wrong provider/model identity; requested-versus-returned model mismatch;
+  credential violation; budget telemetry unavailable; a spend/call/token cap would be
+  exceeded; evidence-integrity failure; dataset/hash/freeze mismatch; unexpected
+  repository/base movement; inability to verify required encryption; an unauthorized
+  provider endpoint; any need to start WP-2B-4.
+- **WP-2B-3 DONE definition (decision 27):** ALL of: the exact provider/model snapshot
+  verified; the human-approved dataset version/hash recorded; the sealed holdout
+  unavailable during development; all provider calls/tokens/spend accounted; the
+  confusion matrix produced; every required metric carrying an explicit denominator;
+  the adversarial subset separately reported; the thresholds evaluated mechanically; no
+  evidence-integrity failure; requested-versus-returned model identity matched; all
+  incomplete outputs treated as `JUDGE_ERROR`; a repository-safe summary existing; an
+  external evidence inventory existing; Peter Nguyen reviewing the measured result;
+  Peter Nguyen explicitly ratifying OR declining OD-1 based on the measured results; no
+  Scenario A system-under-test run occurred; no WP-2B-4 work occurred.
+- **Threshold-miss disposition (decision 28):** CALIBRATION NOT ACCEPTED; OD-1 stays
+  OPEN; no baseline-eligible semantic verdict; no retry-until-green; any
+  model/rubric/policy/schema/dataset/label/settings change creates a new versioned
+  attempt and requires a new sealed holdout or new owner authorization; WP-2B-4 stays
+  blocked.
+- **Client/transport (decision 29):** the official OpenAI Python SDK. Exact approved
+  version and integrity, verified 2026-08-14 from official PyPI release metadata
+  (read-only; no installation in the docs-only authorization task): `openai` **3.0.0**
+  (released 2026-08-12; requires-python `>=3.10`); wheel
+  `openai-3.0.0-py3-none-any.whl` SHA-256
+  `8d32ac3a6647a66910d6cb8a64f0fa5a6c823604b6e82db83d9d055c6709bd51`; sdist
+  `openai-3.0.0.tar.gz` SHA-256
+  `ffd00ef1678d70957e1f1ed98d5bfcf1d661f41ea4482f22e7d0144a66435a49`. Implementation
+  preflight must re-verify these values before installation; adopting any different
+  version or integrity value returns to Peter Nguyen for approval — never a silent
+  substitution.
+- **Dependency policy (decision 30):** installation only inside the isolated WP-2B-3
+  implementation environment after this authorization merges; exact version lock; no
+  global install; no unrelated package addition; if official-SDK use becomes
+  impossible, STOP and return to Peter Nguyen before using any other transport.
+- **Network egress (decision 31):** provider egress restricted to
+  `api.openai.com:443`; TLS certificate verification mandatory; no proxy unless Peter
+  Nguyen explicitly approves one.
+- **Provider project and credential lifecycle (decision 32):** a dedicated OpenAI
+  project; a dedicated project-scoped service account; a provider-side spend limit at
+  or below the approved ceiling; a model allowlist where the provider surface offers
+  one; the credential revoked or rotated after the authorized run.
+- **Provider-side retention (decision 33):** at implementation preflight, determine and
+  record the exact organization/project posture for: Responses application-state
+  retention; abuse-monitoring retention; prompt-cache retention; ZDR; MAM; Safety
+  Retention; and model-eligibility exceptions. Use ZDR/MAM when actually available and
+  verified for the exact authorized OpenAI organization/project. If ZDR/MAM is not
+  available, Peter Nguyen explicitly ACCEPTS the provider's documented default
+  retention posture FOR THIS SYNTHETIC-ONLY CALIBRATION DATASET; this acceptance does
+  NOT extend to customer data, production data, personal data, credentials, secrets, or
+  unrelated evidence. `store: false` remains required. No ZDR claim may be made without
+  exact organization/project verification.
+- **Human labeling (decision 34):** a versioned labeling guide with a recorded SHA-256;
+  labels completed before judge calls; labelers blinded to judge output; disagreement
+  adjudicated before provider execution; two independent human labels preferred when
+  reasonably available. **Owner-approved sole-maintainer exception:** lack of a second
+  independent labeler is NOT an automatic deadlock; if a second independent labeler is
+  unavailable, Peter Nguyen may act as the sole human gold-label authority; all final
+  labels still require explicit owner approval before provider execution; and no
+  inter-rater-independence claim may be made when only one human authority labeled.
+- **Holdout freeze / unseal (decision 35):** before unsealing the holdout, freeze and
+  hash ALL of: the provider/model snapshot; the endpoint; the SDK/transport version;
+  the system policy; the rubric contracts; the verdict schema; the dataset; the split
+  map; the labels; the reasoning effort; the final holdout `max_output_tokens`; the
+  retention settings; the thresholds; the retry policy; the call cap; the token cap;
+  the dollar cap. Expected answers and labels must never enter the judge envelope. The
+  sealed holdout executes ONCE. An incomplete output is `JUDGE_ERROR` and is never
+  parsed as a verdict. Any post-hoc change requires a new versioned attempt and a new
+  sealed holdout or new explicit owner authorization.
+- **OD-1 status:** OD-1 REMAINS OPEN. BER-DEC-008 authorizes the measured calibration
+  and the owner-ratification gate; it does NOT pre-ratify OD-1 and does not pre-approve
+  a successful calibration result. Only after the measured sealed-holdout evidence is
+  reviewed may Peter Nguyen explicitly ratify or decline OD-1.
+- **Explicitly NOT authorized by BER-DEC-008:** WP-2B-4; live Scenario A; Scenario A
+  system-under-test execution; generic corpus execution; WP-2B-5; WP-2B-6; WP-2B-7; CI
+  integration; workflow creation or modification; production deployment; promotion;
+  baseline eligibility; a successful calibration result in advance; OD-1 ratification
+  in advance; a different model; a moving model alias; customer or production data.
+- **Authority boundary:** BER-DEC-008 becomes effective only after the reviewed PR
+  containing it is manually merged. The owner approval of 2026-08-14 recorded in the
+  decision package is a decision record, not implementation authority. Auto-merge
+  remains prohibited; human merge authority remains required; this entry authorizes no
+  merge of any PR.
+- **Supersedes / superseded by:** None. BER-DEC-001 through BER-DEC-007 are unchanged.
+
 ---
 
 ## 14. Continuation instructions for a brand-new session
@@ -2790,17 +3067,22 @@ before doing anything else:
    earlier revisions of this file or anywhere else. Earlier revisions treated Phase 2B-0
    as the future next phase; that phase is DONE (Outcome B, BER-DEC-005/BER-DEC-006). The
    current registers (§7, §13), not narrative history, decide what is authorized now.
-8. **The immediate next governed step (recorded 2026-08-14) is owner review of the
-   WP-2B-3 authorization decision package**
-   ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md)).
-   WP-2B-2 is DONE ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85));
-   no WP-2B-3 implementation, provider or model selection, calibration-dataset creation,
-   credential access, implementation clone, implementation branch, or evidence-root
-   creation may occur before a reviewed and manually merged BER-DEC-008 records Peter
-   Nguyen's exact authorization terms. **The decision package is a proposal, never
-   authority.** After the owner records his decisions, update the SAME draft closeout PR
-   that prepared the package — or a separately owner-approved successor PR — exactly as
-   the owner directs; do not open parallel governance PRs for the same closeout.
+8. **The immediate next governed step (recorded 2026-08-14, post-owner-approval) is
+   owner review and manual merge of the BER-DEC-008 governance PR**
+   (AUTHORIZATION_PR_PENDING — the separately owner-approved successor PR Peter Nguyen
+   directed after the closeout PR #86 merged; it appends BER-DEC-008 to §13 and updates
+   the decision package
+   ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md))
+   to the owner-approved record of all 35 decisions, dated 2026-08-14). WP-2B-2 is DONE
+   ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85)). Until the
+   BER-DEC-008 governance PR is manually merged, WP-2B-3 remains unauthorized in
+   effect: no WP-2B-3 implementation, provider or model call, calibration-dataset
+   creation, credential access, implementation clone, implementation branch, or
+   evidence-root creation may occur. After the manual merge, implementation begins only
+   on `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly
+   from the exact authorization merge commit, within BER-DEC-008's recorded terms.
+   **The decision package records owner decisions; execution authority still attaches
+   only to the merged BER-DEC-008.**
 9. **Treat WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate), WP-2B-4
    (the Scenario A Limited-Scope Live Suite), and all later work as unauthorized** unless
    and until each is separately authorized by its own reviewed and merged BER-DEC entry.
