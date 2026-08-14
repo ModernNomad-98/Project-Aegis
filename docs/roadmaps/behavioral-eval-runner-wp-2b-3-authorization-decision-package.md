@@ -8,6 +8,12 @@ medium-reasoning model), provider transport/dependency/egress/credential-lifecyc
 provider-side retention decisions, exact dataset denominators with integer acceptance
 gates, and the human-labeling / sealed-holdout one-pass protocol. The owner-decision table
 grew from 28 to 35 items. Nothing in the revision changes the package's non-authority.
+**Revised (second bounded pass):** 2026-08-14 — authorization-boundary completeness only,
+holding the count at exactly 35 decisions: local external-evidence governance terms
+(decisions 24–25), the complete provider-side retention paths including prompt caching
+and Safety Retention (decision 33), process-scoped credential handling (decisions 23,
+32), request/stage/run deadlines (decisions 4, 26), the exact metadata/control-request
+boundary (decisions 3, 17), and official-source traceability for these claims.
 **Owner and sole decision authority:** Peter Nguyen.
 **Repository:** ModernNomad-98/Project-Aegis.
 **Work package:** WP-2B-3 — Measured Judge Calibration and OD-1 Ratification Gate
@@ -73,8 +79,8 @@ recommendations for each row live in §C and are proposals only.
 | --- | --- |
 | 1 | Judge provider |
 | 2 | Exact immutable judge model/snapshot identity |
-| 3 | API endpoint |
-| 4 | Reasoning/settings profile (tools, output mode, reasoning effort, sampling posture) |
+| 3 | API endpoint, and the exact allowed non-generation metadata/control endpoints and purposes |
+| 4 | Reasoning/settings profile (tools, output mode, reasoning effort, sampling posture) and request timeout terms |
 | 5 | Human-labeled calibration dataset size |
 | 6 | Per-control distribution across the semantic-bearing controls |
 | 7 | Expected PASS/FAIL balance |
@@ -87,23 +93,23 @@ recommendations for each row live in §C and are proposals only.
 | 14 | False-FAIL threshold |
 | 15 | Abstention threshold |
 | 16 | `JUDGE_ERROR` threshold |
-| 17 | Maximum provider calls |
+| 17 | Maximum provider calls, and the metadata/control-request boundary (count, endpoints, content rules) |
 | 18 | Maximum input tokens per call |
 | 19 | Maximum output tokens per call |
 | 20 | Maximum dollar spend |
 | 21 | Retry policy |
 | 22 | Concurrency |
-| 23 | Credential source and handling |
-| 24 | External evidence root |
-| 25 | Evidence retention |
-| 26 | Stop conditions |
+| 23 | Credential source and process-scoped handling |
+| 24 | External evidence root and evidence-handling controls (classification, readers, ACL, encryption, marker, redaction, path validation, summary policy) |
+| 25 | Evidence retention, preservation, inventory, and cleanup |
+| 26 | Stop conditions and request/stage/run deadlines |
 | 27 | What constitutes WP-2B-3 DONE |
 | 28 | What happens when thresholds are missed (failure disposition) |
 | 29 | Provider client / transport implementation |
 | 30 | Dependency-install and exact-version locking policy |
 | 31 | Network egress, endpoint, TLS, and proxy policy |
 | 32 | Provider project, service-account, credential, spend-cap, and revocation lifecycle |
-| 33 | Provider-side application-state and abuse-monitoring retention posture, including ZDR/MAM status |
+| 33 | Provider-side retention posture across every path — application state, abuse monitoring, prompt cache, ZDR/MAM configuration, and Safety Retention / model-eligibility exceptions |
 | 34 | Human labeling and adjudication protocol |
 | 35 | Holdout freeze/unseal and incomplete-response disposition |
 
@@ -198,6 +204,30 @@ must approve:
 - must include an explicit safety margin;
 - frozen before holdout unsealing.
 
+### C.2b Request and run deadlines (decisions 4, 26)
+
+The future BER-DEC-008 must record **exact owner-decided values** — deliberately not
+invented here — for:
+
+- connection timeout;
+- per-request total timeout;
+- development-stage wall-clock deadline;
+- holdout-stage wall-clock deadline;
+- complete WP-2B-3 run deadline;
+- timeout cancellation behavior;
+- timeout evidence and reason code.
+
+CONTROL-LAYER RECOMMENDATION — NOT OWNER APPROVAL:
+
+- no request and no stage may be unbounded;
+- timeout is fail-closed;
+- a timed-out judgment becomes `JUDGE_ERROR`, never a verdict;
+- one retry is permitted only where the already-proposed transport-retry policy allows
+  it (counted within the 200 judgment attempts);
+- every timed-out attempt counts against the call budget, against tokens where the
+  provider charges them, and against the wall-clock budget;
+- a stage deadline stops new dispatches and preserves all evidence collected so far.
+
 ### C.3 Dataset options (decisions 5–10)
 
 All options are human-approved, human-labeled datasets over the ten semantic-bearing
@@ -274,10 +304,25 @@ These are recommendations only; OD-1's numbers are Peter Nguyen's to set.
                                    total  =  USD $158.00
 ```
 
-USD $158 is the maximum token charge under the current published price for the maximum
-permitted judgment path, before the **USD $175 hard ceiling**. Actual spend may be far
-lower (development characterization should show typical output well under the cap); the
-authorization cap must nonetheless cover the maximum permitted path.
+USD $158 is the maximum token charge under the current published price for the **200
+maximum token-billed judgment attempts**, before the **USD $175 hard ceiling**. Actual
+spend may be far lower (development characterization should show typical output well
+under the cap); the authorization cap must nonetheless cover the maximum permitted path,
+and **USD $175 remains the absolute cap for ALL provider charges, including any
+unexpected charge arising from a permitted metadata/control request**.
+
+**Metadata/control-request boundary (decisions 3, 17).** The five additional provider
+requests are a **maximum cap, not automatic permission**:
+
+- the future BER-DEC-008 must name every allowed non-generation endpoint and its exact
+  purpose; an endpoint not explicitly named in BER-DEC-008 is prohibited;
+- no calibration prompt, transcript, label, rubric content, or evidence may appear in a
+  metadata/control request;
+- no model generation and no token-billed judgment work may occur through them;
+- every such call is counted and logged, with the exact endpoint and response identity
+  recorded;
+- any call that invokes a model or submits calibration content counts within the 200
+  judgment-attempt budget and its token/spend ceilings, whatever endpoint carried it.
 
 ### C.6 Future implementation surfaces (decisions 24–25; reservations on paper only)
 
@@ -291,9 +336,66 @@ authorization cap must nonetheless cover the maximum permitted path.
 
 None of these may be created before a reviewed and manually merged BER-DEC-008.
 
-### C.7 Credential handling and lifecycle (decisions 23, 32)
+**Decision 24 — evidence-handling controls the future BER-DEC-008 must record (Peter's
+decisions, all of them):**
 
-- API credential supplied only through an owner-managed environment variable;
+- the exact external evidence root;
+- the evidence classification;
+- the authorized readers;
+- the ACL principals;
+- the inheritance posture;
+- the encryption-at-rest requirement, or an explicit owner-accepted non-encryption
+  posture;
+- the permitted evidence categories;
+- the forbidden evidence categories;
+- the sanitization and redaction rules;
+- the ownership-marker fields;
+- the physical-path and reparse-point validation rules;
+- repository separation (the root outside every Git repository);
+- the repository-safe summary policy.
+
+CONTROL-LAYER RECOMMENDATION — NOT OWNER APPROVAL:
+
+- classification: **INTERNAL TECHNICAL CALIBRATION EVIDENCE**;
+- root outside every Git repository;
+- ACL inheritance disabled;
+- only Peter Nguyen's authorized account and SYSTEM;
+- no Everyone, Users, or Authenticated Users principals;
+- use an encrypted volume when available; **if encryption status is unverified or
+  unavailable, return to Peter before any provider execution**;
+- the ownership marker binds: BER-DEC-008, WP-2B-3, the repository, the branch, the
+  exact base SHA/tree, the provider/model snapshot, creation timestamp, expiration,
+  classification, and the cleanup policy;
+- permitted evidence: sanitized requests/envelopes, judge outputs, labels, hashes,
+  usage/cost metadata, validation output, timing, and manifests;
+- forbidden evidence: credentials, tokens, passwords, private keys, unrestricted
+  environment dumps, customer/personal data, unrelated private source, and private
+  chain-of-thought;
+- repository-safe summaries contain hashes, counts, results, and sanitized findings —
+  never raw provider content unless separately approved by Peter.
+
+**Decision 25 — retention, preservation, inventory, and cleanup the future BER-DEC-008
+must record:**
+
+- the exact retention period (the 30-day proposal above stands unless Peter changes it);
+- preserve-on-failure behavior;
+- collision-safe, append-only evidence naming;
+- a final evidence inventory with SHA-256 hashes;
+- owner review before any cleanup;
+- marker-gated, reparse-safe cleanup targeting only the marked root;
+- the exact deletion timestamp and a deletion report;
+- **no automatic cleanup merely because a session ends**.
+
+### C.7 Credential handling and lifecycle (decisions 23, 32) — PROCESS-SCOPED
+
+- API credential supplied only through **process-scoped, ephemeral secret injection into
+  the single authorized calibration process**;
+- **no persistent user-level environment variable** and **no persistent machine-level
+  environment variable**;
+- no inheritance by unrelated processes;
+- no secret in command-line arguments;
+- no secret in files, logs, evidence, crash dumps, or PR output;
+- the secret context is cleared or destroyed when the authorized process terminates;
 - never committed;
 - never written to the evidence root;
 - never printed or logged;
@@ -301,6 +403,7 @@ None of these may be created before a reviewed and manually merged BER-DEC-008.
 - presence checked without revealing its value;
 - no credential copying or persistence by the runner;
 - a missing credential is a STOP condition, never a workaround;
+- **any different credential mechanism requires Peter's explicit approval**;
 - **lifecycle (decision 32):** a dedicated, project-scoped service-account credential in
   a dedicated OpenAI project; a provider project-level spend limit set at or below the
   authorized ceiling; a project/model allowlist where the provider surface offers one;
@@ -321,22 +424,48 @@ CONTROL-LAYER RECOMMENDATION — NOT OWNER APPROVAL:
 - **Egress (31):** network egress restricted to `api.openai.com:443`; TLS certificate
   verification mandatory; no proxy unless Peter explicitly approves one.
 
-### C.9 Provider-side retention posture (decision 33)
+### C.9 Provider-side retention posture — all paths (decision 33)
 
-Official OpenAI documentation (verified 2026-08-14, read-only) records that the
-Responses API retains abuse-monitoring logs for up to 30 days by default; that
-`store: false` controls application-state storage only and does NOT remove
-abuse-monitoring retention; and that eligible customers may obtain **Zero Data
-Retention (ZDR)** or **Modified Abuse Monitoring (MAM)** by provider approval.
+Provider-side retention has FIVE distinct paths, each an explicit part of decision 33.
+From the official documentation (verified 2026-08-14, read-only; sources below):
 
-The future BER-DEC-008 must therefore record:
+1. **Responses application-state retention:** the Responses API has a 30-day
+   application-state retention period by default or when `store: true`; with
+   `store: false`, no data is retained for server-side compaction. The recommended
+   request settings (§C.2) use `store: false`.
+2. **Abuse-monitoring retention:** abuse-monitoring logs may retain customer content for
+   **up to 30 days by default**, and **`store: false` does not eliminate
+   abuse-monitoring retention**.
+3. **Prompt-cache retention:** prompt caching may retain **encrypted key/value tensors
+   in GPU-local storage for up to 24 hours**; **when ZDR is not enabled for the
+   organization, supported queries use extended prompt caching**; and **GPT-5.5 does not
+   support forcing `prompt_cache_retention = in_memory`** (the official documentation
+   states that for `gpt-5.5` and `gpt-5.5-pro` that setting returns an error).
+4. **ZDR/MAM approval and configuration:** Zero Data Retention and Modified Abuse
+   Monitoring **require prior OpenAI approval** and acceptance of additional
+   requirements; when ZDR is enabled, `store` is always treated as `false`.
+5. **Safety Retention / model-eligibility exceptions:** even for ZDR/MAM-approved
+   customers, the provider documents the right to make models ineligible and to retain
+   and human-review content flagged as potentially violating usage policies — ZDR/MAM
+   are subject to these documented eligibility and Safety Retention exceptions.
 
-- whether the OpenAI organization/project has Zero Data Retention or Modified Abuse
-  Monitoring;
-- if neither applies, whether Peter accepts the default provider abuse-monitoring
-  retention for the synthetic calibration dataset;
-- that provider-side retention is distinct from — and additional to — the local 30-day
-  evidence-root retention (§C.6).
+The future BER-DEC-008 must record **Peter's explicit acceptance or rejection of every
+applicable provider-side retention path above for the synthetic calibration dataset**,
+and must not claim ZDR is enabled unless that is independently verified for the exact
+OpenAI organization/project. Provider-side retention is distinct from — and additional
+to — the local 30-day evidence-root retention (§C.6).
+
+**Official source references (all verified 2026-08-14, read-only; no API call):**
+
+- <https://developers.openai.com/api/docs/models/gpt-5.5> — dated snapshot, pricing,
+  supported features (incl. `prompt_caching`);
+- <https://developers.openai.com/api/docs/guides/reasoning> — `max_output_tokens`
+  semantics, `status=incomplete` behavior, the ≥25,000-token reservation guidance;
+- <https://developers.openai.com/api/docs/guides/your-data> — application-state,
+  abuse-monitoring, prompt-cache retention, `prompt_cache_retention` model support,
+  ZDR/MAM approval, and the Safety Retention exceptions;
+- <https://developers.openai.com/api/docs/models/gpt-5.6-terra> — alias-only status of
+  GPT-5.6 Terra.
 
 ### C.10 Human labeling and adjudication protocol (decision 34)
 
@@ -419,8 +548,8 @@ row below records an approval, and nothing in this package may be treated as one
 | --- | --- | --- | --- |
 | 1 | Provider | OpenAI API | PENDING |
 | 2 | Immutable model/snapshot | `gpt-5.5-2026-04-23` (reverify; return to owner if unavailable) | PENDING |
-| 3 | API endpoint | OpenAI Responses API | PENDING |
-| 4 | Settings profile | §C.2 (no tools/search/files/code/functions; `store:false`; `background:false`; no `previous_response_id`; independent per-item requests; JSON-schema output; medium reasoning; documented default sampling posture) | PENDING |
+| 3 | API endpoint + allowed metadata/control endpoints | OpenAI Responses API for judgments; every non-generation endpoint named with its purpose in BER-DEC-008, unnamed endpoints prohibited (§C.5) | PENDING |
+| 4 | Settings profile + request timeouts | §C.2 (no tools/search/files/code/functions; `store:false`; `background:false`; no `previous_response_id`; independent per-item requests; JSON-schema output; medium reasoning; documented default sampling posture) + exact connection/per-request timeouts recorded in BER-DEC-008, fail-closed ⇒ `JUDGE_ERROR` (§C.2b) | PENDING |
 | 5 | Dataset size | 160 items (FAST 120 / STRONGER 240 alternatives) | PENDING |
 | 6 | Per-control distribution | 16 per semantic-bearing control (A, B, C, D, G, H, I, J, N, O): 4 development + 12 holdout | PENDING |
 | 7 | PASS/FAIL balance | dev 2/2 per control; holdout 6/6 per control (60/60 total) | PENDING |
@@ -433,23 +562,23 @@ row below records an approval, and nothing in this package may be treated as one
 | 14 | False-FAIL threshold | ≤ 5% — at most 3/60 expected-PASS | PENDING |
 | 15 | Abstention threshold | ≤ 5% — at most 6/120 | PENDING |
 | 16 | `JUDGE_ERROR` threshold | ≤ 1% — at most 1/120 | PENDING |
-| 17 | Maximum provider requests | 200 judgment attempts (incl. transport retries) + 5 metadata/control = 205 total | PENDING |
+| 17 | Maximum provider requests + metadata boundary | 200 judgment attempts (incl. transport retries) + at most 5 metadata/control requests (a cap, not permission: no calibration content, no generation, endpoints named in BER-DEC-008) = 205 total (§C.5) | PENDING |
 | 18 | Maximum input tokens per judgment | 8,000 | PENDING |
 | 19 | Maximum output tokens per judgment | development 25,000; holdout cap frozen at 8,192–25,000 with safety margin (§C.2a) | PENDING |
 | 20 | Maximum dollar spend | USD $175 total; USD $175 single-day (worst permitted token path USD $158 at current published price) | PENDING |
 | 21 | Retry policy | one transport-failure retry only, counted within the 200; never on semantic disagreement or failed verdict | PENDING |
 | 22 | Concurrency | 1 | PENDING |
-| 23 | Credential source/handling | §C.7 (owner-managed environment variable; never committed/printed/stored; missing ⇒ STOP) | PENDING |
-| 24 | External evidence root | `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` | PENDING |
-| 25 | Retention | 30 calendar days from first evidence creation | PENDING |
-| 26 | Stop conditions | budget/credential/identity/evidence-integrity stops per §C.5, §C.7, and the backlog §2 protocol | PENDING |
+| 23 | Credential source / process-scoped handling | §C.7 (process-scoped ephemeral injection into the single authorized process only; no persistent user- or machine-level env var; no CLI args/files/logs/dumps; destroyed at process exit; missing ⇒ STOP) | PENDING |
+| 24 | External evidence root + handling controls | `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` with the full §C.6 decision-24 set (classification INTERNAL TECHNICAL CALIBRATION EVIDENCE; ACL inheritance disabled, owner+SYSTEM only; encrypted volume or return to Peter; marker fields; redaction; reparse-safe paths; repo separation; summary policy) | PENDING |
+| 25 | Retention, preservation, inventory, cleanup | 30 calendar days; preserve-on-failure; collision-safe append-only names; SHA-256 inventory; owner review before marker-gated reparse-safe cleanup with deletion report; no automatic cleanup on session end (§C.6) | PENDING |
+| 26 | Stop conditions + stage/run deadlines | budget/credential/identity/evidence-integrity stops per §C.5, §C.7, and the backlog §2 protocol; exact dev-stage, holdout-stage, and whole-run wall-clock deadlines recorded in BER-DEC-008, deadline ⇒ stop new dispatches + preserve evidence (§C.2b) | PENDING |
 | 27 | WP-2B-3 DONE definition | §D | PENDING |
 | 28 | Threshold-miss disposition | §E (calibration NOT ACCEPTED; OD-1 stays OPEN; new version for any change) | PENDING |
 | 29 | Provider client / transport | official OpenAI Python SDK, exact version + integrity recorded in the future BER-DEC-008 (§C.8) | PENDING |
 | 30 | Dependency-install / version-locking policy | isolated WP-2B-3 environment only; no global install; no unrelated packages; if installs stay unauthorized, return for a stdlib HTTPS-adapter decision (§C.8) | PENDING |
 | 31 | Egress / TLS / proxy policy | egress restricted to `api.openai.com:443`; mandatory TLS verification; no proxy without explicit approval (§C.8) | PENDING |
 | 32 | Provider project / service account / credential lifecycle | dedicated project-scoped service-account credential; project spend limit; model allowlist where available; revoke/rotate after the run (§C.7) | PENDING |
-| 33 | Provider-side retention posture (ZDR/MAM) | record ZDR/MAM status or explicit acceptance of default abuse-monitoring retention for the synthetic dataset; distinct from local evidence retention (§C.9) | PENDING |
+| 33 | Provider-side retention posture (all paths) | accept/reject each path per §C.9: application state (`store:false`), 30-day abuse monitoring, 24-hour GPU-local prompt cache (extended caching without ZDR; no `in_memory` forcing on GPT-5.5), ZDR/MAM approval status, Safety Retention exceptions; no ZDR claim without org/project verification | PENDING |
 | 34 | Human labeling and adjudication protocol | versioned hashed labeling guide; labels before judge calls; blinded labelers; two independent holdout labels; pre-call adjudication; owner-approved dataset hash (§C.10) | PENDING |
 | 35 | Holdout freeze/unseal and incomplete-response disposition | §C.11 freeze-and-hash list; one-pass holdout; incomplete ⇒ `JUDGE_ERROR`, never a verdict; changes require a new versioned attempt (§C.2a, §C.11) | PENDING |
 
