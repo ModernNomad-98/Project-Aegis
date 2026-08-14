@@ -23,6 +23,7 @@ BER-DEC-008 external evidence root and are not committed.
 | Authorization tree SHA | `feb7cf261d8efa624c18363c9928e7f0cbdfed4c` |
 | Authorized work package | WP-2B-3 — Measured Judge Calibration and OD-1 Ratification Gate (Stage A1 offline slice) |
 | Implementation branch | `feat/behavioral-eval-runner-2b-3-measured-judge-calibration` |
+| Implementation PR | [#88](https://github.com/ModernNomad-98/Project-Aegis/pull/88) — DRAFT (Stage A1 stopping point; not ready, no reviewer requested, no auto-merge, no merge) |
 | Implementation base | the exact authorization merge commit above (never a later moving `main`; `main` was verified identical to it at branch creation) |
 | Authoritative design | `docs/design/behavioral-eval-runner-v1-fast-track-successor.md` §6 over `docs/design/behavioral-eval-runner-v1.md` (§8, §13, §17/§17a, §20) |
 | Authoritative terms | BER-DEC-008 (backlog §13) transcribing all 35 owner-approved decisions of `docs/roadmaps/behavioral-eval-runner-wp-2b-3-authorization-decision-package.md` |
