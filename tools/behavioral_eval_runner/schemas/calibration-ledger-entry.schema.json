@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber/calibration-ledger-entry.schema.json",
+  "title": "WP-2B-3 calibration ledger entry (BER-DEC-008 decisions 17-20, 27)",
+  "description": "One append-only, hash-chained accounting record for one external interaction attempt. Money is integer nano-USD; reasoning tokens are recorded as counts (billed inside output tokens) and no private reasoning content is ever collected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "internal_request_id",
+    "request_kind",
+    "logical_judgment_id",
+    "attempt_number",
+    "provider_response_id",
+    "provider_request_trace_id",
+    "requested_model",
+    "returned_model",
+    "request_timestamp_utc",
+    "completion_timestamp_utc",
+    "latency_ms",
+    "response_status",
+    "incomplete_details_reason",
+    "input_tokens",
+    "output_tokens",
+    "reasoning_tokens",
+    "cached_input_tokens",
+    "unit_prices",
+    "calculated_charge_nanousd",
+    "telemetry_missing",
+    "retry_of_request_id",
+    "sdk_version",
+    "outcome_kind",
+    "day",
+    "cumulative",
+    "prev_entry_sha256",
+    "entry_sha256"
+  ],
+  "properties": {
+    "internal_request_id": {"type": "string", "minLength": 1},
+    "request_kind": {"enum": ["JUDGMENT_ATTEMPT", "METADATA"]},
+    "logical_judgment_id": {"type": ["string", "null"]},
+    "attempt_number": {"type": "integer", "minimum": 1, "maximum": 2},
+    "provider_response_id": {"type": ["string", "null"]},
+    "provider_request_trace_id": {"type": ["string", "null"]},
+    "requested_model": {"enum": ["gpt-5.5-2026-04-23"]},
+    "returned_model": {"type": ["string", "null"]},
+    "request_timestamp_utc": {"type": "string", "minLength": 1},
+    "completion_timestamp_utc": {"type": "string", "minLength": 1},
+    "latency_ms": {"type": "integer", "minimum": 0},
+    "response_status": {"type": "string", "minLength": 1},
+    "incomplete_details_reason": {"type": ["string", "null"]},
+    "input_tokens": {"type": "integer", "minimum": 0},
+    "output_tokens": {"type": "integer", "minimum": 0},
+    "reasoning_tokens": {"type": "integer", "minimum": 0},
+    "cached_input_tokens": {"type": "integer", "minimum": 0},
+    "unit_prices": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_nanousd_per_token",
+        "output_nanousd_per_token",
+        "cached_input_nanousd_per_token",
+        "price_verified_date"
+      ],
+      "properties": {
+        "input_nanousd_per_token": {"const": 5000},
+        "output_nanousd_per_token": {"const": 30000},
+        "cached_input_nanousd_per_token": {"const": 500},
+        "price_verified_date": {"type": "string", "minLength": 1}
+      }
+    },
+    "calculated_charge_nanousd": {"type": "integer", "minimum": 0},
+    "telemetry_missing": {"type": "boolean"},
+    "retry_of_request_id": {"type": ["string", "null"]},
+    "sdk_version": {"type": "string", "minLength": 1},
+    "outcome_kind": {"type": "string", "minLength": 1},
+    "day": {"type": "string", "minLength": 1},
+    "cumulative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judgments_total",
+        "attempts_total",
+        "metadata_requests",
+        "total_external_requests",
+        "input_tokens_total",
+        "output_tokens_total",
+        "reasoning_tokens_total",
+        "cached_input_tokens_total",
+        "spend_nanousd_total",
+        "day_spend_nanousd"
+      ],
+      "properties": {
+        "judgments_total": {"type": "integer", "minimum": 0},
+        "attempts_total": {"type": "integer", "minimum": 0, "maximum": 200},
+        "metadata_requests": {"type": "integer", "minimum": 0, "maximum": 1},
+        "total_external_requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 201
+        },
+        "input_tokens_total": {"type": "integer", "minimum": 0},
+        "output_tokens_total": {"type": "integer", "minimum": 0},
+        "reasoning_tokens_total": {"type": "integer", "minimum": 0},
+        "cached_input_tokens_total": {"type": "integer", "minimum": 0},
+        "spend_nanousd_total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 175000000000
+        },
+        "day_spend_nanousd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 175000000000
+        }
+      }
+    },
+    "prev_entry_sha256": {"type": "string", "pattern": "^$|^[0-9a-f]{64}$"},
+    "entry_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

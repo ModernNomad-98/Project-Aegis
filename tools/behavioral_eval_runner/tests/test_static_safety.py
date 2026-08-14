@@ -77,8 +77,20 @@ class TestStaticSafety(unittest.TestCase):
         self.assertEqual(modules, ["__init__.py", "base.py", "claude_code.py"])
 
     def test_no_dispatch_function_reachable(self) -> None:
-        """The runtime package exposes no callable that could reach a provider."""
+        """No runtime module can reach a provider outside the ONE narrowly
+        authorized WP-2B-3 calibration adapter (BER-DEC-008; task section 13).
+
+        The "openai" fragment is allowlisted for EXACTLY the two calibration
+        adapter modules — every other runtime module remains provider-denied,
+        and every other provider fragment stays banned everywhere.
+        """
         forbidden_fragments = ("api.anthropic", "openai", "bedrock", "vertex")
+        wp2b3_adapter_allowlist = {
+            "openai": {
+                "judge/calibration_transport.py",
+                "judge/calibration_provider.py",
+            }
+        }
         for directory, _dirs, files in os.walk(PACKAGE_ROOT):
             if os.path.basename(directory) == "tests":
                 continue  # this very check lives here; the scan targets runtime code
@@ -86,10 +98,24 @@ class TestStaticSafety(unittest.TestCase):
                 if not name.endswith(".py"):
                     continue
                 path = os.path.join(directory, name)
+                relative = os.path.relpath(path, PACKAGE_ROOT).replace(
+                    "\\", "/"
+                )
                 with open(path, encoding="utf-8") as handle:
                     source = handle.read().lower()
                 for fragment in forbidden_fragments:
-                    self.assertNotIn(fragment, source, f"{name}: {fragment}")
+                    if relative in wp2b3_adapter_allowlist.get(fragment, ()):
+                        continue
+                    self.assertNotIn(
+                        fragment, source, f"{relative}: {fragment}"
+                    )
+        for fragment, allowed in wp2b3_adapter_allowlist.items():
+            for relative in sorted(allowed):
+                allowed_path = os.path.join(PACKAGE_ROOT, *relative.split("/"))
+                self.assertTrue(
+                    os.path.exists(allowed_path),
+                    f"allowlisted adapter module missing: {relative}",
+                )
 
     def test_subprocess_confined_to_allowlisted_modules(self) -> None:
         offenders: list[str] = []

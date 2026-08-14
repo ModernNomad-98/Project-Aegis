@@ -68,6 +68,36 @@ python -m tools.behavioral_eval_runner self-check
 python -m tools.behavioral_eval_runner census --repo . --ref <sha> --verify-baseline --out census.json --canonical
 ```
 
+## WP-2B-3 Stage A1 — measured-calibration controls (BER-DEC-008; OFFLINE)
+
+Authorized by **BER-DEC-008** (authorization PR #87, squash merge
+`1c3e4931329179d9a3f9cc9ec1bb93020378c043`): the OFFLINE implementation of
+the Measured Judge Calibration controls. **Stage A1 makes ZERO
+provider/model/metadata calls, accesses ZERO credentials, and spends
+USD $0** — every element below is exercised with fakes only.
+
+| Module | Delivers |
+| --- | --- |
+| `judge/calibration_errors.py` | Typed WP-2B-3 failure taxonomy with the closed BER-DEC-008 stop-reason set |
+| `judge/calibration_credential.py` | Process-scoped consume-once credential handle (redacted repr; missing ⇒ STOP; never exercised with a real secret in Stage A1) |
+| `judge/calibration_transport.py` | Pinned provider terms (OpenAI Responses API, exact snapshot `gpt-5.5-2026-04-23`, SDK `openai==3.0.0` with recorded wheel/sdist SHA-256); lazy-import client factory with SDK retries pinned to ZERO, connect 15 s / total 300 s, exact `https://api.openai.com/v1`, `trust_env=False`, proxy/TLS/base-URL environment fail-closed; the CLOSED request-kwargs set (no tools/functions/search/code/conversation state; `store:false`; `background:false`; reasoning medium; default sampling); strict structured-output verdict schema; conservative 8,000-input-token gate |
+| `judge/calibration_ledger.py` | Append-only hash-chained accounting in integer nano-USD; pre-dispatch reservations enforcing 200 judgment attempts / 1 metadata request / 201 total, USD $175 total and single-day ceilings (stop BEFORE any cap; worst permitted token path USD $158), per-judgment 2-attempt maximum, missing-usage-telemetry ⇒ recorded worst-case charge + STOP; 90 min / 4 h / 6 h active-execution deadlines with OWNER_WAIT excluded |
+| `judge/calibration_dataset.py` | The SYNTHETIC CANDIDATE dataset contract (160 items; 16 per semantic-bearing control A,B,C,D,G,H,I,J,N,O; 40 dev 2P/2F; 120 sealed holdout 6P/6F; ≥40 CRITICAL expected-FAIL; ≥40 adversarial with ≥20/≥20; overlap reported); split-map hashing; holdout access impossible without the owner freeze; the label-free `CalibrationItemContent` judge-facing projection (expected labels structurally unrepresentable) |
+| `judge/calibration_envelope.py` | Calibration envelopes of the EXACT WP-2B-2 shape (same version/policy/trusted control context), bound through the existing `validate_request_envelope_binding`; label-bearing inputs rejected |
+| `judge/calibration_gates.py` | The hard Stage-A1 gate: OWNER_LABEL_APPROVAL=PENDING mechanically blocks every dispatch; gate-issued-only authorization objects; the decision-35 holdout freeze artifact contract (cap frozen in [8,192, 25,000]) |
+| `judge/calibration_provider.py` | The calibration-only judge client (constructible ONLY with a gate-issued authorization): one runner-owned transport retry maximum (attempts uniquely ledgered and linked; semantic FAIL / malformed / refusal / incomplete NEVER retry); returned-model mismatch ⇒ STOP; incomplete ⇒ `JUDGE_ERROR`, never parsed; concurrency 1; the single authorized metadata request surface (capped at exactly one; not called in Stage A1) |
+| `schemas/calibration-*.schema.json` | Candidate-dataset, owner-approval, and ledger-entry schema mirrors (`1.0.0-wp2b3`) |
+| CLI | `validate-calibration-dataset` and `calibration-status` (repository-safe hashes/counts/status only) plus six new self-check items |
+
+The generic denial boundary is UNCHANGED: `DisabledJudgeProvider` still
+denies every dispatch with `LIVE_DISPATCH_DISABLED`, no Scenario A or
+generic-corpus execution path exists, and the runtime "openai" fragment is
+allowlisted for exactly the two calibration adapter modules. The candidate
+160-item dataset, labeling guide, and owner label-review packet live ONLY
+under the authorized external evidence root; **OWNER_LABEL_APPROVAL is
+PENDING, the development calibration has NOT started, the sealed holdout is
+NOT opened, OD-1 remains OPEN, and WP-2B-4 remains BLOCKED.**
+
 ## Tests
 
 ```bash
@@ -77,3 +107,6 @@ python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"
 All tests are deterministic and offline: mocks, synthetic fixtures, local
 subprocesses for timeout/kill tests only, temp directories under the
 process-local TMP/TEMP. No network, no package installation, no model calls.
+The WP-2B-3 SDK-configuration tests run only where the pinned SDK is
+installed (the isolated WP-2B-3 venv) and are honestly SKIPPED elsewhere —
+they still perform no network call anywhere.
