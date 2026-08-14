@@ -376,7 +376,7 @@ reviewer automation was triggered.
 | Merged at | 2026-08-14T05:34:39Z (2026-08-13T23:34:39-06:00) |
 | Merged by | Peter Nguyen (owner; manual merge) |
 | PR statistics | 2 DCO-signed source commits; 58 changed files; +11,240/−6 |
-| Governance closeout PR | CLOSEOUT_PR_PENDING |
+| Governance closeout PR | #86 |
 
 **Local validation at the reviewed head (developer-machine evidence):** full runner suite
 **663 tests, 0 failures, 0 errors, 4 skipped (pre-existing POSIX-only — skipped, not
@@ -416,7 +416,7 @@ runbook, mechanical harness, skills, evals, validator, and gates are unchanged.
 
 **Durable status:** this summary records completion evidence; **WP-2B-2's durable backlog
 status becomes DONE only through the reviewed governance closeout PR
-(CLOSEOUT_PR_PENDING) that updates
+(#86) that updates
 [`docs/roadmaps/behavioral-eval-runner-backlog.md`](../roadmaps/behavioral-eval-runner-backlog.md)**.
 **WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate) remains BLOCKED and
 unauthorized**: the closeout PR adds an owner decision package

@@ -770,7 +770,7 @@ the sole owner of actual advisory CI integration).
   - merge tree `81404d350a26e8349d3c869209ae04f8628e0a95` (byte-identical to the reviewed
     tree);
   - merged at 2026-08-14T05:34:39Z (2026-08-13T23:34:39-06:00) by Peter Nguyen;
-  - governance closeout PR: CLOSEOUT_PR_PENDING (the reviewed PR that records this status
+  - governance closeout PR: #86 (the reviewed PR that records this status
     change);
   - local validation at the reviewed head: full runner suite **663 tests, 0 failures,
     0 errors, 4 skipped (pre-existing POSIX-only)**; runner `self-check` PASS 15/15;
