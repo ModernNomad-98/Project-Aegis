@@ -79,7 +79,11 @@ untouched.
   with a dummy sentinel and prove `max_retries == 0`, the exact base URL, the 15 s/300 s
   timeouts, and `trust_env=False` — with zero network use.
 
-## 4. Candidate dataset, labeling guide, and owner review packet (EXTERNAL ONLY)
+## 4. Candidate dataset v1, labeling guide, and owner review packet (EXTERNAL ONLY)
+
+*(Historical record of candidate v1; the owner-label review of v1 returned
+CHANGES REQUIRED and candidate v2 superseded it — see §4a. V1 remains
+preserved byte-for-byte as append-only evidence.)*
 
 Built by a provenance-preserved script (copy retained in the evidence root), validated
 through the repository contract AND independently through the committed
@@ -103,6 +107,40 @@ split hashes, exact counts and denominators, the complete 160-item inventory wit
 per-item candidate label + concise rationale + transcript hash, the mechanical
 validation results, one explicit design note for owner veto (the 40 development items
 are deliberately non-adversarial), and an empty ambiguity-flag list.
+
+## 4a. Owner-label review of v1 (CHANGES REQUIRED) and candidate dataset v2
+
+Peter Nguyen supplied the complete v1 owner-review bundle to ChatGPT for the
+required human-facing semantic review. ChatGPT reviewed all 160 transcripts,
+all 160 candidate PASS/FAIL labels, every rationale, the split map, all
+hashes, the labeling guide, the packet composition, and the risk
+classifications. **Disposition: CHANGES REQUIRED — candidate v1 is NOT
+approved**, and OWNER_LABEL_APPROVAL remains PENDING. 148 of 160 candidate
+labels were substantively consistent as written; 12 transcripts required
+clarification/rewrite; 40 holdout cases were development-derived templates;
+24 risk classes needed correction.
+
+One bounded dataset-only revision produced **candidate v2**
+(`1.0.0-wp2b3-candidate.2`) under the external evidence root, with v1
+preserved byte-for-byte:
+
+| Item | Value |
+| --- | --- |
+| V1 (preserved) | semantic SHA-256 `f646b4b9ba6f71e3009bbec6b83538dfe0bd9da1c8c56b7174360da3b5d2b160`; file SHA-256 `8d275332b77b332befe9d4e38efceba0e6417199440feb8298c47bd87146c5f2` |
+| V2 dataset | semantic SHA-256 `b73c8d855fdf9ff304e18d2964d266fef3e97f42050443d52c872bd54ebaa5bf`; file SHA-256 `c212c1c50d1bfd25f3de496acc542d9bd3e2fc258c51eb81ba9fd7c95d11ac56` |
+| Change counts | **52 transcripts changed** (40 §6 holdout-independence replacements + 12 §7 defect rewrites); **108 transcripts byte-identical**; **24 risk-class changes**; **0 candidate PASS/FAIL changes (160/160 preserved)**; **0 split changes; 0 control changes** — proven per-item by the machine-readable v1→v2 change manifest |
+| Holdout-independence correction | the four development-derived holdout slots per control (h-p5/h-p6/h-f5/h-f6) were replaced with genuinely different fact patterns (implicit/qualified/mixed-evidence conduct, different sequencing and failure mechanisms); the deterministic near-duplicate report (normalized difflib similarity; domain phrases neutralized; standardized suffixes stripped) shows **worst same-control holdout-vs-development similarity 0.4454 against the 0.85 gate — zero exceptions**, zero exact duplicates, zero normalized duplicate groups |
+| Twelve quality corrections | A-h-p4/A-h-f4 template defects repaired; the six remaining Control-D PASS previews rewritten as ACTUAL multiline byte-for-byte previews (no literal backslash-n notation anywhere in v2); H-h-f1/H-h-f4 now explicitly numbered question banks; J-h-p2 declines the unauthorized edit with NO substitute repository write; O-h-p4 shows the exact proposed stage-closing row gated on approval |
+| Risk-class correction | G/H/I h-f1..f4 CRITICAL→HIGH (conversational-quality failures no longer supply CRITICAL merely for the floor); A/C/D/J/N/O h-f5/h-f6 HIGH→CRITICAL (new transcripts depict destructive/unsafe conduct per the guide's safety definition); holdout CRITICAL expected-FAIL remains **exactly 40**; CRITICAL∩adversarial overlap 10→13, reported |
+| Unchanged | labeling guide byte-identical (`05708c4052ca2a7f4a173b196dd553237741710bd09db9ff21bc7e835f9fbc2d`); split map byte-identical (`08078227408b9a560afb2e5614019ef0280edda353f9d233c95adfaf4d099fca`); all item IDs, splits, controls, adversarial flags/kinds |
+| Validation | structural + BER-DEC-008 composition + Stage-A1 PENDING checks PASS in the builder AND independently via the committed `validate-calibration-dataset` CLI (160/40/120, 60/60, CRITICAL 40, adversarial 40 = 20 injection/20 role-confusion, 20P/20F); full repository battery re-run green (832/0/0 both interpreters; self-check 21/21; census unchanged `674017e9…`; validator 91; skills 184/0; `git diff --check` clean; no runtime/provider code changed) |
+| Owner-review bundle | ONE upload ZIP `wp2b3-owner-label-review-bundle-v2.zip` at the evidence root (14 entries: dataset, split map, guide copy, packet JSON+MD, distribution report, hash manifest, near-duplicate JSON+MD, change manifest JSON+MD, CLI validation, calibration status, bundle manifest with per-file SHA-256); ZIP SHA-256 `355fc2c42db6cb38c3672e940a46d4c1d6488a3b74beca56aa284641c937645a` |
+
+Provider/model/metadata calls during the revision: **0**; real credential
+access: **0**; external spend: **USD $0**; development and holdout remain
+unexecuted. **Candidate v2 still requires Peter Nguyen's explicit approval —
+no artifact claims human approval, and the runner continues to refuse
+dispatch while OWNER_LABEL_APPROVAL is PENDING.**
 
 ## 5. Tests and validation (actual results at the ORIGINAL implementation head)
 
