@@ -2,7 +2,7 @@
 
 **Status:** OWNER-APPROVED DECISION RECORD (2026-08-14) — **STILL NOT AUTHORIZATION IN
 EFFECT:** execution authority arises only when the governance PR appending BER-DEC-008
-(AUTHORIZATION_PR_PENDING) is reviewed and **manually merged**. Original status,
+([#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) is reviewed and **manually merged**. Original status,
 preserved as provenance: PROPOSAL / OWNER DECISION PACKAGE — NOT AUTHORIZATION.
 **Prepared:** 2026-08-14.
 **Revised:** 2026-08-14 — bounded corrections from the independent control-layer review of
@@ -52,7 +52,7 @@ WP-2B-3 authorization must record. It must be read with the following standing f
 - **BER-DEC-008 status (updated 2026-08-14):** when this package was prepared, no
   BER-DEC-008 existed and the governance log of
   [`behavioral-eval-runner-backlog.md`](behavioral-eval-runner-backlog.md) (§13) ended
-  at BER-DEC-007. The governance PR AUTHORIZATION_PR_PENDING now appends BER-DEC-008,
+  at BER-DEC-007. The governance PR [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87) now appends BER-DEC-008,
   transcribing the owner-approved decisions below; BER-DEC-008 becomes effective only
   on that PR's manual merge.
 - **WP-2B-3 authorization state (updated 2026-08-14):** this package itself grants no
@@ -575,7 +575,7 @@ Peter Nguyen approved every row on 2026-08-14; no row remains PENDING. Each owne
 cell records his exact disposition — **APPROVED AS PROPOSED**, or an APPROVED-WITH
 variant carrying the exact owner-modified value (rows 2, 3, 4, 17, 26, 33, 34). These
 recorded decisions are transcribed into BER-DEC-008 (governance PR
-AUTHORIZATION_PR_PENDING) and become execution authority only through that entry's
+[#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) and become execution authority only through that entry's
 manual merge.
 
 | # | Item | Control-layer proposal (not approved) | Owner decision |
@@ -621,13 +621,13 @@ OWNER DECISION:
 APPROVED — Peter Nguyen, 2026-08-14 (all 35 rows carry a recorded disposition; none PENDING)
 
 BER-DEC-008:
-APPENDED BY GOVERNANCE PR AUTHORIZATION_PR_PENDING — EFFECTIVE ONLY ON MANUAL MERGE
+APPENDED BY GOVERNANCE PR #87 — EFFECTIVE ONLY ON MANUAL MERGE
 ```
 
 Only after Peter Nguyen records his decisions and a reviewed PR is **manually merged**
 appending a BER-DEC-008 entry that captures those exact terms does WP-2B-3 become
 authorized. **Status of that condition (2026-08-14):** Peter Nguyen's decisions are
-recorded above, and the governance PR AUTHORIZATION_PR_PENDING appends BER-DEC-008
+recorded above, and the governance PR [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87) appends BER-DEC-008
 transcribing them into the backlog §13 governance log. The manual-merge condition
 remains outstanding until Peter Nguyen merges that PR; until then no provider call,
 credential use, package installation, implementation branch/clone, or evidence-root

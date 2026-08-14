@@ -536,7 +536,7 @@ squash-merged implementation
 redefined as the **Measured Judge Calibration and OD-1 Ratification
 Gate** (only its former NON-LIVE scaffold scope is absorbed by WP-2B-2; historical record
 retained) — is AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
-AUTHORIZATION_PR_PENDING), **effective only after that governance PR is reviewed and
+[#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)), **effective only after that governance PR is reviewed and
 manually merged** — before that merge it remains a proposed authorization and no WP-2B-3
 implementation may begin (Peter Nguyen approved the complete 35-decision owner package on
 2026-08-14; OD-1 remains OPEN and is NOT pre-ratified);
@@ -809,7 +809,7 @@ the sole owner of actual advisory CI integration).
 - **Phase:** 2B-3
 - **Priority:** GATE
 - **Status:** AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
-  AUTHORIZATION_PR_PENDING) — **effective only after the governance PR containing
+  [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) — **effective only after the governance PR containing
   BER-DEC-008 is reviewed and manually merged. Before that merge, this branch/PR is a
   proposed authorization only, and no WP-2B-3 implementation, provider or model call,
   credential access, implementation clone, implementation branch, or evidence-root
@@ -855,10 +855,10 @@ the sole owner of actual advisory CI integration).
   harness this gate exercises); the versioned human-labeled calibration dataset (does not
   exist yet; the owner-approved size and composition — 160 items, 40 development / 120
   sealed holdout — is recorded by BER-DEC-008); the reviewed and manually merged
-  BER-DEC-008 authorization (governance PR AUTHORIZATION_PR_PENDING); owner availability
+  BER-DEC-008 authorization (governance PR [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)); owner availability
   for OD-1 ratification.
 - **Trigger to begin:** The governance PR containing BER-DEC-008
-  (AUTHORIZATION_PR_PENDING) is manually merged; implementation then begins on
+  ([#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) is manually merged; implementation then begins on
   `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly from
   the exact authorization merge commit per BER-DEC-008's source-baseline terms — never
   from a later moving `main`. BER-DEC-007 does not authorize this work.
@@ -1743,7 +1743,7 @@ backlog.
   WP-2B-3 gate; the owner's numeric-threshold pre-registration and measured-result
   ratification remain pending, and no BER-DEC-008 exists.
   **Post-authorization note (2026-08-14): OPEN — unchanged by BER-DEC-008.** BER-DEC-008
-  (§13 of this file; governance PR AUTHORIZATION_PR_PENDING, effective only on manual
+  (§13 of this file; governance PR [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), effective only on manual
   merge) authorizes the measured calibration and records Peter Nguyen's pre-registered
   numeric thresholds for the sealed holdout, but it does **not** ratify OD-1 and does
   not pre-approve any measured result. OD-1 is ratified or explicitly declined by Peter
@@ -2081,7 +2081,7 @@ WP-2B-2  Scenario A Grading Stack (non-live deterministic + semantic scaffold)
         |
         v
 WP-2B-3  Measured Judge Calibration + OD-1 Ratification Gate — AUTHORIZED by
-BER-DEC-008 (governance PR AUTHORIZATION_PR_PENDING), effective ONLY upon
+BER-DEC-008 (governance PR #87), effective ONLY upon
 manual merge of that governance PR; owner-approved decision package (all 35
 decisions, 2026-08-14) recorded; own branch, provider-call/token/dollar
 budget, evidence root, evidence terms, retention, deadlines, and stop
@@ -2167,7 +2167,7 @@ Explicit statements about this map:
   authorization, and no WP-2B-3 implementation may begin before a reviewed and manually
   merged BER-DEC-008.
 - **Current state (recorded 2026-08-14 — BER-DEC-008 governance PR
-  AUTHORIZATION_PR_PENDING, this governance PR, pending review and manual merge):** the
+  [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), this governance PR, pending review and manual merge):** the
   WP-2B-2 governance closeout PR #86 is MERGED; `main` is at
   `048644084b2e7a080120d984b8f77fb21d662315` (tree
   `fb64b711f6def3109c3f7e399ba744380447b1fe` — PR #86's manual squash merge), which is
@@ -2820,7 +2820,7 @@ model call, and evidence artifact.
   later phase.
 - **Owner:** Peter Nguyen
 - **Repository:** `ModernNomad-98/Project-Aegis`
-- **Authorization PR:** AUTHORIZATION_PR_PENDING
+- **Authorization PR:** [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)
 - **Owner-decision record:** the decision package named above — every §F row carries the
   owner-approved disposition dated 2026-08-14; PENDING rows remaining: none. The owner
   approval is a decision record; execution authority arises only from the manual merge
@@ -3069,7 +3069,7 @@ before doing anything else:
    current registers (§7, §13), not narrative history, decide what is authorized now.
 8. **The immediate next governed step (recorded 2026-08-14, post-owner-approval) is
    owner review and manual merge of the BER-DEC-008 governance PR**
-   (AUTHORIZATION_PR_PENDING — the separately owner-approved successor PR Peter Nguyen
+   ([#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87) — the separately owner-approved successor PR Peter Nguyen
    directed after the closeout PR #86 merged; it appends BER-DEC-008 to §13 and updates
    the decision package
    ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md))
