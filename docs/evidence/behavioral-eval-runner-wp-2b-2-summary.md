@@ -359,3 +359,90 @@ chain, and the root outside every Git repository. It holds the baseline and fina
 validation logs, RED/GREEN cycle logs, census reproduction outputs, and timing records.
 Cleanup is not authorized in this pass; evidence is preserved for owner review within the
 retention window. No personal username or profile path appears in repository-safe output.
+
+## 10. Post-merge closeout record (2026-08-14)
+
+WP-2B-2 was reviewed and **manually merged** by the owner. Auto-merge was not used and no
+reviewer automation was triggered.
+
+| Item | Value |
+| --- | --- |
+| Implementation PR | [#85](https://github.com/ModernNomad-98/Project-Aegis/pull/85) — "Implement BER WP-2B-2 Scenario A grading stack" — MERGED |
+| Merge method | Manual owner squash merge (auto-merge not used) |
+| Final reviewed head | `5d16bace5fec9f7c394ad7f3b4147ac9d4ad74f2` |
+| Final reviewed tree | `81404d350a26e8349d3c869209ae04f8628e0a95` |
+| Squash merge commit (`main`) | `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` |
+| Merge tree | `81404d350a26e8349d3c869209ae04f8628e0a95` (byte-identical to the reviewed tree) |
+| Merged at | 2026-08-14T05:34:39Z (2026-08-13T23:34:39-06:00) |
+| Merged by | Peter Nguyen (owner; manual merge) |
+| PR statistics | 2 DCO-signed source commits; 58 changed files; +11,240/−6 |
+| Governance closeout PR | #86 |
+
+**Local validation at the reviewed head (developer-machine evidence):** full runner suite
+**663 tests, 0 failures, 0 errors, 4 skipped (pre-existing POSIX-only — skipped, not
+passed)**; runner `self-check` **PASS 15/15**; census regenerated twice **byte-identical**
+with canonical SHA-256
+`674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`; validator self-tests
+**91 PASS**; `validate-skills` **184 valid, 0 warnings**; `git diff --check` clean; DCO
+present on both source commits.
+
+**GitHub gate scope (exact):** GitHub CI at the reviewed head ran the repository gates
+only — gate-guard PASS, the validate-skills workflow PASS, and DCO PASS. **GitHub Actions
+did not run the 663-test runner suite**; that result is local developer-machine evidence.
+No post-merge rerun of the 663-test suite has been performed or is claimed by this
+closeout; the recorded results are those produced at the reviewed head `5d16bace` before
+merge.
+
+**Scoped D9 owner decision (Peter Nguyen), recorded in the final PR #85 body:** the
+control A–Q classification contract APPROVED; the semantic-rubric contract shapes APPROVED
+for the NON-LIVE WP-2B-2 scaffold only; the schema shapes APPROVED for the NON-LIVE
+recorded/mock contract; the implementation at exact head `5d16bace` accepted as satisfying
+the BER-DEC-007 non-live scope. **Explicit non-approvals recorded with it:** no measured
+calibration; no OD-1 ratification; no real judge/provider call; no live Scenario A; no
+generic corpus; no baseline eligibility; no promotion or production claim; no
+WP-2B-3/WP-2B-4/WP-2B-5 authorization. The PR #85 squash-merge message preserves the older
+source-commit narrative "D9 sign-off remains PENDING owner decision"; the final PR body's
+later scoped decision is the applicable completion evidence.
+
+**Non-claims (unchanged by the merge, restated as binding):** no measured judge
+calibration exists or is claimed; OD-1 remains OPEN and unratified; R1 remains
+UNAVAILABLE/UNKNOWN; R2 remains BLOCKED (no judge pinned; no provider adapter exists); R4
+and R5 remain INCOMPLETE/BLOCKED; zero runner-generated, grading-stack-generated, or
+test-harness-generated model/provider dispatches; zero actual judge/provider calls; zero
+runner-generated live sessions; USD $0 external spend; 0 package installations; no live
+Scenario A execution; no generic corpus execution; no CI integration; no baseline,
+routing, stability-window, promotion, or production-readiness claim; the Scenario A
+runbook, mechanical harness, skills, evals, validator, and gates are unchanged.
+
+**Durable status:** this summary records completion evidence; **WP-2B-2's durable backlog
+status becomes DONE only through the reviewed governance closeout PR
+(#86) that updates
+[`docs/roadmaps/behavioral-eval-runner-backlog.md`](../roadmaps/behavioral-eval-runner-backlog.md)**.
+**WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate) remains BLOCKED and
+unauthorized**: the closeout PR adds an owner decision package
+([`docs/roadmaps/behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](../roadmaps/behavioral-eval-runner-wp-2b-3-authorization-decision-package.md))
+that is a proposal only; no BER-DEC-008 exists, and no WP-2B-3 implementation, provider
+call, credential use, implementation clone, or evidence root is authorized by this record.
+
+**Evidence-root retention:** the external build-evidence root remains under its
+BER-DEC-007 terms with the recorded expiration **2026-09-12T23:17:17Z** (30 days from
+first evidence creation). **Cleanup remains unauthorized**; evidence is preserved for
+owner review within the retention window. The root was not modified by this closeout.
+
+**Workflow incident — unauthorized post-closeout persistent-memory update (verified):**
+after the implementation session delivered its closeout report (its last authorized
+evidence write occurred 2026-08-13 22:45 local), the assistant's project-scoped
+persistent-memory store — a local file store outside the Git repository — was updated
+without authorization at 2026-08-13 23:22:20–23:22:38 local (~12 minutes before the
+manual merge): one note about PR #85 readiness was created (1,996 bytes, SHA-256
+`8f742a6c7f78b781db8b4db7ed2aa49bdea7eec440ae72a9733b2c087a7e2de9`), one earlier note was
+rewritten as superseded (681 bytes, SHA-256
+`647f01e7ac2b352fed07a91270bcb909e392cdcd750838244b6e179211df25ff`), and the memory index
+was rewritten (736 bytes, SHA-256
+`f6eac2f00b681394c7c9dfb44b7c1b0c8474c4439e12cb2b5ebdd76f5a91ca71`). Disposition: the
+store is outside the Git repository; its content is not implementation evidence; it is
+not governance authority (conversation/assistant memory is never authoritative — §1 of
+the backlog register and BER-DEC-001); it had no effect on the reviewed Git tree; and no
+repair, refresh, or further mutation of the store was performed in this docs-only
+closeout, which also wrote no memory. Recorded here solely as a process-discipline
+incident for owner awareness.
