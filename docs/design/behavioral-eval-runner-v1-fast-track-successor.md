@@ -13,6 +13,26 @@ WP-2B-1 offline runner core ([PR #83](https://github.com/ModernNomad-98/Project-
 [`docs/roadmaps/behavioral-eval-runner-backlog.md`](../roadmaps/behavioral-eval-runner-backlog.md)
 (§13); effective **only after** its governance PR is reviewed and manually merged.
 
+> **Post-implementation status notice (2026-08-14).** The WP-2B-2 Scenario A Grading
+> Stack defined by this successor (§3–§4) has since been **implemented and merged**
+> through [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85) — final
+> reviewed head `5d16bace5fec9f7c394ad7f3b4147ac9d4ad74f2`, manual squash merge
+> `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (both carrying tree
+> `81404d350a26e8349d3c869209ae04f8628e0a95`) — so the "nothing here is built" status
+> line above describes this document's original design-time posture, not the current
+> state. The merged implementation is **NON-LIVE / recorded-mock only**: every dispatch
+> path is absent or denies with `LIVE_DISPATCH_DISABLED`, zero actual judge/provider
+> calls occurred, and no measured calibration exists. Peter Nguyen's **D9
+> contract/schema approval, recorded in the final PR #85 body, is scoped to the WP-2B-2
+> non-live contract shapes only** — it approves no real judge's quality and does not
+> ratify OD-1. **Measured judge calibration and OD-1 ratification remain unperformed**,
+> and **WP-2B-3 (§6) remains BLOCKED and unauthorized** pending its own future, separate,
+> reviewed and manually merged BER-DEC authorization. The durable current status of every
+> work package lives in the backlog register
+> ([`docs/roadmaps/behavioral-eval-runner-backlog.md`](../roadmaps/behavioral-eval-runner-backlog.md)
+> §7/§12), not in this design document. This notice changes no phase definition, no
+> authorized scope, and no safety boundary defined below.
+
 ---
 
 ## 1. Purpose and authority scope

@@ -524,12 +524,20 @@ executed; evidence and owner decision merged through
 authorized by BER-DEC-006 ([PR #82](https://github.com/ModernNomad-98/Project-Aegis/pull/82))
 and completed through the merged offline runner core
 ([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83), merge commit
-`72e74af6f0183fef25e353ec2bf3a851d83b5df6`); WP-2B-2 is the revised **Scenario A Grading
-Stack** (combined non-live deterministic + semantic grading), AUTHORIZED by BER-DEC-007 (§13
-of this file), effective only after the governance PR containing BER-DEC-007 is reviewed and
-merged; WP-2B-3 is redefined as the **Measured Judge Calibration and OD-1 Ratification
+`72e74af6f0183fef25e353ec2bf3a851d83b5df6`); WP-2B-2 — the revised **Scenario A Grading
+Stack** (combined non-live deterministic + semantic grading) — is DONE — authorized by
+BER-DEC-007 ([PR #84](https://github.com/ModernNomad-98/Project-Aegis/pull/84), squash merge
+`1145cb75d79bc6ab13876438527235c93320278b`) and completed through the reviewed, manually
+squash-merged implementation
+[PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85) (final reviewed head
+`5d16bace5fec9f7c394ad7f3b4147ac9d4ad74f2`, merge commit
+`b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`, shared tree
+`81404d350a26e8349d3c869209ae04f8628e0a95`; NON-LIVE / recorded-mock only); WP-2B-3 is
+redefined as the **Measured Judge Calibration and OD-1 Ratification
 Gate** — BLOCKED and NOT authorized by BER-DEC-007 (only its former NON-LIVE scaffold scope
-is absorbed by WP-2B-2; historical record retained); WP-2B-4 is the separate, BLOCKED
+is absorbed by WP-2B-2; historical record retained) — an owner decision package for its
+future authorization is PREPARED but grants no authority, and no BER-DEC-008 exists;
+WP-2B-4 is the separate, BLOCKED
 Scenario A Limited-Scope Live Suite; and WP-2B-5 through WP-2B-7 remain BACKLOG (WP-2B-7 is
 the sole owner of actual advisory CI integration).
 
@@ -680,8 +688,15 @@ the sole owner of actual advisory CI integration).
 - **Title:** Scenario A Grading Stack — combined non-live deterministic + semantic grading
 - **Phase:** 2B-2
 - **Priority:** REQUIRED
-- **Status:** AUTHORIZED — authorized by BER-DEC-007 (§13 of this file), effective only after
-  the governance PR containing BER-DEC-007 is reviewed and manually merged. Scope is limited
+- **Status:** DONE — authorized by BER-DEC-007 (§13 of this file; merged via
+  [PR #84](https://github.com/ModernNomad-98/Project-Aegis/pull/84), squash merge
+  `1145cb75d79bc6ab13876438527235c93320278b`) and completed through the reviewed
+  implementation [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85), merged
+  by manual owner squash merge at 2026-08-14T05:34:39Z (2026-08-13T23:34:39-06:00), merge
+  commit `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`. The delivered stack is NON-LIVE /
+  recorded-mock only: zero runner-generated, grading-stack-generated, or
+  test-harness-generated model/provider dispatches; zero actual judge/provider calls; no
+  measured calibration; no live execution. Scope was limited
   to the non-live deterministic + semantic grading recorded by BER-DEC-007 and the v1.1
   fast-track successor.
 - **Source / evidence:** The v1.1 fast-track successor
@@ -745,8 +760,39 @@ the sole owner of actual advisory CI integration).
   modification beyond the four authorized governance docs.
 - **Related design sections:** §5c, §5d, §6, §7, §8, §9, §13, §18, §19 (2B-2/2B-3); v1.1
   fast-track successor §3–§6.
-- **Completion evidence:** Reviewed and merged WP-2B-2 PR(s) with passing grader and
-  mock-judge harness tests; status updated here through a reviewed PR.
+- **Completion evidence:** Implementation
+  [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85) — "Implement BER
+  WP-2B-2 Scenario A grading stack" (2 DCO-signed source commits; 58 changed files;
+  +11,240/−6):
+  - final reviewed head `5d16bace5fec9f7c394ad7f3b4147ac9d4ad74f2`;
+  - final reviewed tree `81404d350a26e8349d3c869209ae04f8628e0a95`;
+  - manual squash merge `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (auto-merge not used);
+  - merge tree `81404d350a26e8349d3c869209ae04f8628e0a95` (byte-identical to the reviewed
+    tree);
+  - merged at 2026-08-14T05:34:39Z (2026-08-13T23:34:39-06:00) by Peter Nguyen;
+  - governance closeout PR: CLOSEOUT_PR_PENDING (the reviewed PR that records this status
+    change);
+  - local validation at the reviewed head: full runner suite **663 tests, 0 failures,
+    0 errors, 4 skipped (pre-existing POSIX-only)**; runner `self-check` PASS 15/15;
+    census regenerated twice byte-identical with canonical SHA-256
+    `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`; validator
+    self-tests 91 PASS; `validate-skills` 184 valid, 0 warnings;
+  - GitHub CI at the reviewed head ran the repository gates only — gate-guard PASS,
+    validate-skills workflow PASS, DCO PASS. GitHub Actions did NOT run the 663-test
+    runner suite (that result is local developer-machine evidence), and the 4 POSIX-only
+    tests were skipped, not passed;
+  - Peter Nguyen's scoped D9 owner decision is recorded in the final PR #85 body (scope
+    recorded in the OD-1 note in §9 of this file);
+  - zero runner/grading-stack/test-harness model or provider dispatches; zero actual
+    judge/provider calls; USD $0 external spend; no measured calibration; no live
+    execution.
+
+  Squash-message note: the PR #85 squash-merge message preserves the older source-commit
+  narrative "D9 sign-off remains PENDING owner decision," which predates the final review
+  round; the final PR #85 body records Peter Nguyen's later scoped D9 decision and is the
+  applicable completion evidence. Sanitized summary:
+  [`docs/evidence/behavioral-eval-runner-wp-2b-2-summary.md`](../evidence/behavioral-eval-runner-wp-2b-2-summary.md)
+  (post-merge closeout record appended, §10).
 - **Supersedes / superseded by:** Absorbs (supersedes) only the former WP-2B-3 NON-LIVE
   semantic-judge scaffold scope; WP-2B-3 itself continues as the redefined, BLOCKED
   Measured Judge Calibration and OD-1 Ratification Gate, which owns measured calibration
@@ -762,7 +808,16 @@ the sole owner of actual advisory CI integration).
 - **Status:** BLOCKED — NOT authorized by BER-DEC-007. Requires a future, separate,
   reviewed and merged BER-DEC authorization recording its own exact branch, its actual
   judge/provider-call budget, its external evidence root, its evidence-handling terms, its
-  retention, its stop conditions, and its owner review. **Historical note (governance rule
+  retention, its stop conditions, and its owner review. **OWNER DECISION PACKAGE PREPARED
+  — NOT AUTHORIZED (2026-08-14):** a WP-2B-3 authorization decision package exists at
+  [`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md)
+  for owner review. The package is a proposal only — it grants no authority, and **no
+  BER-DEC-008 exists yet**. WP-2B-3 may begin only after ALL of: (1) Peter Nguyen
+  explicitly selects or approves the judge provider and the exact immutable model/snapshot
+  identity; (2) Peter approves the calibration dataset size and composition; (3) Peter
+  pre-registers the numeric thresholds; (4) Peter approves the provider-call, token, and
+  dollar ceilings; (5) Peter approves credential and evidence handling; and (6) a reviewed
+  and manually merged BER-DEC-008 records those exact terms. **Historical note (governance rule
   5 — this record is redefined, not deleted):** the former WP-2B-3 NON-LIVE semantic-judge
   scaffold scope — the injection-resistant judge interface and system policy, delimited
   untrusted-data envelope, no-judge-tools and least-context rules, schema-validated
@@ -786,8 +841,11 @@ the sole owner of actual advisory CI integration).
   This gate is where the actual measurement happens — separately authorized, separately
   budgeted, and owner-reviewed — so WP-2B-2's mock-tested scaffold can never be mistaken
   for a calibrated judge.
-- **Dependencies:** WP-2B-2 DONE (the non-live scaffold and calibration harness this gate
-  exercises); the versioned human-labeled calibration dataset; a future, separate,
+- **Dependencies:** WP-2B-2 DONE — satisfied via
+  [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85), merge commit
+  `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (the non-live scaffold and calibration
+  harness this gate exercises); the versioned human-labeled calibration dataset (does not
+  exist yet; owner-approved size and composition required); a future, separate,
   reviewed and merged WP-2B-3 BER-DEC authorization; owner availability for OD-1
   ratification.
 - **Trigger to begin:** A future reviewed and merged WP-2B-3 authorization per the
@@ -840,7 +898,11 @@ the sole owner of actual advisory CI integration).
   the runner's own first end-to-end self-proof. It automates the currently-manual
   fresh-session acceptance while complementing — never replacing — the mechanical
   evidence harness.
-- **Dependencies:** ALL of: (1) WP-2B-1, WP-2B-2, and WP-2B-3 DONE (this is the first live
+- **Dependencies:** ALL of: (1) WP-2B-1 DONE
+  ([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83)) and WP-2B-2 DONE
+  ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85), merge commit
+  `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`) — both satisfied — and WP-2B-3 DONE, which
+  remains UNMET (WP-2B-3 is BLOCKED and unauthorized) (this is the first live
   phase: the §19 hard precondition requires containment, timeouts, emergency kill, budget
   reservation, attempt recording, aggregate semantics, and bounded concurrency implemented
   and tested first, the Scenario A grading stack built non-live in WP-2B-2, and the
@@ -1656,6 +1718,16 @@ backlog.
   Measured Judge Calibration and OD-1 Ratification Gate — BLOCKED, not authorized by
   BER-DEC-007, and requiring its own future reviewed and merged authorization. OD-1 stays
   OPEN; BER-DEC-007 does not ratify it and authorizes no calibration work.
+  **Post-WP-2B-2 note (2026-08-14): OPEN — unchanged by the WP-2B-2 merge.** WP-2B-2
+  ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85)) delivered only the
+  non-live scaffold and the deterministic/mock calibration harness; **no measured
+  calibration exists**. Peter Nguyen's D9 decision recorded in the final PR #85 body is
+  complete **only for the WP-2B-2 non-live contract shapes** — the A–Q classification
+  contract, the semantic-rubric contract shapes, and the schema shapes of the
+  recorded/mock scaffold — and **D9 does not ratify OD-1**, approves no real judge's
+  quality, and creates no baseline eligibility. OD-1 remains owned by the redefined
+  WP-2B-3 gate; the owner's numeric-threshold pre-registration and measured-result
+  ratification remain pending, and no BER-DEC-008 exists.
 - **OD-2 — Minimum promotion coverage threshold.** OWNER DECISION REQUIRED **BEFORE CI
   PROMOTION**. After the implementation-time census (BER-BKL-008) establishes the honest
   runnable denominator, Peter Nguyen ratifies the minimum authored execution/assertion
@@ -1982,16 +2054,18 @@ WP-2B-1  runner core + minimum guardrails
         |
         v
 WP-2B-2  Scenario A Grading Stack (non-live deterministic + semantic scaffold)
-— AUTHORIZED by BER-DEC-007, effective after the governance PR containing
-  BER-DEC-007 is merged; combines the former WP-2B-2 scope + the former
-  WP-2B-3 NON-LIVE scaffold scope
+— DONE: PR #85 merged (main @ b84e43a); authorized by BER-DEC-007 (PR #84);
+  combines the former WP-2B-2 scope + the former WP-2B-3 NON-LIVE scaffold
+  scope; NON-LIVE / recorded-mock only — no measured calibration
         |
         v
 WP-2B-3  Measured Judge Calibration + OD-1 Ratification Gate — BLOCKED; NOT
 authorized by BER-DEC-007; requires its own future reviewed and merged
 BER-DEC authorization (own branch, actual judge/provider-call budget,
 evidence root, evidence terms, retention, stop conditions); former NON-LIVE
-scaffold scope absorbed by WP-2B-2; historical record retained
+scaffold scope absorbed by WP-2B-2; historical record retained; owner
+decision package PREPARED (a proposal, never authority); no BER-DEC-008
+exists
         |
         v
 WP-2B-4  Scenario A Limited-Scope Live Suite (first live phase; BLOCKED and NOT
@@ -2035,7 +2109,9 @@ Explicit statements about this map:
   authorization requirements — merging the WP-2B-1 authorization does not authorize
   WP-2B-2, completing WP-2B-1 does not authorize WP-2B-2, and live phases remain
   blocked pending their own evidence and owner authorization.
-- **Current state (recorded 2026-08-13):** PR #82 (WP-2B-1 authorization / BER-DEC-006) and
+- **Prior state (recorded 2026-08-13; superseded by the 2026-08-14 entry below — the
+  BER-DEC-007 governance PR #84 and the WP-2B-2 implementation PR #85 have since
+  merged):** PR #82 (WP-2B-1 authorization / BER-DEC-006) and
   PR #83 (WP-2B-1 offline runner core) are MERGED; `main` is at
   `72e74af6f0183fef25e353ec2bf3a851d83b5df6`; WP-2B-1 is DONE. Under the v1.1 fast-track
   successor and BER-DEC-007 (this governance PR, pending review and manual merge): WP-2B-2 is
@@ -2049,6 +2125,22 @@ Explicit statements about this map:
   measured judge calibration, OD-1 ratification, and every live phase remain blocked
   pending their own evidence and owner authorization; BER-DEC-007 authorizes WP-2B-2 only
   and authorizes no WP-2B-3 calibration work.
+- **Current state (recorded 2026-08-14):** PR #84 (WP-2B-2 authorization / BER-DEC-007)
+  and PR #85 (WP-2B-2 Scenario A Grading Stack implementation) are MERGED; `main` is at
+  `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed` (tree
+  `81404d350a26e8349d3c869209ae04f8628e0a95`); **WP-2B-2 is DONE — NON-LIVE /
+  recorded-mock only** (zero actual judge/provider calls; no measured calibration; no
+  live execution). **WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate)
+  remains BLOCKED and NOT authorized**: an owner decision package
+  ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md))
+  is PREPARED for Peter Nguyen's review, is a proposal rather than authority, and **no
+  BER-DEC-008 exists**. WP-2B-4 remains the separate, BLOCKED Scenario A Limited-Scope
+  Live Suite; WP-2B-5 through WP-2B-7 remain governed by their existing dependencies and
+  separate authorization requirements (WP-2B-7 remains the sole owner of actual advisory
+  CI integration). No arrow is crossed by momentum: measured judge calibration, OD-1
+  ratification, and every live phase remain blocked pending their own evidence and owner
+  authorization, and no WP-2B-3 implementation may begin before a reviewed and manually
+  merged BER-DEC-008.
 
 ---
 
@@ -2698,10 +2790,17 @@ before doing anything else:
    earlier revisions of this file or anywhere else. Earlier revisions treated Phase 2B-0
    as the future next phase; that phase is DONE (Outcome B, BER-DEC-005/BER-DEC-006). The
    current registers (§7, §13), not narrative history, decide what is authorized now.
-8. **For WP-2B-2 (once the governance PR #84 containing BER-DEC-007 is merged):** resolve
-   and verify that PR's exact manual merge/squash commit and Git tree BEFORE creating or
-   using `feat/behavioral-eval-runner-2b-2-scenario-a-grading-stack`; never branch from a
-   later moving `main`.
+8. **The immediate next governed step (recorded 2026-08-14) is owner review of the
+   WP-2B-3 authorization decision package**
+   ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md)).
+   WP-2B-2 is DONE ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85));
+   no WP-2B-3 implementation, provider or model selection, calibration-dataset creation,
+   credential access, implementation clone, implementation branch, or evidence-root
+   creation may occur before a reviewed and manually merged BER-DEC-008 records Peter
+   Nguyen's exact authorization terms. **The decision package is a proposal, never
+   authority.** After the owner records his decisions, update the SAME draft closeout PR
+   that prepared the package — or a separately owner-approved successor PR — exactly as
+   the owner directs; do not open parallel governance PRs for the same closeout.
 9. **Treat WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate), WP-2B-4
    (the Scenario A Limited-Scope Live Suite), and all later work as unauthorized** unless
    and until each is separately authorized by its own reviewed and merged BER-DEC entry.
