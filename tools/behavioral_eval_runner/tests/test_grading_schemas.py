@@ -41,6 +41,7 @@ NEW_SCHEMAS = (
     "calibration-dataset.schema.json",
     "calibration-report.schema.json",
     "scenario-a-grading-contract.schema.json",
+    "scenario-a-grading-plan.schema.json",
 )
 
 

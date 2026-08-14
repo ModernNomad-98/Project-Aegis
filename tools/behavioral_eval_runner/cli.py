@@ -93,6 +93,7 @@ from .graders.controls import (
 )
 from .graders.hashing import grade_preview_vs_created
 from .graders.mutation import grade_mutations, grade_zero_commit_evidence
+from .graders.plan import TrustedGradingPlan, make_plan
 from .graders.records import GraderResultState, GradingReasonCode
 from .graders.state_machine import grade_transitions
 from .judge import policy as judge_policy
@@ -523,26 +524,14 @@ def _cmd_version(_args: argparse.Namespace) -> int:
 
 # -------------------------------------------- WP-2B-2 grading-stack commands
 #: Deterministic graders reachable from grade-fixture (recorded evidence only).
-def _mutation_grader(control_letter: str):
-    control_id = f"SCENARIO_A_CONTROL_{control_letter}"
-
-    def grade(evidence):
-        return grade_mutations(evidence, control_id)
-
-    return grade
-
-
+#: Every grader takes (trusted plan, observed evidence). The mutation grader
+#: is control-scoped through the PLAN's control_id (J/K/L/M/N), never a
+#: caller argument.
 _FIXTURE_GRADERS = {
     "append_only": grade_version_sequence,
     "transitions": grade_transitions,
     "approval": grade_approval_boundary,
-    # The mutation grader is control-scoped (J/K/L/M/N grade only their own
-    # observation categories over the shared recorded evidence contract).
-    "mutation_j": _mutation_grader("J"),
-    "mutation_k": _mutation_grader("K"),
-    "mutation_l": _mutation_grader("L"),
-    "mutation_m": _mutation_grader("M"),
-    "mutation_n": _mutation_grader("N"),
+    "mutation": grade_mutations,
     "zero_commit": grade_zero_commit_evidence,
     "activation": grade_activation,
     "workspace_role": grade_workspace_role,
@@ -581,8 +570,9 @@ def _cmd_grade_fixture(args: argparse.Namespace) -> int:
             f"unknown grader {args.grader!r}; choose from "
             f"{sorted(_FIXTURE_GRADERS)}"
         )
+    plan = TrustedGradingPlan.from_dict(_load_json_file(args.plan))
     evidence = _load_json_file(args.evidence)
-    result = grader(evidence)
+    result = grader(plan, evidence)
     _emit(
         {
             "grader": args.grader,
@@ -593,6 +583,11 @@ def _cmd_grade_fixture(args: argparse.Namespace) -> int:
 
 
 def _cmd_build_judge_envelope(args: argparse.Namespace) -> int:
+    """Build/validate a judge envelope WITHOUT dispatch (R2 §7).
+
+    Emits REPOSITORY-SAFE METADATA ONLY: no transcript text, no reversible
+    content_b64 payload, and no file persistence — the full envelope object
+    exists only through the Python API inside the governed session/tests."""
     artifact_keys: dict[str, str] = {}
     for mapping in args.map or []:
         key, _, relative = mapping.partition("=")
@@ -602,21 +597,36 @@ def _cmd_build_judge_envelope(args: argparse.Namespace) -> int:
     gate = JudgeInputGate(args.root)
     gate.verify()
     envelope = build_judge_envelope(
-        rubric_ref=args.rubric, gate=gate, artifact_keys=artifact_keys
+        rubric_ref=args.rubric,
+        gate=gate,
+        artifact_keys=artifact_keys,
+        control_id=args.control,
     )
-    payload = {
-        "envelope": envelope,
-        "envelope_sha256": envelope_sha256(envelope),
-        "dispatched": False,
-        "non_claim": (
-            "envelope construction only; actual judge/provider dispatch is "
-            "not authorized in WP-2B-2 (zero actual judge calls)"
-        ),
-    }
-    if args.out:
-        with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(canonical_json(envelope) + "\n")
-    _emit(payload)
+    context = envelope["control_context"]
+    rubric = envelope["rubric"]
+    _emit(
+        {
+            "envelope_sha256": envelope_sha256(envelope),
+            "policy_version": envelope["policy_version"],
+            "policy_sha256": envelope["policy_sha256"],
+            "rubric": {
+                "rubric_id": rubric["rubric_id"],
+                "rubric_version": rubric["rubric_version"],
+                "rubric_sha256": rubric["rubric_sha256"],
+            },
+            "control_id": context["control_id"],
+            "contract_sha256": context["contract_sha256"],
+            "d9_signoff_state": context["d9_signoff_state"],
+            "input_manifest_sha256": envelope["input_manifest_sha256"],
+            "evidence_keys": sorted(envelope["untrusted_data"]),
+            "dispatched": False,
+            "non_claim": (
+                "metadata only; the raw envelope is never printed or "
+                "persisted by the CLI; actual judge/provider dispatch is not "
+                "authorized in WP-2B-2 (zero actual judge calls)"
+            ),
+        }
+    )
     return 0
 
 
@@ -836,20 +846,28 @@ def run_self_check() -> dict[str, Any]:
         assert len(contract.contract_hash()) == 64
 
     def _grading_fixture_reproducible() -> None:
-        evidence = {
-            "case_uid": build_case_uid(
+        plan = make_plan(
+            control_id="SCENARIO_A_CONTROL_M",
+            case_uid=build_case_uid(
                 "project-orchestrator", "behavior_eval", "self-check", {"id": "sc"}
             ),
+            trusted_source_refs=("self-check:trusted-plan",),
+        )
+        evidence = {
             "git_exit_code": 0,
             "git_stdout": "0\n",
             "git_stderr": "",
             "untracked_only": True,
             "evidence_pointer": "self-check:zero-commit",
         }
-        first = grade_zero_commit_evidence(evidence)
-        second = grade_zero_commit_evidence(evidence)
+        first = grade_zero_commit_evidence(plan, evidence)
+        second = grade_zero_commit_evidence(plan, evidence)
         assert first.result_state is GraderResultState.PASS
         assert first.output_sha256 == second.output_sha256
+        assert set(first.input_sha256s) == {
+            "trusted_grading_plan",
+            "observed_evidence",
+        }
 
     def _judge_provider_absent() -> None:
         from .judge.interface import DisabledJudgeProvider, JudgeClient
@@ -1047,22 +1065,23 @@ def build_parser() -> argparse.ArgumentParser:
         "grade-fixture", help="grade a recorded deterministic Scenario A fixture"
     )
     gf.add_argument("--grader", required=True)
-    gf.add_argument("--evidence", required=True)
+    gf.add_argument("--plan", required=True, help="trusted grading-plan JSON file")
+    gf.add_argument("--evidence", required=True, help="observed evidence JSON file")
     gf.set_defaults(func=_cmd_grade_fixture)
 
     bje = subparsers.add_parser(
         "build-judge-envelope",
-        help="build/validate a judge request envelope WITHOUT dispatch",
+        help="validate a judge envelope WITHOUT dispatch (metadata-only output)",
     )
     bje.add_argument("--root", required=True, help="stage-A evidence bundle root")
     bje.add_argument("--rubric", required=True)
+    bje.add_argument("--control", required=True, help="Scenario A control id")
     bje.add_argument(
         "--map",
         action="append",
         required=True,
         help="evidence key=manifest-relative-path (repeatable)",
     )
-    bje.add_argument("--out", default=None)
     bje.set_defaults(func=_cmd_build_judge_envelope)
 
     vjv = subparsers.add_parser(

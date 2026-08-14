@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from ..errors import SchemaValidationError
 from .records import GraderResult, GradingReasonCode
 from ._base import EvidenceMalformed, GradingFail, require_keys, run_grader
 
@@ -32,19 +33,12 @@ TURN_CLASSES: tuple[str, ...] = (
 
 DEFAULT_LOOP_THRESHOLD = 3
 
-_ALLOWED = frozenset(
-    {
-        "case_uid",
-        "answer_bank_ids",
-        "transitions",
-        "required_start",
-        "loop_threshold",
-        "evidence_pointer",
-    }
-)
-_REQUIRED = frozenset(
-    {"case_uid", "answer_bank_ids", "transitions", "evidence_pointer"}
-)
+ORACLE_ID = "oracle.state_machine.transitions"
+
+#: Observed evidence carries ONLY the recorded transitions; the answer bank,
+#: required start state, and loop threshold are trusted-plan data.
+_ALLOWED = frozenset({"transitions", "evidence_pointer"})
+_REQUIRED = _ALLOWED
 
 _TRANSITION_KEYS = frozenset(
     {"prior_state", "observed_turn_class", "selected_answer_id", "next_state"}
@@ -83,24 +77,24 @@ def _validate_transition(entry: Any, index: int) -> dict[str, Any]:
     return dict(entry)
 
 
-def grade_transitions(evidence: Mapping[str, Any]) -> GraderResult:
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+def grade_transitions(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, _ALLOWED, _REQUIRED)
-        bank = data.get("answer_bank_ids")
-        if not isinstance(bank, list) or not all(
-            isinstance(item, str) and item for item in bank
-        ):
-            raise EvidenceMalformed("answer_bank_ids must be a list of ids")
-        bank_set = set(bank)
+        if plan_obj.answer_bank is None:
+            raise SchemaValidationError(
+                "the trusted plan must carry the canonical answer bank for "
+                "transition grading"
+            )
+        bank_set = set(plan_obj.answer_bank["answer_ids"])
         raw_transitions = data.get("transitions")
         if not isinstance(raw_transitions, list) or not raw_transitions:
             raise EvidenceMalformed("transitions must be a non-empty list")
-        required_start = data.get("required_start", True)
-        if not isinstance(required_start, bool):
-            raise EvidenceMalformed("required_start must be a boolean")
-        threshold = data.get("loop_threshold", DEFAULT_LOOP_THRESHOLD)
-        if not isinstance(threshold, int) or isinstance(threshold, bool) or threshold < 2:
-            raise EvidenceMalformed("loop_threshold must be an int >= 2")
+        required_start_state = plan_obj.required_start_state
+        threshold = (
+            plan_obj.loop_threshold
+            if plan_obj.loop_threshold is not None
+            else DEFAULT_LOOP_THRESHOLD
+        )
 
         transitions = [
             _validate_transition(entry, index)
@@ -114,11 +108,15 @@ def grade_transitions(evidence: Mapping[str, Any]) -> GraderResult:
                     f"previous next_state {transitions[index - 1]['next_state']!r}"
                 )
 
-        if required_start and transitions[0]["prior_state"] != SCENARIO_A_STATES[0]:
+        if (
+            required_start_state is not None
+            and transitions[0]["prior_state"] != required_start_state
+        ):
             raise GradingFail(
                 GradingReasonCode.INVALID_PRIOR_STATE,
                 f"the recorded conversation starts at "
-                f"{transitions[0]['prior_state']}, not {SCENARIO_A_STATES[0]}",
+                f"{transitions[0]['prior_state']}, not the plan-required "
+                f"{required_start_state}",
             )
 
         for index, entry in enumerate(transitions):
@@ -175,6 +173,7 @@ def grade_transitions(evidence: Mapping[str, Any]) -> GraderResult:
             "transition_count": len(transitions),
             "transitions": transitions,
             "loop_threshold": threshold,
+            "answer_bank_sha256": plan_obj.answer_bank["sha256"],
         }
 
-    return run_grader(GRADER_ID, CONTROL_ID, evidence, body)
+    return run_grader(GRADER_ID, ORACLE_ID, plan, evidence, body)

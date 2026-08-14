@@ -24,18 +24,23 @@ from tools.behavioral_eval_runner.graders.records import (
 from tools.behavioral_eval_runner.tests.helpers import make_case_uid
 
 EVIDENCE_SHA = sha256_hex_text("recorded synthetic evidence")
+PLAN_SHA = sha256_hex_text("trusted grading plan")
 
 
 def _result(**overrides) -> GraderResult:
     kwargs = dict(
         grader_id="graders.append_only",
+        oracle_id="oracle.append_only.version_sequence",
         control_id="SCENARIO_A_CONTROL_O",
         case_uid=make_case_uid(),
         assertion_uid=None,
         result_state=GraderResultState.PASS,
         reason_code=None,
         evidence_pointers=("fixture:scenario_a/append_only_good.json#step-3",),
-        input_sha256s={"evidence": EVIDENCE_SHA},
+        input_sha256s={
+            "trusted_grading_plan": PLAN_SHA,
+            "observed_evidence": EVIDENCE_SHA,
+        },
         reproduction={"fixture_step": 3},
     )
     kwargs.update(overrides)
@@ -121,9 +126,21 @@ class GraderResultTests(unittest.TestCase):
 
     def test_input_hashes_validated(self) -> None:
         with self.assertRaises(SchemaValidationError):
-            _result(input_sha256s={"evidence": "not-a-hash"})
+            _result(
+                input_sha256s={
+                    "trusted_grading_plan": "not-a-hash",
+                    "observed_evidence": EVIDENCE_SHA,
+                }
+            )
         with self.assertRaises(SchemaValidationError):
             _result(input_sha256s={})
+        # One blended "evidence" hash is not representable (R2 §4).
+        with self.assertRaises(SchemaValidationError):
+            _result(input_sha256s={"evidence": EVIDENCE_SHA})
+
+    def test_oracle_identity_is_closed(self) -> None:
+        with self.assertRaises(SchemaValidationError):
+            _result(oracle_id="oracle.invented.thing")
 
     def test_evidence_pointers_required_nonempty(self) -> None:
         with self.assertRaises(SchemaValidationError):

@@ -20,7 +20,7 @@
         "required": ["entry_id", "control_id", "risk_class", "expected_label", "input_artifact_refs", "split"],
         "properties": {
           "entry_id": {"type": "string", "minLength": 1},
-          "control_id": {"type": "string", "minLength": 1},
+          "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
           "assertion_uid": {"type": ["string", "null"]},
           "risk_class": {"enum": ["CRITICAL", "HIGH", "STANDARD"]},
           "expected_label": {"enum": ["PASS", "FAIL", "ABSTAIN"]},

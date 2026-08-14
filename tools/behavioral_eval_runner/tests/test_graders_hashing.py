@@ -1,7 +1,7 @@
-"""WP-2B-2: run-local preview-versus-created hashing (prompt 10.E).
+"""WP-2B-2: run-local preview-versus-created hashing (prompt 10.E; R2).
 
-Run-local ONLY: the API cannot accept a fixture-pinned expected digest, and a
-test locks that in — live output is never compared to fixture pins."""
+Run-local ONLY: the API cannot accept a fixture-pinned expected digest, and
+a pinned digest smuggled into the observation is malformed evidence."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from tools.behavioral_eval_runner.graders.records import (
     GraderResultState,
     GradingReasonCode,
 )
-from tools.behavioral_eval_runner.tests.grading_helpers import misc_evidence
+from tools.behavioral_eval_runner.tests.grading_helpers import preview_hash_case
 
 
 class NormalizationTests(unittest.TestCase):
@@ -30,51 +30,40 @@ class NormalizationTests(unittest.TestCase):
 
 class PreviewVsCreatedTests(unittest.TestCase):
     def test_equal_preview_and_created_pass(self) -> None:
-        result = grade_preview_vs_created(
-            misc_evidence("preview_hash_cases", "good_equal")
-        )
+        result = grade_preview_vs_created(*preview_hash_case("good_equal"))
         self.assertIs(result.result_state, GraderResultState.PASS)
         repro = result.reproduction
         self.assertEqual(repro["preview_sha256"], repro["created_sha256"])
 
     def test_crlf_created_matches_lf_preview(self) -> None:
-        result = grade_preview_vs_created(
-            misc_evidence("preview_hash_cases", "good_crlf_equivalent")
-        )
+        result = grade_preview_vs_created(*preview_hash_case("good_crlf_equivalent"))
         self.assertIs(result.result_state, GraderResultState.PASS)
 
     def test_mismatch_fails_with_both_hashes(self) -> None:
-        result = grade_preview_vs_created(
-            misc_evidence("preview_hash_cases", "bad_mismatch")
-        )
+        result = grade_preview_vs_created(*preview_hash_case("bad_mismatch"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.PREVIEW_MISMATCH)
         repro = result.reproduction
         self.assertNotEqual(repro["preview_sha256"], repro["created_sha256"])
 
     def test_empty_created_content_errors(self) -> None:
-        result = grade_preview_vs_created(
-            misc_evidence("preview_hash_cases", "error_empty_created")
-        )
+        result = grade_preview_vs_created(*preview_hash_case("error_empty_created"))
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 
     def test_no_fixture_pin_parameter_exists(self) -> None:
-        # The signature accepts exactly one evidence mapping — there is no
-        # parameter through which a fixture-pinned expected digest could be
-        # injected, and passing one raises TypeError.
         params = list(inspect.signature(grade_preview_vs_created).parameters)
-        self.assertEqual(params, ["evidence"])
+        self.assertEqual(params, ["plan", "evidence"])
+        plan, evidence = preview_hash_case("good_equal")
         with self.assertRaises(TypeError):
             grade_preview_vs_created(  # type: ignore[call-arg]
-                misc_evidence("preview_hash_cases", "good_equal"),
-                expected_sha256="deadbeef",
+                plan, evidence, expected_sha256="deadbeef"
             )
 
     def test_pinned_digest_inside_evidence_is_rejected(self) -> None:
-        evidence = misc_evidence("preview_hash_cases", "good_equal")
+        plan, evidence = preview_hash_case("good_equal")
         evidence["expected_sha256"] = "deadbeef"
-        result = grade_preview_vs_created(evidence)
+        result = grade_preview_vs_created(plan, evidence)
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 

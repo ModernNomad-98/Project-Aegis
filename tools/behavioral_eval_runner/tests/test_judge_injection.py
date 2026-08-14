@@ -90,6 +90,7 @@ class InjectionEnvelopeTests(unittest.TestCase):
             rubric_ref=RUBRIC_REF,
             gate=gate,
             artifact_keys={"transcript": "transcript.txt"},
+            control_id="SCENARIO_A_CONTROL_G",
         )
 
     def test_every_attack_round_trips_as_inert_data(self) -> None:
@@ -147,6 +148,7 @@ class InjectionVerdictTests(unittest.TestCase):
             rubric_ref=RUBRIC_REF,
             gate=gate,
             artifact_keys={"transcript": "transcript.txt"},
+            control_id="SCENARIO_A_CONTROL_G",
         )
         self.request = _request_for(self.envelope)
         self.fixture = load_fixture("mock_verdicts.json")
@@ -187,7 +189,7 @@ class InjectionVerdictTests(unittest.TestCase):
                     raw_output=json.dumps(self._fill(dict(payload))),
                 )
                 result = parse_judge_output(
-                    response, self.request, ("transcript",)
+                    response, self.request, self.envelope
                 )
                 self.assertTrue(result.is_verdict, name)
 
@@ -201,7 +203,7 @@ class InjectionVerdictTests(unittest.TestCase):
                     raw_output=self._materialize(spec),
                 )
                 result = parse_judge_output(
-                    response, self.request, ("transcript",)
+                    response, self.request, self.envelope
                 )
                 self.assertFalse(result.is_verdict, name)
                 self.assertIsNone(result.verdict, name)
@@ -220,7 +222,7 @@ class InjectionVerdictTests(unittest.TestCase):
                     raw_output=None,
                 )
                 result = parse_judge_output(
-                    response, self.request, ("transcript",)
+                    response, self.request, self.envelope
                 )
                 self.assertFalse(result.is_verdict)
 

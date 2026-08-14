@@ -6,9 +6,14 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["request_id", "control_id", "judge", "rubric_id", "rubric_version", "rubric_sha256", "envelope_sha256", "input_manifest_sha256", "schema_version"],
+  "allOf": [
+    {"if": {"required": ["calibration_dataset_id"], "properties": {"calibration_dataset_id": {"type": "string"}}}, "then": {"required": ["calibration_dataset_version", "calibration_dataset_sha256"], "properties": {"calibration_dataset_version": {"type": "string"}, "calibration_dataset_sha256": {"type": "string"}}}},
+    {"if": {"required": ["calibration_dataset_version"], "properties": {"calibration_dataset_version": {"type": "string"}}}, "then": {"required": ["calibration_dataset_id", "calibration_dataset_sha256"], "properties": {"calibration_dataset_id": {"type": "string"}, "calibration_dataset_sha256": {"type": "string"}}}},
+    {"if": {"required": ["calibration_dataset_sha256"], "properties": {"calibration_dataset_sha256": {"type": "string"}}}, "then": {"required": ["calibration_dataset_id", "calibration_dataset_version"], "properties": {"calibration_dataset_id": {"type": "string"}, "calibration_dataset_version": {"type": "string"}}}}
+  ],
   "properties": {
     "request_id": {"type": "string", "minLength": 1},
-    "control_id": {"type": "string", "minLength": 1},
+    "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
     "assertion_uid": {"type": ["string", "null"]},
     "judge": {
       "type": "object",

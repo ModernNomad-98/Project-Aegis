@@ -17,7 +17,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["control_id", "title", "requirement", "source_document", "source_section", "classification", "required_evidence", "deterministic_oracle", "deterministic_status", "semantic_rubric_ref", "semantic_status", "failure_reason_codes", "ambiguity_behavior", "owner_signoff_required", "anchoring_cases", "live_evidence_status", "non_claims", "author_facing_finding"],
+        "required": ["control_id", "title", "requirement", "source_document", "source_section", "classification", "required_evidence", "deterministic_oracle", "required_oracle_ids", "deterministic_status", "semantic_rubric_ref", "semantic_status", "failure_reason_codes", "ambiguity_behavior", "owner_signoff_required", "anchoring_cases", "live_evidence_status", "non_claims", "author_facing_finding"],
         "properties": {
           "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
           "title": {"type": "string", "minLength": 1},
@@ -27,6 +27,7 @@
           "classification": {"enum": ["DETERMINISTIC", "SEMANTIC", "COMPOSITE", "UNJUDGEABLE_AS_WRITTEN", "EVIDENCE_UNAVAILABLE", "OUT_OF_SCOPE_FOR_WP2B2"]},
           "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
           "deterministic_oracle": {"type": ["string", "null"]},
+          "required_oracle_ids": {"type": "array", "items": {"enum": ["oracle.state_machine.transitions", "oracle.approval.boundary", "oracle.mutation.category_scan", "oracle.mutation.zero_commit", "oracle.append_only.version_sequence", "oracle.hashing.preview_vs_created", "oracle.activation.typed_target", "oracle.controls.workspace_role", "oracle.controls.stage_zero", "oracle.controls.questionnaire_dump", "oracle.controls.evidence_capture", "oracle.controls.metadata_capture"]}},
           "deterministic_status": {"enum": ["IMPLEMENTED", "SCAFFOLDED", "NOT_APPLICABLE"]},
           "semantic_rubric_ref": {"type": ["string", "null"]},
           "semantic_status": {"enum": ["IMPLEMENTED", "SCAFFOLDED", "NOT_APPLICABLE"]},

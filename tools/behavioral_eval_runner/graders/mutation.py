@@ -25,6 +25,8 @@ from .records import GraderResult, GradingReasonCode
 from ._base import EvidenceMalformed, GradingFail, require_keys, run_grader
 
 GRADER_ID = "graders.mutation"
+CATEGORY_SCAN_ORACLE_ID = "oracle.mutation.category_scan"
+ZERO_COMMIT_ORACLE_ID = "oracle.mutation.zero_commit"
 ZERO_COMMIT_CONTROL_ID = "SCENARIO_A_CONTROL_M"
 
 R4_NON_CLAIM = (
@@ -56,19 +58,18 @@ _ALL_CATEGORIES = frozenset(
     for category in categories
 )
 
-_ALLOWED = frozenset({"case_uid", "observations", "evidence_pointer"})
+_ALLOWED = frozenset({"observations", "evidence_pointer"})
 _REQUIRED = _ALLOWED
 
 _ZC_ALLOWED = frozenset(
     {
-        "case_uid",
         "git_exit_code",
         "git_stdout",
         "git_stderr",
         "untracked_only",
         "evidence_pointer",
     }
-    )
+)
 _INT_RE = re.compile(r"^-?\d+$")
 
 
@@ -127,16 +128,20 @@ def _check_category(observations: Mapping[str, Any], category: str) -> None:
         )
 
 
-def grade_mutations(evidence: Mapping[str, Any], control_id: str) -> GraderResult:
-    """Grade ONE mutation-scoped control (J/K/L/M/N) over recorded evidence."""
-    categories = MUTATION_CONTROL_CATEGORIES.get(control_id)
+def grade_mutations(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    """Grade ONE mutation-scoped control (J/K/L/M/N) over recorded evidence.
+
+    The graded control comes from the TRUSTED plan, never from the caller or
+    the observation mapping."""
+    categories = MUTATION_CONTROL_CATEGORIES.get(getattr(plan, "control_id", None))
     if categories is None:
         raise SchemaValidationError(
             f"grade_mutations grades only controls "
-            f"{sorted(MUTATION_CONTROL_CATEGORIES)}, not {control_id!r}"
+            f"{sorted(MUTATION_CONTROL_CATEGORIES)}, not "
+            f"{getattr(plan, 'control_id', None)!r}"
         )
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(_plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, _ALLOWED, _REQUIRED)
         observations = _validated_observations(data)
         for category in categories:
@@ -159,11 +164,16 @@ def grade_mutations(evidence: Mapping[str, Any], control_id: str) -> GraderResul
             "non_claim": R4_NON_CLAIM,
         }
 
-    return run_grader(GRADER_ID, control_id, evidence, body)
+    return run_grader(GRADER_ID, CATEGORY_SCAN_ORACLE_ID, plan, evidence, body)
 
 
-def grade_zero_commit_evidence(evidence: Mapping[str, Any]) -> GraderResult:
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+def grade_zero_commit_evidence(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    if getattr(plan, "control_id", None) != ZERO_COMMIT_CONTROL_ID:
+        raise SchemaValidationError(
+            f"the zero-commit oracle grades only {ZERO_COMMIT_CONTROL_ID}"
+        )
+
+    def body(_plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, _ZC_ALLOWED, _ZC_ALLOWED)
         exit_code = data.get("git_exit_code")
         if not isinstance(exit_code, int) or isinstance(exit_code, bool):
@@ -207,4 +217,4 @@ def grade_zero_commit_evidence(evidence: Mapping[str, Any]) -> GraderResult:
             "non_claim": R4_NON_CLAIM,
         }
 
-    return run_grader(GRADER_ID, ZERO_COMMIT_CONTROL_ID, evidence, body)
+    return run_grader(GRADER_ID, ZERO_COMMIT_ORACLE_ID, plan, evidence, body)

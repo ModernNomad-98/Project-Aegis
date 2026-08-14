@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from ..errors import SchemaValidationError
 from .records import GraderResult, GradingReasonCode
 from .hashing import run_local_hash
 from ._base import (
@@ -28,20 +29,12 @@ CONTROL_ID = "SCENARIO_A_CONTROL_O"
 SECTION_KEYS = ("State snapshots", "Decision log", "Approvals", "Deviations")
 ID_SECTION_KEYS = ("State snapshots", "Decision log", "Approvals")
 
-_ALLOWED = frozenset(
-    {"case_uid", "versions", "semantics", "expected_final_ids", "evidence_pointer"}
-)
-_REQUIRED = frozenset({"case_uid", "versions", "semantics", "evidence_pointer"})
+ORACLE_ID = "oracle.append_only.version_sequence"
 
-_SEMANTICS_KEYS = frozenset(
-    {
-        "spec_acceptance_id",
-        "spec_owner_completion_id",
-        "stage2_owner_ids",
-        "stage3_snapshot_id",
-        "forbidden_snapshot_ids",
-    }
-)
+#: Observed evidence carries ONLY the recorded versions; the semantic gates
+#: and expected final IDs are trusted-plan data.
+_ALLOWED = frozenset({"versions", "evidence_pointer"})
+_REQUIRED = _ALLOWED
 
 
 def _is_separator_row(line: str) -> bool:
@@ -218,33 +211,18 @@ def _check_gates(
         )
 
 
-def grade_version_sequence(evidence: Mapping[str, Any]) -> GraderResult:
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+def grade_version_sequence(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, _ALLOWED, _REQUIRED)
         versions = data.get("versions")
         if not isinstance(versions, list) or not versions:
             raise EvidenceMalformed("versions must be a non-empty list")
-        semantics = data.get("semantics")
-        if not isinstance(semantics, Mapping) or set(semantics) != _SEMANTICS_KEYS:
-            raise EvidenceMalformed(
-                f"semantics must carry exactly {sorted(_SEMANTICS_KEYS)}"
+        if plan_obj.semantic_gates is None:
+            raise SchemaValidationError(
+                "the trusted plan must carry the semantic gates for "
+                "append-only grading"
             )
-        # Value TYPES are validated too: a string where a list belongs would
-        # iterate as characters and silently disable a gate (fail closed).
-        for key in ("spec_acceptance_id", "spec_owner_completion_id",
-                    "stage3_snapshot_id"):
-            if not isinstance(semantics[key], str) or not semantics[key]:
-                raise EvidenceMalformed(
-                    f"semantics.{key} must be a non-empty string"
-                )
-        for key in ("stage2_owner_ids", "forbidden_snapshot_ids"):
-            value = semantics[key]
-            if not isinstance(value, list) or not all(
-                isinstance(item, str) and item for item in value
-            ):
-                raise EvidenceMalformed(
-                    f"semantics.{key} must be a list of non-empty strings"
-                )
+        semantics = plan_obj.semantic_gates
         parsed: list[dict[str, list[str]]] = []
         id_census: list[dict[str, list[str]]] = []
         hashes: list[dict[str, str]] = []
@@ -274,23 +252,10 @@ def grade_version_sequence(evidence: Mapping[str, Any]) -> GraderResult:
 
         _check_gates(id_census, semantics)
 
-        expected = data.get("expected_final_ids")
+        expected = plan_obj.expected_final_ids
         if expected is not None:
-            if not isinstance(expected, Mapping):
-                raise EvidenceMalformed("expected_final_ids must be a mapping")
             final_ids = id_census[-1]
             for section, wanted in expected.items():
-                if section not in ID_SECTION_KEYS:
-                    raise EvidenceMalformed(
-                        f"expected_final_ids names unknown section {section!r}"
-                    )
-                if not isinstance(wanted, list) or not all(
-                    isinstance(item, str) and item for item in wanted
-                ):
-                    raise EvidenceMalformed(
-                        f"expected_final_ids[{section!r}] must be a list of "
-                        "non-empty strings"
-                    )
                 actual = final_ids[section]
                 if list(wanted) != actual:
                     raise GradingFail(
@@ -306,4 +271,4 @@ def grade_version_sequence(evidence: Mapping[str, Any]) -> GraderResult:
                        "are never applied to this evidence",
         }
 
-    return run_grader(GRADER_ID, CONTROL_ID, evidence, body)
+    return run_grader(GRADER_ID, ORACLE_ID, plan, evidence, body)

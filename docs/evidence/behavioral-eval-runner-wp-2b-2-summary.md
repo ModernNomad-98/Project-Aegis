@@ -125,8 +125,9 @@ repository gates (gate-guard, validator self-tests, validate-skills, DCO) and do
 run the runner suite.
 
 - Full runner suite: `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
-  ⇒ **618 tests, 0 failures, 0 errors, 4 skipped (POSIX-only, pre-existing)** —
-  377 baseline WP-2B-1 tests plus **241 new WP-2B-2 tests** in 16 new test modules
+  ⇒ **663 tests, 0 failures, 0 errors, 4 skipped (POSIX-only, pre-existing)** at the
+  corrected head (618 at the initial implementation commit; +45 R2 regressions, §5b) —
+  377 baseline WP-2B-1 tests plus **286 new WP-2B-2 tests** in 17 new test modules
   (contract census/serialization + oracle/reason-code agreement; grader-record integrity
   incl. case-scoped assertion identity; per-grader good/bad fixture truth tables;
   state-transition truth table; approval boundaries incl. type-confusion fail-closed;
@@ -226,6 +227,70 @@ check (partial recorded sequences are valid grading evidence; the ordering gates
 append-only prefix already reject dishonest sequences); calibration TRAIN/HOLDOUT split
 breakdown in metrics (the split is represented per the contract; per-split metrics belong
 to the future measured gate).
+
+## 5b. R2 trust-and-evidence-binding correction pass (PR85 correction, second commit)
+
+An independent ChatGPT control-layer review of exact head `f3f82ece` identified five
+defect families; this bounded correction pass reproduced each with RED regressions at
+that head and corrected them test-first (`tests/test_r2_trust_binding.py`; full suite
+618 → **663**, 0 failures, 0 errors):
+
+1. **Trusted grading plans separated from observed evidence** (`graders/plan.py` +
+   `scenario-a-grading-plan.schema.json`): every grader now takes a typed, immutable,
+   hash-bound `TrustedGradingPlan` (bound to the contract hash, carrying the expected
+   target, hash-bound answer-bank identity, required start state, fixed loop threshold,
+   owner-gate IDs, semantic gates, expected final IDs, expected workspace/stage state,
+   and the exact required oracle set) SEPARATELY from the observed evidence mapping.
+   Plan-only keys inside observations fail closed; results bind
+   `trusted_grading_plan` and `observed_evidence` hashes separately; the eight
+   manufactured-PASS vectors are impossible or fail closed. Approvals additionally bind
+   BOTH their ID and their target (an approval for target A never authorizes target B).
+   Fixtures were split into explicit trusted/observed sections.
+2. **Complete deterministic oracle sets enforced**: the contract carries structured
+   `required_oracle_ids` per control; every result carries a closed `oracle_id`
+   (the two mutation-module functions have distinct oracle identities);
+   `grade_control` enforces exact control identity, one coherent case, one coherent
+   plan, and the complete required set — missing/duplicate/extra/foreign/mixed result
+   sets are ERROR; ERROR > FAIL > semantic routing; the outcome carries the contract
+   and plan hashes.
+3. **Judge request/envelope/control/mock binding**: the envelope carries a TRUSTED
+   contract-derived control context (control id, exact requirement, classification,
+   contract version/hash, D9 state = PENDING_OWNER_DECISION) and its rubric must be
+   the contract-declared rubric for that control; `validate_request_envelope_binding`
+   proves envelope hash, stage-A manifest hash, rubric identity/hash, policy
+   identity/hash, control id, contract hash, closed evidence keys, and schema-version
+   compatibility BEFORE any mock lookup (`dispatch_mock_judgment`); the mock client
+   verifies the envelope bytes hash-bind the request before returning any recorded
+   response; `parse_judge_output` takes the actual envelope and derives evidence keys
+   from it; the rendered judge input includes the control requirement and the rubric's
+   pass/fail criteria.
+4. **CLI evidence boundary**: `build-judge-envelope` no longer prints the raw envelope
+   or accepts `--out`; it emits repository-safe metadata only (hashes, identities,
+   evidence-key names, dispatched=false). The full envelope exists only through the
+   Python API. `grade-fixture` now takes `--plan` and `--evidence` separately.
+5. **Strict runtime/schema alignment**: JSON-list-only parsing for every list field
+   (a string can never become a tuple of characters); closed A–Q control IDs in
+   `JudgeRequest`, `StructuredVerdict`, and calibration entries; draft-07 `allOf`
+   cross-field rules in the grader-result, judge-verdict, and judge-request schemas
+   (PASS/FAIL/ABSTAIN reason and failure-mode coupling; all-or-none calibration
+   dataset identity); `verdict_id` bounded; `CalibrationDataset` requires an explicit
+   `schema_version`.
+
+A bounded exact-diff review of this correction (1 read-only finding reviewer; no
+blockers proposed, so the permitted refutation reviewer was not needed) confirmed the
+four blocking dimensions sound and surfaced six non-blockers; five (binding
+content-re-derivation, calibration-schema control pattern, plan-schema binding and
+key closure, `allOf` required-clauses, no-content-echo diagnostics) were fixed
+test-first in the same commit. The remaining item is recorded as non-blocking with a
+disposition: recorded mock responses are keyed by `request_id` (with the envelope
+hash-bound to the request and byte-verified by the mock); per-response envelope
+attribution inside the mock store is a WP-2B-4 integration refinement, not converted
+into a further loop here.
+
+**D9 remains PENDING**: per the independent review disposition, the A–Q classification
+map matches the merged design, but the semantic-rubric approval, schema-shape approval,
+and implementation acceptance are WITHHELD pending this correction's exact-head audit.
+The corrected contracts return to Peter Nguyen for decision.
 
 ## 6. Non-claims and boundaries (binding)
 

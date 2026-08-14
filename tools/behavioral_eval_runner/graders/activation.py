@@ -17,12 +17,12 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from ..enums import InvocationMode, TargetKind
-from ..errors import UnknownEnumValueError
+from ..errors import SchemaValidationError, UnknownEnumValueError
 from .records import GraderResult, GradingReasonCode
 from ._base import EvidenceMalformed, GradingError, GradingFail, require_keys, run_grader
 
 GRADER_ID = "graders.activation"
-CONTROL_ID = "SCENARIO_A_CONTROL_F"
+ORACLE_ID = "oracle.activation.typed_target"
 
 TIER1 = "TIER1_STRUCTURED_EVENT"
 TIER2 = "TIER2_OUTPUT_SIGNATURE"
@@ -31,10 +31,10 @@ EVIDENCE_TIERS = (TIER1, TIER2, TIER3)
 
 RECORDED_SYNTHETIC = "RECORDED_SYNTHETIC"
 
-_ALLOWED = frozenset({"case_uid", "expectation", "observed_nodes", "evidence_pointer"})
+#: Observed evidence carries ONLY the recorded activation graph; the
+#: expected target is trusted-plan data.
+_ALLOWED = frozenset({"observed_nodes", "evidence_pointer"})
 _REQUIRED = _ALLOWED
-
-_EXPECTATION_KEYS = frozenset({"target_kind", "target_name", "invocation_mode"})
 _NODE_ALLOWED_KEYS = frozenset(
     {
         "target_kind",
@@ -117,22 +117,18 @@ def _is_identifying(node: Mapping[str, Any]) -> bool:
     return False
 
 
-def grade_activation(evidence: Mapping[str, Any]) -> GraderResult:
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+def grade_activation(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, _ALLOWED, _REQUIRED)
-        expectation = data.get("expectation")
-        if not isinstance(expectation, Mapping) or set(expectation) != _EXPECTATION_KEYS:
-            raise EvidenceMalformed(
-                f"expectation must carry exactly {sorted(_EXPECTATION_KEYS)}"
+        if plan_obj.expected_target is None:
+            raise SchemaValidationError(
+                "the trusted plan must carry the expected activation target"
             )
-        try:
-            expected_kind = TargetKind.parse(expectation["target_kind"])
-            expected_mode = InvocationMode.parse(expectation["invocation_mode"])
-        except UnknownEnumValueError as exc:
-            raise EvidenceMalformed(str(exc)) from exc
-        expected_name = expectation.get("target_name")
-        if not isinstance(expected_name, str) or not expected_name:
-            raise EvidenceMalformed("expectation.target_name required")
+        expected_kind = TargetKind.parse(plan_obj.expected_target["target_kind"])
+        expected_mode = InvocationMode.parse(
+            plan_obj.expected_target["invocation_mode"]
+        )
+        expected_name = plan_obj.expected_target["target_name"]
 
         raw_nodes = data.get("observed_nodes")
         if not isinstance(raw_nodes, list):
@@ -231,4 +227,4 @@ def grade_activation(evidence: Mapping[str, Any]) -> GraderResult:
             ),
         }
 
-    return run_grader(GRADER_ID, CONTROL_ID, evidence, body)
+    return run_grader(GRADER_ID, ORACLE_ID, plan, evidence, body)

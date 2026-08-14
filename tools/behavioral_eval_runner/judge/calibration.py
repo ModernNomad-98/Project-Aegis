@@ -25,6 +25,7 @@ from .. import GRADING_SCHEMA_VERSION
 from ..canonical import sha256_of_obj
 from ..enums import RiskClass, StrictEnum
 from ..errors import SchemaValidationError
+from ..graders.records import VALID_CONTROL_IDS
 
 HARNESS_NON_CLAIM = (
     "Deterministic MOCK metrics over recorded synthetic inputs; NO MEASURED "
@@ -106,8 +107,9 @@ class CalibrationEntry:
             "entry_id required",
         )
         _require(
-            isinstance(self.control_id, str) and bool(self.control_id),
-            "control_id required",
+            self.control_id in VALID_CONTROL_IDS,
+            f"control_id must be a Scenario A control A-Q, got "
+            f"{self.control_id!r}",
         )
         _require(isinstance(self.risk_class, RiskClass), "risk_class enum required")
         _require(
@@ -153,6 +155,10 @@ class CalibrationEntry:
     def from_dict(cls, payload: Mapping[str, Any]) -> "CalibrationEntry":
         unknown = set(payload) - cls._KEYS
         _require(not unknown, f"CalibrationEntry: unknown keys {sorted(unknown)}")
+        _require(
+            isinstance(payload.get("input_artifact_refs", []), list),
+            "input_artifact_refs must be a JSON list, never a string",
+        )
         entry = cls(
             entry_id=payload.get("entry_id", ""),
             control_id=payload.get("control_id", ""),
@@ -239,6 +245,10 @@ class CalibrationDataset:
             "schema_version" in payload,
             "CalibrationDataset requires an explicit schema_version "
             "(a missing version is never silently defaulted)",
+        )
+        _require(
+            isinstance(payload.get("entries", []), list),
+            "entries must be a JSON list",
         )
         dataset = cls(
             dataset_id=payload.get("dataset_id", ""),

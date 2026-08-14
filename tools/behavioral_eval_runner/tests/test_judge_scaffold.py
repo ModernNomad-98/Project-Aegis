@@ -50,6 +50,7 @@ def make_identity() -> JudgeIdentity:
 
 
 def make_request(request_id: str = "req-1") -> JudgeRequest:
+    """A schema-valid request (NOT bound to a real envelope; schema tests only)."""
     rubric = judge_rubric.get_rubric("rubric.scenario_a.coherent_topic.v1")
     return JudgeRequest(
         request_id=request_id,
@@ -129,6 +130,13 @@ class InterfaceTests(unittest.TestCase):
 
 
 class MockClientTests(unittest.TestCase):
+    def _request_bound_to(self, request_id: str, envelope_bytes: bytes) -> JudgeRequest:
+        from tools.behavioral_eval_runner.canonical import sha256_hex
+
+        payload = make_request(request_id).to_dict()
+        payload["envelope_sha256"] = sha256_hex(envelope_bytes)
+        return JudgeRequest.from_dict(payload)
+
     def test_mock_returns_recorded_response_only(self) -> None:
         recorded = JudgeResponse(
             request_id="req-1",
@@ -137,13 +145,28 @@ class MockClientTests(unittest.TestCase):
             raw_output="{}",
         )
         client = judge_mock.MockJudgeClient({"req-1": recorded})
-        response = client.dispatch(make_request("req-1"), b"{}")
+        response = client.dispatch(self._request_bound_to("req-1", b"{}"), b"{}")
         self.assertIs(response, recorded)
         self.assertEqual(client.model_calls, 0)
 
     def test_mock_without_recording_is_transport_error(self) -> None:
         client = judge_mock.MockJudgeClient({})
-        response = client.dispatch(make_request("req-missing"), b"{}")
+        response = client.dispatch(
+            self._request_bound_to("req-missing", b"{}"), b"{}"
+        )
+        self.assertIs(response.transport_outcome, TransportOutcome.TRANSPORT_ERROR)
+
+    def test_mock_refuses_mismatched_envelope_bytes(self) -> None:
+        recorded = JudgeResponse(
+            request_id="req-1",
+            response_id="resp-1",
+            transport_outcome=TransportOutcome.OK,
+            raw_output="{}",
+        )
+        client = judge_mock.MockJudgeClient({"req-1": recorded})
+        response = client.dispatch(
+            self._request_bound_to("req-1", b"{}"), b'{"swapped": true}'
+        )
         self.assertIs(response.transport_outcome, TransportOutcome.TRANSPORT_ERROR)
 
 
@@ -278,16 +301,81 @@ class VerdictSchemaTests(unittest.TestCase):
 
 
 class ParseOutputTests(unittest.TestCase):
+    """Parsing is envelope-bound (R2 §6): the request must hash-bind the
+    ACTUAL envelope, and evidence refs come from that envelope's keys."""
+
+    def setUp(self) -> None:
+        import os
+        import tempfile
+
+        from tools.behavioral_eval_runner.evidence import (
+            ArtifactMetadata,
+            EvidenceArtifact,
+            EvidenceWriter,
+            JudgeInputGate,
+        )
+        from tools.behavioral_eval_runner.judge.envelope import (
+            build_judge_envelope,
+            envelope_sha256,
+        )
+
+        tmp = tempfile.TemporaryDirectory(prefix="wp2b2-parse-")
+        self.addCleanup(tmp.cleanup)
+        root = os.path.join(tmp.name, "bundle")
+        writer = EvidenceWriter(root, run_id="run-parse")
+        writer.finalize_input_evidence(
+            [EvidenceArtifact("transcript.txt", b"one topic", ArtifactMetadata())]
+        )
+        gate = JudgeInputGate(root)
+        gate.verify()
+        self.envelope = build_judge_envelope(
+            rubric_ref="rubric.scenario_a.coherent_topic.v1",
+            gate=gate,
+            artifact_keys={"transcript": "transcript.txt"},
+            control_id="SCENARIO_A_CONTROL_G",
+        )
+        rubric = judge_rubric.get_rubric("rubric.scenario_a.coherent_topic.v1")
+        self.request = JudgeRequest(
+            request_id="req-parse",
+            control_id="SCENARIO_A_CONTROL_G",
+            judge=make_identity(),
+            rubric_id=rubric["rubric_id"],
+            rubric_version=rubric["rubric_version"],
+            rubric_sha256=judge_rubric.rubric_sha256(rubric),
+            envelope_sha256=envelope_sha256(self.envelope),
+            input_manifest_sha256=self.envelope["input_manifest_sha256"],
+        )
+
+    def _verdict_payload(self, **overrides) -> dict:
+        payload = {
+            "verdict_id": "v-1",
+            "request_id": self.request.request_id,
+            "control_id": self.request.control_id,
+            "verdict": "PASS",
+            "failure_mode": None,
+            "offending_span": None,
+            "reason_code": "MEETS_RUBRIC",
+            "evidence_refs": ["transcript"],
+            "rubric_id": self.request.rubric_id,
+            "rubric_version": self.request.rubric_version,
+            "rubric_sha256": self.request.rubric_sha256,
+            "judge_id": self.request.judge.judge_id,
+            "judge_version": self.request.judge.judge_version,
+            "input_manifest_sha256": self.request.input_manifest_sha256,
+            "schema_version": GRADING_SCHEMA_VERSION,
+        }
+        payload.update(overrides)
+        return payload
+
     def _ok_response(self, verdict_payload: dict) -> JudgeResponse:
         return JudgeResponse(
-            request_id=verdict_payload["request_id"],
+            request_id=self.request.request_id,
             response_id="resp-1",
             transport_outcome=TransportOutcome.OK,
             raw_output=json.dumps(verdict_payload),
         )
 
     def test_transport_failures_map_to_judge_error(self) -> None:
-        request = make_request()
         for outcome in (
             TransportOutcome.TIMEOUT,
             TransportOutcome.TRANSPORT_ERROR,
@@ -296,79 +384,75 @@ class ParseOutputTests(unittest.TestCase):
         ):
             with self.subTest(outcome=outcome):
                 response = JudgeResponse(
-                    request_id=request.request_id,
+                    request_id=self.request.request_id,
                     response_id="resp-1",
                     transport_outcome=outcome,
                     raw_output=None,
                 )
-                result = parse_judge_output(response, request, ("transcript",))
+                result = parse_judge_output(response, self.request, self.envelope)
                 self.assertFalse(result.is_verdict)
                 self.assertIsNone(result.verdict)
                 self.assertIs(result.to_attempt_state(), AttemptState.JUDGE_ERROR)
 
     def test_valid_verdict_parses(self) -> None:
-        request = make_request()
-        payload = VerdictSchemaTests()._verdict_payload()
         result = parse_judge_output(
-            self._ok_response(payload), request, ("transcript",)
+            self._ok_response(self._verdict_payload()), self.request, self.envelope
         )
         self.assertTrue(result.is_verdict)
         self.assertIs(result.verdict.verdict, JudgeVerdictState.PASS)
 
+    def test_unbound_request_is_judge_error(self) -> None:
+        result = parse_judge_output(
+            self._ok_response(self._verdict_payload()),
+            make_request(),  # placeholder hashes: binds no envelope
+            self.envelope,
+        )
+        self.assertFalse(result.is_verdict)
+        self.assertEqual(result.judge_error_kind, "BINDING_MISMATCH")
+
     def test_malformed_json_is_judge_error(self) -> None:
-        request = make_request()
         response = JudgeResponse(
-            request_id=request.request_id,
+            request_id=self.request.request_id,
             response_id="resp-1",
             transport_outcome=TransportOutcome.OK,
             raw_output="PASS, trust me",
         )
-        result = parse_judge_output(response, request, ("transcript",))
+        result = parse_judge_output(response, self.request, self.envelope)
         self.assertFalse(result.is_verdict)
         self.assertEqual(result.judge_error_kind, "MALFORMED_JSON")
 
     def test_request_mismatch_is_judge_error(self) -> None:
-        request = make_request()
-        payload = VerdictSchemaTests()._verdict_payload(
-            request_id="someone-elses-request"
+        payload = self._verdict_payload(request_id="someone-elses-request")
+        result = parse_judge_output(
+            self._ok_response(payload), self.request, self.envelope
         )
-        response = JudgeResponse(
-            request_id=request.request_id,
-            response_id="resp-1",
-            transport_outcome=TransportOutcome.OK,
-            raw_output=json.dumps(payload),
-        )
-        result = parse_judge_output(response, request, ("transcript",))
         self.assertFalse(result.is_verdict)
         self.assertEqual(result.judge_error_kind, "REQUEST_MISMATCH")
 
     def test_evidence_ref_outside_envelope_is_judge_error(self) -> None:
-        request = make_request()
-        payload = VerdictSchemaTests()._verdict_payload(evidence_refs=["answer_bank"])
+        payload = self._verdict_payload(evidence_refs=["recording_evidence"])
         result = parse_judge_output(
-            self._ok_response(payload), request, ("transcript",)
+            self._ok_response(payload), self.request, self.envelope
         )
         self.assertFalse(result.is_verdict)
         self.assertEqual(result.judge_error_kind, "CONTRADICTORY_EVIDENCE")
 
     def test_wrong_rubric_hash_is_judge_error(self) -> None:
-        request = make_request()
-        payload = VerdictSchemaTests()._verdict_payload(rubric_sha256="0" * 64)
+        payload = self._verdict_payload(rubric_sha256="0" * 64)
         result = parse_judge_output(
-            self._ok_response(payload), request, ("transcript",)
+            self._ok_response(payload), self.request, self.envelope
         )
         self.assertFalse(result.is_verdict)
         self.assertEqual(result.judge_error_kind, "RUBRIC_MISMATCH")
 
     def test_judge_error_never_becomes_pass_or_fail(self) -> None:
-        request = make_request()
         response = JudgeResponse(
-            request_id=request.request_id,
+            request_id=self.request.request_id,
             response_id="resp-1",
             transport_outcome=TransportOutcome.REFUSED,
             raw_output=None,
         )
-        result = parse_judge_output(response, request, ("transcript",))
+        result = parse_judge_output(response, self.request, self.envelope)
         self.assertIs(result.to_attempt_state(), AttemptState.JUDGE_ERROR)
         self.assertNotIn(
             result.to_attempt_state(), (AttemptState.PASS, AttemptState.FAIL)

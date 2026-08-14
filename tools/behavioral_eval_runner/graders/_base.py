@@ -72,7 +72,11 @@ def require_keys(
 def require_str(container: Mapping[str, Any], key: str) -> str:
     value = container.get(key)
     if not isinstance(value, str) or not value:
-        raise EvidenceMalformed(f"{key} must be a non-empty string, got {value!r}")
+        # Report the key and TYPE only — never echo malformed content (which
+        # may be transcript text) into diagnostics or results.
+        raise EvidenceMalformed(
+            f"{key} must be a non-empty string, got {type(value).__name__}"
+        )
     return value
 
 
@@ -92,31 +96,48 @@ def require_list(container: Mapping[str, Any], key: str) -> list[Any]:
 
 def run_grader(
     grader_id: str,
-    control_id: str,
+    oracle_id: str,
+    plan: "TrustedGradingPlan",
     evidence: Mapping[str, Any],
-    body: Callable[[Mapping[str, Any]], dict[str, Any]],
+    body: Callable[["TrustedGradingPlan", Mapping[str, Any]], dict[str, Any]],
 ) -> GraderResult:
     """Execute a grader body with the shared fail-closed envelope.
+
+    The TRUSTED grading plan and the OBSERVED evidence arrive as separate,
+    mechanically distinct inputs: the plan must be a validated
+    ``TrustedGradingPlan`` (a raw mapping is refused), the case identity and
+    grading criteria come only from the plan, and the result binds
+    ``trusted_grading_plan`` and ``observed_evidence`` hashes separately.
 
     ``body`` returns the PASS reproduction payload, raises ``GradingFail``
     for a deterministic FAIL, or raises ``GradingError`` (including
     ``EvidenceMalformed``) for a non-verdict ERROR.
     """
+    from .plan import TrustedGradingPlan  # local import: avoids module cycle
+
+    if not isinstance(plan, TrustedGradingPlan):
+        raise SchemaValidationError(
+            "the trusted grading plan must be a TrustedGradingPlan instance; "
+            "a raw mapping cannot carry grading criteria"
+        )
+    plan.validate()
+    if oracle_id not in plan.required_oracle_ids:
+        raise SchemaValidationError(
+            f"oracle {oracle_id!r} is not in the plan's required oracle set "
+            f"for {plan.control_id}: {list(plan.required_oracle_ids)}"
+        )
     if not isinstance(evidence, Mapping):
-        raise SchemaValidationError("evidence must be a mapping")
-    case_uid = evidence.get("case_uid")
-    if not isinstance(case_uid, str) or not case_uid:
-        raise SchemaValidationError("evidence.case_uid is required")
+        raise SchemaValidationError("observed evidence must be a mapping")
     pointer = evidence.get("evidence_pointer")
     if not isinstance(pointer, str) or not pointer:
         raise SchemaValidationError("evidence.evidence_pointer is required")
-    input_hash = sha256_of_obj({k: evidence[k] for k in sorted(evidence)})
+    observed_hash = sha256_of_obj({k: evidence[k] for k in sorted(evidence)})
 
     state = GraderResultState.PASS
     reason: GradingReasonCode | None = None
     reproduction: dict[str, Any]
     try:
-        reproduction = body(evidence)
+        reproduction = body(plan, evidence)
     except GradingFail as fail:
         state = GraderResultState.FAIL
         reason = fail.reason
@@ -128,11 +149,15 @@ def run_grader(
 
     return make_grader_result(
         grader_id=grader_id,
-        control_id=control_id,
-        case_uid=case_uid,
+        oracle_id=oracle_id,
+        control_id=plan.control_id,
+        case_uid=plan.case_uid,
         result_state=state,
         reason_code=reason,
         evidence_pointers=(pointer,),
-        input_sha256s={"evidence": input_hash},
+        input_sha256s={
+            "trusted_grading_plan": plan.plan_sha256,
+            "observed_evidence": observed_hash,
+        },
         reproduction=reproduction,
     )

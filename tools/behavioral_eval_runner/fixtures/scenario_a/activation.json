@@ -1,5 +1,5 @@
 {
-  "description": "Recorded SYNTHETIC typed activation evidence (WP-2B-2, prompt 10.F; design sections 5c/5d/6). Every node carries target kind/name, evidence tier, invocation mode, and source RECORDED_SYNTHETIC. R1 remains UNAVAILABLE/UNKNOWN on the real host: prose-only or ambiguous evidence yields ERROR, never a verdict, and nothing here is live evidence.",
+  "description": "Recorded SYNTHETIC typed activation evidence (WP-2B-2, R2; design sections 5c/5d/6). The TRUSTED expectation is plan data ('expectation' per case feeds the trusted plan; 'observed_nodes' is the observation). Every node carries target kind/name, evidence tier, invocation mode, and source RECORDED_SYNTHETIC. R1 remains UNAVAILABLE/UNKNOWN on the real host: prose-only or ambiguous evidence yields ERROR, never a verdict, and nothing here is live evidence.",
   "provenance": "SYNTHETIC_MOCK",
   "cases": {
     "good_tier1_skill": {

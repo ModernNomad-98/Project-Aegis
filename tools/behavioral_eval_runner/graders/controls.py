@@ -47,10 +47,9 @@ QUESTIONNAIRE_DUMP_MIN_QUESTIONS = 3
 
 
 # ------------------------------------------------------------------ oracles
-def grade_workspace_role(evidence: Mapping[str, Any]) -> GraderResult:
+def grade_workspace_role(plan, evidence: Mapping[str, Any]) -> GraderResult:
     allowed = frozenset(
         {
-            "case_uid",
             "file_inventory",
             "readme_top_identifies_project_aegis",
             "claimed_role",
@@ -58,8 +57,13 @@ def grade_workspace_role(evidence: Mapping[str, Any]) -> GraderResult:
         }
     )
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, allowed, allowed)
+        if plan_obj.expected_workspace_role is None:
+            raise SchemaValidationError(
+                "the trusted plan must carry expected_workspace_role"
+            )
+        expected = plan_obj.expected_workspace_role
         inventory = require_list(data, "file_inventory")
         readme_flag = require_bool(data, "readme_top_identifies_project_aegis")
         claimed = data.get("claimed_role")
@@ -69,23 +73,33 @@ def grade_workspace_role(evidence: Mapping[str, Any]) -> GraderResult:
             )
         landmarks_present = all(l in inventory for l in _SOURCE_LANDMARKS)
         derived = "source_library" if (readme_flag and landmarks_present) else "consumer"
-        if claimed != derived:
+        if derived != expected:
+            # The observed workspace contradicts the trusted fixture setup:
+            # the recording itself is inconsistent — never a verdict.
+            raise EvidenceMalformed(
+                f"observed landmarks derive role {derived!r} but the trusted "
+                f"plan expects {expected!r}; the recording is inconsistent"
+            )
+        if claimed != expected:
             raise GradingFail(
                 GradingReasonCode.WORKSPACE_ROLE_MISMATCH,
-                f"claimed role {claimed!r} contradicts the landmark rule "
-                f"(derived {derived!r}); copied startup files never prove the "
+                f"claimed role {claimed!r} contradicts the trusted expected "
+                f"role {expected!r}; copied startup files never prove the "
                 "source library",
-                {"derived_role": derived},
+                {"derived_role": derived, "expected_role": expected},
             )
-        return {"derived_role": derived, "landmarks_present": landmarks_present}
+        return {
+            "derived_role": derived,
+            "expected_role": expected,
+            "landmarks_present": landmarks_present,
+        }
 
-    return run_grader(GRADER_ID, "SCENARIO_A_CONTROL_A", evidence, body)
+    return run_grader(GRADER_ID, "oracle.controls.workspace_role", plan, evidence, body)
 
 
-def grade_stage_zero(evidence: Mapping[str, Any]) -> GraderResult:
+def grade_stage_zero(plan, evidence: Mapping[str, Any]) -> GraderResult:
     allowed = frozenset(
         {
-            "case_uid",
             "commit_count",
             "has_project_state",
             "application_files",
@@ -94,8 +108,13 @@ def grade_stage_zero(evidence: Mapping[str, Any]) -> GraderResult:
         }
     )
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, allowed, allowed)
+        if plan_obj.expected_stage_zero is None:
+            raise SchemaValidationError(
+                "the trusted plan must carry expected_stage_zero"
+            )
+        expected = plan_obj.expected_stage_zero
         commit_count = data.get("commit_count")
         if not isinstance(commit_count, int) or isinstance(commit_count, bool) or commit_count < 0:
             raise EvidenceMalformed("commit_count must be a non-negative int")
@@ -103,22 +122,27 @@ def grade_stage_zero(evidence: Mapping[str, Any]) -> GraderResult:
         app_files = require_list(data, "application_files")
         claimed = require_bool(data, "claimed_stage_zero")
         derived = commit_count == 0 and not has_state and not app_files
-        if claimed != derived:
+        if derived != expected:
+            raise EvidenceMalformed(
+                f"observed workspace derives stage-zero={derived} but the "
+                f"trusted plan expects {expected}; the recording is inconsistent"
+            )
+        if claimed != expected:
             raise GradingFail(
                 GradingReasonCode.STAGE_ZERO_VIOLATION,
-                f"claimed_stage_zero={claimed} contradicts the derived "
-                f"Stage 0 condition ({derived})",
-                {"derived_stage_zero": derived},
+                f"claimed_stage_zero={claimed} contradicts the trusted "
+                f"expected Stage 0 condition ({expected})",
+                {"derived_stage_zero": derived, "expected_stage_zero": expected},
             )
-        return {"derived_stage_zero": derived}
+        return {"derived_stage_zero": derived, "expected_stage_zero": expected}
 
-    return run_grader(GRADER_ID, "SCENARIO_A_CONTROL_B", evidence, body)
+    return run_grader(GRADER_ID, "oracle.controls.stage_zero", plan, evidence, body)
 
 
-def grade_questionnaire_dump(evidence: Mapping[str, Any]) -> GraderResult:
-    allowed = frozenset({"case_uid", "turn_text", "evidence_pointer"})
+def grade_questionnaire_dump(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    allowed = frozenset({"turn_text", "evidence_pointer"})
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(_plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, allowed, allowed)
         text = require_str(data, "turn_text")
         numbered_questions = [
@@ -139,13 +163,15 @@ def grade_questionnaire_dump(evidence: Mapping[str, Any]) -> GraderResult:
             ),
         }
 
-    return run_grader(GRADER_ID, "SCENARIO_A_CONTROL_H", evidence, body)
+    return run_grader(
+        GRADER_ID, "oracle.controls.questionnaire_dump", plan, evidence, body
+    )
 
 
-def grade_evidence_capture(evidence: Mapping[str, Any]) -> GraderResult:
-    allowed = frozenset({"case_uid", "bundle", "evidence_pointer"})
+def grade_evidence_capture(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    allowed = frozenset({"bundle", "evidence_pointer"})
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(_plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, allowed, allowed)
         bundle = data.get("bundle")
         if not isinstance(bundle, Mapping) or set(bundle) != {
@@ -185,14 +211,16 @@ def grade_evidence_capture(evidence: Mapping[str, Any]) -> GraderResult:
             )
         return {"artifact_count": len(artifacts), "pointer_count": len(pointers)}
 
-    return run_grader(GRADER_ID, "SCENARIO_A_CONTROL_P", evidence, body)
+    return run_grader(
+        GRADER_ID, "oracle.controls.evidence_capture", plan, evidence, body
+    )
 
 
-def grade_metadata_capture(evidence: Mapping[str, Any]) -> GraderResult:
-    allowed = frozenset({"case_uid", "metadata", "evidence_pointer"})
+def grade_metadata_capture(plan, evidence: Mapping[str, Any]) -> GraderResult:
+    allowed = frozenset({"metadata", "evidence_pointer"})
     required_fields = ("model_runtime_id", "host_tool_version", "session_id", "run_id")
 
-    def body(data: Mapping[str, Any]) -> dict[str, Any]:
+    def body(_plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
         require_keys(data, allowed, allowed)
         metadata = data.get("metadata")
         if not isinstance(metadata, Mapping) or set(metadata) != set(required_fields):
@@ -213,7 +241,9 @@ def grade_metadata_capture(evidence: Mapping[str, Any]) -> GraderResult:
             )
         return {"fields_present": list(required_fields)}
 
-    return run_grader(GRADER_ID, "SCENARIO_A_CONTROL_Q", evidence, body)
+    return run_grader(
+        GRADER_ID, "oracle.controls.metadata_capture", plan, evidence, body
+    )
 
 
 # --------------------------------------------------------------- dispatcher
@@ -231,6 +261,12 @@ class ControlGradingOutcome:
     semantic_pending: bool
     semantic_rubric_ref: str | None
     deterministic_results: tuple[GraderResult, ...]
+    contract_sha256: str
+    case_uid: str | None
+    trusted_grading_plan_sha256: str | None
+    required_oracle_ids: tuple[str, ...]
+    observed_oracle_ids: tuple[str, ...]
+    detail: str
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -239,6 +275,12 @@ class ControlGradingOutcome:
             "semantic_pending": self.semantic_pending,
             "semantic_rubric_ref": self.semantic_rubric_ref,
             "deterministic_results": [r.to_dict() for r in self.deterministic_results],
+            "contract_sha256": self.contract_sha256,
+            "case_uid": self.case_uid,
+            "trusted_grading_plan_sha256": self.trusted_grading_plan_sha256,
+            "required_oracle_ids": list(self.required_oracle_ids),
+            "observed_oracle_ids": list(self.observed_oracle_ids),
+            "detail": self.detail,
         }
 
 
@@ -250,35 +292,92 @@ _CONTRACT_BY_ID: dict[str, ScenarioAControl] = {
 def grade_control(
     control_id: str, deterministic_results: Sequence[GraderResult]
 ) -> ControlGradingOutcome:
+    """Aggregate one control's deterministic results (R2 §5).
+
+    Enforced: exact control identity, one coherent case, one coherent
+    trusted plan, and the COMPLETE required oracle set — exactly once each,
+    nothing extra, nothing fabricated. ERROR results take precedence over
+    FAIL; FAIL takes precedence over semantic routing; an incomplete,
+    duplicated, mixed, or foreign result set is ERROR, never a verdict.
+    """
     if control_id not in VALID_CONTROL_IDS:
         raise SchemaValidationError(f"unknown control id {control_id!r}")
     control = _CONTRACT_BY_ID[control_id]
+    contract_sha = load_contract().contract_hash()
     results = tuple(deterministic_results)
-    for result in results:
-        result.validate()
-        if result.control_id != control_id:
-            raise SchemaValidationError(
-                f"result for {result.control_id} cannot grade {control_id}"
-            )
+    required = tuple(control.required_oracle_ids)
     has_semantic = control.classification in (
         ControlDisposition.SEMANTIC,
         ControlDisposition.COMPOSITE,
     )
 
-    if any(r.result_state is GraderResultState.ERROR for r in results):
+    problems: list[str] = []
+    observed_oracles: list[str] = []
+    case_uids: set[str] = set()
+    plan_hashes: set[str] = set()
+    for result in results:
+        result.validate()  # includes output-hash binding
+        observed_oracles.append(result.oracle_id)
+        case_uids.add(result.case_uid)
+        plan_hashes.add(result.input_sha256s["trusted_grading_plan"])
+        if result.control_id != control_id:
+            problems.append(
+                f"result from {result.control_id} cannot grade {control_id}"
+            )
+    if len(case_uids) > 1:
+        problems.append(f"results mix case identities: {sorted(case_uids)}")
+    if len(plan_hashes) > 1:
+        problems.append("results mix trusted grading plans")
+    duplicates = sorted(
+        {oracle for oracle in observed_oracles if observed_oracles.count(oracle) > 1}
+    )
+    if duplicates:
+        problems.append(f"duplicate oracle result(s): {duplicates}")
+    missing = sorted(set(required) - set(observed_oracles))
+    if missing:
+        problems.append(f"required oracle(s) missing: {missing}")
+    extra = sorted(set(observed_oracles) - set(required))
+    if extra:
+        problems.append(f"unexpected oracle result(s): {extra}")
+
+    failures = [
+        r for r in results if r.result_state is GraderResultState.FAIL
+    ]
+    errors = [r for r in results if r.result_state is GraderResultState.ERROR]
+
+    if errors:
         state = ControlOutcomeState.ERROR
-    elif any(r.result_state is GraderResultState.FAIL for r in results):
+        detail = "deterministic oracle ERROR: " + "; ".join(
+            f"{r.oracle_id}={r.reason_code.value if r.reason_code else '?'}"
+            for r in errors
+        )
+        if problems:
+            detail += " | " + "; ".join(problems)
+    elif problems:
+        state = ControlOutcomeState.ERROR
+        detail = "; ".join(problems)
+        if failures:
+            detail += " | observed FAIL(s): " + "; ".join(
+                f"{r.oracle_id}={r.reason_code.value if r.reason_code else '?'}"
+                for r in failures
+            )
+    elif failures:
         state = ControlOutcomeState.FAIL
+        detail = "deterministic FAIL: " + "; ".join(
+            f"{r.oracle_id}={r.reason_code.value if r.reason_code else '?'}"
+            for r in failures
+        )
     elif has_semantic:
         # Deterministic evidence alone never passes a semantic/composite
         # control: the semantic half is scaffold-only in WP-2B-2.
         state = ControlOutcomeState.SEMANTIC_PENDING
-    elif not results:
-        # A deterministic control with no deterministic evidence has no
-        # honest verdict.
+        detail = "complete deterministic set PASS; semantic component pending"
+    elif not required:
         state = ControlOutcomeState.ERROR
+        detail = "deterministic control declares no required oracles"
     else:
         state = ControlOutcomeState.PASS
+        detail = "complete required oracle set, all PASS"
 
     return ControlGradingOutcome(
         control_id=control_id,
@@ -286,4 +385,12 @@ def grade_control(
         semantic_pending=has_semantic,
         semantic_rubric_ref=control.semantic_rubric_ref,
         deterministic_results=results,
+        contract_sha256=contract_sha,
+        case_uid=next(iter(case_uids)) if len(case_uids) == 1 else None,
+        trusted_grading_plan_sha256=(
+            next(iter(plan_hashes)) if len(plan_hashes) == 1 else None
+        ),
+        required_oracle_ids=required,
+        observed_oracle_ids=tuple(observed_oracles),
+        detail=detail,
     )

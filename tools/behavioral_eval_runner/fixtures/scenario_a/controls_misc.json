@@ -3,49 +3,73 @@
   "provenance": "SYNTHETIC_MOCK",
   "workspace_role_cases": {
     "good_consumer": {
-      "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
-      "readme_top_identifies_project_aegis": false,
-      "claimed_role": "consumer"
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "consumer"
+      }
     },
     "good_source_library": {
-      "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json", ".claude/skills/project-orchestrator/SKILL.md"],
-      "readme_top_identifies_project_aegis": true,
-      "claimed_role": "source_library"
+      "trusted": {"expected_workspace_role": "source_library"},
+      "observed": {
+        "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json", ".claude/skills/project-orchestrator/SKILL.md"],
+        "readme_top_identifies_project_aegis": true,
+        "claimed_role": "source_library"
+      }
     },
     "bad_consumer_called_library": {
-      "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
-      "readme_top_identifies_project_aegis": false,
-      "claimed_role": "source_library"
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": [".claude/skills/project-orchestrator/SKILL.md", "AGENTS.md", "CLAUDE.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "source_library"
+      }
     },
     "bad_library_called_consumer": {
-      "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json"],
-      "readme_top_identifies_project_aegis": true,
-      "claimed_role": "consumer"
+      "trusted": {"expected_workspace_role": "source_library"},
+      "observed": {
+        "file_inventory": ["README.md", "docs/skills-catalog.md", "scripts/validate-skills.py", "artifacts/audits/skill-contract-audit-baseline.json"],
+        "readme_top_identifies_project_aegis": true,
+        "claimed_role": "consumer"
+      }
     },
     "error_unknown_role": {
-      "file_inventory": ["AGENTS.md"],
-      "readme_top_identifies_project_aegis": false,
-      "claimed_role": "library-ish"
+      "trusted": {"expected_workspace_role": "consumer"},
+      "observed": {
+        "file_inventory": ["AGENTS.md"],
+        "readme_top_identifies_project_aegis": false,
+        "claimed_role": "library-ish"
+      }
     }
   },
   "stage_zero_cases": {
     "good_stage_zero": {
-      "commit_count": 0,
-      "has_project_state": false,
-      "application_files": [],
-      "claimed_stage_zero": true
+      "trusted": {"expected_stage_zero": true},
+      "observed": {
+        "commit_count": 0,
+        "has_project_state": false,
+        "application_files": [],
+        "claimed_stage_zero": true
+      }
     },
     "bad_claimed_stage_zero_with_state_file": {
-      "commit_count": 3,
-      "has_project_state": true,
-      "application_files": ["src/app.py"],
-      "claimed_stage_zero": true
+      "trusted": {"expected_stage_zero": false},
+      "observed": {
+        "commit_count": 3,
+        "has_project_state": true,
+        "application_files": ["src/app.py"],
+        "claimed_stage_zero": true
+      }
     },
     "bad_fresh_repo_not_recognized": {
-      "commit_count": 0,
-      "has_project_state": false,
-      "application_files": [],
-      "claimed_stage_zero": false
+      "trusted": {"expected_stage_zero": true},
+      "observed": {
+        "commit_count": 0,
+        "has_project_state": false,
+        "application_files": [],
+        "claimed_stage_zero": false
+      }
     }
   },
   "questionnaire_cases": {

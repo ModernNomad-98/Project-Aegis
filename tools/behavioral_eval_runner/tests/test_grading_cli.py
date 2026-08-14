@@ -22,7 +22,7 @@ from tools.behavioral_eval_runner.evidence import (
 )
 from tools.behavioral_eval_runner.tests.grading_helpers import (
     load_fixture,
-    zero_commit_evidence,
+    zero_commit_case,
 )
 
 
@@ -66,33 +66,60 @@ class ValidateContractCommandTests(unittest.TestCase):
 
 class GradeFixtureCommandTests(unittest.TestCase):
     def test_grades_recorded_fixture(self) -> None:
-        evidence = zero_commit_evidence("good_zero")
+        plan, evidence = zero_commit_case("good_zero")
         with tempfile.TemporaryDirectory(prefix="wp2b2-cli-") as tmp:
+            plan_path = os.path.join(tmp, "plan.json")
+            with open(plan_path, "w", encoding="utf-8") as handle:
+                json.dump(plan.to_dict(), handle)
             path = os.path.join(tmp, "evidence.json")
             with open(path, "w", encoding="utf-8") as handle:
                 json.dump(evidence, handle)
             code, payload = _run_cli(
-                ["grade-fixture", "--grader", "zero_commit", "--evidence", path]
+                [
+                    "grade-fixture",
+                    "--grader",
+                    "zero_commit",
+                    "--plan",
+                    plan_path,
+                    "--evidence",
+                    path,
+                ]
             )
         self.assertEqual(code, 0)
         self.assertEqual(payload["result"]["result_state"], "PASS")
         self.assertEqual(len(payload["result"]["output_sha256"]), 64)
+        self.assertEqual(
+            payload["result"]["oracle_id"], "oracle.mutation.zero_commit"
+        )
 
     def test_unknown_grader_rejected(self) -> None:
         code, payload = _run_cli(
-            ["grade-fixture", "--grader", "nope", "--evidence", "x.json"]
+            [
+                "grade-fixture",
+                "--grader",
+                "nope",
+                "--plan",
+                "p.json",
+                "--evidence",
+                "x.json",
+            ]
         )
         self.assertEqual(code, 2)
         self.assertIn("error", payload)
 
 
 class JudgeEnvelopeCommandTests(unittest.TestCase):
-    def test_builds_envelope_without_dispatch(self) -> None:
+    def test_emits_metadata_only_without_dispatch(self) -> None:
+        secret = "one topic transcript content"
         with tempfile.TemporaryDirectory(prefix="wp2b2-cli-env-") as tmp:
             root = os.path.join(tmp, "bundle")
             writer = EvidenceWriter(root, run_id="run-cli")
             writer.finalize_input_evidence(
-                [EvidenceArtifact("transcript.txt", b"one topic", ArtifactMetadata())]
+                [
+                    EvidenceArtifact(
+                        "transcript.txt", secret.encode("utf-8"), ArtifactMetadata()
+                    )
+                ]
             )
             code, payload = _run_cli(
                 [
@@ -101,13 +128,18 @@ class JudgeEnvelopeCommandTests(unittest.TestCase):
                     root,
                     "--rubric",
                     "rubric.scenario_a.coherent_topic.v1",
+                    "--control",
+                    "SCENARIO_A_CONTROL_G",
                     "--map",
                     "transcript=transcript.txt",
                 ]
             )
         self.assertEqual(code, 0)
-        self.assertEqual(payload["envelope"]["envelope_kind"], "aegis_judge_envelope")
+        self.assertNotIn("envelope", payload)  # metadata only, no raw envelope
+        self.assertNotIn(secret, json.dumps(payload))
         self.assertEqual(len(payload["envelope_sha256"]), 64)
+        self.assertEqual(payload["control_id"], "SCENARIO_A_CONTROL_G")
+        self.assertEqual(payload["evidence_keys"], ["transcript"])
         self.assertEqual(payload["dispatched"], False)
 
 

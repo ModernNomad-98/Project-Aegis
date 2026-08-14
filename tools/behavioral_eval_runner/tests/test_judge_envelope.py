@@ -66,6 +66,7 @@ class EnvelopeTestBase(unittest.TestCase):
             gate=self.gate,
             artifact_keys=artifact_keys
             or {"transcript": "transcript.txt"},
+            control_id="SCENARIO_A_CONTROL_G",
         )
 
 
@@ -76,6 +77,7 @@ class EnvelopeConstructionTests(EnvelopeTestBase):
                 rubric_ref=RUBRIC_REF,
                 gate=self.gate,  # not verified
                 artifact_keys={"transcript": "transcript.txt"},
+                control_id="SCENARIO_A_CONTROL_G",
             )
 
     def test_envelope_reads_only_manifest_listed_artifacts(self) -> None:
@@ -85,6 +87,7 @@ class EnvelopeConstructionTests(EnvelopeTestBase):
                 rubric_ref=RUBRIC_REF,
                 gate=self.gate,
                 artifact_keys={"transcript": "not-in-manifest.txt"},
+                control_id="SCENARIO_A_CONTROL_G",
             )
 
     def test_envelope_shape_and_round_trip(self) -> None:
@@ -110,6 +113,7 @@ class EnvelopeConstructionTests(EnvelopeTestBase):
                 rubric_ref=RUBRIC_REF,
                 gate=self.gate,
                 artifact_keys={"surprise_channel": "transcript.txt"},
+                control_id="SCENARIO_A_CONTROL_G",
             )
 
     def test_leakage_keys_are_not_representable(self) -> None:
@@ -139,6 +143,17 @@ class EnvelopeConstructionTests(EnvelopeTestBase):
                 rubric_ref="rubric.invented.v1",
                 gate=self.gate,
                 artifact_keys={"transcript": "transcript.txt"},
+                control_id="SCENARIO_A_CONTROL_G",
+            )
+
+    def test_deterministic_only_control_has_no_envelope(self) -> None:
+        self.gate.verify()
+        with self.assertRaises(SchemaValidationError):
+            build_judge_envelope(
+                rubric_ref=RUBRIC_REF,
+                gate=self.gate,
+                artifact_keys={"transcript": "transcript.txt"},
+                control_id="SCENARIO_A_CONTROL_M",
             )
 
     def test_envelope_hash_deterministic(self) -> None:
@@ -160,6 +175,7 @@ class EnvelopeConstructionTests(EnvelopeTestBase):
                 rubric_ref=RUBRIC_REF,
                 gate=FakeGate(),  # type: ignore[arg-type]
                 artifact_keys={"transcript": "transcript.txt"},
+                control_id="SCENARIO_A_CONTROL_G",
             )
 
     def test_extract_rejects_invalid_base64_entry(self) -> None:

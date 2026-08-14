@@ -6,10 +6,15 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["verdict_id", "request_id", "control_id", "verdict", "failure_mode", "offending_span", "reason_code", "evidence_refs", "rubric_id", "rubric_version", "rubric_sha256", "judge_id", "judge_version", "input_manifest_sha256", "schema_version"],
+  "allOf": [
+    {"if": {"properties": {"verdict": {"const": "PASS"}}}, "then": {"properties": {"reason_code": {"const": "MEETS_RUBRIC"}, "failure_mode": {"type": "null"}, "offending_span": {"type": "null"}, "evidence_refs": {"minItems": 1}}}},
+    {"if": {"properties": {"verdict": {"const": "FAIL"}}}, "then": {"properties": {"reason_code": {"const": "VIOLATES_RUBRIC"}, "failure_mode": {"type": "string"}, "evidence_refs": {"minItems": 1}}}},
+    {"if": {"properties": {"verdict": {"const": "ABSTAIN"}}}, "then": {"properties": {"reason_code": {"const": "INSUFFICIENT_EVIDENCE"}, "failure_mode": {"type": "null"}, "offending_span": {"type": "null"}}}}
+  ],
   "properties": {
     "verdict_id": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$"},
     "request_id": {"type": "string", "minLength": 1},
-    "control_id": {"type": "string", "minLength": 1},
+    "control_id": {"type": "string", "pattern": "^SCENARIO_A_CONTROL_[A-Q]$"},
     "verdict": {"enum": ["PASS", "FAIL", "ABSTAIN"]},
     "failure_mode": {
       "anyOf": [

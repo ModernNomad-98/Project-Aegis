@@ -36,6 +36,30 @@ CONTROL_ID_PREFIX = "SCENARIO_A_CONTROL_"
 CONTROL_LETTERS = "ABCDEFGHIJKLMNOPQ"
 VALID_CONTROL_IDS = frozenset(f"{CONTROL_ID_PREFIX}{c}" for c in CONTROL_LETTERS)
 
+#: Closed deterministic oracle identities (R2 §5): every grader entry point
+#: has exactly one; two functions never share an oracle id.
+ORACLE_IDS = frozenset(
+    {
+        "oracle.state_machine.transitions",
+        "oracle.approval.boundary",
+        "oracle.mutation.category_scan",
+        "oracle.mutation.zero_commit",
+        "oracle.append_only.version_sequence",
+        "oracle.hashing.preview_vs_created",
+        "oracle.activation.typed_target",
+        "oracle.controls.workspace_role",
+        "oracle.controls.stage_zero",
+        "oracle.controls.questionnaire_dump",
+        "oracle.controls.evidence_capture",
+        "oracle.controls.metadata_capture",
+    }
+)
+
+#: The exact input-hash channels every grader result binds SEPARATELY:
+#: the trusted grading plan and the observed evidence (never one blended
+#: "evidence" hash).
+INPUT_HASH_KEYS = frozenset({"trusted_grading_plan", "observed_evidence"})
+
 
 class GraderResultState(StrictEnum):
     """Closed deterministic result states. There is no silent pass."""
@@ -140,6 +164,7 @@ class GraderResult:
     """Immutable deterministic grading result (see module docstring)."""
 
     grader_id: str
+    oracle_id: str
     control_id: str
     case_uid: str
     result_state: GraderResultState
@@ -165,6 +190,7 @@ class GraderResult:
         return {
             "grader_id": self.grader_id,
             "grader_version": self.grader_version,
+            "oracle_id": self.oracle_id,
             "control_id": self.control_id,
             "case_uid": self.case_uid,
             "assertion_uid": self.assertion_uid,
@@ -184,6 +210,10 @@ class GraderResult:
         _require(
             isinstance(self.grader_version, str) and bool(self.grader_version),
             "grader_version must be a non-empty string",
+        )
+        _require(
+            self.oracle_id in ORACLE_IDS,
+            f"oracle_id must be a closed oracle identity, got {self.oracle_id!r}",
         )
         _require(
             self.control_id in VALID_CONTROL_IDS,
@@ -227,11 +257,12 @@ class GraderResult:
                 "every evidence pointer must be a non-empty string",
             )
         _require(
-            isinstance(self.input_sha256s, Mapping) and len(self.input_sha256s) > 0,
-            "input_sha256s must be a non-empty mapping",
+            isinstance(self.input_sha256s, Mapping)
+            and set(self.input_sha256s) == set(INPUT_HASH_KEYS),
+            "input_sha256s must bind exactly the trusted_grading_plan and "
+            "observed_evidence hashes (never one blended hash)",
         )
         for key, value in self.input_sha256s.items():
-            _require(isinstance(key, str) and bool(key), "input hash keys must be strings")
             _require_sha256(value, f"input_sha256s[{key}]")
         _require(
             isinstance(self.reproduction, Mapping),
@@ -257,6 +288,7 @@ class GraderResult:
         {
             "grader_id",
             "grader_version",
+            "oracle_id",
             "control_id",
             "case_uid",
             "assertion_uid",
@@ -275,9 +307,20 @@ class GraderResult:
         unknown = set(payload) - cls._KEYS
         _require(not unknown, f"GraderResult: unknown keys {sorted(unknown)}")
         reason = payload.get("reason_code")
+        pointers = payload.get("evidence_pointers", ())
+        _require(
+            isinstance(pointers, (list, tuple)),
+            "evidence_pointers must be a JSON list, never a string",
+        )
+        for mapping_key in ("input_sha256s", "reproduction"):
+            _require(
+                isinstance(payload.get(mapping_key, {}), Mapping),
+                f"{mapping_key} must be a JSON object",
+            )
         result = cls(
             grader_id=payload.get("grader_id", ""),
             grader_version=payload.get("grader_version", ""),
+            oracle_id=payload.get("oracle_id", ""),
             control_id=payload.get("control_id", ""),
             case_uid=payload.get("case_uid", ""),
             assertion_uid=payload.get("assertion_uid"),
@@ -285,7 +328,7 @@ class GraderResult:
             reason_code=(
                 GradingReasonCode.parse(reason) if reason is not None else None
             ),
-            evidence_pointers=tuple(payload.get("evidence_pointers", ())),
+            evidence_pointers=tuple(pointers),
             input_sha256s=dict(payload.get("input_sha256s", {})),
             reproduction=dict(payload.get("reproduction", {})),
             schema_version=payload.get("schema_version", ""),
@@ -297,6 +340,7 @@ class GraderResult:
 
 def make_grader_result(
     grader_id: str,
+    oracle_id: str,
     control_id: str,
     case_uid: str,
     result_state: GraderResultState,
@@ -309,6 +353,7 @@ def make_grader_result(
     """Build, hash-bind, and validate a deterministic grader result."""
     provisional = GraderResult(
         grader_id=grader_id,
+        oracle_id=oracle_id,
         control_id=control_id,
         case_uid=case_uid,
         assertion_uid=assertion_uid,
@@ -322,6 +367,7 @@ def make_grader_result(
     bound = GraderResult(
         grader_id=provisional.grader_id,
         grader_version=provisional.grader_version,
+        oracle_id=provisional.oracle_id,
         control_id=provisional.control_id,
         case_uid=provisional.case_uid,
         assertion_uid=provisional.assertion_uid,

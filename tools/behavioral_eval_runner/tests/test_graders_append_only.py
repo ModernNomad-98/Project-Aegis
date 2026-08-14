@@ -1,5 +1,6 @@
 """WP-2B-2: append-only / recording grader over recorded version sequences
-(prompt 10.D; mirrors the mechanical harness's content-agnostic oracles)."""
+(prompt 10.D; R2 trusted plans — semantic gates and expected IDs are PLAN
+data, never observation data)."""
 
 from __future__ import annotations
 
@@ -13,7 +14,8 @@ from tools.behavioral_eval_runner.graders.records import (
     GraderResultState,
     GradingReasonCode,
 )
-from tools.behavioral_eval_runner.tests.grading_helpers import append_only_evidence
+from tools.behavioral_eval_runner.graders._base import GradingError
+from tools.behavioral_eval_runner.tests.grading_helpers import append_only_case
 
 
 class ExtractorTests(unittest.TestCase):
@@ -42,10 +44,18 @@ class ExtractorTests(unittest.TestCase):
         rows = extract_immutable_rows(content)
         self.assertEqual(rows["Deviations"], ["- DV-001 recorded wrapped continuation"])
 
+    def test_duplicate_matching_header_fails_closed(self) -> None:
+        content = (
+            "## State snapshots\n| ID |\n| --- |\n| SS-001 |\n\n"
+            "## State snapshots (audit copy)\n| ID |\n| --- |\n| SS-999 |\n"
+        )
+        with self.assertRaises(GradingError):
+            extract_immutable_rows(content)
+
 
 class AppendOnlyGraderTests(unittest.TestCase):
     def test_good_sequence_passes_with_run_local_hashes(self) -> None:
-        result = grade_version_sequence(append_only_evidence("good_sequence"))
+        result = grade_version_sequence(*append_only_case("good_sequence"))
         self.assertIs(result.result_state, GraderResultState.PASS)
         hashes = result.reproduction["version_sha256s"]
         self.assertEqual(len(hashes), 7)
@@ -53,76 +63,75 @@ class AppendOnlyGraderTests(unittest.TestCase):
             self.assertEqual(len(entry["normalized_sha256"]), 64)
 
     def test_placeholder_deletion_fails(self) -> None:
-        result = grade_version_sequence(append_only_evidence("bad_placeholder_deleted"))
+        result = grade_version_sequence(*append_only_case("bad_placeholder_deleted"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.PLACEHOLDER_REMOVED)
 
     def test_row_edit_fails(self) -> None:
-        result = grade_version_sequence(append_only_evidence("bad_row_edited"))
+        result = grade_version_sequence(*append_only_case("bad_row_edited"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.APPEND_ONLY_VIOLATION)
 
     def test_reorder_fails(self) -> None:
-        result = grade_version_sequence(append_only_evidence("bad_rows_reordered"))
+        result = grade_version_sequence(*append_only_case("bad_rows_reordered"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.APPEND_ONLY_VIOLATION)
 
     def test_forbidden_snapshot_fails(self) -> None:
-        result = grade_version_sequence(append_only_evidence("bad_forbidden_snapshot"))
+        result = grade_version_sequence(*append_only_case("bad_forbidden_snapshot"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.FORBIDDEN_SNAPSHOT)
 
     def test_owner_completion_before_acceptance_fails(self) -> None:
         result = grade_version_sequence(
-            append_only_evidence("bad_owner_completion_before_acceptance")
+            *append_only_case("bad_owner_completion_before_acceptance")
         )
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.ORDERING_GATE_VIOLATION)
 
     def test_stage3_before_owners_fails(self) -> None:
-        result = grade_version_sequence(append_only_evidence("bad_stage3_before_owners"))
+        result = grade_version_sequence(*append_only_case("bad_stage3_before_owners"))
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.ORDERING_GATE_VIOLATION)
 
     def test_expected_record_missing_fails(self) -> None:
         result = grade_version_sequence(
-            append_only_evidence("bad_expected_record_missing")
+            *append_only_case("bad_expected_record_missing")
         )
         self.assertIs(result.result_state, GraderResultState.FAIL)
         self.assertIs(result.reason_code, GradingReasonCode.EXPECTED_RECORD_MISSING)
 
     def test_deviation_continuation_sequence_passes(self) -> None:
         result = grade_version_sequence(
-            append_only_evidence("good_deviation_continuation_folded")
+            *append_only_case("good_deviation_continuation_folded")
         )
         self.assertIs(result.result_state, GraderResultState.PASS)
 
     def test_malformed_evidence_errors(self) -> None:
-        evidence = append_only_evidence("good_sequence")
+        plan, evidence = append_only_case("good_sequence")
         evidence["versions"] = []
-        result = grade_version_sequence(evidence)
+        result = grade_version_sequence(plan, evidence)
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 
     def test_deterministic_reproduction(self) -> None:
-        first = grade_version_sequence(append_only_evidence("good_sequence"))
-        second = grade_version_sequence(append_only_evidence("good_sequence"))
+        first = grade_version_sequence(*append_only_case("good_sequence"))
+        second = grade_version_sequence(*append_only_case("good_sequence"))
         self.assertEqual(first.to_dict(), second.to_dict())
         self.assertEqual(first.output_sha256, second.output_sha256)
 
 
 class ShadowSectionAndTypeSafetyTests(unittest.TestCase):
-    """Review fixes: a duplicate matching section header could shadow the
-    real section (fail-open), and untyped semantics values could disable the
-    forbidden-snapshot gate. Both must fail CLOSED."""
+    """R2: a duplicate matching section header could shadow the real section
+    (fail-open), and plan-only keys inside observed evidence fail CLOSED."""
 
-    def _evidence_with_contents(self, contents: list[str]) -> dict:
-        base = append_only_evidence("good_sequence")
+    def _evidence_with_contents(self, contents: list[str]):
+        plan, base = append_only_case("good_sequence")
         base["versions"] = [
             {"version_id": f"v{i:02d}", "content": content}
             for i, content in enumerate(contents)
         ]
-        return base
+        return plan, base
 
     def test_duplicate_matching_section_header_is_malformed(self) -> None:
         v0 = (
@@ -131,8 +140,6 @@ class ShadowSectionAndTypeSafetyTests(unittest.TestCase):
             "## Approvals\n| ID |\n| --- |\n| (none yet) |\n\n"
             "## Deviations\n- (none recorded)\n"
         )
-        # The tampered version rewrites the REAL section and appends a clean
-        # shadow section whose header also matches 'State snapshots'.
         v1 = (
             "## State snapshots\n| ID |\n| --- |\n| SS-TAMPERED |\n\n"
             "## Decision log\n| ID |\n| --- |\n| (none yet) |\n\n"
@@ -140,38 +147,22 @@ class ShadowSectionAndTypeSafetyTests(unittest.TestCase):
             "## Deviations\n- (none recorded)\n\n"
             "## State snapshots (audit copy)\n| ID |\n| --- |\n| SS-001 |\n"
         )
-        result = grade_version_sequence(self._evidence_with_contents([v0, v1]))
+        plan, evidence = self._evidence_with_contents([v0, v1])
+        result = grade_version_sequence(plan, evidence)
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 
-    def test_string_forbidden_snapshot_ids_is_malformed(self) -> None:
-        evidence = append_only_evidence("bad_forbidden_snapshot")
-        evidence["semantics"] = dict(evidence["semantics"])
-        evidence["semantics"]["forbidden_snapshot_ids"] = "SS-003"
-        result = grade_version_sequence(evidence)
+    def test_semantics_key_in_observed_evidence_fails_closed(self) -> None:
+        plan, evidence = append_only_case("bad_forbidden_snapshot")
+        evidence["semantics"] = {"forbidden_snapshot_ids": []}
+        result = grade_version_sequence(plan, evidence)
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 
-    def test_string_stage2_owner_ids_is_malformed(self) -> None:
-        evidence = append_only_evidence("good_sequence")
-        evidence["semantics"] = dict(evidence["semantics"])
-        evidence["semantics"]["stage2_owner_ids"] = "PS-010"
-        result = grade_version_sequence(evidence)
-        self.assertIs(result.result_state, GraderResultState.ERROR)
-        self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
-
-    def test_non_string_semantics_id_is_malformed(self) -> None:
-        evidence = append_only_evidence("good_sequence")
-        evidence["semantics"] = dict(evidence["semantics"])
-        evidence["semantics"]["stage3_snapshot_id"] = 7
-        result = grade_version_sequence(evidence)
-        self.assertIs(result.result_state, GraderResultState.ERROR)
-        self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
-
-    def test_non_list_expected_final_ids_value_is_malformed(self) -> None:
-        evidence = append_only_evidence("good_sequence")
-        evidence["expected_final_ids"] = {"Approvals": 3}
-        result = grade_version_sequence(evidence)
+    def test_expected_final_ids_key_in_observed_evidence_fails_closed(self) -> None:
+        plan, evidence = append_only_case("good_sequence")
+        evidence["expected_final_ids"] = {"Approvals": ["(none yet)"]}
+        result = grade_version_sequence(plan, evidence)
         self.assertIs(result.result_state, GraderResultState.ERROR)
         self.assertIs(result.reason_code, GradingReasonCode.EVIDENCE_MALFORMED)
 

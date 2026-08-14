@@ -16,9 +16,11 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 from .. import GRADING_SCHEMA_VERSION
+from ..canonical import canonical_bytes
 from ..enums import AttemptState, StrictEnum
-from ..errors import SchemaValidationError
-from .interface import JudgeRequest, JudgeResponse, TransportOutcome
+from ..errors import RunnerError, SchemaValidationError
+from ..graders.records import VALID_CONTROL_IDS
+from .interface import JudgeClient, JudgeRequest, JudgeResponse, TransportOutcome
 
 OFFENDING_SPAN_MAX_CHARS = 500
 
@@ -78,7 +80,6 @@ class StructuredVerdict:
         for name in (
             "verdict_id",
             "request_id",
-            "control_id",
             "rubric_id",
             "rubric_version",
             "judge_id",
@@ -88,6 +89,11 @@ class StructuredVerdict:
             _require(
                 isinstance(value, str) and bool(value), f"{name} must be non-empty"
             )
+        _require(
+            self.control_id in VALID_CONTROL_IDS,
+            f"control_id must be a Scenario A control A-Q, got "
+            f"{self.control_id!r}",
+        )
         _require(
             VERDICT_ID_PATTERN.fullmatch(self.verdict_id) is not None,
             "verdict_id must be a bounded identifier "
@@ -194,6 +200,10 @@ class StructuredVerdict:
         _require(not unknown, f"StructuredVerdict: unknown keys {sorted(unknown)}")
         missing = cls._KEYS - set(payload)
         _require(not missing, f"StructuredVerdict: missing keys {sorted(missing)}")
+        _require(
+            isinstance(payload.get("evidence_refs"), list),
+            "evidence_refs must be a JSON list, never a string",
+        )
         failure_mode = payload.get("failure_mode")
         verdict = cls(
             verdict_id=payload.get("verdict_id", ""),
@@ -253,11 +263,22 @@ def _error(kind: str) -> JudgeOutcome:
 def parse_judge_output(
     response: JudgeResponse,
     request: JudgeRequest,
-    envelope_data_keys: Sequence[str],
+    envelope: Mapping[str, Any],
 ) -> JudgeOutcome:
-    """Interpret a (mock) judge response, failing closed to JUDGE_ERROR."""
+    """Interpret a (mock) judge response, failing closed to JUDGE_ERROR.
+
+    The request must bind EXACTLY the supplied envelope (hash-to-hash), and
+    the verdict's evidence references are checked against the envelope's
+    ACTUAL untrusted-data keys — never a caller-supplied key list."""
+    from .envelope import validate_request_envelope_binding
+
     response.validate()
     request.validate()
+    try:
+        validate_request_envelope_binding(request, envelope)
+    except RunnerError:
+        return _error("BINDING_MISMATCH")
+    envelope_data_keys: Sequence[str] = tuple(envelope["untrusted_data"])
     if response.transport_outcome is not TransportOutcome.OK:
         return _error(_TRANSPORT_ERROR_KINDS[response.transport_outcome])
     if response.request_id != request.request_id:
@@ -295,3 +316,27 @@ def parse_judge_output(
     if any(ref not in allowed_refs for ref in verdict.evidence_refs):
         return _error("CONTRADICTORY_EVIDENCE")
     return JudgeOutcome(is_verdict=True, verdict=verdict, judge_error_kind=None)
+
+
+def dispatch_mock_judgment(
+    client: JudgeClient,
+    request: JudgeRequest,
+    envelope: Mapping[str, Any],
+) -> JudgeOutcome:
+    """The single canonical NON-LIVE judgment path (R2 §6).
+
+    Binding is proven BEFORE any client dispatch (and therefore before any
+    recorded mock response lookup); the client then receives the canonical
+    envelope bytes, and the response is parsed against the same envelope.
+    Every mismatch is a fail-closed JUDGE_ERROR outcome, never PASS/FAIL."""
+    from .envelope import validate_request_envelope_binding
+
+    try:
+        validate_request_envelope_binding(request, envelope)
+    except RunnerError:
+        return _error("BINDING_MISMATCH")
+    envelope_bytes = canonical_bytes(
+        {k: envelope[k] for k in sorted(envelope)}
+    )
+    response = client.dispatch(request, envelope_bytes)
+    return parse_judge_output(response, request, envelope)

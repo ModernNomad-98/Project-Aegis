@@ -15,6 +15,7 @@ from typing import Any, Mapping
 from .. import GRADING_SCHEMA_VERSION
 from ..enums import StrictEnum
 from ..errors import LiveDispatchDisabledError, SchemaValidationError
+from ..graders.records import VALID_CONTROL_IDS
 
 _HEX = set("0123456789abcdef")
 
@@ -123,7 +124,11 @@ class JudgeRequest:
 
     def validate(self) -> None:
         _require_str(self.request_id, "request_id")
-        _require_str(self.control_id, "control_id")
+        _require(
+            self.control_id in VALID_CONTROL_IDS,
+            f"control_id must be a Scenario A control A-Q, got "
+            f"{self.control_id!r}",
+        )
         _require(isinstance(self.judge, JudgeIdentity), "judge must be JudgeIdentity")
         self.judge.validate()
         _require_str(self.rubric_id, "rubric_id")
