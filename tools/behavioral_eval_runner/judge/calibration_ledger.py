@@ -1,22 +1,43 @@
-"""WP-2B-3 append-only request/token/cost ledger (BER-DEC-008 decisions
-17-20, 25-26).
+"""WP-2B-3 durable request/token/cost ledger (BER-DEC-008 decisions 17-20,
+25-26; PR #88 correction families 2-3 and the overshoot subcase).
+
+EVENT-SOURCED and SINGLE-FILE: the whole work package is ONE append-only,
+hash-chained event log. Every future external interaction leaves a durable
+write-ahead ``ATTEMPT_STARTED`` event BEFORE any transport use and a
+separate ``ATTEMPT_TERMINAL`` event afterwards; active-execution time and
+validated semantic outcomes are events in the same chain. A later execution
+segment REOPENS the same file: the complete chain is verified and every
+total (attempts, metadata, per-judgment history, spend, per-day spend,
+active time) continues — never a reset. Creating a FRESH file requires an
+explicit, durably recorded first-segment declaration, so silent
+accounting resets are impossible.
+
+Crash safety: a ``STARTED`` attempt with no terminal event is an ORPHAN on
+reopen — it is never forgotten, its identity is never reused, it counts
+against every ceiling at its reserved worst-case charge with billing
+UNKNOWN, and further reservation STOPS under the telemetry-unavailable
+disposition pending owner review.
 
 Money is integer nano-USD only (USD $5 / 1M input tokens = 5,000 nano-USD
-per token; USD $30 / 1M output tokens = 30,000; USD $0.50 / 1M cached input
-tokens = 500), so no float rounding can misstate spend. Every future
-external interaction must pass a PRE-DISPATCH reservation that projects the
-worst permitted charge; a request that could exceed any cap never begins.
+per token; USD $30 / 1M output = 30,000; USD $0.50 / 1M cached input =
+500). Unknown billing is NEVER recorded as known zero: boundary-uncertain
+failures carry the reserved worst-case charge, marked ``billing_unknown``.
 
-Stage A1 exercises this ledger with fakes only — zero provider calls.
+Stage A1 exercises all of this with fakes only — zero provider calls.
+``CalibrationLedger(None)`` remains for isolated unit tests only; the
+live-capable provider rejects it.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import uuid
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
+from .. import WP2B3_AUTHORIZATION_ID, WP2B3_WORK_PACKAGE
 from ..canonical import canonical_json, sha256_of_obj
 from ..enums import StrictEnum
 from .calibration_errors import (
@@ -26,6 +47,7 @@ from .calibration_errors import (
     CalibrationStopReason,
 )
 from .calibration_transport import (
+    AUTHORIZED_MODEL_SNAPSHOT,
     AUTHORIZED_SDK_VERSION,
     DEV_MAX_OUTPUT_TOKENS,
     MAX_INPUT_TOKENS_PER_JUDGMENT,
@@ -51,10 +73,31 @@ DEV_STAGE_DEADLINE_SECONDS = 90 * 60
 HOLDOUT_STAGE_DEADLINE_SECONDS = 4 * 60 * 60
 TOTAL_RUN_DEADLINE_SECONDS = 6 * 60 * 60
 
+_STAGE_DEADLINES: Mapping[str, int] = {
+    "DEVELOPMENT": DEV_STAGE_DEADLINE_SECONDS,
+    "SEALED_HOLDOUT": HOLDOUT_STAGE_DEADLINE_SECONDS,
+}
+_VALID_STAGES = ("DEVELOPMENT", "OWNER_WAIT", "SEALED_HOLDOUT")
+#: OWNER_WAIT contributes ZERO active provider-execution time (decision
+#: 26): it can never be an active segment.
+_ACTIVE_STAGES = ("DEVELOPMENT", "SEALED_HOLDOUT")
+
 
 class RequestKind(StrictEnum):
     JUDGMENT_ATTEMPT = "JUDGMENT_ATTEMPT"
     METADATA = "METADATA"
+
+
+EVENT_KINDS = (
+    "GENESIS",
+    "SEGMENT_OPENED",
+    "ATTEMPT_STARTED",
+    "ATTEMPT_TERMINAL",
+    "ACTIVE_SEGMENT_BEGIN",
+    "ACTIVE_SEGMENT_END",
+    "SEMANTIC_OUTCOME",
+    "DEADLINE_STOP",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,6 +168,8 @@ class Reservation:
     max_output_tokens: int
     day: str
     worst_case_charge_nanousd: int
+    dataset_sha256: str | None
+    stage: str
     retry_of_request_id: str | None = None
     consumed: bool = False
 
@@ -179,16 +224,15 @@ class LedgerEntry:
     unit_prices: Mapping[str, Any]
     calculated_charge_nanousd: int
     telemetry_missing: bool
+    billing_unknown: bool
     retry_of_request_id: str | None
     sdk_version: str
     outcome_kind: str
     day: str
     cumulative: CumulativeSnapshot
-    prev_entry_sha256: str
-    entry_sha256: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        payload = {
+        return {
             "internal_request_id": self.internal_request_id,
             "request_kind": self.request_kind,
             "logical_judgment_id": self.logical_judgment_id,
@@ -209,16 +253,13 @@ class LedgerEntry:
             "unit_prices": dict(self.unit_prices),
             "calculated_charge_nanousd": self.calculated_charge_nanousd,
             "telemetry_missing": self.telemetry_missing,
+            "billing_unknown": self.billing_unknown,
             "retry_of_request_id": self.retry_of_request_id,
             "sdk_version": self.sdk_version,
             "outcome_kind": self.outcome_kind,
             "day": self.day,
             "cumulative": self.cumulative.to_dict(),
-            "prev_entry_sha256": self.prev_entry_sha256,
         }
-        if self.entry_sha256:
-            payload["entry_sha256"] = self.entry_sha256
-        return payload
 
 
 def _recorded_sdk_version() -> str:
@@ -228,126 +269,170 @@ def _recorded_sdk_version() -> str:
     return f"pinned-{AUTHORIZED_SDK_VERSION}-not-imported-offline"
 
 
-class ActiveExecutionClock:
-    """Active-execution wall clock; explicit OWNER_WAIT time is simply never
-    inside an active segment, so it consumes no clock (decision 26)."""
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+class _Aggregates:
+    """Rehydrated history from prior segments (terminals + orphans)."""
 
     def __init__(self) -> None:
-        self._closed: list[tuple[float, float]] = []
-        self._open_start: float | None = None
+        self.attempts = 0
+        self.metadata = 0
+        self.spend_total = 0
+        self.day_spend: dict[str, int] = {}
+        self.tokens = [0, 0, 0, 0]  # input, output, reasoning, cached
+        self.judgment_ids: set[str] = set()
+        self.attempts_by_judgment: dict[str, int] = {}
 
-    def begin_active_segment(self, at: float) -> None:
-        if self._open_start is not None:
-            raise CalibrationLedgerError("an active segment is already open")
-        self._open_start = float(at)
-
-    def end_active_segment(self, at: float) -> None:
-        if self._open_start is None:
-            raise CalibrationLedgerError("no active segment is open")
-        if at < self._open_start:
-            raise CalibrationLedgerError("segment end precedes its start")
-        self._closed.append((self._open_start, float(at)))
-        self._open_start = None
-
-    def active_seconds(self, now: float | None = None) -> float:
-        total = sum(end - start for start, end in self._closed)
-        if self._open_start is not None and now is not None:
-            total += max(0.0, now - self._open_start)
-        return total
-
-    def check_stage_deadline(
-        self, limit_seconds: float, now: float | None = None
-    ) -> None:
-        active = self.active_seconds(now)
-        if active > limit_seconds:
-            raise CalibrationStopError(
-                CalibrationStopReason.DEADLINE_EXCEEDED,
-                f"active execution {active:.0f}s exceeds the "
-                f"{limit_seconds:.0f}s stage deadline; new dispatch stops and "
-                "evidence is preserved",
-            )
+    def add_day(self, day: str, charge: int) -> None:
+        self.day_spend[day] = self.day_spend.get(day, 0) + charge
 
 
 class CalibrationLedger:
-    """Append-only, hash-chained accounting for every external interaction.
-
-    ``path=None`` keeps the ledger in memory (tests); with a path every
-    recorded entry is appended as one canonical-JSON line.
-
-    The BER-DEC-008 ceilings are WORK-PACKAGE totals, and the OWNER_WAIT /
-    freeze design mandates multiple execution segments — so a resuming
-    segment MUST pass every prior segment's ledger file via
-    ``prior_ledger_paths``. Each prior chain is verified and its attempts,
-    metadata count, judgment attempt history, total spend, and per-day
-    spend are folded into every cap check (never a reset; mirrors the
-    WP-2B-1 ``BudgetLedger.load`` contract).
-    """
+    """The single durable work-package accounting authority."""
 
     def __init__(
         self,
         path: str | None,
-        prior_ledger_paths: tuple[str, ...] = (),
+        *,
+        declare_first_segment: bool = False,
     ) -> None:
         self._path = path
         self._entries: list[LedgerEntry] = []
         self._pending: dict[str, Reservation] = {}
-        self._reservation_counter = 0
-        if path is not None and os.path.exists(path) and os.path.getsize(path):
-            raise CalibrationLedgerError(
-                "refusing to reuse an existing non-empty ledger file "
-                "(append-only evidence gets a fresh collision-safe name)"
-            )
-        # Prior-segment rehydration (verified, never trusted blindly).
-        self._prior_attempts = 0
-        self._prior_metadata = 0
-        self._prior_spend_total = 0
-        self._prior_day_spend: dict[str, int] = {}
-        self._prior_attempts_by_judgment: dict[str, int] = {}
-        self._prior_judgment_ids: set[str] = set()
-        self._prior_tokens = [0, 0, 0, 0]  # input, output, reasoning, cached
-        for prior_path in prior_ledger_paths:
-            for payload in _load_verified_chain(prior_path):
-                charge = int(payload["calculated_charge_nanousd"])
-                day = payload["day"]
-                self._prior_spend_total += charge
-                self._prior_day_spend[day] = (
-                    self._prior_day_spend.get(day, 0) + charge
+        self._attempt_counter = 0
+        self._event_seq = 0
+        self._prev_hash = ""
+        self._prior = _Aggregates()
+        self._orphans: tuple[str, ...] = ()
+        self._segments: list[list[Any]] = []  # [stage, begin, end|None]
+        self.run_id = f"seg-{uuid.uuid4().hex[:12]}"
+
+        if path is None:
+            # Isolated unit-test ledger ONLY: the live-capable provider
+            # rejects it (family 2 invariant 1).
+            self.is_durable = False
+            return
+        self.is_durable = True
+        if os.path.exists(path) and os.path.getsize(path):
+            events = _load_verified_chain(path)
+            self._event_seq = len(events)
+            self._prev_hash = events[-1]["event_sha256"]
+            self._rehydrate(events)
+        else:
+            if not declare_first_segment:
+                raise CalibrationLedgerError(
+                    "no work-package ledger exists at this path; creating a "
+                    "FRESH accounting history requires an explicit "
+                    "declare_first_segment=True (a silent reset of the "
+                    "BER-DEC-008 work-package totals is refused)"
                 )
-                self._prior_tokens[0] += int(payload["input_tokens"])
-                self._prior_tokens[1] += int(payload["output_tokens"])
-                self._prior_tokens[2] += int(payload["reasoning_tokens"])
-                self._prior_tokens[3] += int(payload["cached_input_tokens"])
-                if payload["request_kind"] == RequestKind.METADATA.value:
-                    self._prior_metadata += 1
+            self._append_event("GENESIS", {
+                "work_package": WP2B3_WORK_PACKAGE,
+                "authorization_id": WP2B3_AUTHORIZATION_ID,
+                "declared_first_segment": True,
+                "created_utc": _utc_now_iso(),
+            })
+        self._append_event("SEGMENT_OPENED", {
+            "opened_utc": _utc_now_iso(),
+            "prior_event_count": self._event_seq - 1,
+        })
+
+    # -------------------------------------------------------- rehydration
+    def _rehydrate(self, events: list[dict[str, Any]]) -> None:
+        started: dict[str, dict[str, Any]] = {}
+        for event in events:
+            kind = event.get("event_kind")
+            if kind == "ATTEMPT_STARTED":
+                started[event["attempt_id"]] = event
+            elif kind == "ATTEMPT_TERMINAL":
+                started.pop(event["internal_request_id"], None)
+                charge = int(event["calculated_charge_nanousd"])
+                self._prior.spend_total += charge
+                self._prior.add_day(event["day"], charge)
+                self._prior.tokens[0] += int(event["input_tokens"])
+                self._prior.tokens[1] += int(event["output_tokens"])
+                self._prior.tokens[2] += int(event["reasoning_tokens"])
+                self._prior.tokens[3] += int(event["cached_input_tokens"])
+                if event["request_kind"] == RequestKind.METADATA.value:
+                    self._prior.metadata += 1
                 else:
-                    self._prior_attempts += 1
-                    judgment_id = payload["logical_judgment_id"]
-                    if judgment_id:
-                        self._prior_judgment_ids.add(judgment_id)
-                        self._prior_attempts_by_judgment[judgment_id] = (
-                            self._prior_attempts_by_judgment.get(
-                                judgment_id, 0
-                            )
+                    self._prior.attempts += 1
+                    judgment = event["logical_judgment_id"]
+                    if judgment:
+                        self._prior.judgment_ids.add(judgment)
+                        self._prior.attempts_by_judgment[judgment] = (
+                            self._prior.attempts_by_judgment.get(judgment, 0)
                             + 1
                         )
+            elif kind == "ACTIVE_SEGMENT_BEGIN":
+                self._segments.append([event["stage"], float(event["at"]),
+                                       None])
+            elif kind == "ACTIVE_SEGMENT_END":
+                for segment in reversed(self._segments):
+                    if segment[2] is None:
+                        segment[2] = float(event["at"])
+                        break
+        # Orphans: STARTED with no terminal — never forgotten, identity
+        # never reused, conservatively charged, billing UNKNOWN.
+        orphan_ids: list[str] = []
+        for attempt_id, event in started.items():
+            orphan_ids.append(attempt_id)
+            worst = int(event["worst_case_charge_nanousd"])
+            self._prior.spend_total += worst
+            self._prior.add_day(event["day"], worst)
+            if event["request_kind"] == RequestKind.METADATA.value:
+                self._prior.metadata += 1
+            else:
+                self._prior.attempts += 1
+                judgment = event["logical_judgment_id"]
+                if judgment:
+                    self._prior.judgment_ids.add(judgment)
+                    self._prior.attempts_by_judgment[judgment] = (
+                        self._prior.attempts_by_judgment.get(judgment, 0) + 1
+                    )
+        self._orphans = tuple(sorted(orphan_ids))
+
+    @property
+    def orphaned_attempt_ids(self) -> tuple[str, ...]:
+        return self._orphans
+
+    # ------------------------------------------------------------- events
+    def _append_event(self, kind: str, payload: dict[str, Any]) -> dict[str, Any]:
+        if kind not in EVENT_KINDS:
+            raise CalibrationLedgerError(f"unknown event kind {kind!r}")
+        self._event_seq += 1
+        event: dict[str, Any] = {
+            "event_kind": kind,
+            "event_seq": self._event_seq,
+            "run_id": self.run_id,
+            **payload,
+            "prev_event_sha256": self._prev_hash,
+        }
+        event["event_sha256"] = sha256_of_obj(event)
+        self._prev_hash = event["event_sha256"]
+        if self._path is not None:
+            with open(self._path, "a", encoding="utf-8", newline="\n") as fh:
+                fh.write(canonical_json(event) + "\n")
+        return event
 
     # ------------------------------------------------------------ queries
     def entries(self) -> tuple[LedgerEntry, ...]:
         return tuple(self._entries)
 
     def _baseline(self) -> CumulativeSnapshot:
-        """The cumulative state carried in from verified prior segments."""
         return CumulativeSnapshot(
-            judgments_total=len(self._prior_judgment_ids),
-            attempts_total=self._prior_attempts,
-            metadata_requests=self._prior_metadata,
-            total_external_requests=self._prior_attempts
-            + self._prior_metadata,
-            input_tokens_total=self._prior_tokens[0],
-            output_tokens_total=self._prior_tokens[1],
-            reasoning_tokens_total=self._prior_tokens[2],
-            cached_input_tokens_total=self._prior_tokens[3],
-            spend_nanousd_total=self._prior_spend_total,
+            judgments_total=len(self._prior.judgment_ids),
+            attempts_total=self._prior.attempts,
+            metadata_requests=self._prior.metadata,
+            total_external_requests=self._prior.attempts
+            + self._prior.metadata,
+            input_tokens_total=self._prior.tokens[0],
+            output_tokens_total=self._prior.tokens[1],
+            reasoning_tokens_total=self._prior.tokens[2],
+            cached_input_tokens_total=self._prior.tokens[3],
+            spend_nanousd_total=self._prior.spend_total,
             day_spend_nanousd=0,
         )
 
@@ -369,28 +454,26 @@ class CalibrationLedger:
             if reservation.kind is RequestKind.JUDGMENT_ATTEMPT
             and reservation.logical_judgment_id == logical_judgment_id
         )
-        prior = self._prior_attempts_by_judgment.get(logical_judgment_id, 0)
+        prior = self._prior.attempts_by_judgment.get(logical_judgment_id, 0)
         return recorded + pending + prior
 
-    def _count(self, kind: RequestKind, include_pending: bool = True) -> int:
+    def _count(self, kind: RequestKind) -> int:
         recorded = sum(
             1 for entry in self._entries if entry.request_kind == kind.value
         )
-        pending = sum(
-            1 for r in self._pending.values() if r.kind is kind
-        ) if include_pending else 0
+        pending = sum(1 for r in self._pending.values() if r.kind is kind)
         prior = (
-            self._prior_metadata
+            self._prior.metadata
             if kind is RequestKind.METADATA
-            else self._prior_attempts
+            else self._prior.attempts
         )
         return recorded + pending + prior
 
     def _spend(self, day: str | None = None) -> int:
         if day is None:
-            total = self._prior_spend_total
+            total = self._prior.spend_total
         else:
-            total = self._prior_day_spend.get(day, 0)
+            total = self._prior.day_spend.get(day, 0)
         for entry in self._entries:
             if day is None or entry.day == day:
                 total += entry.calculated_charge_nanousd
@@ -413,17 +496,34 @@ class CalibrationLedger:
         estimated_input_tokens: int,
         max_output_tokens: int,
         day: str,
+        dataset_sha256: str | None,
+        stage: str,
         retry_of_request_id: str | None = None,
     ) -> Reservation:
+        if self._orphans:
+            raise CalibrationStopError(
+                CalibrationStopReason.BUDGET_TELEMETRY_UNAVAILABLE,
+                "the work-package history contains STARTED attempts with no "
+                f"terminal event (orphans: {list(self._orphans)}); their "
+                "billing is unknown and conservatively reserved — no new "
+                "reservation is possible pending owner review or a "
+                "separately lawful reconciliation",
+            )
         if not isinstance(kind, RequestKind):
             raise CalibrationLedgerError("kind must be RequestKind")
         if not isinstance(day, str) or not day:
             raise CalibrationLedgerError("day key required (UTC date)")
+        if stage not in _VALID_STAGES:
+            raise CalibrationLedgerError(f"unknown stage {stage!r}")
 
         if kind is RequestKind.JUDGMENT_ATTEMPT:
             if not logical_judgment_id:
                 raise CalibrationLedgerError(
                     "a judgment attempt requires its logical judgment id"
+                )
+            if not isinstance(dataset_sha256, str) or len(dataset_sha256) != 64:
+                raise CalibrationLedgerError(
+                    "a judgment attempt requires the 64-hex dataset identity"
                 )
             if attempt_number not in (1, 2):
                 raise CalibrationReservationDenied(
@@ -497,9 +597,10 @@ class CalibrationLedger:
                 f"on {day} (projected {projected_day} nano-USD)"
             )
 
-        self._reservation_counter += 1
+        self._attempt_counter += 1
+        attempt_id = f"{self.run_id}-att-{self._attempt_counter:06d}"
         reservation = Reservation(
-            reservation_id=f"wp2b3-res-{self._reservation_counter:06d}",
+            reservation_id=attempt_id,
             kind=kind,
             logical_judgment_id=logical_judgment_id,
             attempt_number=attempt_number,
@@ -507,13 +608,35 @@ class CalibrationLedger:
             max_output_tokens=max_output_tokens,
             day=day,
             worst_case_charge_nanousd=worst_case,
+            dataset_sha256=dataset_sha256,
+            stage=stage,
             retry_of_request_id=retry_of_request_id,
         )
-        self._pending[reservation.reservation_id] = reservation
+        # WRITE-AHEAD: the STARTED event is durable BEFORE any transport
+        # use (family 2 invariant 2); a crash from here on leaves an
+        # accounted orphan, never a forgotten external request.
+        self._append_event("ATTEMPT_STARTED", {
+            "attempt_id": attempt_id,
+            "logical_judgment_id": logical_judgment_id,
+            "attempt_number": attempt_number,
+            "request_kind": kind.value,
+            "authorized_model": AUTHORIZED_MODEL_SNAPSHOT,
+            "dataset_sha256": dataset_sha256,
+            "stage": stage,
+            "reserved_utc": _utc_now_iso(),
+            "estimated_input_tokens": estimated_input_tokens,
+            "max_output_tokens": max_output_tokens,
+            "worst_case_charge_nanousd": worst_case,
+            "retry_of_request_id": retry_of_request_id,
+            "day": day,
+        })
+        self._pending[attempt_id] = reservation
         return reservation
 
     def release_unused(self, reservation: Reservation) -> None:
-        """Release a reservation whose dispatch never started."""
+        """Release a reservation whose dispatch never started. The durable
+        STARTED event remains (append-only); releasing only frees the
+        in-memory pending projection."""
         self._pending.pop(reservation.reservation_id, None)
 
     # ------------------------------------------------------------- record
@@ -532,6 +655,7 @@ class CalibrationLedger:
         incomplete_details_reason: str | None,
         usage: ProviderUsage | None,
         outcome_kind: str,
+        billing_unknown: bool = False,
     ) -> LedgerEntry:
         active = self._pending.get(reservation.reservation_id)
         if active is None or active is not reservation or reservation.consumed:
@@ -542,8 +666,16 @@ class CalibrationLedger:
         reservation.consumed = True
         del self._pending[reservation.reservation_id]
 
-        telemetry_missing = usage is None
-        if telemetry_missing:
+        telemetry_missing = False
+        if billing_unknown:
+            if usage is not None:
+                raise CalibrationLedgerError(
+                    "billing_unknown carries NO usage claim; pass usage=None"
+                )
+            charge = reservation.worst_case_charge_nanousd
+            tokens = ProviderUsage.zero()
+        elif usage is None:
+            telemetry_missing = True
             charge = reservation.worst_case_charge_nanousd
             tokens = ProviderUsage.zero()
         else:
@@ -554,7 +686,7 @@ class CalibrationLedger:
         previous = self._entries[-1] if self._entries else None
         prior = previous.cumulative if previous else self._baseline()
         is_judgment = reservation.kind is RequestKind.JUDGMENT_ATTEMPT
-        judgment_ids = set(self._prior_judgment_ids) | {
+        judgment_ids = set(self._prior.judgment_ids) | {
             entry.logical_judgment_id
             for entry in self._entries
             if entry.request_kind == RequestKind.JUDGMENT_ATTEMPT.value
@@ -579,7 +711,7 @@ class CalibrationLedger:
             day_spend_nanousd=day_spend,
         )
         entry = LedgerEntry(
-            internal_request_id=f"wp2b3-req-{len(self._entries) + 1:06d}",
+            internal_request_id=reservation.reservation_id,
             request_kind=reservation.kind.value,
             logical_judgment_id=reservation.logical_judgment_id,
             attempt_number=reservation.attempt_number,
@@ -599,18 +731,15 @@ class CalibrationLedger:
             unit_prices=unit_prices(),
             calculated_charge_nanousd=charge,
             telemetry_missing=telemetry_missing,
+            billing_unknown=billing_unknown,
             retry_of_request_id=reservation.retry_of_request_id,
             sdk_version=_recorded_sdk_version(),
             outcome_kind=outcome_kind,
             day=reservation.day,
             cumulative=cumulative,
-            prev_entry_sha256=previous.entry_sha256 if previous else "",
         )
-        entry = replace(entry, entry_sha256=sha256_of_obj(entry.to_dict()))
         self._entries.append(entry)
-        if self._path is not None:
-            with open(self._path, "a", encoding="utf-8", newline="\n") as fh:
-                fh.write(canonical_json(entry.to_dict()) + "\n")
+        self._append_event("ATTEMPT_TERMINAL", entry.to_dict())
 
         if telemetry_missing:
             raise CalibrationStopError(
@@ -620,29 +749,152 @@ class CalibrationLedger:
                 "recorded with the worst-case reserved charge, explicitly "
                 "marked telemetry_missing — success is never estimated)",
             )
+        if is_judgment and not billing_unknown:
+            if tokens.input_tokens > MAX_INPUT_TOKENS_PER_JUDGMENT:
+                raise CalibrationStopError(
+                    CalibrationStopReason.CAP_WOULD_BE_EXCEEDED,
+                    f"provider reported {tokens.input_tokens} input tokens "
+                    f"for {entry.internal_request_id}, above the "
+                    f"{MAX_INPUT_TOKENS_PER_JUDGMENT}-token judgment budget; "
+                    "the attempt is recorded and the run STOPS",
+                )
+            if tokens.output_tokens > reservation.max_output_tokens:
+                raise CalibrationStopError(
+                    CalibrationStopReason.CAP_WOULD_BE_EXCEEDED,
+                    f"provider reported {tokens.output_tokens} output tokens "
+                    f"for {entry.internal_request_id}, above the reserved "
+                    f"{reservation.max_output_tokens} ceiling; the attempt "
+                    "is recorded and the run STOPS",
+                )
         if (
-            reservation.kind is RequestKind.JUDGMENT_ATTEMPT
-            and tokens.input_tokens > MAX_INPUT_TOKENS_PER_JUDGMENT
+            cumulative.spend_nanousd_total > MAX_TOTAL_SPEND_NANOUSD
+            or day_spend > MAX_SINGLE_DAY_SPEND_NANOUSD
         ):
-            # The conservative pre-dispatch estimate under-counted: the
-            # provider-reported input exceeded the per-judgment budget. The
-            # charge is honestly recorded above; further dispatch stops.
             raise CalibrationStopError(
                 CalibrationStopReason.CAP_WOULD_BE_EXCEEDED,
-                f"provider reported {tokens.input_tokens} input tokens for "
-                f"{entry.internal_request_id}, above the "
-                f"{MAX_INPUT_TOKENS_PER_JUDGMENT}-token judgment budget; "
-                "the attempt is recorded and the run STOPS",
+                "the recorded actual charge breaches a hard spend ceiling "
+                f"(total {cumulative.spend_nanousd_total} nano-USD, day "
+                f"{day_spend} nano-USD); the evidence is preserved and the "
+                "run STOPS",
             )
         return entry
 
+    # ------------------------------------------------- semantic outcomes
+    def record_semantic_outcome(
+        self,
+        internal_request_id: str,
+        outcome: str,
+        detail: str | None = None,
+    ) -> dict[str, Any]:
+        """Family 4: the VALIDATED terminal semantic event, appended only
+        after complete canonical verdict/request/envelope validation."""
+        allowed = (
+            outcome in ("VALIDATED_PASS", "VALIDATED_FAIL",
+                        "VALIDATED_ABSTAIN")
+            or outcome.startswith("JUDGE_ERROR")
+        )
+        if not allowed:
+            raise CalibrationLedgerError(
+                f"semantic outcome {outcome!r} is outside the validated "
+                "vocabulary"
+            )
+        return self._append_event("SEMANTIC_OUTCOME", {
+            "internal_request_id": internal_request_id,
+            "outcome": outcome,
+            "detail": detail,
+            "recorded_utc": _utc_now_iso(),
+        })
+
+    # --------------------------------------------------------- deadlines
+    def begin_active_segment(self, stage: str, at: float) -> None:
+        if stage not in _ACTIVE_STAGES:
+            raise CalibrationLedgerError(
+                f"stage {stage!r} can never hold active provider-execution "
+                "time (OWNER_WAIT contributes zero by decision 26)"
+            )
+        if any(segment[2] is None for segment in self._segments):
+            raise CalibrationLedgerError("an active segment is already open")
+        self._segments.append([stage, float(at), None])
+        if self.is_durable:
+            self._append_event("ACTIVE_SEGMENT_BEGIN",
+                               {"stage": stage, "at": float(at)})
+
+    def end_active_segment(self, at: float) -> None:
+        for segment in reversed(self._segments):
+            if segment[2] is None:
+                if at < segment[1]:
+                    raise CalibrationLedgerError(
+                        "segment end precedes its start"
+                    )
+                segment[2] = float(at)
+                if self.is_durable:
+                    self._append_event("ACTIVE_SEGMENT_END",
+                                       {"at": float(at)})
+                return
+        raise CalibrationLedgerError("no active segment is open")
+
+    def _segment_seconds(self, stage: str | None,
+                         now: float | None) -> float:
+        total = 0.0
+        for seg_stage, begin, end in self._segments:
+            if stage is not None and seg_stage != stage:
+                continue
+            if end is not None:
+                total += end - begin
+            elif now is not None:
+                total += max(0.0, now - begin)
+        return total
+
+    def active_seconds(self, now: float | None = None) -> float:
+        return self._segment_seconds(None, now)
+
+    def stage_active_seconds(self, stage: str,
+                             now: float | None = None) -> float:
+        return self._segment_seconds(stage, now)
+
+    def check_deadlines(self, stage: str, now: float | None = None) -> None:
+        """Enforce the applicable stage limit AND the whole-run limit
+        (BER-DEC-008 decision 26) before any new dispatch."""
+        if stage not in _VALID_STAGES:
+            raise CalibrationLedgerError(f"unknown stage {stage!r}")
+        stage_limit = _STAGE_DEADLINES.get(stage)
+        stage_active = (
+            self.stage_active_seconds(stage, now)
+            if stage_limit is not None
+            else 0.0
+        )
+        total_active = self.active_seconds(now)
+        breach: str | None = None
+        if stage_limit is not None and stage_active > stage_limit:
+            breach = (
+                f"stage {stage} active {stage_active:.0f}s exceeds its "
+                f"{stage_limit}s limit"
+            )
+        elif total_active > TOTAL_RUN_DEADLINE_SECONDS:
+            breach = (
+                f"whole-run active {total_active:.0f}s exceeds the "
+                f"{TOTAL_RUN_DEADLINE_SECONDS}s limit"
+            )
+        if breach is not None:
+            if self.is_durable:
+                self._append_event("DEADLINE_STOP", {
+                    "stage": stage,
+                    "stage_active_seconds": stage_active,
+                    "total_active_seconds": total_active,
+                    "detail": breach,
+                })
+            raise CalibrationStopError(
+                CalibrationStopReason.DEADLINE_EXCEEDED,
+                breach + "; new dispatch stops and evidence is preserved",
+            )
+
 
 def _load_verified_chain(path: str) -> list[dict[str, Any]]:
-    """Verify the persisted hash chain and return the parsed entries."""
+    """Verify the persisted hash chain and return the parsed events."""
     if not os.path.exists(path):
         raise CalibrationLedgerError(f"ledger file not found: {path}")
     prev = ""
-    entries: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
     with open(path, encoding="utf-8") as fh:
         for line_number, line in enumerate(fh, start=1):
             line = line.strip()
@@ -654,22 +906,22 @@ def _load_verified_chain(path: str) -> list[dict[str, Any]]:
                 raise CalibrationLedgerError(
                     f"unparseable ledger line {line_number}: {exc}"
                 ) from exc
-            declared = payload.get("entry_sha256", "")
-            body = {k: v for k, v in payload.items() if k != "entry_sha256"}
-            if payload.get("prev_entry_sha256") != prev:
+            declared = payload.get("event_sha256", "")
+            body = {k: v for k, v in payload.items() if k != "event_sha256"}
+            if payload.get("prev_event_sha256") != prev:
                 raise CalibrationLedgerError(
                     f"ledger chain break at line {line_number}: "
-                    "prev_entry_sha256 does not match the prior entry"
+                    "prev_event_sha256 does not match the prior event"
                 )
             if sha256_of_obj(body) != declared:
                 raise CalibrationLedgerError(
-                    f"ledger entry hash mismatch at line {line_number}"
+                    f"ledger event hash mismatch at line {line_number}"
                 )
             prev = declared
-            entries.append(payload)
-    return entries
+            events.append(payload)
+    return events
 
 
 def verify_ledger_chain(path: str) -> int:
-    """Verify the persisted hash chain; return the entry count."""
+    """Verify the persisted hash chain; return the event count."""
     return len(_load_verified_chain(path))

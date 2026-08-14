@@ -7,6 +7,8 @@ Every test uses fakes: NO real provider call, NO real credential, NO network.
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 import unittest
 
 from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
@@ -109,6 +111,8 @@ class FakeResponsesApi:
         action = self._script.pop(0)
         if isinstance(action, Exception):
             raise action
+        if callable(action):
+            return action(kwargs)  # test hook: may raise or return
         return action
 
 
@@ -169,7 +173,22 @@ class ProviderCase(unittest.TestCase):
         self.envelope_bytes = canonical_bytes(
             {k: self.envelope[k] for k in sorted(self.envelope)}
         )
-        self.ledger = cl.CalibrationLedger(None)  # in-memory
+        # The live-capable provider requires a DURABLE ledger (family 2).
+        self.ledger, self.ledger_path = self._durable_ledger()
+
+    def _durable_ledger(self) -> tuple[cl.CalibrationLedger, str]:
+        tmp = tempfile.TemporaryDirectory(prefix="wp2b3-prov-")
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "wp-ledger.jsonl")
+        return (
+            cl.CalibrationLedger(path, declare_first_segment=True),
+            path,
+        )
+
+    @staticmethod
+    def _ledger_events(path: str) -> list[dict]:
+        with open(path, encoding="utf-8") as fh:
+            return [json.loads(line) for line in fh if line.strip()]
 
     def _client(self, script) -> cp.OpenAICalibrationJudgeClient:
         return cp.OpenAICalibrationJudgeClient(
@@ -289,7 +308,15 @@ class TestDispatchAndFailClosedMapping(ProviderCase):
         entry = entries[0]
         self.assertEqual(entry.requested_model, "gpt-5.5-2026-04-23")
         self.assertEqual(entry.returned_model, "gpt-5.5-2026-04-23")
-        self.assertEqual(entry.outcome_kind, "VERDICT_FAIL")
+        # Family 4: the durable attempt outcome NEVER claims a semantic
+        # verdict from raw JSON; validation appends a separate event.
+        self.assertEqual(entry.outcome_kind, "OUTPUT_RECEIVED_UNVALIDATED")
+        semantic = [
+            e for e in self._ledger_events(self.ledger_path)
+            if e["event_kind"] == "SEMANTIC_OUTCOME"
+        ]
+        self.assertEqual(len(semantic), 1)
+        self.assertEqual(semantic[0]["outcome"], "VALIDATED_FAIL")
         self.assertEqual(entry.reasoning_tokens, 800)
         self.assertTrue(entry.sdk_version and isinstance(entry.sdk_version, str))
 
@@ -404,6 +431,10 @@ class TestRunnerOwnedRetry(ProviderCase):
         entries = self.ledger.entries()
         self.assertEqual(len(entries), 2)
         self.assertEqual(entries[0].outcome_kind, "TRANSPORT_TIMEOUT")
+        # Family 2 invariant 6: a timeout may have crossed the billable
+        # boundary — never recorded as known zero.
+        self.assertTrue(entries[0].billing_unknown)
+        self.assertGreater(entries[0].calculated_charge_nanousd, 0)
         self.assertEqual(entries[0].attempt_number, 1)
         self.assertEqual(entries[1].attempt_number, 2)
         self.assertEqual(entries[1].retry_of_request_id,
@@ -437,6 +468,9 @@ class TestRunnerOwnedRetry(ProviderCase):
         response = client.dispatch(self.request, self.envelope_bytes)
         self.assertIs(response.transport_outcome, TransportOutcome.OK)
         self.assertEqual(len(self.ledger.entries()), 2)
+        # An HTTP-status failure crossed the provider boundary: billing is
+        # unknown, conservatively charged, never known zero (family 2).
+        self.assertTrue(self.ledger.entries()[0].billing_unknown)
 
     def test_auth_status_is_a_stop_not_a_retry(self) -> None:
         fake = FakeSdkClient([FakeStatusError(401)])
@@ -545,6 +579,225 @@ class TestUnclassifiedTransportException(ProviderCase):
         self.assertEqual(len(entries), 1)  # the attempt is still accounted
         self.assertEqual(entries[0].outcome_kind,
                          "STOP_UNCLASSIFIED_TRANSPORT_ERROR")
+        self.assertTrue(entries[0].billing_unknown)
+        self.assertGreater(entries[0].calculated_charge_nanousd, 0)
+
+
+class TestDurableProviderLifecycle(ProviderCase):
+    """Family 2: the live-capable provider path is durable-only, with a
+    write-ahead STARTED event before ANY transport use."""
+
+    def test_provider_rejects_an_in_memory_ledger(self) -> None:
+        from tools.behavioral_eval_runner.judge.calibration_errors import (
+            CalibrationLedgerError,
+        )
+
+        with self.assertRaises(CalibrationLedgerError):
+            cp.OpenAICalibrationJudgeClient(
+                authorization=self.authorization,
+                ledger=cl.CalibrationLedger(None),
+                sdk_client=FakeSdkClient([]),
+                exception_types=FAKE_EXCEPTIONS,
+            )
+
+    def test_started_event_is_durable_before_transport_executes(self) -> None:
+        observed: dict = {}
+
+        def transport_hook(kwargs):
+            events = self._ledger_events(self.ledger_path)
+            observed["started"] = [
+                e for e in events if e["event_kind"] == "ATTEMPT_STARTED"
+            ]
+            observed["terminal"] = [
+                e for e in events if e["event_kind"] == "ATTEMPT_TERMINAL"
+            ]
+            return fake_response(self._valid_raw())
+
+        client = self._client([transport_hook])
+        client.dispatch(self.request, self.envelope_bytes)
+        self.assertEqual(len(observed["started"]), 1)
+        self.assertEqual(len(observed["terminal"]), 0)
+        started = observed["started"][0]
+        self.assertEqual(started["dataset_sha256"],
+                         self.dataset.dataset_sha256())
+        self.assertEqual(started["stage"], "DEVELOPMENT")
+        self.assertEqual(started["logical_judgment_id"],
+                         self.request.request_id)
+
+
+class TestMandatoryDeadlines(ProviderCase):
+    """Family 3: development and whole-run deadlines are mandatory and
+    persistent; the provider consults them before EVERY attempt."""
+
+    def test_provider_has_no_optional_clock_parameter(self) -> None:
+        with self.assertRaises(TypeError):
+            cp.OpenAICalibrationJudgeClient(
+                authorization=self.authorization, ledger=self.ledger,
+                sdk_client=FakeSdkClient([]),
+                exception_types=FAKE_EXCEPTIONS,
+                clock=None,
+            )
+
+    def test_stage_deadline_blocks_the_initial_attempt(self) -> None:
+        self.ledger.begin_active_segment("DEVELOPMENT", at=0.0)
+        self.ledger.end_active_segment(
+            at=cl.DEV_STAGE_DEADLINE_SECONDS + 60.0
+        )
+        fake = FakeSdkClient([fake_response(self._valid_raw())])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=fake, exception_types=FAKE_EXCEPTIONS,
+        )
+        with self.assertRaises(CalibrationStopError) as ctx:
+            client.dispatch(self.request, self.envelope_bytes)
+        self.assertIs(ctx.exception.stop_reason,
+                      CalibrationStopReason.DEADLINE_EXCEEDED)
+        self.assertEqual(fake.responses.calls, [])  # nothing dispatched
+        self.assertEqual(len(self.ledger.entries()), 0)  # no attempt burned
+
+    def test_deadline_between_attempts_blocks_the_retry(self) -> None:
+        class TickingTime:
+            def __init__(self) -> None:
+                self.now = 5000.0  # inside the 5,400 s development limit
+
+            def __call__(self) -> float:
+                return self.now
+
+        ticking = TickingTime()
+        self.ledger.begin_active_segment("DEVELOPMENT", at=0.0)
+
+        def slow_timeout(kwargs):
+            ticking.now = cl.DEV_STAGE_DEADLINE_SECONDS + 50.0
+            raise FakeTimeoutError("attempt 1 timed out at the deadline")
+
+        fake = FakeSdkClient([slow_timeout,
+                              fake_response(self._valid_raw())])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=fake, exception_types=FAKE_EXCEPTIONS,
+            time_source=ticking,
+        )
+        with self.assertRaises(CalibrationStopError) as ctx:
+            client.dispatch(self.request, self.envelope_bytes)
+        self.assertIs(ctx.exception.stop_reason,
+                      CalibrationStopReason.DEADLINE_EXCEEDED)
+        self.assertEqual(len(fake.responses.calls), 1)  # retry prevented
+        entries = self.ledger.entries()
+        self.assertEqual(len(entries), 1)  # only attempt 1 consumed
+        self.assertEqual(entries[0].outcome_kind, "TRANSPORT_TIMEOUT")
+
+
+class TestValidatedSemanticOutcome(ProviderCase):
+    """Family 4: the durable evidence never claims a semantic PASS/FAIL/
+    ABSTAIN the canonical parser would reject."""
+
+    def _fresh(self, script):
+        ledger, path = self._durable_ledger()
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=ledger,
+            sdk_client=FakeSdkClient(script),
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        return client, ledger, path
+
+    def _raw(self, **overrides) -> str:
+        payload = json.loads(self._valid_raw())
+        payload.update(overrides)
+        return json.dumps(payload)
+
+    def _valid_pass_raw(self) -> str:
+        return self._raw(
+            verdict="PASS", failure_mode=None, offending_span=None,
+            reason_code="MEETS_RUBRIC",
+        )
+
+    def _valid_abstain_raw(self) -> str:
+        return self._raw(
+            verdict="ABSTAIN", failure_mode=None, offending_span=None,
+            reason_code="INSUFFICIENT_EVIDENCE", evidence_refs=[],
+        )
+
+    def _semantic_events(self, path: str) -> list[dict]:
+        return [
+            e for e in self._ledger_events(path)
+            if e["event_kind"] == "SEMANTIC_OUTCOME"
+        ]
+
+    def test_valid_complete_verdicts_validate_truthfully(self) -> None:
+        for raw, expected in (
+            (self._valid_pass_raw(), "VALIDATED_PASS"),
+            (self._valid_raw(), "VALIDATED_FAIL"),
+            (self._valid_abstain_raw(), "VALIDATED_ABSTAIN"),
+        ):
+            with self.subTest(expected=expected):
+                client, ledger, path = self._fresh([fake_response(raw)])
+                outcome = cp.dispatch_calibration_judgment(
+                    client, self.request, self.envelope
+                )
+                if expected == "VALIDATED_ABSTAIN":
+                    self.assertTrue(outcome.is_verdict)
+                    self.assertEqual(outcome.verdict.verdict.value,
+                                     "ABSTAIN")
+                semantic = self._semantic_events(path)
+                self.assertEqual(len(semantic), 1)
+                self.assertEqual(semantic[0]["outcome"], expected)
+                self.assertEqual(
+                    ledger.entries()[0].outcome_kind,
+                    "OUTPUT_RECEIVED_UNVALIDATED",
+                )
+
+    def test_tampered_pass_claims_never_become_semantic_pass(self) -> None:
+        tampers = {
+            "missing_required_field": None,  # handled specially below
+            "wrong_request_id": {"request_id": "wp2b3-not-this-one"},
+            "wrong_control_id": {"control_id": "SCENARIO_A_CONTROL_G"},
+            "wrong_rubric_id": {"rubric_id": "rubric.other.v1"},
+            "wrong_rubric_sha": {"rubric_sha256": "a" * 64},
+            "wrong_manifest": {"input_manifest_sha256": "b" * 64},
+            "wrong_judge_id": {"judge_id": "someone-else"},
+            "wrong_schema_version": {"schema_version": "9.9.9"},
+            "invalid_evidence_refs": {"evidence_refs": ["not-a-channel"]},
+            "pass_with_failure_mode": {
+                "failure_mode": "OTHER_RUBRIC_VIOLATION"
+            },
+        }
+        for name, override in tampers.items():
+            with self.subTest(tamper=name):
+                if name == "missing_required_field":
+                    payload = json.loads(self._valid_pass_raw())
+                    del payload["reason_code"]
+                    raw = json.dumps(payload)
+                else:
+                    base = json.loads(self._valid_pass_raw())
+                    base.update(override)
+                    raw = json.dumps(base)
+                client, ledger, path = self._fresh([fake_response(raw)])
+                outcome = cp.dispatch_calibration_judgment(
+                    client, self.request, self.envelope
+                )
+                self.assertFalse(outcome.is_verdict, name)
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+                self.assertNotIn("VALIDATED_PASS", text, name)
+                semantic = self._semantic_events(path)
+                self.assertEqual(len(semantic), 1, name)
+                self.assertTrue(
+                    semantic[0]["outcome"].startswith("JUDGE_ERROR"), name
+                )
+                # ...and a rejected verdict NEVER retries.
+                self.assertEqual(len(ledger.entries()), 1, name)
+
+    def test_raw_verdict_strings_never_label_the_ledger(self) -> None:
+        client, ledger, path = self._fresh(
+            [fake_response(self._valid_raw())]
+        )
+        cp.dispatch_calibration_judgment(client, self.request, self.envelope)
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertNotIn("VERDICT_FAIL", text)
+        self.assertNotIn("VERDICT_PASS", text)
+        self.assertIn("OUTPUT_RECEIVED_UNVALIDATED", text)
+        self.assertIn("VALIDATED_FAIL", text)
 
 
 class TestMetadataRequestSurface(ProviderCase):

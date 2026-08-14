@@ -39,7 +39,6 @@ from .calibration_errors import (
 from .calibration_gates import CalibrationDispatchAuthorization, ExecutionStage
 from .calibration_ledger import (
     CalibrationLedger,
-    DEV_STAGE_DEADLINE_SECONDS,
     ProviderUsage,
     RequestKind,
 )
@@ -47,7 +46,7 @@ from .calibration_transport import (
     AUTHORIZED_MODEL_SNAPSHOT,
     DEV_MAX_OUTPUT_TOKENS,
     build_responses_request_kwargs,
-    enforce_input_token_budget,
+    enforce_proven_input_budget,
     verify_client_invariants,
 )
 from .envelope import render_envelope_text
@@ -112,10 +111,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         ledger: CalibrationLedger,
         sdk_client: Any,
         exception_types: TransportExceptionTypes | None = None,
-        clock: Any | None = None,
-        stage_deadline_seconds: float = DEV_STAGE_DEADLINE_SECONDS,
         day_provider: Callable[[], str] = _utc_day,
-        time_source: Callable[[], float] = time.monotonic,
+        time_source: Callable[[], float] = time.time,
     ) -> None:
         if not isinstance(authorization, CalibrationDispatchAuthorization):
             raise CalibrationAuthorizationError(
@@ -134,13 +131,20 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 "a CalibrationLedger is required: unaccounted dispatch is "
                 "impossible by construction"
             )
+        if not ledger.is_durable:
+            # Family 2 invariant 1: the live-capable provider path requires
+            # durable write-ahead accounting; in-memory ledgers are for
+            # isolated unit tests of the ledger itself only.
+            raise CalibrationLedgerError(
+                "the calibration provider requires the DURABLE work-package "
+                "ledger; an in-memory ledger can silently lose external "
+                "attempts and is refused"
+            )
         verify_client_invariants(sdk_client)
         self._authorization = authorization
         self._ledger = ledger
         self._sdk = sdk_client
         self._exceptions = exception_types
-        self._clock = clock
-        self._stage_deadline_seconds = stage_deadline_seconds
         self._day_provider = day_provider
         self._time_source = time_source
         self._in_flight = False
@@ -164,6 +168,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         incomplete_reason: str | None,
         usage: ProviderUsage | None,
         outcome_kind: str,
+        billing_unknown: bool = False,
     ):
         return self._ledger.record(
             reservation,
@@ -178,6 +183,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
             incomplete_details_reason=incomplete_reason,
             usage=usage,
             outcome_kind=outcome_kind,
+            billing_unknown=billing_unknown,
         )
 
     @staticmethod
@@ -211,16 +217,30 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                     return True
         return False
 
-    @staticmethod
-    def _outcome_label_for_raw(raw_output: str) -> str:
-        try:
-            payload = json.loads(raw_output)
-            verdict = payload.get("verdict") if isinstance(payload, dict) else None
-        except ValueError:
-            verdict = None
-        if verdict in ("PASS", "FAIL", "ABSTAIN"):
-            return f"VERDICT_{verdict}"
-        return "JUDGE_ERROR_MALFORMED"
+    def record_validated_outcome(
+        self, request: JudgeRequest, outcome: JudgeOutcome
+    ) -> None:
+        """Family 4: append the VALIDATED terminal semantic event for the
+        most recent unvalidated output of this request — only after the
+        canonical parser and binding validation have spoken."""
+        target = None
+        for entry in reversed(self._ledger.entries()):
+            if (
+                entry.logical_judgment_id == request.request_id
+                and entry.outcome_kind == "OUTPUT_RECEIVED_UNVALIDATED"
+            ):
+                target = entry
+                break
+        if target is None:
+            return  # no usable output was ever durably received
+        if outcome.is_verdict:
+            assert outcome.verdict is not None
+            label = f"VALIDATED_{outcome.verdict.verdict.value}"
+        else:
+            label = f"JUDGE_ERROR_{outcome.judge_error_kind}"
+        self._ledger.record_semantic_outcome(
+            target.internal_request_id, label
+        )
 
     # ---------------------------------------------------------- dispatch
     def dispatch(self, request: JudgeRequest, envelope_bytes: bytes) -> JudgeResponse:
@@ -276,20 +296,25 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         envelope = json.loads(bytes(envelope_bytes).decode("utf-8"))
         input_text = render_envelope_text(envelope)
         instructions = JUDGE_SYSTEM_POLICY
-        estimated_input = enforce_input_token_budget(input_text, instructions)
         kwargs = build_responses_request_kwargs(
             instructions=instructions,
             input_text=input_text,
             max_output_tokens=DEV_MAX_OUTPUT_TOKENS,
         )
-        if self._clock is not None:
-            self._clock.check_stage_deadline(
-                self._stage_deadline_seconds, now=self._time_source()
-            )
+        # Family-1 gate: the PROVEN bound covers the COMPLETE serialized
+        # request surface (instructions + input + schema block + model +
+        # reasoning) and rejects BEFORE any reservation or provider use.
+        estimated_input = enforce_proven_input_budget(kwargs)
 
         previous_entry_id: str | None = None
         result: _AttemptResult | None = None
         for attempt_number in (1, 2):
+            # Family-3 gate: the persistent stage AND whole-run deadlines
+            # are checked before EVERY external attempt — including the
+            # runner retry — from the durable ledger's active-time state.
+            self._ledger.check_deadlines(
+                self._authorization.stage.value, now=self._time_source()
+            )
             reservation = self._ledger.reserve(
                 kind=RequestKind.JUDGMENT_ATTEMPT,
                 logical_judgment_id=request.request_id,
@@ -297,6 +322,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 estimated_input_tokens=estimated_input,
                 max_output_tokens=DEV_MAX_OUTPUT_TOKENS,
                 day=self._day_provider(),
+                dataset_sha256=self._authorization.dataset_sha256,
+                stage=self._authorization.stage.value,
                 retry_of_request_id=previous_entry_id,
             )
             result = self._attempt(request, kwargs, reservation)
@@ -323,11 +350,15 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         try:
             response = self._sdk.responses.create(**dict(kwargs))
         except exceptions.timeout:
+            # Family 2 invariant 6: the request may have crossed the
+            # billable provider boundary — billing is UNKNOWN and the
+            # reserved worst case is charged, never known zero.
             entry = self._record(
                 reservation, response_id=None, trace_id=None,
                 returned_model=None, started=started, latency_ms=latency(),
                 response_status="TIMEOUT", incomplete_reason=None,
-                usage=ProviderUsage.zero(), outcome_kind="TRANSPORT_TIMEOUT",
+                usage=None, billing_unknown=True,
+                outcome_kind="TRANSPORT_TIMEOUT",
             )
             return _AttemptResult(
                 JudgeResponse(
@@ -344,7 +375,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 reservation, response_id=None, trace_id=None,
                 returned_model=None, started=started, latency_ms=latency(),
                 response_status="CONNECTION_ERROR", incomplete_reason=None,
-                usage=ProviderUsage.zero(),
+                usage=None, billing_unknown=True,
                 outcome_kind="TRANSPORT_CONNECTION_ERROR",
             )
             return _AttemptResult(
@@ -364,7 +395,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                     reservation, response_id=None, trace_id=None,
                     returned_model=None, started=started,
                     latency_ms=latency(), response_status=str(code),
-                    incomplete_reason=None, usage=ProviderUsage.zero(),
+                    incomplete_reason=None, usage=None, billing_unknown=True,
                     outcome_kind="STOP_PROVIDER_AUTH_REJECTED",
                 )
                 raise CalibrationStopError(
@@ -379,7 +410,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 reservation, response_id=None, trace_id=None,
                 returned_model=None, started=started, latency_ms=latency(),
                 response_status=str(code), incomplete_reason=None,
-                usage=ProviderUsage.zero(),
+                usage=None, billing_unknown=True,
                 outcome_kind=f"TRANSPORT_STATUS_{code}",
             )
             return _AttemptResult(
@@ -396,14 +427,15 @@ class OpenAICalibrationJudgeClient(JudgeClient):
             raise  # a typed stop is never re-wrapped
         except Exception as exc:
             # An unclassified transport/SDK exception may still have reached
-            # the provider (and been billed): the attempt is ACCOUNTED with
-            # its worst-case posture unknown, then the run stops typed —
-            # never an unrecorded external request, never a silent crash.
+            # the provider (and been billed): the attempt is ACCOUNTED at
+            # its reserved worst case with billing UNKNOWN, then the run
+            # stops typed — never an unrecorded external request, never a
+            # silent crash, never a known-zero claim.
             self._record(
                 reservation, response_id=None, trace_id=None,
                 returned_model=None, started=started, latency_ms=latency(),
                 response_status="UNCLASSIFIED_EXCEPTION",
-                incomplete_reason=None, usage=ProviderUsage.zero(),
+                incomplete_reason=None, usage=None, billing_unknown=True,
                 outcome_kind="STOP_UNCLASSIFIED_TRANSPORT_ERROR",
             )
             raise CalibrationStopError(
@@ -425,7 +457,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 reservation, response_id=response_id, trace_id=trace_id,
                 returned_model=returned_model, started=started,
                 latency_ms=elapsed_ms, response_status=str(status),
-                incomplete_reason=None, usage=usage or ProviderUsage.zero(),
+                incomplete_reason=None, usage=usage,
+                billing_unknown=usage is None,
                 outcome_kind="STOP_MODEL_IDENTITY_MISMATCH",
             )
             raise CalibrationStopError(
@@ -534,7 +567,10 @@ class OpenAICalibrationJudgeClient(JudgeClient):
             returned_model=returned_model, started=started,
             latency_ms=elapsed_ms, response_status="completed",
             incomplete_reason=None, usage=usage,
-            outcome_kind=self._outcome_label_for_raw(raw_output),
+            # Family 4: the durable attempt record NEVER claims a semantic
+            # verdict from raw JSON — validation appends a separate
+            # SEMANTIC_OUTCOME event through the canonical parse path.
+            outcome_kind="OUTPUT_RECEIVED_UNVALIDATED",
         )
         return _AttemptResult(
             JudgeResponse(
@@ -553,6 +589,9 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         """The single authorized read-only availability request
         (GET /v1/models/gpt-5.5-2026-04-23). Stage A1 never calls this with
         a live client; the ledger enforces the exactly-one cap."""
+        self._ledger.check_deadlines(
+            self._authorization.stage.value, now=self._time_source()
+        )
         reservation = self._ledger.reserve(
             kind=RequestKind.METADATA,
             logical_judgment_id=None,
@@ -560,6 +599,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
             estimated_input_tokens=0,
             max_output_tokens=0,
             day=self._day_provider(),
+            dataset_sha256=self._authorization.dataset_sha256,
+            stage=self._authorization.stage.value,
         )
         started = _utc_now_iso()
         t0 = self._time_source()
@@ -628,4 +669,9 @@ def dispatch_calibration_judgment(
         )
     envelope_bytes = canonical_bytes({k: envelope[k] for k in sorted(envelope)})
     response = client.dispatch(request, envelope_bytes)
-    return parse_judge_output(response, request, envelope)
+    outcome = parse_judge_output(response, request, envelope)
+    if isinstance(client, OpenAICalibrationJudgeClient):
+        # Family 4: only the canonical parser's result may become the
+        # durable terminal semantic event.
+        client.record_validated_outcome(request, outcome)
+    return outcome

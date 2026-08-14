@@ -179,6 +179,67 @@ class TestOwnerApprovalGate(unittest.TestCase):
             cg.OwnerLabelApproval.from_dict(forged_status)
 
 
+class TestFreezeContractIntegrity(unittest.TestCase):
+    """Family 5: the freeze integrity binding covers reasoning_effort and
+    the selected holdout max_output_tokens (BER-DEC-008 decision 35) via a
+    canonical contract digest over the COMPLETE artifact."""
+
+    def test_valid_example_carries_a_correct_contract_digest(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        self.assertIn("freeze_contract_sha256", payload)
+        artifact = cg.HoldoutFreezeArtifact.from_dict(payload)
+        self.assertEqual(
+            artifact.freeze_contract_sha256,
+            cg.freeze_contract_sha256(payload),
+        )
+
+    def test_missing_contract_digest_fails(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        del payload["freeze_contract_sha256"]
+        with self.assertRaises(SchemaValidationError):
+            cg.HoldoutFreezeArtifact.from_dict(payload)
+
+    def test_changed_reasoning_effort_fails_integrity(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload["reasoning_effort"] = "high"  # post-hoc change
+        with self.assertRaises(SchemaValidationError):
+            cg.HoldoutFreezeArtifact.from_dict(payload)
+
+    def test_changed_selected_cap_fails_integrity(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload["holdout_max_output_tokens"] = 20000  # post-hoc change
+        with self.assertRaises(SchemaValidationError):
+            cg.HoldoutFreezeArtifact.from_dict(payload)
+
+    def test_changed_frozen_hash_fails_integrity(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        frozen = dict(payload["frozen_sha256"])
+        frozen["labels"] = "9" * 64
+        payload["frozen_sha256"] = frozen
+        with self.assertRaises(SchemaValidationError):
+            cg.HoldoutFreezeArtifact.from_dict(payload)
+
+    def test_reasoning_and_cap_are_inside_the_digest_surface(self) -> None:
+        base = cg.HoldoutFreezeArtifact.example_dict()
+        varied = cg.HoldoutFreezeArtifact.example_dict()
+        varied["holdout_max_output_tokens"] = 9000
+        self.assertNotEqual(
+            cg.freeze_contract_sha256(base),
+            cg.freeze_contract_sha256(varied),
+        )
+        varied_effort = cg.HoldoutFreezeArtifact.example_dict()
+        varied_effort["reasoning_effort"] = "low"
+        self.assertNotEqual(
+            cg.freeze_contract_sha256(base),
+            cg.freeze_contract_sha256(varied_effort),
+        )
+
+    def test_example_remains_clearly_non_owner(self) -> None:
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        self.assertIn("NOT AN OWNER DECISION",
+                      payload["owner_freeze_statement"])
+
+
 class TestHoldoutFreezeGate(unittest.TestCase):
     def test_no_freeze_artifact_no_holdout_access(self) -> None:
         with self.assertRaises(HoldoutAccessError):

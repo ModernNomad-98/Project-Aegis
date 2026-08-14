@@ -36,12 +36,12 @@ New runtime modules under `tools/behavioral_eval_runner/judge/`:
 | --- | --- |
 | `calibration_errors.py` | Typed WP-2B-3 error taxonomy; closed `CalibrationStopReason` set covering the BER-DEC-008 stop conditions (model-identity mismatch, telemetry unavailable, credential missing, proxy/TLS/base-URL interference, SDK pin/retry violations, owner-approval pending, holdout not frozen, deadline exceeded, concurrency violation) |
 | `calibration_credential.py` | Process-scoped consume-once credential handle: redacted `repr`/`str`, removal from the process environment on first read, missing ⇒ STOP; implemented but NEVER exercised with a real secret in Stage A1 (dummy sentinels only in tests) |
-| `calibration_transport.py` | Pinned terms as code: OpenAI Responses API; exact snapshot `gpt-5.5-2026-04-23`; SDK `openai==3.0.0` with the BER-DEC-008 wheel/sdist SHA-256; egress `api.openai.com:443`; connect 15 s / total 300 s; SDK-owned retries pinned to ZERO. Lazy SDK import (importing the module loads no network machinery); client factory fails closed on proxy/TLS/base-URL environment interference BEFORE construction, builds the inner HTTP client with `trust_env=False`, and verifies `max_retries == 0` and the exact base URL after construction. The CLOSED request-kwargs set (exactly `model/instructions/input/text/reasoning/store/background/max_output_tokens`; every tool/function/search/code/conversation/sampling/cache/service channel is a named FORBIDDEN key), the strict structured-output verdict schema mirroring `StructuredVerdict`, and the conservative ceil(len/3) 8,000-input-token gate |
-| `calibration_ledger.py` | Append-only, hash-chained accounting with integer nano-USD money (input 5,000 / output 30,000 / cached input 500 nano-USD per token; price-verification date recorded). Pre-dispatch reservations enforce: 200 judgment attempts (inclusive of transport retries), 1 metadata request, 201 total external requests, 2 attempts per logical judgment, 8,000 input / 25,000 development output tokens, USD $175 total AND single-day ceilings with stop-BEFORE-cap worst-case projection (worst permitted token path USD $158 = 200 × (8,000×$5/M + 25,000×$30/M)). Missing usage telemetry writes a worst-case-charged, `telemetry_missing`-marked entry and raises the STOP — success is never estimated. Every entry carries the full BER-DEC-008 decision-27 accounting fields (request/judgment/attempt identities, provider response id, requested vs returned model, timestamps/latency, status + `incomplete_details`, token counts incl. reasoning-token COUNT, unit prices, calculated charge, cumulative counters, retry linkage, SDK version). Active-execution deadlines 90 min / 4 h / 6 h with OWNER_WAIT consuming no active clock |
+| `calibration_transport.py` | Pinned terms as code: OpenAI Responses API; exact snapshot `gpt-5.5-2026-04-23`; SDK `openai==3.0.0` with the BER-DEC-008 wheel/sdist SHA-256; egress `api.openai.com:443`; connect 15 s / total 300 s; SDK-owned retries pinned to ZERO. Lazy SDK import (importing the module loads no network machinery); client factory fails closed on proxy/TLS/base-URL environment interference BEFORE construction, builds the inner HTTP client with `trust_env=False`, and verifies `max_retries == 0` and the exact base URL after construction. The CLOSED request-kwargs set (exactly `model/instructions/input/text/reasoning/store/background/max_output_tokens`; every tool/function/search/code/conversation/sampling/cache/service channel is a named FORBIDDEN key), the strict structured-output verdict schema mirroring `StructuredVerdict`, and the PROVEN pre-dispatch 8,000-input-token ceiling: a byte-based upper bound over the COMPLETE serialized request surface (instructions + rendered input + the canonical `text`/schema block + model + reasoning) resting on the byte-level-BPE property token_count ≤ UTF-8 bytes, plus a documented 64-token framing margin — dispatch above 8,000 is impossible, conservative false rejection is permitted (measured: all 40 development items bound at 4,744–5,402 tokens) |
+| `calibration_ledger.py` | EVENT-SOURCED, SINGLE-FILE durable work-package ledger with integer nano-USD money (input 5,000 / output 30,000 / cached input 500 nano-USD per token; price-verification date recorded). One append-only hash chain holds GENESIS / SEGMENT_OPENED / ATTEMPT_STARTED / ATTEMPT_TERMINAL / ACTIVE_SEGMENT_BEGIN·END / SEMANTIC_OUTCOME / DEADLINE_STOP events. Every reservation durably appends a write-ahead STARTED event BEFORE any transport use; a later execution segment REOPENS the same file, verifies the complete chain, and continues every total (creating a fresh file requires an explicit, durably recorded first-segment declaration — silent resets are impossible). STARTED-without-terminal orphans are detected on reopen, counted against every ceiling at reserved worst case with billing UNKNOWN, their identities never reused, and further reservation STOPS pending owner review. Attempt ids are run-prefixed and globally unique across segments; retry linkage is durable. Pre-dispatch reservations enforce: 200 judgment attempts (inclusive of transport retries), 1 metadata request, 201 total, 2 attempts per logical judgment, 8,000 input / 25,000 development output tokens, USD $175 total AND single-day ceilings with stop-BEFORE-cap worst-case projection (worst permitted token path USD $158). Missing usage telemetry writes a worst-case-charged `telemetry_missing` entry and STOPS; boundary-uncertain failures are `billing_unknown` at reserved worst case — NEVER known zero; provider-reported input-token overshoot, output tokens above the reserved ceiling, and an actual charge breaching a hard ceiling each record honestly and STOP. Active-execution deadlines (90 min development / 4 h holdout / 6 h whole-run; OWNER_WAIT contributes zero) are persisted in the same chain and survive restarts |
 | `calibration_dataset.py` | The SYNTHETIC CANDIDATE dataset contract: exactly 160 distinct items over the ten semantic-bearing controls (A, B, C, D, G, H, I, J, N, O); 16 per control (4 development = 2 PASS + 2 FAIL; 12 sealed holdout = 6 + 6); ≥40 holdout CRITICAL expected-FAIL; ≥40 holdout injection/role-confusion items with ≥20/≥20; CRITICAL/adversarial overlap reported separately with no double-counting; distinct-transcript enforcement; `candidate_expected_label` vocabulary with `owner_label_status = PENDING` (candidate labels are explicitly NOT human labels); hash-bound split map; development-only selection; holdout items unreachable without the owner freeze authorization; the label-free `CalibrationItemContent` judge-facing projection on which expected labels are structurally unrepresentable (label-bearing keys raise) |
 | `calibration_envelope.py` | Calibration envelopes of the EXACT WP-2B-2 envelope shape (same version, policy identity, TRUSTED contract-derived control context, base64 canonical-JSON untrusted `transcript` channel, item-manifest input binding) — the existing `validate_request_envelope_binding` and `parse_judge_output` apply unchanged |
 | `calibration_gates.py` | The hard Stage-A1 gate: a missing or PENDING owner label-approval artifact mechanically blocks every provider judgment call; APPROVED artifacts must hash-bind the exact dataset, split map, and labeling guide; authorization objects are constructible ONLY through the gate functions; OWNER_WAIT authorizes nothing; sealed-holdout execution additionally requires the decision-35 freeze artifact (all frozen-artifact hashes present; holdout `max_output_tokens` within [8,192, 25,000]) |
-| `calibration_provider.py` | The calibration-only judge client: constructible only with a gate-issued authorization and a ledger; refuses requests without the authorized candidate-dataset identity; envelope bytes must hash-bind the request BEFORE any reservation or provider interaction; concurrency 1; per-attempt reservation → dispatch → record; the Aegis runner owns EXACTLY ONE connection/transport retry (timeout/connection error/retryable HTTP status with no usable judgment), each attempt uniquely ledgered with retry linkage; semantic FAIL verdicts, malformed output, refusals, and incomplete responses NEVER retry; returned-model mismatch ⇒ recorded entry + STOP (no silent alias normalization); HTTP 401/403 ⇒ STOP; incomplete ⇒ `JUDGE_ERROR`, never parsed as a verdict; the single authorized read-only metadata surface (`GET /v1/models/gpt-5.5-2026-04-23`) is implemented, ledger-capped at exactly one, and NOT called in Stage A1 |
+| `calibration_provider.py` | The calibration-only judge client: constructible only with a gate-issued authorization AND the DURABLE work-package ledger (an in-memory ledger is refused — no unaccounted dispatch path exists); no optional clock — the persistent stage and whole-run deadlines are checked from the ledger's durable active-time state before EVERY external attempt including the runner retry; refuses requests without the authorized candidate-dataset identity or outside the gate-derived development item set; envelope bytes must hash-bind the request BEFORE any reservation or provider interaction; concurrency 1; per-attempt durable STARTED → dispatch → terminal record; the Aegis runner owns EXACTLY ONE connection/transport retry, each attempt uniquely ledgered with durable retry linkage; semantic FAIL verdicts, malformed output, refusals, and incomplete responses NEVER retry; returned-model mismatch ⇒ recorded entry + STOP (no silent alias normalization; also enforced on the metadata response); HTTP 401/403 ⇒ STOP; unclassified transport exceptions ⇒ recorded `billing_unknown` attempt + typed STOP; incomplete ⇒ `JUDGE_ERROR`, never parsed; a completed usable output is durably recorded as `OUTPUT_RECEIVED_UNVALIDATED` and the VALIDATED_PASS/FAIL/ABSTAIN (or `JUDGE_ERROR_*`) terminal semantic event is appended ONLY after the canonical `parse_judge_output` + full request/envelope binding validation; the single authorized read-only metadata surface uses the same durable lifecycle, ledger-capped at exactly one, NOT called in Stage A1 |
 
 Schemas (`1.0.0-wp2b3`, draft-07, `additionalProperties: false`):
 `calibration-candidate-dataset.schema.json`, `calibration-owner-approval.schema.json`,
@@ -104,7 +104,10 @@ per-item candidate label + concise rationale + transcript hash, the mechanical
 validation results, one explicit design note for owner veto (the 40 development items
 are deliberately non-adversarial), and an empty ambiguity-flag list.
 
-## 5. Tests and validation (actual results at the implementation head)
+## 5. Tests and validation (actual results at the ORIGINAL implementation head)
+
+*(Historical record of the originally pushed head `52805dc4…`; the PR #88
+correction pass results at the corrected head are in §5b — 832/0/0.)*
 
 Local runner tests are developer-machine evidence — GitHub CI validates only the
 repository gates and does not run the runner suite.
@@ -191,6 +194,87 @@ the Stage A2 terms); the in-process Python capability-key pattern is bypassable 
 trusted in-process code (standard idiom; no untrusted code path exists); the
 legacy provider-fragment ban list covers the four historical fragments only
 (pre-existing scope).
+
+*(Superseded mechanisms note, recorded by the §5b correction pass: the
+`prior_ledger_paths` cross-segment mechanism described above was REPLACED by the
+single-file continuously-appendable ledger, and the optional deadline clock was
+replaced by mandatory persistent deadlines — see §5b.)*
+
+## 5b. Independent exact-head audit (REQUEST CHANGES) and the PR #88 correction pass
+
+The independent ChatGPT exact-head audit of `52805dc4ea2cd3ccb11a3af79ef557a6d6d32b8d`
+returned **REQUEST CHANGES**: four pre-provider-execution blocker families, one
+decision-35 freeze-contract defect, and one accounting subcase, all corrected in ONE
+bounded test-first pass (38 new RED-first regressions; every family's RED and GREEN
+log retained in the external evidence root; the candidate dataset, split map, and
+labeling guide remained byte-identical throughout):
+
+1. **Provable pre-dispatch input ceiling.** The `ceil(len/3)` heuristic was removed
+   (its names no longer exist). The gate is now `proven_input_token_upper_bound`: the
+   sum of UTF-8 byte lengths of EVERY serialized textual member of the closed request
+   surface — instructions, rendered envelope input, the canonical `text`/schema
+   block, the model identifier, the reasoning block — plus a documented 64-token
+   framing margin, resting on the byte-level-BPE property token_count ≤ UTF-8 bytes.
+   Dispatch above 8,000 is impossible; the provider-reported input overshoot check
+   remains as the second defensive control. Measured against the real candidate
+   dataset: all 40 development items bound between 4,744 and 5,402 tokens.
+2. **Durable work-package accounting.** The ledger was rebuilt as an event-sourced
+   single-file chain: durable write-ahead `ATTEMPT_STARTED` before ANY transport use
+   (judgment and metadata); separate append-only terminal events; reopen-and-verify
+   continuity with an explicit durably-recorded first-segment declaration (silent
+   resets impossible); crash orphans detected, worst-case charged, billing UNKNOWN,
+   identities never reused, further reservation stopped pending owner review;
+   run-prefixed globally unique attempt ids with durable retry linkage; the
+   live-capable provider REJECTS in-memory ledgers. Boundary-uncertain failures
+   (timeout / connection error / HTTP status / unclassified exception) are recorded
+   `billing_unknown` at the reserved worst case — never known zero; known zero
+   remains only for proven-local rejections that never reserve at all.
+3. **Mandatory persistent deadlines.** The optional `clock=None` parameter is gone.
+   Active-execution segments are events in the durable chain; the provider checks the
+   stage limit AND the 6-hour whole-run limit from that persistent state before EVERY
+   external attempt, including between attempt 1 and the runner retry; restarts and
+   segment transitions preserve active time; OWNER_WAIT contributes zero; a deadline
+   denial appends `DEADLINE_STOP` evidence and consumes no external request. The
+   4-hour holdout limit is represented and integrity-tested (no holdout execution
+   exists in Stage A1).
+4. **Validated semantic outcomes.** A completed usable output is durably recorded as
+   `OUTPUT_RECEIVED_UNVALIDATED`; the terminal semantic event
+   (`VALIDATED_PASS/FAIL/ABSTAIN` or `JUDGE_ERROR_*`) is appended ONLY after the
+   canonical `parse_judge_output` plus complete request/envelope binding validation.
+   Ten tamper regressions prove a raw `"verdict": "PASS"` with any wrong field
+   (request id, control, rubric id/hash, manifest, judge identity, schema version,
+   evidence refs, cross-field rules, missing field) never becomes a durable semantic
+   PASS and never retries.
+5. **Complete freeze integrity (decision 35).** `HoldoutFreezeArtifact` now carries
+   `freeze_contract_sha256` — a canonical digest over the COMPLETE artifact binding
+   `reasoning_effort` and the owner-selected holdout `max_output_tokens` together
+   with all thirteen frozen-artifact hashes; any post-hoc change or missing binding
+   invalidates the authorization. Example artifacts remain explicitly non-owner.
+6. **Overshoot subcase (folded into family 2).** Provider-reported output tokens
+   above the reserved ceiling and an actual recorded charge breaching the total or
+   single-day ceiling are each recorded honestly and STOP further execution.
+
+Corrected-head validation: full suite **832 tests, 0 failures, 0 errors** (system
+Python: 9 skips = 4 pre-existing POSIX + 5 SDK-absent; pinned-SDK venv: 4 POSIX skips
+only — every SDK-dependent correction test executed); `self-check` **PASS 21/21**;
+census ×2 byte-identical `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`;
+validator **91 PASS**; `validate-skills` **184/0**; `git diff --check` clean; the
+static-safety allowlist is UNCHANGED (still exactly the two adapter modules); no new
+dependency; zero provider/model/metadata calls and zero credential access throughout
+the correction. A focused read-only exact-corrective-diff reviewer (ten-dimension
+closed scope) ran before commit: **BLOCKERS: 0 — all ten dimensions SOUND**, with
+four non-blocking residuals recorded as dispositions (no post-review code change; the
+committed corrective diff is byte-identical to the reviewed diff): **F4, the one item
+not to drift and a NAMED STAGE A2 PRECONDITION — no production code opens an active
+deadline segment yet, so the mandatory 90-minute/6-hour clocks accrue nothing until
+the Stage A2 driver opens/refreshes the active segment (or the provider is made to
+fail closed when none is open) with epoch-based timestamps; active time does NOT
+accrue automatically**; F1 — the durable write-ahead append is flushed but not
+fsynced (OS/power-loss window; one-line fix named as a first-live-authorization
+precondition); F2 — per-event-kind schema `required` strictness for terminal
+accounting fields; F3 — the metadata unclassified-exception path records known-zero
+where the invariant's letter says billing-unknown (provably identical money; flag
+flip at Stage A2). Full report in the external evidence root.
 
 ## 6. Model and spend accounting (Stage A1)
 

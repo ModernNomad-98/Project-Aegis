@@ -206,23 +206,92 @@ class TestClosedRequestKwargs(unittest.TestCase):
             )
 
 
-class TestInputTokenBudget(unittest.TestCase):
-    def test_estimator_is_conservative_and_deterministic(self) -> None:
-        self.assertEqual(ct.estimate_input_tokens(""), 0)
-        self.assertEqual(ct.estimate_input_tokens("abc"), 1)
-        self.assertEqual(ct.estimate_input_tokens("a" * 30), 10)
+class TestProvenInputBound(unittest.TestCase):
+    """Family 1 (audit blocker): the pre-dispatch 8,000-input-token ceiling
+    must rest on a PROVEN upper bound over the COMPLETE serialized request
+    surface — never the old len/3 heuristic."""
 
-    def test_budget_gate_blocks_oversized_input(self) -> None:
-        small = "x" * 300
-        ct.enforce_input_token_budget(small, "policy")
-        oversized = "x" * (3 * 8001)
-        with self.assertRaises(CalibrationReservationDenied):
-            ct.enforce_input_token_budget(oversized, "policy")
+    def _kwargs(self, input_text: str = "ENVELOPE",
+                instructions: str = "POLICY") -> dict:
+        return ct.build_responses_request_kwargs(
+            instructions=instructions, input_text=input_text,
+            max_output_tokens=ct.DEV_MAX_OUTPUT_TOKENS,
+        )
 
-    def test_budget_counts_instructions_and_input_together(self) -> None:
-        half = "x" * (3 * 4001)
+    def test_len3_heuristic_is_gone(self) -> None:
+        # The unproven estimator may no longer exist under its old names, so
+        # no call path can describe it as a conservative token bound.
+        self.assertFalse(hasattr(ct, "estimate_input_tokens"))
+        self.assertFalse(hasattr(ct, "enforce_input_token_budget"))
+
+    def test_margin_exists_and_is_documented_positive(self) -> None:
+        self.assertGreaterEqual(ct.INPUT_BOUND_FRAMING_MARGIN_TOKENS, 16)
+
+    def test_bound_counts_the_complete_request_surface(self) -> None:
+        from tools.behavioral_eval_runner.canonical import canonical_json
+
+        kwargs = self._kwargs()
+        bound = ct.proven_input_token_upper_bound(kwargs)
+        expected = (
+            len(kwargs["instructions"].encode("utf-8"))
+            + len(kwargs["input"].encode("utf-8"))
+            + len(canonical_json(kwargs["text"]).encode("utf-8"))
+            + len(kwargs["model"].encode("utf-8"))
+            + len(canonical_json(kwargs["reasoning"]).encode("utf-8"))
+            + ct.INPUT_BOUND_FRAMING_MARGIN_TOKENS
+        )
+        self.assertEqual(bound, expected)
+
+    def test_every_textual_component_moves_the_bound(self) -> None:
+        base = ct.proven_input_token_upper_bound(self._kwargs())
+        grown_input = ct.proven_input_token_upper_bound(
+            self._kwargs(input_text="ENVELOPE" + "x" * 100)
+        )
+        self.assertEqual(grown_input, base + 100)
+        grown_instructions = ct.proven_input_token_upper_bound(
+            self._kwargs(instructions="POLICY" + "y" * 50)
+        )
+        self.assertEqual(grown_instructions, base + 50)
+        # The structured-output schema block is part of the counted surface:
+        # the bound must exceed the input+instructions bytes alone by at
+        # least the schema block's serialized size.
+        kwargs = self._kwargs()
+        text_free = (
+            len(kwargs["instructions"].encode("utf-8"))
+            + len(kwargs["input"].encode("utf-8"))
+            + ct.INPUT_BOUND_FRAMING_MARGIN_TOKENS
+        )
+        self.assertGreater(base, text_free + 1000)
+
+    def test_multibyte_text_is_counted_in_bytes_not_chars(self) -> None:
+        snowman = "☃" * 100  # 3 UTF-8 bytes per char, 100 chars = 300 bytes
+        with_snowmen = ct.proven_input_token_upper_bound(
+            self._kwargs(input_text=snowman)
+        )
+        baseline = ct.proven_input_token_upper_bound(
+            self._kwargs(input_text="a")  # 1 byte
+        )
+        self.assertEqual(with_snowmen, baseline + 299)
+
+    def test_enforcement_accepts_at_or_below_8000(self) -> None:
+        kwargs = self._kwargs()
+        bound = ct.enforce_proven_input_budget(kwargs)
+        self.assertLessEqual(bound, ct.MAX_INPUT_TOKENS_PER_JUDGMENT)
+        self.assertEqual(bound, ct.proven_input_token_upper_bound(kwargs))
+
+    def test_enforcement_rejects_above_8000_before_any_use(self) -> None:
+        oversized = self._kwargs(input_text="x" * 8100)
+        self.assertGreater(
+            ct.proven_input_token_upper_bound(oversized),
+            ct.MAX_INPUT_TOKENS_PER_JUDGMENT,
+        )
         with self.assertRaises(CalibrationReservationDenied):
-            ct.enforce_input_token_budget(half, half)
+            ct.enforce_proven_input_budget(oversized)
+
+    def test_bound_docstring_states_the_proof_basis(self) -> None:
+        doc = ct.proven_input_token_upper_bound.__doc__ or ""
+        self.assertIn("byte", doc.lower())
+        self.assertNotIn("heuristic", doc.lower())
 
 
 class TestStructuredOutputSchema(unittest.TestCase):

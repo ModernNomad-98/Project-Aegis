@@ -423,27 +423,55 @@ def validate_request_kwargs(kwargs: Mapping[str, Any]) -> None:
         )
 
 
-# ------------------------------------------------------ input-token budget
-def estimate_input_tokens(text: str) -> int:
-    """Deterministic, conservative token estimate (ceil(len/3)).
+# ------------------------------------------- proven pre-dispatch input bound
+#: Fixed allowance for request framing the byte count cannot see: message/
+#: role wrappers and special tokens added by the provider around the two
+#: textual blocks. Documented framing overhead is single-digit tokens per
+#: message; 64 is a deliberate multiple of that.
+INPUT_BOUND_FRAMING_MARGIN_TOKENS = 64
 
-    Deliberately overestimates so the 8,000-input-token gate fails EARLY,
-    never late; no tokenizer dependency is added.
+#: The kwargs keys whose values are serialized text sent to the model and
+#: therefore counted by the proven bound. ``store``/``background``/
+#: ``max_output_tokens`` are non-textual request parameters, not model input.
+_INPUT_SURFACE_TEXT_KEYS = ("instructions", "input", "model")
+_INPUT_SURFACE_JSON_KEYS = ("text", "reasoning")
+
+
+def proven_input_token_upper_bound(kwargs: Mapping[str, Any]) -> int:
+    """A PROVEN upper bound on the input tokens of one authorized request.
+
+    Proof basis: the pinned model's tokenizer is a byte-level BPE — every
+    vocabulary token consumes at least one byte of the UTF-8 input it
+    encodes, so for any text, token_count(text) <= utf8_byte_length(text).
+    The bound therefore sums the UTF-8 byte lengths of EVERY serialized
+    textual member of the closed request surface — the instructions, the
+    rendered envelope input, the canonical JSON of the structured-output
+    ``text`` block (the schema is request-carried textual contract), the
+    model identifier, and the canonical JSON of the ``reasoning`` block —
+    and adds ``INPUT_BOUND_FRAMING_MARGIN_TOKENS`` for the provider's
+    message framing/special tokens, which are the only input tokens not
+    produced from those bytes. Deliberately conservative: false rejection
+    is permitted, dispatch above 8,000 tokens is not.
     """
-    if not isinstance(text, str):
-        raise CalibrationReservationDenied("token estimation expects text")
-    return (len(text) + 2) // 3
+    from ..canonical import canonical_json  # local: keep import graph light
+
+    validate_request_kwargs(kwargs)
+    total_bytes = 0
+    for key in _INPUT_SURFACE_TEXT_KEYS:
+        total_bytes += len(str(kwargs[key]).encode("utf-8"))
+    for key in _INPUT_SURFACE_JSON_KEYS:
+        total_bytes += len(canonical_json(kwargs[key]).encode("utf-8"))
+    return total_bytes + INPUT_BOUND_FRAMING_MARGIN_TOKENS
 
 
-def enforce_input_token_budget(input_text: str, instructions: str) -> int:
-    """Deny dispatch when the conservative estimate exceeds 8,000 tokens."""
-    estimate = estimate_input_tokens(input_text) + estimate_input_tokens(
-        instructions
-    )
-    if estimate > MAX_INPUT_TOKENS_PER_JUDGMENT:
+def enforce_proven_input_budget(kwargs: Mapping[str, Any]) -> int:
+    """Deny dispatch unless the PROVEN bound is within the 8,000-token
+    per-judgment ceiling (BER-DEC-008 decision 18). Returns the bound."""
+    bound = proven_input_token_upper_bound(kwargs)
+    if bound > MAX_INPUT_TOKENS_PER_JUDGMENT:
         raise CalibrationReservationDenied(
-            f"conservative input estimate {estimate} exceeds the "
-            f"{MAX_INPUT_TOKENS_PER_JUDGMENT}-token judgment budget "
-            "(BER-DEC-008 decision 18)"
+            f"proven input-token upper bound {bound} exceeds the "
+            f"{MAX_INPUT_TOKENS_PER_JUDGMENT}-token judgment ceiling; the "
+            "request is rejected BEFORE any reservation or provider use"
         )
-    return estimate
+    return bound

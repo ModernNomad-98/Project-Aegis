@@ -324,6 +324,24 @@ FREEZE_HASH_FIELDS = (
 )
 
 
+def freeze_contract_sha256(payload: Mapping[str, Any]) -> str:
+    """The canonical freeze-contract digest over the COMPLETE artifact
+    content (PR #88 correction family 5): it binds the owner statement, the
+    frozen date, the SELECTED holdout ``max_output_tokens``, the
+    ``reasoning_effort``, and every decision-35 frozen-artifact hash. Any
+    post-hoc change to any of them invalidates the freeze authorization."""
+    from ..canonical import sha256_of_obj  # local: keep import graph light
+
+    content = {
+        "owner_freeze_statement": payload.get("owner_freeze_statement"),
+        "frozen_date": payload.get("frozen_date"),
+        "holdout_max_output_tokens": payload.get("holdout_max_output_tokens"),
+        "reasoning_effort": payload.get("reasoning_effort"),
+        "frozen_sha256": dict(payload.get("frozen_sha256", {})),
+    }
+    return sha256_of_obj(content)
+
+
 @dataclass(frozen=True, slots=True)
 class HoldoutFreezeArtifact:
     """The owner freeze record required before the ONE-PASS holdout."""
@@ -333,6 +351,7 @@ class HoldoutFreezeArtifact:
     holdout_max_output_tokens: int
     reasoning_effort: str
     frozen_sha256: Mapping[str, str]
+    freeze_contract_sha256: str
 
     def validate(self) -> None:
         _require(
@@ -372,6 +391,25 @@ class HoldoutFreezeArtifact:
         )
         for name in FREEZE_HASH_FIELDS:
             _require_sha256(self.frozen_sha256[name], f"frozen_sha256.{name}")
+        _require_sha256(self.freeze_contract_sha256, "freeze_contract_sha256")
+        expected = freeze_contract_sha256(self.to_dict())
+        _require(
+            self.freeze_contract_sha256 == expected,
+            "freeze_contract_sha256 does not match the artifact content — "
+            "the freeze integrity binding (reasoning effort, selected "
+            "holdout output cap, and every frozen artifact hash) is broken "
+            "and the authorization is INVALID (decision 35)",
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "owner_freeze_statement": self.owner_freeze_statement,
+            "frozen_date": self.frozen_date,
+            "holdout_max_output_tokens": self.holdout_max_output_tokens,
+            "reasoning_effort": self.reasoning_effort,
+            "frozen_sha256": dict(self.frozen_sha256),
+            "freeze_contract_sha256": self.freeze_contract_sha256,
+        }
 
     _KEYS = frozenset(
         {
@@ -380,6 +418,7 @@ class HoldoutFreezeArtifact:
             "holdout_max_output_tokens",
             "reasoning_effort",
             "frozen_sha256",
+            "freeze_contract_sha256",
         }
     )
 
@@ -399,6 +438,7 @@ class HoldoutFreezeArtifact:
             ),
             reasoning_effort=payload.get("reasoning_effort", ""),
             frozen_sha256=dict(payload.get("frozen_sha256", {})),
+            freeze_contract_sha256=payload.get("freeze_contract_sha256", ""),
         )
         artifact.validate()
         return artifact
@@ -407,7 +447,7 @@ class HoldoutFreezeArtifact:
     def example_dict(cls) -> dict[str, Any]:
         """A syntactically valid EXAMPLE for tests and documentation only —
         it is NOT an owner decision and never exists as evidence."""
-        return {
+        content = {
             "owner_freeze_statement": (
                 "EXAMPLE ONLY — NOT AN OWNER DECISION; a real freeze is "
                 "written by Peter Nguyen after development characterization"
@@ -417,6 +457,8 @@ class HoldoutFreezeArtifact:
             "reasoning_effort": REASONING_EFFORT,
             "frozen_sha256": {name: "0" * 64 for name in FREEZE_HASH_FIELDS},
         }
+        content["freeze_contract_sha256"] = freeze_contract_sha256(content)
+        return content
 
 
 class HoldoutFreezeAuthorization:
