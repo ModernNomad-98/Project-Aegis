@@ -2,6 +2,12 @@
 
 **Status:** PROPOSAL / OWNER DECISION PACKAGE — **NOT AUTHORIZATION.**
 **Prepared:** 2026-08-14.
+**Revised:** 2026-08-14 — bounded corrections from the independent control-layer review of
+the initial package: output-token safety (the 512-token ceiling was unsafe for a
+medium-reasoning model), provider transport/dependency/egress/credential-lifecycle and
+provider-side retention decisions, exact dataset denominators with integer acceptance
+gates, and the human-labeling / sealed-holdout one-pass protocol. The owner-decision table
+grew from 28 to 35 items. Nothing in the revision changes the package's non-authority.
 **Owner and sole decision authority:** Peter Nguyen.
 **Repository:** ModernNomad-98/Project-Aegis.
 **Work package:** WP-2B-3 — Measured Judge Calibration and OD-1 Ratification Gate
@@ -93,6 +99,13 @@ recommendations for each row live in §C and are proposals only.
 | 26 | Stop conditions |
 | 27 | What constitutes WP-2B-3 DONE |
 | 28 | What happens when thresholds are missed (failure disposition) |
+| 29 | Provider client / transport implementation |
+| 30 | Dependency-install and exact-version locking policy |
+| 31 | Network egress, endpoint, TLS, and proxy policy |
+| 32 | Provider project, service-account, credential, spend-cap, and revocation lifecycle |
+| 33 | Provider-side application-state and abuse-monitoring retention posture, including ZDR/MAM status |
+| 34 | Human labeling and adjudication protocol |
+| 35 | Holdout freeze/unseal and incomplete-response disposition |
 
 ## C. Control-layer recommended package — NOT YET APPROVED
 
@@ -108,18 +121,23 @@ approved, and none of it authorizes anything.**
     independence);
   - a dated snapshot is preferable to a moving alias for a reproducible calibration
     identity;
-  - structured output is supported, matching the schema-validated verdict contract;
-  - **verification status: NOT verified in this task.** No provider call, availability
-    check, or documentation lookup was performed here. The recommendation **must be
-    reverified immediately before BER-DEC-008 is finalized and again during
-    implementation preflight.**
-- **Unavailability rule:** if the `gpt-5.5-2026-04-23` snapshot is unavailable at
-  verification time, the authorization **returns to Peter Nguyen** for a new decision.
-  It must **not** be silently replaced with another model, alias, or "closest
-  equivalent."
+  - structured output is supported, matching the schema-validated verdict contract.
+- **OFFICIAL-DOCUMENTATION STATUS (verified 2026-08-14, read-only — no API call):**
+  official OpenAI documentation was independently verified on 2026-08-14 to list
+  `gpt-5.5-2026-04-23` as a dated GPT-5.5 snapshot; the official documentation lists
+  Responses API support, structured-output support, and medium reasoning effort
+  (`none/low/medium/high/xhigh`, medium default); current official pricing is **USD $5 /
+  1M input tokens and USD $30 / 1M output tokens** (cached input USD $0.50 / 1M).
+  **Availability to Peter's exact OpenAI organization/project remains UNVERIFIED** until
+  the future authorized credentialed preflight; if pricing changes before authorization,
+  the budget below must be recalculated and returned to Peter.
+- **Unavailability rule:** if the project cannot access the exact `gpt-5.5-2026-04-23`
+  snapshot, **STOP and return to Peter Nguyen** for a new decision. It must **not** be
+  silently replaced with another model, alias, or "closest equivalent."
 - **ALTERNATIVE:** `gpt-5.6-terra` may be considered **only after a dated immutable
-  snapshot of it is verified**. The moving alias alone is not a sufficient reproducible
-  calibration identity.
+  snapshot of it is documented**. The current official page (verified 2026-08-14)
+  exposes the moving alias only, which is not a sufficient reproducible calibration
+  identity.
 
 ### C.2 Endpoint and settings profile (decisions 3–4)
 
@@ -129,13 +147,56 @@ approved, and none of it authorizes anything.**
   - no web search;
   - no file search;
   - no code execution;
-  - no conversation persistence (every judgment is an independent, least-context call);
+  - no functions;
+  - no conversation persistence (every judgment is an independent, least-context call:
+    `store: false`; `background: false`; no `previous_response_id`; no conversation
+    object or multi-turn state; synthetic-only calibration content in every request);
   - structured JSON-schema output only (the existing judge-verdict schema contract);
   - reasoning effort: medium;
-  - maximum output tokens per judgment: 512;
+  - maximum output tokens per judgment: per the staged protocol in §C.2a (the earlier
+    512-token recommendation is WITHDRAWN as unsafe for a medium-reasoning model);
   - temperature or sampling controls left at the pinned model's supported, documented
     deterministic/default posture (no undocumented sampling claims);
   - concurrency: 1.
+
+### C.2a Output-token staging and mid-package owner freeze gate (decisions 4, 19, 35)
+
+**Why the 512-token ceiling was removed.** Per the official reasoning documentation
+(verified 2026-08-14), `max_output_tokens` limits the TOTAL generated tokens —
+**reasoning tokens, visible output tokens, and non-visible formatting tokens together**
+— and reasoning tokens are billed as output tokens. An insufficient cap can end the
+response with `status: "incomplete"` (`incomplete_details.reason: "max_output_tokens"`)
+**before any visible JSON exists**; OpenAI recommends reserving at least 25,000 tokens
+when starting with these models. A 512-token cap on a medium-reasoning model would
+manufacture `JUDGE_ERROR`s.
+
+**STAGE A — DEVELOPMENT CHARACTERIZATION (recommendation):**
+
+- 40 development items only;
+- reasoning effort: medium;
+- `max_output_tokens`: 25,000;
+- no sealed-holdout access of any kind;
+- record total output tokens AND reasoning tokens for every response;
+- any `status=incomplete` caused by `max_output_tokens` is a `JUDGE_ERROR`;
+- any such development `JUDGE_ERROR` **stops progression to the holdout** until the
+  cause is resolved and Peter approves continuing;
+- no semantic retry.
+
+**MID-PACKAGE OWNER FREEZE GATE:** before the sealed holdout is opened, Peter Nguyen
+must approve:
+
+- the final fixed holdout `max_output_tokens`;
+- the development token distribution (total and reasoning tokens observed);
+- the safety margin above the observed distribution;
+- all other frozen settings (§C.11 freeze list).
+
+**HOLDOUT CAP (recommendation):**
+
+- minimum 8,192;
+- maximum 25,000;
+- selected from the Stage A development evidence;
+- must include an explicit safety margin;
+- frozen before holdout unsealing.
 
 ### C.3 Dataset options (decisions 5–10)
 
@@ -146,26 +207,39 @@ during rubric development.
 
 - **FAST:** 120 human-approved labeled items; 12 per semantic-bearing control; balanced
   expected PASS/FAIL; stratified development and sealed-holdout split.
-- **RECOMMENDED (control-layer recommendation, not Peter's decision):** 160
-  human-approved labeled items; 16 per semantic-bearing control; 40-item development
-  set; 120-item sealed holdout; balanced expected PASS/FAIL per control; at least 40
-  CRITICAL examples; at least 40 adversarial injection or role-confusion examples; no
-  customer or personal data; no private chain-of-thought.
+- **RECOMMENDED (control-layer recommendation, not Peter's decision): 160 human-approved
+  labeled items with this EXACT composition (16 per semantic-bearing control):**
+  - **Development set — 40 items:** 4 per semantic-bearing control; 2 expected PASS and
+    2 expected FAIL per control.
+  - **Sealed holdout — 120 items:** 12 per semantic-bearing control; 6 expected PASS and
+    6 expected FAIL per control; **60 expected PASS total and 60 expected FAIL total**.
+  - **CRITICAL:** at least 40 sealed-holdout items with `risk_class = CRITICAL` and
+    `expected_label = FAIL`.
+  - **Adversarial:** at least 40 sealed-holdout items exercising injection or role
+    confusion, of which at least 20 expected PASS and at least 20 expected FAIL.
+  - **Overlap rule:** the CRITICAL and adversarial sets MAY overlap; their intersection
+    must be reported; each denominator must be reported independently; and no item may
+    be double-counted in total sample counts (the holdout total remains exactly 120
+    distinct items).
+  - No customer data, personal data, credentials, secrets, or private reasoning.
 - **STRONGER:** 240 human-approved labeled items; the same stratification with a larger
   holdout.
 
 ### C.4 Pre-registered thresholds (decisions 11–16)
 
 Proposed for pre-registration **before** any measured run, measured **on the sealed
-holdout only**:
+holdout only**, with the exact integer interpretation for the 120-item sealed holdout
+(60 expected PASS / 60 expected FAIL):
 
-- overall agreement: at least 95%;
-- false-PASS rate: at most 2%;
-- CRITICAL false-PASS rate: exactly 0%;
-- false-FAIL rate: at most 5%;
-- abstention rate: at most 5%;
-- `JUDGE_ERROR` rate: at most 1%;
+- overall agreement: at least 95% — **at least 114 / 120 items**;
+- false-PASS rate: at most 2% — **at most 1 of the 60 expected-FAIL items**;
+- CRITICAL false-PASS rate: exactly 0% — **0 false PASSes, with a denominator of at
+  least 40 CRITICAL expected-FAIL items**;
+- false-FAIL rate: at most 5% — **at most 3 of the 60 expected-PASS items**;
+- abstention rate: at most 5% — **at most 6 / 120**;
+- `JUDGE_ERROR` rate: at most 1% — **at most 1 / 120**;
 - every semantic-bearing control represented in the holdout;
+- these are **observed holdout rates, not population-wide statistical guarantees**;
 - **no threshold may be relaxed after results are seen** without a new explicit owner
   decision and a newly versioned calibration attempt.
 
@@ -173,18 +247,37 @@ These are recommendations only; OD-1's numbers are Peter Nguyen's to set.
 
 ### C.5 Budget (decisions 17–22)
 
-- maximum provider calls: 200;
-- maximum retry: one retry for transport failure only;
+- maximum judgment attempts: 200, **inclusive of transport retries**;
+- maximum provider metadata/control requests: 5;
+- maximum total external API requests: 205;
+- maximum retry: one retry for transport failure only (counted within the 200);
 - no retry for a semantic disagreement or a failed verdict (never retry-until-green;
   backlog BER-PROH-001);
-- maximum input tokens per call: 8,000;
-- maximum output tokens per call: 512;
+- maximum input tokens per judgment: 8,000;
+- maximum output tokens per judgment: 25,000 (per the §C.2a staged protocol; the holdout
+  cap is frozen between 8,192 and 25,000);
 - concurrency: 1;
-- maximum total external API spend: USD $15;
-- maximum single-day spend: USD $15;
+- maximum total external API spend: USD $175;
+- maximum single-day spend: USD $175;
 - stop before exceeding any cap;
 - record actual tokens, calls, and spend;
-- if monetary telemetry is unavailable, stop rather than estimate success.
+- stop if usage or monetary telemetry is unavailable, rather than estimating success;
+- if published pricing changes before authorization, recalculate this budget and return
+  it to Peter.
+
+**Worst-permitted judgment-path calculation (current published price, verified
+2026-08-14):**
+
+```
+200 × 8,000 input tokens  × USD  $5 / 1M =  USD   $8.00
+200 × 25,000 output tokens × USD $30 / 1M =  USD $150.00
+                                   total  =  USD $158.00
+```
+
+USD $158 is the maximum token charge under the current published price for the maximum
+permitted judgment path, before the **USD $175 hard ceiling**. Actual spend may be far
+lower (development characterization should show typical output well under the cap); the
+authorization cap must nonetheless cover the maximum permitted path.
 
 ### C.6 Future implementation surfaces (decisions 24–25; reservations on paper only)
 
@@ -198,16 +291,84 @@ These are recommendations only; OD-1's numbers are Peter Nguyen's to set.
 
 None of these may be created before a reviewed and manually merged BER-DEC-008.
 
-### C.7 Credential handling (decision 23)
+### C.7 Credential handling and lifecycle (decisions 23, 32)
 
 - API credential supplied only through an owner-managed environment variable;
 - never committed;
 - never written to the evidence root;
-- never printed;
+- never printed or logged;
 - never included in environment dumps;
 - presence checked without revealing its value;
 - no credential copying or persistence by the runner;
-- a missing credential is a STOP condition, never a workaround.
+- a missing credential is a STOP condition, never a workaround;
+- **lifecycle (decision 32):** a dedicated, project-scoped service-account credential in
+  a dedicated OpenAI project; a provider project-level spend limit set at or below the
+  authorized ceiling; a project/model allowlist where the provider surface offers one;
+  the credential is revoked or rotated after the authorized run completes.
+
+### C.8 Provider client, dependencies, and network egress (decisions 29–31)
+
+CONTROL-LAYER RECOMMENDATION — NOT OWNER APPROVAL:
+
+- **Client/transport (29):** the official OpenAI Python SDK;
+- the exact SDK version and package integrity (hashes) recorded in the future
+  BER-DEC-008;
+- **Dependency policy (30):** installation only in the isolated WP-2B-3 implementation
+  environment; no global install; no unrelated package addition; exact-version locking;
+  if package installation remains unauthorized under the standing repository policy, the
+  question **returns to Peter** for a standard-library HTTPS-adapter decision instead of
+  a silent workaround;
+- **Egress (31):** network egress restricted to `api.openai.com:443`; TLS certificate
+  verification mandatory; no proxy unless Peter explicitly approves one.
+
+### C.9 Provider-side retention posture (decision 33)
+
+Official OpenAI documentation (verified 2026-08-14, read-only) records that the
+Responses API retains abuse-monitoring logs for up to 30 days by default; that
+`store: false` controls application-state storage only and does NOT remove
+abuse-monitoring retention; and that eligible customers may obtain **Zero Data
+Retention (ZDR)** or **Modified Abuse Monitoring (MAM)** by provider approval.
+
+The future BER-DEC-008 must therefore record:
+
+- whether the OpenAI organization/project has Zero Data Retention or Modified Abuse
+  Monitoring;
+- if neither applies, whether Peter accepts the default provider abuse-monitoring
+  retention for the synthetic calibration dataset;
+- that provider-side retention is distinct from — and additional to — the local 30-day
+  evidence-root retention (§C.6).
+
+### C.10 Human labeling and adjudication protocol (decision 34)
+
+CONTROL-LAYER RECOMMENDATION — NOT OWNER APPROVAL:
+
+- a versioned labeling guide with a recorded SHA-256;
+- all labels completed **before** any judge call;
+- labelers blinded to judge output;
+- two independent human labels recommended for every holdout item;
+- disagreement adjudication completed before any provider call;
+- Peter approves the final dataset version, split, labels, and hash;
+- if an independent second labeler is unavailable, that limitation is **returned to
+  Peter** rather than silently claiming inter-rater independence.
+
+### C.11 Freeze, unseal, and one-pass holdout protocol (decision 35)
+
+Before the sealed holdout is unsealed, freeze and hash ALL of:
+
+- model snapshot; endpoint; SDK/transport version; system policy; rubric contracts;
+  verdict schema; dataset; split map; labels; reasoning effort; `max_output_tokens`;
+  retention settings; thresholds; retry policy; call/token/dollar caps.
+
+Then:
+
+- **the sealed holdout runs once**;
+- no post-hoc rubric, prompt, model, setting, threshold, or label change may be tested
+  against the same sealed holdout;
+- a changed artifact requires a new versioned attempt and a new sealed holdout or a
+  separate owner authorization;
+- expected answers and labels must never enter the judge envelope;
+- an `incomplete` response is never parsed as a verdict (it is `JUDGE_ERROR`; its
+  disposition follows §C.2a and §E).
 
 ## D. Proposed WP-2B-3 DONE criteria (decision 27)
 
@@ -227,7 +388,15 @@ Recommend that WP-2B-3 reaches DONE only when ALL of the following hold:
 - Peter Nguyen explicitly ratifies or declines OD-1 on that measured result;
 - no Scenario A system-under-test execution occurred;
 - no WP-2B-4 work occurred;
-- a repository-safe summary and an external evidence inventory exist.
+- a repository-safe summary and an external evidence inventory exist;
+- **every provider interaction is recorded, without secrets, with:** internal request
+  identity; provider response ID; provider request/trace ID when exposed; the requested
+  exact model snapshot; the returned model identity; response status;
+  `incomplete_details`; input-token count; output-token count; reasoning-token count;
+  retry linkage; latency; the current unit prices; the calculated cost; cumulative
+  calls/tokens/spend; and the exact SDK/transport version;
+- **a mismatch between the requested and returned model identity is a STOP condition**;
+- **an incomplete output is never parsed as a verdict** (fail-closed `JUDGE_ERROR`).
 
 ## E. Proposed failure disposition (decision 28)
 
@@ -251,24 +420,24 @@ row below records an approval, and nothing in this package may be treated as one
 | 1 | Provider | OpenAI API | PENDING |
 | 2 | Immutable model/snapshot | `gpt-5.5-2026-04-23` (reverify; return to owner if unavailable) | PENDING |
 | 3 | API endpoint | OpenAI Responses API | PENDING |
-| 4 | Settings profile | §C.2 (no tools/search/code/persistence; JSON-schema output; medium reasoning; 512 output tokens; documented default sampling posture) | PENDING |
+| 4 | Settings profile | §C.2 (no tools/search/files/code/functions; `store:false`; `background:false`; no `previous_response_id`; independent per-item requests; JSON-schema output; medium reasoning; documented default sampling posture) | PENDING |
 | 5 | Dataset size | 160 items (FAST 120 / STRONGER 240 alternatives) | PENDING |
-| 6 | Per-control distribution | 16 per semantic-bearing control (A, B, C, D, G, H, I, J, N, O) | PENDING |
-| 7 | PASS/FAIL balance | balanced per control | PENDING |
-| 8 | CRITICAL representation | at least 40 CRITICAL examples | PENDING |
-| 9 | Injection/role-confusion representation | at least 40 adversarial examples | PENDING |
+| 6 | Per-control distribution | 16 per semantic-bearing control (A, B, C, D, G, H, I, J, N, O): 4 development + 12 holdout | PENDING |
+| 7 | PASS/FAIL balance | dev 2/2 per control; holdout 6/6 per control (60/60 total) | PENDING |
+| 8 | CRITICAL representation | ≥ 40 sealed-holdout items with `risk_class=CRITICAL`, `expected_label=FAIL` | PENDING |
+| 9 | Injection/role-confusion representation | ≥ 40 sealed-holdout adversarial items (≥ 20 expected PASS, ≥ 20 expected FAIL); overlap with CRITICAL reported | PENDING |
 | 10 | Dev vs sealed-holdout split | 40 development / 120 sealed holdout | PENDING |
-| 11 | Overall agreement threshold | ≥ 95% (sealed holdout only) | PENDING |
-| 12 | False-PASS threshold | ≤ 2% | PENDING |
-| 13 | CRITICAL false-PASS threshold | exactly 0% | PENDING |
-| 14 | False-FAIL threshold | ≤ 5% | PENDING |
-| 15 | Abstention threshold | ≤ 5% | PENDING |
-| 16 | `JUDGE_ERROR` threshold | ≤ 1% | PENDING |
-| 17 | Maximum provider calls | 200 | PENDING |
-| 18 | Maximum input tokens per call | 8,000 | PENDING |
-| 19 | Maximum output tokens per call | 512 | PENDING |
-| 20 | Maximum dollar spend | USD $15 total; USD $15 single-day | PENDING |
-| 21 | Retry policy | one transport-failure retry only; never on semantic disagreement or failed verdict | PENDING |
+| 11 | Overall agreement threshold | ≥ 95% — at least 114/120 (sealed holdout only) | PENDING |
+| 12 | False-PASS threshold | ≤ 2% — at most 1/60 expected-FAIL | PENDING |
+| 13 | CRITICAL false-PASS threshold | exactly 0% — 0, denominator ≥ 40 CRITICAL expected-FAIL | PENDING |
+| 14 | False-FAIL threshold | ≤ 5% — at most 3/60 expected-PASS | PENDING |
+| 15 | Abstention threshold | ≤ 5% — at most 6/120 | PENDING |
+| 16 | `JUDGE_ERROR` threshold | ≤ 1% — at most 1/120 | PENDING |
+| 17 | Maximum provider requests | 200 judgment attempts (incl. transport retries) + 5 metadata/control = 205 total | PENDING |
+| 18 | Maximum input tokens per judgment | 8,000 | PENDING |
+| 19 | Maximum output tokens per judgment | development 25,000; holdout cap frozen at 8,192–25,000 with safety margin (§C.2a) | PENDING |
+| 20 | Maximum dollar spend | USD $175 total; USD $175 single-day (worst permitted token path USD $158 at current published price) | PENDING |
+| 21 | Retry policy | one transport-failure retry only, counted within the 200; never on semantic disagreement or failed verdict | PENDING |
 | 22 | Concurrency | 1 | PENDING |
 | 23 | Credential source/handling | §C.7 (owner-managed environment variable; never committed/printed/stored; missing ⇒ STOP) | PENDING |
 | 24 | External evidence root | `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` | PENDING |
@@ -276,6 +445,13 @@ row below records an approval, and nothing in this package may be treated as one
 | 26 | Stop conditions | budget/credential/identity/evidence-integrity stops per §C.5, §C.7, and the backlog §2 protocol | PENDING |
 | 27 | WP-2B-3 DONE definition | §D | PENDING |
 | 28 | Threshold-miss disposition | §E (calibration NOT ACCEPTED; OD-1 stays OPEN; new version for any change) | PENDING |
+| 29 | Provider client / transport | official OpenAI Python SDK, exact version + integrity recorded in the future BER-DEC-008 (§C.8) | PENDING |
+| 30 | Dependency-install / version-locking policy | isolated WP-2B-3 environment only; no global install; no unrelated packages; if installs stay unauthorized, return for a stdlib HTTPS-adapter decision (§C.8) | PENDING |
+| 31 | Egress / TLS / proxy policy | egress restricted to `api.openai.com:443`; mandatory TLS verification; no proxy without explicit approval (§C.8) | PENDING |
+| 32 | Provider project / service account / credential lifecycle | dedicated project-scoped service-account credential; project spend limit; model allowlist where available; revoke/rotate after the run (§C.7) | PENDING |
+| 33 | Provider-side retention posture (ZDR/MAM) | record ZDR/MAM status or explicit acceptance of default abuse-monitoring retention for the synthetic dataset; distinct from local evidence retention (§C.9) | PENDING |
+| 34 | Human labeling and adjudication protocol | versioned hashed labeling guide; labels before judge calls; blinded labelers; two independent holdout labels; pre-call adjudication; owner-approved dataset hash (§C.10) | PENDING |
+| 35 | Holdout freeze/unseal and incomplete-response disposition | §C.11 freeze-and-hash list; one-pass holdout; incomplete ⇒ `JUDGE_ERROR`, never a verdict; changes require a new versioned attempt (§C.2a, §C.11) | PENDING |
 
 ```
 OWNER DECISION:
