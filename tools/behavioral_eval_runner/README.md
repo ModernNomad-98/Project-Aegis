@@ -92,11 +92,54 @@ USD $0** — every element below is exercised with fakes only.
 The generic denial boundary is UNCHANGED: `DisabledJudgeProvider` still
 denies every dispatch with `LIVE_DISPATCH_DISABLED`, no Scenario A or
 generic-corpus execution path exists, and the runtime "openai" fragment is
-allowlisted for exactly the two calibration adapter modules. The candidate
+allowlisted for exactly the named calibration adapter modules. The candidate
 160-item dataset, labeling guide, and owner label-review packet live ONLY
-under the authorized external evidence root; **OWNER_LABEL_APPROVAL is
-PENDING, the development calibration has NOT started, the sealed holdout is
-NOT opened, OD-1 remains OPEN, and WP-2B-4 remains BLOCKED.**
+under the authorized external evidence root; **the development calibration
+has NOT started, the sealed holdout is NOT opened, OD-1 remains OPEN, and
+WP-2B-4 remains BLOCKED.**
+
+## WP-2B-3 Stage A2 — dedicated DEVELOPMENT driver (BER-DEC-008; OFFLINE)
+
+`judge/calibration_development_driver.py` is the narrowly scoped Stage A2
+DEVELOPMENT execution driver — WP-2B-3 / BER-DEC-008 / DEVELOPMENT stage /
+owner-approved dataset `1.0.0-wp2b3-candidate.2` / `gpt-5.5-2026-04-23`
+ONLY. It is deliberately **not** part of the generic CLI (which still has no
+live-run command); its module-executable surface defaults to the offline
+`--describe` contract report:
+
+```bash
+python -m tools.behavioral_eval_runner.judge.calibration_development_driver --describe
+```
+
+What it enforces on top of the Stage A1 machinery it composes:
+
+- ONE canonical ledger (`runs/wp2b3-development-ledger-v1.jsonl`) and ONE
+  canonical run manifest (`runs/wp2b3-development-run-manifest-v1.json`),
+  derived exclusively from the ownership-marker-verified evidence root — no
+  caller-selected paths; wrongly-marked roots are refused.
+- GENESIS exactly once (refused when the ledger or manifest exists); later
+  segments reopen the same hash-chained file and must re-prove every
+  manifest binding (audited head/tree, approval hash, artifact hashes,
+  model, SDK, caps) before resuming.
+- A durably verified DEVELOPMENT active segment is required before ANY
+  external interaction, so the 90-minute/6-hour deadlines govern the single
+  metadata probe, every judgment attempt, and the one runner-owned retry.
+- Exactly the 40 DEVELOPMENT items in sorted item-id order (20/20 gold
+  balance asserted); sealed-holdout items are structurally unreachable.
+- Restart-safe, never retry-until-green: terminal outcomes are never
+  redispatched; orphans and crashed-open segments block resume fail-closed;
+  OWNER_WAIT (with the one-time repository-safe result summary) only after
+  all 40 terminal outcomes.
+- Consume-once process-scoped credential wiring; live execution requires
+  the exact audited head/tree; the live path was NEVER exercised — Stage A2
+  preflight tests use fakes, dummy sentinels, and temp roots only, and the
+  REAL canonical ledger does not exist.
+
+Owner-label approval state: **APPROVED** via Peter Nguyen's hash-bound
+external approval artifact (2026-08-14; see
+`docs/evidence/behavioral-eval-runner-wp-2b-3-summary.md` §9). Development
+execution remains **NOT STARTED** pending the independent exact-head audit
+and the credentialed execution session.
 
 ## Tests
 

@@ -1123,6 +1123,9 @@ def run_self_check() -> dict[str, Any]:
         allowlist = {
             "judge/calibration_transport.py",
             "judge/calibration_provider.py",
+            # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver is
+            # the third and only other module permitted to name the provider.
+            "judge/calibration_development_driver.py",
         }
         package_root = os.path.dirname(os.path.abspath(__file__))
         needle = _caltransport.AUTHORIZED_SDK_NAME  # never a literal here

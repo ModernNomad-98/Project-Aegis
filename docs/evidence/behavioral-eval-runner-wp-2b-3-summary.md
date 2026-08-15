@@ -1,12 +1,15 @@
-# Behavioral Eval Runner — WP-2B-3 Stage A1: sanitized implementation summary
+# Behavioral Eval Runner — WP-2B-3 Stages A1–A2: sanitized implementation summary
 
 **Scope: the OFFLINE Stage A1 slice of WP-2B-3 (Measured Judge Calibration and OD-1
 Ratification Gate) under BER-DEC-008 — the calibration-only provider transport,
 request/token/cost accounting, owner-label approval gate, holdout freeze gate, and the
-SYNTHETIC CANDIDATE dataset/labeling/review artifacts. ZERO provider/model/metadata
-calls; ZERO credential access; USD $0 external provider spend; the 40-item development
-calibration has NOT started; the sealed holdout is NOT opened; OWNER_LABEL_APPROVAL is
-PENDING; OD-1 remains OPEN; WP-2B-4 remains BLOCKED.**
+SYNTHETIC CANDIDATE dataset/labeling/review artifacts — plus the Stage A2 PREFLIGHT
+(§9): Peter Nguyen's recorded owner-label approval and the dedicated offline-tested
+DEVELOPMENT execution driver. ZERO provider/model/metadata calls; ZERO credential
+access; USD $0 external provider spend; the 40-item development calibration has NOT
+started; the sealed holdout is NOT opened; OWNER_LABEL_APPROVAL is APPROVED via the
+hash-bound external artifact (2026-08-14, §9); OD-1 remains OPEN; WP-2B-4 remains
+BLOCKED.**
 
 This file is repository-safe: no personal username, no personal path, no secret, no
 environment dump, no raw dataset content. The candidate dataset, labeling guide, owner
@@ -333,9 +336,11 @@ flip at Stage A2). Full report in the external evidence root.
 
 - **No measured calibration exists or is claimed.** Nothing here says anything about
   any real judge's quality.
-- **OWNER_LABEL_APPROVAL: PENDING.** No provider judgment call is possible while
-  PENDING, and the runner enforces this mechanically; Claude cannot and does not
-  certify the candidate labels as human-approved.
+- **OWNER_LABEL_APPROVAL: APPROVED (Stage A2, 2026-08-14)** — by Peter Nguyen's
+  explicit hash-bound external approval artifact under the BER-DEC-008 decision-34
+  sole-maintainer exception (§9). Historical Stage A1 state: PENDING throughout A1;
+  Claude never certified the candidate labels — the flip exists ONLY as the owner's
+  own recorded decision. Development execution remains NOT STARTED.
 - **OD-1 remains OPEN; WP-2B-4 remains BLOCKED**; no baseline-eligible semantic
   verdict exists or can exist from this work.
 - The generic/live denial boundary is intact: `DisabledJudgeProvider` denies every
@@ -343,8 +348,11 @@ flip at Stage A2). Full report in the external evidence root.
   no CI/workflow integration, and no deployment exists or was added.
 - The sealed holdout was not opened; expected labels are structurally absent from
   every judge-facing surface; holdout execution requires the future owner freeze.
-- The next gate is: independent exact-head audit → Peter Nguyen's human label
-  approval → the 40-item development calibration → the OWNER_WAIT token-cap freeze.
+- The next gate is: independent ChatGPT exact-head audit of the Stage A2 preflight
+  commit → a BRAND-NEW execution session with the process-scoped credential →
+  ONE metadata availability request + the 40-item DEVELOPMENT calibration →
+  STOP in OWNER_WAIT for Peter's token-distribution review and the holdout
+  `max_output_tokens` freeze (§9).
 
 ## 8. External evidence root
 
@@ -361,3 +369,190 @@ label-review packet + CLI validation outputs, the builder-script provenance copy
 timing records, and the final SHA-256 evidence inventory. Cleanup is not authorized;
 evidence is preserved for owner review within the 30-day retention window. No
 credential exists anywhere under the root.
+
+## 9. Stage A2 preflight — owner-label approval and the dedicated DEVELOPMENT driver
+
+**(PROMPT-ID `PR88-WP2B3-STAGE-A2-PREFLIGHT-OWNER-APPROVAL-530CDEFC`, 2026-08-14.
+OFFLINE preflight only: ZERO provider/model/metadata calls, ZERO real credential
+access, USD $0 spend, development 0/40 and holdout 0/120 unexecuted, real canonical
+ledger NOT created.)**
+
+### 9a. Owner-label approval (BER-DEC-008 decision 34)
+
+- **Peter Nguyen explicitly APPROVED candidate dataset `1.0.0-wp2b3-candidate.2` as
+  the human gold-label dataset on 2026-08-14** under the decision-34 sole-maintainer
+  exception, in an exact frozen owner statement transcribed verbatim into the
+  external approval artifact (never paraphrased).
+- Approval artifact: `approvals/wp2b3-owner-label-approval-v2.json` under the
+  evidence root — SHA-256
+  `b04b5aa3b0854aacf9d9e53f1e9e399062e2ac5805d6b5b6b8b052e9f9dbb675`; validates
+  through the committed `OwnerLabelApproval` contract and flips
+  `calibration-status` to APPROVED with only the holdout-freeze block remaining.
+- Provenance sidecar: `approvals/wp2b3-owner-label-approval-v2-provenance.json` —
+  SHA-256 `4d90ec81d23f4a8b48827827657df7920faa4c4643d944eec6fbfae3c55b0a8b`,
+  binding the approval-artifact hash, all approved artifact hashes, the owner
+  decision date, BER-DEC-008, PR #88, the branch, and the Stage A2 preflight
+  starting head/tree (`530cdefc…` / `747a3968…`).
+- Hash bindings approved by the owner (all re-verified live this session):
+  dataset semantic
+  `b73c8d855fdf9ff304e18d2964d266fef3e97f42050443d52c872bd54ebaa5bf`; dataset file
+  `c212c1c50d1bfd25f3de496acc542d9bd3e2fc258c51eb81ba9fd7c95d11ac56`; split map
+  semantic `08078227408b9a560afb2e5614019ef0280edda353f9d233c95adfaf4d099fca`;
+  labeling guide
+  `05708c4052ca2a7f4a173b196dd553237741710bd09db9ff21bc7e835f9fbc2d`; owner-review
+  bundle `355fc2c42db6cb38c3672e940a46d4c1d6488a3b74beca56aa284641c937645a`.
+- **A second independent human labeler was NOT used, and NO independent inter-rater
+  agreement claim is made or may be made.** ChatGPT's human-facing semantic review
+  of the v2 bundle: PASS. No provider result existed when the labels were approved.
+- The approved candidate dataset JSON remains IMMUTABLE (its historical embedded
+  Stage-A1 `owner_label_status=PENDING` field is deliberately preserved because
+  changing the file would change the owner-approved hash); the separate approval
+  artifact is the durable unlocking authority. New status artifact
+  `dataset/wp2b3-calibration-status-v3.json` records
+  APPROVED / NOT_STARTED / BLOCKED_PENDING_OWNER_WAIT_FREEZE / OD-1 OPEN /
+  WP-2B-4 BLOCKED; the prior PENDING status artifacts are preserved untouched.
+
+### 9b. Dedicated DEVELOPMENT execution driver (offline-tested)
+
+New module `tools/behavioral_eval_runner/judge/calibration_development_driver.py` —
+the narrowly scoped Stage A2 driver (WP-2B-3 / BER-DEC-008 / DEVELOPMENT /
+`1.0.0-wp2b3-candidate.2` / `gpt-5.5-2026-04-23` ONLY; module-executable
+`--describe` surface; **NOT wired into the generic CLI**, which still exposes no
+live dispatch command):
+
+- **One canonical ledger path** `runs/wp2b3-development-ledger-v1.jsonl` and **one
+  canonical run manifest** `runs/wp2b3-development-run-manifest-v1.json`, derived
+  exclusively from the marker-verified evidence root (`verify_evidence_root`
+  enforces the full BER-DEC-008 marker binding incl. the recorded encrypted-volume
+  gate and a reparse-free path chain); no API accepts a caller-selected ledger
+  path, and an arbitrary or wrongly-marked root is refused.
+- **Second genesis mechanically refused:** creating the fresh accounting history
+  requires the explicit first-segment declaration AND is refused whenever the
+  canonical ledger or manifest already exists; a later session REOPENS the same
+  hash-chained file and must re-prove EVERY manifest binding (authorization,
+  audited execution head/tree, evidence-marker hash, approval-artifact hash,
+  dataset/split/guide/bundle hashes, model, SDK, caps) before resuming.
+- **Mandatory persistent DEVELOPMENT active segment:** the driver refuses ALL
+  external interaction (the metadata probe and every judgment attempt) unless the
+  DEVELOPMENT active segment is open AND durably verified in the canonical chain,
+  answering §5b residual **F4**; the 90-minute development and 6-hour whole-run
+  clocks therefore govern the metadata request, every initial attempt, and the
+  single runner-owned retry; OWNER_WAIT accrues nothing and permits nothing.
+- **Deterministic development-only execution:** exactly the 40 approved
+  DEVELOPMENT items in sorted item-id order (20 expected PASS / 20 expected FAIL,
+  asserted); sealed-holdout items remain structurally unreachable (never
+  projected, never in the gate-issued authorized request-id set).
+- **Restart/crash safety without retry-until-green:** items with a durable
+  terminal semantic outcome are never dispatched again (JUDGE_ERRORs — including
+  `max_output_tokens` incompletes — are terminal and never semantically retried);
+  an orphaned STARTED attempt blocks resume through the existing fail-closed
+  telemetry-unavailable stop; an OPEN active segment from an uncontrolled crash
+  is preserved honestly and blocks resume pending owner review; a typed stop
+  closes the segment and preserves all evidence; OWNER_WAIT is entered only when
+  all 40 outcomes are terminal and reconciled, and the repository-safe result
+  summary (confusion matrix, agreement, false-PASS/false-FAIL, abstention,
+  JUDGE_ERROR count, token/latency distributions, calls/retries/spend) is
+  written once to `runs/wp2b3-development-result-summary-v1.json`.
+- **Credential posture:** the future live entry consumes the dedicated
+  process-scoped credential exactly once (removed from the environment on read),
+  passes it only to the pinned SDK client factory, and no secret can reach the
+  ledger, manifest, or summary; this preflight exercised the path with DUMMY
+  sentinels only and never inspected the real environment.
+- The static-safety provider-fragment allowlist (three mirrors:
+  `tests/test_static_safety.py`, `tests/test_static_safety_calibration.py`, and
+  the `self-check` item in `cli.py`) now names the driver as the THIRD and only
+  other module permitted to reference the provider — the same narrow exact-path
+  mechanism Stage A1 introduced; no generic live surface was added.
+
+### 9c. Stage A2 validation (all OFFLINE)
+
+- RED first: the driver family was written and run before the module existed
+  (ImportError RED log retained), then GREEN; the intermediate red run that
+  caught the two un-updated allowlist mirrors is retained; the post-review
+  remediation (§9d) was itself RED-first (60-error RED log retained). Final
+  family: **60 tests**.
+- Full runner suite: **892 tests, 0 failures, 0 errors** in BOTH interpreters
+  (system Python 3.14.4: 9 skips = 4 POSIX + 5 SDK-absent; pinned-SDK venv:
+  4 POSIX skips) — 832 baseline (re-run green before any edit) + 60 new.
+- `self-check` **PASS 21/21**; census ×2 over the pinned WP-2B-1 snapshot
+  byte-identical `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`
+  (unchanged); validator self-tests **91 PASS**; `validate-skills` **184 valid /
+  0 warnings**; `git diff --check` clean; static-safety suite green (AST scan
+  zero violations; driver import loads no network module and never imports the
+  SDK at import time).
+- Mechanically re-verified: approved dataset / split map / labeling guide /
+  owner-review bundle byte-unchanged; the approval artifact validates; **the real
+  canonical ledger and run manifest do NOT exist** (no `runs/` directory under
+  the evidence root); zero provider/model/metadata calls; zero credential access;
+  USD $0; development 0/40; holdout 0/120; OD-1 OPEN; WP-2B-4 BLOCKED.
+- §5b residuals **F1** (ledger append fsync) and **F3** (metadata
+  unclassified-exception billing flag) remain OPEN NAMED PRECONDITIONS for the
+  first-live execution authorization — deliberately NOT changed here to keep this
+  corrective/enablement diff bounded to the authorized driver scope.
+
+### 9d. Focused exact-diff review (ten closed dimensions) and remediation
+
+ONE bounded read-only reviewer examined the exact staged diff across the ten
+closed dimensions (approval hash binding; canonical-path enforcement;
+second-genesis prevention; active-segment enforcement; deterministic
+40-item selection; resume/orphan; credential non-persistence;
+zero-provider-call boundary; no generic live-dispatch expansion; OWNER_WAIT
+stopping). Verdict: **nine dimensions SOUND, one BLOCKER**, confirmed under
+the seven-part blocker test and remediated RED-first in the same pass:
+
+1. **(Blocker, fixed) Approval-artifact hash pin.** The five binding hashes
+   inside the approval artifact are repository constants, so a well-formed
+   APPROVED artifact could be reconstructed by any evidence-root writer and
+   the gate could not tell it from Peter's. Fix: `ApprovedArtifactIdentity`
+   now carries `approval_artifact_sha256`, pinned in
+   `PRODUCTION_APPROVED_ARTIFACTS` to the owner-recorded
+   `b04b5aa3b0854aacf9d9e53f1e9e399062e2ac5805d6b5b6b8b052e9f9dbb675`, and
+   `load_owner_approval` refuses (OWNER_APPROVAL_PENDING) any artifact whose
+   FILE hash differs — the trust anchor now rides the exact-head audit like
+   every other binding. RED-first regression: a reconstructed artifact with
+   all five binding fields correct but a different statement blocks at
+   `prepare()`. This also discharges the §13 requirement that ANY altered
+   approval artifact blocks.
+2. **(Adopted) `make_client` segment gate** — a live-capable client is now
+   constructible only under the verified open DEVELOPMENT segment (closes
+   the last F4 hole the reviewer identified).
+3. **(Adopted; §9.6 conformance) Typed stops close the segment** — any
+   `CalibrationStopError` during the interaction phase now durably closes
+   the active segment (elapsed time honestly recorded) before re-raising;
+   only an uncontrolled crash leaves a segment open. RED-first regression:
+   a mid-run deadline stop leaves `…DEADLINE_STOP, ACTIVE_SEGMENT_END` as
+   the chain tail and permits a later manifest-verified reopen.
+4. **(Adopted) Distribution honesty** — the per-judgment output/latency
+   distributions the owner reads for the holdout `max_output_tokens` freeze
+   now cover only telemetry-bearing attempts (completed/incomplete);
+   zero-token transport-failure terminals no longer dilute the means.
+   RED-first regression with a timeout+retry run.
+5. **(Adopted) Import-probe backing** — the driver joined the calibration
+   lazy-SDK import probe, mechanically backing the "never imports the SDK
+   at import time" claim; a stale two-module docstring was corrected.
+
+Recorded dispositions (no code change; for the audit and the live gate):
+`VerifiedEvidenceRoot` is a plain dataclass rather than key-guarded (a
+marker is self-attesting JSON; the marker binding, not the object, is the
+control); a crash between manifest write and ledger creation leaves a
+zero-spend state requiring manual owner cleanup (genesis and reopen both
+refuse); refused resumes append a `SEGMENT_OPENED` event (append-only
+honesty, not a defect); the summary `retries` figure counts attempt-2
+records within the ledger's cross-session caps; §5b residuals F1 (ledger
+append fsync) and F3 (metadata billing flag) remain OPEN NAMED
+PRECONDITIONS for the first-live authorization. Open owner questions
+recorded by the reviewer (approval re-signing procedure; provenance-sidecar
+role in the gate; post-stop resume procedure) are returned to Peter with
+this preflight rather than answered unilaterally.
+
+### 9e. Next exact gate
+
+1. Independent ChatGPT exact-head audit of this Stage A2 preflight commit;
+2. only after PASS: a BRAND-NEW execution session;
+3. Peter injects the dedicated process-scoped credential outside chat;
+4. ONE metadata availability request + the approved 40-item DEVELOPMENT run
+   (driver-enforced order, caps, deadlines, and active segment);
+5. STOP in OWNER_WAIT;
+6. Peter reviews token distributions, incomplete/`JUDGE_ERROR` outcomes, and
+   cost, then freezes the holdout `max_output_tokens` (8,192–25,000);
+7. the sealed holdout remains prohibited; PR #88 remains DRAFT and unmerged.

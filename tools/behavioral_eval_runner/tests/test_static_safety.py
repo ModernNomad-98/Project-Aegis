@@ -80,15 +80,20 @@ class TestStaticSafety(unittest.TestCase):
         """No runtime module can reach a provider outside the ONE narrowly
         authorized WP-2B-3 calibration adapter (BER-DEC-008; task section 13).
 
-        The "openai" fragment is allowlisted for EXACTLY the two calibration
-        adapter modules — every other runtime module remains provider-denied,
-        and every other provider fragment stays banned everywhere.
+        The "openai" fragment is allowlisted for EXACTLY the named
+        calibration adapter modules — every other runtime module remains
+        provider-denied, and every other provider fragment stays banned
+        everywhere.
         """
         forbidden_fragments = ("api.anthropic", "openai", "bedrock", "vertex")
         wp2b3_adapter_allowlist = {
             "openai": {
                 "judge/calibration_transport.py",
                 "judge/calibration_provider.py",
+                # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver
+                # composes the two adapter modules and is the THIRD and only
+                # other module permitted to name the provider.
+                "judge/calibration_development_driver.py",
             }
         }
         for directory, _dirs, files in os.walk(PACKAGE_ROOT):

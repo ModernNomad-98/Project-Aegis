@@ -28,6 +28,9 @@ PROVIDER_FRAGMENT_ALLOWLIST = frozenset(
     {
         "judge/calibration_transport.py",
         "judge/calibration_provider.py",
+        # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver composes
+        # the two adapter modules and may therefore name the provider.
+        "judge/calibration_development_driver.py",
     }
 )
 
@@ -41,6 +44,8 @@ _IMPORT_PROBE = (
     "import tools.behavioral_eval_runner.judge.calibration_envelope\n"
     "import tools.behavioral_eval_runner.judge.calibration_gates\n"
     "import tools.behavioral_eval_runner.judge.calibration_provider\n"
+    "import tools.behavioral_eval_runner.judge."
+    "calibration_development_driver\n"
     "loaded = [m for m in ('socket', 'urllib', 'urllib.request', 'http.client',"
     " 'ssl', 'ftplib', 'smtplib', 'subprocess', 'openai', 'httpx2', 'httpx')"
     " if m in sys.modules]\n"
