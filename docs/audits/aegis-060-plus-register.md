@@ -22,7 +22,7 @@ Rules of this register (from the program's operating rules):
 ### AEGIS-060 (candidate) — Trigger-eval neighbor identifiers are annotated prose, not machine-resolvable names
 
 - **Classification / severity / status:** Candidate fixture-hygiene defect / P2 / **REMEDIATION IMPLEMENTED — EFFECTIVE ONLY ON OWNER MERGE** (branch
-  `fix/aegis-060-trigger-eval-targets`, PR AEGIS-060-PR-PLACEHOLDER, OPEN /
+  `fix/aegis-060-trigger-eval-targets`, PR [#89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), OPEN /
   DRAFT / UNMERGED at the time of writing; the finding remains live on `main`
   until that PR is merged by the owner)
 - **Observed behavior and evidence:** Five trigger-eval files write neighbor
