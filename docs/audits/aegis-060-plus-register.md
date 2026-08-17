@@ -21,7 +21,10 @@ Rules of this register (from the program's operating rules):
 
 ### AEGIS-060 (candidate) — Trigger-eval neighbor identifiers are annotated prose, not machine-resolvable names
 
-- **Classification / severity / status:** Candidate fixture-hygiene defect / P2 / **Candidate — mechanically evidenced, unremediated**
+- **Classification / severity / status:** Candidate fixture-hygiene defect / P2 / **REMEDIATION IMPLEMENTED — EFFECTIVE ONLY ON OWNER MERGE** (branch
+  `fix/aegis-060-trigger-eval-targets`, PR AEGIS-060-PR-PLACEHOLDER, OPEN /
+  DRAFT / UNMERGED at the time of writing; the finding remains live on `main`
+  until that PR is merged by the owner)
 - **Observed behavior and evidence:** Five trigger-eval files write neighbor
   identifiers as `"<name> (subagent)"` — prose annotation inside the name
   field — so a machine consumer cannot resolve them against disk:
@@ -46,6 +49,60 @@ Rules of this register (from the program's operating rules):
 - **Negative regression:** The EVAL-004 fixture case
   (`scripts/tests/fixtures/contract-audit/`) keeps proving the rule fires on
   an annotated name.
+- **Remediation (implemented, not yet merged):** Nine machine-resolved values
+  across the five files above had the trailing prose annotation `" (subagent)"`
+  removed; only `overlaps_with` and `expected_skill` entries were touched. No
+  `prompt`, `reason`, `id`, or `should_not_trigger` value changed, so no
+  expected winner, negative neighbour, or overlap relationship changed. Target
+  kind is retained where the register's expected behavior places it — in the
+  human-readable `reason` prose (e.g. "the red-team subagent"), which the
+  EVAL-004 rule does not scan.
+  - `agent-goal-hijack-defender` — `overlaps_with[4]`, `cases[5].expected_skill`
+    → `ai-security-red-team-reviewer`
+  - `ai-evaluation-harness` — `overlaps_with[5]`
+    → `ai-security-red-team-reviewer`
+  - `ai-threat-modeler` — `overlaps_with[5]`, `cases[4].expected_skill`
+    → `ai-security-red-team-reviewer`
+  - `prompt-injection-defender` — `overlaps_with[5]`, `cases[4].expected_skill`
+    → `ai-security-red-team-reviewer`
+  - `release-readiness-reviewer` — `overlaps_with[4]`,
+    `cases[4].expected_skill` → `release-readiness-reviewer`
+- **Target-resolution verification:** both corrected targets resolve to
+  reviewer agents on disk — `.claude/agents/ai-security-red-team-reviewer.md`
+  and `.claude/agents/release-readiness-reviewer.md`. The
+  `release-readiness-reviewer` case remains the skill-vs-subagent namespace
+  case (the same-named agent composes the skill); its `reason` still names the
+  subagent explicitly, so the agent target is preserved, not converted to a
+  skill.
+- **Measured result (branch `fix/aegis-060-trigger-eval-targets`, corpus at
+  commit `3944f255c4a9157f33a5caedb9fec49adda3018c`):** EVAL-004 live findings
+  **5 → 0**; total findings **414 → 409**; the five removals are exactly the
+  five EVAL-004 rows on the five paths above (P2 5 → 0), with zero findings
+  added and every other rule count unchanged (ARTF-001 10, ROUTE-002 311,
+  SIDE-004 82, STATE-001 2, VOCAB-002 4; P0 2, P1 96, info 311). Route graph
+  recomputes **byte-identical** — no node or edge changed. Corpus byte count
+  drops by exactly 99 (9 values × the 11-character annotation). Validator:
+  184 skills valid, 0 warnings. Audit self-tests: 57 assertions pass;
+  validator gate self-tests: 91 assertions pass. The EVAL-004 negative fixture
+  is untouched and still proves the rule fires (one P1 ghost neighbour + one
+  P2 annotated name). No behavioral eval was executed — this remains a
+  mechanical result only.
+- **Audit artifacts deliberately NOT regenerated:** the frozen baseline
+  artifacts (`artifacts/audits/skill-contract-audit-baseline.json`,
+  `docs/audits/skill-contract-audit-baseline.md`,
+  `artifacts/audits/corpus-manifest-baseline.json`,
+  `artifacts/audits/corpus-route-graph.json`) are stamped at repo SHA
+  `4f361d14930d87d689c5c7495c993a57e35f2609` and were produced from an
+  LF-form checkout. They are left byte-unchanged on this branch: a
+  regeneration from a CRLF working tree (`core.autocrlf=true`, no
+  `.gitattributes`) inflates `audited_byte_count` by 67,306 bytes and rewrites
+  `corpus_content_hash`, `engine_sha256`, and the catalog hash with values no
+  LF checkout can reproduce — drift caused by the checkout, not by AEGIS-060.
+  That the engine is unchanged is verifiable: the LF-normalized bytes of
+  `scripts/audit-skill-contracts.py` hash to `c886b27aee860aed…`, exactly the
+  `engine_sha256` the frozen baseline records. Regeneration is therefore left
+  to an LF checkout at merge time; the measured before/after figures above are
+  the evidence of record until then.
 
 No further new IDs are proposed by this baseline pass. Two observations were
 deliberately NOT given IDs (below) because their evidence is incomplete or
@@ -75,7 +132,7 @@ their materiality is unconfirmed.
 | ROUTE-003 | 1 | `project-orchestrator/SKILL.md` Stage-2 route (spec → prioritization → commitments; planner absent) | AEGIS-035, AEGIS-045 | **Root cause confirmed on current main** exactly as the handoff recorded |
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
-| EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | — |
+| EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | Baseline count, frozen. Remediated on branch `fix/aegis-060-trigger-eval-targets` (5 → 0); live on `main` until that PR merges — see AEGIS-060 above |
 | SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
 
