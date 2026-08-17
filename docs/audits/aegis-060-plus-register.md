@@ -90,11 +90,43 @@ Rules of this register (from the program's operating rules):
   findings 414 → 409; the five removals are exactly the five false EVAL-004
   rows. Every other rule count is unchanged (ARTF-001 10, ROUTE-002 311,
   SIDE-004 82, STATE-001 2, VOCAB-002 4; P0 2, P1 96, info 311). Route graph
-  byte-identical. Validator: 184 skills valid, 0 warnings. Audit self-tests:
-  **66** assertions pass (57 before, +9 typed-target regressions, including
-  parity with `models.parse_target` and a live-corpus assertion that the four
-  authored subagent expectations and five annotated overlaps remain intact).
-  Validator gate self-tests: 91 assertions pass.
+  **byte-identical** — re-measured under v1.13.0 rather than carried over:
+  sha256 `6c844eb6c35e1b40…`, 184 nodes / 968 edges, topology and bytes both
+  unchanged (the route graph carries no tool-version provenance). Validator:
+  184 skills valid, 0 warnings. Audit self-tests: **69** assertions pass (57 on
+  the uncorrected engine, then +9 typed-target regressions, then +3 closing the
+  automatic review findings below). Validator gate self-tests: 91 assertions
+  pass.
+- **Corrected engine version — `1.13.0`.** The type-collapsing engine that
+  produced the AEGIS-060 false positives remains historically identified as
+  **v1.12.0**, and every frozen artifact recording 1.12.0 is left exactly as it
+  is. EVAL-004's observable semantics changed, so the corrected engine is
+  **v1.13.0**: a corrected live report must be distinguishable by version, not
+  only by `engine_sha256`. Read any 1.12.0-stamped EVAL-004 row as the old
+  namespace-collapsing rule.
+- **Automatic review findings closed (PR #89, reviewed commit `2d769dec87`).**
+  The ready-for-review transition triggered an automatic review that raised
+  three P2 findings against the correction itself; all three were valid and are
+  closed additively:
+  1. *Engine version.* Semantics changed while `TOOL_VERSION` still read
+     1.12.0 → bumped to 1.13.0 (above), with a binding assertion.
+  2. *Machine-surface coverage.* The typed-target fixture repeated one target
+     across `overlaps_with`, `expected_skill`, and `should_not_trigger`, which
+     `audit_evals` unions into a set — so deleting any single collector was
+     masked by the other two. Each surface now carries its **own** unique
+     target, positive and negative, and each collector is independently
+     binding: removing any one of the three makes the regression fail on its
+     own (verified by mutation).
+  3. *Parser parity.* The audit's local parser rejected every trailing
+     parenthetical other than the exact `(subagent)`, while the merged
+     `models.parse_target` treats every other nonempty value as a **skill**
+     target named by the complete string. Being stricter than the runtime is
+     itself a defect: the audit now mirrors the runtime exactly, so
+     `x (agent)` is a skill named `x (agent)` and surfaces as an ordinary
+     unknown target (P1) rather than a special malformed class. The parity test
+     covers bare, `(subagent)`, `(agent)`, `(subagent )`, `(reviewer)`,
+     `(sub agent)`, `()`, a leading-marker string, and padded forms, asserting
+     kind, complete name, and annotation. The BER runtime is unchanged.
 - **Negative regression retained:** the `thin-contract` fixture still proves
   EVAL-004 can fire — `ghost-neighbor` as an unknown target (P1) and
   `clean-skill (subagent)` as a **kind mismatch** (P2, because only the

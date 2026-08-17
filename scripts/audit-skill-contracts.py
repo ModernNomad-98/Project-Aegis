@@ -90,7 +90,12 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.12.0"
+# 1.13.0 — EVAL-004 resolves TYPED targets against separate skill/subagent
+# namespaces. v1.12.0 unioned the namespaces and stripped the annotation as
+# prose, which is what produced the AEGIS-060 false positives; a corrected live
+# report must be distinguishable from that engine by VERSION, not only by
+# engine_sha256. Frozen baselines that record 1.12.0 stay as they are.
+TOOL_VERSION = "1.13.0"
 
 
 class InputContainmentError(Exception):
@@ -539,7 +544,6 @@ REFUSAL_CASE = re.compile(r"(?i)refus|halt|stop|declin|reject|never|no write|not
 # surface, runnable against any checkout). The two are held in agreement by an
 # explicit parity assertion in scripts/tests/test_audit_skill_contracts.py.
 SUBAGENT_MARKER = "(subagent)"
-TRAILING_ANNOTATION = re.compile(r"\(([^()]*)\)\s*$")
 
 
 class TypedTarget(NamedTuple):
@@ -549,11 +553,19 @@ class TypedTarget(NamedTuple):
 
 
 def parse_typed_target(raw: object) -> TypedTarget | None:
-    """Parse an authored target string; None means malformed/unsupported.
+    """Parse an authored target string exactly as the merged runtime does.
 
-    Returning None is deliberate: an unsupported trailing annotation must NOT
-    silently resolve to the leading name (that collapse is precisely the
-    superseded treatment, design §20a-S4).
+    Mirrors `models.parse_target`: strip the outer whitespace; the EXACT
+    trailing `(subagent)` names a subagent; every other nonempty string is a
+    SKILL whose name is the complete stripped text — including any other
+    parenthetical, which is part of the name rather than a kind marker. Only an
+    empty (or nameless `(subagent)`) target is unparseable, and returns None.
+
+    A non-`(subagent)` parenthetical is therefore NOT collapsed to its leading
+    name (that collapse is the superseded treatment, design §20a-S4): it simply
+    names a skill that will not exist, which EVAL-004 reports as an unknown
+    target. Being STRICTER than the runtime here would be its own defect — the
+    audit must judge targets by the runtime's reading, not a private one.
     """
     text = str(raw).strip()
     if not text:
@@ -561,8 +573,6 @@ def parse_typed_target(raw: object) -> TypedTarget | None:
     if text.endswith(SUBAGENT_MARKER):
         name = text[: -len(SUBAGENT_MARKER)].strip()
         return TypedTarget("subagent", name, SUBAGENT_MARKER) if name else None
-    if TRAILING_ANNOTATION.search(text):
-        return None  # e.g. `x (agent)`, `x (subagent )` — not the runtime form
     return TypedTarget("skill", text, None)
 
 
@@ -744,7 +754,7 @@ RULES: list[dict] = [
      "surfaces": ["trigger-evals.json"],
      "positive_fixture": "thin-contract", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-053", "AEGIS-018"],
-     "limits": "resolution is by declared namespace — a bare name is a skill, an exact trailing (subagent) is a subagent; a VALID annotation is never itself a finding. Existence on disk is not activation: this proves a target resolves, never that it wins"},
+     "limits": "resolution is by declared namespace — the exact trailing (subagent) is a subagent, and EVERY other nonempty value is a skill whose name is the complete string (the runtime's reading, mirrored exactly; the audit is never stricter). A VALID annotation is never itself a finding, and a non-(subagent) parenthetical is part of the skill NAME, so it surfaces as an unknown target rather than a special malformed class. Existence on disk is not activation: this proves a target resolves, never that it wins"},
     {"id": "REF-001", "purpose": "markdown link target missing on disk",
      "authority": "validator D55 link-check precedent; skill-generation-standard.md §3/§9",
      "severity": "P1", "classification": "mechanical",
@@ -1484,14 +1494,15 @@ class Audit:
                 continue
             target = parse_typed_target(n)
             if target is None:
-                # Unsupported/malformed annotation — never silently resolved to
-                # the leading name (that collapse is superseded, §20a-S4).
+                # Unparseable for the runtime too: an empty target, or a bare
+                # `(subagent)` with no name in front of it. Every other nonempty
+                # string parses as a skill name, so it never reaches here.
                 self.findings.append(Finding(
                     "EVAL-004", "P1", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals target {n!r} is not a resolvable typed "
-                    f"target — a bare name declares a skill and the exact "
-                    f"suffix {SUBAGENT_MARKER!r} declares a subagent; no other "
-                    "trailing annotation is supported",
+                    f"trigger-evals target {n!r} has no resolvable target name "
+                    f"— the exact suffix {SUBAGENT_MARKER!r} declares a "
+                    "subagent and must be preceded by a name; any other "
+                    "nonempty value names a skill",
                     "eval-coverage", ["AEGIS-053", "AEGIS-018"], s.name, "high", True,
                 ))
                 continue
