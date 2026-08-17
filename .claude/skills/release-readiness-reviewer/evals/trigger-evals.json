@@ -1,7 +1,7 @@
 {
   "skill": "release-readiness-reviewer",
   "description": "Trigger discrimination for the Phase 6 delivery cluster: the release gate vs pipeline design vs rollback authoring, against shipped code-reviewer / secure-migration-reviewer, and the skill-vs-subagent namespace boundary (the same-named read-only subagent COMPOSES this skill for delegated reviews — full-codebase-auditor pattern).",
-  "overlaps_with": ["ci-pipeline-architect", "rollback-runbook-author", "code-reviewer", "secure-migration-reviewer", "release-readiness-reviewer (subagent)"],
+  "overlaps_with": ["ci-pipeline-architect", "rollback-runbook-author", "code-reviewer", "secure-migration-reviewer", "release-readiness-reviewer"],
   "cases": [
     {
       "id": "ship-gate-wins-here",
@@ -34,7 +34,7 @@
     {
       "id": "delegated-review-composes-subagent",
       "prompt": "Spin up the release-readiness reviewer agent on this PR and give me its verdict while I keep working.",
-      "expected_skill": "release-readiness-reviewer (subagent)",
+      "expected_skill": "release-readiness-reviewer",
       "should_not_trigger": [],
       "reason": "Delegated, isolated review runs go to the same-named read-only SUBAGENT in .claude/agents/, which composes this skill as its procedure — the full-codebase-auditor namespace pattern; the skill itself is what runs inline."
     }
