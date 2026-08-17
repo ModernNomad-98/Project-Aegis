@@ -130,7 +130,7 @@ def build_calibration_judge_request(
     if not isinstance(rubric, Mapping):
         raise SchemaValidationError("envelope has no rubric section")
     request = JudgeRequest(
-        request_id=calibration_request_id(content.item_id),
+        request_id=calibration_request_id(content.item_id, dataset_sha256),
         control_id=content.control_id,
         judge=calibration_judge_identity(),
         rubric_id=rubric["rubric_id"],

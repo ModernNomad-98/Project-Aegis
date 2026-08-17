@@ -103,15 +103,16 @@ class TestOwnerApprovalGate(unittest.TestCase):
             dataset=self.dataset, stage=cg.ExecutionStage.DEVELOPMENT,
         )
         self.assertEqual(len(authorization.authorized_request_ids), 40)
+        dataset_sha = self.dataset.dataset_sha256()
         for item in cd.development_items(self.dataset):
             self.assertIn(
-                cd.calibration_request_id(item.item_id),
+                cd.calibration_request_id(item.item_id, dataset_sha),
                 authorization.authorized_request_ids,
             )
         for item in self.dataset.items:
             if item.split is cd.CandidateSplit.SEALED_HOLDOUT:
                 self.assertNotIn(
-                    cd.calibration_request_id(item.item_id),
+                    cd.calibration_request_id(item.item_id, dataset_sha),
                     authorization.authorized_request_ids,
                 )
 

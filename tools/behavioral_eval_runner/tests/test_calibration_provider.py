@@ -550,8 +550,9 @@ class TestHoldoutDispatchBoundary(ProviderCase):
         self.assertEqual(len(self.ledger.entries()), 0)  # zero attempts
 
     def test_authorization_covers_exactly_the_development_items(self) -> None:
+        dataset_sha = self.dataset.dataset_sha256()
         expected = {
-            cd.calibration_request_id(item.item_id)
+            cd.calibration_request_id(item.item_id, dataset_sha)
             for item in cd.development_items(self.dataset)
         }
         self.assertEqual(

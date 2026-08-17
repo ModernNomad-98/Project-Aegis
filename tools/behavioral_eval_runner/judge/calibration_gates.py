@@ -292,7 +292,7 @@ def authorize_calibration_dispatch(
             "dataset identity; no authorization is issued",
         )
     authorized_request_ids = frozenset(
-        calibration_request_id(item.item_id)
+        calibration_request_id(item.item_id, dataset_identity.dataset_sha256)
         for item in dataset.items
         if item.split is CandidateSplit.DEVELOPMENT
     )

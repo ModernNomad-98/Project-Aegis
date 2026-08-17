@@ -15,7 +15,8 @@
         "ACTIVE_SEGMENT_BEGIN",
         "ACTIVE_SEGMENT_END",
         "SEMANTIC_OUTCOME",
-        "DEADLINE_STOP"
+        "DEADLINE_STOP",
+        "RUN_STATE_TRANSITION"
       ]
     },
     "event_seq": {"type": "integer", "minimum": 1},
@@ -121,6 +122,8 @@
     "stage_active_seconds": {"type": "number", "minimum": 0},
     "total_active_seconds": {"type": "number", "minimum": 0},
     "detail": {"type": ["string", "null"]},
+    "run_state": {"enum": ["RUN_PAUSED", "RUN_STOPPED", "OWNER_WAIT"]},
+    "reason": {"type": ["string", "null"]},
     "outcome": {
       "anyOf": [
         {"enum": ["VALIDATED_PASS", "VALIDATED_FAIL", "VALIDATED_ABSTAIN"]},

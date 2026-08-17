@@ -556,3 +556,104 @@ this preflight rather than answered unilaterally.
 6. Peter reviews token distributions, incomplete/`JUDGE_ERROR` outcomes, and
    cost, then freezes the holdout `max_output_tokens` (8,192–25,000);
 7. the sealed holdout remains prohibited; PR #88 remains DRAFT and unmerged.
+
+## 10. First-live correction pass — the four audit blocker families
+
+**The independent ChatGPT exact-head audit of `ca19b919…` returned REQUEST
+CHANGES BEFORE PROVIDER EXECUTION** with four consolidated blocker
+families, corrected in ONE bounded RED→GREEN pass (28 new regressions in
+`tests/test_calibration_first_live_corrections.py`; per-family RED and
+GREEN logs under the evidence root `stage-a3\`). ZERO provider/model/
+metadata calls; ZERO credential access; USD $0; the approved dataset,
+split map, labeling guide, owner-approval artifact, provenance sidecar,
+provider, model, SDK pin, thresholds, and budgets are all byte-unchanged;
+the real canonical ledger and run manifest still do not exist.
+
+**A. Real-model binding + label-opaque request IDs.**
+`calibration_request_id(item_id, dataset_sha256)` now derives an opaque
+deterministic id `wp2b3-r-<32-hex>` (a truncated SHA-256 over the approved
+dataset identity + item id): nothing judge-visible carries a raw item id,
+a `-dev-p/-dev-f/-h-p/-h-f` marker, a label, a rationale, a risk class, or
+a split, while accounting and the owner summary keep the deterministic
+item↔request mapping. The strict structured-output schema is now
+REQUEST-SPECIFIC: `structured_verdict_output_schema(request, evidence_keys)`
+pins request_id, control_id, rubric_id, rubric_version, rubric_sha256,
+judge_id, judge_version, input_manifest_sha256, and schema_version to
+exactly one authorized value each (single-value enums) and closes
+`evidence_refs` to the envelope's actual untrusted-data keys — a real
+model can produce a completely binding-valid verdict from provider-visible
+content alone and is never asked to invent trusted values; the runtime
+parser's independent equality checks are UNCHANGED (a corrupted binding
+remains `JUDGE_ERROR`). The proven pre-dispatch input bound was re-run over
+all 40 REAL development items with the request-specific schema:
+**4,742–5,400 tokens, all within the 8,000 ceiling** (`a3-input-bounds.json`).
+
+**B. Crash-durable append barrier.** Every durable ledger event append now
+writes the complete canonical line, flushes, and calls `os.fsync` before
+returning — above all the write-ahead `ATTEMPT_STARTED` relied upon before
+ANY transport use; active-segment and run-state events use the same path;
+an fsync failure prevents transport; append-only hash-chain semantics and
+in-memory unit-test ledgers are unchanged; no second ledger implementation.
+
+**C. Persistent metadata / RUN_STOPPED / RUN_PAUSED / OWNER_WAIT.** The
+ledger now carries durable append-only `RUN_STATE_TRANSITION` events with
+the closed state set: `RUN_PAUSED` (deliberate owner pause; clean resume
+permitted), `RUN_STOPPED` (fail-closed provider/auth/model/cap/telemetry/
+metadata stop; automatic resume prohibited; owner disposition required),
+`OWNER_WAIT` (all 40 outcomes terminal; summary written; zero further
+interaction). Judgments now require one durable successful metadata
+terminal (`METADATA_OK` with returned model exactly `gpt-5.5-2026-04-23`)
+— a metadata COUNT of one without that success blocks and stops (the
+single authorized request is never repeated); a failed metadata request is
+durably terminal, carries `billing_unknown=true` (never known-zero), and
+persists RUN_STOPPED. Every owner-return stop persists RUN_STOPPED, which
+`reopen()` rejects before any client or segment exists; OWNER_WAIT and the
+result summary independently block re-entry across restarts (deleting the
+summary file does not reopen the run); completed items and metadata
+success never repeat; no resume-authorization mechanism was added — a
+RUN_STOPPED run returns to Peter.
+
+**D. Complete owner-freeze token distributions.** The development summary
+now records, for telemetry-bearing judgment attempts, complete
+per-judgment INPUT, TOTAL-OUTPUT, and REASONING token distributions —
+sample count, minimum, maximum, mean, median, deterministic nearest-rank
+p95 (k = ceil(p/100·n), tested), and the full sorted value table — while
+preserving incomplete-response details, `JUDGE_ERROR` outcomes, retries,
+latency, calls, and spend; transport failures without token telemetry are
+excluded from the distributions but counted in attempts/retries/spend.
+
+**Validation at the corrected head:** full suite **920 tests, 0 failures,
+0 errors** in BOTH interpreters (system 9 skips; pinned-SDK venv 4 skips);
+`self-check` 21/21; census ×2 byte-identical `674017e9…`; validator 91;
+`validate-skills` 184/0; `git diff --check` clean; static-safety suite and
+AST scan green.
+
+**Focused ten-dimension exact-diff review before this commit: BLOCKERS 0 —
+all ten dimensions SOUND** (binding visibility; label-leak absence; fsync
+before transport; metadata-success requirement; metadata billing-unknown;
+persistent RUN_STOPPED; lawful RUN_PAUSED resume; durable OWNER_WAIT; no
+duplicate dispatch; distribution completeness). Two bounded observations
+were adopted RED-first in the same pass: the stop path now persists
+RUN_STOPPED BEFORE closing the segment (a storage failure between the two
+appends degrades to the already resume-blocking open segment, never a
+silently resumable run), and a test-file path-portability fix. Recorded
+dispositions (no code change): pre-dispatch `CalibrationReservationDenied`
+/ authorization refusals persist no RUN_STOPPED — unreachable under the
+authorized caps (proven bounds ≤5,400 of 8,000; ≤80 of 200 attempts) and
+still fail closed via the open segment; a refused `reopen()` appends its
+`SEGMENT_OPENED` before reading state (append-only honesty; no client or
+segment results); the pause branch's reason string labels the only
+reachable path; item-id opacity vs `input_manifest_sha256` rests on
+SHA-256 preimage resistance (models cannot invert it; requests are
+stateless with `store:false`) and the sorted run order is fixed by
+BER-DEC-008; `evidence_refs` `minItems` is unsupported by strict
+structured outputs — an empty array remains runtime-invalid for PASS/FAIL
+(fail-closed `JUDGE_ERROR`); the metadata MODEL-MISMATCH terminal records
+known-zero deliberately — a completed response is not boundary-uncertain,
+and metadata retrieval is not token-billed (the billing-unknown
+requirement applies to uncertain-boundary failures, which now carry it).
+
+First-live execution remains pending another independent exact-head audit
+of THIS corrective commit; the future credentialed session must still
+independently re-verify the evidence-root ACL, encryption, reparse-free
+path, retention, exact head/tree, and clean tree live.

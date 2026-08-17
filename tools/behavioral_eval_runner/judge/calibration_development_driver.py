@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import stat as stat_module
 import statistics
@@ -94,6 +95,9 @@ from .calibration_ledger import (
     MAX_SINGLE_DAY_SPEND_NANOUSD,
     MAX_TOTAL_EXTERNAL_REQUESTS,
     MAX_TOTAL_SPEND_NANOUSD,
+    RUN_STATE_OWNER_WAIT,
+    RUN_STATE_PAUSED,
+    RUN_STATE_STOPPED,
     TOTAL_RUN_DEADLINE_SECONDS,
     CalibrationLedger,
     RequestKind,
@@ -468,6 +472,48 @@ def authorize_development_dispatch(
     )
 
 
+# ---------------------------------------------- owner-freeze distributions
+def nearest_rank_percentile(values, percentile: int):
+    """Deterministic nearest-rank percentile (audit family D): the k-th
+    smallest value with k = ceil(percentile/100 * n). No interpolation, so
+    the result is always an observed sample value."""
+    if not values:
+        raise SchemaValidationError("percentile of an empty sample")
+    ordered = sorted(values)
+    k = max(1, math.ceil(percentile / 100.0 * len(ordered)))
+    return ordered[k - 1]
+
+
+def _distribution(values) -> dict[str, Any]:
+    """The complete owner-freeze evidence for one token dimension."""
+    ordered = sorted(values)
+    if not ordered:
+        return {
+            "sample_count": 0,
+            "minimum": None,
+            "maximum": None,
+            "mean": None,
+            "median": None,
+            "p95": None,
+            "percentile_definition": (
+                "nearest-rank: k-th smallest, k = ceil(p/100 * n)"
+            ),
+            "values_sorted": [],
+        }
+    return {
+        "sample_count": len(ordered),
+        "minimum": ordered[0],
+        "maximum": ordered[-1],
+        "mean": statistics.fmean(ordered),
+        "median": statistics.median(ordered),
+        "p95": nearest_rank_percentile(ordered, 95),
+        "percentile_definition": (
+            "nearest-rank: k-th smallest, k = ceil(p/100 * n)"
+        ),
+        "values_sorted": ordered,
+    }
+
+
 # -------------------------------------------------- deterministic item set
 def development_run_order(dataset: CandidateDataset) -> tuple[CandidateItem, ...]:
     """The EXACT deterministic development execution order: the 40
@@ -653,6 +699,12 @@ class Wp2b3DevelopmentDriver:
         self._segment_open_verified = False
         self.state = "READY"
 
+    def _request_id(self, item: CandidateItem) -> str:
+        """The label-opaque request id for one approved item (family A)."""
+        return calibration_request_id(
+            item.item_id, self.expected_artifacts.dataset_semantic_sha256
+        )
+
     # ------------------------------------------------------------- gates
     def prepare(self) -> None:
         """Section 10 steps 3-4: verify the approved artifacts and load the
@@ -775,6 +827,35 @@ class Wp2b3DevelopmentDriver:
                 "the durable chain records an OPEN ACTIVE SEGMENT from a "
                 "prior run (an uncontrolled crash is preserved honestly); "
                 "resume is refused pending owner review"
+            )
+        # Family C: persisted failure/terminal run states are authoritative
+        # across restarts — RUN_STOPPED and OWNER_WAIT can never be
+        # silently resumed; only a clean RUN_PAUSED run may continue.
+        run_state = ledger.current_run_state()
+        if run_state == RUN_STATE_STOPPED:
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "the durable ledger records RUN_STOPPED (a fail-closed "
+                "provider/auth/model/cap/telemetry/metadata stop); "
+                "automatic resume is prohibited and no request may be "
+                "repeated — this run returns to Peter Nguyen for a "
+                "separate disposition",
+            )
+        if run_state == RUN_STATE_OWNER_WAIT:
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "the durable ledger records OWNER_WAIT: all 40 development "
+                "outcomes are terminal and the summary is written; every "
+                "further provider interaction is prohibited",
+            )
+        if os.path.exists(
+            _canonical_path(self.verified_root,
+                            DEVELOPMENT_RESULT_SUMMARY_RELPATH)
+        ):
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "the development result summary already exists; the "
+                "development stage is complete and cannot be re-entered",
             )
         self.ledger = ledger
 
@@ -920,7 +1001,7 @@ class Wp2b3DevelopmentDriver:
         client = self.make_client(sdk_client, exception_types)
         dispatched = 0
         for item in development_run_order(self.dataset):
-            request_id = calibration_request_id(item.item_id)
+            request_id = self._request_id(item)
             if request_id in self._terminal_request_ids():
                 continue
             self._dispatch_one(client, item)
@@ -1007,7 +1088,7 @@ class Wp2b3DevelopmentDriver:
         outcomes = self._outcome_by_item()
         missing = [
             item.item_id for item in order
-            if calibration_request_id(item.item_id) not in outcomes
+            if self._request_id(item) not in outcomes
         ]
         if missing:
             raise CalibrationAuthorizationError(
@@ -1029,6 +1110,14 @@ class Wp2b3DevelopmentDriver:
             fh.write(json.dumps(summary, sort_keys=True, indent=2) + "\n")
             fh.flush()
             os.fsync(fh.fileno())
+        # Family C: OWNER_WAIT is durable — the transition is an
+        # append-only chain event that survives restarts and blocks every
+        # further external interaction.
+        assert self.ledger is not None
+        self.ledger.record_run_state(
+            RUN_STATE_OWNER_WAIT,
+            reason="all-40-development-outcomes-terminal",
+        )
         self.state = "OWNER_WAIT"
         return summary
 
@@ -1054,7 +1143,7 @@ class Wp2b3DevelopmentDriver:
         }
         for item in order:
             gold = item.candidate_expected_label.value
-            outcome = outcomes[calibration_request_id(item.item_id)]
+            outcome = outcomes[self._request_id(item)]
             matrix["expected_pass" if gold == "PASS" else "expected_fail"] += 1
             if outcome.startswith("JUDGE_ERROR"):
                 judge_error += 1
@@ -1076,7 +1165,11 @@ class Wp2b3DevelopmentDriver:
                 else:
                     false_fail += 1
                     matrix["false_fail"] += 1
-            per_item.append({"item_id": item.item_id, "outcome": outcome})
+            per_item.append({
+                "item_id": item.item_id,
+                "request_id": self._request_id(item),  # the opaque mapping
+                "outcome": outcome,
+            })
 
         events = self._read_events(
             canonical_ledger_path(self.verified_root)
@@ -1098,7 +1191,9 @@ class Wp2b3DevelopmentDriver:
             if e.get("response_status") in ("completed", "incomplete")
         ]
         latencies = [int(e.get("latency_ms", 0)) for e in usable]
+        inputs = [int(e.get("input_tokens", 0)) for e in usable]
         outputs = [int(e.get("output_tokens", 0)) for e in usable]
+        reasonings = [int(e.get("reasoning_tokens", 0)) for e in usable]
         incomplete = [
             {
                 "request_id": e.get("logical_judgment_id"),
@@ -1136,6 +1231,15 @@ class Wp2b3DevelopmentDriver:
                 "per_judgment_output_mean": (
                     statistics.fmean(outputs) if outputs else 0.0
                 ),
+            },
+            # Family D: the complete owner-freeze evidence — per-judgment
+            # distributions over telemetry-bearing attempts only (transport
+            # failures without token telemetry are excluded here but remain
+            # counted in attempts/retries/failures/spend accounting).
+            "distributions": {
+                "input_tokens": _distribution(inputs),
+                "output_tokens": _distribution(outputs),
+                "reasoning_tokens": _distribution(reasonings),
             },
             "accounting": {
                 "judgment_attempts": cumulative.attempts_total,
@@ -1177,7 +1281,20 @@ class Wp2b3DevelopmentDriver:
         self.open_development_segment()
         assert self.ledger is not None
         try:
-            if self.ledger.cumulative().metadata_requests == 0:
+            # Family C: judgments require one durable metadata SUCCESS
+            # (METADATA_OK for the exact snapshot) — a metadata attempt
+            # COUNT never suffices, and the single authorized request is
+            # never repeated.
+            if not self.ledger.metadata_success_recorded():
+                if self.ledger.cumulative().metadata_requests >= 1:
+                    raise CalibrationStopError(
+                        CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                        "the single authorized metadata availability "
+                        "request was consumed without a durable "
+                        "METADATA_OK success; no judgment may proceed and "
+                        "no metadata retry exists — owner disposition "
+                        "required",
+                    )
                 self.run_metadata_probe(
                     sdk_client=sdk_client, exception_types=exception_types
                 )
@@ -1186,26 +1303,39 @@ class Wp2b3DevelopmentDriver:
                 exception_types=exception_types,
                 owner_stop_after_items=owner_stop_after_items,
             )
-        except CalibrationStopError:
-            # Section 9.6: a controlled TYPED stop closes the active
-            # segment durably (its elapsed time is honestly recorded);
-            # only an uncontrolled crash leaves a segment open.
+        except CalibrationStopError as exc:
+            # Section 9.6 + family C: a typed stop persists the fail-closed
+            # RUN_STOPPED state FIRST and then closes the active segment —
+            # if storage fails between the two appends, the surviving state
+            # is the (already resume-blocking) open segment, never a
+            # silently resumable run. Automatic resume after restart is
+            # impossible; the run returns to the owner. Only an
+            # uncontrolled crash leaves a segment open.
+            self.ledger.record_run_state(
+                RUN_STATE_STOPPED, reason=exc.stop_reason.value
+            )
             if self._segment_open_verified:
                 self.close_development_segment()
-            self.state = "TYPED_STOP"
+            self.state = "RUN_STOPPED"
             raise
         assert self.dataset is not None
         terminal = self._terminal_request_ids()
         all_ids = {
-            calibration_request_id(item.item_id)
+            self._request_id(item)
             for item in development_run_order(self.dataset)
         }
         if all_ids <= terminal:
             return self.finalize()
+        # Family C: the deliberate owner-controlled partial pause is
+        # durably RUN_PAUSED (no provider failure implied); a clean
+        # RUN_PAUSED run may lawfully resume from the same ledger.
         self.close_development_segment()
-        self.state = "TYPED_STOP"
+        self.ledger.record_run_state(
+            RUN_STATE_PAUSED, reason="owner_stop_after_items"
+        )
+        self.state = "RUN_PAUSED"
         return {
-            "state": "TYPED_STOP",
+            "state": "RUN_PAUSED",
             "stopped_after_items": dispatched,
             "terminal_total": len(all_ids & terminal),
             "items_total": len(all_ids),

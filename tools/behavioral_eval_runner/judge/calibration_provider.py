@@ -296,10 +296,15 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         envelope = json.loads(bytes(envelope_bytes).decode("utf-8"))
         input_text = render_envelope_text(envelope)
         instructions = JUDGE_SYSTEM_POLICY
+        # Family-A binding: the strict output schema pins every trusted
+        # binding field to its one authorized value and closes
+        # evidence_refs to the envelope's actual untrusted-data keys.
         kwargs = build_responses_request_kwargs(
             instructions=instructions,
             input_text=input_text,
             max_output_tokens=DEV_MAX_OUTPUT_TOKENS,
+            request=request,
+            evidence_keys=tuple(sorted(envelope["untrusted_data"])),
         )
         # Family-1 gate: the PROVEN bound covers the COMPLETE serialized
         # request surface (instructions + input + schema block + model +
@@ -607,12 +612,16 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         try:
             result = self._sdk.models.retrieve(AUTHORIZED_MODEL_SNAPSHOT)
         except Exception as exc:
+            # Family C: a metadata exception may have crossed the provider
+            # boundary — billing is UNKNOWN, never known-zero (the reserved
+            # worst case for a metadata request is zero, but the FLAG must
+            # be honest).
             self._record(
                 reservation, response_id=None, trace_id=None,
                 returned_model=None, started=started,
                 latency_ms=max(0, int((self._time_source() - t0) * 1000)),
                 response_status="UNCLASSIFIED_EXCEPTION",
-                incomplete_reason=None, usage=ProviderUsage.zero(),
+                incomplete_reason=None, usage=None, billing_unknown=True,
                 outcome_kind="STOP_UNCLASSIFIED_TRANSPORT_ERROR",
             )
             raise CalibrationStopError(

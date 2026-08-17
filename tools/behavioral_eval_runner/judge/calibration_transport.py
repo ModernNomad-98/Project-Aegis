@@ -262,13 +262,24 @@ FORBIDDEN_REQUEST_KEYS = frozenset(
 VERDICT_SCHEMA_NAME = "aegis_judge_verdict"
 
 
-def structured_verdict_output_schema() -> dict[str, Any]:
+def structured_verdict_output_schema(
+    request: Any = None,
+    evidence_keys: tuple[str, ...] | None = None,
+) -> dict[str, Any]:
     """The strict JSON-schema output contract for the judge verdict.
 
     Mirrors ``StructuredVerdict`` exactly: every field required, no
     additional properties, closed enums, and the WP-2B-2 verdict
     ``schema_version``. Runtime validation (``StructuredVerdict.from_dict``)
     remains the enforcing authority; this schema shapes provider output.
+
+    Audit family A: when the trusted ``request`` is supplied, every trusted
+    binding field (request id, control, rubric identity trio, judge
+    identity, input-manifest hash, schema version) is pinned to EXACTLY its
+    one authorized value via a single-value enum, and ``evidence_refs`` is
+    closed to the envelope's actual untrusted-data keys — a real model can
+    therefore satisfy every runtime equality check using only the
+    provider-visible request, and is never asked to invent trusted values.
     """
     from .verdict import (  # local import: keep module import graph light
         OFFENDING_SPAN_MAX_CHARS,
@@ -318,6 +329,32 @@ def structured_verdict_output_schema() -> dict[str, Any]:
         "input_manifest_sha256": {"type": "string"},
         "schema_version": {"type": "string", "enum": [GRADING_SCHEMA_VERSION]},
     }
+    if request is not None:
+        pinned = {
+            "request_id": request.request_id,
+            "control_id": request.control_id,
+            "rubric_id": request.rubric_id,
+            "rubric_version": request.rubric_version,
+            "rubric_sha256": request.rubric_sha256,
+            "judge_id": request.judge.judge_id,
+            "judge_version": request.judge.judge_version,
+            "input_manifest_sha256": request.input_manifest_sha256,
+            "schema_version": request.schema_version,
+        }
+        for name, value in pinned.items():
+            properties[name] = {"type": "string", "enum": [value]}
+    if evidence_keys is not None:
+        keys = sorted(evidence_keys)
+        if not keys or not all(isinstance(k, str) and k for k in keys):
+            raise CalibrationStopError(
+                CalibrationStopReason.REQUEST_SETTINGS_VIOLATION,
+                "evidence_keys must be the non-empty closed set of envelope "
+                "untrusted-data keys",
+            )
+        properties["evidence_refs"] = {
+            "type": "array",
+            "items": {"type": "string", "enum": keys},
+        }
     expected = set(StructuredVerdict._KEYS)
     assert set(properties) == expected, "schema must mirror StructuredVerdict"
     return {
@@ -333,8 +370,15 @@ def build_responses_request_kwargs(
     instructions: str,
     input_text: str,
     max_output_tokens: int,
+    request: Any = None,
+    evidence_keys: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
-    """Build the closed, validated kwargs for ONE judgment request."""
+    """Build the closed, validated kwargs for ONE judgment request.
+
+    The live dispatch path always supplies ``request`` and
+    ``evidence_keys`` so the structured-output schema pins every trusted
+    binding (audit family A); the parameter-less form remains only for
+    schema-mirror introspection and tests."""
     if (
         not isinstance(max_output_tokens, int)
         or isinstance(max_output_tokens, bool)
@@ -353,7 +397,9 @@ def build_responses_request_kwargs(
                 "type": "json_schema",
                 "name": VERDICT_SCHEMA_NAME,
                 "strict": True,
-                "schema": structured_verdict_output_schema(),
+                "schema": structured_verdict_output_schema(
+                    request=request, evidence_keys=evidence_keys
+                ),
             }
         },
         "reasoning": {"effort": REASONING_EFFORT},

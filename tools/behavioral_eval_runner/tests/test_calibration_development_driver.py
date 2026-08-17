@@ -301,8 +301,9 @@ class TestOwnerApprovalGate(DriverCase):
         driver.prepare()
         auth = driver.authorization
         self.assertIs(auth.stage, cg.ExecutionStage.DEVELOPMENT)
+        dataset_sha = self.identity.dataset_semantic_sha256
         expected_ids = {
-            cd.calibration_request_id(item.item_id)
+            cd.calibration_request_id(item.item_id, dataset_sha)
             for item in cd.development_items(self.dataset)
         }
         self.assertEqual(auth.authorized_request_ids, frozenset(expected_ids))
@@ -312,7 +313,7 @@ class TestOwnerApprovalGate(DriverCase):
             if i.split is cd.CandidateSplit.SEALED_HOLDOUT
         )
         self.assertNotIn(
-            cd.calibration_request_id(holdout.item_id),
+            cd.calibration_request_id(holdout.item_id, dataset_sha),
             auth.authorized_request_ids,
         )
 
@@ -721,9 +722,10 @@ class TestActiveDevelopmentSegment(DriverCase):
                       CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE)
 
     def test_typed_stop_error_closes_segment_durably(self) -> None:
-        """Section 9.6: a controlled TYPED stop (e.g. a deadline denial)
-        closes the active segment durably; only an uncontrolled crash may
-        leave it open. Resume afterwards is not blocked by segment state."""
+        """Section 9.6 + family C: a controlled TYPED stop (e.g. a deadline
+        denial) closes the active segment durably AND persists RUN_STOPPED;
+        only an uncontrolled crash may leave a segment open, and a stopped
+        run can never silently resume."""
         order = drv.development_run_order(self.dataset)
         driver = self._driver()
         driver.prepare()
@@ -750,18 +752,23 @@ class TestActiveDevelopmentSegment(DriverCase):
             )
         self.assertIs(ctx.exception.stop_reason,
                       CalibrationStopReason.DEADLINE_EXCEEDED)
-        self.assertEqual(driver.state, "TYPED_STOP")
+        self.assertEqual(driver.state, "RUN_STOPPED")
         events = self._ledger_events()
         kinds = [e["event_kind"] for e in events]
         self.assertIn("DEADLINE_STOP", kinds)
+        # Reviewer-hardened ordering: RUN_STOPPED is persisted BEFORE the
+        # segment closes, so a storage failure between the two appends
+        # leaves the (already resume-blocking) open segment, never a
+        # silently resumable run.
+        state_index = kinds.index("RUN_STATE_TRANSITION")
+        self.assertGreater(state_index, kinds.index("DEADLINE_STOP"))
+        self.assertEqual(events[state_index]["run_state"], "RUN_STOPPED")
         self.assertEqual(kinds[-1], "ACTIVE_SEGMENT_END")
+        self.assertGreater(kinds.index("ACTIVE_SEGMENT_END"), state_index)
         second = self._driver()
         second.prepare()
-        second.reopen()  # controlled close => segment state permits reopen
-        self.assertGreater(
-            second.ledger.stage_active_seconds("DEVELOPMENT"),
-            float(cl.DEV_STAGE_DEADLINE_SECONDS),
-        )
+        with self.assertRaises(CalibrationStopError):
+            second.reopen()  # persisted RUN_STOPPED: no automatic resume
 
 
 # ================================================= dataset and item set
@@ -797,7 +804,9 @@ class TestDevelopmentItemSet(DriverCase):
         driver = self._driver()
         driver.prepare()
         holdout_ids = {
-            cd.calibration_request_id(i.item_id)
+            cd.calibration_request_id(
+                i.item_id, self.identity.dataset_semantic_sha256
+            )
             for i in self.dataset.items
             if i.split is cd.CandidateSplit.SEALED_HOLDOUT
         }
@@ -932,7 +941,7 @@ class TestExecutionAccounting(DriverCase):
             owner_stop_after_items=3,
         )
         self.assertEqual(result["stopped_after_items"], 3)
-        self.assertEqual(driver.state, "TYPED_STOP")
+        self.assertEqual(driver.state, "RUN_PAUSED")
         self.assertEqual(len(sdk1.responses.calls), 3)
 
         second = self._driver()

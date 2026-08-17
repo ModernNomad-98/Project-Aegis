@@ -97,7 +97,24 @@ EVENT_KINDS = (
     "ACTIVE_SEGMENT_END",
     "SEMANTIC_OUTCOME",
     "DEADLINE_STOP",
+    "RUN_STATE_TRANSITION",
 )
+
+#: Durable append-only run states (first-live audit family C).
+#: RUN_PAUSED — deliberate owner-controlled partial pause; clean resume
+#: permitted. RUN_STOPPED — fail-closed provider/auth/model/cap/telemetry/
+#: metadata stop; automatic resume prohibited; owner disposition required.
+#: OWNER_WAIT — all 40 development outcomes terminal; summary written; all
+#: further provider interaction prohibited.
+RUN_STATE_PAUSED = "RUN_PAUSED"
+RUN_STATE_STOPPED = "RUN_STOPPED"
+RUN_STATE_OWNER_WAIT = "OWNER_WAIT"
+VALID_RUN_STATES = (RUN_STATE_PAUSED, RUN_STATE_STOPPED,
+                    RUN_STATE_OWNER_WAIT)
+
+#: The exact durable outcome a successful metadata availability request
+#: records; a metadata COUNT is never treated as metadata SUCCESS.
+METADATA_SUCCESS_OUTCOME_KIND = "METADATA_OK"
 
 
 @dataclass(frozen=True, slots=True)
@@ -307,6 +324,8 @@ class CalibrationLedger:
         self._prior = _Aggregates()
         self._orphans: tuple[str, ...] = ()
         self._segments: list[list[Any]] = []  # [stage, begin, end|None]
+        self._run_state: str | None = None
+        self._metadata_ok = False
         self.run_id = f"seg-{uuid.uuid4().hex[:12]}"
 
         if path is None:
@@ -374,6 +393,19 @@ class CalibrationLedger:
                     if segment[2] is None:
                         segment[2] = float(event["at"])
                         break
+            elif kind == "RUN_STATE_TRANSITION":
+                self._run_state = event.get("run_state")
+        # Durable metadata SUCCESS (family C): only a terminal METADATA
+        # event whose outcome is METADATA_OK for the exact authorized
+        # snapshot counts — a bare metadata attempt count never does.
+        for event in events:
+            if (
+                event.get("event_kind") == "ATTEMPT_TERMINAL"
+                and event.get("request_kind") == RequestKind.METADATA.value
+                and event.get("outcome_kind") == METADATA_SUCCESS_OUTCOME_KIND
+                and event.get("returned_model") == AUTHORIZED_MODEL_SNAPSHOT
+            ):
+                self._metadata_ok = True
         # Orphans: STARTED with no terminal — never forgotten, identity
         # never reused, conservatively charged, billing UNKNOWN.
         orphan_ids: list[str] = []
@@ -413,8 +445,15 @@ class CalibrationLedger:
         event["event_sha256"] = sha256_of_obj(event)
         self._prev_hash = event["event_sha256"]
         if self._path is not None:
+            # Crash-durability barrier (first-live audit family B): every
+            # durable event — above all the write-ahead ATTEMPT_STARTED
+            # relied upon BEFORE any transport use — is written, flushed,
+            # AND fsynced to the stable file boundary before control
+            # returns. An fsync failure propagates and prevents transport.
             with open(self._path, "a", encoding="utf-8", newline="\n") as fh:
                 fh.write(canonical_json(event) + "\n")
+                fh.flush()
+                os.fsync(fh.fileno())
         return event
 
     # ------------------------------------------------------------ queries
@@ -740,6 +779,12 @@ class CalibrationLedger:
         )
         self._entries.append(entry)
         self._append_event("ATTEMPT_TERMINAL", entry.to_dict())
+        if (
+            entry.request_kind == RequestKind.METADATA.value
+            and entry.outcome_kind == METADATA_SUCCESS_OUTCOME_KIND
+            and entry.returned_model == AUTHORIZED_MODEL_SNAPSHOT
+        ):
+            self._metadata_ok = True
 
         if telemetry_missing:
             raise CalibrationStopError(
@@ -778,6 +823,39 @@ class CalibrationLedger:
                 "run STOPS",
             )
         return entry
+
+    # ------------------------------------------------------- run state
+    def record_run_state(
+        self,
+        run_state: str,
+        *,
+        reason: str | None = None,
+        detail: str | None = None,
+    ) -> dict[str, Any]:
+        """Append the durable run-state transition (family C): RUN_PAUSED,
+        RUN_STOPPED, and OWNER_WAIT are authoritative across restarts."""
+        if run_state not in VALID_RUN_STATES:
+            raise CalibrationLedgerError(
+                f"unknown run state {run_state!r}; the closed set is "
+                f"{VALID_RUN_STATES}"
+            )
+        event = self._append_event("RUN_STATE_TRANSITION", {
+            "run_state": run_state,
+            "reason": reason,
+            "detail": detail,
+            "recorded_utc": _utc_now_iso(),
+        })
+        self._run_state = run_state
+        return event
+
+    def current_run_state(self) -> str | None:
+        """The latest durable run state (None before any transition)."""
+        return self._run_state
+
+    def metadata_success_recorded(self) -> bool:
+        """True only when a durable METADATA_OK terminal for the exact
+        authorized snapshot exists (prior segments or this one)."""
+        return self._metadata_ok
 
     # ------------------------------------------------- semantic outcomes
     def record_semantic_outcome(

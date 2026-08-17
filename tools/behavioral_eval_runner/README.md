@@ -141,6 +141,35 @@ external approval artifact (2026-08-14; see
 execution remains **NOT STARTED** pending the independent exact-head audit
 and the credentialed execution session.
 
+### First-live execution-gate corrections (audit of `ca19b919…`; OFFLINE)
+
+The independent exact-head audit returned REQUEST CHANGES with four
+consolidated pre-provider blocker families, corrected RED→GREEN (summary
+§10): **(A)** judge-visible request ids are now deterministic label-opaque
+digests (`wp2b3-r-<32-hex>`; no item id, split, label, or position leaks),
+and the strict structured-output schema is request-specific — every
+trusted binding field (request id, control, rubric trio, judge identity,
+manifest hash, schema version) is pinned to its one authorized value and
+`evidence_refs` is closed to the envelope's actual untrusted-data keys, so
+a real model can satisfy every runtime equality check from
+provider-visible content alone (all 40 real development items re-verified
+at 4,742–5,400 proven input tokens against the 8,000 ceiling);
+**(B)** every durable ledger event append now completes a
+write → flush → `os.fsync` barrier before control returns — above all the
+write-ahead `ATTEMPT_STARTED` before any transport use; **(C)** durable
+append-only run states: judgments require a durable `METADATA_OK` success
+for the exact snapshot (a bare metadata count never suffices, and the
+single authorized request is never repeated); every fail-closed stop
+(model/auth/telemetry/cap/metadata/unclassified/deadline) persists
+`RUN_STOPPED`, which no restart can silently resume; the owner-controlled
+pause persists `RUN_PAUSED` and resumes lawfully; `OWNER_WAIT` is durable
+across processes; metadata exceptions record `billing_unknown`, never
+known-zero; **(D)** the development summary now carries complete
+per-judgment input/output/reasoning token distributions (count, min, max,
+mean, median, deterministic nearest-rank p95, sorted values) over
+telemetry-bearing attempts for the owner's holdout `max_output_tokens`
+freeze.
+
 ## Tests
 
 ```bash

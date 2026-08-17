@@ -441,10 +441,34 @@ def split_map_sha256(dataset: CandidateDataset) -> str:
     return sha256_of_obj(split_map(dataset))
 
 
-def calibration_request_id(item_id: str) -> str:
-    """The canonical judgment request id for one item (single derivation
-    shared by the envelope builder and the authorization gate)."""
-    return f"wp2b3-{item_id}"
+#: Opaque request-id namespace (audit family A): judge-visible request ids
+#: carry NO raw item id, split marker, PASS/FAIL marker, control position,
+#: label, or rationale — item ids like ``A-dev-p1`` would otherwise leak
+#: the gold label through their ``-p``/``-f`` suffix.
+OPAQUE_REQUEST_ID_PREFIX = "wp2b3-r-"
+_OPAQUE_REQUEST_ID_HEX_CHARS = 32
+
+
+def calibration_request_id(item_id: str, dataset_sha256: str) -> str:
+    """The canonical LABEL-OPAQUE judgment request id for one item (single
+    derivation shared by the envelope builder, the authorization gate, and
+    the development driver).
+
+    Deterministic and collision-free across the approved dataset: the id is
+    a truncated SHA-256 over the dataset's semantic identity plus the item
+    id, so accounting and owner summaries can re-derive the mapping while
+    nothing judge-visible encodes the item, its split, or its label."""
+    _require(
+        isinstance(item_id, str) and bool(item_id), "item_id required"
+    )
+    _require(
+        isinstance(dataset_sha256, str)
+        and len(dataset_sha256) == 64
+        and set(dataset_sha256) <= _HEX,
+        "dataset_sha256 must be a 64-hex semantic dataset identity",
+    )
+    digest = sha256_hex_text(f"{dataset_sha256}:{item_id}")
+    return OPAQUE_REQUEST_ID_PREFIX + digest[:_OPAQUE_REQUEST_ID_HEX_CHARS]
 
 
 def development_items(dataset: CandidateDataset) -> tuple[CandidateItem, ...]:
