@@ -40,6 +40,7 @@ import contextlib
 import hashlib
 import importlib.util
 import io
+import json
 import os
 import re
 import shutil
@@ -48,6 +49,11 @@ import sys
 import tempfile
 from pathlib import Path
 from unittest import mock
+
+# Keep the repository clean: importing the audit engine by path (and any
+# subprocess re-entry below) must never leave a `scripts/__pycache__/` behind.
+sys.dont_write_bytecode = True
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 TESTS_DIR = Path(__file__).resolve().parent
 REAL_REPO = TESTS_DIR.parent.parent
@@ -306,8 +312,346 @@ def test_eval004_two_classes(a) -> None:
     sevs = [s for s, _ in hits]
     assert sevs == ["P1", "P2"], f"EVAL-004 must yield one P1 + one P2, got {sevs}"
     assert "ghost-neighbor" in hits[0][1], hits
+    # `clean-skill (subagent)` is a KIND MISMATCH, not "an annotated name": the
+    # syntax is valid and declares the subagent namespace, but the fixture has
+    # no `.claude/agents/clean-skill.md` — only the same-named SKILL. A valid
+    # annotation is never the defect (BER v1 §5d); the missing agent is.
     assert "clean-skill (subagent)" in hits[1][1], hits
-    ok("EVAL-004 separates a stale neighbor (P1) from an annotated real one (P2)")
+    assert "subagent" in hits[1][1] and "agent" in hits[1][1], hits[1][1]
+    ok("EVAL-004 separates an unknown target (P1) from a kind mismatch (P2)")
+
+
+# --- typed-target contract (BER v1 §3/§5d; merged models.py::parse_target) ---
+#
+# EVAL-004 must resolve a target against the namespace its SYNTAX declares:
+# a bare name declares a SKILL, a trailing `(subagent)` declares a SUBAGENT.
+# The annotation is REQUIRED TYPE SYNTAX, never removable prose — collapsing
+# the two namespaces is what made AEGIS-060 a false positive.
+
+_TT_SKILL_MD = """---
+name: {name}
+description: 'Does one narrow thing. Use when that narrow thing is needed.'
+---
+
+# {name}
+
+## Purpose
+
+One narrow thing.
+
+## Workflow
+
+1. Read the input.
+2. Report.
+
+## Output Format
+
+A short report.
+
+## Validation Checklist
+
+- [ ] Reported.
+"""
+
+
+def _typed_target_repo(tmp: Path, *, skills, agents, targets) -> Path:
+    """Minimal repo: `probe` carries `targets` in ALL THREE machine surfaces."""
+    repo = tmp / "repo"
+    for name in [*skills, "probe"]:
+        d = repo / ".claude" / "skills" / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "SKILL.md").write_text(_TT_SKILL_MD.format(name=name), encoding="utf-8")
+    for name in agents:
+        d = repo / ".claude" / "agents"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{name}.md").write_text(
+            f"---\nname: {name}\ntools: Read, Grep, Glob\n---\n\nReviewer fixture.\n",
+            encoding="utf-8",
+        )
+    ev = repo / ".claude" / "skills" / "probe" / "evals"
+    ev.mkdir(parents=True, exist_ok=True)
+    # every target appears in overlaps_with AND expected_skill AND
+    # should_not_trigger — §5B requires proof in each machine-resolved surface.
+    cases = [
+        {
+            "id": f"case-{i}",
+            "prompt": "Probe the routing boundary for this neighbor.",
+            "expected_skill": t,
+            "should_not_trigger": [t],
+            "reason": "Typed-target resolution probe.",
+        }
+        for i, t in enumerate(targets)
+    ]
+    (ev / "trigger-evals.json").write_text(
+        json.dumps({"skill": "probe", "overlaps_with": list(targets),
+                    "cases": cases}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return repo
+
+
+def _eval004(repo: Path):
+    a = audit_mod.Audit(repo)
+    a.run()
+    return [f for f in a.findings if f.rule == "EVAL-004"]
+
+
+def _typed_case(label: str, *, skills, agents, targets, expect) -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-tt-"))
+    try:
+        hits = _eval004(_typed_target_repo(tmp, skills=skills, agents=agents,
+                                          targets=targets))
+        got = sorted(f.severity for f in hits)
+        assert got == sorted(expect), (
+            f"{label}: expected EVAL-004 {sorted(expect)}, got {got} "
+            f"— {[f.evidence for f in hits]}"
+        )
+        ok(label)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_eval004_valid_bare_skill_is_silent() -> None:
+    # §5A — a bare name whose skill exists resolves as a skill: no finding.
+    _typed_case("EVAL-004: bare name + existing skill resolves silently",
+                skills=["example-target"], agents=[],
+                targets=["example-target"], expect=[])
+
+
+def test_eval004_valid_typed_subagent_is_silent() -> None:
+    # §5B — `(subagent)` + existing agent resolves as a subagent: no finding,
+    # in expected_skill, should_not_trigger, AND overlaps_with.
+    _typed_case("EVAL-004: `(subagent)` + existing agent resolves silently in "
+                "all three machine surfaces",
+                skills=[], agents=["example-target"],
+                targets=["example-target (subagent)"], expect=[])
+
+
+def test_eval004_dual_namespace_is_distinguishable() -> None:
+    # §5C — both kinds exist under one name; BOTH forms are valid and are
+    # resolved to DIFFERENT namespaces (the release-readiness-reviewer shape).
+    _typed_case("EVAL-004: dual-namespace name resolves both bare->skill and "
+                "annotated->subagent with no finding",
+                skills=["dual-target"], agents=["dual-target"],
+                targets=["dual-target", "dual-target (subagent)"], expect=[])
+
+
+def test_eval004_agent_only_bare_name_is_kind_mismatch() -> None:
+    # §5D — bare syntax declares a SKILL; only the agent exists -> mismatch.
+    _typed_case("EVAL-004: bare name that exists only as an agent is a kind "
+                "mismatch (P2)",
+                skills=[], agents=["agent-only"],
+                targets=["agent-only"], expect=["P2"])
+
+
+def test_eval004_skill_only_subagent_name_is_kind_mismatch() -> None:
+    # §5E — `(subagent)` declares a SUBAGENT; only the skill exists -> mismatch.
+    _typed_case("EVAL-004: `(subagent)` whose name exists only as a skill is a "
+                "kind mismatch (P2)",
+                skills=["skill-only"], agents=[],
+                targets=["skill-only (subagent)"], expect=["P2"])
+
+
+def test_eval004_ghost_target_still_unknown() -> None:
+    # §5F — neither namespace, in either syntax -> unknown target (P1) still.
+    _typed_case("EVAL-004: a name in neither namespace is still an unknown "
+                "target (P1), in bare and annotated form",
+                skills=[], agents=[],
+                targets=["ghost-name", "other-ghost (subagent)"],
+                expect=["P1", "P1"])
+
+
+def test_eval004_non_subagent_parenthetical_is_a_skill_name() -> None:
+    # §5G — only the EXACT `(subagent)` suffix changes the kind. Every other
+    # nonempty string is a SKILL target whose name is the complete string
+    # (runtime contract). `agent-only (agent)` therefore names a skill that does
+    # not exist -> unknown target (P1). It is never collapsed to `agent-only`
+    # (that collapse is the superseded treatment, design §20a-S4).
+    _typed_case("EVAL-004: a non-`(subagent)` parenthetical is part of the "
+                "SKILL name and fails as an unknown target",
+                skills=["skill-only"], agents=["agent-only"],
+                targets=["agent-only (agent)", "skill-only (subagent )"],
+                expect=["P1", "P1"])
+
+
+def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
+    # Codex 3797458777 — EVAL-004's observable semantics changed, so the engine
+    # must not still identify as 1.12.0. The frozen historical baseline is the
+    # type-collapsing 1.12.0 engine; a corrected live report has to be
+    # distinguishable by VERSION, not only by engine source hash.
+    assert audit_mod.TOOL_VERSION == "1.13.0", (
+        f"corrected EVAL-004 semantics require a minor bump; got "
+        f"{audit_mod.TOOL_VERSION!r}"
+    )
+    ok("audit engine reports v1.13.0 for the corrected EVAL-004 semantics")
+
+
+def _per_surface_repo(tmp: Path, *, skills, agents,
+                      overlaps, expected, not_triggered) -> Path:
+    """Minimal repo placing a DISTINCT target in each machine surface.
+
+    `_typed_target_repo` repeats one target across all three surfaces, and
+    `audit_evals` unions them into a set — so deleting any single collector is
+    masked by the other two. Here each surface carries its OWN target, which
+    binds the collectors independently (Codex 3797458780).
+    """
+    repo = tmp / "repo"
+    for name in [*skills, "probe"]:
+        d = repo / ".claude" / "skills" / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "SKILL.md").write_text(_TT_SKILL_MD.format(name=name), encoding="utf-8")
+    for name in agents:
+        d = repo / ".claude" / "agents"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{name}.md").write_text(
+            f"---\nname: {name}\ntools: Read, Grep, Glob\n---\n\nReviewer fixture.\n",
+            encoding="utf-8",
+        )
+    ev = repo / ".claude" / "skills" / "probe" / "evals"
+    ev.mkdir(parents=True, exist_ok=True)
+    (ev / "trigger-evals.json").write_text(
+        json.dumps({
+            "skill": "probe",
+            "overlaps_with": list(overlaps),
+            "cases": [{
+                "id": "per-surface-case",
+                "prompt": "Probe the routing boundary for this neighbor.",
+                "expected_skill": expected,
+                "should_not_trigger": list(not_triggered),
+                "reason": "Per-surface typed-target resolution probe.",
+            }],
+        }, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return repo
+
+
+def test_eval004_each_machine_surface_is_independently_collected() -> None:
+    # Codex 3797458780 — one UNIQUE ghost per surface. Every name must appear in
+    # its own P1 finding, so removing ANY ONE collector (overlaps_with,
+    # expected_skill, should_not_trigger) fails this test on its own.
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-tt-surface-"))
+    try:
+        hits = _eval004(_per_surface_repo(
+            tmp, skills=[], agents=[],
+            overlaps=["ghost-in-overlaps"],
+            expected="ghost-in-expected",
+            not_triggered=["ghost-in-not-triggered"],
+        ))
+        blob = " | ".join(f.evidence for f in hits)
+        for surface, name in (("overlaps_with", "ghost-in-overlaps"),
+                              ("expected_skill", "ghost-in-expected"),
+                              ("should_not_trigger", "ghost-in-not-triggered")):
+            matched = [f for f in hits if name in f.evidence]
+            assert matched, (
+                f"{surface} is not independently collected: no EVAL-004 finding "
+                f"names {name!r} — got {blob}"
+            )
+            assert matched[0].severity == "P1", (
+                f"{surface}: expected P1 unknown target for {name!r}, got "
+                f"{matched[0].severity}"
+            )
+        assert len(hits) == 3, f"expected exactly 3 findings, got {len(hits)}: {blob}"
+        ok("EVAL-004: overlaps_with, expected_skill, and should_not_trigger are "
+           "each independently collected (unique ghost per surface)")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_eval004_each_machine_surface_resolves_valid_subagent() -> None:
+    # Positive counterpart: a VALID typed subagent in each surface, still with a
+    # distinct name per surface, must produce no finding at all.
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-tt-surface-ok-"))
+    try:
+        hits = _eval004(_per_surface_repo(
+            tmp, skills=[], agents=["ow-agent", "es-agent", "snt-agent"],
+            overlaps=["ow-agent (subagent)"],
+            expected="es-agent (subagent)",
+            not_triggered=["snt-agent (subagent)"],
+        ))
+        assert not hits, (
+            "valid typed subagents must resolve silently in every machine "
+            f"surface, got {[f.evidence for f in hits]}"
+        )
+        ok("EVAL-004: a valid typed subagent resolves silently in each machine "
+           "surface independently")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_eval004_parser_parity_with_merged_runtime() -> None:
+    # §5H — the audit's LOCAL parser must agree with the merged runner's
+    # models.py::parse_target on kind, bare name, and annotation. Parity is
+    # asserted in the TEST; the audit engine never imports runtime code.
+    runtime = REAL_REPO / "tools" / "behavioral_eval_runner" / "models.py"
+    if not runtime.is_file():
+        ok("EVAL-004: runtime parity skipped (BER runtime not present)")
+        return
+    # Imported as a PACKAGE (it uses relative imports). This import lives in the
+    # test only — the audit engine itself never imports runtime code.
+    sys.path.insert(0, str(REAL_REPO / "tools"))
+    try:
+        import importlib
+        rt = importlib.import_module("behavioral_eval_runner.models")
+    finally:
+        sys.path.remove(str(REAL_REPO / "tools"))
+    # The audit engine must stay STANDALONE: assert against its SOURCE, not its
+    # namespace. A real `import behavioral_eval_runner...` binds a module
+    # object, so a value-scan would miss exactly the regression this guards.
+    engine_src = AUDIT_PATH.read_text(encoding="utf-8")
+    offending = [
+        line for line in engine_src.splitlines()
+        if re.match(r"\s*(?:from|import)\s+\S*behavioral_eval_runner", line)
+    ]
+    assert not offending, (
+        f"the audit engine must stay standalone (no BER import): {offending}"
+    )
+    # Codex 3797458783 — parity must cover NON-`(subagent)` parentheticals too.
+    # The runtime treats every other nonempty value as a SKILL whose name is the
+    # complete stripped string; the audit parser must not be stricter.
+    for raw in ("example-target", "example-target (subagent)",
+                "dual-target", "release-readiness-reviewer (subagent)",
+                "  spaced-name (subagent)  ",
+                "x (agent)", "x (subagent )", "x (reviewer)",
+                "x (sub agent)", "x ()", "(subagent) x",
+                "  padded-bare-name  ", "  x (agent)  "):
+        mine = audit_mod.parse_typed_target(raw)
+        theirs = rt.parse_target(raw)
+        assert mine is not None, f"audit parser rejected {raw!r}"
+        assert mine.kind == theirs.target_kind.value, (
+            f"kind disagreement on {raw!r}: {mine.kind} vs "
+            f"{theirs.target_kind.value}")
+        assert mine.name == theirs.target_name, (
+            f"name disagreement on {raw!r}: {mine.name!r} vs "
+            f"{theirs.target_name!r}")
+        assert mine.annotation == theirs.target_annotation, (
+            f"annotation disagreement on {raw!r}: {mine.annotation!r} vs "
+            f"{theirs.target_annotation!r}")
+    ok("EVAL-004: audit parser agrees with merged models.parse_target on kind, "
+       "name, and annotation (no runtime import)")
+
+
+def test_eval004_live_corpus_typed_targets_resolve() -> None:
+    # §5I — the four authored subagent EXPECTATIONS and the five annotated
+    # overlaps resolve on the real corpus, and EVAL-004 is silent there.
+    a = real_audit()
+    hits = [f for f in a.findings if f.rule == "EVAL-004"]
+    assert hits == [], f"live EVAL-004 must be zero, got {[f.evidence for f in hits]}"
+    annotated = 0
+    expectations = 0
+    for p in sorted((REAL_REPO / ".claude" / "skills").glob(
+            "*/evals/trigger-evals.json")):
+        d = json.loads(p.read_text(encoding="utf-8"))
+        for v in (d.get("overlaps_with") or []):
+            if str(v).strip().endswith("(subagent)"):
+                annotated += 1
+        for c in d.get("cases") or []:
+            if str(c.get("expected_skill", "")).strip().endswith("(subagent)"):
+                expectations += 1
+    assert expectations == 4, f"expected 4 authored subagent expectations, got {expectations}"
+    assert annotated == 5, f"expected 5 annotated overlaps entries, got {annotated}"
+    ok("EVAL-004: live corpus is silent with 4 typed subagent expectations and "
+       "5 annotated overlaps intact")
 
 
 def test_state_rules_map_to_aegis(a) -> None:
@@ -1356,6 +1700,18 @@ def main() -> int:
     test_side004_real_corpus_targets()
     test_side004_approval_elsewhere_never_suppresses()
     test_eval004_two_classes(a)
+    test_eval004_valid_bare_skill_is_silent()
+    test_eval004_valid_typed_subagent_is_silent()
+    test_eval004_dual_namespace_is_distinguishable()
+    test_eval004_agent_only_bare_name_is_kind_mismatch()
+    test_eval004_skill_only_subagent_name_is_kind_mismatch()
+    test_eval004_ghost_target_still_unknown()
+    test_eval004_non_subagent_parenthetical_is_a_skill_name()
+    test_audit_engine_version_marks_corrected_eval004_semantics()
+    test_eval004_each_machine_surface_is_independently_collected()
+    test_eval004_each_machine_surface_resolves_valid_subagent()
+    test_eval004_parser_parity_with_merged_runtime()
+    test_eval004_live_corpus_typed_targets_resolve()
     test_state_rules_map_to_aegis(a)
     test_mechanical_flag_matches_inventory(a)
     test_negation_guard()

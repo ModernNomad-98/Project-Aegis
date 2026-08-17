@@ -82,6 +82,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 try:
     import yaml
@@ -89,7 +90,12 @@ except ImportError:  # reported fail-closed in main()
     yaml = None
 
 TOOL_NAME = "audit-skill-contracts"
-TOOL_VERSION = "1.12.0"
+# 1.13.0 — EVAL-004 resolves TYPED targets against separate skill/subagent
+# namespaces. v1.12.0 unioned the namespaces and stripped the annotation as
+# prose, which is what produced the AEGIS-060 false positives; a corrected live
+# report must be distinguishable from that engine by VERSION, not only by
+# engine_sha256. Frozen baselines that record 1.12.0 stay as they are.
+TOOL_VERSION = "1.13.0"
 
 
 class InputContainmentError(Exception):
@@ -524,6 +530,52 @@ USER_ABS_PATH = re.compile(r"[A-Za-z]:[\\/][Uu]sers[\\/]|(?<![A-Za-z0-9])/Users/
 REFUSAL_CASE = re.compile(r"(?i)refus|halt|stop|declin|reject|never|no write|not write|forbid")
 
 
+# --- typed targets (EVAL-004) -----------------------------------------------
+# A trigger-eval target names ONE of two namespaces, and its SYNTAX declares
+# which: a bare name declares a SKILL (`.claude/skills/<name>/`); an exact
+# trailing `(subagent)` declares a SUBAGENT (`.claude/agents/<name>.md`). The
+# annotation is REQUIRED TYPE SYNTAX, not removable prose — it changes the
+# namespace, so `x` and `x (subagent)` are two DIFFERENT targets that merely
+# share a name (behavioral-eval-runner-v1 design §3/§5d).
+#
+# This is a LOCAL minimal parser deliberately mirroring the merged runner's
+# contract in tools/behavioral_eval_runner/models.py::parse_target. It is NOT
+# imported from there: this audit tool must stay standalone (single dependency
+# surface, runnable against any checkout). The two are held in agreement by an
+# explicit parity assertion in scripts/tests/test_audit_skill_contracts.py.
+SUBAGENT_MARKER = "(subagent)"
+
+
+class TypedTarget(NamedTuple):
+    kind: str            # "skill" | "subagent"
+    name: str            # bare name within that kind's namespace
+    annotation: str | None  # the verbatim parenthetical, preserved as evidence
+
+
+def parse_typed_target(raw: object) -> TypedTarget | None:
+    """Parse an authored target string exactly as the merged runtime does.
+
+    Mirrors `models.parse_target`: strip the outer whitespace; the EXACT
+    trailing `(subagent)` names a subagent; every other nonempty string is a
+    SKILL whose name is the complete stripped text — including any other
+    parenthetical, which is part of the name rather than a kind marker. Only an
+    empty (or nameless `(subagent)`) target is unparseable, and returns None.
+
+    A non-`(subagent)` parenthetical is therefore NOT collapsed to its leading
+    name (that collapse is the superseded treatment, design §20a-S4): it simply
+    names a skill that will not exist, which EVAL-004 reports as an unknown
+    target. Being STRICTER than the runtime here would be its own defect — the
+    audit must judge targets by the runtime's reading, not a private one.
+    """
+    text = str(raw).strip()
+    if not text:
+        return None
+    if text.endswith(SUBAGENT_MARKER):
+        name = text[: -len(SUBAGENT_MARKER)].strip()
+        return TypedTarget("subagent", name, SUBAGENT_MARKER) if name else None
+    return TypedTarget("skill", text, None)
+
+
 # --- complete implemented-rule inventory ------------------------------------
 # Every rule the code below can emit is registered here, INCLUDING rules that
 # fire zero times on the live corpus. The JSON report augments each entry with
@@ -696,13 +748,13 @@ RULES: list[dict] = [
      "positive_fixture": "generic-approval", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-014", "AEGIS-018"],
      "limits": "risk classification is keyword-based; a refusal keyword in an unrelated assertion satisfies it spuriously"},
-    {"id": "EVAL-004", "purpose": "trigger-eval neighbor name not machine-resolvable",
-     "authority": "repo trigger-evals convention; eval-runner-designer (a runner must resolve names)",
+    {"id": "EVAL-004", "purpose": "trigger-eval target does not resolve in the namespace its syntax declares",
+     "authority": "behavioral-eval-runner-v1 design §3/§5d (typed targets); merged tools/behavioral_eval_runner/models.py::parse_target and census typed routing",
      "severity": "P1", "classification": "mechanical",
      "surfaces": ["trigger-evals.json"],
      "positive_fixture": "thin-contract", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-053", "AEGIS-018"],
-     "limits": "only the (subagent)/(agent) annotation is stripped; the AEGIS-060 CANDIDATE it evidences is recorded in the register, not asserted as an established mapping here"},
+     "limits": "resolution is by declared namespace — the exact trailing (subagent) is a subagent, and EVERY other nonempty value is a skill whose name is the complete string (the runtime's reading, mirrored exactly; the audit is never stricter). A VALID annotation is never itself a finding, and a non-(subagent) parenthetical is part of the skill NAME, so it surfaces as an unknown target rather than a special malformed class. Existence on disk is not activation: this proves a target resolves, never that it wins"},
     {"id": "REF-001", "purpose": "markdown link target missing on disk",
      "authority": "validator D55 link-check precedent; skill-generation-standard.md §3/§9",
      "severity": "P1", "classification": "mechanical",
@@ -1362,7 +1414,8 @@ class Audit:
 
     # -- family H: eval coverage (AEGIS-014/-018) ----------------------------
 
-    def audit_evals(self, s: Skill, known_names: set[str]) -> None:
+    def audit_evals(self, s: Skill, skill_names: set[str],
+                    agent_names: set[str]) -> None:
         if not (s.eval_cases or s.trigger_cases):
             return  # absence of evals.json is the validator's finding, not ours
 
@@ -1416,11 +1469,17 @@ class Audit:
                     "eval-coverage", ["AEGIS-014", "AEGIS-018"], s.name, "medium", False,
                 ))
 
-        # EVAL-004: every neighbor NAME in the trigger fixtures must exist on
-        # disk — a rename/retire that missed an eval leaves the discrimination
-        # suite testing against a ghost. The annotated-prose class is the direct
-        # evidence for the AEGIS-060 CANDIDATE (recorded in the register as a
-        # candidate — NOT asserted here as an established AEGIS mapping).
+        # EVAL-004: every machine target in the trigger fixtures must resolve in
+        # the namespace its SYNTAX declares — bare name → skill, exact trailing
+        # `(subagent)` → subagent. The two namespaces are checked SEPARATELY and
+        # never unioned: `x` and `x (subagent)` are different targets that share
+        # a name, so a skill must never satisfy a subagent expectation (design
+        # §5d; merged models.parse_target / census typed routing).
+        #
+        # A rename/retire that missed an eval still leaves the suite testing
+        # against a ghost (P1). A target whose name exists only in the OPPOSITE
+        # namespace is a kind mismatch (P2) — the authored syntax and the disk
+        # disagree about which kind is meant.
         neighbor_names: set[str] = set()
         raw = s.trigger_raw
         for n in raw.get("overlaps_with") or []:
@@ -1431,24 +1490,43 @@ class Audit:
             for n in c.get("should_not_trigger") or []:
                 neighbor_names.add(str(n))
         for n in sorted(neighbor_names):
-            if not n or n in known_names:
+            if not n:
                 continue
-            stripped = re.sub(r"\s*\((?:sub)?agent\)\s*$", "", n)
-            if stripped in known_names:
-                # The target EXISTS (as a skill or reviewer agent) but the name
-                # field carries a prose annotation — a machine consumer (the
-                # future eval runner, AEGIS-018) cannot resolve it as written.
+            target = parse_typed_target(n)
+            if target is None:
+                # Unparseable for the runtime too: an empty target, or a bare
+                # `(subagent)` with no name in front of it. Every other nonempty
+                # string parses as a skill name, so it never reaches here.
+                self.findings.append(Finding(
+                    "EVAL-004", "P1", s.rel(s.trigger_evals_path), 0, s.name,
+                    f"trigger-evals target {n!r} has no resolvable target name "
+                    f"— the exact suffix {SUBAGENT_MARKER!r} declares a "
+                    "subagent and must be preceded by a name; any other "
+                    "nonempty value names a skill",
+                    "eval-coverage", ["AEGIS-053", "AEGIS-018"], s.name, "high", True,
+                ))
+                continue
+            declared = skill_names if target.kind == "skill" else agent_names
+            other = agent_names if target.kind == "skill" else skill_names
+            if target.name in declared:
+                continue  # resolves in the namespace it declares
+            if target.name in other:
+                found = "an agent" if target.kind == "skill" else "a skill"
+                want = (f"`.claude/skills/{target.name}/`" if target.kind == "skill"
+                        else f"`.claude/agents/{target.name}.md`")
                 self.findings.append(Finding(
                     "EVAL-004", "P2", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals neighbor {n!r} is annotated prose, not a "
-                    f"resolvable name (target {stripped!r} exists) — an eval "
-                    "runner cannot match it mechanically",
+                    f"trigger-evals target {n!r} declares kind "
+                    f"{target.kind!r} but {target.name!r} exists only as "
+                    f"{found} on disk — {want} is missing, so the declared "
+                    "target cannot resolve (a skill never satisfies a subagent "
+                    "expectation)",
                     "eval-coverage", ["AEGIS-053", "AEGIS-018"], s.name, "high", True,
                 ))
             else:
                 self.findings.append(Finding(
                     "EVAL-004", "P1", s.rel(s.trigger_evals_path), 0, s.name,
-                    f"trigger-evals references neighbor {n!r}, which is not a "
+                    f"trigger-evals references target {n!r}, which is not a "
                     "skill or agent on disk",
                     "eval-coverage", ["AEGIS-053", "AEGIS-018"], s.name, "high", True,
                 ))
@@ -1504,7 +1582,10 @@ class Audit:
     def run(self) -> None:
         self.discover()
         self.capture_provenance()  # ONCE, after discovery, before any output
-        known_names = {s.name for s in self.skills} | self.agent_names()
+        # Namespaces stay SEPARATE for EVAL-004 typed resolution (design §5d);
+        # they are never unioned into one bag of "known names".
+        skill_names = {s.name for s in self.skills}
+        agent_names = self.agent_names()
         for s in self.skills:
             self.audit_side_effects(s)
             self.audit_approvals(s)
@@ -1512,7 +1593,7 @@ class Audit:
             self.audit_artifacts(s)
             self.audit_vocabulary(s)
             self.audit_parity(s)
-            self.audit_evals(s, known_names)
+            self.audit_evals(s, skill_names, agent_names)
             self.audit_references(s)
         self.audit_routes()
         self.findings.sort(key=lambda f: (f.file, f.line, f.rule, f.evidence))
