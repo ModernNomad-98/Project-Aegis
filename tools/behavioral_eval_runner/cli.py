@@ -113,6 +113,27 @@ from .judge.envelope import (
 )
 from .judge.verdict import StructuredVerdict
 
+# WP-2B-3 measured-calibration controls (offline-only; BER-DEC-008 Stage A1:
+# no command performs or can perform a provider/model/metadata call).
+from . import (
+    CALIBRATION_SCHEMA_VERSION,
+    CALIBRATION_STACK_VERSION,
+    WP2B3_AUTHORIZATION_ID,
+    WP2B3_AUTHORIZATION_MERGE_SHA,
+    WP2B3_WORK_PACKAGE,
+)
+from .judge import calibration_dataset as _caldata
+from .judge import calibration_gates as _calgates
+from .judge import calibration_ledger as _calledger
+from .judge import calibration_transport as _caltransport
+from .judge.calibration_errors import (
+    CalibrationAuthorizationError,
+    CalibrationStopError,
+    CalibrationStopReason,
+    HoldoutAccessError,
+    LabelLeakError,
+)
+
 #: The full command surface. Live/run/dispatch verbs are deliberately absent.
 COMMANDS = (
     "census",
@@ -132,6 +153,9 @@ COMMANDS = (
     "validate-judge-verdict",
     "mock-calibration",
     "grading-capabilities",
+    # WP-2B-3 measured-calibration controls (offline-only; BER-DEC-008).
+    "validate-calibration-dataset",
+    "calibration-status",
 )
 
 #: Top-level module names the package must never import (network / arbitrary
@@ -700,6 +724,65 @@ def _cmd_grading_capabilities(_args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_validate_calibration_dataset(args: argparse.Namespace) -> int:
+    """Validate an EXTERNAL candidate dataset file against the BER-DEC-008
+    contract; the output is repository-safe (hashes and counts only — never
+    transcripts, rationales, or per-item candidate labels)."""
+    payload = _load_json_file(args.dataset)
+    dataset = _caldata.CandidateDataset.from_dict(payload)
+    report = _caldata.validate_authorized_composition(dataset)
+    _emit(
+        {
+            "dataset_id": dataset.dataset_id,
+            "dataset_version": dataset.version,
+            "dataset_sha256": dataset.dataset_sha256(),
+            "split_map_sha256": _caldata.split_map_sha256(dataset),
+            "schema_version": dataset.schema_version,
+            "owner_label_status": dataset.owner_label_status.value,
+            "provenance": dataset.provenance,
+            "composition": "PASS",
+            **report,
+        }
+    )
+    return 0
+
+
+def _cmd_calibration_status(args: argparse.Namespace) -> int:
+    """Repository-safe WP-2B-3 gate status. This command performs ZERO
+    provider interaction by construction."""
+    approval_status = _calgates.OwnerApprovalStatus.PENDING
+    if args.approval:
+        approval = _calgates.OwnerLabelApproval.from_dict(
+            _load_json_file(args.approval)
+        )
+        approval_status = approval.status
+    blocked_reasons = []
+    if approval_status is not _calgates.OwnerApprovalStatus.APPROVED:
+        blocked_reasons.append(
+            "OWNER_LABEL_APPROVAL is PENDING — no provider judgment call is "
+            "possible (BER-DEC-008 decision 34)"
+        )
+    blocked_reasons.append(
+        "sealed holdout requires the owner freeze state (decision 35)"
+    )
+    _emit(
+        {
+            "work_package": WP2B3_WORK_PACKAGE,
+            "authorization_id": WP2B3_AUTHORIZATION_ID,
+            "authorization_merge_sha": WP2B3_AUTHORIZATION_MERGE_SHA,
+            "calibration_stack_version": CALIBRATION_STACK_VERSION,
+            "stage": "A1-offline-implementation",
+            "owner_label_approval": approval_status.value,
+            "provider_dispatch_allowed": False,
+            "dispatch_blocked_reasons": blocked_reasons,
+            "provider_calls_made_by_this_command": 0,
+            "od1_status": "OPEN",
+            "wp2b4_status": "BLOCKED",
+        }
+    )
+    return 0
+
+
 def run_self_check() -> dict[str, Any]:
     """Offline invariants check; returns the structured result."""
     checks: list[dict[str, Any]] = []
@@ -955,6 +1038,146 @@ def run_self_check() -> dict[str, Any]:
         assert under.baseline_eligible is False
         assert no_thresholds.baseline_eligible is False
 
+    def _calibration_gates_fail_closed() -> None:
+        identity = _calgates.DatasetIdentity(
+            dataset_id="d", dataset_version="1", dataset_sha256="a" * 64,
+            split_map_sha256="b" * 64, labeling_guide_sha256="c" * 64,
+        )
+        try:
+            _calgates.authorize_calibration_dispatch(
+                approval=None, dataset_identity=identity, dataset=None,
+                stage=_calgates.ExecutionStage.DEVELOPMENT,
+            )
+        except CalibrationStopError as exc:
+            assert exc.stop_reason is CalibrationStopReason.OWNER_APPROVAL_PENDING
+        else:
+            raise AssertionError("missing owner approval failed to block")
+        try:
+            _calgates.CalibrationDispatchAuthorization(
+                stage=_calgates.ExecutionStage.DEVELOPMENT,
+                dataset_sha256="a" * 64, approval_statement="forged",
+            )
+        except CalibrationAuthorizationError:
+            pass
+        else:
+            raise AssertionError("direct authorization construction succeeded")
+        try:
+            _calgates.authorize_holdout_access(freeze_artifact=None)
+        except HoldoutAccessError:
+            pass
+        else:
+            raise AssertionError("holdout unlocked without an owner freeze")
+
+    def _calibration_request_settings_closed() -> None:
+        kwargs = _caltransport.build_responses_request_kwargs(
+            instructions="policy", input_text="envelope",
+            max_output_tokens=_caltransport.DEV_MAX_OUTPUT_TOKENS,
+        )
+        assert set(kwargs) == set(_caltransport.REQUIRED_REQUEST_KEYS)
+        tampered = dict(kwargs)
+        tampered["tools"] = []
+        try:
+            _caltransport.validate_request_kwargs(tampered)
+        except CalibrationStopError:
+            pass
+        else:
+            raise AssertionError("a tools channel was accepted")
+
+    def _calibration_caps_and_pricing_exact() -> None:
+        assert _calledger.MAX_JUDGMENT_ATTEMPTS == 200
+        assert _calledger.MAX_METADATA_REQUESTS == 1
+        assert _calledger.MAX_TOTAL_EXTERNAL_REQUESTS == 201
+        assert _calledger.MAX_TOTAL_SPEND_NANOUSD == 175_000_000_000
+        assert _calledger.MAX_SINGLE_DAY_SPEND_NANOUSD == 175_000_000_000
+        assert 200 * _calledger.worst_case_attempt_charge_nanousd() == (
+            158_000_000_000
+        )
+        assert _caltransport.MAX_INPUT_TOKENS_PER_JUDGMENT == 8000
+        assert _caltransport.DEV_MAX_OUTPUT_TOKENS == 25000
+        assert _caltransport.CONNECT_TIMEOUT_SECONDS == 15.0
+        assert _caltransport.TOTAL_REQUEST_TIMEOUT_SECONDS == 300.0
+        assert _caltransport.SDK_MAX_RETRIES == 0
+
+    def _calibration_dataset_contract_enforced() -> None:
+        try:
+            _caldata.CalibrationItemContent.from_mapping(
+                {
+                    "item_id": "x",
+                    "control_id": _caldata.SEMANTIC_BEARING_CONTROL_IDS[0],
+                    "transcript": "t",
+                    "candidate_expected_label": "PASS",
+                }
+            )
+        except LabelLeakError:
+            pass
+        else:
+            raise AssertionError("a label key reached the content surface")
+        assert len(_caldata.SEMANTIC_BEARING_CONTROL_IDS) == 10
+        contract_semantic = tuple(
+            c.control_id for c in load_contract().controls
+            if c.semantic_rubric_ref is not None
+        )
+        assert contract_semantic == _caldata.SEMANTIC_BEARING_CONTROL_IDS
+
+    def _calibration_provider_fragments_allowlisted() -> None:
+        allowlist = {
+            "judge/calibration_transport.py",
+            "judge/calibration_provider.py",
+            # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver is
+            # the third and only other module permitted to name the provider.
+            "judge/calibration_development_driver.py",
+        }
+        package_root = os.path.dirname(os.path.abspath(__file__))
+        needle = _caltransport.AUTHORIZED_SDK_NAME  # never a literal here
+        offenders: list[str] = []
+        present: set[str] = set()
+        for directory, _dirs, files in os.walk(package_root):
+            if os.path.basename(directory) == "tests":
+                continue
+            for name in files:
+                if not name.endswith(".py"):
+                    continue
+                path = os.path.join(directory, name)
+                relative = os.path.relpath(path, package_root).replace(
+                    "\\", "/"
+                )
+                with open(path, encoding="utf-8") as handle:
+                    lowered = handle.read().lower()
+                if needle in lowered:
+                    if relative in allowlist:
+                        present.add(relative)
+                    else:
+                        offenders.append(relative)
+        assert not offenders, f"provider fragments outside allowlist: {offenders}"
+        assert present == allowlist, "allowlisted adapter modules missing"
+
+    def _calibration_schemas_consistent() -> None:
+        dataset_schema = load_schema("calibration-candidate-dataset.schema.json")
+        item_schema = dataset_schema["properties"]["items"]["items"]
+        assert sorted(
+            item_schema["properties"]["split"]["enum"]
+        ) == sorted(_caldata.CandidateSplit.values())
+        assert sorted(
+            item_schema["properties"]["candidate_expected_label"]["enum"]
+        ) == sorted(_caldata.CandidateLabel.values())
+        assert sorted(
+            item_schema["properties"]["owner_label_status"]["enum"]
+        ) == sorted(_caldata.OwnerLabelStatus.values())
+        assert sorted(
+            item_schema["properties"]["risk_class"]["enum"]
+        ) == sorted(RiskClass.values())
+        assert sorted(
+            item_schema["properties"]["control_id"]["enum"]
+        ) == sorted(_caldata.SEMANTIC_BEARING_CONTROL_IDS)
+        approval_schema = load_schema("calibration-owner-approval.schema.json")
+        assert sorted(
+            approval_schema["properties"]["status"]["enum"]
+        ) == sorted(_calgates.OwnerApprovalStatus.values())
+        ledger_schema = load_schema("calibration-ledger-entry.schema.json")
+        assert sorted(
+            ledger_schema["properties"]["request_kind"]["enum"]
+        ) == sorted(_calledger.RequestKind.values())
+
     check("enum_sets_closed", _enums_closed)
     check("canonical_encoding_stable", _canonical_stable)
     check("identity_behavior", _identity_behavior)
@@ -970,6 +1193,27 @@ def run_self_check() -> dict[str, Any]:
     check("judge_provider_absent_or_denied", _judge_provider_absent)
     check("judge_envelope_security_invariants", _judge_envelope_invariants)
     check("mock_calibration_threshold_behavior", _mock_calibration_behavior)
+    check("calibration_gates_fail_closed", _calibration_gates_fail_closed)
+    check(
+        "calibration_request_settings_closed",
+        _calibration_request_settings_closed,
+    )
+    check(
+        "calibration_caps_and_pricing_exact",
+        _calibration_caps_and_pricing_exact,
+    )
+    check(
+        "calibration_dataset_contract_enforced",
+        _calibration_dataset_contract_enforced,
+    )
+    check(
+        "calibration_provider_fragments_allowlisted",
+        _calibration_provider_fragments_allowlisted,
+    )
+    check(
+        "calibration_schemas_match_code_enums",
+        _calibration_schemas_consistent,
+    )
 
     overall = "PASS" if all(c["result"] == "PASS" for c in checks) else "FAIL"
     return {
@@ -1103,6 +1347,27 @@ def build_parser() -> argparse.ArgumentParser:
         "grading-capabilities", help="truthful grading-stack capability report"
     )
     gc.set_defaults(func=_cmd_grading_capabilities)
+
+    # WP-2B-3 measured-calibration controls (offline-only; BER-DEC-008).
+    vcd = subparsers.add_parser(
+        "validate-calibration-dataset",
+        help=(
+            "validate an external candidate calibration dataset against the "
+            "BER-DEC-008 composition contract (hashes/counts output only)"
+        ),
+    )
+    vcd.add_argument("--dataset", required=True)
+    vcd.set_defaults(func=_cmd_validate_calibration_dataset)
+
+    cstat = subparsers.add_parser(
+        "calibration-status",
+        help=(
+            "repository-safe WP-2B-3 gate status (owner label approval, "
+            "blocked provider execution); performs zero provider interaction"
+        ),
+    )
+    cstat.add_argument("--approval", default=None)
+    cstat.set_defaults(func=_cmd_calibration_status)
 
     return parser
 

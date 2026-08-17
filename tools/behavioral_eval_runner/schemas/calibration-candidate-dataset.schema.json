@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber/calibration-candidate-dataset.schema.json",
+  "title": "WP-2B-3 candidate calibration dataset (BER-DEC-008; NOT human-approved)",
+  "description": "The 160-item SYNTHETIC CANDIDATE dataset contract. Candidate labels are proposed by the implementation session and carry owner_label_status=PENDING until Peter Nguyen's explicit approval; the assembled dataset lives only under the external evidence root.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_id",
+    "version",
+    "labeler_role",
+    "provenance",
+    "owner_label_status",
+    "items",
+    "schema_version"
+  ],
+  "properties": {
+    "dataset_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "labeler_role": {"type": "string", "minLength": 1},
+    "provenance": {"enum": ["SYNTHETIC_CANDIDATE_NOT_HUMAN_APPROVED"]},
+    "owner_label_status": {"enum": ["PENDING", "APPROVED"]},
+    "schema_version": {"enum": ["1.0.0-wp2b3"]},
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item_id",
+          "control_id",
+          "split",
+          "risk_class",
+          "adversarial",
+          "adversarial_kind",
+          "candidate_expected_label",
+          "candidate_rationale",
+          "owner_label_status",
+          "transcript"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,64}$"
+          },
+          "control_id": {
+            "enum": [
+              "SCENARIO_A_CONTROL_A",
+              "SCENARIO_A_CONTROL_B",
+              "SCENARIO_A_CONTROL_C",
+              "SCENARIO_A_CONTROL_D",
+              "SCENARIO_A_CONTROL_G",
+              "SCENARIO_A_CONTROL_H",
+              "SCENARIO_A_CONTROL_I",
+              "SCENARIO_A_CONTROL_J",
+              "SCENARIO_A_CONTROL_N",
+              "SCENARIO_A_CONTROL_O"
+            ]
+          },
+          "split": {"enum": ["DEVELOPMENT", "SEALED_HOLDOUT"]},
+          "risk_class": {"enum": ["CRITICAL", "HIGH", "STANDARD"]},
+          "adversarial": {"type": "boolean"},
+          "adversarial_kind": {
+            "anyOf": [
+              {"enum": ["PROMPT_INJECTION", "ROLE_CONFUSION"]},
+              {"type": "null"}
+            ]
+          },
+          "candidate_expected_label": {"enum": ["PASS", "FAIL"]},
+          "candidate_rationale": {"type": "string", "minLength": 1},
+          "owner_label_status": {"enum": ["PENDING", "APPROVED"]},
+          "transcript": {"type": "string", "minLength": 1}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"adversarial": {"const": true}}},
+            "then": {
+              "properties": {
+                "adversarial_kind": {
+                  "enum": ["PROMPT_INJECTION", "ROLE_CONFUSION"]
+                }
+              }
+            },
+            "else": {
+              "properties": {"adversarial_kind": {"const": null}}
+            }
+          }
+        ]
+      }
+    }
+  }
+}
