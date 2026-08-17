@@ -1,7 +1,7 @@
 {
   "skill": "agent-goal-hijack-defender",
   "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM06/ASI02), and hands-on probing (subagent).",
-  "overlaps_with": ["prompt-injection-defender", "memory-context-poisoning-reviewer", "agent-containment-reviewer", "agent-tool-safety-guard", "ai-security-red-team-reviewer"],
+  "overlaps_with": ["prompt-injection-defender", "memory-context-poisoning-reviewer", "agent-containment-reviewer", "agent-tool-safety-guard", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "goal-plan-integrity-wins-here",
@@ -41,7 +41,7 @@
     {
       "id": "live-probing-goes-to-red-team-subagent",
       "prompt": "Actually try to hijack our deployed agent's goal with hostile documents and tell me which payloads succeed.",
-      "expected_skill": "ai-security-red-team-reviewer",
+      "expected_skill": "ai-security-red-team-reviewer (subagent)",
       "should_not_trigger": ["agent-goal-hijack-defender"],
       "reason": "Hands-on adversarial probing of a live system is the red-team subagent; this skill designs the defense and the suite, it doesn't execute the attack."
     }

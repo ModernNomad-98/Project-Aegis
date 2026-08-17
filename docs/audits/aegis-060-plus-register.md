@@ -19,90 +19,92 @@ Rules of this register (from the program's operating rules):
 
 ## 1. New candidate findings
 
-### AEGIS-060 (candidate) — Trigger-eval neighbor identifiers are annotated prose, not machine-resolvable names
+### AEGIS-060 (REJECTED CANDIDATE) — trigger-eval subagent annotations are valid typed-target syntax, not defects
 
-- **Classification / severity / status:** Candidate fixture-hygiene defect / P2 / **REMEDIATION IMPLEMENTED — EFFECTIVE ONLY ON OWNER MERGE** (branch
-  `fix/aegis-060-trigger-eval-targets`, PR [#89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), OPEN /
-  DRAFT / UNMERGED at the time of writing; the finding remains live on `main`
-  until that PR is merged by the owner)
-- **Observed behavior and evidence:** Five trigger-eval files write neighbor
-  identifiers as `"<name> (subagent)"` — prose annotation inside the name
-  field — so a machine consumer cannot resolve them against disk:
+- **Classification / severity / status:** Candidate fixture-hygiene defect /
+  P2 / **REJECTED CANDIDATE — FALSE POSITIVE CAUSED BY EVAL-004 TYPE COLLAPSE;
+  ID RETIRED AND NEVER REUSED**
+- **What the candidate claimed (superseded):** that five trigger-eval files
+  wrote neighbor identifiers as `"<name> (subagent)"` — "prose annotation
+  inside the name field" — so a machine consumer could not resolve them
+  against disk:
   - `.claude/skills/agent-goal-hijack-defender/evals/trigger-evals.json`
   - `.claude/skills/ai-evaluation-harness/evals/trigger-evals.json`
   - `.claude/skills/ai-threat-modeler/evals/trigger-evals.json`
   - `.claude/skills/prompt-injection-defender/evals/trigger-evals.json`
   - `.claude/skills/release-readiness-reviewer/evals/trigger-evals.json`
-  (audit rule EVAL-004; the annotated targets exist as reviewer agents, so
-  these are hygiene defects, not stale references.)
-- **Expected behavior:** Neighbor fields hold exact on-disk names; agent-vs-
-  skill kind belongs in a separate field or note.
-- **Why a new ID:** Not covered by AEGIS-001..059 — AEGIS-053 concerns
-  non-durable defect-ID references, AEGIS-018 concerns the missing behavioral
-  runner. This blocks the AEGIS-018 remediation (a runner cannot match
-  annotated names), so it is a distinct, reusable failure mode with named
-  surfaces and a clear owner.
-- **Likely owner:** Eval fixture conventions (`eval-runner-designer`
-  guidance, the five files above).
-- **Suggested batch:** PR 11 (test bootstrap / behavioral-eval pilot).
-- **Positive regression:** EVAL-004 reports zero findings.
-- **Negative regression:** The EVAL-004 fixture case
-  (`scripts/tests/fixtures/contract-audit/`) keeps proving the rule fires on
-  an annotated name.
-- **Remediation (implemented, not yet merged):** Nine machine-resolved values
-  across the five files above had the trailing prose annotation `" (subagent)"`
-  removed; only `overlaps_with` and `expected_skill` entries were touched. No
-  `prompt`, `reason`, `id`, or `should_not_trigger` value changed, so no
-  expected winner, negative neighbour, or overlap relationship changed. Target
-  kind is retained where the register's expected behavior places it — in the
-  human-readable `reason` prose (e.g. "the red-team subagent"), which the
-  EVAL-004 rule does not scan.
-  - `agent-goal-hijack-defender` — `overlaps_with[4]`, `cases[5].expected_skill`
-    → `ai-security-red-team-reviewer`
-  - `ai-evaluation-harness` — `overlaps_with[5]`
-    → `ai-security-red-team-reviewer`
-  - `ai-threat-modeler` — `overlaps_with[5]`, `cases[4].expected_skill`
-    → `ai-security-red-team-reviewer`
-  - `prompt-injection-defender` — `overlaps_with[5]`, `cases[4].expected_skill`
-    → `ai-security-red-team-reviewer`
-  - `release-readiness-reviewer` — `overlaps_with[4]`,
-    `cases[4].expected_skill` → `release-readiness-reviewer`
-- **Target-resolution verification:** both corrected targets resolve to
-  reviewer agents on disk — `.claude/agents/ai-security-red-team-reviewer.md`
-  and `.claude/agents/release-readiness-reviewer.md`. The
-  `release-readiness-reviewer` case remains the skill-vs-subagent namespace
-  case (the same-named agent composes the skill); its `reason` still names the
-  subagent explicitly, so the agent target is preserved, not converted to a
-  skill.
-- **Measured result (branch `fix/aegis-060-trigger-eval-targets`, corpus at
-  commit `3944f255c4a9157f33a5caedb9fec49adda3018c`):** EVAL-004 live findings
-  **5 → 0**; total findings **414 → 409**; the five removals are exactly the
-  five EVAL-004 rows on the five paths above (P2 5 → 0), with zero findings
-  added and every other rule count unchanged (ARTF-001 10, ROUTE-002 311,
+- **Why it is a false positive:** the annotation is **required target-kind
+  syntax**, not prose. A bare name declares the SKILL namespace
+  (`.claude/skills/<name>/`); an exact trailing `(subagent)` declares the
+  SUBAGENT namespace (`.claude/agents/<name>.md`). The candidate's evidence
+  came entirely from audit rule EVAL-004 as implemented in
+  `audit-skill-contracts` v1.12.0, which unioned the two namespaces into one
+  `known_names` set and regex-stripped `\s*\((?:sub)?agent\)\s*$` as
+  removable prose — a **type collapse in the audit rule**, reported against
+  correctly authored fixtures.
+- **Reconciliation that settled it (authority order: merged implementation →
+  effective merged design → audit logic → candidate register):**
+  1. **Merged implementation** — `tools/behavioral_eval_runner/models.py::parse_target`
+     returns `TargetKind.SUBAGENT` for a trailing `(subagent)`, retains the
+     bare name as `target_name`, and retains `"(subagent)"` as
+     `target_annotation`; a bare name returns `TargetKind.SKILL`.
+     `census.py` applies that parser to `expected_skill`,
+     `should_not_trigger`, and `overlaps_with`, and keys routing identities as
+     `target_kind::target_name`, so a skill and a subagent sharing a name never
+     collapse.
+  2. **Effective merged design** — `behavioral-eval-runner-v1.md` §3 item 3
+     ("typed, **NOT stripped**") and §5d (the parenthetical is "preserved,
+     because it CHANGES the kind"; "a skill activation never satisfies a
+     subagent-delegation expectation"). §20a-S4 records the strip-and-treat-as-
+     metadata approach as already **superseded**. The fast-track successor
+     (§1, §9) leaves §3/§5d untouched and authoritative.
+  3. Both corrected targets exist as reviewer agents:
+     `.claude/agents/ai-security-red-team-reviewer.md` (agent only — no skill
+     of that name to collapse into) and `.claude/agents/release-readiness-reviewer.md`
+     (the dual-namespace case, where a same-named skill also exists).
+- **Corrected expected behavior:** trigger-eval machine fields hold the exact
+  on-disk name **in the syntax that declares the target's kind**. Agent-vs-skill
+  kind belongs in that syntax — NOT in `reason` prose, and not in a new field.
+- **What happened in draft PR #89:**
+  1. Commits `3944f25` / `c01a1c2` / `9d8d8eb` acted on the false candidate and
+     stripped **nine** machine-resolved values across the five files above
+     (agent-goal-hijack-defender 2, ai-evaluation-harness 1, ai-threat-modeler
+     2, prompt-injection-defender 2, release-readiness-reviewer 2). Every one
+     changed machine semantics; the `release-readiness-reviewer` case became
+     indistinguishable from its own inline-skill case.
+  2. A focused exact-diff review discovered the conflict **before merge**, and
+     the owner rejected the remediation premise.
+  3. A later **additive** correction commit in the same PR restored all nine
+     values byte-for-byte — the five trigger-eval files are blob-equal to base
+     `1c3e4931329179d9a3f9cc9ec1bb93020378c043` and leave the net PR diff.
+  4. The actual correction was to EVAL-004: namespace-aware typed-target
+     resolution, matching the merged runtime contract without importing it.
+- **Corrected EVAL-004 behavior:** valid bare skill target → no finding; valid
+  `(subagent)` target whose agent exists → no finding; name present only in the
+  opposite namespace → **kind mismatch, mechanical P2**; name in neither
+  namespace → **unknown target, mechanical P1**; unsupported trailing
+  annotation → deterministic P1, never silently resolved to the leading name.
+- **Measured result:** live EVAL-004 findings **5 → 0**, achieved by correcting
+  the rule while the corpus is byte-identical to base (corpus content hash
+  `9443a936961bb15a…` matches the pre-change measurement exactly). Total
+  findings 414 → 409; the five removals are exactly the five false EVAL-004
+  rows. Every other rule count is unchanged (ARTF-001 10, ROUTE-002 311,
   SIDE-004 82, STATE-001 2, VOCAB-002 4; P0 2, P1 96, info 311). Route graph
-  recomputes **byte-identical** — no node or edge changed. Corpus byte count
-  drops by exactly 99 (9 values × the 11-character annotation). Validator:
-  184 skills valid, 0 warnings. Audit self-tests: 57 assertions pass;
-  validator gate self-tests: 91 assertions pass. The EVAL-004 negative fixture
-  is untouched and still proves the rule fires (one P1 ghost neighbour + one
-  P2 annotated name). No behavioral eval was executed — this remains a
-  mechanical result only.
-- **Audit artifacts deliberately NOT regenerated:** the frozen baseline
-  artifacts (`artifacts/audits/skill-contract-audit-baseline.json`,
-  `docs/audits/skill-contract-audit-baseline.md`,
-  `artifacts/audits/corpus-manifest-baseline.json`,
-  `artifacts/audits/corpus-route-graph.json`) are stamped at repo SHA
-  `4f361d14930d87d689c5c7495c993a57e35f2609` and were produced from an
-  LF-form checkout. They are left byte-unchanged on this branch: a
-  regeneration from a CRLF working tree (`core.autocrlf=true`, no
-  `.gitattributes`) inflates `audited_byte_count` by 67,306 bytes and rewrites
-  `corpus_content_hash`, `engine_sha256`, and the catalog hash with values no
-  LF checkout can reproduce — drift caused by the checkout, not by AEGIS-060.
-  That the engine is unchanged is verifiable: the LF-normalized bytes of
-  `scripts/audit-skill-contracts.py` hash to `c886b27aee860aed…`, exactly the
-  `engine_sha256` the frozen baseline records. Regeneration is therefore left
-  to an LF checkout at merge time; the measured before/after figures above are
-  the evidence of record until then.
+  byte-identical. Validator: 184 skills valid, 0 warnings. Audit self-tests:
+  **66** assertions pass (57 before, +9 typed-target regressions, including
+  parity with `models.parse_target` and a live-corpus assertion that the four
+  authored subagent expectations and five annotated overlaps remain intact).
+  Validator gate self-tests: 91 assertions pass.
+- **Negative regression retained:** the `thin-contract` fixture still proves
+  EVAL-004 can fire — `ghost-neighbor` as an unknown target (P1) and
+  `clean-skill (subagent)` as a **kind mismatch** (P2, because only the
+  same-named skill exists and no `.claude/agents/clean-skill.md` does). The
+  valid annotation was never the defect; the missing agent is.
+- **Explicitly NOT claimed:** no behavioral eval was executed — every result
+  above is mechanical. **No AEGIS-060 source remediation reached `main`**: the
+  strip existed only in draft PR #89 and was reverted additively within it.
+- **ID disposition:** AEGIS-060 is retained, never renumbered, never reused,
+  and no successor ID is created for it. Its surfaces are **not** defective.
 
 No further new IDs are proposed by this baseline pass. Two observations were
 deliberately NOT given IDs (below) because their evidence is incomplete or
@@ -132,7 +134,7 @@ their materiality is unconfirmed.
 | ROUTE-003 | 1 | `project-orchestrator/SKILL.md` Stage-2 route (spec → prioritization → commitments; planner absent) | AEGIS-035, AEGIS-045 | **Root cause confirmed on current main** exactly as the handoff recorded |
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
-| EVAL-004 | 5 | five trigger-evals files (annotated neighbor names) | **new: AEGIS-060 (candidate)** | Baseline count, frozen. Remediated on branch `fix/aegis-060-trigger-eval-targets` (5 → 0); live on `main` until that PR merges — see AEGIS-060 above |
+| EVAL-004 | 5 | five trigger-evals files (typed `(subagent)` targets) | **AEGIS-060 — REJECTED, false positive** | Baseline count, frozen. All five were **false positives** from EVAL-004 v1.12.0 collapsing the skill and subagent namespaces. The rule now resolves each target in the namespace its syntax declares; with the corpus byte-identical to baseline, live EVAL-004 = 0. The authored files were never defective — see AEGIS-060 above |
 | SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
 
@@ -170,9 +172,11 @@ The planned PR 2..11 sequence stands. Three adjustments:
    state template cites is fixed first.
 2. **PR 9 (roadmap ↔ commitments alignment) has its exact surface list**:
    the four VOCAB-002 hits. No scope growth needed.
-3. **PR 11 absorbs AEGIS-060 (candidate)** — fixture hygiene is a
-   precondition of the behavioral-eval pilot, and the fix is five small,
-   mechanically-regressed edits.
+3. **PR 11 no longer carries AEGIS-060** — the candidate is REJECTED as a
+   false positive (above). There is no fixture-hygiene precondition for the
+   behavioral-eval pilot: the five files were already correct typed-target
+   syntax, and the corrective work landed in the audit rule instead. PR 11
+   loses this item and gains no replacement.
 
 ROUTE-002 triage (311 edges) is NOT assigned to a numbered batch yet;
 recommend triaging it inside PR 5 (shared vocabulary) discovery, splitting a

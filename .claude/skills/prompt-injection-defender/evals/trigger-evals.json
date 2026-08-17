@@ -1,7 +1,7 @@
 {
   "skill": "prompt-injection-defender",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer and the ai-security-red-team-reviewer subagent.",
-  "overlaps_with": ["ai-threat-modeler", "system-prompt-leakage-reviewer", "rag-security-architect", "agent-tool-safety-guard", "security-pr-reviewer", "ai-security-red-team-reviewer"],
+  "overlaps_with": ["ai-threat-modeler", "system-prompt-leakage-reviewer", "rag-security-architect", "agent-tool-safety-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "injection-defense-wins-here",
@@ -34,7 +34,7 @@
     {
       "id": "live-probing-goes-to-red-team-subagent",
       "prompt": "Actually try to jailbreak our deployed assistant and tell me which injection payloads succeed.",
-      "expected_skill": "ai-security-red-team-reviewer",
+      "expected_skill": "ai-security-red-team-reviewer (subagent)",
       "should_not_trigger": ["prompt-injection-defender"],
       "reason": "Hands-on adversarial probing of a live system is the red-team subagent; this skill designs the defense and the suite, it doesn't execute the attack."
     }

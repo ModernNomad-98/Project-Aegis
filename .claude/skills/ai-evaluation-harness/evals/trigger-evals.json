@@ -1,7 +1,7 @@
 {
   "skill": "ai-evaluation-harness",
   "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: model-behavior eval harness vs code-test curation vs threat modeling vs live monitoring, and against the shipped regression-suite-curator, qa-automation-architect, api-contract-test-designer, and the ai-security-red-team-reviewer subagent.",
-  "overlaps_with": ["regression-suite-curator", "qa-automation-architect", "api-contract-test-designer", "ai-threat-modeler", "observability-operator", "ai-security-red-team-reviewer"],
+  "overlaps_with": ["regression-suite-curator", "qa-automation-architect", "api-contract-test-designer", "ai-threat-modeler", "observability-operator", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "eval-harness-wins-here",
