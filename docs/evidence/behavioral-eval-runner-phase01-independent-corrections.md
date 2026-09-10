@@ -71,6 +71,21 @@ PowerShell initially translated passing POSIX unittest stderr into a misleading
 host failure; direct subprocess capture established the final container status.
 Final exact-commit independent review remains a separate gate.
 
+Independent review of `c6822e1c3fd0dd2b8195c3909c1cf57faeab6607` approved with
+one minor evidence-fidelity finding; 20 independently run pinned-SDK tests
+passed without skips. The final follow-up preserves `incomplete_details.reason`
+on late incomplete responses. Its regression first failed with
+`None != 'max_output_tokens'`, then passed with the complete provider,
+transport, ledger and calibration-static suites: 127 tests, no skips,
+42.007 seconds. Command: `<sdk-python> -B -m unittest
+tools.behavioral_eval_runner.tests.test_calibration_provider
+tools.behavioral_eval_runner.tests.test_calibration_transport
+tools.behavioral_eval_runner.tests.test_calibration_ledger
+tools.behavioral_eval_runner.tests.test_static_safety_calibration`.
+The full platform results above apply to c6822e1; this final small field
+preservation change was verified with the targeted suite rather than repeating
+unaffected full-suite checks. Final follow-up exact-head review is pending.
+
 ## Scope of the evidence
 
 The deadline covers cooperative asynchronous SDK/network I/O and rejects late

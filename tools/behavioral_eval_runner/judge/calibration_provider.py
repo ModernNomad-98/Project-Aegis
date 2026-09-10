@@ -526,7 +526,9 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 reservation, response_id=response_id, trace_id=trace_id,
                 returned_model=returned_model, started=started,
                 latency_ms=elapsed_ms, response_status=str(status),
-                incomplete_reason=None, usage=usage,
+                incomplete_reason=getattr(
+                    getattr(response, "incomplete_details", None), "reason", None
+                ), usage=usage,
                 outcome_kind="STOP_DEADLINE_EXCEEDED",
             )
             raise CalibrationStopError(

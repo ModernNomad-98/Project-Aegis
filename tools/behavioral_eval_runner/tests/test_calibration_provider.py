@@ -307,6 +307,20 @@ class TestExecutionSurfaceBoundary(ProviderCase):
 
 
 class TestDispatchAndFailClosedMapping(ProviderCase):
+    def test_late_incomplete_response_preserves_provider_reason(self):
+        response = fake_response(None, status="incomplete", incomplete_reason="max_output_tokens")
+        sdk = FakeSdkClient([ct.CompletedResponseDeadlineExceeded(response)])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=sdk, exception_types=FAKE_EXCEPTIONS)
+        with self.assertRaises(CalibrationStopError) as ctx:
+            client.dispatch(self.request, self.envelope_bytes)
+        self.assertIs(ctx.exception.stop_reason, CalibrationStopReason.DEADLINE_EXCEEDED)
+        entry, = self.ledger.entries()
+        self.assertEqual(entry.response_status, "incomplete")
+        self.assertEqual(entry.incomplete_details_reason, "max_output_tokens")
+        self.assertEqual(len(sdk.responses.calls), 1)
+
     def test_successful_verdict_round_trip(self) -> None:
         client = self._client([fake_response(self._valid_raw())])
         outcome = cp.dispatch_calibration_judgment(
