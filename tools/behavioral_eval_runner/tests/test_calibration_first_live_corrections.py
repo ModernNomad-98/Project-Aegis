@@ -329,6 +329,8 @@ class TestFamilyBFsyncDurability(unittest.TestCase):
         ledger = self.cl.CalibrationLedger(
             self.ledger_path, declare_first_segment=True
         )
+        import time
+        ledger.begin_active_segment('DEVELOPMENT', time.time())
         observed: dict = {}
 
         def transport_hook(kwargs):
@@ -347,6 +349,7 @@ class TestFamilyBFsyncDurability(unittest.TestCase):
             sdk_client=FakeSdkClient([transport_hook]),
             exception_types=FAKE_EXCEPTIONS,
         )
+        client.request_model_availability_metadata()
         before = self.fsync_calls
         outcome = self.cp.dispatch_calibration_judgment(
             client, self.request, self.envelope
@@ -359,11 +362,12 @@ class TestFamilyBFsyncDurability(unittest.TestCase):
         ledger = self.cl.CalibrationLedger(
             self.ledger_path, declare_first_segment=True
         )
+        import time
+        ledger.begin_active_segment('DEVELOPMENT', time.time())
 
         def broken_fsync(_fd):
             raise OSError("simulated stable-storage failure")
 
-        self._os.fsync = broken_fsync
         sdk = FakeSdkClient([])
         client = self.cp.OpenAICalibrationJudgeClient(
             authorization=self.authorization,
@@ -371,6 +375,8 @@ class TestFamilyBFsyncDurability(unittest.TestCase):
             sdk_client=sdk,
             exception_types=FAKE_EXCEPTIONS,
         )
+        client.request_model_availability_metadata()
+        self._os.fsync = broken_fsync
         with self.assertRaises(OSError):
             client.dispatch(
                 self.request,

@@ -73,3 +73,7 @@ class CalibrationReservationDenied(CalibrationLedgerError):
     """A pre-dispatch reservation was denied; the request must not begin."""
 
     reason_code = "BUDGET_CAP"
+
+
+class CalibrationLockError(CalibrationLedgerError):
+    """Another execution already owns the canonical I/O boundary."""

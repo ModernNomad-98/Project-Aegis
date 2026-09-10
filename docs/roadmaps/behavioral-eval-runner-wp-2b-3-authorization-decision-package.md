@@ -1,8 +1,12 @@
 # Behavioral Eval Runner — WP-2B-3 Measured Judge Calibration Authorization Decision Package
 
-**Status:** OWNER-APPROVED DECISION RECORD (2026-08-14) — **STILL NOT AUTHORIZATION IN
-EFFECT:** execution authority arises only when the governance PR appending BER-DEC-008
-([#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) is reviewed and **manually merged**. Original status,
+**Status (reconciled 2026-09-10):** OWNER-APPROVED DECISION RECORD (2026-08-14).
+BER-DEC-008 is effective through the manual merge of
+[#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), commit
+`1c3e4931329179d9a3f9cc9ec1bb93020378c043`. WP-2B-3 is AUTHORIZED, not DONE;
+implementation preflight, exact-head review, and the later owner holdout freeze remain
+required. OD-1 remains OPEN and WP-2B-4 remains BLOCKED. The dated preparation and
+approval narrative below is historical; this update grants no additional authority. Original status,
 preserved as provenance: PROPOSAL / OWNER DECISION PACKAGE — NOT AUTHORIZATION.
 **Prepared:** 2026-08-14.
 **Revised:** 2026-08-14 — bounded corrections from the independent control-layer review of

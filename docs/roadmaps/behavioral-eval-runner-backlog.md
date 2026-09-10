@@ -869,7 +869,7 @@ the sole owner of actual advisory CI integration).
   CRITICAL false-PASS measurement; measured adversarial injection and role-confusion
   calibration; presentation of the measured result to Peter Nguyen; and OD-1
   numeric-threshold and measured-result ratification.
-- **Acceptance criteria:** The measured calibration runs only under the future WP-2B-3
+- **Acceptance criteria:** The measured calibration runs only under the merged BER-DEC-008
   authorization's own budget, evidence, and stop terms; every measurement above is
   recorded with `calibration_dataset_version/hash`, the pinned judge identity, and the
   full confusion matrix (design §8); the measured result is presented to Peter Nguyen and
@@ -886,7 +886,8 @@ the sole owner of actual advisory CI integration).
   ratified; no generic corpus execution; no CI integration.
 - **Related design sections:** §8, §13, §17 criterion 9, §17a item 9, §18, §19 (2B-3),
   §20 D1/D9/OD-1/R2; v1.1 successor §6.
-- **Completion evidence:** The future reviewed and merged WP-2B-3 authorization and
+- **Completion evidence:** Authorization PR #87 is merged at
+  `1c3e4931329179d9a3f9cc9ec1bb93020378c043`. Still required: reviewed and merged
   calibration-evidence PR(s); the measured calibration report; the recorded OD-1
   ratification; status updated here through a reviewed PR.
 - **Supersedes / superseded by:** Redefined by BER-DEC-007: only the former NON-LIVE
@@ -916,7 +917,7 @@ the sole owner of actual advisory CI integration).
   ([PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83)) and WP-2B-2 DONE
   ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85), merge commit
   `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`) — both satisfied — and WP-2B-3 DONE, which
-  remains UNMET (WP-2B-3 is BLOCKED and unauthorized) (this is the first live
+  remains UNMET (WP-2B-3 is AUTHORIZED by merged BER-DEC-008, not DONE) (this is the first live
   phase: the §19 hard precondition requires containment, timeouts, emergency kill, budget
   reservation, attempt recording, aggregate semantics, and bounded concurrency implemented
   and tested first, the Scenario A grading stack built non-live in WP-2B-2, and the
@@ -924,8 +925,8 @@ the sole owner of actual advisory CI integration).
   truthful R1 activation-identifying mechanism or an explicitly owner-approved bounded
   activation claim scope sufficient for Scenario A's claims; (3) R2 measured calibration
   completed and OD-1 ratified through WP-2B-3 — the Measured Judge Calibration and OD-1
-  Ratification Gate (itself requiring its own future reviewed and merged authorization; not
-  authorized by BER-DEC-007); (4) R4 effective per-tool-path confinement proven for the selected live host,
+  Ratification Gate (authorized by merged BER-DEC-008; measured completion and OD-1
+  ratification still pending); (4) R4 effective per-tool-path confinement proven for the selected live host,
   including control-plane corpus inaccessibility; (5) R5 execution-profile observability and
   isolation proven for the selected live host, or an explicit owner-approved narrower live
   claim scope that defines exactly what remains unobservable and excludes affected runs from
@@ -3037,6 +3038,34 @@ model call, and evidence artifact.
 
 ## 14. Continuation instructions for a brand-new session
 
+### 2026-09-10 reconciliation of merged BER-DEC-008
+
+PR #87 is merged at `1c3e4931329179d9a3f9cc9ec1bb93020378c043`;
+its tree is `feb7cf261d8efa624c18363c9928e7f0cbdfed4c`. WP-2B-3 is
+AUTHORIZED, not DONE. The dated BER-DEC-008 transcription above is preserved.
+The owner-approved decision package §F incorporates the following sections in
+full; abbreviated wording above does not remove their requirements:
+
+- Decision 19 / §C.2a: a development `JUDGE_ERROR` caused by output-cap
+  exhaustion stops progression **to the holdout** until the cause is resolved
+  and Peter explicitly approves continuing. This does not, by itself, require
+  stopping the remaining development characterizations. No semantic retry.
+- Decision 23 / §C.7: no credential in **any file**, including temporary and
+  configuration files; no environment dumps, copying, or persistence by the
+  runner; no unrelated-process inheritance. Process-scoped ephemeral injection
+  and destruction at termination remain required.
+- Decision 27 / §D: every interaction records internal request identity,
+  provider response ID, provider request/trace ID when exposed, requested and
+  returned model identities, status, `incomplete_details`, input/output/reasoning
+  tokens, retry linkage, latency, unit prices, calculated cost, cumulative
+  calls/tokens/spend, and exact SDK/transport version. Missing telemetry is
+  recorded honestly and triggers the existing stop policy.
+
+These are corrections to the transcription of existing approvals, not new
+owner decisions. Source: [approved package](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md),
+§C.2a, §C.7, §D, and §F rows 19, 23, 27. Current Phase 0/1 code/test
+dispositions are in [the reconciliation report](../evidence/behavioral-eval-runner-phase01-review.md).
+
 A future session (human or AI) resuming Behavioral Eval Runner work follows these steps
 before doing anything else:
 
@@ -3067,25 +3096,16 @@ before doing anything else:
    earlier revisions of this file or anywhere else. Earlier revisions treated Phase 2B-0
    as the future next phase; that phase is DONE (Outcome B, BER-DEC-005/BER-DEC-006). The
    current registers (§7, §13), not narrative history, decide what is authorized now.
-8. **The immediate next governed step (recorded 2026-08-14, post-owner-approval) is
-   owner review and manual merge of the BER-DEC-008 governance PR**
-   ([#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87) — the separately owner-approved successor PR Peter Nguyen
-   directed after the closeout PR #86 merged; it appends BER-DEC-008 to §13 and updates
-   the decision package
-   ([`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md))
-   to the owner-approved record of all 35 decisions, dated 2026-08-14). WP-2B-2 is DONE
-   ([PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85)). Until the
-   BER-DEC-008 governance PR is manually merged, WP-2B-3 remains unauthorized in
-   effect: no WP-2B-3 implementation, provider or model call, calibration-dataset
-   creation, credential access, implementation clone, implementation branch, or
-   evidence-root creation may occur. After the manual merge, implementation begins only
-   on `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly
-   from the exact authorization merge commit, within BER-DEC-008's recorded terms.
-   **The decision package records owner decisions; execution authority still attaches
-   only to the merged BER-DEC-008.**
-9. **Treat WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate), WP-2B-4
-   (the Scenario A Limited-Scope Live Suite), and all later work as unauthorized** unless
-   and until each is separately authorized by its own reviewed and merged BER-DEC entry.
+8. **Continue the authorized WP-2B-3 implementation and pre-execution review.**
+   PR #87 is merged; PR #88 carries the implementation based directly on its
+   authorization merge. Preserve that source binding rather than rebasing onto
+   a later moving `main`. WP-2B-2 is DONE. WP-2B-3 remains subject to its exact-head
+   review, preflight, budgets, evidence controls, and later owner holdout freeze.
+   An implementation review or green offline test suite does not grant execution
+   or merge approval.
+9. **WP-2B-4 (Scenario A Limited-Scope Live Suite) and later work remain unauthorized**
+   unless separately authorized through their own reviewed and merged BER-DEC entries.
+   WP-2B-3 authorization does not satisfy its DONE or OD-1 ratification gates.
 10. **Record all outcomes durably** through reviewed repository artifacts — evidence
     reports at their authorized paths and reviewed PRs updating this register — never
     through conversation memory alone.

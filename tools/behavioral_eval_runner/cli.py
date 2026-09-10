@@ -751,12 +751,24 @@ def _cmd_calibration_status(args: argparse.Namespace) -> int:
     """Repository-safe WP-2B-3 gate status. This command performs ZERO
     provider interaction by construction."""
     approval_status = _calgates.OwnerApprovalStatus.PENDING
+    blocked_reasons = []
     if args.approval:
         approval = _calgates.OwnerLabelApproval.from_dict(
             _load_json_file(args.approval)
         )
-        approval_status = approval.status
-    blocked_reasons = []
+        from .judge.calibration_development_driver import PRODUCTION_APPROVED_ARTIFACTS
+        from .canonical import sha256_hex
+        expected = PRODUCTION_APPROVED_ARTIFACTS
+        identity = expected.gate_identity()
+        with open(args.approval, 'rb') as handle:
+            artifact_hash = sha256_hex(handle.read())
+        if (all(getattr(approval, field) == getattr(identity, field) for field in (
+                'dataset_id', 'dataset_version', 'dataset_sha256',
+                'split_map_sha256', 'labeling_guide_sha256'))
+                and artifact_hash == expected.approval_artifact_sha256):
+            approval_status = approval.status
+        else:
+            blocked_reasons.append('owner approval identity does not match the pinned approved artifact')
     if approval_status is not _calgates.OwnerApprovalStatus.APPROVED:
         blocked_reasons.append(
             "OWNER_LABEL_APPROVAL is PENDING — no provider judgment call is "

@@ -46,6 +46,7 @@ import stat as stat_module
 import statistics
 import time
 from dataclasses import dataclass
+from functools import wraps
 from datetime import datetime, timezone
 from typing import Any, Callable, Mapping, MutableMapping
 
@@ -57,6 +58,7 @@ from .. import (
 )
 from ..canonical import canonical_bytes, sha256_hex
 from ..errors import SchemaValidationError
+from .calibration_io import check_path, checked_open, exclusive_lock
 from .calibration_credential import (
     CalibrationCredential,
     consume_process_scoped_credential,
@@ -78,6 +80,7 @@ from .calibration_envelope import (
 from .calibration_errors import (
     CalibrationAuthorizationError,
     CalibrationLedgerError,
+    CalibrationReservationDenied,
     CalibrationStopError,
     CalibrationStopReason,
 )
@@ -153,6 +156,11 @@ def _require(condition: bool, message: str) -> None:
         raise SchemaValidationError(message)
 
 
+def _validate_owner_stop_limit(value: int | None) -> None:
+    _require(value is None or (type(value) is int and value > 0),
+             "owner_stop_after_items must be a positive integer or None")
+
+
 def _require_sha256(value: Any, where: str) -> str:
     _require(
         isinstance(value, str) and len(value) == 64 and set(value) <= _HEX,
@@ -170,7 +178,7 @@ def _require_sha1_hex(value: Any, where: str) -> str:
 
 
 def _sha256_file(path: str) -> str:
-    with open(path, "rb") as handle:
+    with checked_open(path, "rb") as handle:
         return sha256_hex(handle.read())
 
 
@@ -287,23 +295,7 @@ _MARKER_BINDINGS: Mapping[str, Any] = {
 def _refuse_reparse_ancestors(root: str) -> None:
     """Refuse a reparse point anywhere on the evidence-root path chain
     (BER-DEC-008 decision 24)."""
-    flag = getattr(stat_module, "FILE_ATTRIBUTE_REPARSE_POINT", None)
-    if flag is None:  # non-Windows platforms carry no reparse attribute
-        return
-    path = os.path.abspath(root)
-    while True:
-        try:
-            attributes = os.lstat(path).st_file_attributes
-        except OSError:
-            attributes = 0
-        if attributes & flag:
-            raise CalibrationAuthorizationError(
-                f"evidence-root path chain contains a reparse point: {path}"
-            )
-        parent = os.path.dirname(path)
-        if parent == path:
-            return
-        path = parent
+    check_path(root)
 
 
 def verify_evidence_root(root: str) -> VerifiedEvidenceRoot:
@@ -325,7 +317,7 @@ def verify_evidence_root(root: str) -> VerifiedEvidenceRoot:
             "evidence root carries no ownership marker; an unmarked root is "
             "never usable (BER-DEC-008 decision 24)"
         )
-    with open(marker_path, encoding="utf-8") as handle:
+    with checked_open(marker_path, encoding="utf-8") as handle:
         marker = json.load(handle)
     for key, expected in _MARKER_BINDINGS.items():
         found = marker.get(key)
@@ -353,7 +345,12 @@ def _canonical_path(verified: VerifiedEvidenceRoot, relpath: str) -> str:
             "canonical paths derive only from a marker-verified evidence "
             "root; arbitrary paths are refused (task section 8)"
         )
-    return os.path.join(verified.root, *relpath.split("/"))
+    parts = relpath.split("/")
+    if any(part in ("", ".", "..") or "\\" in part or ":" in part for part in parts):
+        raise CalibrationAuthorizationError("unsafe relative evidence path")
+    path = os.path.join(verified.root, *parts)
+    check_path(path)
+    return path
 
 
 def canonical_ledger_path(verified: VerifiedEvidenceRoot) -> str:
@@ -386,7 +383,7 @@ def load_approved_dataset(
             "the dataset file is not byte-identical to the owner-approved "
             "artifact; a changed dataset requires a new owner approval",
         )
-    with open(dataset_path, encoding="utf-8") as handle:
+    with checked_open(dataset_path, encoding="utf-8") as handle:
         dataset = CandidateDataset.from_dict(json.load(handle))
     if (
         dataset.dataset_id != expected.dataset_id
@@ -446,7 +443,7 @@ def load_owner_approval(
             "artifact is NOT an owner approval — OWNER_LABEL_APPROVAL is "
             "treated as PENDING",
         )
-    with open(approval_path, encoding="utf-8") as handle:
+    with checked_open(approval_path, encoding="utf-8") as handle:
         approval = OwnerLabelApproval.from_dict(json.load(handle))
     return approval
 
@@ -647,6 +644,26 @@ def build_run_manifest(
 
 
 # ------------------------------------------------------------- the driver
+def _execution_locked(method):
+    @wraps(method)
+    def locked(self, *args, **kwargs):
+        _validate_owner_stop_limit(kwargs.get('owner_stop_after_items'))
+        from threading import get_ident
+        owner = get_ident()
+        if getattr(self, '_execution_lock_owner', None) == owner:
+            return method(self, *args, **kwargs)
+        # One OS lock spans initialization, every transport, and finalization.
+        # It lives at the root so creation of runs/ is also serialized.
+        path = _canonical_path(self.verified_root, 'wp2b3-execution.lock')
+        with exclusive_lock(path):
+            self._execution_lock_owner = owner
+            try:
+                return method(self, *args, **kwargs)
+            finally:
+                self._execution_lock_owner = None
+    return locked
+
+
 class Wp2b3DevelopmentDriver:
     """The Stage A2 DEVELOPMENT driver: composes the Stage A1 gate, ledger,
     and provider machinery under the section 8-11 controls."""
@@ -735,6 +752,7 @@ class Wp2b3DevelopmentDriver:
             )
 
     # -------------------------------------------------- genesis / reopen
+    @_execution_locked
     def create_genesis(self, *, started_utc: str) -> None:
         """Create the canonical run manifest and the ledger GENESIS —
         refused whenever either already exists (one genesis, ever)."""
@@ -745,13 +763,14 @@ class Wp2b3DevelopmentDriver:
         )
         ledger_path = canonical_ledger_path(self.verified_root)
         manifest_path = canonical_manifest_path(self.verified_root)
+        pending_path = manifest_path + '.pending'
         if os.path.exists(ledger_path):
             raise CalibrationLedgerError(
                 "the canonical work-package ledger already exists; a second "
                 "GENESIS (a fresh accounting history) is mechanically "
                 "refused — reopen the existing ledger instead"
             )
-        if os.path.exists(manifest_path):
+        if os.path.exists(manifest_path) or os.path.exists(pending_path):
             raise CalibrationLedgerError(
                 "the canonical run manifest already exists; a second "
                 "GENESIS is refused"
@@ -764,14 +783,18 @@ class Wp2b3DevelopmentDriver:
             started_utc=started_utc,
         )
         os.makedirs(os.path.dirname(manifest_path), exist_ok=True)
-        with open(manifest_path, "w", encoding="utf-8", newline="\n") as fh:
+        with checked_open(pending_path, "x", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
             fh.flush()
             os.fsync(fh.fileno())
         self.ledger = CalibrationLedger(
             ledger_path, declare_first_segment=True
         )
+        check_path(pending_path)
+        check_path(manifest_path)
+        os.replace(pending_path, manifest_path)
 
+    @_execution_locked
     def reopen(self) -> None:
         """Reopen the ONE canonical ledger: verify the chain, re-prove every
         manifest binding, and fail closed on orphans or a crashed-open
@@ -779,16 +802,18 @@ class Wp2b3DevelopmentDriver:
         self._require_prepared()
         ledger_path = canonical_ledger_path(self.verified_root)
         manifest_path = canonical_manifest_path(self.verified_root)
-        if not os.path.exists(ledger_path):
+        pending_path = manifest_path + '.pending'
+        recovering = not os.path.exists(manifest_path) and os.path.exists(pending_path)
+        if not os.path.exists(ledger_path) and not recovering:
             raise CalibrationLedgerError(
                 "no canonical ledger exists; a first segment requires the "
                 "explicit GENESIS declaration"
             )
-        if not os.path.exists(manifest_path):
+        if not os.path.exists(manifest_path) and not recovering:
             raise CalibrationAuthorizationError(
                 "the canonical run manifest is missing; resume is refused"
             )
-        with open(manifest_path, encoding="utf-8") as handle:
+        with checked_open(pending_path if recovering else manifest_path, encoding="utf-8") as handle:
             recorded = json.load(handle)
         unknown = set(recorded) - _MANIFEST_KEYS
         missing = _MANIFEST_KEYS - set(recorded)
@@ -813,7 +838,20 @@ class Wp2b3DevelopmentDriver:
                     f"{expected_now.get(key)!r}); a model/dataset/approval/"
                     "code-head/settings/manifest mismatch prevents resume"
                 )
-        ledger = CalibrationLedger(ledger_path)
+        if recovering:
+            # A pending manifest is never executable. Recover only an
+            # initialization-only chain; preserve any malformed/spent history.
+            if os.path.exists(ledger_path):
+                from .calibration_ledger import _load_verified_chain
+                events = _load_verified_chain(ledger_path)
+                if any(e['event_kind'] not in ('GENESIS', 'SEGMENT_OPENED') for e in events):
+                    raise CalibrationLedgerError('pending initialization contains execution evidence')
+            ledger = CalibrationLedger(ledger_path, declare_first_segment=True)
+            check_path(pending_path)
+            check_path(manifest_path)
+            os.replace(pending_path, manifest_path)
+        else:
+            ledger = CalibrationLedger(ledger_path)
         if ledger.orphaned_attempt_ids:
             raise CalibrationStopError(
                 CalibrationStopReason.BUDGET_TELEMETRY_UNAVAILABLE,
@@ -863,7 +901,7 @@ class Wp2b3DevelopmentDriver:
     @staticmethod
     def _read_events(ledger_path: str) -> list[dict[str, Any]]:
         events: list[dict[str, Any]] = []
-        with open(ledger_path, encoding="utf-8") as handle:
+        with checked_open(ledger_path, encoding="utf-8") as handle:
             for line in handle:
                 line = line.strip()
                 if line:
@@ -996,7 +1034,13 @@ class Wp2b3DevelopmentDriver:
     ) -> int:
         """Dispatch the remaining development items in deterministic order;
         items with a durable terminal outcome are NEVER dispatched again."""
+        _validate_owner_stop_limit(owner_stop_after_items)
         self._require_open_segment()
+        if self.ledger is None or not self.ledger.metadata_success_recorded():
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "judgments require durable METADATA_OK for the authorized snapshot",
+            )
         assert self.dataset is not None
         client = self.make_client(sdk_client, exception_types)
         dispatched = 0
@@ -1106,7 +1150,7 @@ class Wp2b3DevelopmentDriver:
                 "the development result summary already exists; it is "
                 "append-only and never overwritten"
             )
-        with open(summary_path, "w", encoding="utf-8", newline="\n") as fh:
+        with checked_open(summary_path, "w", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(summary, sort_keys=True, indent=2) + "\n")
             fh.flush()
             os.fsync(fh.fileno())
@@ -1261,6 +1305,7 @@ class Wp2b3DevelopmentDriver:
         }
 
     # ------------------------------------------------------ orchestration
+    @_execution_locked
     def execute_development(
         self,
         *,
@@ -1272,6 +1317,7 @@ class Wp2b3DevelopmentDriver:
     ) -> dict[str, Any]:
         """The future DEVELOPMENT run in the exact section-10 order. Stage
         A2 preflight exercises this with fakes only."""
+        _validate_owner_stop_limit(owner_stop_after_items)
         if self.authorization is None:
             self.prepare()
         if declare_first_segment:
@@ -1303,7 +1349,7 @@ class Wp2b3DevelopmentDriver:
                 exception_types=exception_types,
                 owner_stop_after_items=owner_stop_after_items,
             )
-        except CalibrationStopError as exc:
+        except (CalibrationStopError, CalibrationReservationDenied) as exc:
             # Section 9.6 + family C: a typed stop persists the fail-closed
             # RUN_STOPPED state FIRST and then closes the active segment —
             # if storage fails between the two appends, the surviving state
@@ -1311,9 +1357,11 @@ class Wp2b3DevelopmentDriver:
             # silently resumable run. Automatic resume after restart is
             # impossible; the run returns to the owner. Only an
             # uncontrolled crash leaves a segment open.
-            self.ledger.record_run_state(
-                RUN_STATE_STOPPED, reason=exc.stop_reason.value
-            )
+            if self.ledger.current_run_state() != RUN_STATE_STOPPED:
+                self.ledger.record_run_state(
+                    RUN_STATE_STOPPED, reason=(exc.stop_reason.value if isinstance(exc, CalibrationStopError)
+                                               else CalibrationStopReason.CAP_WOULD_BE_EXCEEDED.value)
+                )
             if self._segment_open_verified:
                 self.close_development_segment()
             self.state = "RUN_STOPPED"
@@ -1378,37 +1426,26 @@ def execute_development_live(
     audited_head_sha: str,
     audited_tree_sha: str,
     declare_first_segment: bool,
-    current_head_sha: str | None = None,
-    current_tree_sha: str | None = None,
     environ: MutableMapping[str, str] | None = None,
     owner_stop_after_items: int | None = None,
-    repo_root: str | None = None,
-    _root_override_for_offline_tests: str | None = None,
-    _expected_artifacts_override_for_offline_tests: (
-        ApprovedArtifactIdentity | None
-    ) = None,
 ) -> dict[str, Any]:
     """The FUTURE live entry: section 10 steps 1-8 in order, then the run.
 
     Never invoked in the Stage A2 preflight. The evidence root is the
-    hard-pinned ``AUTHORIZED_EVIDENCE_ROOT``; the underscore overrides
-    exist for OFFLINE TESTS ONLY and never carry a live credential.
+    hard-pinned ``AUTHORIZED_EVIDENCE_ROOT``. Synthetic orchestration uses
+    Wp2b3DevelopmentDriver with a fake transport, never this entry point.
     """
     # 1. exact repository head/tree and authorization state
-    if current_head_sha is None or current_tree_sha is None:
-        if repo_root is None:
-            repo_root = os.path.abspath(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             "..", "..", "..")
-            )
-        current_head_sha, current_tree_sha = _resolve_repo_identity(repo_root)
-    # 2. evidence root marker / ACL / encryption / retention surface
-    root = _root_override_for_offline_tests or AUTHORIZED_EVIDENCE_ROOT
-    verified = verify_evidence_root(root)
-    expected = (
-        _expected_artifacts_override_for_offline_tests
-        or PRODUCTION_APPROVED_ARTIFACTS
+    _validate_owner_stop_limit(owner_stop_after_items)
+    repo_root = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")
     )
+    current_head_sha, current_tree_sha = _resolve_repo_identity(repo_root)
+    if (current_head_sha != audited_head_sha or current_tree_sha != audited_tree_sha):
+        raise CalibrationAuthorizationError('current source does not match the audited head/tree')
+    # 2. evidence root marker / ACL / encryption / retention surface
+    verified = verify_evidence_root(AUTHORIZED_EVIDENCE_ROOT)
+    expected = PRODUCTION_APPROVED_ARTIFACTS
     driver = Wp2b3DevelopmentDriver(
         verified_root=verified,
         expected_artifacts=expected,

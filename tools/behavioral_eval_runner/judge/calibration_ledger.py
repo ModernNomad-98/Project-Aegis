@@ -40,6 +40,7 @@ from typing import Any, Mapping
 from .. import WP2B3_AUTHORIZATION_ID, WP2B3_WORK_PACKAGE
 from ..canonical import canonical_json, sha256_of_obj
 from ..enums import StrictEnum
+from .calibration_io import checked_open, exclusive_lock
 from .calibration_errors import (
     CalibrationLedgerError,
     CalibrationReservationDenied,
@@ -434,31 +435,59 @@ class CalibrationLedger:
     def _append_event(self, kind: str, payload: dict[str, Any]) -> dict[str, Any]:
         if kind not in EVENT_KINDS:
             raise CalibrationLedgerError(f"unknown event kind {kind!r}")
-        self._event_seq += 1
+        if getattr(self, "_write_failed", False):
+            raise CalibrationLedgerError("ledger write previously failed; reopen required")
         event: dict[str, Any] = {
             "event_kind": kind,
-            "event_seq": self._event_seq,
+            "event_seq": self._event_seq + 1,
             "run_id": self.run_id,
             **payload,
             "prev_event_sha256": self._prev_hash,
         }
         event["event_sha256"] = sha256_of_obj(event)
-        self._prev_hash = event["event_sha256"]
         if self._path is not None:
             # Crash-durability barrier (first-live audit family B): every
             # durable event — above all the write-ahead ATTEMPT_STARTED
             # relied upon BEFORE any transport use — is written, flushed,
             # AND fsynced to the stable file boundary before control
             # returns. An fsync failure propagates and prevents transport.
-            with open(self._path, "a", encoding="utf-8", newline="\n") as fh:
-                fh.write(canonical_json(event) + "\n")
-                fh.flush()
-                os.fsync(fh.fileno())
+            try:
+                with exclusive_lock(self._path + ".append.lock"):
+                    events = _load_verified_chain(self._path) if os.path.exists(self._path) else []
+                    prior = events[-1]["event_sha256"] if events else ""
+                    if prior != self._prev_hash or len(events) != self._event_seq:
+                        raise CalibrationLedgerError("stale ledger writer; reopen required")
+                    with checked_open(self._path, "a", encoding="utf-8", newline="\n") as fh:
+                        fh.write(canonical_json(event) + "\n")
+                        fh.flush()
+                        os.fsync(fh.fileno())
+            except BaseException:
+                self._write_failed = True
+                raise
+        self._event_seq += 1
+        self._prev_hash = event["event_sha256"]
         return event
 
     # ------------------------------------------------------------ queries
     def entries(self) -> tuple[LedgerEntry, ...]:
         return tuple(self._entries)
+
+    def interaction_lock(self):
+        if self._path is None:
+            raise CalibrationLedgerError('transport requires a durable ledger')
+        return exclusive_lock(self._path + '.transport.lock')
+
+    def require_active_transport(self, stage: str) -> None:
+        if self._run_state in (RUN_STATE_STOPPED, RUN_STATE_OWNER_WAIT):
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                f"{self._run_state} prohibits further provider interaction",
+            )
+        if not any(s[0] == stage and s[2] is None for s in self._segments):
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "provider interaction requires an open active stage segment",
+            )
 
     def _baseline(self) -> CumulativeSnapshot:
         return CumulativeSnapshot(
@@ -943,12 +972,12 @@ class CalibrationLedger:
         )
         total_active = self.active_seconds(now)
         breach: str | None = None
-        if stage_limit is not None and stage_active > stage_limit:
+        if stage_limit is not None and stage_active >= stage_limit:
             breach = (
                 f"stage {stage} active {stage_active:.0f}s exceeds its "
                 f"{stage_limit}s limit"
             )
-        elif total_active > TOTAL_RUN_DEADLINE_SECONDS:
+        elif total_active >= TOTAL_RUN_DEADLINE_SECONDS:
             breach = (
                 f"whole-run active {total_active:.0f}s exceeds the "
                 f"{TOTAL_RUN_DEADLINE_SECONDS}s limit"
@@ -973,7 +1002,7 @@ def _load_verified_chain(path: str) -> list[dict[str, Any]]:
         raise CalibrationLedgerError(f"ledger file not found: {path}")
     prev = ""
     events: list[dict[str, Any]] = []
-    with open(path, encoding="utf-8") as fh:
+    with checked_open(path, encoding="utf-8") as fh:
         for line_number, line in enumerate(fh, start=1):
             line = line.strip()
             if not line:
@@ -984,6 +1013,21 @@ def _load_verified_chain(path: str) -> list[dict[str, Any]]:
                 raise CalibrationLedgerError(
                     f"unparseable ledger line {line_number}: {exc}"
                 ) from exc
+            if not isinstance(payload, dict):
+                raise CalibrationLedgerError(f'ledger line {line_number} must be an object')
+            sequence = payload.get('event_seq')
+            kind = payload.get('event_kind')
+            if (type(sequence) is not int or sequence != len(events) + 1
+                    or kind not in EVENT_KINDS):
+                raise CalibrationLedgerError(f'invalid ledger sequence/kind at line {line_number}')
+            if not events:
+                if (kind != 'GENESIS'
+                        or payload.get('work_package') != WP2B3_WORK_PACKAGE
+                        or payload.get('authorization_id') != WP2B3_AUTHORIZATION_ID
+                        or payload.get('declared_first_segment') is not True):
+                    raise CalibrationLedgerError('ledger must begin with the authorized GENESIS')
+            elif kind == 'GENESIS':
+                raise CalibrationLedgerError('duplicate ledger GENESIS')
             declared = payload.get("event_sha256", "")
             body = {k: v for k, v in payload.items() if k != "event_sha256"}
             if payload.get("prev_event_sha256") != prev:

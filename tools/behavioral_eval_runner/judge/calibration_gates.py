@@ -176,6 +176,11 @@ class OwnerLabelApproval:
 # ----------------------------------------------- dispatch authorization
 _AUTHORIZATION_KEY = object()
 
+# No owner freeze has been approved yet. A later reviewed owner disposition
+# must pin the canonical artifact digest in the audited source, independently
+# of caller-provided content. Tests patch this trust anchor with synthetic data.
+APPROVED_HOLDOUT_FREEZE_SHA256: str | None = None
+
 
 class CalibrationDispatchAuthorization:
     """Proof that the gates passed. Constructible ONLY by
@@ -465,12 +470,13 @@ class HoldoutFreezeAuthorization:
     """Proof the holdout freeze gate passed; issued only by
     ``authorize_holdout_access``."""
 
-    __slots__ = ("artifact",)
+    __slots__ = ("artifact", "_issued_sha256", "_item_hashes")
 
     def __init__(
         self,
         *,
         artifact: HoldoutFreezeArtifact,
+        item_hashes: frozenset[str] = frozenset(),
         _key: object | None = None,
     ) -> None:
         if _key is not _AUTHORIZATION_KEY:
@@ -479,10 +485,31 @@ class HoldoutFreezeAuthorization:
                 "authorize_holdout_access"
             )
         self.artifact = artifact
+        from ..canonical import sha256_of_obj
+        self._issued_sha256 = sha256_of_obj(artifact.to_dict())
+        self._item_hashes = item_hashes
+
+    def validate(self) -> None:
+        from ..canonical import sha256_of_obj
+        self.artifact.validate()
+        if (sha256_of_obj(self.artifact.to_dict()) != self._issued_sha256
+                or self._issued_sha256 != APPROVED_HOLDOUT_FREEZE_SHA256):
+            raise HoldoutAccessError('owner freeze changed or approval is no longer pinned')
+
+    def validate_dataset(self, dataset) -> None:
+        self.validate()
+        if dataset.dataset_sha256() != self.artifact.frozen_sha256['dataset']:
+            raise HoldoutAccessError('dataset does not match the owner freeze')
+
+    def validate_item(self, item) -> None:
+        from ..canonical import sha256_of_obj
+        self.validate()
+        if sha256_of_obj(item.to_dict()) not in self._item_hashes:
+            raise HoldoutAccessError('item is not bound to the frozen dataset')
 
 
 def authorize_holdout_access(
-    *, freeze_artifact: HoldoutFreezeArtifact | None
+    *, freeze_artifact: HoldoutFreezeArtifact | None, dataset=None
 ) -> HoldoutFreezeAuthorization:
     """Sealed-holdout access exists ONLY behind a valid owner freeze."""
     if freeze_artifact is None or not isinstance(
@@ -493,6 +520,18 @@ def authorize_holdout_access(
             "(BER-DEC-008 decisions 19, 35)"
         )
     freeze_artifact.validate()
-    return HoldoutFreezeAuthorization(
-        artifact=freeze_artifact, _key=_AUTHORIZATION_KEY
-    )
+    from ..canonical import sha256_of_obj
+    if (APPROVED_HOLDOUT_FREEZE_SHA256 is None
+            or sha256_of_obj(freeze_artifact.to_dict()) != APPROVED_HOLDOUT_FREEZE_SHA256):
+        raise HoldoutAccessError(
+            "holdout freeze lacks an independently pinned owner approval; holdout stays sealed"
+        )
+    authorization = HoldoutFreezeAuthorization(
+        artifact=freeze_artifact, _key=_AUTHORIZATION_KEY)
+    if dataset is not None:
+        authorization.validate_dataset(dataset)
+        from .calibration_dataset import CandidateSplit
+        authorization._item_hashes = frozenset(
+            sha256_of_obj(item.to_dict()) for item in dataset.items
+            if item.split is CandidateSplit.SEALED_HOLDOUT)
+    return authorization

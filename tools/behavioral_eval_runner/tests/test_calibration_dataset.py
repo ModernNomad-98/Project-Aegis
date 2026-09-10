@@ -296,13 +296,17 @@ class TestHoldoutContentProjectionGate(unittest.TestCase):
     def test_from_item_allows_holdout_with_gate_issued_freeze(self) -> None:
         from tools.behavioral_eval_runner.judge import calibration_gates as cg
 
-        artifact = cg.HoldoutFreezeArtifact.from_dict(
-            cg.HoldoutFreezeArtifact.example_dict()
-        )
-        freeze = cg.authorize_holdout_access(freeze_artifact=artifact)
-        content = cd.CalibrationItemContent.from_item(
-            self._holdout_item(), holdout_authorization=freeze
-        )
+        dataset = build_conforming_dataset()
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload['frozen_sha256']['dataset'] = dataset.dataset_sha256()
+        payload['freeze_contract_sha256'] = cg.freeze_contract_sha256(payload)
+        artifact = cg.HoldoutFreezeArtifact.from_dict(payload)
+        from unittest.mock import patch
+        from tools.behavioral_eval_runner.canonical import sha256_of_obj
+        with patch.object(cg, 'APPROVED_HOLDOUT_FREEZE_SHA256', sha256_of_obj(artifact.to_dict())):
+            freeze = cg.authorize_holdout_access(freeze_artifact=artifact, dataset=dataset)
+            content = cd.CalibrationItemContent.from_item(
+                self._holdout_item(), holdout_authorization=freeze)
         self.assertTrue(content.item_id)
 
     def test_development_items_need_no_freeze(self) -> None:

@@ -275,7 +275,10 @@ class TestHoldoutFreezeGate(unittest.TestCase):
         artifact = cg.HoldoutFreezeArtifact.from_dict(
             cg.HoldoutFreezeArtifact.example_dict()
         )
-        authorization = cg.authorize_holdout_access(freeze_artifact=artifact)
+        from unittest.mock import patch
+        from tools.behavioral_eval_runner.canonical import sha256_of_obj
+        with patch.object(cg, 'APPROVED_HOLDOUT_FREEZE_SHA256', sha256_of_obj(artifact.to_dict())):
+            authorization = cg.authorize_holdout_access(freeze_artifact=artifact)
         self.assertIsInstance(authorization, cg.HoldoutFreezeAuthorization)
 
 

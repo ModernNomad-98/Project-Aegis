@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import time
 import unittest
 
 from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
@@ -157,6 +158,7 @@ def _authorization(dataset: cd.CandidateDataset) -> cg.CalibrationDispatchAuthor
 
 
 class ProviderCase(unittest.TestCase):
+    SEED_METADATA = True
     def setUp(self) -> None:
         self.dataset = build_conforming_dataset()
         self.authorization = _authorization(self.dataset)
@@ -180,10 +182,19 @@ class ProviderCase(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory(prefix="wp2b3-prov-")
         self.addCleanup(tmp.cleanup)
         path = os.path.join(tmp.name, "wp-ledger.jsonl")
-        return (
-            cl.CalibrationLedger(path, declare_first_segment=True),
-            path,
-        )
+        ledger = cl.CalibrationLedger(path, declare_first_segment=True)
+        ledger.begin_active_segment("DEVELOPMENT", time.time())
+        if self.SEED_METADATA:
+            client = cp.OpenAICalibrationJudgeClient(
+                authorization=self.authorization, ledger=ledger,
+                sdk_client=FakeSdkClient([]), exception_types=FAKE_EXCEPTIONS)
+            client.request_model_availability_metadata()
+            # Reopen preserves durable prerequisite/accounting while the current
+            # segment entries remain scoped to the judgment under test.
+            ledger.end_active_segment(time.time())
+            ledger = cl.CalibrationLedger(path)
+            ledger.begin_active_segment("DEVELOPMENT", time.time())
+        return ledger, path
 
     @staticmethod
     def _ledger_events(path: str) -> list[dict]:
@@ -495,7 +506,7 @@ class TestRunnerOwnedRetry(ProviderCase):
         client.dispatch(self.request, self.envelope_bytes)
         cumulative = self.ledger.cumulative()
         self.assertEqual(cumulative.attempts_total, 2)
-        self.assertEqual(cumulative.total_external_requests, 2)
+        self.assertEqual(cumulative.total_external_requests, 3)  # includes metadata prerequisite
 
 
 class TestHoldoutDispatchBoundary(ProviderCase):
@@ -503,17 +514,18 @@ class TestHoldoutDispatchBoundary(ProviderCase):
     sealed-holdout item — the provider enforces item membership."""
 
     def _holdout_request(self):
-        artifact = cg.HoldoutFreezeArtifact.from_dict(
-            cg.HoldoutFreezeArtifact.example_dict()
-        )
-        freeze = cg.authorize_holdout_access(freeze_artifact=artifact)
-        holdout_item = next(
-            item for item in self.dataset.items
-            if item.split is cd.CandidateSplit.SEALED_HOLDOUT
-        )
-        content = cd.CalibrationItemContent.from_item(
-            holdout_item, holdout_authorization=freeze
-        )
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload['frozen_sha256']['dataset'] = self.dataset.dataset_sha256()
+        payload['freeze_contract_sha256'] = cg.freeze_contract_sha256(payload)
+        artifact = cg.HoldoutFreezeArtifact.from_dict(payload)
+        from unittest.mock import patch
+        from tools.behavioral_eval_runner.canonical import sha256_of_obj
+        with patch.object(cg, 'APPROVED_HOLDOUT_FREEZE_SHA256', sha256_of_obj(artifact.to_dict())):
+            freeze = cg.authorize_holdout_access(freeze_artifact=artifact, dataset=self.dataset)
+            holdout_item = next(item for item in self.dataset.items
+                                if item.split is cd.CandidateSplit.SEALED_HOLDOUT)
+            content = cd.CalibrationItemContent.from_item(
+                holdout_item, holdout_authorization=freeze)
         envelope = ce.build_calibration_envelope(content)
         request = ce.build_calibration_judge_request(
             content=content, envelope=envelope,
@@ -607,10 +619,10 @@ class TestDurableProviderLifecycle(ProviderCase):
         def transport_hook(kwargs):
             events = self._ledger_events(self.ledger_path)
             observed["started"] = [
-                e for e in events if e["event_kind"] == "ATTEMPT_STARTED"
+                e for e in events if e["event_kind"] == "ATTEMPT_STARTED" and e.get("request_kind") == "JUDGMENT_ATTEMPT"
             ]
             observed["terminal"] = [
-                e for e in events if e["event_kind"] == "ATTEMPT_TERMINAL"
+                e for e in events if e["event_kind"] == "ATTEMPT_TERMINAL" and e.get("request_kind") == "JUDGMENT_ATTEMPT"
             ]
             return fake_response(self._valid_raw())
 
@@ -640,10 +652,12 @@ class TestMandatoryDeadlines(ProviderCase):
             )
 
     def test_stage_deadline_blocks_the_initial_attempt(self) -> None:
+        self.ledger.end_active_segment(time.time())
         self.ledger.begin_active_segment("DEVELOPMENT", at=0.0)
         self.ledger.end_active_segment(
             at=cl.DEV_STAGE_DEADLINE_SECONDS + 60.0
         )
+        self.ledger.begin_active_segment("DEVELOPMENT", time.time())
         fake = FakeSdkClient([fake_response(self._valid_raw())])
         client = cp.OpenAICalibrationJudgeClient(
             authorization=self.authorization, ledger=self.ledger,
@@ -665,6 +679,7 @@ class TestMandatoryDeadlines(ProviderCase):
                 return self.now
 
         ticking = TickingTime()
+        self.ledger.end_active_segment(time.time())
         self.ledger.begin_active_segment("DEVELOPMENT", at=0.0)
 
         def slow_timeout(kwargs):
@@ -802,6 +817,7 @@ class TestValidatedSemanticOutcome(ProviderCase):
 
 
 class TestMetadataRequestSurface(ProviderCase):
+    SEED_METADATA = False
     def test_metadata_request_is_ledgered_and_capped_at_one(self) -> None:
         fake = FakeSdkClient([])
         client = cp.OpenAICalibrationJudgeClient(

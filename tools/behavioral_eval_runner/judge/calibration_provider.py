@@ -27,12 +27,15 @@ import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from functools import wraps
 from typing import Any, Callable, Mapping
 
 from ..canonical import canonical_bytes, sha256_hex
 from .calibration_errors import (
     CalibrationAuthorizationError,
     CalibrationLedgerError,
+    CalibrationLockError,
+    CalibrationReservationDenied,
     CalibrationStopError,
     CalibrationStopReason,
 )
@@ -99,6 +102,28 @@ def _utc_now_iso() -> str:
 
 def _utc_day() -> str:
     return datetime.now(timezone.utc).date().isoformat()
+
+
+def _serialized_transport(method):
+    @wraps(method)
+    def locked(self, *args, **kwargs):
+        try:
+            with self._ledger.interaction_lock():
+                self._ledger.require_active_transport(self._authorization.stage.value)
+                try:
+                    return method(self, *args, **kwargs)
+                except (CalibrationStopError, CalibrationReservationDenied) as exc:
+                    from .calibration_ledger import RUN_STATE_STOPPED
+                    reason = (exc.stop_reason if isinstance(exc, CalibrationStopError)
+                              else CalibrationStopReason.CAP_WOULD_BE_EXCEEDED)
+                    self._ledger.record_run_state(RUN_STATE_STOPPED, reason=reason.value)
+                    raise
+        except CalibrationLockError as exc:
+            raise CalibrationStopError(
+                CalibrationStopReason.CONCURRENCY_VIOLATION,
+                'another client owns the canonical transport boundary',
+            ) from exc
+    return locked
 
 
 class OpenAICalibrationJudgeClient(JudgeClient):
@@ -258,9 +283,15 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         finally:
             self._in_flight = False
 
+    @_serialized_transport
     def _dispatch_once_guarded(
         self, request: JudgeRequest, envelope_bytes: bytes
     ) -> JudgeResponse:
+        if not self._ledger.metadata_success_recorded():
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "judgments require durable METADATA_OK for the authorized snapshot",
+            )
         request.validate()
         if request.calibration_dataset_sha256 is None:
             raise CalibrationAuthorizationError(
@@ -590,6 +621,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         )
 
     # ------------------------------------------------- metadata (1 max)
+    @_serialized_transport
     def request_model_availability_metadata(self):
         """The single authorized read-only availability request
         (GET /v1/models/gpt-5.5-2026-04-23). Stage A1 never calls this with

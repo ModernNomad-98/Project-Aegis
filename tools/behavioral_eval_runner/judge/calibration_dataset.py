@@ -171,7 +171,7 @@ class CandidateItem:
             control_id=payload.get("control_id", ""),
             split=CandidateSplit.parse(payload.get("split")),
             risk_class=RiskClass.parse(payload.get("risk_class")),
-            adversarial=bool(payload.get("adversarial")),
+            adversarial=payload.get("adversarial"),
             adversarial_kind=(
                 AdversarialKind.parse(kind) if kind is not None else None
             ),
@@ -490,10 +490,9 @@ def holdout_items(dataset: CandidateDataset, freeze: Any) -> tuple[CandidateItem
             "freeze authorization; development execution cannot iterate "
             "the holdout"
         )
-    return tuple(
-        item for item in dataset.items
-        if item.split is CandidateSplit.SEALED_HOLDOUT
-    )
+    freeze.validate_dataset(dataset)
+    return tuple(item for item in dataset.items
+                 if item.split is CandidateSplit.SEALED_HOLDOUT)
 
 
 # -------------------------------------------------- judge-facing projection
@@ -575,6 +574,7 @@ class CalibrationItemContent:
                     "judge-facing projection requires the owner freeze "
                     "authorization; the sealed holdout stays sealed"
                 )
+            holdout_authorization.validate_item(item)
         content = cls(
             item_id=item.item_id,
             control_id=item.control_id,

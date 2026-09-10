@@ -665,11 +665,15 @@ class TestActiveDevelopmentSegment(DriverCase):
                       CalibrationStopReason.DEADLINE_EXCEEDED)
         self.assertEqual(sdk.metadata_calls, [])
         events = self._ledger_events()
-        self.assertEqual(events[-1]["event_kind"], "DEADLINE_STOP")
+        self.assertEqual(events[-2]["event_kind"], "DEADLINE_STOP")
+        self.assertEqual(events[-1]["event_kind"], "RUN_STATE_TRANSITION")
+        self.assertEqual(events[-1]["run_state"], "RUN_STOPPED")
+        self.assertEqual(events[-1]["reason"], "DEADLINE_EXCEEDED")
 
     def test_deadline_blocks_judgment_dispatch(self) -> None:
         driver = self._ready()
         driver.open_development_segment()
+        driver.run_metadata_probe(sdk_client=FakeSdkClient([]), exception_types=FAKE_EXCEPTIONS)
         self.clock.advance(cl.DEV_STAGE_DEADLINE_SECONDS + 1)
         sdk = FakeSdkClient([])
         with self.assertRaises(CalibrationStopError) as ctx:
@@ -1045,28 +1049,18 @@ class TestExecutionAccounting(DriverCase):
 
 # ======================================================= credential rules
 class TestCredentialBoundary(DriverCase):
-    def test_live_execution_requires_credential(self) -> None:
-        environ: dict[str, str] = {}
-        with self.assertRaises(CalibrationStopError) as ctx:
+    def test_live_execution_rejects_offline_overrides(self) -> None:
+        with self.assertRaises(TypeError):
             drv.execute_development_live(
-                audited_head_sha=AUDITED_HEAD,
-                audited_tree_sha=AUDITED_TREE,
-                current_head_sha=AUDITED_HEAD,
-                current_tree_sha=AUDITED_TREE,
+                audited_head_sha=AUDITED_HEAD, audited_tree_sha=AUDITED_TREE,
                 declare_first_segment=True,
-                environ=environ,
                 _root_override_for_offline_tests=self.root,
-                _expected_artifacts_override_for_offline_tests=self.identity,
             )
-        self.assertIn(
-            ctx.exception.stop_reason,
-            (CalibrationStopReason.CREDENTIAL_MISSING,
-             CalibrationStopReason.SDK_VERSION_MISMATCH),
-        )
-        available, version = ct.verify_sdk_available()
-        if available and version == ct.AUTHORIZED_SDK_VERSION:
-            self.assertIs(ctx.exception.stop_reason,
-                          CalibrationStopReason.CREDENTIAL_MISSING)
+
+    def test_missing_credential_is_rejected(self) -> None:
+        with self.assertRaises(CalibrationStopError) as ctx:
+            drv.consume_credential({})
+        self.assertIs(ctx.exception.stop_reason, CalibrationStopReason.CREDENTIAL_MISSING)
 
     def test_dummy_credential_consume_once_and_redaction(self) -> None:
         sentinel = "dummy-test-sentinel-never-a-real-secret"
