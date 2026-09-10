@@ -1464,13 +1464,16 @@ def execute_development_live(
     sdk_client = build_judge_client(credential, environ)
     # 7-20. manifest/genesis or reopen, active segment, metadata, the 40
     # development judgments, summary, OWNER_WAIT.
-    started_utc = datetime.now(timezone.utc).isoformat()
-    return driver.execute_development(
-        sdk_client=sdk_client,
-        declare_first_segment=declare_first_segment,
-        started_utc=started_utc,
-        owner_stop_after_items=owner_stop_after_items,
-    )
+    try:
+        started_utc = datetime.now(timezone.utc).isoformat()
+        return driver.execute_development(
+            sdk_client=sdk_client,
+            declare_first_segment=declare_first_segment,
+            started_utc=started_utc,
+            owner_stop_after_items=owner_stop_after_items,
+        )
+    finally:
+        sdk_client.close()
 
 
 # ------------------------------------------------------------ module CLI

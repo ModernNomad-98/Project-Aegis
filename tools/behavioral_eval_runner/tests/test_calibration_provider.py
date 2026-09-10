@@ -376,6 +376,50 @@ class TestDispatchAndFailClosedMapping(ProviderCase):
         self.assertEqual(entries[0].outcome_kind,
                          "STOP_MODEL_IDENTITY_MISMATCH")
 
+    def test_malformed_usage_stops_and_accounts_before_and_after_reopen(self) -> None:
+        for field in ("input_tokens", "output_tokens", "reasoning_tokens", "cached_tokens"):
+            for value in (-1, "bogus", "1", float("nan"), float("inf"), 1.5, True, None):
+                with self.subTest(field=field, value=value):
+                    self.ledger, self.ledger_path = self._durable_ledger()
+                    response = fake_response(self._valid_raw())
+                    target = response.usage
+                    if field == "reasoning_tokens":
+                        target = target.output_tokens_details
+                    elif field == "cached_tokens":
+                        target = target.input_tokens_details
+                    setattr(target, field, value)
+                    self._assert_unusable_usage_stops(response)
+        with self.subTest(field="cache_exceeds_input"):
+            self.ledger, self.ledger_path = self._durable_ledger()
+            response = fake_response(self._valid_raw())
+            response.usage.input_tokens_details.cached_tokens = 901
+            self._assert_unusable_usage_stops(response)
+
+    def _assert_unusable_usage_stops(self, response) -> None:
+        sdk = FakeSdkClient([response, fake_response(self._valid_raw())])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=sdk, exception_types=FAKE_EXCEPTIONS)
+        with self.assertRaises(CalibrationStopError) as ctx:
+            client.dispatch(self.request, self.envelope_bytes)
+        self.assertIs(ctx.exception.stop_reason,
+                      CalibrationStopReason.BUDGET_TELEMETRY_UNAVAILABLE)
+        entry, = self.ledger.entries()
+        self.assertTrue(entry.telemetry_missing)
+        started = [event for event in self._ledger_events(self.ledger_path)
+                   if event["event_kind"] == "ATTEMPT_STARTED"][-1]
+        self.assertEqual(entry.calculated_charge_nanousd,
+                         started["worst_case_charge_nanousd"])
+        for ledger in (self.ledger, cl.CalibrationLedger(self.ledger_path)):
+            self.assertEqual(ledger.cumulative().attempts_total, 1)
+            self.assertEqual(ledger.current_run_state(), cl.RUN_STATE_STOPPED)
+            stopped_client = cp.OpenAICalibrationJudgeClient(
+                authorization=self.authorization, ledger=ledger,
+                sdk_client=sdk, exception_types=FAKE_EXCEPTIONS)
+            with self.assertRaises(CalibrationStopError):
+                stopped_client.dispatch(self.request, self.envelope_bytes)
+        self.assertEqual(len(sdk.responses.calls), 1)
+
     def test_missing_usage_telemetry_is_a_stop(self) -> None:
         client = self._client([fake_response(self._valid_raw(), usage=None)])
         with self.assertRaises(CalibrationStopError) as ctx:
@@ -428,6 +472,87 @@ class TestDispatchAndFailClosedMapping(ProviderCase):
 
 
 class TestRunnerOwnedRetry(ProviderCase):
+    def test_completed_late_response_keeps_actual_usage_without_retry(self):
+        from unittest.mock import patch
+        try:
+            import httpx2
+            import openai
+        except ImportError:
+            self.skipTest("pinned SDK not installed")
+        from tools.behavioral_eval_runner.judge.calibration_credential import CalibrationCredential
+
+        calls = []
+
+        def handler(request):
+            calls.append(request)
+            # Simulate completion/parsing without yielding to loop cancellation.
+            time.sleep(0.15)
+            payload = json.loads(json.dumps(fake_response(self._valid_raw()), default=vars))
+            return httpx2.Response(200, json=payload)
+
+        sdk = ct.build_judge_client(CalibrationCredential("synthetic-test-sentinel"), environ={})
+        self.addCleanup(sdk.close)
+        sdk._client._transport = httpx2.MockTransport(handler)
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger, sdk_client=sdk,
+            exception_types=cp.resolve_sdk_exception_types())
+        with patch.object(ct, "TOTAL_REQUEST_TIMEOUT_SECONDS", 0.1):
+            with self.assertRaises(CalibrationStopError) as ctx:
+                client.dispatch(self.request, self.envelope_bytes)
+        self.assertIs(ctx.exception.stop_reason, CalibrationStopReason.DEADLINE_EXCEEDED)
+        entry, = self.ledger.entries()
+        self.assertFalse(entry.billing_unknown)
+        self.assertEqual(entry.input_tokens, 900)
+        self.assertEqual(entry.output_tokens, 1200)
+        self.assertEqual(self.ledger.current_run_state(), cl.RUN_STATE_STOPPED)
+        self.assertEqual(len(calls), 1)
+
+    def test_real_sdk_deadline_finishes_cancellation_before_accounted_retry(self):
+        import asyncio
+        from unittest.mock import patch
+        try:
+            import httpx2
+            import openai
+        except ImportError:
+            self.skipTest("pinned SDK not installed")
+        from tools.behavioral_eval_runner.judge.calibration_credential import CalibrationCredential
+
+        class StalledBody(httpx2.AsyncByteStream):
+            closed = False
+
+            async def __aiter__(self):
+                await asyncio.Event().wait()
+                yield b"unreachable"
+
+            async def aclose(self):
+                self.closed = True
+
+        body = StalledBody()
+        calls = []
+
+        def handler(request):
+            calls.append(request)
+            if len(calls) == 1:
+                return httpx2.Response(200, stream=body,
+                                       headers={"content-type": "application/json"})
+            self.assertTrue(body.closed, "retry must wait for request cleanup")
+            payload = json.loads(json.dumps(fake_response(self._valid_raw()), default=vars))
+            return httpx2.Response(200, json=payload)
+
+        sdk = ct.build_judge_client(CalibrationCredential("synthetic-test-sentinel"), environ={})
+        self.addCleanup(sdk.close)
+        sdk._client._transport = httpx2.MockTransport(handler)
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger, sdk_client=sdk,
+            exception_types=cp.resolve_sdk_exception_types())
+        with patch.object(ct, "TOTAL_REQUEST_TIMEOUT_SECONDS", 0.1):
+            client.dispatch(self.request, self.envelope_bytes)
+        first, second = self.ledger.entries()
+        self.assertTrue(first.billing_unknown)
+        self.assertEqual(second.retry_of_request_id, first.internal_request_id)
+        self.assertEqual(self.ledger.cumulative().attempts_total, 2)
+        self.assertEqual(len(calls), 2)
+
     def test_timeout_then_success_uses_exactly_two_ledgered_attempts(self) -> None:
         fake = FakeSdkClient([
             FakeTimeoutError("connect timeout"),
@@ -818,6 +943,27 @@ class TestValidatedSemanticOutcome(ProviderCase):
 
 class TestMetadataRequestSurface(ProviderCase):
     SEED_METADATA = False
+
+    def test_completed_late_metadata_is_accounted_without_prerequisite_success(self):
+        def late(model):
+            raise ct.CompletedResponseDeadlineExceeded(_Namespace(id=model))
+
+        fake = FakeSdkClient([])
+        fake.models = _Namespace(retrieve=late)
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=fake, exception_types=FAKE_EXCEPTIONS)
+        with self.assertRaises(CalibrationStopError) as ctx:
+            client.request_model_availability_metadata()
+        self.assertIs(ctx.exception.stop_reason, CalibrationStopReason.DEADLINE_EXCEEDED)
+        entry, = self.ledger.entries()
+        self.assertEqual(entry.returned_model, ct.AUTHORIZED_MODEL_SNAPSHOT)
+        self.assertFalse(entry.billing_unknown)
+        reopened = cl.CalibrationLedger(self.ledger_path)
+        self.assertEqual(reopened.cumulative().metadata_requests, 1)
+        self.assertFalse(reopened.metadata_success_recorded())
+        self.assertEqual(reopened.current_run_state(), cl.RUN_STATE_STOPPED)
+
     def test_metadata_request_is_ledgered_and_capped_at_one(self) -> None:
         fake = FakeSdkClient([])
         client = cp.OpenAICalibrationJudgeClient(

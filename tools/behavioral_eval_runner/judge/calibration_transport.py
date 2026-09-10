@@ -15,7 +15,7 @@ section 13). Everything here is offline-safe by construction:
   web/file search, code execution, conversation state, sampling overrides,
   and cache/service knobs are structurally absent.
 
-No function in this module performs a provider call.
+Only the deadline facade performs calls; importing or constructing it does not.
 """
 
 from __future__ import annotations
@@ -171,6 +171,91 @@ def verify_client_invariants(client: Any) -> None:
         )
 
 
+class CompletedResponseDeadlineExceeded(Exception):
+    """A received response must be accounted for without a transport retry."""
+
+    def __init__(self, response: Any) -> None:
+        super().__init__("completed response exceeded the total request deadline")
+        self.response = response
+
+
+class _DeadlineClient:
+    """Synchronous boundary over cancellable SDK I/O, on one owned event loop.
+
+    A timeout unwinds the request and closes its response before returning to
+    the ledger/retry owner. No worker thread or abandoned request survives it.
+    This is an I/O deadline, not containment for blocking native/Python code.
+    """
+
+    def __init__(self, sdk: Any) -> None:
+        import asyncio
+        from types import SimpleNamespace
+
+        self._sdk = sdk
+        self._runner = asyncio.Runner()
+        self.models = SimpleNamespace(retrieve=self._retrieve)
+        self.responses = SimpleNamespace(create=self._create)
+
+    @property
+    def max_retries(self):
+        return self._sdk.max_retries
+
+    @max_retries.setter
+    def max_retries(self, value):
+        self._sdk.max_retries = value
+
+    @property
+    def base_url(self):
+        return self._sdk.base_url
+
+    @base_url.setter
+    def base_url(self, value):
+        self._sdk.base_url = value
+
+    @property
+    def timeout(self):
+        return self._sdk.timeout
+
+    @property
+    def _client(self):
+        return self._sdk._client
+
+    def _run(self, operation, method, path, *args, **kwargs):
+        import asyncio
+        import openai
+
+        verify_client_invariants(self)
+
+        async def invoke():
+            loop = asyncio.get_running_loop()
+            deadline = loop.time() + TOTAL_REQUEST_TIMEOUT_SECONDS
+            try:
+                async with asyncio.timeout_at(deadline):
+                    result = await operation(*args, **kwargs)
+                # Also reject completion after synchronous response parsing
+                # delayed delivery of the event loop's cancellation callback.
+                if loop.time() >= deadline:
+                    raise CompletedResponseDeadlineExceeded(result)
+                return result
+            except TimeoutError:
+                request = self._client.build_request(method, str(self.base_url) + path)
+                raise openai.APITimeoutError(request=request) from None
+
+        return self._runner.run(invoke())
+
+    def _retrieve(self, model):
+        return self._run(self._sdk.models.retrieve, "GET", "models/" + model, model)
+
+    def _create(self, **kwargs):
+        return self._run(self._sdk.responses.create, "POST", "responses", **kwargs)
+
+    def close(self):
+        try:
+            self._runner.run(self._sdk.close())
+        finally:
+            self._runner.close()
+
+
 def build_judge_client(
     credential: CalibrationCredential,
     environ: Mapping[str, str] | None = None,
@@ -195,8 +280,8 @@ def build_judge_client(
     timeout = openai.Timeout(
         timeout=TOTAL_REQUEST_TIMEOUT_SECONDS, connect=CONNECT_TIMEOUT_SECONDS
     )
-    http_client = openai.DefaultHttpxClient(trust_env=False, timeout=timeout)
-    client = openai.OpenAI(
+    http_client = openai.DefaultAsyncHttpxClient(trust_env=False, timeout=timeout)
+    client = openai.AsyncOpenAI(
         api_key=credential.reveal_for_transport_use_only(),
         base_url=AUTHORIZED_BASE_URL,
         max_retries=SDK_MAX_RETRIES,
@@ -204,7 +289,7 @@ def build_judge_client(
         http_client=http_client,
     )
     verify_client_invariants(client)
-    return client
+    return _DeadlineClient(client)
 
 
 # ------------------------------------------------ closed request settings

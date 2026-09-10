@@ -47,6 +47,7 @@ from .calibration_ledger import (
 )
 from .calibration_transport import (
     AUTHORIZED_MODEL_SNAPSHOT,
+    CompletedResponseDeadlineExceeded,
     DEV_MAX_OUTPUT_TOKENS,
     build_responses_request_kwargs,
     enforce_proven_input_budget,
@@ -219,17 +220,15 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         output_details = getattr(usage, "output_tokens_details", None)
         input_details = getattr(usage, "input_tokens_details", None)
         try:
-            return ProviderUsage(
-                input_tokens=int(getattr(usage, "input_tokens")),
-                output_tokens=int(getattr(usage, "output_tokens")),
-                reasoning_tokens=int(
-                    getattr(output_details, "reasoning_tokens", 0) or 0
-                ),
-                cached_input_tokens=int(
-                    getattr(input_details, "cached_tokens", 0) or 0
-                ),
+            tokens = ProviderUsage(
+                input_tokens=getattr(usage, "input_tokens"),
+                output_tokens=getattr(usage, "output_tokens"),
+                reasoning_tokens=getattr(output_details, "reasoning_tokens", 0),
+                cached_input_tokens=getattr(input_details, "cached_tokens", 0),
             )
-        except (TypeError, AttributeError):
+            tokens.validate()
+            return tokens
+        except (TypeError, AttributeError, CalibrationLedgerError):
             return None
 
     @staticmethod
@@ -383,8 +382,12 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         def latency() -> int:
             return max(0, int((self._time_source() - t0) * 1000))
 
+        completed_late = False
         try:
             response = self._sdk.responses.create(**dict(kwargs))
+        except CompletedResponseDeadlineExceeded as exc:
+            response = exc.response
+            completed_late = True
         except exceptions.timeout:
             # Family 2 invariant 6: the request may have crossed the
             # billable provider boundary — billing is UNKNOWN and the
@@ -518,6 +521,20 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 "unreachable: telemetry-missing record must stop"
             )
 
+        if completed_late:
+            self._record(
+                reservation, response_id=response_id, trace_id=trace_id,
+                returned_model=returned_model, started=started,
+                latency_ms=elapsed_ms, response_status=str(status),
+                incomplete_reason=None, usage=usage,
+                outcome_kind="STOP_DEADLINE_EXCEEDED",
+            )
+            raise CalibrationStopError(
+                CalibrationStopReason.DEADLINE_EXCEEDED,
+                "completed response exceeded the total request deadline; "
+                "actual usage recorded, no retry",
+            )
+
         if status == "incomplete":
             reason = getattr(
                 getattr(response, "incomplete_details", None), "reason", None
@@ -641,8 +658,12 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         )
         started = _utc_now_iso()
         t0 = self._time_source()
+        completed_late = False
         try:
             result = self._sdk.models.retrieve(AUTHORIZED_MODEL_SNAPSHOT)
+        except CompletedResponseDeadlineExceeded as exc:
+            result = exc.response
+            completed_late = True
         except Exception as exc:
             # Family C: a metadata exception may have crossed the provider
             # boundary — billing is UNKNOWN, never known-zero (the reserved
@@ -676,6 +697,18 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 f"metadata availability returned {returned!r} instead of "
                 f"{AUTHORIZED_MODEL_SNAPSHOT!r}; STOP and return to the "
                 "owner — never substitute",
+            )
+        if completed_late:
+            self._record(
+                reservation, response_id=returned, trace_id=None,
+                returned_model=returned, started=started,
+                latency_ms=elapsed_ms, response_status="OK",
+                incomplete_reason=None, usage=ProviderUsage.zero(),
+                outcome_kind="STOP_DEADLINE_EXCEEDED",
+            )
+            raise CalibrationStopError(
+                CalibrationStopReason.DEADLINE_EXCEEDED,
+                "metadata response exceeded the total request deadline; no retry",
             )
         return self._record(
             reservation,

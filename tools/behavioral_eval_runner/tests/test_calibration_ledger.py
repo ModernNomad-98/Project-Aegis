@@ -15,6 +15,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.behavioral_eval_runner.judge import calibration_ledger as cl
 from tools.behavioral_eval_runner.judge.calibration_errors import (
@@ -82,6 +83,33 @@ def _record_ok(ledger: cl.CalibrationLedger, reservation: cl.Reservation,
 def _events(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as fh:
         return [json.loads(line) for line in fh if line.strip()]
+
+
+class TestTerminalAccounting(unittest.TestCase):
+    def test_invalid_usage_keeps_reservation_available_for_terminal_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = _ledger(tmp)
+            reservation = _reserve(ledger)
+            with self.assertRaises(CalibrationLedgerError):
+                _record_ok(ledger, reservation, _usage(inp=-1))
+            self.assertFalse(reservation.consumed)
+            self.assertEqual(ledger.cumulative().attempts_total, 0)
+            _record_ok(ledger, reservation)
+            self.assertTrue(reservation.consumed)
+            reopened = cl.CalibrationLedger(os.path.join(tmp, "ledger.jsonl"))
+            self.assertEqual(reopened.cumulative().attempts_total, 1)
+
+    def test_terminal_fsync_failure_does_not_consume_reservation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = _ledger(tmp)
+            reservation = _reserve(ledger)
+            with patch.object(cl.os, "fsync", side_effect=OSError("synthetic fsync failure")):
+                with self.assertRaises(OSError):
+                    _record_ok(ledger, reservation)
+            self.assertFalse(reservation.consumed)
+            self.assertEqual(ledger.cumulative().attempts_total, 0)
+            with self.assertRaisesRegex(CalibrationLedgerError, "write previously failed"):
+                _record_ok(ledger, reservation)
 
 
 class TestCapsAndPricing(unittest.TestCase):

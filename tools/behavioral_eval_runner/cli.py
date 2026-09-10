@@ -187,6 +187,13 @@ FORBIDDEN_INSTALL_LITERALS = ("pip install", "npm install", "easy_install")
 #: process-tree control). Matched by exact path, never by suffix.
 SUBPROCESS_ALLOWED_MODULES = frozenset({"materialize.py", "process_control.py"})
 
+# Cancellable total deadlines in the authorized calibration transport only.
+ASYNCIO_ALLOWED_MODULES = frozenset({
+    "judge/calibration_transport.py",
+    "tests/test_calibration_provider.py",
+    "tests/test_calibration_transport.py",
+})
+
 
 def _emit(payload: Any) -> None:
     sys.stdout.write(json.dumps(payload, sort_keys=True, indent=2) + "\n")
@@ -227,13 +234,17 @@ def _scan_ast(relative: str, source: str) -> list[dict[str, str]]:
         if isinstance(node, ast.Import):
             for alias in node.names:
                 root_mod = alias.name.split(".", 1)[0]
-                if root_mod in FORBIDDEN_IMPORT_ROOTS:
+                if root_mod in FORBIDDEN_IMPORT_ROOTS and not (
+                    root_mod == "asyncio" and relative in ASYNCIO_ALLOWED_MODULES
+                ):
                     _record(f"import {alias.name}", "forbidden-import")
                 if root_mod == "subprocess" and not subprocess_allowed:
                     _record("import subprocess", "subprocess-outside-allowlist")
         elif isinstance(node, ast.ImportFrom):
             root_mod = (node.module or "").split(".", 1)[0]
-            if root_mod in FORBIDDEN_IMPORT_ROOTS:
+            if root_mod in FORBIDDEN_IMPORT_ROOTS and not (
+                root_mod == "asyncio" and relative in ASYNCIO_ALLOWED_MODULES
+            ):
                 _record(f"from {node.module} import ...", "forbidden-import")
             if root_mod == "subprocess" and not subprocess_allowed:
                 _record("from subprocess import ...", "subprocess-outside-allowlist")

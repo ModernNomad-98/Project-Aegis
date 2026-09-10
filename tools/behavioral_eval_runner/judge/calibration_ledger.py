@@ -731,9 +731,6 @@ class CalibrationLedger:
                 "record() requires the live, unconsumed reservation issued "
                 "for this exact request (reservations are single-use)"
             )
-        reservation.consumed = True
-        del self._pending[reservation.reservation_id]
-
         telemetry_missing = False
         if billing_unknown:
             if usage is not None:
@@ -806,8 +803,12 @@ class CalibrationLedger:
             day=reservation.day,
             cumulative=cumulative,
         )
-        self._entries.append(entry)
         self._append_event("ATTEMPT_TERMINAL", entry.to_dict())
+        # Retain the reserved liability until terminal evidence is durable.
+        # Validation or persistence failures must not erase an issued attempt.
+        self._entries.append(entry)
+        reservation.consumed = True
+        del self._pending[reservation.reservation_id]
         if (
             entry.request_kind == RequestKind.METADATA.value
             and entry.outcome_kind == METADATA_SUCCESS_OUTCOME_KIND

@@ -319,12 +319,62 @@ class TestStructuredOutputSchema(unittest.TestCase):
 class TestPinnedSdkClientConfiguration(unittest.TestCase):
     """Prove the CONFIGURED client owns zero SDK retries (BER-DEC-008 dec 21)."""
 
+    def test_total_deadline_cancels_slow_body_before_returning(self):
+        import asyncio
+        import time
+        from unittest.mock import patch
+        import httpx2
+        import openai
+
+        class SlowBody(httpx2.SyncByteStream, httpx2.AsyncByteStream):
+            closed = False
+            completed = False
+
+            def __iter__(self):
+                for chunk in (b'{"id":', b'"synthetic",', b'"object":', b'"model"}'):
+                    time.sleep(0.06)
+                    yield chunk
+                self.completed = True
+
+            async def __aiter__(self):
+                for chunk in (b'{"id":', b'"synthetic",', b'"object":', b'"model"}'):
+                    await asyncio.sleep(0.06)
+                    yield chunk
+                self.completed = True
+
+            def close(self):
+                self.closed = True
+
+            async def aclose(self):
+                self.closed = True
+
+        for endpoint in ("metadata", "judgment"):
+            with self.subTest(endpoint=endpoint):
+                body = SlowBody()
+                with patch.object(ct, "TOTAL_REQUEST_TIMEOUT_SECONDS", 0.1):
+                    client = ct.build_judge_client(CalibrationCredential(DUMMY_SECRET), environ={})
+                    try:
+                        client._client._transport = httpx2.MockTransport(
+                            lambda request: httpx2.Response(200, stream=body,
+                                                          headers={"content-type": "application/json"}))
+                        with self.assertRaises(openai.APITimeoutError):
+                            if endpoint == "metadata":
+                                client.models.retrieve(ct.AUTHORIZED_MODEL_SNAPSHOT)
+                            else:
+                                client.responses.create(model=ct.AUTHORIZED_MODEL_SNAPSHOT,
+                                                        input="synthetic")
+                        self.assertTrue(body.closed)
+                        self.assertFalse(body.completed)
+                    finally:
+                        client.close()
+
     def test_sdk_version_is_the_authorized_pin(self) -> None:
         ct.verify_sdk_version()
 
     def test_client_factory_configuration(self) -> None:
         credential = CalibrationCredential(DUMMY_SECRET)
         client = ct.build_judge_client(credential, environ={})
+        self.addCleanup(client.close)
         self.assertEqual(client.max_retries, 0)  # zero SDK-owned retries
         self.assertEqual(str(client.base_url), "https://api.openai.com/v1/")
         timeout = client.timeout
@@ -334,6 +384,7 @@ class TestPinnedSdkClientConfiguration(unittest.TestCase):
     def test_client_verification_rejects_nonzero_retries(self) -> None:
         credential = CalibrationCredential(DUMMY_SECRET)
         client = ct.build_judge_client(credential, environ={})
+        self.addCleanup(client.close)
         client.max_retries = 2
         with self.assertRaises(CalibrationStopError) as ctx:
             ct.verify_client_invariants(client)
@@ -345,6 +396,7 @@ class TestPinnedSdkClientConfiguration(unittest.TestCase):
     def test_client_verification_rejects_wrong_base_url(self) -> None:
         credential = CalibrationCredential(DUMMY_SECRET)
         client = ct.build_judge_client(credential, environ={})
+        self.addCleanup(client.close)
         client.base_url = "https://evil.example/v1"
         with self.assertRaises(CalibrationStopError) as ctx:
             ct.verify_client_invariants(client)
@@ -355,6 +407,7 @@ class TestPinnedSdkClientConfiguration(unittest.TestCase):
     def test_inner_http_client_ignores_environment(self) -> None:
         credential = CalibrationCredential(DUMMY_SECRET)
         client = ct.build_judge_client(credential, environ={})
+        self.addCleanup(client.close)
         inner = client._client
         self.assertFalse(getattr(inner, "_trust_env", True))
 
