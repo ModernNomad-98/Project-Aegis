@@ -70,10 +70,11 @@ The [inventory](inventory.json) records four required original calibration input
 Their expected hashes survive; their bytes were not found in the
 [repository scan](artifact-search.json) or authorized external root. The missing
 original ZIP is different from the new backup ZIP created on this computer.
-The original review conversation's attachment remains a recovery lead; access
-has not been confirmed. The later approval JSON was not part of that original
-ZIP. Supporting approval provenance is also missing but is not a driver gate
-input itself.
+On 2026-09-11 the owner confirmed that the original review conversation is no
+longer accessible. That recovery lead is closed; no surviving original copy is
+currently identified. The later approval JSON was not part of that original ZIP.
+Supporting approval provenance is also missing but is not a driver gate input
+itself.
 
 Historical A2/A3 records say zero provider calls/spend and that the canonical
 ledger and manifest had not been created. They are not established lost run
@@ -86,11 +87,10 @@ execution controls remain unchanged by this documentation update; any intended
 change belongs in the reviewed execution requirements. The current live client
 supports development only, with no approved holdout freeze.
 
-Next: recover the original attachments if available. If only some originals
-survive, preserve them and identify the minimum new packaging or approval work.
-If none survive, prepare replacement calibration material with new provenance
-and explicit owner label approval. Then complete execution preflight against
-the selected, reviewed source revision.
+Next: follow the [replacement preparation plan](replacement-plan.md), using the
+surviving contracts and validators. If originals unexpectedly surface, preserve
+and verify them before deciding which replacement work remains necessary.
+Then complete execution preflight against the selected, reviewed source revision.
 
 ## Record interpretation and limits
 
@@ -99,8 +99,9 @@ validator (184 skills, zero warnings), plus JSON parsing, handoff-link checks
 and `git diff --check`. Runtime source was unchanged; the historical runtime
 test results above were not rerun for these documentation additions.
 
-The JSON and log files here preserve their historical contents, including old
-machine paths and filenames. Those paths are evidence context, not instructions
+The verification JSON and logs preserve their historical contents, including old
+machine paths and filenames. The recovery inventory also records dated owner
+updates as leads are resolved. Those paths are evidence context, not instructions
 to recreate the old machine. `inventory.json` points to the original scan path;
 its preserved copy is `artifact-search.json` here. Its top-level user-folder
 search was limited and does not establish that every cloud location was searched.

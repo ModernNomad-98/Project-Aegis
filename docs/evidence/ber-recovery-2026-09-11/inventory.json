@@ -31,7 +31,7 @@
   "recovery_leads": [
     {"source": "repository and local history", "status": "no_matches", "evidence": "../reviews/approved-artifact-search-2026-09-11.json"},
     {"source": "top-level Downloads/Documents/Desktop/OneDrive filenames on new computer", "status": "no_calibration_or_Aegis_named_entries_found", "limitations": "Not a recursive system search; cloud-only files were not hydrated."},
-    {"source": "original owner review conversation attachments", "status": "access_unknown_owner_question_pending", "note": "The documented 14-entry ZIP does not include the later approval or provenance sidecar."},
+    {"source": "original owner review conversation attachments", "status": "owner_confirmed_unavailable", "owner_update_date": "2026-09-11", "owner_response": "no", "note": "The owner confirmed they no longer have access to the original review conversation. This recovery lead is closed. The documented 14-entry ZIP does not include the later approval or provenance sidecar."},
     {"source": "off-device archives or account backups", "status": "not_accessible_or_identified_in_current_session"}
   ],
   "current_host": {"encryption": "unverified_admin_query_denied", "evidence_root": "absent", "credential_read": false, "provider_requests_during_recovery": 0},
