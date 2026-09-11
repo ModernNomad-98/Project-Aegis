@@ -2965,6 +2965,19 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     left unarmed (this repo's PR-no-merge policy).
 ---
 
+- **D62 (2026-09-11) — Keep recovery continuation in GitHub.** Following the
+  loss of the previous computer, the owner clarified that GitHub is the project
+  backup location and that the project contains no secret or personal data.
+  The owner approved publication of the three reviewed Phase 0/1 commits, then
+  directed continuation of committing the useful recovery records and setup
+  instructions. Preserve the handoff, missing-input identities, verification
+  evidence and runtime dependency lock in the repository, reachable from its
+  README and BER backlog. A separate copy of the newly generated local ZIP is
+  optional. Historical reports retain their original dates and source bindings;
+  no missing calibration input, approval or execution history is reconstructed
+  by this decision. See the
+  [recovery handoff](../evidence/ber-recovery-2026-09-11/README.md).
+
 ## 6. Post-merge corrections
 
 - **2026-07-07 — Phase 4 headline correction.** Squash commit `ee6515c` (PR #7) is titled "Phase 4: security & RLS pack (4 skills)" but actually delivered **all 9** canonical Phase 4 skills (`threat-modeler`, `appsec-implementer`, `multi-tenant-security-tester`, `rls-policy-auditor`, `secrets-identity-hardener`, `supply-chain-security-reviewer`, `security-pr-reviewer`, `secure-migration-reviewer`, `static-analysis-reviewer`); the stale "(4 skills)" headline was captured when auto-merge was armed on the 4-skill branch state, and the remaining 5 skills were pushed before the merge fired. `main` contains all 9 — validator reports 36 skills, exit 0.

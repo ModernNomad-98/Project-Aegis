@@ -1,0 +1,20 @@
+{
+  "archive": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\recovery\\aegis-recovery-20260911-8f92e91-complete.zip",
+  "archive_sha256": "bdb55a3d7877320c60d3972b37133371bc981692fc93f0188a55e0df8c57e103",
+  "archive_bytes": 13523726,
+  "files_verified": 103,
+  "head": "8f92e916f86bc0b9df618fb6a7887bd531df8fea",
+  "tree": "499e7e96bd524fe024aec94ed69d11a17f783e13",
+  "fresh_clone_verified": true,
+  "git_fsck_passed": true,
+  "offline_install_passed": true,
+  "pip_check_passed": true,
+  "exact_pinned_distributions_verified": 18,
+  "synthetic_tests": "...............\n----------------------------------------------------------------------\nRan 15 tests in 4.790s\n\nOK",
+  "self_check": "PASS",
+  "self_check_count": 21,
+  "runtime_platform": "Windows x64 CPython 3.14; interpreter separately required",
+  "off_device_copy_verified": false,
+  "missing_calibration_inputs_recovered": false,
+  "provider_requests": 0
+}

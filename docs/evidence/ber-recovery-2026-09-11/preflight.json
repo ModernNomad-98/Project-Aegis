@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-11",
+  "head": "8f92e916f86bc0b9df618fb6a7887bd531df8fea",
+  "tree": "499e7e96bd524fe024aec94ed69d11a17f783e13",
+  "audited_identity_matches": true,
+  "tracked_clean": true,
+  "live_source_identity_gate_passed": true,
+  "sdk_version": "3.0.0",
+  "sdk_version_matches": true,
+  "wheel_sha256": "8d32ac3a6647a66910d6cb8a64f0fa5a6c823604b6e82db83d9d055c6709bd51",
+  "wheel_integrity_matches": true,
+  "installed_sdk_files_checked": 1510,
+  "installed_sdk_mismatches": [],
+  "transport_environment_violations": [],
+  "evidence_root_preflight": "CalibrationAuthorizationError: evidence root does not exist: C:\\temp\\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence",
+  "volume_encryption": "UNVERIFIED: manage-bde -status C: denied; administrator rights required",
+  "dataset_hashes_and_owner_artifacts": "BLOCKED: authorized evidence root missing",
+  "credential_access": "NOT ATTEMPTED",
+  "provider_requests": 0,
+  "disposition": "STOP_BEFORE_EXECUTION"
+}

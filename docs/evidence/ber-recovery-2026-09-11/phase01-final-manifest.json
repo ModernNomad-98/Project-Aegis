@@ -1,0 +1,103 @@
+{
+  "base": "ac9e1cdb020f4efb7a52e5ea606c3b329fb486e2",
+  "head": "8f92e916f86bc0b9df618fb6a7887bd531df8fea",
+  "tree": "499e7e96bd524fe024aec94ed69d11a17f783e13",
+  "full_suite_head": "c6822e1c3fd0dd2b8195c3909c1cf57faeab6607",
+  "full_suite_tests": 961,
+  "windows_sdk_skips": 13,
+  "posix_skips": 11,
+  "final_targeted_tests": 127,
+  "final_targeted_skips": 0,
+  "final_targeted_seconds": 42.007,
+  "files": [
+    {
+      "path": "docs/evidence/behavioral-eval-runner-phase01-independent-corrections.md",
+      "sha256_lf": "74980c67a486f4d3b43705635a078483bb8d359a62aaaa85d16efe35eb57cdab"
+    },
+    {
+      "path": "docs/evidence/behavioral-eval-runner-phase01-review.md",
+      "sha256_lf": "ff51f2621b7936795b626053be3d5c93c5dd3f9c5b1c6696837600e2e9caacef"
+    },
+    {
+      "path": "docs/roadmaps/behavioral-eval-runner-backlog.md",
+      "sha256_lf": "6cd6be02b9a3ba11eb47f3151f45c3db65bc05bdca87408bbdaac4ead972679a"
+    },
+    {
+      "path": "docs/roadmaps/behavioral-eval-runner-wp-2b-3-authorization-decision-package.md",
+      "sha256_lf": "a1ebf67c9d7a9ac98ab84dbd67d25e8e79b5dc911509e87bba96c8c02c5b0757"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/cli.py",
+      "sha256_lf": "e0cc1d701c715449e94c69525c3a69aaf2545ea92a857e9b2fab24f65e528364"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_dataset.py",
+      "sha256_lf": "ad392e3fd4f0b540056a787c956e63fff560530f5d21376d2b911635ed8f3bd5"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_development_driver.py",
+      "sha256_lf": "5e28bf7c7fd4b9193b24e21f1f27b7505f7e678a5734dd967bde2f92245eccfc"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_errors.py",
+      "sha256_lf": "d4310d51b0eb86d312f3bf30ccbec10f082a75a38e6a9f5f3d0b381be19205f9"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_gates.py",
+      "sha256_lf": "4fc367b51b823d8a40bb08d163f6f2da5f90188c2cffd22becf8043a9cb565ba"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_io.py",
+      "sha256_lf": "7cf177f3c4f8309de1c8a08e16fd0e401d1188c9f21c61078b72789e8af8a1b8"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_ledger.py",
+      "sha256_lf": "e57fbbfc180bdec08e96abdfa55b62a12aa3d5fbb229d25c064876507e3f4e21"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_provider.py",
+      "sha256_lf": "0f30980bbd61a2eacb5809b6fc98ea3b4803dd12b6ed4c0c20876781365f4af5"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/judge/calibration_transport.py",
+      "sha256_lf": "dbc938121a9a749dddf0ba29332e1628dbeef7dbd336a532c126861d008676a8"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_dataset.py",
+      "sha256_lf": "3ad11a411473219eb52698891e0b14a4af51268d194d07a0fcd131911db377a1"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_development_driver.py",
+      "sha256_lf": "04d1d39f4d365d971021ab9facccc6d8184fdaf4b112988e5b4ae4d2a6da7980"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_first_live_corrections.py",
+      "sha256_lf": "62427c92ed9aa60986b5556a1d7a7b51276e5aca45d015a92b1e59ce304f8ac4"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_gates.py",
+      "sha256_lf": "4234d5cfc0fed1bab4f05ffb60da32bb2655d3abe1dfb1aadf93b6978c48e392"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_ledger.py",
+      "sha256_lf": "fd3dd137018ba4bed5e82cf143e2bbcfbe9fd0b9c609eba9eed75d4295ce6172"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_phase01.py",
+      "sha256_lf": "ef16564f8f7ef160f72e1f9dfa9bd1fcdaf8b4842cbe2a20ce746190c6fa61c9"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_provider.py",
+      "sha256_lf": "7b2b5ccf3896769f1a4a86d90a229722de40b2e4f1458ba46de8101dee1c70b6"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_calibration_transport.py",
+      "sha256_lf": "69e8ee4624de3e977103e73f2e8a87665202cc05e836d120a25f4d005e52338e"
+    },
+    {
+      "path": "tools/behavioral_eval_runner/tests/test_hardening.py",
+      "sha256_lf": "4e64d440854b17a39934c414818a4cee6e702da7d520ab4f31d01c11910fe322"
+    }
+  ],
+  "patch_sha256": "6b15b010e444f970bfbd89798cb27c85a9a8bb7ae875ad9178bfcc528ffda7b7"
+}

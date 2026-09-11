@@ -14,6 +14,9 @@ security, QA, audit, troubleshooting, and AI safety.
 
 ## About
 
+Returning to Behavioral Eval Runner work on another computer? Start with the
+[current recovery handoff and setup instructions](docs/evidence/ber-recovery-2026-09-11/README.md).
+
 Project Aegis is a reusable engineering operating system for AI coding agents, built to
 protect, guide, and sharpen AI-assisted software development. It combines reusable skills in
 the open Agent Skills format, read-only specialist subagents, validation gates, eval

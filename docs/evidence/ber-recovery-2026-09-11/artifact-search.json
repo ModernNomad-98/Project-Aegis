@@ -1,0 +1,12 @@
+{
+  "date": "2026-09-11",
+  "scope": "C:\\src\\Project Aegis\\Project-Aegis",
+  "includes": "hidden and ignored files, local worktree, installed dependencies and local Git files",
+  "files_enumerated": 6984,
+  "files_hashed": 6984,
+  "bytes_hashed": 70839923,
+  "matches": [],
+  "errors": [],
+  "raw_artifact_contents_disclosed": false,
+  "local_git_history_named_artifact_matches": 0
+}

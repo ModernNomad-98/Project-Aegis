@@ -12,6 +12,13 @@ what authority.
 ## 1. Status and authority
 
 - **Status:** ACTIVE DURABLE BACKLOG
+- **2026-09-11 recovery checkpoint:** The owner lost the previous computer.
+  Reviewed Phase 0/1 source is preserved on `review/ber-phase01-corrections`;
+  [recovery inventory, evidence and new-computer setup](../evidence/ber-recovery-2026-09-11/README.md)
+  are now recorded with the repository. GitHub is the agreed backup location;
+  another copy of the locally generated ZIP is optional. Original calibration
+  inputs remain missing. This checkpoint does not change phase status or
+  execution authority.
 - **Created:** 2026-08-10
 - **Owner:** Peter Nguyen
 - **Repository:** ModernNomad-98/Project-Aegis
