@@ -57,37 +57,43 @@ navigability.
 
 ## Workflow
 
+This automatic phase reads the corpus and produces proposed index/status/link
+changes in the conversation. It does not renumber, amend, overwrite, or move
+existing records. Their application requires the separately authorized manual
+mutation route. Ordinary new ADR drafts go to `adr-writer` and its bounded
+document-persistence contract; a proposed graph is not evidence of a file edit.
+
 1. **Inventory and index.** List every ADR with its number, title, date,
    and current status in a single index/log — the navigable front page of
-   the decision history. Assign missing numbers; give status-less records
-   a status.
-2. **Apply the status lifecycle.** Each ADR is proposed, accepted,
+   the decision history. Propose missing numbers and statuses; label any
+   unresolved human decision instead of inventing acceptance.
+2. **Propose the status lifecycle mapping.** Each ADR is proposed, accepted,
    rejected, deprecated, or superseded — never ambiguous. A superseded ADR
    stays in the record (it's history) with its status and a pointer to
    its successor; it is not deleted.
-3. **Wire the superseding graph both ways.** When a new decision replaces
-   an old one, the NEW ADR names what it supersedes, and the OLD ADR is
+3. **Propose the superseding graph both ways.** When a new decision replaces
+   an old one, the NEW ADR names what it supersedes, and the proposed OLD ADR update is
    marked "superseded by <new>". Bidirectional links let a reader walk the
    evolution in either direction. Preserve the chain, don't collapse it.
 4. **Enforce append-only history.** A decided ADR is not edited in place
    to change its decision — that erases the reasoning that was true when
-   it was made. A changed decision is a NEW ADR that supersedes; only
-   typo/clarity fixes amend in place, noted as such.
+   it was made. A changed decision is a NEW ADR that supersedes; propose
+   typo/clarity amendments separately, dated and explicitly authorized before application.
 5. **Draw the new-vs-amend line.** Material change to the decision or its
    consequences → new superseding ADR. Clarification, formatting, a fixed
    link → amendment with a dated note. State which and why.
-6. **Detect and resolve contradictions.** Scan for two current decisions
-   that conflict; surface each pair and resolve it — usually a new ADR
+6. **Detect contradictions and propose resolutions.** Scan for two current decisions
+   that conflict; surface each pair and propose its resolution — usually a new ADR
    that supersedes one or reconciles both — rather than leaving the corpus
    self-contradictory. Contested FACTS behind a conflict go to
    `source-of-truth-reconciler` first.
-7. **Make it navigable and referenced.** Group/tag by area, link related
-   ADRs, and ensure code/docs point at the governing ADR. The log's job
+7. **Propose navigation and references.** Draft area tags, related-ADR links,
+   and code/doc pointers to the governing ADR. The log's job
    is that anyone can find the current decision on a topic and its
    history.
 8. **Author via adr-writer.** Any individual ADR (new, or the superseding
-   record) is written by `adr-writer`; this skill places it in the
-   sequence, sets statuses, and wires links. Deliver the corpus plan/index
+   record) is drafted by `adr-writer`; this skill proposes its position,
+   statuses and links. Deliver the corpus plan/index
    in the Output Format.
 
 The ADR index format, the status lifecycle diagram, superseding-link
@@ -99,8 +105,8 @@ conventions, and the new-vs-amend decision guide:
 ```
 ADR CORPUS PLAN — <project>
 Index:         numbered list — <NNNN | title | date | status | supersedes/superseded-by>
-Status pass:   every ADR has a lifecycle status; ambiguous ones resolved
-Superseding:   bidirectional links wired (new names old; old → superseded-by new)
+Status plan:   evidenced current statuses; proposed updates and unresolved decisions labeled
+Superseding:   bidirectional links proposed (new names old; old → superseded-by new)
 Append-only:   history preserved; changed decisions = new superseding ADRs, not in-place edits
 New-vs-amend:  <decisions on which changes are new ADRs vs amendments, with reasons>
 Contradictions:<conflicting pairs surfaced + resolution (superseding/reconciling ADR)>
@@ -113,15 +119,14 @@ Boundaries:    corpus-by-type → diataxis-doc-organizer; pipeline → docs-as-c
 
 - [ ] A single index/log lists every ADR with number, title, date, and
       status.
-- [ ] Every ADR has a lifecycle status; none is ambiguous.
-- [ ] Superseding links are bidirectional (new names old; old points to
+- [ ] Current statuses are evidenced; proposed statuses and unresolved human decisions are labeled.
+- [ ] Proposed superseding links are bidirectional (new names old; old points to
       its successor).
 - [ ] History is append-only — no decided ADR was edited in place to
       change its decision; changes are new superseding records.
 - [ ] The new-ADR-vs-amendment line is applied with stated reasons.
-- [ ] Contradictions between current ADRs are surfaced and resolved, not
-      left silent.
-- [ ] The corpus is navigable and code/docs reference the governing ADR.
+- [ ] Contradictions are surfaced with proposed resolutions, not silently decided.
+- [ ] Navigation and governing-ADR pointers are proposed; application claims require separate evidence.
 - [ ] Individual-record authoring is delegated to `adr-writer`, not
       duplicated here.
 

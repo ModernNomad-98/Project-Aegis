@@ -24,8 +24,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Creates a new ADR rather than editing ADR-0007's history.",
-          "Marks ADR-0007 superseded and links both ADRs in both directions.",
+          "Drafts a new ADR and proposed path; any ordinary new-file persistence follows the documented authorization boundary.",
+          "Proposes the predecessor status/backlink update without editing ADR-0007 in this automatic route.",
           "Explains in context what changed since ADR-0007's assumptions."
         ]
       }
@@ -51,6 +51,19 @@
           "Asks for or flags the missing alternatives rather than fabricating a comparison.",
           "If proceeding, records the honest context (decision by momentum), marks status appropriately, and does not invent rejected options.",
           "Still includes the mandatory rollback plan and review date."
+        ]
+      }
+    },
+    {
+      "id": "draft-boundary-does-not-write-existing-policy-or-records",
+      "type": "should_trigger",
+      "prompt": "Use adr-writer to prepare the proposed document changes for review; show the draft and proposed paths.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a complete conversation draft and proposed target paths, without claiming any file was changed.",
+          "Does not edit prior records, policy, executable authorization, or agent behavior files under the ordinary documentary exception.",
+          "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
         ]
       }
     }

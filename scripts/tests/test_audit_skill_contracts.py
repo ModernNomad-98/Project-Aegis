@@ -240,8 +240,9 @@ def test_side004_fixture_classes(a) -> None:
 
 def test_side004_real_corpus_targets() -> None:
     """The Gate 2.5 blocker-1 regression: the KNOWN auto-invocable mutating
-    skills must never again be a silent scanned-zero. Every named target is
-    auto-invocable on disk and must carry at least one SIDE-004 candidate."""
+    skills must never again be a silent scanned-zero. Nine were deliberately
+    reclassified manual-only during the 2026-09-12 shared-contract review;
+    remaining automatic authors retain semantic-candidate coverage."""
     targets = [
         "docs-first-implementer", "tdd-engineer", "systematic-debugger",
         "flaky-test-detective", "reviewable-diff-discipline",
@@ -253,8 +254,17 @@ def test_side004_real_corpus_targets() -> None:
     ra = real_audit()
     skills = {s.name: s for s in ra.skills}
     s4_owners = {f.owning_skill for f in ra.findings if f.rule == "SIDE-004"}
+    remediated_manual = set(targets[:9])
     for t in targets:
         assert t in skills, f"target skill {t} missing from the corpus"
+        if t in remediated_manual:
+            assert skills[t].classify()["manual_only"], f"reviewed execution posture regressed: {t}"
+            assert t not in s4_owners, f"manual execution is outside SIDE-004's automatic-route rule: {t}"
+            continue
+        if t == "chat-backlog-reconciliation":
+            assert not skills[t].classify()["manual_only"]
+            assert t not in s4_owners, "bounded documentary preview/grant/write protocol regressed"
+            continue
         assert not skills[t].classify()["manual_only"], (
             f"{t} is expected auto-invocable (a manual-only flip is a posture "
             "change to re-account here deliberately)"
@@ -263,8 +273,7 @@ def test_side004_real_corpus_targets() -> None:
             f"{t} must yield at least one SIDE-004 semantic-review candidate — "
             "a silent clean here is the Gate 2.5 blocker-1 false-clean"
         )
-    ok(f"all {len(targets)} known live mutation targets carry SIDE-004 candidates "
-       "(no silent clean)")
+    ok(f"all {len(targets)} reviewed live targets retain declared posture/candidate coverage")
 
 
 def test_side004_approval_elsewhere_never_suppresses() -> None:
@@ -479,11 +488,30 @@ def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # must not still identify as 1.12.0. The frozen historical baseline is the
     # type-collapsing 1.12.0 engine; a corrected live report has to be
     # distinguishable by VERSION, not only by engine source hash.
-    assert audit_mod.TOOL_VERSION == "1.13.0", (
+    assert audit_mod.TOOL_VERSION == "1.13.1", (
         f"corrected EVAL-004 semantics require a minor bump; got "
         f"{audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.13.0 for the corrected EVAL-004 semantics")
+    ok("audit engine reports v1.13.1 for corrected EVAL-004 semantics and raw ARTF-001 anchors")
+
+
+def test_artifact_anchor_uses_raw_file_lines() -> None:
+    with tempfile.TemporaryDirectory(prefix="aegis-artifact-anchor-") as directory:
+        repo = Path(directory)
+        skill_dir = repo / ".claude" / "skills" / "anchor"
+        skill_dir.mkdir(parents=True)
+        body = "# Anchor\n\n```text\nA durable claim in a fence is ignored.\n```\n\nCreates a durable record.\n"
+        for header in ("", "---\n---\n", "---\nname: anchor\n---\n",
+                       "---\nname: anchor\ndescription: |\n  A multiline description.\n\n---\n"):
+            raw = header + body
+            (skill_dir / "SKILL.md").write_text(raw, encoding="utf-8")
+            audit = audit_mod.Audit(repo)
+            audit.audit_artifacts(audit_mod.Skill(skill_dir, repo))
+            findings = [f for f in audit.findings if f.rule == "ARTF-001"]
+            assert len(findings) == 1, findings
+            expected = raw.splitlines().index("Creates a durable record.") + 1
+            assert findings[0].line == expected, (header, findings[0].line, expected)
+    ok("ARTF-001 anchors the raw prose line across empty/multiline frontmatter and preceding fences")
 
 
 def _per_surface_repo(tmp: Path, *, skills, agents,
@@ -1708,6 +1736,7 @@ def main() -> int:
     test_eval004_ghost_target_still_unknown()
     test_eval004_non_subagent_parenthetical_is_a_skill_name()
     test_audit_engine_version_marks_corrected_eval004_semantics()
+    test_artifact_anchor_uses_raw_file_lines()
     test_eval004_each_machine_surface_is_independently_collected()
     test_eval004_each_machine_surface_resolves_valid_subagent()
     test_eval004_parser_parity_with_merged_runtime()

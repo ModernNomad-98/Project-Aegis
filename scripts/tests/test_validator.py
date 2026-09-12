@@ -1091,9 +1091,9 @@ def test_atomic_stage1_question_contract():
     orch_ids = [c["id"] for c in orch_evals["cases"]]
     fac_ids = [c["id"] for c in fac_evals["cases"]]
 
-    assert len(orch_ids) == 47, f"project-orchestrator eval count must be 47; got {len(orch_ids)}"
+    assert len(orch_ids) == 49, f"project-orchestrator eval count must be 49; got {len(orch_ids)}"
     assert len(fac_ids) == 12, f"facilitator eval count must be 12; got {len(fac_ids)}"
-    ok("evals: project-orchestrator has 47 cases, facilitator has 12")
+    ok("evals: project-orchestrator has 49 cases, facilitator has 12")
 
     assert len(orch_ids) == len(set(orch_ids)), (
         "orchestrator eval IDs must be unique; duplicates: "

@@ -82,6 +82,7 @@
     },
     "expected_workspace_role": {"anyOf": [{"type": "null"}, {"enum": ["consumer", "source_library"]}]},
     "expected_stage_zero": {"type": ["boolean", "null"]},
+    "approval_lifecycle_version": {"const": "1.0.0", "description": "Optional trusted, hash-bound lifecycle contract; omission grades legacy boundaries only."},
     "schema_version": {"const": "1.0.0-wp2b2"},
     "plan_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   }

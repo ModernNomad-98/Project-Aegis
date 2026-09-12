@@ -36,7 +36,7 @@ standard and is exempt from validation (it is a template, not a shipped skill).
 | --- | --- | --- |
 | `name` | yes | Must exactly equal the containing directory name. This is the repo convention that keeps invocation, filesystem, and catalog in sync. Lowercase kebab-case. |
 | `description` | yes | Specific and **trigger-oriented** — say *when* to use the skill and *what it does*, in terms a model can match against a user request. Under **1024 characters**, measured on the parsed value (see the Portability contract below). Avoid vague verbs ("helps with", "handles"). |
-| `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Narrow approved-write exception (mirrors §5):** an auto-invocable skill may create or append to a non-executable documentation or project-state file in the current working tree, only as a second-phase action after showing the exact target path and exact content or diff and receiving explicit, content-specific, single-use approval in the current session; the approved path and content must not change before the write. The exception does NOT cover overwrite, delete, or rename; source code; executable or configuration files; agent-instruction or behavior-steering files; security, identity, authorization, policy, or CI/workflow files; secrets; network calls; external or live-state mutation; spending; deployment; or other irreversible action — those remain manual-only and require `disable-model-invocation: true`. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. |
+| `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Bounded documentary exception:** the governing definition is Exception 1 in §5 below. It permits authorized ordinary documentation create/append, immutable transcription of evidenced human approvals and lifecycle facts, and refresh of exactly six named project-state projection sections. Honor applicable existing authorization; obtain missing authority before writing. All excluded files and operations remain manual-only. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. |
 | `allowed-tools` | optional | If present, must be a **narrow** list. Broad grants (`*`, `all`, `Bash` alone with no scoping) are forbidden — they defeat least-privilege. Omit the field to inherit the session default rather than widening it. |
 
 ### Description guidance
@@ -148,14 +148,33 @@ the deterministic sequence below.
 
 ### EXCEPTION 1 — Approved documentation/state write (self-contained rule)
 
-An auto-invocable skill may create or append to a non-executable documentation or project-state
-file in the current working tree only as a second-phase action after showing the exact target path
-and exact content or diff and receiving explicit, content-specific, single-use approval in the
-current session; the approved path and content must not change before the write. The exception
-does NOT cover overwrite, delete, or rename; source code; executable or configuration files;
-agent-instruction or behavior-steering files; security, identity, authorization, policy, or
-CI/workflow files; secrets; network calls; external or live-state mutation; spending; deployment;
-or other irreversible action. Those remain manual-only and require `disable-model-invocation: true`.
+An auto-invocable skill may draft non-executable documentation or project-state content in the
+conversation, then create or append the exact authorized content in the current working tree.
+Show the target path and complete content or diff before the write. Use an applicable explicit
+current-session instruction already authorizing the bounded recording; do not demand repeat
+consent or arbitrarily narrow that grant. Otherwise obtain content-specific, single-use approval
+for the displayed path/content. A changed proposal must still be covered by the actual grant;
+a business answer alone is not an instruction to persist a document.
+
+Two narrowly defined documentary operations are included:
+
+- Append immutable evidence of an already-given human grant, revocation, supersession or observed
+  expiry/use fact. Records transcribe authority; they do not create, expand or withdraw it.
+  Preserve historical bytes and derive effective status from the complete lifecycle under
+  [the approval-register contract](../.claude/skills/scoped-approval-register/references/register-format.md).
+- Refresh only named mutable projection sections in an authorized project-state document:
+  Current product summary, Current approved scope, Current users/roles, Current success definition,
+  Open questions and Next recommended action. Show the exact section replacements, derive them
+  from authoritative records, preserve immutable records and unrelated sections, and verify
+  those boundaries after writing. A projection is not approval evidence and cannot change scope.
+
+The exception does NOT permit arbitrary overwrite, delete or rename; source code; executable or
+configuration files; agent instructions or behavior-steering files; security/identity controls;
+executable authorization policy, permission configuration or enforcement settings; governance
+policy changes; CI/workflow files; secrets; network calls; external/live-state mutation; spending;
+deployment; or other irreversible action. Documentary approval history is distinct from those
+enforcement surfaces even when stored under `docs/approvals/`. Excluded execution remains
+manual-only and requires `disable-model-invocation: true`. Nothing here activates a TALI route.
 
 ### EXCEPTION 2 — Task-Authorized Local Implementation (TALI)
 

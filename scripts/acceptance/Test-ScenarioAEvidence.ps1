@@ -107,6 +107,65 @@ $devTruncated = ($devPrev -split "`n" | Where-Object { $_ -notmatch 'stays above
 Assert (-not (Test-AppendOnly -PrevRows $devRowsPrev -CurRows (Get-ImmutableRows -Content $devTruncated)).Ok) "deleting a past deviation's continuation line FAILS append-only"
 
 # --- Part 2: manifest conformance (hash + exact IDs) ----------------------------------
+# Full-document transitions: named projections are mutable, all other bytes are
+# protected except append-only data rows. The grant itself is never edited.
+$grantDoc = "# State`n`n## Approvals`n| ID | Event |`n|---|---|`n| A-1 | GRANT ACTIVE staging only |`n`n"
+$projectionNames = @('Current product summary', 'Current approved scope', 'Current users/roles', 'Current success definition', 'Open questions', 'Next recommended action')
+foreach ($name in $projectionNames) {
+    $before = $grantDoc + "## $name`nold`n"
+    $after = $grantDoc + "## $name`nnew`n"
+    Assert ((Test-ProjectStateTransition $before $after).Ok) "refresh of '$name' passes"
+}
+$lifecycleAppend = $grantDoc.Replace('| A-1 | GRANT ACTIVE staging only |', "| A-1 | GRANT ACTIVE staging only |`n| A-2 | REVOKED target A-1; effective 2026-09-12; evidence owner |")
+Assert ((Test-ProjectStateTransition $grantDoc $lifecycleAppend).Ok) 'appended lifecycle event preserves the original grant'
+foreach ($bad in @($grantDoc.Replace('ACTIVE', 'REVOKED'), $grantDoc.Replace('ACTIVE', 'active'),
+    $grantDoc.Replace('staging only', 'production too'), $grantDoc.Replace('# State', '# Changed'),
+    $grantDoc.Replace('| ID | Event |', '| ID | Changed |'),
+    ($grantDoc + "## Approvals`n| A-3 | hides original |`n"))) {
+    Assert (-not (Test-ProjectStateTransition $grantDoc $bad).Ok) 'protected grant, preamble, table header or duplicate section change fails'
+}
+$unknown = $grantDoc + "## Current approved scope backup`nold`n"
+Assert (-not (Test-ProjectStateTransition $unknown ($unknown.Replace('old', 'new'))).Ok) 'similar projection name stays protected'
+$projectionDoc = $grantDoc + "## Open questions`nold`n"
+foreach ($bad in @(($projectionDoc + "## Open questions`nnew`n"), $projectionDoc.Replace('## Open questions', '## Open questions renamed'), $grantDoc)) {
+    Assert (-not (Test-ProjectStateTransition $projectionDoc $bad).Ok) 'duplicated, renamed or removed projection fails'
+}
+$fenced = $grantDoc + '## Protected example' + "`n" + '```markdown' + "`n## Open questions`nold`n" + '```' + "`n"
+Assert (-not (Test-ProjectStateTransition $fenced ($fenced.Replace('old', 'new'))).Ok) 'a fenced heading cannot confer projection permission'
+foreach ($header in @(' ## Protected policy', '   ## Protected policy', "##`tProtected policy", '# Protected policy', '### Protected policy')) {
+    $indented = $projectionDoc + $header + "`nprotected body`n"
+    Assert (-not (Test-ProjectStateTransition $indented ($indented.Replace('protected body', 'changed body'))).Ok) 'indented/tab-separated unknown heading stays protected'
+}
+foreach ($marker in @('~~~', '```')) {
+    $falseClose = $grantDoc + '## Protected example' + "`n" + $marker + 'text' + "`n" + $marker + 'not-a-close' + "`n## Open questions`nold`n" + $marker + 'still-not-a-close' + "`n" + $marker + "`n"
+    Assert (-not (Test-ProjectStateTransition $falseClose ($falseClose.Replace('old', 'new'))).Ok) 'fence-like content cannot expose a fake projection section'
+}
+$mixed = $grantDoc + "## Decision log`n| ID | Decision |`n|---|---|`n| PS-1 | Original |`n"
+$mixedBad = $mixed.Replace('| A-1 | GRANT', "| Surprise | scaffold |`n| A-1 | GRANT").Replace('| PS-1 | Original |', "| PS-1 | Original |`n| PS-2 | Valid append |")
+# Put the stray pipe line before the Approvals separator, so it is scaffolding.
+$mixedBad = $mixedBad.Replace("| Surprise | scaffold |`n", '').Replace("## Approvals`n| ID | Event |", "## Approvals`n| Surprise | scaffold |`n| ID | Event |")
+Assert (-not (Test-ProjectStateTransition $mixed $mixedBad).Ok) 'valid decision append cannot hide an Approvals scaffolding edit'
+$setext = $projectionDoc + "Protected policy`n----------------`nprotected body`n"
+Assert (-not (Test-ProjectStateTransition $setext ($setext.Replace('protected body', 'changed body'))).Ok) 'unsupported Setext section cannot stay inside a mutable projection'
+$commented = $grantDoc + "## Protected policy`n<!--`n## Open questions`n-->`nprotected body`n"
+Assert (-not (Test-ProjectStateTransition $commented ($commented.Replace('protected body', 'changed body'))).Ok) 'commented projection heading cannot authorize visible protected changes'
+Assert ((Test-ProjectStateTransition $commented $commented).Ok) 'unchanged multiline template comments are supported'
+$inlineComment = $projectionDoc + "## Protected policy <!-- note -->`nprotected body`n"
+Assert (-not (Test-ProjectStateTransition $inlineComment ($inlineComment.Replace('protected body', 'changed body'))).Ok) 'inline comment cannot hide a real protected heading'
+$htmlBlock = $grantDoc + "## Protected policy`n<div>`n## Open questions`n</div>`nprotected body`n"
+Assert (-not (Test-ProjectStateTransition $htmlBlock ($htmlBlock.Replace('protected body', 'changed body'))).Ok) 'unsupported raw HTML cannot manufacture a projection'
+foreach ($opener in @('<?processing', '<![CDATA[', '<!DOCTYPE html')) {
+    $declaration = $grantDoc + "## Protected policy`n$opener`n## Open questions`n?>`nprotected body`n"
+    Assert (-not (Test-ProjectStateTransition $declaration ($declaration.Replace('protected body', 'changed body'))).Ok) 'unsupported HTML declaration cannot manufacture a projection'
+}
+$literalComment = $projectionDoc + 'Use `<!--` literally.' + "`n## Protected policy`nprotected body`n" + 'Use `-->` literally.' + "`n"
+Assert (-not (Test-ProjectStateTransition $literalComment ($literalComment.Replace('protected body', 'changed body'))).Ok) 'literal inline comment opener cannot mask a protected heading'
+foreach ($indent in @('    ', "`t")) {
+    $indentedComment = $projectionDoc + "$indent<!--`n## Protected policy`nprotected body`n$indent-->`n"
+    Assert (-not (Test-ProjectStateTransition $indentedComment ($indentedComment.Replace('protected body', 'changed body'))).Ok) 'indented code comment opener cannot mask a protected heading'
+}
+Assert ((Test-ProjectStateTransition $v00 $v01).Ok) 'real cold-start transition preserves full-document boundaries'
+
 Write-Host "`nPart 2 - manifest conformance (hash + IDs)"
 $mf = (Get-Content -Raw $RealManifest) | ConvertFrom-Json
 $step01 = $mf.steps | Where-Object { $_.file -eq '01-discovery-recorded.md' }
@@ -158,6 +217,15 @@ function Invoke-BadFixture { param([string] $SeqDir, [string] $Tag)
 function Artifact-Of { param([string] $SeqDir)
     return Join-Path (Join-Path (Split-Path -Parent $SeqDir) 'artifact') 'clinic-appointment-tracker-v1.md'
 }
+$badBoundary = New-FixtureCopy 'protected-boundary'
+$badBoundaryFile = Join-Path $badBoundary '01-discovery-recorded.md'
+[System.IO.File]::WriteAllText($badBoundaryFile, ([System.IO.File]::ReadAllText($badBoundaryFile)).Replace('# Project State', '# Changed State'), $Utf8NoBom)
+$badBoundaryManifest = Join-Path (Split-Path -Parent $badBoundary) 'manifest.json'
+$boundaryManifest = [System.IO.File]::ReadAllText($badBoundaryManifest) | ConvertFrom-Json
+($boundaryManifest.steps | Where-Object { $_.file -eq '01-discovery-recorded.md' }).sha256 = Get-NormalizedSha256 $badBoundaryFile
+[System.IO.File]::WriteAllText($badBoundaryManifest, ($boundaryManifest | ConvertTo-Json -Depth 30), $Utf8NoBom)
+$boundaryResult = Invoke-BadFixture $badBoundary 'protected-boundary'
+Assert ($boundaryResult.ExitCode -ne 0 -and $boundaryResult.Output -match 'Protected (content|section header/order) changed') 'real replay rejects protected preamble change even with a matching manifest hash'
 $badRow = New-FixtureCopy 'badrow'
 foreach ($fn in @('07-commitment-readiness-na.md', '08-stage3-snapshot.md')) {
     $fp = Join-Path $badRow $fn; [System.IO.File]::WriteAllText($fp, (Strip-Rows ([System.IO.File]::ReadAllText($fp)) '^\| PS-010 \|'), $Utf8NoBom) }

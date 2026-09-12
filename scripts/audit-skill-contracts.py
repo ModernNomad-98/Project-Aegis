@@ -95,7 +95,7 @@ TOOL_NAME = "audit-skill-contracts"
 # prose, which is what produced the AEGIS-060 false positives; a corrected live
 # report must be distinguishable from that engine by VERSION, not only by
 # engine_sha256. Frozen baselines that record 1.12.0 stay as they are.
-TOOL_VERSION = "1.13.0"
+TOOL_VERSION = "1.13.1"
 
 
 class InputContainmentError(Exception):
@@ -264,6 +264,10 @@ class Skill:
         self.skill_md = path / "SKILL.md"
         self.text = self.skill_md.read_text(encoding="utf-8") if self.skill_md.is_file() else ""
         fm_text, self.body = split_frontmatter(self.text)
+        # split_frontmatter strips both delimiters and all header lines.
+        # Prose matches must still report raw SKILL.md line numbers.
+        self.body_line_offset = (next(i + 1 for i, line in enumerate(self.text.splitlines()[1:], 1)
+                                      if line.strip() == "---") if fm_text is not None else 0)
         self.frontmatter: dict = {}
         if fm_text is not None and yaml is not None:
             try:
@@ -1055,10 +1059,9 @@ class Audit:
         defenced = strip_fences(s.body)
         m = DURABLE_CLAIM.search(defenced)
         if m and not DURABILITY_LEVEL.search(defenced):
-            # FIX (v1#7): line computed on `defenced` — the exact string the
-            # match ran on — not on the pre-strip body.
+            # Fences preserve line count; restore the stripped YAML offset.
             self.findings.append(Finding(
-                "ARTF-001", "P1", s.rel(), line_of(defenced, m.start()), s.name,
+                "ARTF-001", "P1", s.rel(), s.body_line_offset + line_of(defenced, m.start()), s.name,
                 f"claims durability ({m.group(0)!r}) without naming a durability level "
                 "(transcript-only / workspace-persisted / Git-tracked / locally "
                 "committed / remote-persisted / released)",

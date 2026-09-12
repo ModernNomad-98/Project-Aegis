@@ -12,6 +12,13 @@ what authority.
 ## 1. Status and authority
 
 - **Status:** ACTIVE DURABLE BACKLOG
+- **2026-09-12 engineering checkpoint:** [PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)
+  is merged as `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its post-merge
+  Actions run passed. The scoped calibration controls/driver engineering is
+  delivered. Replacement approved inputs, label review, measured calibration,
+  OD-1 and later work-package gates remain open. The
+  [shared-contract follow-up](../evidence/shared-contracts-closeout-2026-09-12/README.md)
+  records its own implementation and verification scope.
 - **2026-09-11 recovery checkpoint:** The owner lost the previous computer.
   Reviewed Phase 0/1 source is preserved on `review/ber-phase01-corrections`;
   [recovery inventory, evidence and new-computer setup](../evidence/ber-recovery-2026-09-11/README.md)

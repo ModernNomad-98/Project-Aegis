@@ -66,6 +66,19 @@
           "Persistent agent-memory write/trust/hygiene rules are agent-memory-governance; chat-backlog-reconciliation sweeps conversation history into repo docs, not memory stores."
         ]
       }
+    },
+    {
+      "id": "draft-boundary-does-not-write-existing-policy-or-records",
+      "type": "should_trigger",
+      "prompt": "Use chat-backlog-reconciliation to prepare the proposed document changes for review; show the draft and proposed paths.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a complete conversation draft and proposed target paths, without claiming any file was changed.",
+          "Does not edit prior records, policy, executable authorization, or agent behavior files under the ordinary documentary exception.",
+          "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
+        ]
+      }
     }
   ]
 }

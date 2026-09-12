@@ -1,6 +1,7 @@
 ---
 name: systematic-debugger
-description: Drive an unknown-cause bug to its root cause through the fixed sequence reproduce → reduce → isolate → fix one thing → verify → prevent, with evidence at every step and no shotgun fixes. Use when something fails and the cause is not yet known — an intermittent failure, a regression since a release, wrong output with no obvious source, an error only in one environment. Ranks hypotheses and proves or disproves them instead of guessing; changes exactly one thing per fix attempt; never calls a symptom a root cause without evidence. Do NOT use when the cause is already isolated (implement the fix with tdd-engineer) or for whole-repo health assessment (full-codebase-auditor).
+description: "MANUAL-ONLY; never auto-invoke. Drive an unknown-cause bug to its root cause through the fixed sequence reproduce → reduce → isolate → fix one thing → verify → prevent, with evidence at every step and no shotgun fixes. Use when something fails and the cause is not yet known — an intermittent failure, a regression since a release, wrong output with no obvious source, an error only in one environment. Ranks hypotheses and proves or disproves them instead of guessing; changes exactly one thing per fix attempt; never calls a symptom a root cause without evidence. Do NOT use when the cause is already isolated (implement the fix with tdd-engineer) or for whole-repo health assessment (full-codebase-auditor)."
+disable-model-invocation: true
 ---
 
 # Systematic Debugger
@@ -42,6 +43,12 @@ check — not "it works now."
    data volume, permissions, concurrency.
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Reproduce.** Build the smallest command/test/script that shows the
    failure on demand; record the exact invocation and failure output. For
@@ -112,6 +119,12 @@ Unknowns kept: <what was not proven, and its risk>
   stripped before the fix ships; list it and remove it.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - Reproduction or investigation would require production data access,
   destructive operations, or config changes in shared environments →

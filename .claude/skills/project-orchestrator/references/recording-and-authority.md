@@ -7,6 +7,12 @@ the schema and section mutability live in
 recording, authority-grant separation, idempotent-and-exact recording, and the
 mutable-projection refresh.
 
+**Existing authorization remains effective.** The default preview/approval forms
+below apply when recording authority is still needed. If a direct current-session
+instruction already authorizes the bounded operation, cite it and proceed within
+its scope; do not ask again or recast a recurring grant as one-use. Recording a
+human decision transcribes existing authority; it is not a second authority grant.
+
 ## 1. Risk-tiered recording (do not ceremony every answer)
 
 A file-operation ceremony after every ordinary product answer is
@@ -71,7 +77,9 @@ for an implementation-authority Approval grant, which is never batched):
 - attribution (`user` | `orchestrator-via-<skill>`);
 - the byte-for-byte full entry (no ellipsis, no omitted column) — for an APPROVAL
   entry this includes its ACTIVE status, its allowed scope, AND its **FORBIDDEN**
-  scope, each anchored to immutable evidence, never a mutable projection;
+  scope, each anchored to immutable evidence, never a mutable projection. A later
+  lifecycle entry instead records the event and target grant; prior rows remain
+  unchanged. Effective status comes from the full lifecycle, not old ACTIVE text;
 - ONE approval question for that entry;
 - exact post-write confirmation — the appended entry reproduced, or an exact
   hash + complete path + entry id.
@@ -103,19 +111,25 @@ several separate approval turns.
 
 Scope agreement, product-spec acceptance, design acceptance, and "permission to
 proceed" are **not** implementation authority. Authority to implement is a
-SEPARATE grant, recorded as its own Approval entry whose allowed scope and
-**FORBIDDEN** scope are previewed and recorded before anything runs
-(`scoped-approval-register` via the template's Approvals table).
+SEPARATE applicable explicit grant whose allowed scope and actual prohibitions
+cover the operation before it runs. A directly available current-session grant
+is valid evidence before transcription; recording it does not require another
+grant (`scoped-approval-register` via the template's Approvals table).
 
 - Ambiguous words — "yes", "continue", "proceed", "looks good", "that works" —
   apply ONLY to the exact proposal immediately awaiting approval. Approval is
   never widened by inference to an adjacent or later action.
 - Nothing that changes the world — installing a package, scaffolding, editing
   source, running a migration, a network action, a commit or push, a
-  deployment, any implementation — happens without the relevant ACTIVE
+  deployment, any implementation — happens without the relevant effectively ACTIVE
   authority grant covering it as worded. Absent that grant, halt and route
   through `human-approval-boundary` + `change-classification-gate` +
   `agent-authorization-matrix`.
+
+An old ACTIVE field is insufficient: use the approval register's full lifecycle
+procedure, including expiry and consumption, and never revive an invalidated
+predecessor. This checks existing grants; it does not demand the same approval
+again. Current direct user instructions remain usable source evidence.
 
 ## 3. Idempotent and exact recording
 
@@ -148,11 +162,17 @@ a stage is reported complete. See
 [project-state-template.md](project-state-template.md) for the section list and
 the conflict rule; nothing here changes that schema.
 
+The standard's documentation exception permits these specific section replacements,
+not an arbitrary file overwrite. Compare immutable records and unrelated sections
+before and after; they must be unchanged. Apply a current grant that already
+covers the refresh, or obtain the missing approval for the exact proposed diff.
+
 ## Stop conditions
 
 - A consequential, authority-changing, or irreversible action is in a low-risk
   batch → pull it out; it gets its own explicit approval.
 - Scope, spec, or design acceptance is being read as authority to implement →
-  it is not; require a separate, previewed, recorded implementation grant.
+  it is not; require an applicable explicit implementation grant, honoring a
+  directly available current-session instruction before documentary transcription.
 - A rejected proposal is about to be re-offered, or an already-recorded decision
   re-proposed → stop; report the recorded state and take the next valid action.

@@ -834,7 +834,9 @@ class StrictParserTests(unittest.TestCase):
         from tools.behavioral_eval_runner.graders.plan import TrustedGradingPlan
 
         schema = load_schema("scenario-a-grading-plan.schema.json")
-        self.assertEqual(set(schema["properties"]), set(TrustedGradingPlan._KEYS))
+        self.assertEqual(set(schema["properties"]), TrustedGradingPlan._KEYS | TrustedGradingPlan._OPTIONAL_KEYS)
+        self.assertEqual(set(schema["required"]), set(TrustedGradingPlan._KEYS))
+        self.assertEqual(schema["properties"]["approval_lifecycle_version"]["const"], "1.0.0")
         final_ids = schema["properties"]["expected_final_ids"]["anyOf"][1]
         self.assertFalse(final_ids["additionalProperties"])
         self.assertEqual(

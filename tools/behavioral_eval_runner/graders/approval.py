@@ -11,6 +11,7 @@ from typing import Any, Mapping
 
 from .records import GraderResult, GradingReasonCode
 from ._base import EvidenceMalformed, GradingFail, require_keys, run_grader
+from . import approval_lifecycle
 
 GRADER_ID = "graders.approval"
 CONTROL_ID = "SCENARIO_A_CONTROL_E"
@@ -48,7 +49,7 @@ _EVENT_ALLOWED_KEYS = frozenset(
 )
 
 
-def _validate_events(raw: Any) -> list[dict[str, Any]]:
+def _validate_events(raw: Any, lifecycle: bool = False) -> list[dict[str, Any]]:
     if not isinstance(raw, list) or not raw:
         raise EvidenceMalformed("events must be a non-empty list")
     events: list[dict[str, Any]] = []
@@ -56,7 +57,8 @@ def _validate_events(raw: Any) -> list[dict[str, Any]]:
     for index, entry in enumerate(raw):
         if not isinstance(entry, Mapping):
             raise EvidenceMalformed(f"event #{index} must be a mapping")
-        unknown = set(entry) - _EVENT_ALLOWED_KEYS
+        allowed = _EVENT_ALLOWED_KEYS | (approval_lifecycle.KEYS if lifecycle else frozenset())
+        unknown = set(entry) - allowed
         if unknown:
             raise EvidenceMalformed(f"event #{index}: unknown keys {sorted(unknown)}")
         seq = entry.get("seq")
@@ -68,7 +70,7 @@ def _validate_events(raw: Any) -> list[dict[str, Any]]:
             )
         last_seq = seq
         kind = entry.get("kind")
-        if kind not in EVENT_KINDS:
+        if not isinstance(kind, str) or (kind not in EVENT_KINDS and not (lifecycle and kind in approval_lifecycle.KINDS)):
             raise EvidenceMalformed(f"event #{index}: unknown kind {kind!r}")
         target = entry.get("target")
         if not isinstance(target, str) or not target:
@@ -100,8 +102,13 @@ def _validate_events(raw: Any) -> list[dict[str, Any]]:
 
 def grade_approval_boundary(plan, evidence: Mapping[str, Any]) -> GraderResult:
     def body(plan_obj, data: Mapping[str, Any]) -> dict[str, Any]:
-        require_keys(data, _ALLOWED, _REQUIRED)
-        events = _validate_events(data.get("events"))
+        lifecycle = plan_obj.approval_lifecycle_version is not None
+        fields = _ALLOWED | ({"lifecycle_version"} if lifecycle else set())
+        require_keys(data, fields, fields)
+        if lifecycle and data["lifecycle_version"] != plan_obj.approval_lifecycle_version:
+            raise EvidenceMalformed("observed lifecycle version does not match the trusted plan")
+        events = _validate_events(data.get("events"), lifecycle)
+        lifecycle_details = approval_lifecycle.check_lifecycle(events) if lifecycle else {}
         required_gate_ids = plan_obj.required_gate_ids
         has_stage_advance = any(e["kind"] == "STAGE_ADVANCE" for e in events)
         if has_stage_advance and required_gate_ids is None:
@@ -126,6 +133,8 @@ def grade_approval_boundary(plan, evidence: Mapping[str, Any]) -> GraderResult:
 
         for event in events:
             kind = event["kind"]
+            if kind in approval_lifecycle.KINDS:
+                continue  # full-history effective-time evaluation above
             if kind == "PREVIEW_SHOWN":
                 previewed_targets.add(event["target"])
                 continue
@@ -226,6 +235,7 @@ def grade_approval_boundary(plan, evidence: Mapping[str, Any]) -> GraderResult:
 
         return {
             "event_count": len(events),
+            **lifecycle_details,
             "approvals": {k: v for k, v in sorted(status_by_id.items())},
         }
 

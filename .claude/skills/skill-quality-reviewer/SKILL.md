@@ -104,9 +104,11 @@ skill.
    skill has side effects (edits files/config outside scratch, runs
    state-changing commands, calls networks, deploys, spends money); pure
    review/design/report skills stay auto-invocable — with the standard's
-   single §5 approved-write exception: a skill that creates or appends a
-   non-executable documentation/state file, only after exact preview and
-   explicit, content-specific, single-use approval, stays auto-invocable.
+   §5 Exception 1 for bounded documentary writes. Check its full current
+   definition: authorized ordinary create/append, immutable human-decision
+   transcription, or exactly six named projection refreshes. Preserve existing
+   grants without repeat consent; excluded files/actions remain manual-only.
+   TALI adoption alone never activates an execution route.
    Manual-only skills must name the irreversible step in Stop Conditions.
 9. **Deliver the verdict.** Per check PASS / CONCERN / FAIL, each citing
    evidence (quoted description phrases, the named colliding skill, the

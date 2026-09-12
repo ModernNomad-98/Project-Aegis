@@ -50,7 +50,7 @@ to your app.
      [`rls-policy-auditor`](../../.claude/skills/rls-policy-auditor/SKILL.md).**
      Yields the row-security audit with the fix delivered as a reviewable migration.
    - **Make the fix un-regressable —
-     [`multi-tenant-security-tester`](../../.claude/skills/multi-tenant-security-tester/SKILL.md).**
+     [`multi-tenant-security-tester`](../../.claude/skills/multi-tenant-security-tester/SKILL.md).** **Manual-only.**
      Yields the isolation findings turned into an executable negative test suite, so a
      future change can't silently reopen the leak.
 

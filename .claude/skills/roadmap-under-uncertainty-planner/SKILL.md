@@ -1,6 +1,6 @@
 ---
 name: roadmap-under-uncertainty-planner
-description: Plan a product roadmap when the future is genuinely uncertain — organize by horizon (now/next/later, or committed/planned/exploratory) instead of a false-precision Gantt of dated features, let confidence decay with distance, sequence by dependency AND by learning (retire the most uncertainty first), frame around outcomes/themes not a feature checklist, reconcile ambition against real capacity with slack, and communicate without over-promising. Produces a horizon-based roadmap with confidence levels, an uncertainty-reduction sequence, and a re-planning cadence. Consumes a prioritization (the ranking of WHAT) from prioritization-frame-picker; owns sequencing and communication over TIME. Use when building or resetting a roadmap, planning under shifting priorities, or when a dated roadmap keeps being wrong. Do NOT use to pick/apply a prioritization framework (prioritization-frame-picker), write one feature's spec (product-spec-writer), or plan one feature's flag rollout (feature-flag-rollout-strategist).
+description: Plan a product roadmap under uncertainty — organize by non-binding horizons (now/next/later), label confidence separately from human delivery commitments, sequence by dependency and learning, frame outcomes rather than a feature checklist, and reconcile ambition against capacity with slack. Produces a roadmap, uncertainty-reduction sequence and re-planning cadence. Consumes prioritization from prioritization-frame-picker; owns sequencing and communication over time. Use when building or resetting a roadmap, planning under shifting priorities, or when a dated roadmap keeps being wrong. Do NOT use to rank a backlog (prioritization-frame-picker), assess commitment readiness (roadmap-to-commitments-translator), write one feature spec (product-spec-writer), or plan one rollout (feature-flag-rollout-strategist).
 ---
 
 # Roadmap Under Uncertainty Planner
@@ -59,8 +59,8 @@ TIME; it consumes the ranking of WHAT to do from
    the outcomes it should produce. Each candidate becomes a hypothesized
    path to an outcome, not a guaranteed deliverable — this reframing is
    what lets the plan flex without "failing".
-2. **Choose the horizon model.** now/next/later or committed/planned/
-   exploratory. Assign granularity per horizon: near-term items are
+2. **Choose the horizon model.** Now/Next/Later are non-binding planning
+   buckets. Assign granularity per horizon: near-term items are
    specific and confident; far-term items are themes and directions, not
    dated features. State the model so readers calibrate.
 3. **Let confidence decay with distance.** Near horizon: high confidence,
@@ -81,10 +81,14 @@ TIME; it consumes the ranking of WHAT to do from
    are communicated. A roadmap without a re-plan rhythm silently becomes
    a stale promise.
 7. **Communicate without over-promising.** Label each item's confidence
-   and horizon; distinguish committed from directional from exploratory;
+   and horizon separately from any evidenced human delivery commitment;
    avoid presenting the whole thing as a dated contract. State the
    assumptions the plan rests on so a changed assumption visibly changes
    the plan.
+   Readiness assessment needs no delivery approval. `COMMIT-ABLE` is evidence
+   for a human decision, not a promise; cite an actual named human decision
+   before reporting an item as committed. Do not invent or silently cancel
+   an existing commitment when moving an item between horizons.
 8. **Deliver** the horizon roadmap in the Output Format, with confidence,
    the uncertainty-reduction sequence, and the re-plan cadence explicit.
 
@@ -97,12 +101,12 @@ feature reframing patterns:
 ```
 ROADMAP (uncertainty-aware) — <product/team>, horizon model=<now/next/later | ...>
 Outcomes:      <the outcomes this roadmap serves>
-Now (committed):    <specific items, high confidence, date-range if any>
+Now (current planning): <specific items, confidence and estimated date-range if supported>
 Next (planned):     <directional, quarter-grained, medium confidence>
 Later (exploratory):<themes/directions, low confidence, "intend to explore">
-Per item:      outcome=<...> confidence=<high|med|low> depends-on=<...>
+Per item:      outcome=<...> confidence=<high|med|low> depends-on=<...>; commitment=<none | human decision + evidence>
 Uncertainty bets: <cheap experiments/spikes front-loaded to retire the biggest unknowns>
-Capacity:      <committed vs slack vs maintenance; trade-offs if over capacity>
+Capacity:      <planned allocation vs slack vs maintenance; trade-offs if over capacity>
 Assumptions:   <what the plan rests on — changing these changes the plan>
 Re-plan:       <cadence + off-cadence triggers + how changes are communicated>
 Boundaries:    ranking → prioritization-frame-picker; one spec → product-spec-writer;
@@ -123,6 +127,8 @@ Boundaries:    ranking → prioritization-frame-picker; one spec → product-spe
       a trade-off, not compressed away.
 - [ ] A re-planning cadence and its triggers are stated.
 - [ ] The plan's load-bearing assumptions are explicit.
+- [ ] Horizons and confidence create no commitment; any reported promise has
+      its named human decision and evidence, checked separately from readiness.
 - [ ] Ranking, single-spec, and single-rollout concerns are handed to
       their owning skills.
 

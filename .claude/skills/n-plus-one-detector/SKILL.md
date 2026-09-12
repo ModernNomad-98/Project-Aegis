@@ -1,6 +1,7 @@
 ---
 name: n-plus-one-detector
-description: 'Detect and design out chatty data-access patterns — the N+1 (one query per row), repeated identical queries in one request, serial awaited calls in loops, and over-fetching. Detection is evidence-first: per-request query counts and logs, ORM instrumentation, static cues (lazy relation touched inside iteration); the fix is pattern-matched — eager/preload, batched IN-key or dataloader-style loads memoized per request scope, joins or denormalization with prices stated — plus the regression guard: query-count budgets asserted in tests so the pattern cannot return. Each individual query is usually FAST — that is why plan-reading finds nothing; the defect is the pattern. Use when a request issues suspiciously many queries, latency scales with result-set size, or lazy-load storms are suspected. Do NOT use for one slow query (query-plan-reader), unattributed slowness (profiling-methodology-designer), or caching design (caching-strategy-designer).'
+description: "MANUAL-ONLY; never auto-invoke. Detect and design out chatty data-access patterns — the N+1 (one query per row), repeated identical queries in one request, serial awaited calls in loops, and over-fetching. Detection is evidence-first: per-request query counts and logs, ORM instrumentation, static cues (lazy relation touched inside iteration); the fix is pattern-matched — eager/preload, batched IN-key or dataloader-style loads memoized per request scope, joins or denormalization with prices stated — plus the regression guard: query-count budgets asserted in tests so the pattern cannot return. Each individual query is usually FAST — that is why plan-reading finds nothing; the defect is the pattern. Use when a request issues suspiciously many queries, latency scales with result-set size, or lazy-load storms are suspected. Do NOT use for one slow query (query-plan-reader), unattributed slowness (profiling-methodology-designer), or caching design (caching-strategy-designer)."
+disable-model-invocation: true
 ---
 
 # N-Plus-One Detector
@@ -71,6 +72,12 @@ skill's signature symptom.
    tables are, and whether denormalized read fields are maintainable.
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Confirm the pattern with counts, not vibes.** For the symptomatic
    operation, produce the evidence table: distinct statement shapes ×
@@ -198,6 +205,12 @@ Residual: <paths with the same pattern not yet fixed — listed, not implied don
   sizes) rides along with the pattern fix.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - Asked to fix by caching ("just cache the page/result") → refuse the
   reflex: the pattern gets fixed first; caching a chatty pattern hides

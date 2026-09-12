@@ -1,6 +1,7 @@
 ---
 name: query-plan-reader
-description: 'Read ONE query''s execution plan and turn it into a ranked tuning verdict — capture the plan with actual runtime statistics where safe (EXPLAIN-style, tool-agnostic), interpret operators (scans vs index access, join strategy, sort/spill, row-estimate vs actual divergence as the diagnostic core), name the dominant cost node, and rank fixes by evidence: statistics refresh, query rewrite, index add/change (write-amplification and storage price stated), or schema adjustment — each with a re-verification method at representative data volume. Multi-tenant note: tenant-scoping predicates and row-security policies appear IN the plan and are part of the cost being read. Use when one query is slow, when asked to interpret EXPLAIN output, or when an index decision needs evidence. Do NOT use for many-small-queries chatter (n-plus-one-detector), unattributed slowness (profiling-methodology-designer), or moving whole workloads (operational-vs-analytical-splitter).'
+description: "MANUAL-ONLY; never auto-invoke. Read ONE query's execution plan and turn it into a ranked tuning verdict — capture the plan with actual runtime statistics where safe (EXPLAIN-style, tool-agnostic), interpret operators (scans vs index access, join strategy, sort/spill, row-estimate vs actual divergence as the diagnostic core), name the dominant cost node, and rank fixes by evidence: statistics refresh, query rewrite, index add/change (write-amplification and storage price stated), or schema adjustment — each with a re-verification method at representative data volume. Multi-tenant note: tenant-scoping predicates and row-security policies appear IN the plan and are part of the cost being read. Use when one query is slow, when asked to interpret EXPLAIN output, or when an index decision needs evidence. Do NOT use for many-small-queries chatter (n-plus-one-detector), unattributed slowness (profiling-methodology-designer), or moving whole workloads (operational-vs-analytical-splitter)."
+disable-model-invocation: true
 ---
 
 # Query Plan Reader
@@ -69,6 +70,12 @@ tool in the performance pack — one query, its plan, its verdict.
    earns less optimization than a per-request path).
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Capture the plan honestly.** Prefer actual-execution statistics
    over estimates for reads; for INSERT/UPDATE/DELETE, analyze-style
@@ -188,6 +195,12 @@ Not addressed: <what this verdict deliberately leaves alone>
   4,000 of an offset paginator; that is a keyset-rewrite verdict.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - Asked to capture analyze-style plans for mutating statements against
   production, or the capture itself would add dangerous load → stop

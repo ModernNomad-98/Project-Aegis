@@ -7,7 +7,7 @@ Detail for `roadmap-under-uncertainty-planner`. Read on demand.
 | Model | Horizons | Grain per horizon |
 |---|---|---|
 | Now / Next / Later | 3 buckets | Now = specific; Next = directional; Later = themes |
-| Committed / Planned / Exploratory | by confidence | Committed = dated-range; Planned = quarter; Exploratory = intent |
+| Near / Middle / Far | planning distance | Near = specific estimates; Middle = directional; Far = exploratory |
 | Time-boxed (this Q / next Q / H2+) | calendar | nearer = finer grain |
 
 Pick one and state it so readers calibrate. Do NOT mix a dated bar chart
@@ -17,12 +17,18 @@ with "subject to change" — the chart wins the reader's belief.
 
 | Confidence | Precision allowed | Language |
 |---|---|---|
-| High (now) | date range OK | "shipping", "committed" |
+| High (now) | supported estimated range | "currently planned", "estimated" |
 | Medium (next) | quarter | "planned", "expected" |
 | Low (later) | none — theme only | "exploring", "intend to" |
 
 The failure mode is high precision + low confidence (an exact date on a
 far-out idea). Match grain to certainty.
+
+Confidence and horizon do not grant delivery authority. A named human must make
+an evidenced commitment decision before wording an item as committed. Readiness
+can be assessed without that decision; COMMIT-ABLE remains non-binding. Show
+existing human commitments as a separate field with evidence, and surface any
+conflict with changed estimates rather than silently rewriting the promise.
 
 ## Uncertainty-bet patterns (sequence to learn)
 

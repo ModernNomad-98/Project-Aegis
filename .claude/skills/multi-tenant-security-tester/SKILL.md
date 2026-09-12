@@ -1,6 +1,7 @@
 ---
 name: multi-tenant-security-tester
-description: Design and specify an executable negative-test suite that PROVES tenant isolation and object-level authorization hold — cross-tenant reads/writes, IDOR by-id enumeration, privilege escalation, wrong-role and wrong-tenant access, and service-role/background-job bypasses — with a per-surface test matrix, seeded two-tenant fixtures, and pass = the forbidden action is denied. Use when asked to write or plan tenant-isolation / authorization security tests, to turn isolation-review or threat-model findings into regression tests, or to add a cross-tenant negative suite before a security-sensitive launch. Do NOT use to FIND leaks by inspection (tenant-isolation-reviewer), define tenant semantics (tenant-modeler), audit RLS policy text (rls-policy-auditor), or review a diff (security-pr-reviewer).
+description: "MANUAL-ONLY; never auto-invoke. Design and specify an executable negative-test suite that PROVES tenant isolation and object-level authorization hold — cross-tenant reads/writes, IDOR by-id enumeration, privilege escalation, wrong-role and wrong-tenant access, and service-role/background-job bypasses — with a per-surface test matrix, seeded two-tenant fixtures, and pass = the forbidden action is denied. Use when asked to write or plan tenant-isolation / authorization security tests, to turn isolation-review or threat-model findings into regression tests, or to add a cross-tenant negative suite before a security-sensitive launch. Do NOT use to FIND leaks by inspection (tenant-isolation-reviewer), define tenant semantics (tenant-modeler), audit RLS policy text (rls-policy-auditor), or review a diff (security-pr-reviewer)."
+disable-model-invocation: true
 ---
 
 # Multi-Tenant Security Tester
@@ -50,6 +51,12 @@ happy path proves nothing about isolation and is treated as absent.
    impersonate the wrong tenant/role authentically (not by faking internals).
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Confirm a defined boundary and a real target.** Pin the tenant
    definition and the enforcement point. Undefined or no runnable system →
@@ -146,6 +153,12 @@ Handoffs: <rls-policy-auditor for DB-layer negative plan; appsec-implementer for
   assert it uniformly.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - Tenant semantics or the isolation boundary are undefined → stop; route to
   `tenant-modeler`.

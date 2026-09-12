@@ -1,6 +1,7 @@
 ---
 name: tdd-engineer
-description: Implement behavior test-first with a strict red-green-refactor loop — write the failing test, run it, CONFIRM it fails for the intended reason (not a typo, import error, or wrong assertion), implement the minimal change to pass, and refactor only once green. Reports the exact commands run and their real output at every step. Use when the user asks for TDD or "tests first", when adding new behavior with a clear testable contract, when fixing a bug that should get a regression test proving the fix, or when changing code whose behavior must provably not regress. Do NOT use for exploratory spikes with no settled contract, or for pure test-suite cleanup with no behavior change.
+description: "MANUAL-ONLY; never auto-invoke. Implement behavior test-first with a strict red-green-refactor loop — write the failing test, run it, CONFIRM it fails for the intended reason (not a typo, import error, or wrong assertion), implement the minimal change to pass, and refactor only once green. Reports the exact commands run and their real output at every step. Use when the user asks for TDD or \"tests first\", when adding new behavior with a clear testable contract, when fixing a bug that should get a regression test proving the fix, or when changing code whose behavior must provably not regress. Do NOT use for exploratory spikes with no settled contract, or for pure test-suite cleanup with no behavior change."
+disable-model-invocation: true
 ---
 
 # TDD Engineer
@@ -42,6 +43,12 @@ transcript of the exact commands showing both states.
 4. CI configuration — what will run this test later must run it the same way.
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **State the contract** as concrete cases: happy path, edges, error
    behavior. Each case becomes a test; pick the smallest that forces the
@@ -110,6 +117,12 @@ Coverage of contract: <cases covered / deferred (with reason)>
   pattern, skipped marker); confirm the count of executed tests moved.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - The contract cannot be stated as concrete cases even after asking → stop;
   the task is a spike or a modeling question, not TDD.

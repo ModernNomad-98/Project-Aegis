@@ -14,7 +14,7 @@
           "Hard rules name required inputs — migration review verdict, rollback artifact, approval citation — without which a run does not start.",
           "Encodes backup-then-verify BEFORE the change and expected-delta verification AFTER (absence-of-error is not success), plus stop conditions each with a safe halt state.",
           "Builds the deployment-history index from the prior run notes and anchors every ETA range to cited index rows.",
-          "Delivers template + index as repo docs; never executes anything."
+          "Delivers template + index as conversation drafts with proposed repository paths; never executes anything."
         ]
       }
     },
@@ -63,6 +63,19 @@
         "triggers": false,
         "assertions": [
           "A live incident needs the reactive playbook — incident-response-runbook; the deployment prompt template is proactive discipline for planned runs."
+        ]
+      }
+    },
+    {
+      "id": "draft-boundary-does-not-write-existing-policy-or-records",
+      "type": "should_trigger",
+      "prompt": "Use gated-deployment-prompt-template to prepare the proposed document changes for review; show the draft and proposed paths.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a complete conversation draft and proposed target paths, without claiming any file was changed.",
+          "Does not edit prior records, policy, executable authorization, or agent behavior files under the ordinary documentary exception.",
+          "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
         ]
       }
     }

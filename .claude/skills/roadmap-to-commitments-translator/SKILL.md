@@ -91,8 +91,8 @@ mode, because the lifecycle uses this skill in two different places:
   set and honest date RANGES once that bar is met.
 
 1. **Separate commit-able from aspirational.** Only items that are
-   high-confidence, capacity-backed, AND dependency-clear become
-   commitments. Everything else stays directional. This split is the whole
+   high-confidence, capacity-backed, AND dependency-clear become candidates for
+   an evidenced human commitment decision. Everything else stays directional. This split is the whole
    job; blurring it is how roadmaps become broken promises.
 2. **Ground in real capacity.** Base commitments on velocity EVIDENCE, not
    the aspirational sprint. Subtract maintenance, support, and interrupt
