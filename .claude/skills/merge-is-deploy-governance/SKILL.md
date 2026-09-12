@@ -68,6 +68,13 @@ verified deploy is an ACCEPTED, stated risk instead of an unnoticed one.
 
 ## Workflow
 
+This automatic phase produces an in-conversation governance draft only. Writing
+that policy to the repository, changing enforcement configuration, or executing
+Git/network operations belongs to a separately authorized manual route. The
+ordinary-document exception does not cover those policy changes. Report exact
+proposed destinations/content and distinguish proposals from completed writes;
+honor applicable existing user grants without asking for the same grant again.
+
 1. **Verify and document the reality.** State, with the platform evidence:
    merging to `<branch>` deploys `<what>` to `<environment>` with no human
    step between. List what does NOT auto-deploy (e.g. migrations that an
@@ -84,7 +91,7 @@ verified deploy is an ACCEPTED, stated risk instead of an unnoticed one.
    left to gate). A post-merge failure is an INCIDENT-CLASS signal that
    triggers rollback/fix-forward — not a "gate failure" that implies the
    merge could have been stopped.
-4. **Record the branch-protection configuration in-repo** (format:
+4. **Draft the branch-protection configuration record and its proposed repository path** (format:
    [references/governance-doc-template.md](references/governance-doc-template.md)):
    protected branch, required checks by name, strictness
    (up-to-date-before-merge and why), review requirements, who may merge —
@@ -104,7 +111,7 @@ verified deploy is an ACCEPTED, stated risk instead of an unnoticed one.
    (using it on a squash commit fails). Note what revert does NOT undo
    (applied migrations, external side effects) and route the full runbook
    to `rollback-runbook-author`.
-7. **Deliver the governance doc + gap list:** the doc into the repo (dated),
+7. **Deliver the governance draft + gap list:** dated draft and proposed repo path,
    gaps (insufficient required checks, missing verification signals,
    unowned protection) as routed follow-ups.
 
@@ -135,7 +142,7 @@ Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/h
       ignored.
 - [ ] Post-merge checks explicitly reclassified as verification with the
       incident-on-failure consequence stated.
-- [ ] Branch protection recorded in-repo with source labeled, drift-check
+- [ ] Branch-protection draft has source and proposed path labeled, drift-check
       cadence set, and the human-only change rule (never agents) explicit.
 - [ ] Exposure window stated with duration, blast radius, and a named
       accepter — no silent risk.

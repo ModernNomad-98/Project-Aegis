@@ -1,0 +1,5 @@
+Checking DCO sign-off over origin/main..HEAD ...
+
+  SIGNED  61f2a4648dea  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(skills): preserve approval lifecycle and explicit invocation contracts
+
+OK: 1 commit(s) checked, all signed off or exempt.

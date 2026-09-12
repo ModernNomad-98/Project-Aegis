@@ -94,6 +94,7 @@ class TrustedGradingPlan:
     expected_final_ids: Mapping[str, Any] | None = None
     expected_workspace_role: str | None = None
     expected_stage_zero: bool | None = None
+    approval_lifecycle_version: str | None = None
     plan_version: str = PLAN_SCHEMA_VERSION
     schema_version: str = PLAN_SCHEMA_VERSION
 
@@ -121,7 +122,7 @@ class TrustedGradingPlan:
 
     # ---------------------------------------------------------------- content
     def _content_dict(self) -> dict[str, Any]:
-        return {
+        content = {
             "plan_id": self.plan_id,
             "plan_version": self.plan_version,
             "case_uid": self.case_uid,
@@ -151,6 +152,11 @@ class TrustedGradingPlan:
             "expected_stage_zero": self.expected_stage_zero,
             "schema_version": self.schema_version,
         }
+        # Omission preserves legacy plan hashes. A present version is mandatory
+        # trusted context, never an observed-evidence opt-in or downgrade switch.
+        if self.approval_lifecycle_version is not None:
+            content["approval_lifecycle_version"] = self.approval_lifecycle_version
+        return content
 
     def validate(self) -> None:
         _require(
@@ -292,6 +298,11 @@ class TrustedGradingPlan:
             f"plan/schema version must be {PLAN_SCHEMA_VERSION}",
         )
         expected_hash = sha256_of_obj(self._content_dict())
+        if self.approval_lifecycle_version is not None:
+            _require(self.approval_lifecycle_version == "1.0.0",
+                     "unsupported approval_lifecycle_version")
+            _require("oracle.approval.boundary" in self.required_oracle_ids,
+                     "approval lifecycle requires the approval oracle")
         _require(
             self.plan_sha256 == expected_hash,
             "plan_sha256 does not match the plan content (tampered or "
@@ -329,8 +340,11 @@ class TrustedGradingPlan:
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "TrustedGradingPlan":
-        unknown = set(payload) - cls._KEYS
+        unknown = set(payload) - cls._KEYS - cls._OPTIONAL_KEYS
         _require(not unknown, f"TrustedGradingPlan: unknown keys {sorted(unknown)}")
+        if "approval_lifecycle_version" in payload:
+            _require(payload["approval_lifecycle_version"] == "1.0.0",
+                     "approval_lifecycle_version must be 1.0.0 when present")
         missing = cls._KEYS - set(payload)
         _require(not missing, f"TrustedGradingPlan: missing keys {sorted(missing)}")
         for list_key in ("required_oracle_ids", "trusted_source_refs"):
@@ -365,11 +379,14 @@ class TrustedGradingPlan:
             expected_final_ids=payload["expected_final_ids"],
             expected_workspace_role=payload["expected_workspace_role"],
             expected_stage_zero=payload["expected_stage_zero"],
+            approval_lifecycle_version=payload.get("approval_lifecycle_version"),
             schema_version=payload["schema_version"],
             plan_sha256=payload["plan_sha256"],
         )
         plan.validate()
         return plan
+
+    _OPTIONAL_KEYS = frozenset({"approval_lifecycle_version"})
 
 
 def make_plan(
@@ -388,6 +405,7 @@ def make_plan(
     expected_final_ids: Mapping[str, Any] | None = None,
     expected_workspace_role: str | None = None,
     expected_stage_zero: bool | None = None,
+    approval_lifecycle_version: str | None = None,
 ) -> TrustedGradingPlan:
     """Build, hash-bind, and validate a trusted grading plan."""
     contract = load_contract()
@@ -421,6 +439,7 @@ def make_plan(
         expected_final_ids=expected_final_ids,
         expected_workspace_role=expected_workspace_role,
         expected_stage_zero=expected_stage_zero,
+        approval_lifecycle_version=approval_lifecycle_version,
         plan_sha256="0" * 64,
     )
     bound = TrustedGradingPlan(
@@ -432,6 +451,7 @@ def make_plan(
                 "required_start_state", "loop_threshold", "required_gate_ids",
                 "semantic_gates", "expected_final_ids",
                 "expected_workspace_role", "expected_stage_zero",
+                "approval_lifecycle_version",
                 "schema_version",
             )},
             "plan_sha256": sha256_of_obj(provisional._content_dict()),

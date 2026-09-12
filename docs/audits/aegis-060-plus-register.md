@@ -14,6 +14,13 @@ the rejected candidate.
 The [merged disposition](https://github.com/ModernNomad-98/Project-Aegis/blob/000352f55b71f0c3e897a482d279d34bfaa3d66b/docs/audits/aegis-060-plus-register.md)
 is authoritative.
 
+**Shared-contract implementation checkpoint, 2026-09-12:** the fresh audit and
+[complete candidate dispositions](../evidence/shared-contracts-closeout-2026-09-12/README.md)
+record 19 confirmed repairs, 79 false positives and three adjacent write-boundary
+repairs. This current checkpoint supersedes backlog assumptions about those
+specific contracts; the frozen historical evidence and retired AEGIS-060 ID below
+remain intact. It does not close unrelated AEGIS items or measured calibration.
+
 ## Historical baseline (superseded where the current disposition says so)
 
 Companion to the frozen AEGIS-001..059 baseline

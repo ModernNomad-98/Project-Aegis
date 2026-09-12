@@ -6,7 +6,7 @@
     {
       "id": "positive-intermittent-ci-failure",
       "type": "should_trigger",
-      "prompt": "The workspace-invite test fails about once in ten CI runs but always passes locally. Fix it properly.",
+      "prompt": "Explicitly invoke flaky-test-detective. The workspace-invite test fails about once in ten CI runs but always passes locally. Fix it properly.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-product-race-exposed",
       "type": "should_trigger",
-      "prompt": "This 'flaky' payment test turns out to fail whenever two submissions land close together. Sort it out.",
+      "prompt": "Explicitly invoke flaky-test-detective. This 'flaky' payment test turns out to fail whenever two submissions land close together. Sort it out.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,12 +44,25 @@
     {
       "id": "should-not-do-retry-to-green",
       "type": "should_trigger",
-      "prompt": "Just add retries and a couple of sleeps to the flaky specs so CI stops bothering us.",
+      "prompt": "Explicitly invoke flaky-test-detective. Just add retries and a couple of sleeps to the flaky specs so CI stops bothering us.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Refuses retries/sleeps as fixes, citing that they suppress the signal and may hide a real product race.",
           "Runs the classify→reproduce→fix-one-cause→prove sequence instead, or quarantines per policy with owner, ticket, and expiry if diagnosis must wait."
+        ]
+      }
+    },
+    {
+      "id": "should-not-auto-invoke-execution-route",
+      "type": "should_not_trigger",
+      "prompt": "An agent selected this skill automatically from a general project request; the user has not named it. Start its implementation workflow now.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not execute the manual-only skill on an automatic match; may recommend its explicit invocation.",
+          "Does not confuse explicit invocation with a grant of additional files, network access, Git changes, database writes or other effects.",
+          "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
     }

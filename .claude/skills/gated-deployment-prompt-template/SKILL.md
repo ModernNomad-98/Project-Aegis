@@ -66,6 +66,13 @@ every future execution start from discipline instead of recall.
 
 ## Workflow
 
+This automatic phase produces an in-conversation draft only. The resulting
+operator prompt steers behavior, so writing it or its index into the repository
+is excluded from the ordinary-document exception. Propose exact destinations
+and content for the separately authorized manual authoring route; no file write
+or deployment occurs in this phase. Existing user grants remain effective
+within their actual scope and do not need repeated consent.
+
 1. **Fix the operation class and its unit** (one migration apply, one
    grant, one backfill run) — one template per class; a template for
    "deployments in general" gates nothing.
@@ -102,8 +109,8 @@ every future execution start from discipline instead of recall.
    ETA with no citable prior run is labeled
    `unverified — recommend confirming`, and the standing rule goes in the
    template: ANY uncited operational claim carries that label.
-9. **Deliver template + index** into the repo docs; posture note: this
-   skill authors them — executing a run happens under the template's own
+9. **Deliver template + index drafts** in the conversation with proposed repo
+   paths; persistence uses the separate manual route. Executing a run uses the template's own
    gates with a human operator, and any agent involvement in execution
    respects `agent-authorization-matrix` floors.
 

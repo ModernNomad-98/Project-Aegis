@@ -1,101 +1,136 @@
-# Approval Register — Format, Lifecycle, Placement
+# Approval Register — Immutable Records and Effective Authority
 
-Companion to `scoped-approval-register`. Everything here is product-agnostic;
-identifiers are placeholders (`<owner>/<repo>`, `<tenant-id>`) per house rule.
+A grant records what a human authorized; later events record its lifecycle.
+Neither record creates authority by itself.
 
-## Entry template
-
-```markdown
-### APR-<NNN>: <short imperative title>
-
-- **Status:** ACTIVE
-- **Date / Grantor:** <YYYY-MM-DD> / <named human or role, e.g. "repo owner">
-- **Reason:** <the need this authorization answers — one or two sentences>
-- **Scope allowed:** <exact actions, files/paths, branches, environments,
-  tenants covered — in or quoting the grantor's wording>
-- **Scope FORBIDDEN:** <explicit adjacent actions this grant does NOT cover>
-- **Evidence:** <link to the grant: PR comment URL, issue reply, dated chat
-  record committed to the repo, commit SHA>
-- **Expiry:** <YYYY-MM-DD | "one-time" | "until <condition>" | "until superseded">
-```
-
-## Field semantics
-
-| Field | Rule |
-| --- | --- |
-| Status | One of `ACTIVE`, `SUPERSEDED by APR-<NNN>`, `EXPIRED <date>`, `REVOKED <date, by whom>`. The only field ever edited in place — and only to flip state. |
-| Date / Grantor | A NAMED human or role. "The team" cannot be cited; a person or accountable role can. |
-| Reason | Why the authorization exists. Lets a future reader judge whether the reason still holds before leaning on the entry. |
-| Scope allowed | The grantor's wording governs. If the wording and the recorded scope differ, the wording wins and the entry is defective. |
-| Scope FORBIDDEN | Mandatory and non-empty. Name the adjacent actions a future agent would plausibly stretch this grant to cover (the next environment up, the neighboring table, the protected branch). |
-| Evidence | A retrievable pointer. An entry without evidence records a claim, not a grant. |
-| Expiry | One-time grants die on use — flip to `EXPIRED` when consumed. Phase-scoped grants name the phase. Durable grants say `until superseded`. |
-
-## Lifecycle rules
-
-1. **Append-only history.** New authorization = new entry. Never rewrite an
-   old entry's scope; never delete an entry. The register's value under audit
-   is that its history is trustworthy.
-2. **Supersede, don't edit.** Widening/narrowing scope: write APR-042, flip
-   APR-017 to `SUPERSEDED by APR-042`. Both remain readable.
-3. **Revocation is a state, not a deletion.** `REVOKED 2026-07-07, by <role>`
-   preserves both the grant and its withdrawal.
-4. **Consumed one-time grants are flipped promptly** — an ACTIVE one-time
-   entry that already fired is a phantom authorization.
-5. **Expiry sweep:** whenever the register is touched, flip any entry whose
-   expiry has passed. Stale-ACTIVE is the register lying.
-
-## Citation rule (state at the top of every register)
-
-> An action is authorized by this register only if an **ACTIVE** entry's
-> **Scope allowed** covers it as worded. Absence from any FORBIDDEN list is
-> not permission — deny-by-default holds. FORBIDDEN beats allowed on
-> conflict, within and across entries.
-
-## Placement options
-
-| Option | When |
-| --- | --- |
-| Dedicated `docs/approvals/APPROVAL_REGISTER.md` | Default. One file, append-style, easy to link. |
-| Exceptions section inside the repo's context map | House pattern observed in a production multi-agent repo (Repo A): ~60 "narrow exception" blocks with exactly these fields, co-located with the context the exceptions modify. Valid when a context map is already the governance hub — pairs with `context-co-update-ci-gate`. |
-| Per-phase blocks inside stage/phase docs | Acceptable for phase-scoped grants; add a pointer line to the central register so citation stays one-hop. |
-
-Never two authoritative registers. If both a dedicated file and a context-map
-section exist, one must declare itself a pointer to the other.
-
-## Worked example
+## Immutable grant template
 
 ```markdown
-### APR-013: Backfill script may run against the staging tenant
+### APR-013: Staging backfill
 
-- **Status:** ACTIVE
-- **Date / Grantor:** 2026-07-07 / repo owner
-- **Reason:** Orders backfill (issue #88) needs one supervised run before the
-  migration PR can be validated end-to-end.
-- **Scope allowed:** Run `scripts/backfill-orders.ts` in validate-only AND
-  apply mode against tenant `<staging-tenant-id>` on the staging environment,
-  during the issue-#88 work only.
-- **Scope FORBIDDEN:** Any production tenant or environment; any other
-  script; schema changes; re-running after issue #88 closes without a new
-  grant.
-- **Evidence:** PR #91 review comment (link) — "approved for staging tenant
-  only, one issue's duration".
-- **Expiry:** until issue #88 closes.
+- **Event:** GRANT
+- **Status at recording:** ACTIVE
+- **Date / Grantor:** <ISO timestamp> / <named human or accountable role>
+- **Reason:** <why this authorization was given>
+- **Scope allowed:** <verbatim grant plus the exact proposal it answered>
+- **Scope FORBIDDEN:** <actual prohibitions and allowed-scope boundaries;
+  "none additionally stated" when appropriate>
+- **Evidence:** <human source and retrievable pointer or dated verbatim record>
+- **Expiry / use limit:** <actual date, condition or use count; none stated if absent>
 ```
+
+The entry ID and every recorded byte are immutable. Legacy `Status: ACTIVE`
+grant entries are read as their initial state, never as a live status cache.
+A grant limited to one use remains limited even before consumption is transcribed.
+An instruction to repeat an authorized repair loop must not be reduced to one use.
+
+## Lifecycle event template
+
+```markdown
+### APR-014: Staging backfill consumed
+
+- **Event:** CONSUMED
+- **Target grant:** APR-013
+- **Successor grant:** none
+- **Effective at:** <ISO timestamp or unambiguous ordered condition>
+- **Recorded at / By:** <ISO timestamp> / <recorder identity>
+- **Reason / Evidence:** <actual action or human decision, with source>
+- **New authority:** none
+```
+
+Event kinds are `REVOKED`, `EXPIRED`, `CONSUMED`, and `SUPERSEDED`.
+`SUPERSEDED` names an earlier target grant and a distinct, already-recorded
+successor GRANT with actual human evidence that explicitly replaces the
+predecessor; overlap alone is not supersession. Revocation requires the human
+withdrawal; expiry and consumption record facts under the original grant's terms.
+Recording a fact later does not backdate the record or fabricate earlier approval.
+Record the effective time separately from the transcription time.
+
+The same form fits a project's Approvals table: use its next unique approval ID
+for each event, name the event and target in the immutable row, and keep its
+scope/evidence fields explicit. Do not add a mutable status column or change old
+rows. Lifecycle rows belong to the APPROVAL entry type, not a new state type.
+
+## Effective-status procedure
+
+1. Validate unique record IDs, event kinds, target references and human source
+   evidence. Preserve append/transcription order; effective times may precede
+   transcription and need not increase with row order. Establish applicability
+   by evidenced effective time, including late-recorded facts. An event targets an existing
+   GRANT; a successor must be a distinct GRANT. Missing targets, duplicate IDs,
+   self-links, cycles or contradictory events make affected authority unresolved;
+   do not use those records to authorize action. Preserve and identify defective
+   occurrences by location/hash in a non-authorizing annotation. An annotation
+   does not repair or validate malformed history. Further authority requires a
+   separately evidenced human grant with a fresh unambiguous ID; never edit old bytes.
+2. Replay applicable events for the target through the proposed action time.
+   A grant begins ACTIVE only if supported by the actual human decision. Apply
+   revocation, supersession, expiry and exhaustion of its use limit. Evaluate the
+   expiry/condition even if no EXPIRED event has been appended. If whether a use
+   occurred is unknown, do not retry by assuming a one-use grant is unused.
+3. Invalidation is terminal for that grant. A later literal ACTIVE row or
+   removal/revocation/expiry of a successor cannot reactivate a predecessor.
+   Reauthorization requires a NEW grant ID and a new human decision. Repeated
+   reports of the same invalidating fact do not restore authority.
+4. Only effectively ACTIVE grants can cover an action. Match actual allowed
+   scope, environment, target, limits and applicable prohibitions. Inactive old
+   FORBIDDEN clauses do not veto an explicitly authorized replacement forever.
+   Where active human instructions conflict, use their actual precedence and
+   explicit supersession; if still unresolved, ask about that conflict only.
+5. Cite the grant, lifecycle records and time/use facts used for the decision.
+   A current direct instruction is also valid source evidence; a lagging register
+   is a recording gap, not grounds to demand the same grant again. Preserve its
+   scope exactly when transcribing it.
+
+An append-only register documents history; it is not a concurrency lock or a
+tamper-proof authorization service. Concurrent consumption and permission
+enforcement belong to the executing system. This document does not prove those
+operational guarantees. Keep a granted recurring scope active until its actual
+conditions end; routine use does not consume it as though it were one-time.
+
+## Citation rule
+
+> Register-derived authorization requires an effectively ACTIVE, evidenced human
+> grant covering the action as worded, after full lifecycle and limit checks.
+> Absence of a prohibition is not permission. Historical ACTIVE text is
+> insufficient. Recording preserves existing human authority; it never creates,
+> enlarges or silently narrows it, and does not require repeat consent for a
+> current instruction already covering the action.
+
+## Persistence and placement
+
+Prefer one authoritative `docs/approvals/APPROVAL_REGISTER.md` or the product
+repo's existing Approvals table. Other files link to it rather than creating
+competing registers. This is a non-executable documentary record; it must not
+double as permission configuration, policy code or agent instructions.
+
+Draft in the conversation first. Show the exact path and appended content and
+check whether current authorization covers recording it. Use that authorization
+without asking again; if absent, obtain approval before writing. Keep prior bytes
+unchanged. Authority comes from the human decision, not the act of writing.
+
+Report storage precisely: draft = transcript-only; verified file write =
+workspace-persisted. Claim Git-tracked, locally committed or remote-persisted only
+after separately verifying each state. A local file is not a backup on GitHub.
+Recording does not authorize a commit or push outside the user's applicable grant.
+
+## Worked lifecycle
+
+- APR-010 grants recurring staging validation until superseded, with human evidence.
+- APR-011 records a newly granted staging-and-demo scope. APR-012 explicitly
+  supersedes APR-010 with APR-011; APR-010's historical ACTIVE field is unchanged.
+- APR-013 records revocation of APR-011. Neither grant now authorizes execution;
+  APR-010 does not revive because its successor was revoked.
+- APR-014 records a separate, human-approved one-time backfill. APR-015 records
+  consumption. Another run cannot cite APR-014 even though its initial field
+  still reads ACTIVE. It requires a new human grant.
 
 ## Anti-patterns
 
-- **The optimistic paraphrase** — "sure" recorded as approval of the whole
-  plan. Record what the "sure" answered.
-- **The empty FORBIDDEN field** — an entry that closes no doors decides
-  nothing; disputes always arrive at the adjacent action.
-- **The evidence-free entry** — "approved verbally" with no committed record.
-  If the grant only exists in ephemeral chat, commit the dated quote first
-  (`chat-backlog-reconciliation` is the cadenced version of this move).
-- **The self-service widening** — an agent extending its own entry's scope
-  because the new action is "basically the same". Widening is a new grant.
-- **Registering policy instead of grants** — standing authority rules (what
-  agents may EVER do) belong to `agent-authorization-matrix`; a designed
-  standing-approval loop belongs to `standing-approval-and-auto-advance`.
-  The register records that a specific grant happened, including — as one
-  entry — the human's adoption of such a policy.
+- Editing an old Status field, including a harmless-looking expiry update.
+- Treating an old ACTIVE field as sufficient after a later revocation.
+- Letting a new projection or revoked successor resurrect an old grant.
+- Inventing prohibitions, expiry or use limits during transcription.
+- Calling a local write remote-persisted without checking its published commit.
+- Backdating a grant to excuse an earlier action or treating a machine record as
+  independent evidence that a human gave approval.

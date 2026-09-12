@@ -1,0 +1,66 @@
+{
+  "baseRefOid": "f5e04ad07a5fd2b34b7470bffd38a50c15ce691a",
+  "comments": [
+    {
+      "id": "IC_kwDOTPe6NM8AAAABUF1kew",
+      "author": {
+        "login": "chatgpt-codex-connector"
+      },
+      "authorAssociation": "NONE",
+      "body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-09-12T03:59:49.428791Z\">2026-09-12T03:59:49.428791Z</relative-time> | `e9b8ec0` | PR opened |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+      "createdAt": "2026-09-12T03:48:48Z",
+      "includesCreatedEdit": true,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/pull/90#issuecomment-5643265147",
+      "viewerDidAuthor": false
+    }
+  ],
+  "headRefOid": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+  "mergeStateStatus": "BLOCKED",
+  "mergeable": "MERGEABLE",
+  "number": 90,
+  "reviewDecision": "REVIEW_REQUIRED",
+  "reviews": [
+    {
+      "id": "PRR_kwDOTPe6NM8AAAABNQ6m4w",
+      "author": {
+        "login": "chatgpt-codex-connector"
+      },
+      "authorAssociation": "NONE",
+      "body": "\n### \ud83d\udca1 Codex Review\n\nHere are some automated review suggestions for this pull request.\n\n**Reviewed commit:** `e9b8ec03c6`\n    \n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+      "submittedAt": "2026-09-12T03:59:46Z",
+      "includesCreatedEdit": false,
+      "reactionGroups": [],
+      "state": "COMMENTED",
+      "commit": {
+        "oid": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c"
+      }
+    }
+  ],
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-12T03:48:50Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34671364281/job/103493197637",
+      "name": "validate-skills",
+      "startedAt": "2026-09-12T03:48:39Z",
+      "status": "COMPLETED",
+      "workflowName": "validate-skills"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-12T03:48:46Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34671364281/job/103493197607",
+      "name": "gate-guard",
+      "startedAt": "2026-09-12T03:48:39Z",
+      "status": "COMPLETED",
+      "workflowName": "validate-skills"
+    }
+  ],
+  "url": "https://github.com/ModernNomad-98/Project-Aegis/pull/90"
+}

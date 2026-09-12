@@ -1,0 +1,136 @@
+=== Test-ScenarioAEvidence (5.1.26100.8875, edition Desktop) ===
+PowerShell host exe selected: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
+
+Part 1 - append-only comparator
+  [PASS] valid append (00 -> 01) succeeds
+  [PASS] low-risk batch append (01 -> 02) succeeds
+  [PASS] projection-only refresh succeeds
+  [PASS] placeholder deletion FAILS append-only
+  [PASS] immutable row edit FAILS
+  [PASS] evidence row deletion FAILS
+  [PASS] a wrapped deviation folds into ONE row including its continuation bytes
+  [PASS] appending a NEW deviation after a wrapped one succeeds
+  [PASS] editing a past deviation's CONTINUATION line FAILS append-only
+  [PASS] deleting a past deviation's continuation line FAILS append-only
+  [PASS] refresh of 'Current product summary' passes
+  [PASS] refresh of 'Current approved scope' passes
+  [PASS] refresh of 'Current users/roles' passes
+  [PASS] refresh of 'Current success definition' passes
+  [PASS] refresh of 'Open questions' passes
+  [PASS] refresh of 'Next recommended action' passes
+  [PASS] appended lifecycle event preserves the original grant
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] protected grant, preamble, table header or duplicate section change fails
+  [PASS] similar projection name stays protected
+  [PASS] duplicated, renamed or removed projection fails
+  [PASS] duplicated, renamed or removed projection fails
+  [PASS] duplicated, renamed or removed projection fails
+  [PASS] a fenced heading cannot confer projection permission
+  [PASS] indented/tab-separated unknown heading stays protected
+  [PASS] indented/tab-separated unknown heading stays protected
+  [PASS] indented/tab-separated unknown heading stays protected
+  [PASS] indented/tab-separated unknown heading stays protected
+  [PASS] indented/tab-separated unknown heading stays protected
+  [PASS] fence-like content cannot expose a fake projection section
+  [PASS] fence-like content cannot expose a fake projection section
+  [PASS] valid decision append cannot hide an Approvals scaffolding edit
+  [PASS] unsupported Setext section cannot stay inside a mutable projection
+  [PASS] commented projection heading cannot authorize visible protected changes
+  [PASS] unchanged multiline template comments are supported
+  [PASS] inline comment cannot hide a real protected heading
+  [PASS] unsupported raw HTML cannot manufacture a projection
+  [PASS] unsupported HTML declaration cannot manufacture a projection
+  [PASS] unsupported HTML declaration cannot manufacture a projection
+  [PASS] unsupported HTML declaration cannot manufacture a projection
+  [PASS] literal inline comment opener cannot mask a protected heading
+  [PASS] indented code comment opener cannot mask a protected heading
+  [PASS] indented code comment opener cannot mask a protected heading
+  [PASS] real cold-start transition preserves full-document boundaries
+
+Part 2 - manifest conformance (hash + IDs)
+  [PASS] manifest step conforms for the real fixture
+  [PASS] hash mismatch FAILS (fixture modified without updating the manifest)
+  [PASS] duplicated immutable ID FAILS the manifest ID check
+  [PASS] unexpected immutable ID FAILS the manifest ID check
+
+Part 2b - semantic gates
+  [PASS] semantic gates pass for the real manifest
+  [PASS] a Stage 2 owner (PS-010) removed from every step FAILS the semantic gate
+  [PASS] missing user spec acceptance (PS-006) FAILS the semantic gate
+  [PASS] missing product-spec owner completion (PS-007) FAILS the semantic gate
+
+Part 2c - spec-artifact verification
+  [PASS] spec-artifact verification passes for the real artifact + acceptance row
+  [PASS] a malformed pinned digest (not sha256:+64-hex) FAILS
+  [PASS] a well-formed but wrong pinned digest FAILS (recomputed hash mismatch)
+  [PASS] an acceptance row lacking the digest and artifact path FAILS
+  [PASS] a missing artifact file FAILS
+
+Part 3 - bad fixtures fail the full harness
+  [PASS] real replay rejects protected preamble change even with a matching manifest hash
+  [PASS] harness FAILS when a required row (PS-010) is removed from every later version
+  [PASS] harness FAILS a fixture modified without updating its manifest hash
+  [PASS] harness FAILS when the product-spec acceptance row (PS-006) is missing
+  [PASS] harness FAILS when the product-spec owner-completion row (PS-007) is missing
+  [PASS] harness FAILS on an unexpected fixture file
+  [PASS] harness FAILS when the accepted-spec artifact is tampered (digest no longer matches the pin)
+  [PASS] harness FAILS when the accepted-spec artifact fixture is missing
+  [PASS] the leak-probe run fails (tampered artifact) after creating evidence
+  [PASS] an expected-failure run's preserved evidence is contained under the tracked -WorkDir (not leaked to temp)
+  [PASS] harness PASSES the real fixture sequence (with its accepted-spec artifact) via -FixtureDir
+
+Part 4 - external-WorkDir + link resolution
+  [PASS] harness passes with a normal external physical -WorkDir
+  [PASS] caller SENTINEL.txt survives
+  [PASS] caller pre-existing product-repo/preexisting.txt untouched
+  [PASS] owned run child cleaned up under the caller dir
+  [PASS] harness REJECTS a not-yet-existing -WorkDir inside the skills repo
+  [PASS] the rejected in-repo -WorkDir was NEVER created
+  [PASS] harness REJECTS a junction -WorkDir whose physical target is inside the repo
+  [PASS] no run dir leaked into the skills repo via the junction
+  [PASS] harness REJECTS -WorkDir nested BELOW a junction whose target is the repo
+  [PASS] no run dir leaked into the repo via a nested-below-junction WorkDir
+  [PASS] harness REJECTS a not-yet-existing -WorkDir under a junction into the repo
+  [PASS] the rejected -WorkDir was NEVER created inside the repo (checked physically)
+
+Part 5 - fail-closed commit-count
+  [PASS] exit 0 + clean '0' accepts zero
+  [PASS] nonzero git exit FAILS
+  [PASS] empty output FAILS
+  [PASS] non-numeric output FAILS
+  [PASS] multiple values FAIL
+  [PASS] negative value FAILS
+  [PASS] overflow value FAILS
+  [PASS] unexpected positive count FAILS
+
+Part 6 - owned-run-root cleanup proves deletion
+  [PASS] a correctly marked, owned run root is deleted and returns $true
+  [PASS] the deleted run root is verified truly absent
+Cleanup REFUSED: ownership marker '.scenario-a-run-id' not found in 'C:\Users\PeterNguyen\AppData\Local\Temp\sca-test-own-nomarker-946a3266\scenario-a-run-fixture' - not deleting an unverified directory.
+  [PASS] a missing ownership marker refuses deletion (returns $false)
+  [PASS] the unmarked directory is left in place
+Cleanup REFUSED: ownership marker run-id in 'C:\Users\PeterNguyen\AppData\Local\Temp\sca-test-own-badid-5be08cf0\scenario-a-run-fixture' does not match this run - not deleting.
+  [PASS] a mismatched marker run-id refuses deletion (returns $false)
+  [PASS] the mismatched-run-id directory is left in place
+Cleanup FAILED: deleting 'C:\Users\PeterNguyen\AppData\Local\Temp\sca-test-own-locked-7bc7542a\scenario-a-run-fixture' threw: The process cannot access the file 'locked.txt' because it is being used by another process. - residual state may remain; reporting failure instead of unproven success.
+  [PASS] a failed deletion (locked file) returns $false, never unproven success
+  [PASS] residual state is detected: the root still exists after the failed deletion
+
+Part 7 - copyable template parity with the cold-start fixture
+  [PASS] the template file still carries a '## Worked example' section
+  [PASS] the '## Template' (copyable) section exists before the worked example
+  [PASS] the copyable fenced block was located under '## Template'
+  [PASS] cold-start fixture's Decision placeholder row is the expected '(none yet)' row
+  [PASS] cold-start fixture's Approval placeholder row is the expected '(none yet)' row
+  [PASS] the copyable template's empty Decision row matches the cold-start fixture exactly
+  [PASS] the copyable template's empty Approval row matches the cold-start fixture exactly
+  [PASS] the copyable block contains no pre-populated immutable PS-* or A-* data row
+  [PASS] the copyable block preserves its initial SS-001 snapshot row
+  [PASS] the worked example (below the copyable block) still demonstrates real PS-* rows
+  [PASS] the worked example was not treated as the copyable block
+
+PASS - all 111 test(s) passed (host: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe).

@@ -1,0 +1,39 @@
+{
+  "commit": "4d6d292168d8a6fb47b7593870409d61707bdd7a",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--init",
+    "--pull",
+    "never",
+    "--network",
+    "none",
+    "--user",
+    "65534:65534",
+    "--mount",
+    "type=bind,source=C:\\src\\Project Aegis\\Project-Aegis,target=/source,readonly",
+    "-e",
+    "PYTHONPATH=/source/artifacts/reviews/phase01-testdeps",
+    "sha256:9bd26ad900bb5e0f4dee75839e957a89ae89c2b7ab1e76050e559790e946b948",
+    "python3",
+    "-B",
+    "/source/artifacts/reviews/shared-contracts-20260912/run_posix.py",
+    "4d6d292168d8a6fb47b7593870409d61707bdd7a"
+  ],
+  "exit_code": 0,
+  "seconds": 39.506,
+  "log": "4d6d292-posix.log",
+  "tail": [
+    "test_no_tls_or_verification_weakening_literals (test_static_safety_calibration.TestCalibrationStaticSafety.test_no_tls_or_verification_weakening_literals) ... ok",
+    "test_other_provider_fragments_remain_banned_everywhere (test_static_safety_calibration.TestCalibrationStaticSafety.test_other_provider_fragments_remain_banned_everywhere) ... ok",
+    "test_provider_fragments_confined_to_the_allowlist (test_static_safety_calibration.TestCalibrationStaticSafety.test_provider_fragments_confined_to_the_allowlist) ... ok",
+    "test_importing_grading_stack_loads_no_network_module (test_static_safety_grading.TestGradingStackStaticSafety.test_importing_grading_stack_loads_no_network_module) ... ok",
+    "",
+    "----------------------------------------------------------------------",
+    "Ran 987 tests in 25.054s",
+    "",
+    "OK (skipped=13)",
+    "EXIT CODES [0, 0, 0, 0, 0]"
+  ]
+}

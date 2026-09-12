@@ -313,20 +313,20 @@ only after the user confirms.
 propose → approve → append/refresh (or approved-create at cold start).** Prepare
 the complete dated entry — one of the template's three types: a **DECISION**
 (carrying its "(chosen over …, because …)" clause — the rejected alternative and
-the plain-language why), an **APPROVAL** (an `A-*` scope/authority grant — its ACTIVE status, allowed scope, and **FORBIDDEN** scope, anchored to immutable evidence), or a **STATE SNAPSHOT** (new current stage + next action;
+the plain-language why), an **APPROVAL** (an `A-*` evidenced grant or immutable lifecycle event naming its target and effective time), or a **STATE SNAPSHOT** (new current stage + next action;
 a stage advance is a NEW snapshot, latest wins — no header field is edited) — per
 [references/project-state-template.md](references/project-state-template.md). Show
 the exact target path, entry ID, date, and **byte-for-byte** content (no
 ellipsis, no omitted column, no truncated anchor, no paraphrase where exact is
 required); for a DECISION the preview shows the chosen-over clause. Ask ONE
-lightweight "OK to record it?"; append ONLY after an explicit yes to that exact
+lightweight "OK to record it?" when recording is not already authorized; append under the applicable explicit grant to that exact
 path and content; then confirm the exact appended entry (or an exact hash +
 complete location + entry id). The **create leg** shows the COMPLETE initial
-document and creates the file only after the explicit yes (overwrite is never
-allowed). A decline, an ambiguous answer, or any change to content/path means no
-write — revise and re-propose (at cold start: nothing is created). Approval is
-single-use for the displayed entry; a business answer is never write approval; a
-correction is a NEW superseding entry, never a silent overwrite. **The recording
+document and creates it under applicable explicit authorization (overwrite is
+never allowed). Without an existing grant covering the write, obtain approval
+of that preview; a decline or ambiguity means no write. Re-propose changed content
+only when it exceeds the actual grant. A business answer alone is not write approval;
+a correction is a NEW entry, never a silent overwrite. **The recording
 DISCIPLINE — risk-tiered batching of low-risk decisions, authority kept separate
 from scope/spec/design acceptance, proposal-fingerprint and already-recorded
 idempotency, and the mutable-projection refresh — lives in
@@ -342,7 +342,7 @@ Each turn produces (never a wall of jargon):
 WHERE YOU ARE:   <plain-language stage — e.g. "You have an agreed idea but no written plan yet.">
 WHAT I CHECKED:  <state file + repo signals that put you here>
 ONE QUESTION:    <a single business question, if a decision is needed>   (else: —)
-WHAT HAPPENS NEXT: <one of — classification decision (no skill invoked) | owning skill named plainly → invokes `<skill-name>` | record terminal decision (preview + await your exact approval)>
+WHAT HAPPENS NEXT: <one of — classification decision (no skill invoked) | owning skill named plainly → invokes `<skill-name>` | record terminal decision (preview + cite applicable existing authorization, otherwise await approval)>
 STAGE-2 OWNERS:  (shown while in Stage 2)
   product-spec=<pending|complete-awaiting-record|complete-recorded|blocked(reason)>;
   prioritization=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|blocked(reason)>;
@@ -352,10 +352,10 @@ STAGE-2 OWNERS:  (shown while in Stage 2)
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
 RECORDING: exactly one form (see references/recording-and-authority.md) — NONE THIS TURN (no terminal result exists to record — a pure invocation, classification, or question turn; nothing to preview or approve, and no log entry is fabricated); or SINGLE=<path + one ID + date + attribution + byte-for-byte entry>; or BATCH (low-risk only)=<path(s) + ORDERED list of every ID + each date/attribution + byte-for-byte content of EVERY entry + any exact projection refresh>, ONE approval for the complete bounded batch (high-risk actions are never batched)
-RECORDING STATUS: NONE THIS TURN (nothing to write) | AWAITING EXPLICIT APPROVAL — nothing written yet (after your yes → RECORDED: the exact single entry; or the batch's every recorded ID + every refreshed projection listed — partial-failure reports exactly what did and did not land)
+RECORDING STATUS: NONE THIS TURN | AWAITING EXPLICIT APPROVAL (only when authority is missing; nothing written) | RECORDED under applicable explicit grant: exact entry or every batch ID + every refreshed projection listed; partial failure reports exactly what did and did not land
 ```
 
-`docs/project-state.md` is the durable artifact (template in Supporting Files):
+`docs/project-state.md` is workspace-persisted after a verified write (template in Supporting Files); Git-tracked, committed and remote-persisted require separate evidence:
 append-only immutable evidence — the STATE SNAPSHOT log (latest snapshot IS the
 current state), the decision log (each entry with its chosen-over rationale),
 approvals, and deviations — plus mutable current-view projections (summary,
@@ -438,9 +438,9 @@ scope, users, success, open questions) refreshed at approved checkpoints.
   the user by name.
 - **Acceptance is not authority; a business answer is not write approval.**
   Scope agreement, spec/design acceptance, and "looks good / proceed" authorize
-  only the exact proposal in front of the user — not its recording, and not
-  implementation (a separate, previewed, recorded grant). The log entry is its
-  own approval; ambiguous approval is never widened by inference (see
+  the actual proposal in front of the user. Check whether it includes recording
+  or implementation; preserve an explicit current grant without repeat consent.
+  Acceptance alone adds no unstated authority (see
   `references/recording-and-authority.md`).
 - **Calling the product repo "the skills library".** A fresh product repo that
   contains copied `.claude` skills is still the user's product — detect repo
@@ -461,12 +461,12 @@ scope, users, success, open questions) refreshed at approved checkpoints.
   knows their next step, or who wants the requirements interview itself, is
   routed to the owning skill (`requirements-gathering-facilitator`,
   `product-spec-writer`, `code-reviewer`, …); this skill steps aside.
-- **A `docs/project-state.md` append or create without its own approval** — the
+- **A `docs/project-state.md` write without applicable authorization** — the
   entry's exact path and content have not been shown (at cold start: the
   COMPLETE initial document, including the first STATE SNAPSHOT, has not been
-  previewed), the explicit content-specific yes has not arrived, or the
-  content/path changed after the yes. Do not write or create; re-propose. A
-  business-question answer is never write approval.
+  previewed), or the proposed write exceeds every applicable explicit grant.
+  Preview the complete write and obtain only missing authority. Honor existing
+  grants; a business-question answer alone is never write approval.
 - **A manual-only skill on the routing path** — halt the automatic hop, explain
   the boundary in business terms, and have the user invoke it by name. The
   orchestrator's own auto-invocation is never authority to auto-invoke a
@@ -477,7 +477,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - [references/project-state-template.md](references/project-state-template.md) —
   the `docs/project-state.md` schema and copyable template: three append-only
   dated entry types (STATE SNAPSHOT latest-wins; DECISION with its chosen-over
-  clause; APPROVAL — an `A-*` grant with ACTIVE/allowed/FORBIDDEN scope anchored
+  clause; APPROVAL — an `A-*` grant or immutable lifecycle event anchored
   to immutable evidence), the composed decision-ID + approval-citation patterns,
   the propose → approve → append (cold-start approved-create) flow, and the
   immutable-evidence vs mutable-projection split (immutable evidence wins).

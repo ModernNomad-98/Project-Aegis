@@ -1,16 +1,18 @@
 ---
 name: scoped-approval-register
-description: 'Record every granted human approval as a durable, append-style register entry — Status, Reason, Scope allowed, Scope FORBIDDEN, Evidence — so authorization survives the approving conversation and is cited from the repo, never re-argued from memory. Covers placement, entry lifecycle (supersede, never rewrite), and the deny-by-default citation rule: an action is authorized only if an ACTIVE entry''s allowed scope covers it as worded. Use when an approval was just granted and must be recorded, when agents re-ask already-decided permissions, or when "am I allowed to do X?" has no citable answer. Composes human-approval-boundary: it decides WHERE approval is required and halts; this records the grant it obtains. Do NOT use to decide whether approval is needed (human-approval-boundary), design standing-approval policy (standing-approval-and-auto-advance — its adopted policy lands here as an entry), codify authority floors (agent-authorization-matrix), or record design decisions (adr-writer).'
+description: 'Preserve granted human approvals as immutable grant records and later lifecycle events, with verbatim scope and evidence. Derive effective authority from the complete history so revoked, expired, consumed, or superseded grants cannot revive. Use when an approval must be recorded, agents re-ask an existing permission, or an authorization needs a citable source. Draft first; persist only within applicable user authorization. Existing current-session grants remain valid without repeat consent. Do NOT use to decide whether approval is needed (human-approval-boundary), design standing approval policy (standing-approval-and-auto-advance), codify authority floors (agent-authorization-matrix), or record design choices (adr-writer).'
 ---
 
 # Scoped Approval Register
 
 ## Purpose
 
-Make granted approvals durable, scoped, and citable. Approvals granted in
+Make granted approvals scoped and citable. A draft is transcript-only; a verified
+file write is workspace-persisted. Git-tracked, locally committed, and
+remote-persisted require their own verified Git/remote evidence. Approvals granted in
 conversation evaporate when the conversation does — the next session either
 re-asks (fatigue) or assumes (hazard). This skill records each grant as an
-append-style register entry with five mandatory fields — Status, Reason,
+immutable register entry with five mandatory fields — Status, Reason,
 Scope allowed, Scope FORBIDDEN, Evidence — so that months later an agent can
 cite exactly what is and is not authorized, and negative scope is as explicit
 as positive scope. The register is the TRACK half of the approval discipline:
@@ -62,60 +64,75 @@ exactly these fields.
 
 ## Workflow
 
-1. **Capture the grant verbatim at the moment it is given.** Quote the exact
-   approving words and their source location. If the wording is ambiguous
-   about scope, ask the grantor to tighten it NOW — recording an ambiguous
-   scope creates a phantom authorization.
-2. **Locate or create the register.** Prefer one dedicated, append-style file
+1. **Capture the grant and the proposal it answers.** Quote the approving words
+   and their source with the relevant request. A contextual "yes" to a complete
+   proposal is usable approval; do not ask again because the answer is short.
+   Clarify only scope still unresolved after reading the actual conversation.
+2. **Locate or propose the register.** Prefer one dedicated, append-only file
    (e.g. `docs/approvals/APPROVAL_REGISTER.md`); a context-map exceptions
    section is an equally valid house pattern. One register per repo — split
    registers fragment citation.
-3. **Write the entry** with all mandatory fields (full template and field
+3. **Draft the immutable entry** with all mandatory fields (full template and field
    semantics: [references/register-format.md](references/register-format.md)):
    Status, Date + Grantor, Reason, **Scope allowed** (as worded), **Scope
    FORBIDDEN** (explicit negatives — what this approval does NOT cover),
    Evidence (link/pointer to the grant), Expiry/review-by.
-4. **Derive the FORBIDDEN scope explicitly.** Ask: what adjacent action would
-   a future agent plausibly stretch this grant to cover? Name it as
-   forbidden. An empty forbidden list is a draft, not an entry.
-5. **Check for interactions:** does this entry supersede, conflict with, or
-   partially overlap an existing one? Supersede by adding a new entry and
-   flipping the old entry's Status to `SUPERSEDED by <id>` — never rewrite or
-   delete history.
+4. **Preserve the grant's boundaries.** Record explicit prohibitions and what
+   the stated allowed scope excludes. If none were additionally stated, say so;
+   do not invent a restriction, expiry, or one-use limit that narrows the human's
+   instruction. Proposed safeguards are not existing grantor prohibitions.
+5. **Check interactions without inventing supersession.** Preserve compatible
+   overlapping grants. Append `SUPERSEDED` only when the human instruction
+   actually replaces a predecessor, naming both grants and that evidence.
+   Clarify unresolved conflicts only. Revocation, expiry and one-time consumption
+   append events; no old field is edited. Apply the reference's full effective-status
+   procedure, including malformed histories and late-recorded facts.
 6. **State the citation rule with the register** (once, at the top): an
-   action is authorized by the register only if an ACTIVE entry's Scope
-   allowed covers it; absence from any FORBIDDEN list is not permission —
-   deny-by-default holds.
-7. **Deliver:** the new/updated entry, any superseded-entry status flips, and
-   a one-line pointer for the closeout so the grant is discoverable.
+   action is covered only by an effectively ACTIVE grant whose actual scope
+   includes it. Historical ACTIVE text alone does not authorize action. Current
+   direct human instructions are themselves evidence; delayed transcription
+   does not invalidate them or require repeat consent.
+7. **Persist only within applicable authorization.** Show the exact target and
+   proposed append. Use an existing current-session instruction covering this
+   recording; ask once only if authority is missing. The documentation exception
+   covers transcription, not changing permission controls or agent instructions.
+   Verify the append and unchanged prior records. Report achieved persistence
+   and entry IDs; a local write alone does not survive loss of the computer.
 
 ## Output Format
 
 ```
 APPROVAL REGISTER ENTRY
 Id:              <register-id — sequential or date-based>
-Status:          ACTIVE | SUPERSEDED by <id> | EXPIRED <date> | REVOKED <date, by whom>
-Date / Grantor:  <YYYY-MM-DD> / <named human or role>
+Event:           GRANT | SUPERSEDED | EXPIRED | REVOKED | CONSUMED
+Target:          <grant ID for lifecycle events; none for a new grant>
+Successor:       <new grant ID for SUPERSEDED; otherwise none>
+Status:          <state recorded by THIS immutable event, not a mutable field>
+Date / Grantor:  <grant only: ISO timestamp / human or accountable role>
+Effective at:    <lifecycle only: timestamp or ordered condition>
+Recorded at/By:  <lifecycle only: transcription timestamp / recorder>
+New authority:   <lifecycle only: none; scope fields refer to target grant>
 Reason:          <why this authorization exists>
 Scope allowed:   <exact actions, files, branches, environments — as worded by the grantor>
-Scope FORBIDDEN: <explicit negatives this grant does NOT cover — never empty>
+Scope FORBIDDEN: <actual prohibitions and scope limits; no invented restriction>
 Evidence:        <link: PR comment / issue / chat record / commit>
-Expiry:          <date, condition, "one-time", or "until superseded">
+Expiry:          <actual date/condition/use limit; none stated if absent>
+Persistence:     transcript-only | workspace-persisted | Git-tracked | locally committed | remote-persisted
 ```
 
 ## Validation Checklist
 
 - [ ] The grant is quoted or linked verbatim — the entry's scope matches the
       grantor's wording, not a paraphrase.
-- [ ] Scope FORBIDDEN is present and names real adjacent actions — not empty,
-      not boilerplate.
-- [ ] Evidence field points at a retrievable artifact, not "approved in chat"
-      with no pointer.
+- [ ] Scope FORBIDDEN preserves actual limits without inventing restrictions.
+- [ ] Evidence identifies the actual human source: a retrievable pointer or
+      dated verbatim current-session record with its proposal context.
 - [ ] Expiry/one-time vs durable comes from the wording, not assumption.
-- [ ] Superseded/conflicting entries had Status flipped — no entry was
-      rewritten or deleted.
-- [ ] The citation rule (deny-by-default; ACTIVE + covered = authorized) is
-      stated with the register.
+- [ ] Lifecycle events append by unique ID; prior entries remain unchanged.
+- [ ] Full-history effective status and expiry/use limits are checked; revoking
+      a successor does not revive its predecessor.
+- [ ] Existing current-session authorization was honored without repeat consent.
+- [ ] Persistence claims match the write/Git/remote verification actually done.
 - [ ] No secrets, tokens, or live identifiers in the entry — reference
       environments and tenants by placeholder or name, never credential.
 
@@ -123,19 +140,19 @@ Expiry:          <date, condition, "one-time", or "until superseded">
 
 - **Paraphrase drift:** "yes, go ahead" recorded as "approved schema changes"
   is a fabricated widening. Record the words and what they answered.
-- **The missing negative:** most approval disputes are about the action NEXT
-  to the approved one. The FORBIDDEN field exists to close that door while
-  the grantor is still present.
+- **Invented negatives:** a recorder cannot withdraw part of a grant by adding
+  a FORBIDDEN clause the human did not authorize.
 - **Approval of a different step:** a grant for step A cited to authorize
   step B is the classic misuse; the citation rule (covered-by-wording) is
   what blocks it. See also `human-approval-boundary`'s rule that enthusiasm
   is not approval.
-- **Register rot:** entries whose Expiry passed but Status still says ACTIVE
-  make the register lie. Sweep expired entries when touching the register.
+- **Stale ACTIVE text:** check later events and expiry/use conditions each time.
+  Append observed expiry/consumption; do not rewrite the historical grant.
 - **Two registers:** once approvals live in two places, every citation is
   contestable. Merge before appending.
-- **Recording ≠ granting:** an entry with no evidence link records nothing.
-  The register cannot create authority, only preserve it.
+- **Recording ≠ granting:** cite the actual human source. A missing archival
+  pointer limits future verification; it does not erase a direct instruction
+  still present in the current session. The register cannot create authority.
 
 ## Stop Conditions
 

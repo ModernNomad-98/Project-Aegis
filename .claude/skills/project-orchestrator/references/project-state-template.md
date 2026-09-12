@@ -1,6 +1,8 @@
 # `docs/project-state.md` — schema and template
 
-This is the durable memory of a project's journey from idea to shipped. The
+This is workspace-persisted memory after a verified write. Git-tracked, locally
+committed and remote-persisted require their own verified evidence; this workflow
+does not imply a push or backup. The
 orchestrator **reads it first every session** (the latest STATE SNAPSHOT entry
 locates the project on the lifecycle map), **appends** immutable evidence to it
 as the project advances, and **refreshes** its mutable projection sections at
@@ -11,6 +13,10 @@ approved (the orchestrator's Capability 4 propose → approve → append/refresh
 contract). It lives in the **user's product repo** at `docs/project-state.md` —
 never in the skills library, and never confused with it.
 
+Applicable existing current-session authorization remains valid: show and scope-check
+the proposed write without demanding the same grant again. Obtain approval only for
+missing authority. A delayed register transcription does not invalidate a direct grant.
+
 ## Composition (what this schema reuses, by name)
 
 - **Decision log** composes `phased-work-handoff-designer`'s decision-ID
@@ -19,8 +25,12 @@ never in the skills library, and never confused with it.
   entry that flags the deviation**, never a silent overwrite.
 - **Approvals** composes `scoped-approval-register`'s citation pattern: Status /
   Scope allowed / **Scope FORBIDDEN** / Evidence, append-style, supersede-never-
-  rewrite, deny-by-default (an action is authorized only if an ACTIVE entry's
-  allowed scope covers it as worded). An ACTIVE approval's allowed scope is
+  rewrite, deny-by-default. Derive effective status from the complete grant and
+  lifecycle history under that skill's register-format contract; historical
+  ACTIVE text cannot revive a revoked, expired, consumed or superseded grant.
+  Append lifecycle events as new `A-*` rows naming target, event, effective and
+  recorded time, evidence and any successor; never flip an old Status field.
+  An effectively ACTIVE approval's allowed scope is
   **frozen to immutable evidence** — stated inline exactly, or referenced by a
   DECISION id or an accepted-artifact path + SHA-256, never by pointer to a
   mutable projection — so a later projection refresh cannot change what was
@@ -35,7 +45,7 @@ never in the skills library, and never confused with it.
 
 1. **Three dated immutable entry types.** A log entry is exactly one of: a
    **DECISION** (a choice made — the decision log), an **APPROVAL** (an `A-*`
-   scope/authority grant — the Approvals table, carrying its ACTIVE status, its
+   scope/authority grant or later lifecycle event — the Approvals table, carrying its recorded status, its
    allowed scope, and its **FORBIDDEN** scope, each anchored to immutable
    evidence), or a **STATE SNAPSHOT** (where the project stands: current stage +
    next recommended action — the snapshots table). All three go through the same
@@ -47,6 +57,9 @@ never in the skills library, and never confused with it.
    reorder, or silently replace a past row. A correction is a NEW dated entry
    that references and supersedes the old one, which stays unedited above — the
    Zero Trust AI Engineering Discipline applied to the build journey.
+   For approvals, a superseding event names the old and new grants; revoking
+   the successor never restores the predecessor. Legacy ACTIVE fields record
+   initial states and never replace full lifecycle checks.
 3. **Mutable projection, refreshed not rewritten as evidence.** The
    current-view sections (below) are mutable projections of the current truth.
    They are **re-derived from the authoritative immutable evidence** at approved
@@ -312,3 +325,17 @@ current-view sections are **projections**: they render today's truth from the
 records and are refreshed at checkpoints, while Approval A-001 makes explicit
 that agreeing the scope is **not** authority to build — implementation is a
 separate grant taken later.
+
+### Worked lifecycle append (separate from the copyable empty template)
+
+Suppose `A-010` is an evidenced standing grant for staging validation. Leave that
+entire original row unchanged when its human grantor later revokes it. Append:
+
+| ID | Status/event at recording | Date / Grantor or recorder | Scope allowed | Scope FORBIDDEN | Evidence |
+|---|---|---|---|---|---|
+| A-011 | REVOKED; target A-010; successor none | Recorded 2026-09-12T03:00:00Z / recorder | No new authority; effective 2026-09-12T02:00:00Z | Target grant A-010 is no longer usable from its evidenced effective time | Dated verbatim human withdrawal and source pointer; target grant A-010 |
+
+The effective time differs from the recording time; the historical ACTIVE text
+in A-010 remains unchanged. Evaluate the full history using
+`scoped-approval-register/references/register-format.md`. This illustrative row
+does not grant or revoke any real project permission.

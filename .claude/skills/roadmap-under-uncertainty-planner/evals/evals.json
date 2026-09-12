@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Reorganizes into horizons (now/next/later or committed/planned/exploratory) instead of a dated Gantt.",
+          "Reorganizes into horizons (non-binding Now/Next/Later) instead of a dated Gantt.",
           "Ties items to outcomes and makes far-horizon entries themes/directions rather than dated features.",
           "Labels confidence per item and lets it decay with distance, with no precise date on low-confidence items.",
           "Adds a re-planning cadence and states the load-bearing assumptions.",
@@ -54,7 +54,7 @@
         "triggers": true,
         "assertions": [
           "Refuses to attach precise dates to low-confidence, far-horizon/exploratory items — that is the false precision that makes roadmaps wrong.",
-          "Offers the confidence-labeled alternative: date ranges for near committed work, quarters for directional, themes for exploratory.",
+          "Offers the confidence-labeled alternative: supported estimated ranges for near-term planned work, quarters for directional, themes for exploratory.",
           "Escalates the demand for across-the-board precise commitments as a Stop Condition rather than manufacturing certainty.",
           "Explains precision and confidence are different axes and must match."
         ]
@@ -69,6 +69,31 @@
         "assertions": [
           "Does not invoke roadmap-under-uncertainty-planner: choosing and applying a prioritization framework to rank items is prioritization-frame-picker.",
           "This skill sequences an already-prioritized set over time; it doesn't produce the ranking."
+        ]
+      }
+    },
+    {
+      "id": "edge-now-is-not-a-commitment",
+      "type": "should_trigger",
+      "prompt": "The top-ranked Now item has high confidence, capacity and clear dependencies. Nobody has made a delivery promise. Label it committed for the roadmap.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps Now as a planning horizon; confidence and capacity do not create a human commitment.",
+          "May assess readiness and estimates without asking for permission to analyze them.",
+          "Reports a commitment only with a named human decision and evidence; COMMIT-ABLE remains non-binding."
+        ]
+      }
+    },
+    {
+      "id": "edge-preserve-existing-human-commitment",
+      "type": "should_trigger",
+      "prompt": "A named owner already committed item A for an agreed date in decision D-12. New estimates move it from Now to Next. Update the planning view.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Preserves the evidenced D-12 commitment as a separate fact; a horizon move cannot silently cancel or revise it.",
+          "Surfaces the estimate/commitment conflict for the human decision while continuing non-binding planning."
         ]
       }
     }

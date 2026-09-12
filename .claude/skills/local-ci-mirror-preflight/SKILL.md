@@ -1,6 +1,7 @@
 ---
 name: local-ci-mirror-preflight
-description: 'Before any commit, mirror CI locally: read the CI workflow definitions, derive the closest local equivalent of every PR-triggered check, run them, and verify the SAME checks pass on clean mainline FIRST via a separate git worktree (never by flipping a shared checkout). Classify every failure — PR-caused / pre-existing-on-main / CI-infrastructure / cannot-determine-locally; only PR-caused failures block; pre-existing ones are reported, not absorbed. Includes a declared docs-only lightweight path; the preflight record feeds the closeout. Runs only the repo''s own declared checks. Use before committing or pushing non-trivial work, when CI fails on things never run locally, or to distinguish your breakage from main''s. Do NOT use as the release ship/no-ship gate (release-readiness-reviewer), to choose validation DEPTH (risk-tiered-validation-selector picks the tier this mirrors), to architect shard/resume machinery (sharded-validation-with-resume), or to design the pipeline (ci-pipeline-architect).'
+description: "MANUAL-ONLY; never auto-invoke. Explicitly invoke to mirror the repository's CI locally before commit or push. Read PR-triggered workflow checks, derive and run their local equivalents, and verify clean mainline in a separate Git worktree. Classify failures as PR-caused, pre-existing on main, CI infrastructure, or locally indeterminate; report inherited failures without absorbing them. Includes a declared docs-only path and evidence for closeout. Runs only repository-declared checks. Not the release ship/no-ship gate (release-readiness-reviewer), validation-depth selector (risk-tiered-validation-selector), shard/resume designer (sharded-validation-with-resume), or pipeline designer (ci-pipeline-architect)."
+disable-model-invocation: true
 ---
 
 # Local CI Mirror Preflight
@@ -55,6 +56,12 @@ whose fault it is — with a fixed four-class taxonomy instead of vibes.
    docs-only/fast/full changes which derived checks are in scope.
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Derive the check list from the workflow definitions** — not from
    memory, not from README claims. For each PR-triggered job, record: CI
@@ -149,6 +156,12 @@ Residual risk to real CI: <cannot-determine items, matrix gaps>
   setup, rerun) and record it.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - Asked to commit despite an unexplained PR-caused failure ("CI will tell
   us") → refuse the shortcut; state the failing check and the fix path.

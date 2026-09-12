@@ -43,8 +43,16 @@ date silently becomes permanent.
 
 ## Workflow
 
+Draft in the conversation first. Persist an ordinary non-executable ADR only
+under the standard's approved-document exception: show exact path/content,
+honor an applicable existing current-session grant or obtain missing approval,
+create/append without overwriting history, then verify the write. Security or
+governance policy, agent instructions and existing-file amendments/backlinks require
+their separately authorized manual route; this automatic drafting phase does
+not execute those changes or broaden a grant.
+
 1. **Locate the ADR home and number.** Follow the repo's existing convention;
-   create `docs/adr/` with `NNNN-title.md` naming only if none exists.
+   propose `docs/adr/NNNN-title.md` naming only if no convention exists.
 2. **State the context:** the forces, constraints, and the problem as it
    stood at decision time — written so it stays true even after the code
    changes. No solution language in the context section.
@@ -62,13 +70,15 @@ date silently becomes permanent.
    acceptable; "reversal is impractical after X because Y" is.
 8. **Set status and review date:** status (proposed | accepted | superseded)
    and a specific date to re-examine the decision against its assumptions.
-   Link superseded ADRs both ways.
+   Include predecessor links in the draft; propose any old-file back-link
+   change for its separately authorized route rather than editing it here.
 9. **Cross-check:** could a new team member reconstruct the decision's logic
    from this document alone, without hallway context?
 
 ## Output Format
 
-A single markdown file following [assets/adr-template.md](assets/adr-template.md):
+A Markdown draft and exact target following [assets/adr-template.md](assets/adr-template.md);
+report separately whether authorized persistence actually occurred:
 
 ```
 # ADR-NNNN: <title, imperative>
@@ -92,7 +102,7 @@ Date: <decision date>   Review by: <specific date>
 - [ ] Rollback plan has trigger conditions AND steps; impractical reversal is
       explained, never blank.
 - [ ] Review date is a specific date, not "later".
-- [ ] Superseded ADRs are linked in both directions.
+- [ ] The draft links to its predecessor and proposes the reverse link; old-file changes require separate application evidence.
 
 ## Gotchas
 

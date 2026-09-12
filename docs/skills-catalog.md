@@ -146,7 +146,7 @@ convention, decision D3 — present and well-formed, not "passing").
 | `source-of-truth-reconciler` | #269 (+#270 assumption-surfacing) | yes | Resolve doc/code/instruction conflicts by evidence-cited precedence; surface all assumptions. |
 | `change-classification-gate` | #264 (+#263 scope lock) | yes | Classify a change → validation floor + approval path; lock scope to the approved class. |
 | `human-approval-boundary` | #265 (+#270 stop-when-unclear) | yes | Halt for explicit approval at high-risk boundaries with a structured approval request. |
-| `reviewable-diff-discipline` | #271 (+#272 exact-file staging) | yes | Small intentional diffs; exact-path staging; staged set must equal declared intent. |
+| `reviewable-diff-discipline` | #271 (+#272 exact-file staging) | **no** (manual-only; executes state-changing operations) | Small intentional diffs; exact-path staging; staged set must equal declared intent. |
 | `ai-closeout-reporter` | #274 | yes | Terminal closeout with a mandatory "intentionally not done / omitted" section. |
 | `agent-failure-recovery` | #275 | **no** (manual-only; mutates git state) | Preserve-first recovery of broken git/tree state; destructive cleanup needs backup + approval. |
 | `agent-instruction-consolidator` | #276 | **no** (manual-only; edits behavior-steering files) | Align agent instruction files to one canonical source with rule-preservation proof. |
@@ -219,9 +219,9 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 | `domain-modeler` | cat 01 #3 (Domain Model Discovery) | yes | Domain model from requirements/code — language, contexts, aggregates + invariants; ends at a hard "do not code yet" gate. |
 | `architecture-designer` | cat 01 #42/#55 | yes | Inspects CURRENT architecture first; component/dependency/data-ownership maps, tradeoffs, ADR draft, incremental migration plan. |
 | `adr-writer` | cat 01 #1 (ADR Authoring) | yes | ADR with honest alternatives, consequences, operational impact, mandatory rollback/reversal plan + review date. |
-| `docs-first-implementer` | cat 08 discipline (ex-`grill-with-docs`) | yes | Pin the EXACT installed version (lockfile), read matching docs, summarize task syntax, implement, verify; uncertainty declared, never guessed. |
-| `tdd-engineer` | cat 06 | yes | Strict red-green-refactor; confirms each test fails for the INTENDED reason before implementing the minimal change; exact commands reported. |
-| `systematic-debugger` | cat 06/08 | yes | Reproduce → reduce → isolate → fix ONE thing → verify → prevent; prediction-tested hypotheses, no shotgun fixes. |
+| `docs-first-implementer` | cat 08 discipline (ex-`grill-with-docs`) | **no** (manual-only; executes state-changing operations) | Pin the EXACT installed version (lockfile), read matching docs, summarize task syntax, implement, verify; uncertainty declared, never guessed. |
+| `tdd-engineer` | cat 06 | **no** (manual-only; executes state-changing operations) | Strict red-green-refactor; confirms each test fails for the INTENDED reason before implementing the minimal change; exact commands reported. |
+| `systematic-debugger` | cat 06/08 | **no** (manual-only; executes state-changing operations) | Reproduce → reduce → isolate → fix ONE thing → verify → prevent; prediction-tested hypotheses, no shotgun fixes. |
 | `code-reviewer` | cat 08 #277 (AI Code Review Protocol) | yes | Reviews ACTUAL diffs only; severity-ranked findings with file:line evidence + remediation; no diff, no review. |
 | `code-simplifier` | cat 01 #11 adjacent | **no** (manual-only; edits working code) | Behavior-preserving simplification, green-before-and-after per move; coverage gate; "not done" list is a deliverable. |
 | `principal-code-analyst` | cat 01 | yes | Subsystem strategic read: findings laddered to architecture/security/cost claims; risk register; small-step remediation + validation plan. |
@@ -273,9 +273,10 @@ master-prompt §6: ASVS-style verification, SSDF-style secure-SDLC, and SLSA-sty
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
 authorization are mandatory on SaaS paths; every skill produces concrete artifacts and
-negative tests; no finding is suppressed without written rationale. Two skills have
+negative tests; no finding is suppressed without written rationale. Three skills have
 side effects and are **manual-only** (`disable-model-invocation: true`):
-`appsec-implementer` and `secrets-identity-hardener` edit code/config.
+`appsec-implementer` and `secrets-identity-hardener` edit code/config;
+`multi-tenant-security-tester` seeds data and implements/runs isolation suites.
 
 Per reconciliation §3, the execution-plan `rls-policy-author` and
 `rls-negative-test-designer` are **merged into `rls-policy-auditor`** (no separate
@@ -288,7 +289,7 @@ per-command negative-test plan.
 | --- | --- | --- | --- |
 | `threat-modeler` | cat 03 #91/#92 | yes | Design-time threat model: assets/actors/trust-boundaries, STRIDE per boundary, abuse cases, exploit-path-gated severity, mitigations mapped to negative tests; consumes tenant/authz outputs. |
 | `appsec-implementer` | cat 03 (control implementation) | **no** (manual-only; edits code/config) | Builds one NAMED control test-first — negative test red→green, minimal server-side control, scoped diff, residual risk stated. |
-| `multi-tenant-security-tester` | cat 03 #93/#95 + cat 06 | yes | Executable cross-tenant/authorization negative suite: two-tenant fixtures, forbidden-action-denied assertions, positive controls, IDOR/list/mass-assignment/exports/jobs, honest coverage. |
+| `multi-tenant-security-tester` | cat 03 #93/#95 + cat 06 | **no** (manual-only; executes state-changing operations) | Executable cross-tenant/authorization negative suite: two-tenant fixtures, forbidden-action-denied assertions, positive controls, IDOR/list/mass-assignment/exports/jobs, honest coverage. |
 | `rls-policy-auditor` | cat 03 #94/#95/#96/#97/#98/#99/#100/#102 (merged author + negative-test designer) | yes | Per-command RLS audit/authoring: recursion, unsafe SECURITY DEFINER, broad grants, missing tenant scope, service-role leakage, frontend-derived scope; mandatory negative-test plan; delivers policies as a migration, never runs live DDL. |
 | `secrets-identity-hardener` | cat 03 #103/#104/#123/#109 | **no** (manual-only; edits code/config) | Env classification (catches VITE_/NEXT_PUBLIC_ leaks), moves secrets server-side with a client-bundle-absence proof, rotates leaked creds, least-privilege service accounts, session/token flags. |
 | `supply-chain-security-reviewer` | cat 03 #121/#122 | yes | SLSA-style: lockfile-based dependency set, reachability triage of scanner output, install/build-script and CI compromise paths, SHA pinning, compromise-path-gated severity. |
@@ -316,10 +317,11 @@ tester; screenshot evidence carries naming/masking/metadata/storage rules; Playw
 uses resilient locators and web-first assertions with no arbitrary sleeps; Vite skills
 prove `VITE_` secret non-exposure at the `dist/` level; Vitest skills choose the
 environment intentionally; flake work classifies, reproduces, fixes one cause, and
-proves stability. Four skills have side effects and are **manual-only**
+proves stability. Five skills have side effects and are **manual-only**
 (`disable-model-invocation: true`): `playwright-e2e-engineer` (writes specs, drives a
 browser), `clickthrough-test-engineer` (drives a live app), `vitest-unit-component-engineer`
-(writes test files, runs suites), and `vite-build-qa-engineer` (runs builds/preview).
+(writes test files, runs suites), `vite-build-qa-engineer` (runs builds/preview),
+and `flaky-test-detective` (applies a test-layer fix and verifies stability).
 
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
@@ -341,7 +343,7 @@ discrimination against its nearest neighbors. Per reconciliation §3, `acceptanc
 | `screenshot-evidence-planner` | cat 06 #223 | yes | Evidence policy: risk-justified checkpoints, deterministic naming, mandatory pre-storage block-out masking, metadata (build/env/persona/viewport), storage/retention classes, case/PR/closeout linkage. |
 | `vitest-unit-component-engineer` | cat 06 #183 + cat 05 #180 | **no** (manual-only; writes test files, runs suites) | Vitest unit/component tests: intentional node-vs-DOM environment per file, owned-seam mocks only, Testing Library user-facing queries, determinism, real run output, regression spot-check. |
 | `vite-build-qa-engineer` | cat 05 #178 + cat 06 #217 | **no** (manual-only; runs builds/preview) | Build-artifact QA: `VITE_` env classification, dist-level secret value+pattern proof, build/preview parity (base, deep links, modes), bundle budgets + sourcemap policy; exposures → `secrets-identity-hardener`. |
-| `flaky-test-detective` | cat 06 #209/#210 | yes | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
+| `flaky-test-detective` | cat 06 #209/#210 | **no** (manual-only; executes state-changing operations) | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
 | `test-data-architect` | cat 06 #196–#199 | yes | Persona/baseline catalog (read-only), per-layer data sources, determinism, worker-scoped parallel isolation, synthetic-only PII posture, structural cleanup + traceability, schema-coupled seed evolution. |
 | `regression-suite-curator` | cat 06 #190/#210 | yes | Evidence-based promote/retain/demote/retire with written rationale (never silent deletion), protected security regressions (human-approval to retire), enforced quarantine registry, tier-budget fit. |
 | `integration-test-designer` | cat 06 **#184 (pulled forward)** | yes | The layer BETWEEN unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams with rationale, real-path auth minting, persisted-state assertions, no browser; security matrices deferred to `multi-tenant-security-tester`. |
@@ -658,7 +660,8 @@ These are the concrete, invocable rules of the **Zero Trust AI Engineering
 Discipline** (D16) — its TRACK / VERIFY / GOVERN / HAND OFF groups. All 10
 ship `evals/evals.json` **and** `evals/trigger-evals.json`; every skill names
 the neighbor it composes with and discriminates against it in trigger-evals.
-9 of 10 are advisory/design skills producing guidance → model-invocable;
+8 of 10 are advisory/design skills producing guidance → model-invocable;
+`local-ci-mirror-preflight` is manual-only because it creates/removes Git worktrees;
 `standing-approval-and-auto-advance` is **manual-only** because it authors
 standing autonomy — the same reasoning that makes `agent-authorization-matrix`
 manual-only.
@@ -670,7 +673,7 @@ manual-only.
 | `chat-backlog-reconciliation` | P13 | yes | Cadenced extraction of chat-only decisions/bugs/backlog into dated repo docs, then per-item audit against PR/source evidence (completed/partial/active/not-active/unknown); chat claims cap at unknown without repo proof; standing rule: tracked repo docs, not stale chat. |
 | `context-co-update-ci-gate` | P8 | yes | CI gate failing PRs that touch important paths without a context-map/notes update (declared no-op escape hatch, never silent) + the update protocol (date+SHA stamps, evidence-only status moves, risk notes never deleted without proof). Write-back half of `agent-startup-context-gate`'s read loop. |
 | `lane-authoring-guide` | P10 | yes | Pre-work, evidence-cited guide per parallel agent lane: lifecycle slice, contracts, per-unit recipe + checklist, and the explicit "must NOT do" boundary; mutually exclusive lanes, cited claims or `unverified` labels. Work's BEGINNING — distinct from the closeout at work's end. |
-| `local-ci-mirror-preflight` | P4 | yes | Per-commit CI mirror: derive local equivalents of every PR-triggered check from the workflow files, baseline on clean mainline FIRST (separate git worktree), classify every failure PR-caused / pre-existing / CI-infra / cannot-determine; declared docs-only path; preflight record feeds the closeout. |
+| `local-ci-mirror-preflight` | P4 | **no** (manual-only; executes state-changing operations) | Per-commit CI mirror: derive local equivalents of every PR-triggered check from the workflow files, baseline on clean mainline FIRST (separate git worktree), classify every failure PR-caused / pre-existing / CI-infra / cannot-determine; declared docs-only path; preflight record feeds the closeout. |
 | `risk-tiered-validation-selector` | P5 | yes | Fail-closed classifier from changed files to validation depth (docs-only / fast / full): never-docs-only and forced-full lists, max-over-files aggregation, diffable rules, unmatched ⇒ full. Routes validation COST where `change-classification-gate` routes APPROVAL. |
 | `sharded-validation-with-resume` | P6 | yes | Full tier as named functional shards: persisted status file (failed ≠ interrupted), resume reruns only unfinished shards (never resumes past real failures), empty-or-fail uncategorized catch-shard, parallel shards into ONE aggregate gate as the sole required check. |
 | `merge-is-deploy-governance` | P7 | yes | Standing governance when merge==deploy: documented reality (incl. what does NOT auto-deploy), PR validation promoted to the authoritative gate, post-merge demoted to verification, branch-protection config recorded in-repo (human-only changes), stated exposure window, revert-PR rollback with strategy-correct mechanics (squash ⇒ ordinary `git revert <sha>`). |
@@ -709,8 +712,9 @@ runbooks (consuming `secure-migration-reviewer` verdicts and
 The 6-skill performance engineering pack (reconciliation §3 D12 table, built
 by D23, 2026-07-07): performance as an engineering discipline — these skills
 **design FOR performance**; the D10 pair below **measures** it (the seam is
-pinned in trigger-evals on both sides). All 6 ship both eval files; all are
-design/analysis skills that edit nothing → **model-invocable**.
+pinned in trigger-evals on both sides). All 6 ship both eval files. Four are
+model-invocable design/analysis skills; `query-plan-reader` (executing query analysis)
+and `n-plus-one-detector` (installing regression guards) are **manual-only**.
 `profiling-methodology-designer` attributes unexplained time and hands
 findings to the narrow tools: `query-plan-reader` (one heavy query) vs
 `n-plus-one-detector` (many fast queries — the sibling seam), and
@@ -723,8 +727,8 @@ default and defers a new cache store's isolation to
 | Skill | Source (D12.3 / D23) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
 | `profiling-methodology-designer` | reconciliation §3 D12.3 | yes | Where-does-time-go methodology: attribution level first (trace / on-CPU / off-CPU / allocation — low utilization means WAITING), measurement conditions (warm/cold, representative load + volume, overhead budget), narrowing loop with stop rule and ruled-out register, handoff map. Production attach = approval-gated; fixes nothing. |
-| `query-plan-reader` | reconciliation §3 D12.3 | yes | ONE query's plan → ranked verdict: dominant cost node, estimate-vs-actual divergence first (statistics refresh is the cheapest fix), sargability rewrites, composite indexes priced in write amplification, tenant/row-security predicate cost read, re-verification at representative volume. |
-| `n-plus-one-detector` | reconciliation §3 D12.3 | yes | Chatty data-access patterns (N+1, repeated identical, serial awaits, over-fetch) evidenced by per-request counts, fixed by pattern (eager/preload, batched loaders memoized per REQUEST scope — a tenant-leak boundary), guarded by query-count budgets in tests. Refuses the cache-the-storm reflex. |
+| `query-plan-reader` | reconciliation §3 D12.3 | **no** (manual-only; executes state-changing operations) | ONE query's plan → ranked verdict: dominant cost node, estimate-vs-actual divergence first (statistics refresh is the cheapest fix), sargability rewrites, composite indexes priced in write amplification, tenant/row-security predicate cost read, re-verification at representative volume. |
+| `n-plus-one-detector` | reconciliation §3 D12.3 | **no** (manual-only; executes state-changing operations) | Chatty data-access patterns (N+1, repeated identical, serial awaits, over-fetch) evidenced by per-request counts, fixed by pattern (eager/preload, batched loaders memoized per REQUEST scope — a tenant-leak boundary), guarded by query-count budgets in tests. Refuses the cache-the-storm reflex. |
 | `caching-strategy-designer` | reconciliation §3 D12.3 | yes | What/where/how-it-stays-correct caching: written consistency envelope per item, invalidation before shipping (backstop TTL always), tenant-qualified keys as a correctness boundary, stampede + cold-start protection, failure semantics, hit-ratio targets with a removal trigger. Authorization results never cached by default. |
 | `latency-budget-architect` | reconciliation §3 D12.3 | yes | End-to-end target → per-hop budgets with closing arithmetic: overhead rows (serialization, queue wait, connections, retries), honest tail math on fan-out, timeouts DERIVED from budgets with cascade checks, explicit headroom, budget-claim review rule. Consumes SLO targets; never sets them. |
 | `frontend-perf-engineer` | reconciliation §3 D12.3 | yes | The browser's share: metrics pinned to a device/network class, deletion-first weight audit, splitting with a floor, asset/font strategy, SSR/hydration honesty (the double bill), evidence-based runtime fixes, bundle-size + metric budgets as CI gates with a claim rule. |

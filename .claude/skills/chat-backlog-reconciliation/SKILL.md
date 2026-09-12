@@ -78,16 +78,20 @@ tracked repo doc, not chat history, is the working record from now on.
      resolve it.
    A chat message saying "done" is a claim, not evidence: without repo
    proof the ceiling is `unknown`.
-4. **Write the dated reconciliation doc** (one per sweep, dated filename)
-   with the extraction table + audit verdicts + citations.
+4. **Draft the dated reconciliation doc** (one per sweep, dated filename)
+   with the extraction table, verdicts and citations. Show exact path/content;
+   create/append under the standard's documentary exception using an applicable
+   current-session grant, or obtain missing approval once. Verify the write and
+   report its actual persistence level. Existing-file replacement is separate.
 5. **Route the survivors.** `not-active`-but-wanted and `partial` gaps go to
    the real backlog; unrecorded decisions go to the decision log/ADR flow;
    unrecorded approvals route to `scoped-approval-register`. Each routed
    item gets its destination noted in the doc.
-6. **Enforce the standing rule.** The doc (and the repo's agent
-   instructions, if they carry such rules) states: do not rely on stale chat
+6. **Propose the standing rule.** The reconciliation draft states: do not rely on stale chat
    history — use the tracked repo docs; future sessions cite the
-   reconciliation doc, not the conversations it drained.
+   reconciliation doc, not the conversations it drained. Changes to agent
+   instructions or governance policy belong to their manual authoring route;
+   this documentary phase does not apply them.
 7. **Set the next sweep boundary** — a reconciliation without a cadence
    decays into a one-off.
 

@@ -1,6 +1,7 @@
 ---
 name: docs-first-implementer
-description: Implement against frameworks, libraries, or external services by first identifying the EXACT versions installed in this repo and reading the matching documentation — official docs, local node_modules/vendored docs, changelogs — before writing any code. Summarizes only the syntax relevant to the task, implements, then verifies with the project's tests/build/lint. States uncertainty explicitly when docs for the pinned version are unavailable instead of guessing from training data. Use when implementing a feature that touches a framework or library API, when an API may have changed across versions, when integrating an external SDK or service, or after being burned by an API that "should exist" but doesn't in the installed version.
+description: "MANUAL-ONLY; never auto-invoke. Implement against frameworks, libraries, or external services by first identifying the EXACT versions installed in this repo and reading the matching documentation — official docs, local node_modules/vendored docs, changelogs — before writing any code. Summarizes only the syntax relevant to the task, implements, then verifies with the project's tests/build/lint. States uncertainty explicitly when docs for the pinned version are unavailable instead of guessing from training data. Use when implementing a feature that touches a framework or library API, when an API may have changed across versions, when integrating an external SDK or service, or after being burned by an API that \"should exist\" but doesn't in the installed version."
+disable-model-invocation: true
 ---
 
 # Docs-First Implementer
@@ -46,6 +47,12 @@ uncertainty is stated as a first-class output, not papered over.
    (from package scripts, CI config, or CLAUDE.md).
 
 ## Workflow
+
+Explicit human invocation selects this execution-capable skill; it does not
+expand the allowed target or activate TALI. Use applicable existing user grants
+without repeated consent. Before a state-changing command, confirm its actual
+files, environment and effects fit those grants; if authority is absent, propose
+the operation and obtain it before proceeding.
 
 1. **Pin the exact version.** Read the lockfile, not the manifest range.
    Record: library, locked version, and where it is imported today.
@@ -110,6 +117,12 @@ Verification: <exact commands + actual results>
   they beat a newer, shinier docs site.
 
 ## Stop Conditions
+
+- The skill was selected automatically rather than explicitly invoked by the
+  human: do not execute it. An agent may recommend the named manual skill.
+- A write, Git/network operation, database command or test side effect exceeds
+  the applicable human grant: stop that operation and obtain the missing scope.
+  Existing authorized operations do not need the same permission again.
 
 - No documentation for the installed version can be located and the changelog
   gap is unbridgeable → stop and present options (upgrade, spike, proceed

@@ -10,10 +10,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Builds a single index/log listing every ADR with number, title, date, and current status.",
-          "Assigns a lifecycle status (proposed/accepted/rejected/deprecated/superseded) to each, resolving ambiguous ones.",
-          "Wires bidirectional superseding links where later decisions replaced earlier ones.",
-          "Makes the corpus navigable and delegates authoring of any individual record to adr-writer.",
+          "Drafts a single index/log listing every ADR with number, title, date, and current status.",
+          "Proposes an evidenced lifecycle status (proposed/accepted/rejected/deprecated/superseded) to each, resolving ambiguous ones.",
+          "Proposes bidirectional superseding links where later decisions replaced earlier ones.",
+          "Proposes corpus navigation and delegates authoring of any individual record to adr-writer.",
           "Preserves superseded ADRs as history rather than deleting them."
         ]
       }
@@ -26,8 +26,8 @@
         "triggers": true,
         "assertions": [
           "Refuses the in-place overwrite: editing ADR-012 to change its decision erases the reasoning that was true when it was made.",
-          "Creates a NEW ADR (via adr-writer) that supersedes ADR-012, and marks ADR-012 'superseded by' the new record — bidirectional.",
-          "Keeps ADR-012 in the corpus as history with its updated status.",
+          "Drafts a NEW ADR via adr-writer and proposes the old ADR's status/backlink; no automatic existing-file mutation.",
+          "Preserves ADR-012 unchanged and labels the status update as proposed.",
           "Distinguishes this material change (new ADR) from a mere clarification (amendment)."
         ]
       }
@@ -40,7 +40,7 @@
         "triggers": true,
         "assertions": [
           "Surfaces the conflicting pair of currently-accepted ADRs rather than leaving the corpus self-contradictory.",
-          "Resolves it with a new superseding/reconciling ADR (authored via adr-writer) and correct status/link updates.",
+          "Proposes a superseding/reconciling ADR via adr-writer and corresponding status/link updates; unresolved human decisions stay unresolved.",
           "Routes any contested underlying FACT to source-of-truth-reconciler, and any genuinely new architecture decision to architecture-designer, before recording.",
           "Does not simply pick one silently."
         ]
@@ -54,7 +54,7 @@
         "triggers": true,
         "assertions": [
           "Refuses to delete a superseded ADR: it is still history and the trail from newer decisions back to it must survive.",
-          "Keeps it with a 'superseded by' status/link so the evolution stays traceable.",
+          "Keeps the historical record unchanged and proposes a 'superseded by' link where missing.",
           "Explains that append-only history is the point of an ADR corpus.",
           "Offers navigability improvements (grouping/tags) instead of deletion."
         ]
@@ -69,6 +69,19 @@
         "assertions": [
           "Does not invoke adr-sequencer: authoring one ADR's content (context/decision/alternatives/consequences/rollback) is adr-writer.",
           "Sequencing would only enter to place and link that record within the corpus, which is not what's asked."
+        ]
+      }
+    },
+    {
+      "id": "draft-boundary-does-not-write-existing-policy-or-records",
+      "type": "should_trigger",
+      "prompt": "Use adr-sequencer to prepare the proposed document changes for review; show the draft and proposed paths.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a complete conversation draft and proposed target paths, without claiming any file was changed.",
+          "Does not edit prior records, policy, executable authorization, or agent behavior files under the ordinary documentary exception.",
+          "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
         ]
       }
     }

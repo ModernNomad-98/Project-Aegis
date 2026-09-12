@@ -1,0 +1,127 @@
+[
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_validator.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.56,
+    "log": "windows-working-0.log",
+    "tail": [
+      "  PASS  elicitation sheet: the observed compound's atomic decomposition is shown",
+      "  PASS  evals: project-orchestrator has 47 cases, facilitator has 12",
+      "  PASS  evals: all orchestrator and facilitator eval IDs are unique",
+      "  PASS  evals: the three new orchestrator IDs and three new facilitator IDs each appear exactly once",
+      "  PASS  evals: the observed compound wording is represented on both sides",
+      "  PASS  evals: anti-overcorrection process case and same-target-options case present",
+      "",
+      "OK: 91 gate self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/validate-skills.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.305,
+    "log": "windows-working-1.log",
+    "tail": [
+      "Validating 184 skill(s) under .claude/skills/ ...",
+      "",
+      "",
+      "OK: 184 skill(s) valid, 0 warning(s)"
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_audit_skill_contracts.py"
+    ],
+    "exit_code": 0,
+    "seconds": 7.538,
+    "log": "windows-working-2.log",
+    "tail": [
+      "  PASS  output inside .claude/skills/ is refused (the tool stays read-only)",
+      "ERROR refusing to write output inside .claude/skills/: C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-fixture-ga35z46d\\repo\\.claude\\agents\\..\\skills\\escape.json",
+      "  PASS  output-path containment refuses a ../ traversal into .claude/skills/",
+      "  PASS  scanner enumerates exactly the on-disk corpus (184 skills)",
+      "  PASS  real project-state template still binds as an append-only contract surface",
+      "  PASS  audit output is deterministic across runs",
+      "",
+      "OK: 63 contract-audit self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "-m",
+      "tools.behavioral_eval_runner",
+      "self-check"
+    ],
+    "exit_code": 0,
+    "seconds": 2.189,
+    "log": "windows-working-3.log",
+    "tail": [
+      "      \"result\": \"PASS\"",
+      "    }",
+      "  ],",
+      "  \"live_dispatch\": \"DISABLED\",",
+      "  \"runner_version\": \"0.1.0-wp2b1\",",
+      "  \"schema_version\": \"1.0.0-wp2b1\",",
+      "  \"self_check\": \"PASS\"",
+      "}"
+    ]
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.115,
+    "log": "windows-working-4.log",
+    "tail": [
+      "warning: in the working copy of '.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'scripts/acceptance/Invoke-ScenarioAEvidence.ps1', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'scripts/acceptance/Test-ScenarioAEvidence.ps1', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'scripts/audit-skill-contracts.py', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'scripts/tests/test_audit_skill_contracts.py', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'tools/behavioral_eval_runner/graders/approval.py', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'tools/behavioral_eval_runner/graders/plan.py', LF will be replaced by CRLF the next time Git touches it",
+      "warning: in the working copy of 'tools/behavioral_eval_runner/schemas/scenario-a-grading-plan.schema.json', LF will be replaced by CRLF the next time Git touches it"
+    ]
+  },
+  {
+    "command": [
+      "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\phase01-sdk-venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/behavioral_eval_runner/tests",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "exit_code": 1,
+    "seconds": 199.721,
+    "log": "windows-working-5.log",
+    "tail": [
+      "    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "AssertionError: Items in the first set but not the second:",
+      "'approval_lifecycle_version'",
+      "",
+      "----------------------------------------------------------------------",
+      "Ran 985 tests in 197.051s",
+      "",
+      "FAILED (failures=1, skipped=14)"
+    ]
+  }
+]

@@ -33,7 +33,10 @@ Proposed ──► Accepted ──► Deprecated
 Every ADR has exactly one current status. Superseded/rejected records
 STAY in the corpus.
 
-## Superseding links (bidirectional)
+## Proposed superseding links (bidirectional)
+
+These are drafts for the separately authorized application route; this automatic
+review does not mutate old records or invent a human decision.
 
 - New ADR: "Supersedes ADR-0012".
 - Old ADR: status → Superseded; "Superseded by ADR-0045".
@@ -46,8 +49,8 @@ STAY in the corpus.
 |---|---|
 | Decision itself changes | NEW ADR that supersedes the old |
 | Consequence/tradeoff materially changes | NEW ADR (or amend with dated note if minor) |
-| Typo, broken link, formatting | Amend in place, dated note |
-| Clarification that doesn't change meaning | Amend in place, dated note |
+| Typo, broken link, formatting | Propose amendment with dated note; apply only under separate authorization |
+| Clarification that doesn't change meaning | Propose amendment with dated note; apply only under separate authorization |
 
 Never disguise a material decision change as an "amendment" — it makes
 the history lie.
@@ -63,8 +66,8 @@ nothing that was ever accepted or rejected.
 1. List currently-Accepted ADRs.
 2. Look for pairs whose decisions can't both hold now (same topic,
    opposite calls).
-3. For each: is one actually superseded (fix the link) or is there a real
+3. For each: is one actually superseded (propose the link correction) or is there a real
    live conflict?
-4. Resolve a live conflict with a new superseding/reconciling ADR
+4. Propose a resolution of a live conflict with a new superseding/reconciling ADR
    (authored via `adr-writer`). Contested facts → `source-of-truth-reconciler`;
    a genuinely new decision → `architecture-designer`.

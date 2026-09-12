@@ -1,0 +1,13 @@
+COMMAND git rev-parse 61f2a46 61f2a46^{tree} ffcbb2a ffcbb2a^{tree}
+61f2a4648dead20a7db557441a65dbfd4c1c045a
+7ec828f7b88d0ba8d800e4a5b703b8716e8382af
+ffcbb2a47d0e1a32578c5a5ae226e80a908d49bb
+344a51dbceec528f8223e47e38a8f08e8b0f913c
+EXIT 0
+COMMAND git diff --name-only 61f2a46..ffcbb2a
+docs/approval-lifecycle-grading.md
+scripts/acceptance/Invoke-ScenarioAEvidence.ps1
+scripts/acceptance/Test-ScenarioAEvidence.ps1
+EXIT 0
+COMMAND git diff --quiet 61f2a46..ffcbb2a -- tools .claude scripts/tests scripts/audit-skill-contracts.py
+EXIT 0

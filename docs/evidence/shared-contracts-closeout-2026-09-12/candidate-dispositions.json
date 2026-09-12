@@ -1,0 +1,2255 @@
+{
+  "baseline": {
+    "tool": "audit-skill-contracts",
+    "version": "1.13.0",
+    "engine_sha256": "7fdf02290b0b15ed353c6fe9b32c200b2ddc235a20d6aec201cc2f6582f90514",
+    "repo_sha": "f5e04ad07a5fd2b34b7470bffd38a50c15ce691a",
+    "branch": "fix/shared-skill-contracts",
+    "working_tree_dirty": false,
+    "dirty_paths_in_scanned_surfaces": [],
+    "audited_file_count": 704,
+    "audited_byte_count": 4023009,
+    "corpus_content_hash": "9443a936961bb15a92dfc733009fc70dc48f0b37116d7ce63c43b86fe7f040dd",
+    "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout — line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output — docs/skills-catalog.md (content → manifest `family`), the `.claude/agents/` filenames (→ known_names + manifest), and the `docs/paths/` filenames (→ manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
+    "auxiliary_inputs": {
+      "skills_catalog": {
+        "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
+        "sha256": "69cf03c5b4fc8faa447e13be2ea4ed54d366b0c054980f0d494caa70edd382e2"
+      },
+      "agent_names_enumerated": {
+        "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
+        "names": [
+          "ai-security-red-team-reviewer",
+          "full-codebase-auditor",
+          "principal-architecture-reviewer",
+          "qa-automation-lead",
+          "release-readiness-reviewer",
+          "secure-saas-reviewer",
+          "senior-troubleshooting-lead"
+        ]
+      },
+      "guided_path_names_enumerated": {
+        "kind": "enumerated name only (feeds manifest); not in corpus hash",
+        "names": [
+          "add-ai-safely.md",
+          "check-your-app.md",
+          "something-is-broken.md"
+        ]
+      }
+    },
+    "skill_count": 184,
+    "rule_count": 27,
+    "finding_count": 409,
+    "by_severity": {
+      "P0": 2,
+      "P1": 96,
+      "P2": 0,
+      "info": 311
+    },
+    "by_rule": {
+      "ARTF-001": 10,
+      "ROUTE-002": 311,
+      "SIDE-004": 82,
+      "STATE-001": 2,
+      "VOCAB-002": 4
+    },
+    "mechanical_count": 311,
+    "semantic_review_candidates": 98
+  },
+  "counts": {
+    "confirmed-fixed": 19,
+    "false-positive": 79
+  },
+  "candidate_count": 98,
+  "unresolved": 0,
+  "fingerprint_algorithm": "first 12 hex SHA256 of compact UTF-8 JSON [rule,file,reported_line,evidence], ensure_ascii=False",
+  "line_number_note": "SIDE-004 line 0 is a workflow-level match. Baseline ARTF-001 lines are body-relative; v1.13.1 restores raw-file anchors without altering detector semantics.",
+  "reviewers": [
+    "pr88_preflight_review (A-M SIDE context)",
+    "calibration_qa_skill_review (N-Z SIDE context)",
+    "shared_contracts_preflight (non-SIDE/core context)"
+  ],
+  "candidates": [
+    {
+      "fingerprint": "a9d93563fb4e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/adr-sequencer/SKILL.md",
+        "line": 0,
+        "owning_skill": "adr-sequencer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record) is written by `adr' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "adr-sequencer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Workflow applied ADR statuses/backlinks/amendments without a write boundary. Now proposes the corpus changes and requires the separate application route."
+    },
+    {
+      "fingerprint": "f1ba133f5d48",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/adr-writer/SKILL.md",
+        "line": 0,
+        "owning_skill": "adr-writer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "adr-writer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment appears as operational consequences to document, not an instruction to deploy."
+    },
+    {
+      "fingerprint": "b3bd1d00de23",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/adr-writer/SKILL.md",
+        "line": 0,
+        "owning_skill": "adr-writer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create `docs/adr/` with `NNNN-title.md`' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "adr-writer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Workflow created the ADR and changed its predecessor without the documentary boundary. Now drafts first, permits authorized ordinary create/append, and separates old-file amendments."
+    },
+    {
+      "fingerprint": "558d50c1550c",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/agent-authorization-matrix/SKILL.md",
+        "line": 72,
+        "owning_skill": "agent-authorization-matrix",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "agent-authorization-matrix",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durable means recurring authorization duration; expiry and record location are separately specified."
+    },
+    {
+      "fingerprint": "8a05dc17e2a8",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/agent-containment-reviewer/SKILL.md",
+        "line": 76,
+        "owning_skill": "agent-containment-reviewer",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "agent-containment-reviewer",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durable describes runtime recovery/checkpoints in the reviewed containment design."
+    },
+    {
+      "fingerprint": "c9f42470417f",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/agent-governance-audit/SKILL.md",
+        "line": 0,
+        "owning_skill": "agent-governance-audit",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "agent-governance-audit",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews historical deployment evidence; does not execute deployment."
+    },
+    {
+      "fingerprint": "f47e1e9f0fdd",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/agent-harness-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "agent-harness-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record schema itself is `audit-log' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "agent-harness-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Defines record schemas and test designs, not an execution step."
+    },
+    {
+      "fingerprint": "bb3093e5ea02",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/agent-harness-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "agent-harness-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write, design the test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "agent-harness-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Defines record schemas and test designs, not an execution step."
+    },
+    {
+      "fingerprint": "01d7fa836d67",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/agent-memory-governance/SKILL.md",
+        "line": 56,
+        "owning_skill": "agent-memory-governance",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "agent-memory-governance",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durable refers to temporally stable memory facts."
+    },
+    {
+      "fingerprint": "789f86009a42",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "ai-cost-guardrail-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'spend budgets' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "ai-cost-guardrail-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Designs spend budgets and controls; does not spend money."
+    },
+    {
+      "fingerprint": "0f6174262676",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
+        "line": 0,
+        "owning_skill": "ai-lifecycle-risk-manager",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "ai-lifecycle-risk-manager",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment is a lifecycle transition being designed."
+    },
+    {
+      "fingerprint": "0e35950e3488",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
+        "line": 0,
+        "owning_skill": "ai-sdlc-operating-model",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "ai-sdlc-operating-model",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment is part of the operating model being described."
+    },
+    {
+      "fingerprint": "e108d3d1e0b1",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/architecture-advisor/SKILL.md",
+        "line": 0,
+        "owning_skill": "architecture-advisor",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "architecture-advisor",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment is an architectural constraint/tradeoff."
+    },
+    {
+      "fingerprint": "8bb0d7e85f33",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/architecture-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "architecture-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "architecture-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "The deliverable is a migration plan, not an executed migration."
+    },
+    {
+      "fingerprint": "4498f88c3357",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/audit-log-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "audit-log-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'update/delete attempts on audit records' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "audit-log-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Specifies negative-test plans for audit tampering; does not mutate application data or implement tests."
+    },
+    {
+      "fingerprint": "cd80d535546d",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/audit-log-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "audit-log-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the negative-test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "audit-log-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Specifies negative-test plans for audit tampering; does not mutate application data or implement tests."
+    },
+    {
+      "fingerprint": "3a67e3fe59fc",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/audit-log-architect/SKILL.md",
+        "line": 7,
+        "owning_skill": "audit-log-architect",
+        "related_skills": [],
+        "evidence": "claims durability ('durably') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "audit-log-architect",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durability describes application audit-log storage and tamper tests."
+    },
+    {
+      "fingerprint": "ec1e2e83c945",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/azure-saas-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "azure-saas-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "azure-saas-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Defines a deployment architecture, not provisioning execution."
+    },
+    {
+      "fingerprint": "c447ef1d9ecd",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/background-job-orchestration-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "background-job-orchestration-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "background-job-orchestration-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Defines deployment/worker topology and rollout considerations."
+    },
+    {
+      "fingerprint": "1718315e3988",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/caching-strategy-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "caching-strategy-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "caching-strategy-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Cold-start and rollout behavior are design considerations."
+    },
+    {
+      "fingerprint": "c738e1a28c9e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/cell-based-architecture-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "cell-based-architecture-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "cell-based-architecture-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Specifies cell provisioning/deployment design."
+    },
+    {
+      "fingerprint": "aed901a3dd4b",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/change-classification-gate/SKILL.md",
+        "line": 0,
+        "owning_skill": "change-classification-gate",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'apply per class' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "change-classification-gate",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Applies classification/validation rules, not a source patch."
+    },
+    {
+      "fingerprint": "cc5d6121f605",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/chat-backlog-reconciliation/SKILL.md",
+        "line": 0,
+        "owning_skill": "chat-backlog-reconciliation",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'Write the dated reconciliation doc' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "chat-backlog-reconciliation",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Dated reconciliation output lacked an exact preview/persistence boundary. Now previews and records under applicable authorization; instruction changes use a separate manual route."
+    },
+    {
+      "fingerprint": "96ecec68777a",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/cloud-architecture-decider/SKILL.md",
+        "line": 0,
+        "owning_skill": "cloud-architecture-decider",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "cloud-architecture-decider",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Produces an architecture model and implementation handoff; does not execute the described rollout."
+    },
+    {
+      "fingerprint": "3b609751a5df",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/cloud-architecture-decider/SKILL.md",
+        "line": 0,
+        "owning_skill": "cloud-architecture-decider",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record to `adr' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "cloud-architecture-decider",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Produces an architecture model and implementation handoff; does not execute the described rollout."
+    },
+    {
+      "fingerprint": "587f846dfa1e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/code-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "code-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "code-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment appears as an object of review."
+    },
+    {
+      "fingerprint": "1a8fe16beee8",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/docs-as-code-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "docs-as-code-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "docs-as-code-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Designs the documentation pipeline and deployment process."
+    },
+    {
+      "fingerprint": "2d07a1c001f1",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/docs-first-implementer/SKILL.md",
+        "line": 0,
+        "owning_skill": "docs-first-implementer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'implemented defensively' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "docs-first-implementer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Implementation is an actual source mutation; now explicitly manual-only, with invocation fixtures aligned."
+    },
+    {
+      "fingerprint": "cbf2b5392e3b",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/domain-modeler/SKILL.md",
+        "line": 0,
+        "owning_skill": "domain-modeler",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'buy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "domain-modeler",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Buy/build is domain classification vocabulary, not a purchase instruction."
+    },
+    {
+      "fingerprint": "c795f727d3b2",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/flaky-test-detective/SKILL.md",
+        "line": 0,
+        "owning_skill": "flaky-test-detective",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Fix that one cause at the test layer** when it is a test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "flaky-test-detective",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Fixing the test is an actual source mutation; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "0e8547598c12",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/full-codebase-auditor/SKILL.md",
+        "line": 0,
+        "owning_skill": "full-codebase-auditor",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "full-codebase-auditor",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews deployment configuration and risks."
+    },
+    {
+      "fingerprint": "622c79126c90",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+        "line": 0,
+        "owning_skill": "gated-deployment-prompt-template",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "gated-deployment-prompt-template",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Matched text describes operation classes, future operator reporting and prompt drafting. Separate adjacent persistence defect is recorded below."
+    },
+    {
+      "fingerprint": "dd6434861691",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+        "line": 0,
+        "owning_skill": "gated-deployment-prompt-template",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'writes its report' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "gated-deployment-prompt-template",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Matched text describes operation classes, future operator reporting and prompt drafting. Separate adjacent persistence defect is recorded below."
+    },
+    {
+      "fingerprint": "cbf3d83a588f",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+        "line": 0,
+        "owning_skill": "gated-deployment-prompt-template",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the hard rules** — non-negotiables for every run of this class' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "gated-deployment-prompt-template",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Matched text describes operation classes, future operator reporting and prompt drafting. Separate adjacent persistence defect is recorded below."
+    },
+    {
+      "fingerprint": "a355ba062b8d",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "horizontal-scalability-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "horizontal-scalability-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews deployment/scaling configuration."
+    },
+    {
+      "fingerprint": "a7b7309d2c5b",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/human-approval-boundary/SKILL.md",
+        "line": 44,
+        "owning_skill": "human-approval-boundary",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "human-approval-boundary",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durable means a recurring grant class, not a claim of repository backup."
+    },
+    {
+      "fingerprint": "5cbf3bb6687a",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/incident-response-runbook/SKILL.md",
+        "line": 0,
+        "owning_skill": "incident-response-runbook",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "incident-response-runbook",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Asks responders about deployment and describes operator response steps."
+    },
+    {
+      "fingerprint": "dccc30dba2cb",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/latency-budget-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "latency-budget-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'spend budget' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "latency-budget-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Spend refers to milliseconds of latency budget."
+    },
+    {
+      "fingerprint": "0b88286e2532",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "llm-output-safety-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'writes and runs code' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "llm-output-safety-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews whether the application can execute unsafe output; does not execute it."
+    },
+    {
+      "fingerprint": "15dce89cb04d",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
+        "line": 0,
+        "owning_skill": "local-ci-mirror-preflight",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [vcs-mutation]: 'git worktree' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "local-ci-mirror-preflight",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Git worktree add/remove and fetch change state; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "fd631aefa5b2",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "memory-context-poisoning-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'write — untrusted-derived entries' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "memory-context-poisoning-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews proposed memory/artifact mutations as threat surfaces."
+    },
+    {
+      "fingerprint": "99e522783032",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+        "line": 0,
+        "owning_skill": "merge-is-deploy-governance",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "merge-is-deploy-governance",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Matched text describes merge/deploy reality and classifies fix-forward, not an execution command. Separate adjacent governance persistence defect is recorded below."
+    },
+    {
+      "fingerprint": "f042a47be4b0",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+        "line": 0,
+        "owning_skill": "merge-is-deploy-governance",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'fix-forward — not a \"gate failure' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "merge-is-deploy-governance",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Matched text describes merge/deploy reality and classifies fix-forward, not an execution command. Separate adjacent governance persistence defect is recorded below."
+    },
+    {
+      "fingerprint": "83273b09b135",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/multi-tenant-data-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "multi-tenant-data-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "multi-tenant-data-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Produces a migration plan and test criteria."
+    },
+    {
+      "fingerprint": "42971cea16b4",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+        "line": 0,
+        "owning_skill": "multi-tenant-security-tester",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'Seed tenant A and tenant' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "multi-tenant-security-tester",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Tenant seeding mutates a datastore; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "4fddf62ad7a5",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+        "line": 0,
+        "owning_skill": "multi-tenant-security-tester",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'implement the suite' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "multi-tenant-security-tester",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Implementing an isolation suite writes source/tests; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "c5b99371959d",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/n-plus-one-detector/SKILL.md",
+        "line": 0,
+        "owning_skill": "n-plus-one-detector",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [install]: 'Install the regression guard' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "n-plus-one-detector",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Installing regression guards actually changes hooks/tests; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "6bc6a44741e6",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/offline-first-sync-architect/SKILL.md",
+        "line": 74,
+        "owning_skill": "offline-first-sync-architect",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "offline-first-sync-architect",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durable queue storage explicitly uses IndexedDB/SQLite and restart behavior."
+    },
+    {
+      "fingerprint": "52859dc41b96",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/onboarding-doc-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "onboarding-doc-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "onboarding-doc-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Documents an existing deployment process for onboarding."
+    },
+    {
+      "fingerprint": "8002c36c93d6",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
+        "line": 88,
+        "owning_skill": "operational-vs-analytical-splitter",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "operational-vs-analytical-splitter",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durability is a data-architecture property, not conversation memory."
+    },
+    {
+      "fingerprint": "3754dbdf8734",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/phased-work-handoff-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "phased-work-handoff-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'stage doesn\\'t say \"tests' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "phased-work-handoff-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Requests evidence of earlier changes for handoff, not new execution."
+    },
+    {
+      "fingerprint": "55c4ef3f9e96",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/product-analytics-instrumenter/SKILL.md",
+        "line": 0,
+        "owning_skill": "product-analytics-instrumenter",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchases' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "product-analytics-instrumenter",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Purchase is an analytics event and instrumentation target."
+    },
+    {
+      "fingerprint": "dc675e4c54f3",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/project-orchestrator/SKILL.md",
+        "line": 0,
+        "owning_skill": "project-orchestrator",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "project-orchestrator",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment wording is a handoff; the matched create leg already requires a complete preview and approval. Separate projection/authority contradictions were fixed without relabeling this match."
+    },
+    {
+      "fingerprint": "4e37420fa5f2",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/project-orchestrator/SKILL.md",
+        "line": 0,
+        "owning_skill": "project-orchestrator",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create leg — the COMPLETE initial document' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "project-orchestrator",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment wording is a handoff; the matched create leg already requires a complete preview and approval. Separate projection/authority contradictions were fixed without relabeling this match."
+    },
+    {
+      "fingerprint": "73eb61238d1b",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/project-orchestrator/SKILL.md",
+        "line": 354,
+        "owning_skill": "project-orchestrator",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "project-orchestrator",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Artifact durability level was ambiguous. Now distinguishes transcript-only, workspace persistence, Git tracking, local commit and remote persistence with verification."
+    },
+    {
+      "fingerprint": "6e2c2a907373",
+      "baseline_finding": {
+        "rule": "STATE-001",
+        "severity": "P0",
+        "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
+        "line": 171,
+        "owning_skill": "project-orchestrator",
+        "related_skills": [],
+        "evidence": "append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)",
+        "family": "state-append",
+        "aegis_map": [
+          "AEGIS-002",
+          "AEGIS-006"
+        ],
+        "remediation_owner": "project-orchestrator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "The copyable empty-state row is preserved under rule 9 and the acceptance regressions. Replacing it would fabricate evidence; retained as a reviewed false positive."
+    },
+    {
+      "fingerprint": "b6395d760c2a",
+      "baseline_finding": {
+        "rule": "STATE-001",
+        "severity": "P0",
+        "file": ".claude/skills/project-orchestrator/references/project-state-template.md",
+        "line": 183,
+        "owning_skill": "project-orchestrator",
+        "related_skills": [],
+        "evidence": "append-only-declared file carries mutable placeholder 'none yet' (will demand later replacement the contract forbids)",
+        "family": "state-append",
+        "aegis_map": [
+          "AEGIS-002",
+          "AEGIS-006"
+        ],
+        "remediation_owner": "project-orchestrator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "The copyable empty-state row is preserved under rule 9 and the acceptance regressions. Replacing it would fabricate evidence; retained as a reviewed false positive."
+    },
+    {
+      "fingerprint": "5fd221b7f16f",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/qa-automation-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "qa-automation-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the migration' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "qa-automation-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Specifies a migration test plan and implementation handoff."
+    },
+    {
+      "fingerprint": "8f2be73eabb1",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/qa-strategy-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "qa-strategy-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded database' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "qa-strategy-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Designs test environments and seeding requirements."
+    },
+    {
+      "fingerprint": "9fdb313ac9f4",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/query-plan-reader/SKILL.md",
+        "line": 0,
+        "owning_skill": "query-plan-reader",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'execution EXECUTES the write' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "query-plan-reader",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "EXPLAIN ANALYZE on mutation SQL executes the write even inside a rollback; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "ea48cd21c601",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/query-plan-reader/SKILL.md",
+        "line": 0,
+        "owning_skill": "query-plan-reader",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'apply (via the change' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "query-plan-reader",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "The source-write match describes the change-process handoff; the actual datastore execution is separately confirmed."
+    },
+    {
+      "fingerprint": "3bca99f68ee4",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/realtime-subscription-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "realtime-subscription-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "realtime-subscription-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Describes deployment design and lifecycle behavior."
+    },
+    {
+      "fingerprint": "0f5cb0f175bb",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/regression-suite-curator/SKILL.md",
+        "line": 0,
+        "owning_skill": "regression-suite-curator",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'fixed bug' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "regression-suite-curator",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Produces prioritized work items and implementation handoff."
+    },
+    {
+      "fingerprint": "da3954c0c33c",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/release-readiness-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "release-readiness-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploying' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "release-readiness-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment is reviewed for readiness, not performed."
+    },
+    {
+      "fingerprint": "7197eb6bbbb7",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/reviewable-diff-discipline/SKILL.md",
+        "line": 0,
+        "owning_skill": "reviewable-diff-discipline",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record it for the closeout' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "reviewable-diff-discipline",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "The matched documentation phrase reports unrelated findings. Separate adjacent Git mutation is recorded below."
+    },
+    {
+      "fingerprint": "856f570f6c8c",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+        "line": 0,
+        "owning_skill": "risk-tiered-validation-selector",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'Write the docs' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "risk-tiered-validation-selector",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Classifies the proposed change and chooses validation depth."
+    },
+    {
+      "fingerprint": "b93baa896367",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+        "line": 0,
+        "owning_skill": "risk-tiered-validation-selector",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the forced-full list:** surfaces whose risk ignores diff' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "risk-tiered-validation-selector",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Classifies the proposed change and chooses validation depth."
+    },
+    {
+      "fingerprint": "a9e5ad4717f7",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/rls-policy-auditor/SKILL.md",
+        "line": 0,
+        "owning_skill": "rls-policy-auditor",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'INSERT/WITH CHECK:** can a row' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "rls-policy-auditor",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Provides a SQL negative-test plan and proposed policy findings; not test execution."
+    },
+    {
+      "fingerprint": "07c6ac63563e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/rls-policy-auditor/SKILL.md",
+        "line": 0,
+        "owning_skill": "rls-policy-auditor",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the negative-test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "rls-policy-auditor",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Provides a SQL negative-test plan and proposed policy findings; not test execution."
+    },
+    {
+      "fingerprint": "faf8a2e00fed",
+      "baseline_finding": {
+        "rule": "VOCAB-002",
+        "severity": "P1",
+        "file": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md",
+        "line": 3,
+        "owning_skill": "roadmap-under-uncertainty-planner",
+        "related_skills": [
+          "roadmap-to-commitments-translator"
+        ],
+        "evidence": "'committed' used as a roadmap HORIZON label ('committed/planned/exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
+        "family": "vocabulary",
+        "aegis_map": [
+          "AEGIS-044",
+          "AEGIS-039"
+        ],
+        "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Now/Next/Later was conflated with committed/planned/exploratory. Horizons are now nonbinding; readiness and actual human commitment evidence remain separate."
+    },
+    {
+      "fingerprint": "926f70e4f4e4",
+      "baseline_finding": {
+        "rule": "VOCAB-002",
+        "severity": "P1",
+        "file": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md",
+        "line": 62,
+        "owning_skill": "roadmap-under-uncertainty-planner",
+        "related_skills": [
+          "roadmap-to-commitments-translator"
+        ],
+        "evidence": "'committed' used as a roadmap HORIZON label ('committed/planned/\\n   exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
+        "family": "vocabulary",
+        "aegis_map": [
+          "AEGIS-044",
+          "AEGIS-039"
+        ],
+        "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Now/Next/Later was conflated with committed/planned/exploratory. Horizons are now nonbinding; readiness and actual human commitment evidence remain separate."
+    },
+    {
+      "fingerprint": "14b297bf4fe2",
+      "baseline_finding": {
+        "rule": "VOCAB-002",
+        "severity": "P1",
+        "file": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md",
+        "line": 100,
+        "owning_skill": "roadmap-under-uncertainty-planner",
+        "related_skills": [
+          "roadmap-to-commitments-translator"
+        ],
+        "evidence": "'committed' used as a roadmap HORIZON label ('Now (committed)') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
+        "family": "vocabulary",
+        "aegis_map": [
+          "AEGIS-044",
+          "AEGIS-039"
+        ],
+        "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Now/Next/Later was conflated with committed/planned/exploratory. Horizons are now nonbinding; readiness and actual human commitment evidence remain separate."
+    },
+    {
+      "fingerprint": "85702ccb524e",
+      "baseline_finding": {
+        "rule": "VOCAB-002",
+        "severity": "P1",
+        "file": ".claude/skills/roadmap-under-uncertainty-planner/references/roadmap-uncertainty-sheet.md",
+        "line": 10,
+        "owning_skill": "roadmap-under-uncertainty-planner",
+        "related_skills": [
+          "roadmap-to-commitments-translator"
+        ],
+        "evidence": "'committed' used as a roadmap HORIZON label ('Committed / Planned / Exploratory') while roadmap-to-commitments-translator reserves 'committed' for capacity-backed promises (AEGIS-044)",
+        "family": "vocabulary",
+        "aegis_map": [
+          "AEGIS-044",
+          "AEGIS-039"
+        ],
+        "remediation_owner": "roadmap-under-uncertainty-planner + roadmap-to-commitments-translator",
+        "confidence": "high",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Now/Next/Later was conflated with committed/planned/exploratory. Horizons are now nonbinding; readiness and actual human commitment evidence remain separate."
+    },
+    {
+      "fingerprint": "654286e60536",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/rollback-runbook-author/SKILL.md",
+        "line": 0,
+        "owning_skill": "rollback-runbook-author",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "rollback-runbook-author",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Authors instructions for the operator, not a deployment."
+    },
+    {
+      "fingerprint": "e3dddcdaa7da",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/saas-platform-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "saas-platform-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "saas-platform-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment and spending are platform design tradeoffs."
+    },
+    {
+      "fingerprint": "0381b721f014",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/saas-platform-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "saas-platform-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'buy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "saas-platform-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Deployment and spending are platform design tradeoffs."
+    },
+    {
+      "fingerprint": "784ed5d6308e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/schema-evolution-planner/SKILL.md",
+        "line": 0,
+        "owning_skill": "schema-evolution-planner",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "schema-evolution-planner",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Authors migration/deployment plans, not execution."
+    },
+    {
+      "fingerprint": "f52240b919d7",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/schema-evolution-planner/SKILL.md",
+        "line": 0,
+        "owning_skill": "schema-evolution-planner",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write from application code' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "schema-evolution-planner",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Authors migration/deployment plans, not execution."
+    },
+    {
+      "fingerprint": "816b9c17b896",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/scoped-approval-register/SKILL.md",
+        "line": 0,
+        "owning_skill": "scoped-approval-register",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'create the register' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "scoped-approval-register",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Creating/registering grants lacked a consistent documentary boundary and immutable lifecycle. Now previews authorized transcription, appends lifecycle facts and preserves actual grant scope."
+    },
+    {
+      "fingerprint": "c98363f361ed",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/scoped-approval-register/SKILL.md",
+        "line": 6,
+        "owning_skill": "scoped-approval-register",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "scoped-approval-register",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Artifact durability level was ambiguous. Now distinguishes transcript-only, workspace persistence, Git tracking, local commit and remote persistence with verification."
+    },
+    {
+      "fingerprint": "8be055f5b441",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/screenshot-evidence-planner/SKILL.md",
+        "line": 0,
+        "owning_skill": "screenshot-evidence-planner",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded data' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "screenshot-evidence-planner",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Defines required capture data; does not seed a datastore."
+    },
+    {
+      "fingerprint": "9015dfdb772a",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/search-architecture-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "search-architecture-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write latency) vs asynchronous (index via change' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "search-architecture-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Index writes and purchase choices are design tradeoffs."
+    },
+    {
+      "fingerprint": "ab389ffa6184",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/search-architecture-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "search-architecture-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'buys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "search-architecture-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Index writes and purchase choices are design tradeoffs."
+    },
+    {
+      "fingerprint": "61ce1fcdc478",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/secure-migration-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "secure-migration-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'Deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "secure-migration-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Reviews deployment/migration steps."
+    },
+    {
+      "fingerprint": "93aaa02f02b5",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/security-logging-alerting-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "security-logging-alerting-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'implemented by `observability-operator` (manual-only); logging changes' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "security-logging-alerting-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Explicitly hands implementation to manual-only observability-operator."
+    },
+    {
+      "fingerprint": "e1b18dd29462",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/skill-deprecation-planner/SKILL.md",
+        "line": 0,
+        "owning_skill": "skill-deprecation-planner",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record (catalog retired section + decision-log entry' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "skill-deprecation-planner",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Plans retirement records, compatibility work and coverage; does not execute them."
+    },
+    {
+      "fingerprint": "1663f9ba9377",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/skill-deprecation-planner/SKILL.md",
+        "line": 0,
+        "owning_skill": "skill-deprecation-planner",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'write the coverage diff' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "skill-deprecation-planner",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Plans retirement records, compatibility work and coverage; does not execute them."
+    },
+    {
+      "fingerprint": "0f805de3a1cb",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "skill-quality-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "skill-quality-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Lists side effects in the skill under review as classification inputs."
+    },
+    {
+      "fingerprint": "267a5f9f870e",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "skill-quality-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'edits files/config' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "skill-quality-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Lists side effects in the skill under review as classification inputs."
+    },
+    {
+      "fingerprint": "25f8322b5367",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/skill-quality-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "skill-quality-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'spends money' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "skill-quality-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Lists side effects in the skill under review as classification inputs."
+    },
+    {
+      "fingerprint": "2f9f6c9e19ff",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
+        "line": 0,
+        "owning_skill": "soc2-trust-criteria-mapper",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'buy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "soc2-trust-criteria-mapper",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Buy is customer-purchase context for criteria mapping."
+    },
+    {
+      "fingerprint": "26bf369fd6ce",
+      "baseline_finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/streaming-event-architect/SKILL.md",
+        "line": 75,
+        "owning_skill": "streaming-event-architect",
+        "related_skills": [],
+        "evidence": "claims durability ('Durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "streaming-event-architect",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Durability refers to runtime log/replay/ordering behavior."
+    },
+    {
+      "fingerprint": "770bc4072042",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/structured-output-validator/SKILL.md",
+        "line": 0,
+        "owning_skill": "structured-output-validator",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeding a banned-content fixture' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "structured-output-validator",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Uses synthetic banned-content inputs for validation, not a datastore mutation."
+    },
+    {
+      "fingerprint": "78d446287db9",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/systematic-debugger/SKILL.md",
+        "line": 0,
+        "owning_skill": "systematic-debugger",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Fix one thing' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "systematic-debugger",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "The debugging workflow applies a fix; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "0b5d7fa2c547",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/tdd-engineer/SKILL.md",
+        "line": 0,
+        "owning_skill": "tdd-engineer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the failing test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "tdd-engineer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "confirmed-fixed",
+      "rationale": "Red/green development writes tests and source; now explicitly manual-only."
+    },
+    {
+      "fingerprint": "6a12b75d1c4a",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
+        "line": 0,
+        "owning_skill": "tenant-isolation-reviewer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the negative-test plan**: concrete tests' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "tenant-isolation-reviewer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Writes a negative-test plan, not application test source."
+    },
+    {
+      "fingerprint": "d299fa964a62",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/tenant-modeler/SKILL.md",
+        "line": 0,
+        "owning_skill": "tenant-modeler",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'provisioning' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "tenant-modeler",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Provisioning is a lifecycle design state."
+    },
+    {
+      "fingerprint": "875d5e28f654",
+      "baseline_finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/threat-modeler/SKILL.md",
+        "line": 0,
+        "owning_skill": "threat-modeler",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'Write the validation test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "threat-modeler",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "disposition": "false-positive",
+      "rationale": "Produces a validation test plan, not executable changes."
+    }
+  ],
+  "adjacent_confirmed_fixed": [
+    {
+      "skill": "gated-deployment-prompt-template",
+      "finding": "Actual persistence of a behavior-steering prompt and index lacked the excluded-file boundary.",
+      "fix": "Automatic route now returns conversation drafts/proposed paths; separately invoked persistence required."
+    },
+    {
+      "skill": "merge-is-deploy-governance",
+      "finding": "Actual repository governance-policy persistence was instructed from an automatic route.",
+      "fix": "Automatic route now drafts policy, with separate manual persistence/application."
+    },
+    {
+      "skill": "reviewable-diff-discipline",
+      "finding": "Stash/stage/unstage commands actually mutate Git state despite the matched SIDE phrase itself being a false positive.",
+      "fix": "Explicit manual-only posture and aligned invocation cases."
+    }
+  ]
+}

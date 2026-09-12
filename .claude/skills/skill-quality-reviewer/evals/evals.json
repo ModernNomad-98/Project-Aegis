@@ -64,9 +64,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Check 7 PASS: the write matches the standard's single §5 approved-write exception — it creates or appends a non-executable documentation/state file, second-phase only, with exact preview and explicit, content-specific, single-use in-session approval — so the skill stays auto-invocable with no posture flip.",
+          "Check 7 PASS: this create/append flow falls within §5 Exception 1, with exact preview and applicable explicit authorization; the skill stays auto-invocable within that boundary.",
           "Does not demand `disable-model-invocation: true` on the strength of this write alone; the absolute pre-D52 side-effects-means-manual-only rule is not applied.",
-          "The exception's shape is verified from the WORKFLOW TEXT (preview step and approval step actually present), not assumed from the skill's self-description — a missing preview or blanket approval would void the exception."
+          "Verifies the workflow's exact preview and actual authority scope, honoring an applicable existing current-session grant without repeat consent; an unscoped claim of blanket permission is insufficient."
         ]
       }
     },
@@ -77,7 +77,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Check 7 FAIL: the §5 exception explicitly excludes agent-instruction or behavior-steering files and security, identity, authorization, policy, and CI/workflow files — AGENTS.md and an authorization file are named as excluded targets, so the preview-and-approval ceremony does NOT keep the skill auto-invocable.",
+          "Check 7 FAIL: AGENTS.md and an operative authorization-policy matrix remain excluded agent-instruction/policy targets. The documentary carveout for immutable transcription of actual human decisions cannot authorize changing those rules.",
           "Requires `disable-model-invocation: true` plus the irreversible step named in Stop Conditions; the recommendation cannot be ship while the posture stays auto-invocable.",
           "Does not accept approval ceremony as a substitute for the manual-only posture on excluded targets — the exception is scoped by TARGET class, not by how polite the write flow is."
         ]
@@ -92,6 +92,42 @@
         "assertions": [
           "Does not invoke skill-quality-reviewer: the target is a CHANGE's governance trail (approvals, merge authority, closeout), not a skill definition's quality — that is agent-governance-audit.",
           "The skill added by that PR could separately be quality-reviewed, but only if asked; process compliance and skill quality are different verdicts on different evidence."
+        ]
+      }
+    },
+    {
+      "id": "edge-existing-documentary-grant-remains-auto",
+      "type": "should_trigger",
+      "prompt": "Review an automatic recorder that previews and appends immutable transcripts of already evidenced human decisions and lifecycle facts to a non-executable approvals register under my existing current-session recording grant.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Posture passes only within the standard documentary carveout; the record creates no new authority.",
+          "Does not demand the same recording grant again; executable permission or governance-policy changes remain excluded."
+        ]
+      }
+    },
+    {
+      "id": "edge-six-projections-with-existing-grant",
+      "type": "should_trigger",
+      "prompt": "Review an automatic project-state recorder that previews updates to exactly Current product summary, Current approved scope, Current users/roles, Current success definition, Open questions, and Next recommended action under an existing explicit grant.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Allows only those six evidenced projection bodies under the granted documentary exception; verifies old records and unrelated sections stay unchanged.",
+          "Preserves the existing grant without repeat consent; excludes permission configuration, agent instructions, governance policy and immutable history from projection refresh."
+        ]
+      }
+    },
+    {
+      "id": "edge-immutable-overwrite-never-a-projection",
+      "type": "should_trigger",
+      "prompt": "Review a recorder that treats the Approvals table as a projection and flips old ACTIVE status fields to REVOKED under ordinary doc-refresh approval.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Fails the contract: immutable history is not one of the six projections.",
+          "Requires appending evidenced lifecycle events while preserving prior rows; cannot hide the overwrite behind an approval ceremony."
         ]
       }
     }

@@ -276,6 +276,34 @@ function Invoke-GitCapture {
 # Placeholders are treated as immutable rows exactly like evidence: the schema (rule 9)
 # preserves them - the first real entry is APPENDED after the placeholder, and the
 # placeholder is never edited, replaced, or deleted.
+function Get-StateSyntaxLine {
+    param([string] $Line, [ref] $InsideComment)
+    # Mask comments for syntax detection while retaining original bytes in the
+    # parsed document. Inline comments must not hide a real heading either.
+    $masked = $Line; $cursor = 0
+    if ($InsideComment.Value) {
+        $end = $Line.IndexOf('-->', [StringComparison]::Ordinal)
+        if ($end -lt 0) { return (' ' * $Line.Length) }
+        $cursor = $end + 3
+        $masked = (' ' * $cursor) + $Line.Substring($cursor)
+        $InsideComment.Value = $false
+    }
+    while ($cursor -lt $Line.Length) {
+        $start = $Line.IndexOf('<!--', $cursor, [StringComparison]::Ordinal)
+        if ($start -lt 0) { break }
+        $end = $Line.IndexOf('-->', $start + 4, [StringComparison]::Ordinal)
+        if ($end -lt 0) {
+            if ($Line.Substring(0, $start) -notmatch '^ {0,3}$') { throw 'Ambiguous inline/indented-code multiline-comment opener; use a standalone template comment' }
+            $masked = $masked.Substring(0, $start) + (' ' * ($Line.Length - $start))
+            $InsideComment.Value = $true; break
+        }
+        $length = $end + 3 - $start
+        $masked = $masked.Substring(0, $start) + (' ' * $length) + $masked.Substring($end + 3)
+        $cursor = $end + 3
+    }
+    return $masked
+}
+
 function Get-ImmutableRows {
     param([Parameter(Mandatory)][string] $Content)
 
@@ -285,18 +313,37 @@ function Get-ImmutableRows {
     # Slice the document into sections keyed by their '## ' header.
     $rawBySection = @{}
     $curKey = $null
+    $fence = $null
+    $inComment = $false
     foreach ($line in $lines) {
-        if ($line -match '^\s*##\s+(.*)$') {
+        $syntaxLine = $line
+        if ($null -eq $fence) { $syntaxLine = Get-StateSyntaxLine $line ([ref]$inComment) }
+        if ($syntaxLine -match '^ {0,3}(`{3,}|~{3,})(.*)$') {
+            $marker = $Matches[1]
+            $tail = $Matches[2]
+            if ($null -eq $fence) {
+                if ($marker[0] -ceq [char]96 -and $tail.Contains([string][char]96)) { throw 'Ambiguous backtick fence opener' }
+                $fence = $marker
+            }
+            elseif ($marker[0] -ceq $fence[0] -and $marker.Length -ge $fence.Length -and $tail -match '^[ \t]*$') { $fence = $null }
+            continue
+        }
+        if ($null -ne $fence) { continue }
+        if ($syntaxLine -match '^ {0,3}#{1,6}[ \t]+(.*)$') {
             $header = $Matches[1].Trim()
             $curKey = $null
+            if ($syntaxLine -notmatch '^ {0,3}##[ \t]+') { continue }
             if ($header -like 'State snapshots*') { $curKey = 'State snapshots' }
             elseif ($header -like 'Decision log*') { $curKey = 'Decision log' }
             elseif ($header -like 'Approvals*')     { $curKey = 'Approvals' }
             elseif ($header -like 'Deviations*')     { $curKey = 'Deviations' }
-            if ($curKey) { $rawBySection[$curKey] = New-Object System.Collections.Generic.List[string] }
+            if ($curKey) {
+                if ($rawBySection.ContainsKey($curKey)) { throw "Duplicate immutable section: $curKey" }
+                $rawBySection[$curKey] = New-Object System.Collections.Generic.List[string]
+            }
             continue
         }
-        if ($curKey) { $rawBySection[$curKey].Add($line) }
+        if ($curKey -and -not [string]::IsNullOrWhiteSpace($syntaxLine)) { $rawBySection[$curKey].Add($line) }
     }
 
     $result = @{}
@@ -323,7 +370,7 @@ function Get-ImmutableRows {
                     # (indices <= sepIdx are the header row and the separator itself).
                     if ($i -le $sepIdx) { continue }
                     if ($ln -notmatch '^\s*\|') { continue }
-                    $rows.Add($ln.Trim())
+                    $rows.Add($ln)
                 } else {
                     # Non-table section (Deviations): a '- ' bullet STARTS a row; any other
                     # non-empty, non-comment line is a wrapped CONTINUATION of the previous
@@ -332,9 +379,9 @@ function Get-ImmutableRows {
                     # check. A stray continuation with no preceding bullet has nothing to
                     # attach to and is ignored.
                     if ($ln -match '^\s*-\s') {
-                        $rows.Add($ln.Trim())
+                        $rows.Add($ln)
                     } elseif ($rows.Count -gt 0) {
-                        $rows[$rows.Count - 1] = $rows[$rows.Count - 1] + ' ' + $ln.Trim()
+                        $rows[$rows.Count - 1] = $rows[$rows.Count - 1] + "`n" + $ln
                     }
                 }
             }
@@ -367,7 +414,7 @@ function Test-AppendOnly {
             $problems.Add("[$key] an immutable row was DELETED (prev $($prev.Count) row(s) -> now $($cur.Count)); previous rows, including empty-state placeholders, are preserved.")
         } else {
             for ($i = 0; $i -lt $prev.Count; $i++) {
-                if ($cur[$i] -ne $prev[$i]) {
+                if ($cur[$i] -cne $prev[$i]) {
                     $problems.Add("[$key] immutable row #$($i + 1) was edited, reordered, or replaced (every previous row must be preserved byte-for-byte).")
                 }
             }
@@ -382,6 +429,100 @@ function Test-AppendOnly {
         Problems = @($problems)
         Added    = @($added)
     }
+}
+
+# Full-document refresh guard. Unknown sections, preamble, header order and
+# immutable scaffolding are protected; only six exact projection bodies may
+# change. Structural document changes require a separate operation/approval.
+function Get-ProjectStateSections {
+    param([Parameter(Mandatory)][string] $Content)
+    $sections = New-Object System.Collections.Generic.List[object]
+    $current = [pscustomobject]@{ Header = ''; Lines = (New-Object System.Collections.Generic.List[string]) }
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $fence = $null
+    $inComment = $false
+    foreach ($line in (Split-IntoLines $Content)) {
+        $syntaxLine = $line
+        if ($null -eq $fence) { $syntaxLine = Get-StateSyntaxLine $line ([ref]$inComment) }
+        if ($null -eq $fence -and $syntaxLine -match '^ {0,3}(?:=+|-+)[ \t]*$') { throw 'Unsupported Setext heading/thematic-break syntax; use the flat ATX project-state template' }
+        if ($null -eq $fence -and $syntaxLine -match '^ {0,3}#{1,6}[ \t]*$') { throw 'Empty ATX heading cannot define a project-state section' }
+        if ($null -eq $fence -and $syntaxLine -match '^ {0,3}<(?:[!?]|/?[A-Za-z][A-Za-z0-9-]*(?:[ \t/>]|$))') { throw 'Unsupported raw HTML block; use the flat project-state template' }
+        if ($syntaxLine -match '^ {0,3}(`{3,}|~{3,})(.*)$') {
+            $marker = $Matches[1]
+            $tail = $Matches[2]
+            if ($null -eq $fence) {
+                if ($marker[0] -ceq [char]96 -and $tail.Contains([string][char]96)) { throw 'Ambiguous backtick fence opener' }
+                $fence = $marker
+            }
+            elseif ($marker[0] -ceq $fence[0] -and $marker.Length -ge $fence.Length -and $tail -match '^[ \t]*$') { $fence = $null }
+            $current.Lines.Add($line)
+        } elseif ($null -eq $fence -and $syntaxLine -match '^ {0,3}#{1,6}[ \t]+(.+)$') {
+            $name = $Matches[1]
+            if (-not $seen.Add($name)) { throw "Duplicate project-state section: $name" }
+            $sections.Add($current)
+            $current = [pscustomobject]@{ Header = $line; Lines = (New-Object System.Collections.Generic.List[string]) }
+        } else { $current.Lines.Add($line) }
+    }
+    if ($null -ne $fence) { throw 'Unclosed fenced block in project-state document' }
+    if ($inComment) { throw 'Unclosed HTML comment in project-state document' }
+    $sections.Add($current)
+    return ,$sections.ToArray()
+}
+
+function Test-ProjectStateTransition {
+    param([Parameter(Mandatory)][string] $PreviousContent,
+          [Parameter(Mandatory)][string] $CurrentContent)
+    $problems = New-Object System.Collections.Generic.List[string]
+    $changed = New-Object System.Collections.Generic.List[string]
+    $added = @()
+    $projectionNames = @('Current product summary', 'Current approved scope',
+        'Current users/roles', 'Current success definition', 'Open questions', 'Next recommended action')
+    try {
+        $previous = Get-ProjectStateSections $PreviousContent
+        $current = Get-ProjectStateSections $CurrentContent
+        $ao = Test-AppendOnly (Get-ImmutableRows $PreviousContent) (Get-ImmutableRows $CurrentContent)
+        foreach ($problem in $ao.Problems) { $problems.Add($problem) }
+        $added = $ao.Added
+        if ($previous.Count -ne $current.Count) { throw 'Protected section structure changed' }
+        $seenProjections = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+        for ($i = 0; $i -lt $previous.Count; $i++) {
+            $old = $previous[$i]; $new = $current[$i]
+            if ($old.Header -cne $new.Header) { throw 'Protected section header/order changed' }
+            $projection = $null
+            foreach ($name in $projectionNames) {
+                if ($new.Header -ceq "## $name" -or $new.Header -ceq ("## $name " + [char]0x2014 + ' projection (refresh from records)')) { $projection = $name }
+            }
+            if ($projection -and -not $seenProjections.Add($projection)) { throw "Duplicate projection: $projection" }
+            $oldText = $old.Lines -join "`n"; $newText = $new.Lines -join "`n"
+            if ($oldText -ceq $newText) { continue }
+            if ($projection) { $changed.Add($projection); continue }
+            $immutable = $new.Header -cmatch '^## (State snapshots|Decision log|Approvals|Deviations)(?:$| \()'
+            if (-not $immutable) { $problems.Add("Protected content changed: $($new.Header)"); continue }
+            $immutableName = $Matches[1]
+            $sectionAdded = @($ao.Added | Where-Object { $_.StartsWith("[$immutableName] ", [StringComparison]::Ordinal) })
+            # An immutable body may gain only one contiguous block of appended
+            # data rows. Existing bytes, blank lines, comments and table headers
+            # must survive. The row-prefix check above enforces append order.
+            $extra = $new.Lines.Count - $old.Lines.Count
+            $prefix = 0
+            while ($prefix -lt $old.Lines.Count -and $prefix -lt $new.Lines.Count -and $old.Lines[$prefix] -ceq $new.Lines[$prefix]) { $prefix++ }
+            $valid = $extra -gt 0 -and $ao.Ok
+            if ($valid) {
+                for ($j = $prefix; $j -lt $old.Lines.Count; $j++) {
+                    if ($old.Lines[$j] -cne $new.Lines[$j + $extra]) { $valid = $false }
+                }
+                $isDeviation = $new.Header -cmatch '^## Deviations(?:$| \()'
+                for ($j = $prefix; $j -lt ($prefix + $extra); $j++) {
+                    if ($isDeviation) {
+                        if ($j -eq $prefix -and $new.Lines[$j] -notmatch '^\s*-\s') { $valid = $false }
+                    } elseif ($new.Lines[$j] -notmatch '^\s*\|') { $valid = $false }
+                }
+                if ($sectionAdded.Count -eq 0) { $valid = $false }
+            }
+            if (-not $valid) { $problems.Add("Protected immutable scaffolding/content changed: $($new.Header)") }
+        }
+    } catch { $problems.Add($_.Exception.Message) }
+    return [pscustomobject]@{ Ok = ($problems.Count -eq 0); Problems = @($problems); Added = @($added); ChangedProjections = @($changed) }
 }
 
 # Assert a fixture version conforms to its manifest step: the normalized SHA-256 matches
@@ -798,13 +939,13 @@ try {
         $appendOk   = $true
         $appendNote = 'baseline (no previous version to compare)'
         if ($prevRows) {
-            $ao = Test-AppendOnly -PrevRows $prevRows -CurRows $curRows
+            $ao = Test-ProjectStateTransition -PreviousContent (Read-Utf8File $prevEvidenceSnapshot) -CurrentContent (Read-Utf8File $curEvidenceSnapshot)
             $appendOk = $ao.Ok
             if ($ao.Ok) {
                 if ($ao.Added.Count -gt 0) {
                     $appendNote = "append-only OK; added " + ($ao.Added -join ' ')
                 } else {
-                    $appendNote = "append-only OK; projection-only refresh (no immutable rows added)"
+                    $appendNote = "append-only OK; permitted projections refreshed: " + ($ao.ChangedProjections -join ', ')
                 }
             } else {
                 $appendNote = "APPEND-ONLY VIOLATION: " + ($ao.Problems -join ' | ')
