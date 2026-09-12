@@ -12,13 +12,23 @@ what authority.
 ## 1. Status and authority
 
 - **Status:** ACTIVE DURABLE BACKLOG
+- **2026-09-12 offline CI delivery checkpoint:**
+  [PR #91](https://github.com/ModernNomad-98/Project-Aegis/pull/91) merged as
+  `0e95b29118fc27087ebaec2c5c9854a14d0cbeed`; both verification jobs passed in
+  [main run 34677278437](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34677278437).
+  The merged tree matches tested head `69915fe`. Permanent Linux/Windows contract,
+  BER and acceptance CI is delivered; the hosted Desktop module-path failure was
+  fixed and reverified. See the [delivery record](../evidence/offline-ci-2026-09-12/DELIVERY.md).
+  [Owner grant AEGIS-APR-002](../approvals/APPROVAL_REGISTER.md#aegis-apr-002-administrator-merges)
+  records standing administrator-merge approval. Measured calibration, approved
+  inputs/labels, OD-1 and WP-2B-4 retain their existing gates and status.
 - **2026-09-12 shared-contract delivery checkpoint:**
   [PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90) merged as
   `82dfebee7dadb68207bead5cb10fa3c562f21c1e` after specific owner authorization for
   its administrator merge. The merged tree matches tested head `98546d8`; its
   [main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34674269186)
   passed. The shared-contract implementation and both GitHub review fixes are
-  delivered. [Permanent offline CI](../offline-ci.md) is the separate follow-up;
+  delivered. [Permanent offline CI](../offline-ci.md) subsequently shipped in PR #91;
   measured calibration, approved inputs/labels, OD-1 and WP-2B-4 remain open.
 - **2026-09-12 engineering checkpoint:** [PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)
   is merged as `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its post-merge

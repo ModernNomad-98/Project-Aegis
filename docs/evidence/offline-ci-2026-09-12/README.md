@@ -1,5 +1,8 @@
 # Offline CI implementation verification
 
+**Delivered:** PR #91 is merged and main verification passed. See the
+[delivery record](DELIVERY.md). The checkpoints below preserve pre-merge evidence.
+
 Implementation tested: `b483d4e0b98d76b64c8053c99397eb5a296c7705`.
 Base: PR #90 merge `82dfebee7dadb68207bead5cb10fa3c562f21c1e`.
 This checkpoint records local results before hosted verification; it is not a

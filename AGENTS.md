@@ -13,3 +13,11 @@ Skills live in `.claude/skills/<skill-name>/SKILL.md` (open Agent Skills format:
 Before designing, reviewing, or fixing anything, find the matching skill there and follow its SKILL.md.
 Skills whose description begins "MANUAL-ONLY" must never be auto-applied — use them only when the user names them explicitly.
 Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths.
+
+**Source-library owner approvals.** For work on `ModernNomad-98/Project-Aegis` in
+Role A, read [the owner approval register](docs/approvals/APPROVAL_REGISTER.md)
+before asking for an approval already granted. Apply the recorded human scope and
+later lifecycle events. These are this source repository's owner instructions;
+consumer/product repositories and unrelated forks do not inherit them by copying
+Aegis files. Current direct user instructions retain their authority before they
+are transcribed into the register.
