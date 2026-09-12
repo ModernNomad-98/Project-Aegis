@@ -22,6 +22,9 @@ the focused branch, DCO-signed commits, one PR, existing CI and in-scope correct
 It excludes runtime work and stops before merge. AEGIS-APR-001 remains applicable
 to read-only reviewers; AEGIS-APR-002 does not override this task's no-merge boundary.
 The task authorization source and bounded summary are in the evidence document.
+The current correction instruction continues PR #95 on this same branch: address
+all six GitHub findings, reply/resolve only after pushing evidence, request a fresh
+exact-head Codex review and monitor it plus all CI. No second branch or PR is allowed.
 
 Status vocabulary: AUTHORIZED = the human granted the exact package;
 READY_FOR_OWNER_REVIEW = scoped delivery evidence exists, acceptance still pending;
@@ -49,7 +52,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Permitted delivery | Focused branch, explicit-path staging, DCO-signed commits, normal push, exactly one PR to main, all-check monitoring and in-scope corrections |
 | Forbidden | Merge/auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
 | Non-goals | Offline kernel, physical extraction/wrappers, actual execution/containment, distribution, dashboard, BER advancement |
-| Completion | Three-file bounded diff, actual local validation, resolved independent reviews, one PR and terminal exact-head checks; stop for owner review before merge |
+| Completion | Three-file bounded diff, local validation, independent re-reviews of all six findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; PR #95 stays open/unmerged with auto-merge disabled |
 | Next owner decision | Review the delivered CP-WP-001 PR and decide its acceptance/merge disposition; later implementation needs separate authorization |
 
 ### 2.1 Required evidence handling
@@ -64,10 +67,21 @@ No active-state storage, raw evidence creation or deletion policy is executed he
 
 Acceptance requires: Role A/remote/base/grant reconciliation; explicit product/BER
 boundaries; every required reuse primitive classified; all eleven logical components
-and their authority limits; normative T01–T25 and C01–C07 coverage; identity,
+and their authority limits; normative T01–T25 and C01–C09 coverage; identity,
 idempotency, atomicity, pause/stop, corruption/schema/receipt handling; seven storage
 classes and checkpoint transfer; platform limits/threats/tests; blocked later work;
 reviewable three-file diff and actual validation evidence.
+
+The corrected contract must cover CP-D01–CP-D10 and the negative families in
+[design section 10.1](../design/resumable-control-plane-v1.md#101-six-finding-specific-negative-acceptance-families):
+F01 stable cross-revision/run effect identity and durable approved distinctions;
+F02 proof-free dispositions remain non-dispatching and cannot certify success;
+F03 source-atomic one-use claims across all consumers with synthetic isolation;
+F04a/F04b intent-owned versioned budget settlement for every receipt/non-dispatch/
+cancellation/uncertainty/terminal/restart route; F05 independently fresh checkpoint
+recovery; F06 atomic repository-wide outstanding slot across items/runs. Independent
+review must verify transitions, storage/crash rules and negative cases agree; adding
+prose or passing CI alone does not close a finding.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
@@ -92,8 +106,8 @@ edit is required; these three documents cross-link each other.
 
 ## 4. Validation and delivery protocol
 
-Before staging run `git diff --check`; inspect all new-file content (ordinary
-unstaged Git diff omits untracked files). Inspect Markdown heading/table/fence
+Before staging run `git diff --check`; inspect the complete correction diff and
+all resulting three-file content. Inspect Markdown heading/table/fence
 structure, local links/anchors and scenario coverage. Check only allowed paths.
 Stage the three explicit paths. Run `git diff --cached --check` before each commit
 and inspect the complete staged diff. Commit with DCO sign-off.
@@ -113,13 +127,17 @@ available dependencies only; disclose unavailable checks rather than installing.
 Markdown/link checking is separate from skill validation; do not claim the latter
 validates arbitrary documentation.
 
-After normal push create one PR titled `docs: define resumable delivery control
-contract`. Body includes scope, exact base/head, inventory/line count, reuse choices,
-validation/reviews, limitations/non-goals, implementation non-authorization and
-explicit no-auto-merge. Update that same PR only. Monitor every attached check to a
-terminal conclusion, including `validate-skills`, `gate-guard` and
-`windows-offline-checks`; success cannot be claimed while pending. Fix only the three
-docs; otherwise report blocker. Revalidate affected reviews/checks after correction.
+After a new DCO-signed correction commit, push normally to the existing branch and
+update only [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95). Body
+includes exact base/head/tree, file/line count, corrections, validation/reviews,
+limitations and no-auto-merge. Reply separately to every finding with disposition,
+corrected contract location and pushed commit; only then resolve its thread.
+Request fresh Codex review explicitly naming that head. Monitor all review threads,
+the new review and every attached CI check to terminal status. `validate-skills`,
+`gate-guard` and `windows-offline-checks` must succeed on that head; old-head results
+are historical. New findings require the same in-scope correction/review cycle.
+Ready-for-owner-review requires no unresolved thread and no blocking fresh-review
+finding. Leave PR open/unmerged and auto-merge disabled; exceeding scope/budget stops.
 
 [Existing CI](../offline-ci.md) runs without PR path filters and already performs
 dependency setup, synthetic tests and evidence upload. It may run unchanged under
@@ -132,8 +150,8 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budgets and synthetic-only adapters | Independent synthetic T/C tests, platform/lock/replay/checkpoint evidence; stop before any real authority or external adapter |
-| CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, authentic approval-source design, verified platform containment/fencing, independent evidence policy and accounting decisions | Negative authority/path/process/receipt probes; no live deployment/provider call without separately named grant; stop on unavailable guarantees |
+| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T25/C01–C09/F01–F06 tests, including F04a/F04b; stable identities, slot/replay/budget/freshness evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
 
@@ -174,7 +192,7 @@ and CI changes would touch current protected surfaces. Future test plans are in
 
 A new session verifies role, repository, current branch/head/remote and complete
 approval lifecycle before any work. Read design, this register and evidence.
-Carry CP-D01–CP-D07 with explicit supersession/deviation records; preserve previous
+Carry CP-D01–CP-D10 with explicit supersession/deviation records; preserve previous
 decisions unless the owner accepts a change. Each stage records changed files,
 intentional untouched paths, actual commands and distinctive results, reviewers,
 unresolved obligations, authority source and exact next entry criteria.

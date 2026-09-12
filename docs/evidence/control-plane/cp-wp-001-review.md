@@ -34,7 +34,14 @@ credentials/holdouts/provider dispatch, database/deployment/release/tag/settings
 merge/auto-merge/force-push and changes to unrelated untracked files. These excerpts
 and summary preserve the source's scope; they do not grant anything independently.
 
-## 2. Startup reconciliation
+Continuation source: Peter's 2026-09-12 written attachment beginning "Continue the
+already authorized CP-WP-001 work on PR #95." It requires correction of six inline
+findings at `9e3db6193b47ec002f1087b21fe9a55708972544`, independent re-reviews,
+same-branch DCO correction commits, normal push, six evidence-backed thread replies/
+resolutions, fresh exact-head Codex review and all-check monitoring. It expressly
+forbids merge, another branch/PR or expansion beyond the original three files/budgets.
+
+## 2. Initial-delivery startup reconciliation
 
 AGENTS.md and the complete owner register were reread. The four local Role A
 landmarks were verified: README starts `# Project Aegis`, and catalog, validator
@@ -85,7 +92,11 @@ The three new docs fall outside the current protected-path regex but under globa
 CODEOWNERS. Existing CI has no PR path filter; all attached checks still require
 terminal review. No live branch-protection settings were inferred from local files.
 
-## 4. Review findings and dispositions
+## 4. Historical initial-draft reviews
+
+The findings/verdicts below describe the initial delivery at `9e3db61`. They do
+not close the six later GitHub findings or validate the correction head. The prior
+ready-for-owner-review handoff was superseded by the review in section 6.
 
 Two independent read-only reviewers examined all three drafts and the current
 authorization. The architecture/recovery reviewer applied architecture/review
@@ -108,7 +119,10 @@ contract; S01 closed, no blocking findings. Both explicitly exclude implementati
 merge or runtime-capability approval. Remaining platform/authentication/receipt
 limitations are future entry gates, not accepted operational risk.
 
-## 5. Validation evidence
+## 5. Historical initial-delivery validation
+
+Results and content hashes in this section are historical, before the current
+six-finding correction cycle; none is asserted as validation of the new head.
 
 | Actual local command/check | Exit / result |
 | --- | --- |
@@ -144,7 +158,72 @@ change; the unchanged hosted CI supplies those regression jobs. No dependency
 installation, browser renderer or new validator was added. Hosted capability skips
 must be reported as observed; CI remains distinct from future controller evidence.
 
-## 6. Intentional omissions and continuation
+## 6. PR #95 six-finding correction cycle
+
+Startup: `git fetch origin`, current branch/head/remote, tracked/staged diffs and
+the complete GitHub PR/reviews/threads were read successfully. Branch remained
+`docs/cp-wp-001-durable-state-authority-recovery`; local/live head was
+`9e3db6193b47ec002f1087b21fe9a55708972544`, tree
+`658932112682c9af53ff963cd404e50600f28f24`. Main remained the base above.
+Tracked/staged changes were empty; status listed only the two preserved untracked
+directories. Role A, AGENTS.md and complete approval lifecycle were reverified.
+PR was open, unmerged, auto-merge disabled. All six threads were unresolved.
+
+Source: [Codex review at 9e3db61](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5185912683),
+submitted 2026-09-12 08:43:54 UTC. GH1–GH6 below are local finding references,
+not new issue IDs. Corrections are proposed contract requirements; their negative
+cases are future tests, not claims that a controller or external guarantee exists.
+
+| Finding / source | Corrected normative contract / negative acceptance | Disposition |
+| --- | --- | --- |
+| GH1 P1 [stable effect dedup](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687618) | Design CP-D08, 5.1, T03/T15/T16: key is repository UID + logical-effect ID only; immutable descriptor and durable equivalence/predecessor links; changed/repeated effect requires explicit bound new-ID approval; completed/unknown aliases cannot repeat. F01 tests revisions/runs and metadata/descriptor/new-ID bypasses | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH2 P1 [unknown-effect disposition](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687628) | CP-D04, 7.4, T17: proof-free owner choice only stops/final-fails/reports; nonexecution or reviewed safe same-key retry proof required for original-effect dispatch; compensation preserves predecessor and cannot bypass outstanding slot. F02 tests risk acceptance, new IDs, success and retry proof failures | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH3 P1 [atomic one-use authority](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687631) | CP-D09, 5.2, T03/T13/T25, C08: source-atomic claim/redemption binds exact intent/effect/expiry across all consumers; local reservation is accounting only; unsupported/ambiguous authority denies; synthetic capability cannot enable real adapter. F03 tests host/controller/manual races and missing/invalid/replayed claims | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH4 P2 [budget settlement](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687620) | CP-D10, 5.4, T10/T17–T20/T23/T25, C09: intent-owned RESERVED/CONSUMED/ADJUSTED/RELEASED/UNKNOWN_WORST_CASE_CHARGED lifecycle, atomic actual/worst-case settlement, true overrun plus fence, no uncertainty refund/reset. F04a/F04b cover every receipt/non-dispatch/cancellation/terminal/restart route and duplicate/negative accounting | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH5 P2 [checkpoint freshness](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687623) | CP-D07, 7.3, 8/8.1, T14, C07: source/export heads plus independently current monotonic anchor or complete authoritative source reconciliation; later facts/pending commits block stale import; no hash-chain/inactive-host shortcut. F05 restores older valid checkpoints after newer effects and grant consumption; absent/stale/contradictory proof denies | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH6 P2 [one outstanding operation](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995687636) | CP-D02, 5.3, T03/T10–T12, C02/C09: repository-wide slot checked/acquired atomically with intent; independent of writer lock, lifecycle and item/run; closes only with proven obligations/validation disposition. F06 tests sequential same-owner/process attempts for every outstanding disposition and crash/restart | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+
+All six also update the threat model (design 9), future tests (10/10.1), and backlog
+acceptance/blocked later-package gates (2.2/5). Runtime verification is deferred.
+Independent architecture/recovery and security/authority re-reviews each verified
+all six contracts and their negative families. Final verdicts: approve documentation
+corrections, GH1–GH6 addressed, no blocking findings. This is substantive document
+review closure only; actual GitHub thread resolution follows pushed-head replies.
+
+| Correction-review finding | Verified disposition |
+| --- | --- |
+| R-A1 MAJOR, also confirmed by security: proven non-dispatch could free slot despite unknown claim/control bill; T25 known-billing precondition contradicted UNKNOWN branch | CLOSED after reread: 5.3 requires resolved source/control/budget obligations for BOTH release routes; T25 classifies known/unknown independently; F04a/F06 deny another item/run when no effect occurred but control billing is unknown |
+| R-A2 MAJOR: safe-retry claim requirement preceded the new attempt's durable intent | CLOSED after reread: 7.4 verifies eligible authority/source and prior claim/billing disposition; new atomic claim/receipt/redemption occurs only after T03 intent; effect uncertainty does not waive budget uncertainty |
+| R-A3 MAJOR: T23 existing-obligation precondition omitted contradictory bill after release closed the obligation | CLOSED after reread: T23 accepts recorded intent/effect/reservation identity including settled/RELEASED in any state, atomically adjusts true usage plus exception/fence, never advances lifecycle or reopens terminals; F04b covers it |
+
+Final independently reviewed design working-copy SHA-256 (before line-ending normalization):
+`d7da89e9768da018eb7cce6b810e0aac12bb73fc17826fb0796b4fd1651e07cf`.
+The staged LF representation has identical text and SHA-256
+`cc497561df7e7cfb646559628d1e8ea6eec935d1d6c0b09cf77afad4ea71c08c`;
+the three working copies were normalized to LF before the final scope check.
+Reviewed backlog SHA-256:
+`6a098836169c9b58878349cefc619ed257921e8b6beb59110bb94ef850bcaaee`.
+Primary review also preserved trustworthy-time/clock-rollback rules and verified
+that contradictory post-release bills become true-usage adjustments, not discarded
+observations. Reviewers performed no writes or runtime tests.
+
+| Actual correction-cycle local validation | Exit / result |
+| --- | --- |
+| `git diff --check` | 0; no whitespace errors; Git's existing line-ending conversion warnings are not failures |
+| `python -B scripts/validate-skills.py` | 0; 184 skills valid, zero warnings; existing dependencies only |
+| `python -B scripts/tests/test_validator.py` | 0; 91 gate self-test assertions passed; synthetic temporary fixtures only |
+| In-memory PowerShell here-string piped to `python -B -` | 0; three UTF-8 files, 39 local links/anchors, 22 tables, 46 headings; unique T01–T25/C01–C09 definitions and valid references, CP-D/F/budget vocabulary; 1,164 lines before this evidence expansion |
+| Complete correction diff and resulting content inspection | 0 for Git diff retrieval; all hunks reviewed, then focused follow-up corrections re-reviewed; no browser-rendering claim |
+| In-memory Git scope/branch/base/head/index audit | 0; exact branch/base/reviewed old head, only three authorized changed paths, staged index empty before explicit staging; status only enumerated the two preserved untracked directories |
+
+The final expanded evidence receives the same structural/scope/line-budget checks
+before commit. Staged/committed checks, thread replies/resolution, fresh exact-head
+review, final SHA/tree and CI results are recorded in PR #95 and the handoff after
+normal push. No self-referential commit or old-head CI claim is made here. Full local
+BER/platform suites remain skipped for prose-only work; unchanged hosted CI supplies
+regression evidence. F01–F06 are unexecuted future controller tests, not CI claims.
+
+## 7. Intentional omissions and continuation
 
 Only the three authorized Markdown files are created. No runtime implementation,
 schema/policy execution, shared extraction, BER/CI/dependency change, credential or
