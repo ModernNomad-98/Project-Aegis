@@ -1,0 +1,140 @@
+[
+  {
+    "url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022579",
+    "pull_request_review_id": 5185119971,
+    "id": 3995022579,
+    "node_id": "PRRC_kwDOTPe6NM7uHzTz",
+    "diff_hunk": "@@ -0,0 +1,119 @@\n+\"\"\"Deterministic lifecycle checks on normalized, recorded approval evidence.\n+\n+This is an offline grader, not an authorization service or consent authenticator.\n+Recording sequence and effective time remain distinct, including late revocations.\n+\"\"\"\n+from __future__ import annotations\n+\n+from datetime import datetime\n+import re\n+\n+from ._base import EvidenceMalformed, GradingFail\n+from .records import GradingReasonCode\n+\n+VERSION = \"1.0.0\"\n+KINDS = frozenset({\"APPROVAL_REVOKED\", \"APPROVAL_CONSUMED\", \"APPROVAL_EXPIRED\", \"APPROVAL_SUPERSEDED\"})\n+KEYS = frozenset({\"at\", \"usage\", \"expires_at\", \"event_id\", \"successor_id\"})\n+_ACTIONS = frozenset({\"ACTION_PERFORMED\", \"RECORD_APPENDED\", \"STAGE_ADVANCE\"})\n+_UTC = re.compile(r\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z\\Z\")\n+\n+\n+def _time(value, field):\n+    if not isinstance(value, str) or not _UTC.fullmatch(value):\n+        raise EvidenceMalformed(f\"{field} must be a UTC ISO timestamp ending Z\")\n+    try:\n+        return datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))\n+    except ValueError as exc:\n+        raise EvidenceMalformed(f\"invalid {field}: {value!r}\") from exc\n+\n+\n+def check_lifecycle(events):\n+    \"\"\"Validate the complete history, then evaluate authority at each action.\n+\n+    Unknown/malformed references are errors. Valid but inactive authority fails.\n+    Missing grants and ordinary preview/target/owner gates remain the boundary\n+    grader's responsibility. Input dictionaries are never mutated.\n+    \"\"\"\n+    grants, times, expiries, ids = {}, {}, {}, set()\n+    last_occurrence = None\n+    for event in events:\n+        seq, kind = event[\"seq\"], event[\"kind\"]\n+        times[seq] = _time(event.get(\"at\"), \"at\")\n+        if kind not in KINDS:\n+            if last_occurrence is not None and times[seq] < last_occurrence:\n+                raise EvidenceMalformed(\"ordinary event occurrence times must follow recording order\")\n+            last_occurrence = times[seq]\n+        permitted = {\"at\"}\n+        if kind == \"APPROVAL_GRANTED\": permitted |= {\"usage\", \"expires_at\"}\n+        if kind in KINDS: permitted.add(\"event_id\")\n+        if kind == \"APPROVAL_SUPERSEDED\": permitted.add(\"successor_id\")\n+        if (set(event) & KEYS) - permitted:\n+            raise EvidenceMalformed(f\"{kind}: misplaced lifecycle fields\")\n+        if kind == \"APPROVAL_GRANTED\":\n+            gid = event.get(\"approval_id\")\n+            if not gid or gid in ids:\n+                raise EvidenceMalformed(\"grant IDs must be present, unique and immutable\")\n+            ids.add(gid)\n+            if event.get(\"usage\") not in (\"STANDING\", \"SINGLE_USE\") or \"expires_at\" not in event:\n+                raise EvidenceMalformed(\"grant requires explicit usage and nullable expires_at\")\n+            expiries[gid] = (None if event[\"expires_at\"] is None else _time(event[\"expires_at\"], \"expires_at\"))",
+    "path": "tools/behavioral_eval_runner/graders/approval_lifecycle.py",
+    "commit_id": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+    "original_commit_id": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+    "user": {
+      "login": "chatgpt-codex-connector[bot]",
+      "id": 199175422,
+      "node_id": "BOT_kgDOC98s_g",
+      "avatar_url": "https://avatars.githubusercontent.com/in/1144995?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D",
+      "html_url": "https://github.com/apps/chatgpt-codex-connector",
+      "followers_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Reject grants that expire before they begin**\n\nWhen a grant's `expires_at` precedes its own `at` timestamp, this assignment accepts the internally impossible interval; a lifecycle history containing only that grant consequently returns PASS, while a later action produces FAIL rather than the documented malformed-evidence ERROR. Compare the parsed expiry with the grant time and reject an earlier value so invalid timestamps cannot enter grading results.\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+    "created_at": "2026-09-12T03:59:46Z",
+    "updated_at": "2026-09-12T03:59:46Z",
+    "html_url": "https://github.com/ModernNomad-98/Project-Aegis/pull/90#discussion_r3995022579",
+    "pull_request_url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/90",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022579"
+      },
+      "html": {
+        "href": "https://github.com/ModernNomad-98/Project-Aegis/pull/90#discussion_r3995022579"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/90"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022579/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 59,
+    "original_line": 59,
+    "side": "RIGHT",
+    "author_association": "NONE",
+    "original_position": 59,
+    "position": 59,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022583",
+    "pull_request_review_id": 5185119971,
+    "id": 3995022583,
+    "node_id": "PRRC_kwDOTPe6NM7uHzT3",
+    "diff_hunk": "@@ -0,0 +1,90 @@\n+# Shared skill contracts \u2014 implementation and review record\n+\n+Prepared 2026-09-12 from merged main `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`.\n+This records the implementation candidate; submitted-revision checks and merge\n+disposition are recorded separately. The owner authorized fixes, automated tests,\n+commits, pushes and merges after PR #88. Read-only agents have standing permission.\n+\n+## Prior delivery and revised scope\n+\n+[PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88) merged at that\n+base after explicit authorization for its administrator merge. Its tree matches\n+tested head `d53752d2b600410da122d4b85429c35f30d7c873`, and\n+[post-merge run 34668951280](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34668951280)\n+passed. That authorization was specific to PR #88; it does not authorize a later\n+protected-workflow bypass.\n+\n+The shared-contract preflight audited all 184 skills and 704 corpus files. All\n+98 semantic candidates were reviewed: **19 confirmed and repaired, 79 false\n+positives, zero unresolved**. Context review found three additional write-boundary\n+defects. The expanded invocation work uses the original plan's contingency:\n+shared-contract engineering/review estimate revised from 12\u201324 to **16\u201332 active\n+hours**, with external review waits additional. Permanent offline CI remains a\n+separate **2\u20134 hour** change after these commands and contracts are settled.\n+\n+## Dated implementation decisions\n+\n+- Preserve immutable grants and append lifecycle facts. Derive effective authority\n+  from actual human evidence, expiry, use and invalidation history; a successor's\n+  revocation cannot revive an old grant. Existing current-session authorization\n+  remains valid before transcription and does not require repeat consent.\n+- Reconcile the standard, orchestrator and reviewer around bounded documentary\n+  create/append, immutable decision transcription and exactly six named projection\n+  refreshes. Operative permission/governance/agent-instruction changes remain\n+  excluded. TALI is not activated by this change.\n+- Keep Now/Next/Later horizons nonbinding. Readiness and confidence do not make\n+  human commitments, and moving a horizon does not cancel an actual commitment.\n+- Reclassify nine execution-capable skills as manual-only under the existing\n+  policy. Total skills stay **184**; manual skills change **19 \u2192 28**. Their",
+    "path": "docs/evidence/shared-contracts-closeout-2026-09-12/README.md",
+    "commit_id": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+    "original_commit_id": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+    "user": {
+      "login": "chatgpt-codex-connector[bot]",
+      "id": 199175422,
+      "node_id": "BOT_kgDOC98s_g",
+      "avatar_url": "https://avatars.githubusercontent.com/in/1144995?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D",
+      "html_url": "https://github.com/apps/chatgpt-codex-connector",
+      "followers_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Exclude the template from manual-only totals**\n\nCounting shipped skill directories while excluding validator-ignored `.claude/skills/_template` shows this commit changes the manual-only population from 18 to 27, not 19 to 28. The inflated totals appear to count the template as a skill, and the consumer safety warning in `README.md` remains at 18 despite the nine new classifications; reconcile these count surfaces against the actual shipped corpus.\n\nAGENTS.md reference: [AGENTS.md:L15-L15](https://github.com/ModernNomad-98/Project-Aegis/blob/e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c/AGENTS.md#L15-L15)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+    "created_at": "2026-09-12T03:59:46Z",
+    "updated_at": "2026-09-12T03:59:46Z",
+    "html_url": "https://github.com/ModernNomad-98/Project-Aegis/pull/90#discussion_r3995022583",
+    "pull_request_url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/90",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022583"
+      },
+      "html": {
+        "href": "https://github.com/ModernNomad-98/Project-Aegis/pull/90#discussion_r3995022583"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/90"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/ModernNomad-98/Project-Aegis/pulls/comments/3995022583/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 38,
+    "original_line": 38,
+    "side": "RIGHT",
+    "author_association": "NONE",
+    "original_position": 38,
+    "position": 38,
+    "subject_type": "line"
+  }
+]

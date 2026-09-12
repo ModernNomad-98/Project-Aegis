@@ -1,0 +1,9 @@
+Checking DCO sign-off over origin/main..HEAD ...
+
+  SIGNED  4d6d292168d8  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(review): reject impossible expiry and correct shipped manual counts
+  SIGNED  e9b8ec03c6a4  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  docs: preserve raw verification log whitespace
+  SIGNED  df1f46548c0a  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  docs: preserve shared-contract verification and review evidence
+  SIGNED  ffcbb2a47d0e  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(acceptance): reject empty project-state section headings
+  SIGNED  61f2a4648dea  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(skills): preserve approval lifecycle and explicit invocation contracts
+
+OK: 5 commit(s) checked, all signed off or exempt.

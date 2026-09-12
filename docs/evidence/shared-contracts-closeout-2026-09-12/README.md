@@ -52,6 +52,8 @@ separate **2–4 hour** change after these commands and contracts are settled.
 
 - [GitHub review corrections](github-review-fixes.md) records two findings on the
   first submitted revision, their fixes and corrected shipped-skill count proof.
+- [Corrected-revision verification](corrected-verification.md) records the full
+  987-test BER results on both platforms and 113 passing acceptance cases.
 - [Submitted implementation verification](verification.md) records exact commits,
   source-identity checks, raw logs, platform skips and final read-only reviews.
 - [Prepared offline CI follow-up](offline-ci-followup.md) records the separately

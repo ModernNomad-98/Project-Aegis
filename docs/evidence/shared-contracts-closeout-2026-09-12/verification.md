@@ -1,5 +1,10 @@
 # Shared contracts: implementation verification
 
+The [corrected-revision verification](corrected-verification.md) supersedes this
+initial candidate record after GitHub review found two additional issues. It
+records 987 passing BER tests on each platform and 113 acceptance cases on the
+corrected implementation. The initial evidence below remains preserved.
+
 Recorded 2026-09-12. The implementation is committed at
 `ffcbb2a47d0e1a32578c5a5ae226e80a908d49bb`, tree
 `344a51dbceec528f8223e47e38a8f08e8b0f913c`. The subsequent evidence commit only adds
