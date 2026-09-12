@@ -69,8 +69,10 @@ commands, environment, skips and any remaining limitations.
 
 ## Completion boundary
 
-The latest final verification and GitHub disposition will be recorded alongside
-this file before closeout is declared complete. The existing workflow checks
+[Candidate verification](verification.md) records the completed full platform
+suites, gates and [independent reviews](reviews.md). The PR body records the
+submitted head's checks and GitHub disposition before closeout is declared
+complete. The existing workflow checks
 validator self-tests, skill validation and DCO; it does not run BER or contract
 audit tests. Those suites require the separate recorded local verification until
 the later reviewed CI change is merged.
