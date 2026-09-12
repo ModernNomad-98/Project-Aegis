@@ -1,0 +1,966 @@
+# Resumable Aegis delivery control plane — v1 contract
+
+Status: DESIGN PROPOSAL FOR OWNER REVIEW; CP-WP-001 documentation only.
+Owner: Peter Nguyen. Repository: ModernNomad-98/Project-Aegis.
+Inspected base: `57e6928d2849aa5377daf52c723b85736292585d` (2026-09-12).
+
+This document specifies future behavior; no controller, runtime schema, policy,
+adapter or execution authority is delivered. MUST and MUST NOT express proposed
+acceptance requirements, not instructions to execute them. Approval to author or
+merge this document does not authorize implementation or any delivery action.
+
+Continuation: [separate backlog](../roadmaps/resumable-control-plane-backlog.md).
+Verification: [CP-WP-001 evidence](../evidence/control-plane/cp-wp-001-review.md).
+
+## 1. Purpose, boundaries and authority
+
+The future product coordinates governed software delivery that can pause and
+continue across process restarts without losing decisions, repeating uncertain
+effects or treating stale approvals as current. Its first implementation target
+would be an offline, single-host kernel with synthetic adapters only.
+
+Forces, in order: preserve authority and evidence; prevent duplicate effects;
+make recovery decisions explicit; keep the first increment reviewable; defer
+distribution and optimization until demonstrated demand.
+
+### 1.1 Role A and Role B
+
+Apply [AGENTS.md](../../AGENTS.md) before acting. Role A requires the README title,
+catalog, validator and audit-baseline landmarks, not copied startup files alone.
+This checkout meets those requirements. Role B is a consumer/product repository
+using copied Aegis skills. Its work, owners, approvals, evidence and repository
+identity are separate; source-library grants never transfer by copying files.
+A future controller must bind each target repository explicitly and reject
+cross-project work/approval/receipt substitutions. No consumer repository is
+created or selected by this work package.
+
+### 1.2 Separation from BER
+
+The [BER parent design](behavioral-eval-runner-v1.md) owns BER architecture,
+controls and evidence. Its [successor](behavioral-eval-runner-v1-fast-track-successor.md)
+supersedes only its stated scope. The [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md)
+owns BER continuation, including current WP-2B-3 authorization and unfinished
+measured acceptance. Current notices supersede historical statements that no
+implementation exists or that BER-DEC-008 has not yet taken effect.
+
+At this base, BER engineering and offline CI are delivered; original calibration
+inputs are missing, replacement approvals and measured calibration remain open,
+OD-1 is unratified and WP-2B-4 is blocked. No result here advances those gates.
+BER's own use of "control plane" does not establish a delivery controller.
+BER-BKL-015 describes optional BER evidence consumers, not ownership of this stream.
+Any future BER adapter must respect BER's own authority and consume verified
+evidence without changing it. This stream never edits the BER backlog implicitly.
+
+### 1.3 Approval sources
+
+The complete [owner register](../approvals/APPROVAL_REGISTER.md) currently contains
+active AEGIS-APR-001 (read-only agents) and AEGIS-APR-002 (administrator merges),
+with no later lifecycle entries. Neither starts unrelated implementation.
+The 2026-09-13 direct CP-WP-001 continuation approves commit, push and merge of
+this three-document PR after required review/CI; implementation remains unauthorized.
+The register remains the one documentary approval register; these documents link
+to it and record task evidence, not a competing source of general grants.
+
+### 1.4 Non-goals
+
+No executable controller, schemas, policy, model dispatch, credential handling,
+real execution adapter, CI wiring, dependency, database, deployment, release,
+tag, automatic merge, multi-host execution, dashboard or BER behavior change.
+No claim of live containment, measured calibration or exactly-once external effects.
+
+## 2. Current implementation and reuse dispositions
+
+Paths in this table are under `tools/behavioral_eval_runner/`; tests are under its
+`tests/`. Each primitive has exactly one disposition for the stated proposed use.
+All reuse, wrapping and corrections are later work. None occurs in CP-WP-001.
+No physical extraction is justified now; an interface can precede extraction.
+
+| Primitive / current responsibility | Classification | Proposed use / seam | Coupling and platform limits | Protecting tests / change ownership |
+| --- | --- | --- | --- | --- |
+| [canonical.py](../../tools/behavioral_eval_runner/canonical.py): deterministic JSON and SHA-256 | REUSE AS-IS | Import unchanged byte/hash functions behind a versioned Python serialization contract; new identities use integers/strings | BER exception; finite floats accepted, not a cross-language numeric-normalization standard; file hashing has no containment | `test_canonical.py`; add controller golden-byte tests in CP-WP-002; no BER change |
+| [identity.py](../../tools/behavioral_eval_runner/identity.py): case/assertion/repetition IDs | BER-SPECIFIC — DO NOT REUSE | New project/item/run/effect identity contract | BER kinds, assertion positions and repetition semantics; no OS dependence identified | `test_identity.py` retained; new controller tests; BER modification nowhere |
+| [pathsafe.py](../../tools/behavioral_eval_runner/pathsafe.py): lexical paths and separate reparse checks | WRAP BEHIND A NEW INTERFACE | Future owned-path checked-I/O interface | `safe_join` does not invoke reparse checkers despite its docstring; check-before-open races remain; Windows ADS/device rules are useful | `test_pathsafe.py`; add ancestor/swap/capability tests in CP-WP-002; no BER edit |
+| [preflight.py](../../tools/behavioral_eval_runner/preflight.py): eval prerequisites | BER-SPECIFIC — DO NOT REUSE | Borrow honest missing-prerequisite blocking, build independent readiness | Case/fixture/invocation/verdict coupling; declared capabilities are not host proof | `test_preflight.py` retained; new readiness tests; BER modification nowhere |
+| [process_control.py](../../tools/behavioral_eval_runner/process_control.py): timeouts and process cleanup | WRAP BEHIND A NEW INTERFACE | Later execution adapter exposes measured cleanup capability | Windows post-leader descendant reaping unavailable; termination does not revoke grants or cancel remote effects | `test_process_control.py`; CP-WP-003 capability probes before real use |
+| [scheduler.py](../../tools/behavioral_eval_runner/scheduler.py): deterministic BER ordering | BER-SPECIFIC — DO NOT REUSE | Initially follow explicit dependency order; no priority scheduler | Case risk/identity/reverse-edge coupling; scheduler produces evidence, not dispatch | `test_scheduler.py` retained; independent dependency tests; modification nowhere |
+| [budget.py](../../tools/behavioral_eval_runner/budget.py): reservation/replay/kill state | REQUIRES CORRECTION BEFORE REUSE | Accounting invariants only until integrated with one atomic intent transaction | Thread lock, separate fsynced ledger and checkpoint replacement; intervening crash can block replay; joint rewrite defeats authenticity | `test_budget.py`; CP-WP-003 accounting decision/correction or separate implementation; no direct kernel dependency |
+| [calibration_ledger.py](../../tools/behavioral_eval_runner/judge/calibration_ledger.py): durable calibration accounting | BER-SPECIFIC — DO NOT REUSE | Precedent for durable intent and orphan refusal | BER authorization/model/SDK/prices/caps/stages pinned; local file/lock assumptions | `test_calibration_ledger.py`, `test_calibration_first_live_corrections.py`; new journal tests in CP-WP-002; no BER modification |
+| [calibration_development_driver.py](../../tools/behavioral_eval_runner/judge/calibration_development_driver.py): bound calibration orchestration | BER-SPECIFIC — DO NOT REUSE | Reference exact-identity resume and terminal/orphan gates | Dataset/model/approval/provider coupling; cooperative single-host lock | `test_calibration_development_driver.py`; independent engine in CP-WP-002; no BER modification |
+| [calibration_io.py](../../tools/behavioral_eval_runner/judge/calibration_io.py): checked I/O and process lock | WRAP BEHIND A NEW INTERFACE | Owned storage/lease interface | BER errors; local cooperative lock, not distributed fencing; checked paths alone do not prove every race prevented | `test_calibration_phase01.py`, driver tests; new multiprocess/platform tests in CP-WP-002 |
+| [evidence.py](../../tools/behavioral_eval_runner/evidence.py): manifests and finalization | REQUIRES CORRECTION BEFORE REUSE | Controller evidence contract first; generalized writer only after review | Hardcoded BER schema, access policy and final-report 30-day retention; Windows swap protection detection-only; not a journal | `test_evidence.py`, `test_group_bcde.py`, `test_hardening.py`; CP-WP-003 correction or independent writer |
+| [approval_lifecycle.py](../../tools/behavioral_eval_runner/graders/approval_lifecycle.py): grades recorded approvals | BER-SPECIFIC — DO NOT REUSE | Borrow lifecycle rules and abuse cases | Explicitly not an authorization service/consent authenticator | `test_approval_lifecycle.py`; independent verifier; BER modification nowhere |
+| Materializer, runtime surface, execution profile, containment | BER-SPECIFIC — DO NOT REUSE | Reference safety requirements for later adapter design | BER corpus/fixtures/profiles; live host guarantees not proven by code presence | Corresponding materialize/runtime/profile/containment suites retained; CP-WP-003 independent capability work |
+| Models, enums, aggregation, reporting | BER-SPECIFIC — DO NOT REUSE | New delivery states and reports | BER attempt/quorum/coverage meanings are not delivery completion | Existing model/aggregation/report suites retained; new controller records; modification nowhere |
+| [schemas](../../tools/behavioral_eval_runner/schemas): run, attempt, case, profile, materialization, evidence, grading and calibration | BER-SPECIFIC — DO NOT REUSE | Closed/versioned-record precedents only | BER namespace and meanings; schemas cannot authenticate grants, ensure durability or enforce paths | `test_grading_schemas.py` and procedural evidence/calibration tests; new runtime schemas only under later authorization |
+| Existing BER automated suites | REUSE AS-IS | Unchanged regression coverage if pure helpers are later imported | BER fixtures/history/platform prerequisites; skips remain gaps | Existing CI owns execution; no CP-WP-001 edits or claims that controller tests ran |
+| BER fixtures and test helpers | BER-SPECIFIC — DO NOT REUSE | Independent synthetic controller fixtures | BER expected outcomes/approval assumptions; sealed holdouts inaccessible | New CP-WP-002 fixtures only; BER modification nowhere |
+
+The [runner README](../../tools/behavioral_eval_runner/README.md) distinguishes
+offline implementation from unavailable/unknown real-host R1–R5 evidence.
+Fail-closed restart refusal is useful precedent, not automatic workflow recovery.
+
+## 3. Names, alternatives and decision register
+
+No exact tracked collision was found for the four candidates at the inspected base.
+This is not a public package-name reservation.
+
+| Candidate | Assessment |
+| --- | --- |
+| `tools/aegis_control_plane` | Architectural fit, but "control plane" already names BER internals |
+| `tools/aegis_controller` | Vague delivery scope; suggests one controller rather than bounded interfaces |
+| `tools/aegis_runner` | Confusing with Behavioral Eval Runner; understates authority and recovery |
+| `tools/aegis_delivery_control` | Recommended separate governed-delivery namespace |
+
+Eventual command: `python -m tools.aegis_delivery_control`, following BER's module
+entry convention. No installed console script or packaging dependency is implied.
+
+| Decision | Proposed rule | Reversal condition |
+| --- | --- | --- |
+| CP-D01 | Independent stream and namespace; BER unchanged | Explicit owner-reviewed integration design |
+| CP-D02 | One host/owner and one repository-wide outstanding synthetic operation; atomic slot guard across items/runs, independent of lock | Demonstrated need plus separately approved multi-operation/distributed design |
+| CP-D03 | Authority and state transitions deterministic; workers untrusted | Not relaxable by worker output or implementation convenience |
+| CP-D04 | Unknown effects remain non-dispatching; proof-free owner disposition can only stop/final-fail/report | Authoritative nonexecution proof or separately reviewed safe retry using the original effect identity; never owner risk acceptance alone |
+| CP-D05 | Storage interface before selecting implementation | CP-WP-002 authorization must name selected storage and crash model |
+| CP-D06 | Terminal state never reopens; late receipt/accounting and validation dispositions settle obligations without advancement | New explicitly authorized run/item revision, preserving predecessor history; never replace COMPLETED evidence with cancellation |
+| CP-D07 | Imported state needs independent monotonic freshness proof or complete authoritative reconciliation before dispatch | No self-consistent chain or inactive-host exception |
+| CP-D08 | Effect dedup key excludes item/run/source/plan/policy revisions; immutable logical-effect binding survives them | Different/repeated/compensating effect needs explicit new-ID approval and durable predecessor disposition |
+| CP-D09 | External one-use grants require atomic claim/consume at the trusted source; local reservation is not authority | Real dispatch denied when source or any consuming path cannot enforce it |
+| CP-D10 | Versioned budget settlements retain honest usage and worst-case uncertainty across terminals/restarts | Only authoritative settlement evidence changes held/charged totals; no implicit refund/reset |
+
+These IDs are proposal decisions, not granted execution permissions. A later
+accepted change names superseded decisions and reasons rather than silently
+rewriting the continuation assumptions.
+
+Contract-first adds no runtime cost and keeps reversal to document edits. An
+immediate offline kernel gives executable evidence sooner but commits to storage
+before recovery semantics are reviewed. A hosted workflow service adds deployment,
+identity, cost and operational scope. Choose contract-first; revisit only after
+owner acceptance. Then ship independently reviewable offline, capability and
+integration packages, each with its own stop point in the separate backlog.
+
+## 4. Components, ownership and trust boundaries
+
+These are logical interfaces, not eleven services. Only the durable-state owner
+writes authoritative events. Other writes below are immutable evidence or disposable
+projections. Requests to append are validated by the engine and state owner.
+
+| Component | Trusted/untrusted inputs | Reads | Writes | May request | Cannot possess | Failure behavior / evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| Operator interface | Authenticated identity; command payload still untrusted | Sanitized status/proposals | No direct authoritative writes | Accept plan, pause, resume, stop, review | A CLI flag cannot create consent | Reject invalid identity/payload; command ID, actor proof reference, disposition |
+| Deterministic transition/authority engine | Validated commands; untrusted observations | Verified state, item, policy, verifier result | Event transactions through owner | Allowed transition and bounded operation | Cannot invent grants or remove gates | Deny unknowns; record predicates, versions and reasons |
+| Single durable-state owner | Typed transactions with expected head | Project catalog, outstanding slot, journals and accounting | Authoritative catalog/journals/slot and budget/use records | Atomic intent/settlement acknowledgement | Cannot turn local use reservation into an external atomic claim | Project lock/I/O/integrity/freshness failure closes dispatch; committed sequence/hash receipt |
+| Work-item repository | Proposed content untrusted until accepted/pinned | Immutable definitions/dependencies | New revisions through owner | Acceptance/supersession review | Cannot approve its proposals or dispatch | Reject cycles/mismatch; definition digest/provenance |
+| Approval verifier | Human evidence and atomic-claim receipt from trusted source; text untrusted | Full lifecycle, source claims/uses, scope/time facts | Decisions/nonsecret claim references through owner, never grants | Fresh verification and source-atomic claim/consume after write-ahead intent | Cannot replace external claim with a local lock/read | Expired/revoked/consumed/unknown/unreachable source denies; evidence binds claim to effect |
+| Execution adapter interface | Exact request and trusted-boundary one-shot permission | Approved snapshot and allowed workspace | Only named authorized effect targets | Execute/cancel original effect; retry only under separately verified contract | Cannot expand paths, choose fresh keys, retry itself or certify completion | Refuse mismatch/expiry/redeemed capability; bound effect/usage receipts and uncertainty |
+| Evidence writer | Raw output untrusted; validated metadata | Explicit artifacts | New immutable evidence | Record artifact references | Cannot rewrite history or authenticate itself | Preserve failure; manifests/classification/redaction/finalization |
+| Reconciliation adapter | Approved lookup and pending effect identity | Bounded external status or synthetic equivalent | Observation artifacts | Read-only lookup/disposition proposal | Cannot resend mutation | Unknown stays unresolved; query/target/freshness/receipt evidence |
+| Materialized-state projector | Verified ordered events only | Journal | Disposable cache | Rebuild | Cannot authorize from cache or repair history | Reject gaps/versions; projection version and source head |
+| Policy evaluator | Approved pinned policy; other content untrusted | Gates, caps, paths, dependencies | No policy/history changes | Deterministic decision | Cannot accept worker policy changes | Missing/unsupported rule denies; policy hash and evaluated predicates |
+| Read-only reporting interface | Validated query | Verified sanitized view/evidence | No authoritative state | Read/export preview | Cannot advance/repair/approve | Label stale/unverified data; report source head and coverage |
+
+Dependency direction: operator -> engine -> verifier/policy -> state owner ->
+bounded adapter request. Adapter -> evidence/verification -> engine -> state owner.
+Projector/reporting consume verified state; no reverse authority edge exists.
+
+| Boundary | Assets and trust change |
+| --- | --- |
+| B1 operator -> authority | Authentic human consent versus text claiming approval |
+| B2 definitions -> engine | Repository/item/policy identity and required gates |
+| B3 engine -> durable owner | Ordered atomic intent/accounting and history |
+| B4 engine -> worker/adapter | Narrow capabilities; AI worker is untrusted |
+| B5 observations -> verification | Receipts/evidence versus established completion |
+| B6 checkpoint -> recovery | Provenance, completeness and exclusive ownership |
+
+The AI worker cannot approve work, alter required gates, rewrite historical events,
+change its own allowed paths or establish its own completion. A proposed plan or
+patch is untrusted input requiring the same acceptance path as any other input.
+Workers cannot directly access controller state, approval sources or raw evidence.
+
+## 5. Identity, authority and deterministic dispatch
+
+### 5.1 Stable logical-effect identity
+
+Bind an explicit repository UID to the canonical repository and owner-approved
+target configuration; a folder name is insufficient. Run UID survives restart;
+writer epoch changes with verified exclusive reacquisition. Item UID plus immutable
+definition digest binds inputs, dependency IDs, targets and required gates. Every
+operation must declare at least one independent acceptance check; T01 rejects an
+empty check set before any intent or contact. No implicit validation-free operation.
+Pin source commit/tree, plan digest, policy digest and schema/reducer versions.
+Input changes require a new revision and explicit acceptance; old evidence retains
+the old binding. Moving `main` never changes a running work item's identity.
+
+The deduplication key is a domain-separated hash of repository UID and accepted
+logical-effect ID ONLY. Item/revision/run/source/plan/policy/validation versions,
+target and semantic-input hashes are not alternate key generators. An immutable
+EFFECT_DEFINED record binds that ID to action, target and canonical semantic inputs.
+All references must match that descriptor; changed metadata or a renamed/revised
+item cannot create a new effect or bypass its history. The catalog records each
+item revision's effect references and predecessor/equivalence relationships.
+Equivalent effects across revisions/runs reuse the same ID and dedup key.
+A new validation-only revision may adopt a completed effect through T28; it never
+reopens the predecessor, repeats its mutation or inherits its check passes.
+
+A legitimately different semantic effect requires an explicit approval binding a
+new logical-effect ID, full descriptor and DIFFERENT_FROM predecessor relationship.
+Intentional repetition similarly requires approved REPEAT_OF; compensation requires
+approved COMPENSATES. These are new effects, not rewriting the predecessor. Changing
+inputs, target, source, plan, policy or validation alone never grants repetition.
+Unclassified equivalence or a missing predecessor history blocks dispatch. An alias
+of a completed or unknown predecessor cannot redispatch it. A known completed
+effect can only be intentionally repeated as the separately approved new effect;
+an unknown predecessor cannot be repeated on risk acceptance, even under a new ID.
+Safe recovery of that original effect follows section 7.4 with the SAME key.
+Compensation does not prove the original outcome and cannot bypass CP-D02's slot.
+The verified project effect index spans every item revision and run; incomplete
+catalog, equivalence or freshness evidence denies dispatch.
+
+### 5.2 Approval lifecycle and authoritative one-use claims
+
+Approval verification matches genuine human source, repository, work package,
+action/target/paths, revision scope, time, budgets and actual use limits. Missing
+permission is not permission; absence of prohibition is not a grant. Read the full
+lifecycle: expiry (even without a recorded EXPIRED event), revocation, supersession
+and consumption apply. Revoking a successor never revives its predecessor.
+Effective time is distinct from recorded order; late facts remain visible.
+T13 accepts late facts even after terminal disposition. Verify authority at the exact
+governed claim/redemption/dispatch/validation/adoption boundary or interval required by the grant, using trusted time.
+A proven prior breach or unresolved ordering marks affected provenance disputed and
+fences affected operations/transitive adoptions; terminal stays fixed. Only authoritative correction of that exact historical fact clears it; a replacement grant cannot. Ordinary expiry/
+revocation after authorized use and that action's valid consumption are not retroactive
+breaches, but still constrain future use. Unresolved provenance cannot support T28.
+Unknown one-use consumption reserves the use until resolved, never resets it.
+Malformed/duplicate grant IDs, missing targets, supersession cycles or conflicting
+lifecycle evidence make affected authority unresolved; they cannot authorize dispatch.
+Recurring grants are not converted into one-use grants. Direct current human
+instructions remain evidence before register transcription; recording is not granting.
+
+Real approval authentication/freshness is an unresolved live-adapter design gate.
+The offline kernel can use only explicitly synthetic authority, structurally unable
+to enable real adapters. No Markdown parser or worker text becomes a trusted human.
+Recheck all authority at each dispatch using trustworthy time and a fresh source;
+clock rollback never extends a grant. Specify/prove maximum proof age and revocation
+propagation before a real adapter is enabled; accepted invalidation wins before
+dispatch. Source-claim contact also obeys the current local dispatch fence.
+Fresh reads and repository-local serialization do not prevent another host,
+controller or manual path from spending the same external one-use grant. Real use
+MUST atomically claim/consume it at the trusted approval source using CAS, exclusive
+lease, nonce redemption or an equivalent one-shot capability. The atomic claim binds
+repository, work package, action, target, logical-effect ID/key, intent/attempt,
+descriptor digest and expiration. Every consumer, including manual paths, must use
+that authoritative mechanism; a bypass path makes the grant unsupported for real
+dispatch. Expired, revoked, superseded, consumed, ambiguous or unreachable authority
+denies. No atomic source semantics means no real one-use dispatch.
+
+After durable local intent, the source claim is idempotently identified by that
+intent. Persist its nonsecret receipt before dispatch. The trusted dispatch boundary
+redeems the capability once, checking binding, current expiry/revocation and final
+fence. The source/broker integration must enforce that linearization across all
+consumers; a claim followed by an unprotected fresh read is insufficient. If the
+claim/redemption result is lost, query its original identity and retain uncertainty;
+never mint another claim or assume no use. A lost lease/expired token cannot renew
+authority automatically. No claim of instantaneous cancellation of an already
+accepted external effect is made. Synthetic claim receipts have a distinct type
+and cannot satisfy a real adapter's construction or dispatch requirements.
+
+Permission-use records have RESERVED, CONSUMED and RELEASED dispositions, bound to
+grant ID, logical effect key and typed origin: EXECUTION_INTENT (operation or validator) or T28 EFFECT_ADOPTION. The final authority check
+may recognize that intent's own reservation; any other intent is denied that use.
+It must still check expiry, revocation, supersession and changed scope. Definite
+non-dispatch permits release only on recorded proof and under the original grant's
+use terms (a grant consumed by intent creation is not restored by cancellation).
+Uncertain initiation retains the reservation. Normal consumption by the authorized
+in-flight action prevents later uses; it does not itself revoke that same action.
+For an external source these local records are accounting/provenance only. Release
+also requires authoritative source disposition under original grant terms; a local
+RELEASED record cannot make a spent external grant available. Reservation, consumption
+and release are serialized across repository runs but do not replace source atomicity.
+
+### 5.3 Atomic dispatch and one outstanding operation
+
+Under one repository owner, T03 atomically checks the verified outstanding-effect
+index and acquires its sole operation slot with intent, local permission-use and
+budget reservations and attempt identity. A writer lock alone is NOT the slot guard.
+When CP-D02 is active, any OTHER operation that is initiated, unsettled, uncertain,
+reconciling, cancelling, draining or awaiting validation denies new dispatch across
+all runs/items, even for sequential commands in the same process under the same owner.
+Paused or terminal lifecycle does not free unresolved obligations. Slot reconstruction
+includes committed-but-unacknowledged intents. BOTH slot-release routes require all
+source-claim/control-contact/budget obligations resolved, plus either proven
+non-dispatch or verified final effect and closure of EVERY registered validation
+obligation. A recoverable failure or unmet check prerequisite leaves its obligation
+open and retains the slot through remediation/retry; a failure observation alone is
+not closure. Nonterminal successful checks retain the slot until the distinct T16
+operation-finalization commit; aggregate gates cannot be bypassed by slot release.
+A terminal cancellation may close validation, never count as pass. Proven no effect
+with unknown claim/control billing still holds the slot and denies another operation.
+Contradictory late evidence restores an unresolved obligation and fences the repository;
+if another operation now owns the slot, preserve both obligations and that ownership,
+never silently evict it or pretend that historical non-dispatch proof was correct.
+
+Receipt collection, validation, pause/stop and read-only reconciliation of the owned
+operation use its existing slot. Required validation obligations are registered with
+the accepted operation. T27 commits a validator sub-intent before any launch/contact,
+bound to parent origin (execution intent or T28 adoption), effect, exact current
+revision/check/input/attempt and its own use/budget records.
+It is a subordinate activity, not another delivery effect. Its capability binds the
+pinned read-only input snapshot, check/attempt, allowed actions and isolated bounded
+output/scratch paths. Enforced containment covers subprocesses, tools and network;
+no target, repository/Git, deployment, production-data, authority or controller-state
+mutation is permitted. Unavailable containment denies launch; instructions alone
+are insufficient. A proposed repair/mutation requires a separately approved logical
+effect under T03/5.1 and still cannot bypass the occupied slot. Complete verified
+history plus an effective fence can prove no start ONLY when no such intent exists;
+a recorded intent with missing launch/result acknowledgement remains uncertain unless
+authoritative non-launch proof resolves it. Absence of a result is never no-start proof.
+T26 settles validation obligations after STOPPED/FAILED_FINAL without new validation,
+business advancement or reopening; it cannot waive receipt integrity or unknown costs.
+A section 7.4-approved retry
+of the SAME logical effect may retain/transfer that slot to a new attempt; it is not
+a new operation and keeps the original uncertain attempt/accounting. Another effect,
+including compensation, cannot use that exception. T03 rechecks slot ownership and
+retry proof atomically; simply labelling a command "retry" never bypasses the guard.
+
+The adapter initiates only after durable intent, any required authoritative claim
+receipt and final serialized fence/authority/slot check. Serialize local pause/stop
+and dispatch initiation so a committed fence wins; use section 5.2 for source-atomic
+external authority. Do not wait for operation completion while holding the command
+loop hostage: receipts arrive separately. No adapter retries or spends a capability
+twice on its own. Claim requests and other potentially chargeable control interactions
+must be declared/bounded/accounted as part of the owned operation before contact.
+
+### 5.4 Durable budget settlement
+
+Budget records are separate from permission-use records. Version 1 dispositions
+are RESERVED, CONSUMED, ADJUSTED, RELEASED and UNKNOWN_WORST_CASE_CHARGED. Each
+reservation ID is owned by exactly one INTENT_COMMITTED (including T27's typed
+validator sub-intent), atomically binding repository,
+work package, effect key, attempt, budget-policy/cap snapshot and reserved vector R.
+Use integer enforceable units per dimension; no negative/nonfinite value or float
+money. Require a defensible maximum liability W before contact (R covers W); an
+unbounded or unobservable dimension cannot be silently uncapped. Synthetic W may be
+zero; that says nothing about real billing. Account every attempt/control interaction.
+
+| Event/disposition | Required evidence and atomic accounting effect |
+| --- | --- |
+| BUDGET_RESERVED / RESERVED | In the intent transaction: held=R, charged=0; deny if aggregate held+charged would exceed caps |
+| BUDGET_CONSUMED / CONSUMED | Bound authoritative final usage A: held=0, charged=A; commit with receipt/settlement reference; semantic pass/fail is irrelevant to billing |
+| BUDGET_ADJUSTED / ADJUSTED | Authoritative correction/reconciliation of actual A, including refund: replace prior absolute held/charged with verified values; never apply a blind delta twice |
+| BUDGET_RELEASED / RELEASED | Proven non-dispatch AND zero liability for the reservation: held=0, charged=0; source claim/control costs must already be accounted separately |
+| BUDGET_UNKNOWN / UNKNOWN_WORST_CASE_CHARGED | Missing telemetry, ambiguous billing/dispatch or cancellation without final evidence: held=0, charged=W, uncertainty=true; no assumed zero/refund |
+
+Every settlement includes schema/event ID, expected prior reservation-event hash,
+original intent/effect/attempt, evidence references, new absolute amounts and reason.
+Commit settlement with its receipt/reconciliation/accounting observation so replay
+cannot see an outcome with missing accounting. Repeated event ID/payload is an
+idempotent observation; conflicting/stale predecessor or a second release denies.
+RELEASED cannot be released again. A later contradictory authoritative outcome/bill
+produces ADJUSTED with true usage, or UNKNOWN when usage is unresolved, plus an
+integrity exception/dispatch fence atomically;
+the original release remains history, never a reason to discard or undercount a bill.
+CONSUMED/ADJUSTED/UNKNOWN may receive an evidence-backed ADJUSTED record; none resets
+historical caps or removes attempts. Totals are sums of current held+charged per
+reservation over complete history, checked for nonnegative amounts and no double use.
+
+Classify usage from all verified history, not just the incoming receipt. Missing or
+less-informative telemetry cannot downgrade prior authoritative CONSUMED/ADJUSTED
+usage to UNKNOWN/W or erase an overrun. Retain that settlement by reference with the
+new observation. Only authoritative corrected usage/refund may reduce known charges.
+Evidence of additional unresolved liability preserves known charges and records the
+additional exposure/fence; never replace a larger known amount with a smaller W.
+
+If A exceeds R/W or remaining cap, durably record actual A and a breach/dispatch
+fence in the same transaction; never reject the bill, understate usage or increase
+the cap to make it fit. Missing telemetry charges W and blocks further dispatch
+pending reconciliation. Uncertainty can be removed only by authoritative final
+usage or non-dispatch/zero-liability proof; only the latter permits full release.
+A cancellation request, process death, stop, owner acceptance or item revision is
+not release evidence. Known cancellation charges are consumed/adjusted; unknown
+ones remain worst-case charged. Never release while uncertainty still exists.
+Terminal states retain accounting; late receipts settle through T23 without reopening.
+On restart reconstruct every reservation/disposition, cap and breach before dispatch.
+An external-source outage or an unavailable budget bound closes dispatch, not the ledger.
+
+## 6. Normative state model
+
+### 6.1 Vocabulary and invariants
+
+| State | Meaning |
+| --- | --- |
+| PLANNED | Accepted definition; next declared step has not dispatched |
+| RUNNING | Committed intent; initiated or awaiting immediate result |
+| PAUSING | Dispatch fence committed; existing activity being accounted for |
+| PAUSED | Fence retained; no unaccounted active execution; cursor preserved |
+| VALIDATING | Recorded result awaits deterministic validation/required review |
+| RECONCILIATION_REQUIRED | Effect, ownership or integrity cannot safely be inferred |
+| BLOCKED | Known unmet prerequisite, approval, capability or recoverable failure |
+| FAILED_FINAL | Final failure established under accepted policy |
+| COMPLETED | All required evidence/gates establish completion |
+| STOPPED | Permanent execution fence for this run/item |
+
+READY is a derived predicate, not durable permission. WAITING_FOR_APPROVAL is
+BLOCKED with APPROVAL_REQUIRED. FAILED_RECOVERABLE is BLOCKED with explicit
+recovery conditions. No state is added merely because it has a UI label.
+
+Keep durable reason-keyed dispatch fences, continuation cursor,
+blocking reasons, identity bindings and outstanding-effect dispositions separate
+from lifecycle. Each fence binds scope, reason and originating event/obligation;
+new uncertainty has a new identity. Effective prohibition is the union of applicable
+fences. Only proof for that exact instance permits its authorized transition to clear
+it; no lifecycle change, stale proof or same reason string clears another fence.
+A PAUSED item may lose approval while staying paused. Unknown
+effects cannot hide behind PAUSED. Terminal states never reopen; non-advancing
+late receipts may settle obligations while preserving the terminal disposition.
+Run-level stop fences every nonterminal item. A run is COMPLETED only if all
+required items, gates and effect obligations are complete; reporting cannot infer
+completion from a majority or from a worker's prose.
+
+### 6.2 Transition table
+
+Actors: O = verified operator; E = deterministic engine; S = state owner;
+V = authorized independent validator; R = bounded reconciliation adapter.
+Every record below is a proposed versioned event, not an executable schema.
+Every unspecified state/event pair is denied. Commit failure means no durable
+acknowledgement, no new effect, and closed dispatch until storage is verified.
+
+| ID / current state | Event | Authorized actor | Preconditions | Durable record | Permitted side effect | Resulting state | Interruption result | Forbidden alternatives |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| T01 absent | Accept definition | O -> E/S | Valid role/repo/definition/dependencies; at least one independent acceptance check per operation | PLAN_ACCEPTED with bindings | None | PLANNED | No acknowledgement if commit fails | Dispatch unrecorded plan |
+| T02 PLANNED/BLOCKED | Evaluate prerequisites | E/S | Verified history, current inputs and typed cursor | READINESS_EVALUATED, retaining recovery/finalization blockers and slot | None | PLANNED only for ready operation-planning cursor with no unresolved validation/recovery/finalization obligation; otherwise BLOCKED with original cursor | Unknowns block | Readiness bypasses typed T16 recovery/finalization; permanent cached permission |
+| T03 PLANNED | Initiate operation | E/S | Ready, no applicable fence for this attempt (only 7.4 permits a bound outcome-only exception), fresh verified catalog, current authority; atomic repository slot check: no OTHER outstanding operation (5.3); original key/descriptor and any same-effect retry proof valid | Atomic INTENT_COMMITTED, slot ownership, budget/use reservations, attempt/effect key and consumption of any exact one-attempt retry exception | Named effect only after durable intent, required source-atomic claim/receipt/redemption and final checks | RUNNING | C02/C03/C08 reconciliation retains slot, source claim and accounting | Revision generates fresh key; local lock/read substitutes for source claim or one-operation guard |
+| T04 PLANNED/BLOCKED | Pause before dispatch | O -> E/S | Authentic command | PAUSE_REQUESTED and PAUSE_SETTLED atomically | None | PAUSED | Fence only acknowledged after commit | Dispatch after fence |
+| T05 RUNNING | Pause local execution | O -> E/S | Authentic command; owned attempt | PAUSE_REQUESTED, fence, outstanding attempt | Approved bounded cancel/drain only | PAUSING | Unknown child/result -> RECONCILIATION_REQUIRED, fence retained | Claiming child termination from parent exit |
+| T06 RUNNING | Pause external mutation | O -> E/S | Authentic command; effect key retained | PAUSE_REQUESTED and outstanding effect | Permitted observe/cancel, never new mutation | PAUSING | Missing/ambiguous receipt -> RECONCILIATION_REQUIRED | Retry, implicit rollback, cancellation assumed successful |
+| T07 PAUSING | Activity settled | E/S from checked observations | No unaccounted active work; receipts/checkpoints bound | PAUSE_SETTLED with continuation cursor | None | PAUSED | Unknown activity remains reconciliation-required | Settled acknowledgement without proof |
+| T08 VALIDATING | Pause validation | O -> E/S | Authentic command | Fence and validation checkpoint | Settle/cancel existing validation only | PAUSING until settled, then PAUSED | Unknown validator activity -> reconciliation | Starting new validation while paused |
+| T09 RECONCILIATION_REQUIRED | Pause | O -> E/S | Authentic command | Pause fence | Permitted read-only reconciliation | RECONCILIATION_REQUIRED | Uncertainty and fence persist | Hiding uncertainty as PAUSED |
+| T10 RUNNING/PAUSING | Receive ordinary current-operation result | Adapter observation -> E/S | Request/effect/target/input binding verified; usage AND source/control claims classified; contradiction uses T23 | RECEIPT_RECORDED and 5.4 settlement/reference atomically; preserve slot through validation | Preserve evidence | Only known final result plus settled usage/source/control -> VALIDATING or PAUSING to T07; any UNKNOWN -> reconciliation retaining receipt/fence/slot; breach fences dispatch | Uncertain receipt/claim/accounting retains obligations | Known cost hides unknown claim; receipt equals success; late result bypasses fence |
+| T11 VALIDATING | APPLY_VALIDATION for recorded pass | E/S using independently verified V observation | Exact unapplied observation/check/attempt; selected check's application guards, finality/cessation and source/accounting settled; no dispatch fence; other checks may be pending | VALIDATION_PASSED and apply-key disposition by immutable observation reference, never another observation/charge; slot retained until finalization | None | VALIDATING for another pending unblocked declared check; BLOCKED on its prerequisites; when all current checks pass, BLOCKED with FINALIZING cursor for distinct T16, even if aggregate gates already pass | Denied/unknown guard leaves observation unapplied; retry command semantics below | Require unrelated pending checks evaluated before recording this check's pass; duplicate application or early slot release |
+| T12 VALIDATING | APPLY_VALIDATION for recorded failure | E/S using independently verified V observation | Exact unapplied observation/check/attempt; selected failure classification, finality/cessation and source/accounting verified; no dispatch fence | VALIDATION_FAILED plus apply key; recoverable check/slot stays open. Final branch atomically commits permanent item/operation fence, closes this failed check by observation reference and releases slot only if ALL 5.3 obligations settled; preserve all history | None | BLOCKED with VALIDATING cursor if recoverable; FAILED_FINAL under final rule, remaining checks use T26 under the committed terminal fence | Denied/unknown guard leaves observation unapplied; slot retained | Release slot on recoverable failure; retry parent effect; erase failure or duplicate observation |
+| T13 any state | Ingest approval expiry/revocation/supersession/use or availability facts | Verifier -> E/S | Trusted lifecycle facts bound to exact grant/action; compare effective time with the grant-required governed boundary/interval; own valid reservation/consumption follows section 5 | AUTHORITY_INVALIDATED or evaluated disposition with proof/time/action bindings; current denial fences its applicable scope; historical breach/uncertainty disputes and fences affected provenance/dependents; authoritative correction atomically clears only its exact resolved historical fence | Account for existing activity only | Terminal unchanged; no applicable current denial or historical dispute -> same lifecycle; otherwise PAUSED retains blocker, idle -> BLOCKED, active -> PAUSING/reconciliation under affected scope; ordinary later expiry cannot retroactively invalidate history | Unverifiable ordering/provenance denies new reliance | Revive grant; discard late facts; ordinary post-action expiry/own consumption proves historical breach; reopen terminal |
+| T14 PAUSED | Resume | O -> E/S | Fresh authority/identities, independently verified recovery freshness (8.1), complete effect/use/budget indexes, exclusive owner; unresolved owned effect uses T17 instead | RESUME_ACCEPTED with cursor and cleared pause-only fence; retain other blockers and owned slot until 5.3 closure | None; later T03 enforces global slot and source claim | BLOCKED if any recovery/remediation/finalization blocker remains; otherwise restore PLANNED/VALIDATING cursor | Denial leaves PAUSED with reason | Clear non-pause blocker; bypass T16; stale checkpoint or resume itself enables dispatch |
+| T15 any nonterminal | Source/plan/policy/item binding mismatch | E/S | Mismatch detected | BINDING_MISMATCH and fence | Account for existing work only | PAUSED retains fence/blocker; idle -> BLOCKED; active/uncertain -> reconciliation | Preserve old bindings | Silently follow moving main or changed inputs |
+| T16 BLOCKED | Bound remediation/recovery, or distinct FINALIZE_OPERATION | Recovery: O -> E/S; finalization: E/S under accepted policy, O where required | Recovery: explicit check/attempt-bound disposition and current guards. Finalization: all applied current checks, aggregate gates and 5.3 settlement verified; no remaining recovery blocker or fence; owned slot | BLOCKER_RESOLVED with typed cursor, or atomic OPERATION_FINALIZED with finalization key, cursor and slot disposition; preserve all history | None | Recovery -> VALIDATING for referenced application/authorized T27, or operation PLANNED under 5.1/7.4; PAUSED if fenced. Finalization -> next-operation PLANNED or COMPLETED only if ALL work/gates pass | Unresolved guard stays BLOCKED with cursor/slot; duplicate finalized key returns prior disposition | Reapply a check to finalize; restart parent for validator recovery; implicitly reclaim slot; erase failure |
+| T17 RECONCILIATION_REQUIRED | Resolve outcome | R evidence + O where policy requires -> E/S | Verified activity/check cursor and 7.4 route; contradiction uses T23; retain observations independently of readiness | RECONCILIATION_RECORDED plus receipt/observation and accounting references; atomically clear only exact uncertainty-fence instances resolved by bound authoritative proof, retain every other fence/blocker and cursor; terminal branch commits permanent item/operation fence retaining unknown obligations; safe-retry branch records only 7.4 exact one-attempt exception; no duplicate application | None | UNKNOWN remains reconciliation except outcome/activity uncertainty exactly covered by 7.4 retry exception; uncovered activity or source/control/billing UNKNOWN always denies; settled result -> PAUSED if pause remains, otherwise BLOCKED while another fence/recovery/finalization blocker remains or VALIDATING for pending check/application; operation nonexecution/safe-retry -> PLANNED only with no applicable blocker/fence for that attempt, otherwise PAUSED/BLOCKED under 7.4; validator non-launch/interruption -> BLOCKED with VALIDATING cursor pending T16 (PAUSED if pause remains); proof-free -> STOPPED/FAILED_FINAL/report-only | Missing proof/telemetry/source retains uncertainty and slot | Receipt hides UNKNOWN; validator recovery retries parent; reconciliation applies/duplicates a stored result |
+| T18 every nonterminal state | Graceful stop | O or E under approved stop rule -> S | Authentic command/rule | STOP_RECORDED, permanent fence, drain deadline and 5.4 known settlement or retained reserve/worst-case charge | Bounded already-approved drain; no new steps | STOPPED immediately; effects, accounting and slot pending until proven settled | Timeout -> T20; uncertain outcome remains worst-case charged | Stop releases budget/use/slot; business workflow advances |
+| T19 every nonterminal state | Immediate stop | O or E under approved stop rule -> S | Authentic command/rule | STOP_RECORDED, permanent fence, obligations and 5.4 uncertainty/known settlement | Best-effort allowed cancellation/kill and observation | STOPPED | Unknown outcomes/billing retain worst-case charge and slot | Cancellation means zero bill; erase accounting or promise reversal |
+| T20 STOPPED with graceful drain | Escalate immediate stop | O or approved deadline rule -> E/S | Outstanding drain/cancel obligations | STOP_ESCALATED plus evidence-backed 5.4 settlement or UNKNOWN; no automatic refund | Permitted cancellation only | STOPPED | Unknown obligations, charge and slot remain | Reopen work; refund on deadline |
+| T21 any state | Competing resume | Second process | Owner lock unavailable | No competing journal write; local denial result | None | Canonical state unchanged | Bounded refuse/wait | Unlink lock, PID/mtime takeover |
+| T22 COMPLETED/FAILED_FINAL/STOPPED | Restart/resume request | O/read interface; E denies advancement | Verified terminal event | No advancing event; optional non-authorizing observation | Reporting and separately allowed receipt reconciliation | Same terminal state | Integrity failure makes status unverified, dispatch closed | Reopen terminal run or reset budget |
+| T23 any state | Unexpected/contradictory/terminal effect receipt or subsequent accounting | R -> E/S | Recorded intent/effect/reservation identity, including settled/RELEASED; bound authentic receipt; usage/source/control classified from complete history; routing priority below | LATE_RECEIPT_RECORDED plus accounting atomically; newly verified final outstanding effect records pending-validation cursor and invalidates unused retry exceptions and atomically records RETRY_INITIATION_DISABLED for each pending retry intent; receipt intake and initiation/new claim contact serialize with current-outcome recheck; contradiction restores obligation/integrity fence including dependent adoptions; preserve other slot owner | Evidence preservation only | Terminal unchanged; nonterminal contradiction/UNKNOWN or newly verified final outstanding effect -> reconciliation with retained fences and typed cursor; otherwise same lifecycle, no advancement | Retain valid receipt despite absent usage; never downgrade known charges | Reject late receipt solely due to lifecycle; silently evict slot owner; undercount liability or reopen terminal |
+| T24 any state with recorded validator intent | Ingest typed validator observation | Bound V/R observation -> E/S | Exact operation/check/input/attempt; authentic immutable RESULT or authoritative cessation proof covering every execution/descendant path; result availability, cessation and source/usage classified independently from complete history | RESULT: VALIDATOR_OBSERVATION_RECORDED once; cessation with retained RESULT: CESSATION_RECORDED by reference; otherwise CEASED_RESULT_UNAVAILABLE/VALIDATOR_INTERRUPTED with current check recovery blocker/obligation retained; both include 5.4 settlement/reference; noncontradictory proof atomically clears only exact resolved uncertainty instances; contradictions retain evidence/integrity fence; an applicable mandatory terminal policy atomically records its bound irreversible stop obligation/fence | Evidence preservation only | Terminal unchanged; nonterminal UNKNOWN/contradiction -> reconciliation; current interrupted attempt with settled facts -> BLOCKED with VALIDATING cursor, PAUSED if pause remains or PAUSING until T07; otherwise preserve lifecycle | Missing result never becomes pass/fail/nonexecution or downgrades a recorded result; timeout/parent exit cannot prove cessation | Apply during intake; close interrupted check/slot; drop delayed result, duplicate charge or overwrite history |
+| T25 any state with recorded intent | Ingest authoritative nonexecution proof before/after handoff | E/S | Bound proof for exact intent/attempt covering EVERY initiation/effect path including descendants; classify contradiction before settlement; source/control/billing classified | NONDISPATCH_PROVEN plus proof/source/use/5.4 references once; contradiction preserves both accounts, restores obligation/integrity fence and known charges; otherwise atomically clear only exact proof-resolved uncertainty instances, retaining all other blockers/fences | None | Terminal unchanged; nonterminal contradiction/UNKNOWN -> reconciliation; noncontradictory historical proof otherwise preserves cursor/state; current unlaunched OPERATION_RETRY with verified effect -> reconciliation with validation cursor; other current attempts -> PAUSED if pause remains, otherwise BLOCKED for T16 validator or 7.4 operation recovery | Missing claim/control bill retains slot/accounting; duplicates cannot reset later progress | Contradiction releases liability or erases success; stale proof clears parent/newer fence; local release revives grant; no launch means zero cost |
+| T26 STOPPED/FAILED_FINAL | Settle terminal validation obligation | E/S using bound T24 observation or verified non-launch/cessation proof | Exact registered check and attempt if launched; complete history/permanent fence; no unknown validator activity; disposition rule below | TERMINAL_VALIDATION_SETTLED by observation/proof reference and 5.4 settlement/reference; cancellation and later result are separate facts; close slot only if ALL 5.3 obligations settled | None; no new validation | Same terminal; late result still admissible via T24, no replacement/reopen | Unknown cessation/cost retains obligation/slot as applicable | Cessation proves no delayed result; drop late pass/fail; cancel COMPLETED requirement |
+| T27 VALIDATING | Begin declared validation | E/S | Atomic check of selected check's declared prerequisites/launch gates, current bindings/authority/budget and 5.3 non-mutating contained validator capability, unresolved check, no eligible unapplied RESULT; any prior failed/non-launched/interrupted attempt has a bound T16 recovery disposition matching its eligible observation head, consumed only by this exact successor intent, owned slot, no active/uncertain validator or repository/local fence | Atomic VALIDATOR_INTENT_COMMITTED with parent-origin/effect/current-revision/check/input/attempt binding and own use/budget reservations plus exact recovery-choice consumption | Named validator only after durable intent, source claim and final recheck of launch guards/fence and its own consumed recovery proof | VALIDATING, obligation active; unmet prerequisite denies launch and records BLOCKED with check cursor | Intent without launch/result proof uncertain; C02/C08/C09 apply; proven denial follows T25/T26 | Discover prerequisite after spending; launch before intent; retry parent or reuse grant/budget |
+| T28 PLANNED/BLOCKED | ADOPT_VERIFIED_EFFECT for accepted validation-only revision | O-authorized E/S | Current accepted operation/check set; adoption authority supports source-atomic consumption with this transaction, no applicable fence/blocker; fresh complete history and proven original-action authority at its governed time, exact effect/descriptor and compatible pinned receipt/input bindings; predecessor operation fully settled/finalized and repository slot FREE | Atomic EFFECT_ADOPTED with immutable adoption key, original receipt/provenance references, current validation obligations/cursor, slot ownership and ADOPTION_AUTHORITY_CONSUMED under adoption key; no delivery intent or predecessor grant/charge reuse | None; no contact | VALIDATING under current requirements; predecessor terminal state unchanged | C01/C02/C05 replay adoption key before lifecycle/slot guards; committed adoption keeps slot | Reopen old item, reuse spent grant/pass, acquire occupied slot or repeat effect |
+
+After T24/T07, resume preserves the typed cursor and every non-pause blocker; only
+without a pending recovery/finalization blocker may it restore VALIDATING for T11/T12. A prior failure remains binding until explicit
+remediation and a newly authorized validation attempt; resume does not rerun until
+green. Success still requires all current completion gates. If observation validity
+is uncertain, block for disposition rather than discard it. No paused observation
+itself finalizes work.
+
+T12's permanent final-failure fence belongs to the failed item/operation, not an
+eternal repository-wide ban. Its slot closes in that transaction if all independent
+obligations are settled; otherwise T23/T25/T26 settlement closes it when eligible.
+T17 and noncontradictory T24/T25 clear only uncertainty instances whose exact effect/claim/reservation proofs
+settle them; another attempt, later fence generation, pause, authority, integrity,
+breach or recovery fence survives. Clearing one bill cannot clear another obligation.
+T16 may clear explicitly resolved authority/binding/recovery instances only under its
+bound disposition/current proof; terminal fences are never cleared.
+T25 classifies conflicting proof before any clearance/release. A proof contradicting
+an accepted effect/result preserves both records, real charges and unresolved exposure,
+fences the repository and every dependent adoption, and preserves another slot owner.
+Terminal status stays fixed but its evidence is marked disputed; nonterminal dependents
+require reconciliation. Neither contradictory receipt nor nonexecution proof certifies
+the replacement outcome. Noncontradictory proof for an older disposed attempt is
+retained without resetting a newer cursor, recovery disposition or validation result.
+
+T02/T14/T17 cannot clear an unresolved recovery/remediation blocker or redirect its
+validator cursor to parent PLANNED. Only the explicitly bound T16 recovery disposition
+clears it for the selected check/attempt. Pause then resume restores BLOCKED first
+when that disposition is pending; settling later accounting does not bypass it.
+
+T11 records the final check pass independently of aggregate readiness, then preserves
+a FINALIZING cursor and slot. T16 FINALIZE_OPERATION reads already-applied checks,
+reevaluates aggregate gates/current bindings and all settlement obligations, and
+atomically records finalization/slot disposition/next cursor. It never reapplies a
+validator observation. The immutable key binds operation and accepted requirement
+revision; revisions cannot erase prior finalization or authorize another effect.
+An unmet gate retains BLOCKED/FINALIZING; later eligible finalization may proceed
+without another validation. Duplicate finalization by any command returns its recorded
+disposition before lifecycle guards, including after crash/terminal advancement.
+
+T23 takes precedence for contradictory/unexpected disposed-attempt receipts in any state.
+Bind exact attempt, not just effect key: ordinary current receipts use T10 (RUNNING/PAUSING)
+or T17 (reconciliation); other late/terminal receipts/accounting use T23; validator evidence uses T24.
+Serialize T23 original-final-receipt commit against retry initiation and new claim contact.
+Receipt first: atomically disable the pending retry intent even if its exception was consumed;
+final handoff rechecks current effect outcome and this exact attempt fence. T17 cannot revive it.
+The disable fences only that retry's initiation, not parent validation or authorized read-only settlement.
+T25 requires independent all-path nonexecution/source/cost proof, retains the validation cursor,
+and cannot erase the original effect or authorize parent retry. Once obligations settle, T17 restores validation.
+Handoff first or ambiguous order: retain retry activity/claims/costs until authoritative settlement;
+the original receipt cannot prove retry nonexecution or zero liability. Consumed exceptions remain history.
+Foreign/unbound receipts cannot change facts/accounting/authority; authentic contradictions remain evidence.
+
+T24 records each immutable typed observation once; intake replay adds no event/charge.
+New usage proofs settle separately under 5.4. Distinct T11/T12 APPLY_VALIDATION references only RESULT;
+cessation cannot pass/fail. The atomic apply key binds operation/check/attempt/observation ID,
+never another check or successor. Application appends only disposition/index, not observation/accounting.
+Denied apply stays unapplied: its old command repeats denial; a new eligible command may apply once.
+Any command for an applied key returns its prior disposition before lifecycle guards, even after advancement;
+no duplicate event, check completion, slot release or new authorization follows.
+
+T17 settles T24 UNKNOWN facts and restores the typed cursor: effect receipt -> T27 checks;
+validator RESULT -> T11/T12 reference application. Pause retains PAUSED; recovery/finalization
+retains BLOCKED/cursor. Settlement neither relaunches a check nor converts failure to success.
+T17/T25 proven validator non-launch settles only its sub-intent/source/budget: UNKNOWN -> reconciliation,
+pause -> PAUSED, otherwise BLOCKED/VALIDATING pending bound T16 recovery. T27 still checks fresh
+authority/budget/prerequisites. Never reopen terminal or retry parent T03; recoverable failure/checks
+retain obligations/slot until every current check and settlement closes before advancement.
+
+A launched validator may cease without an available authentic result. T24's typed
+CEASED_RESULT_UNAVAILABLE proves cessation of that exact attempt and all descendants,
+not that no result was ever produced. Complete verified history must have no authentic
+result already retained; missing incoming result cannot downgrade known evidence.
+With an already retained RESULT, T24 records later cessation proof by reference instead,
+settling exact uncertainty/accounting without interruption or a new recovery blocker.
+For CEASED_RESULT_UNAVAILABLE only, keep the check/slot open and bind its attempt/observation recovery blocker.
+Unknown activity/source/cost stays reconciliation; T17 settles only proven uncertainty
+and retains that blocker. Known facts require T16 before continuation, preserving pause
+and other fences. If an eligible original RESULT exists, T16 selects its application;
+T11/T12 must classify/apply it before any retry. Final failure forbids a successor;
+recoverable failure still needs its bound remediation. Only when no eligible RESULT
+exists may T16 authorize a fresh attempt. A new eligible observation before successor
+intent invalidates that recovery choice and restores BLOCKED pending T16.
+T27 atomically consumes the choice for its exact successor and supersedes old attempt
+application eligibility. Final handoff verifies its own consumed proof; benign historical
+intake does not change the eligible observation head or make the old result an APPLY
+candidate. New uncertainty, conflicting evidence or liability still fences/reconciles
+under T24/5.4 and can deny handoff. Old results never satisfy a successor; a delayed result
+alone does not contradict cessation. Cessation-only observations never establish success.
+For any late original RESULT, evaluate the still-applicable accepted policy. If it requires
+terminal failure/stop, T24 atomically binds an irreversible stop obligation and fence to
+that result, policy version and affected operation/dependent adoption before handoff or
+finalization. Existing approved T18/T19 stop rules perform the terminal transition;
+already-started successors are accounted/drained/cancelled. No rule is invented and no
+old result is applied to a successor. T16/T17/replay cannot waive this obligation;
+terminal predecessors stay fixed. Benign historical intake is the only eligibility exception.
+
+T28 requires a new accepted operation/revision, exact repository/effect/key/descriptor/final receipt and fresh source proof of original governed-time authority;
+pin compatible result/input digests and target generation; stale/changed/ambiguous bindings or disputed transitive provenance deny.
+All predecessor checks, effect/source/control/budget and finalization must be settled. Any occupied slot,
+even for the same effect, denies adoption; the retry exception cannot transfer it to another revision.
+The adoption key binds repository/current item revision/operation/check-set and original effect/receipt digest.
+Replay precedes spent-grant/lifecycle/slot guards; stop/cancel/revision never refunds consumption, reacquires the slot or repeats charges.
+Atomically validate/consume the CURRENT adoption grant (ID/source/version/terms) at its source, under that key, with
+EFFECT_ADOPTED/current checks/free-slot acquisition. Record grant/use/terms/proof even for recurring authority;
+one-use/capped grants consume once under actual terms across every consumer. No predecessor grant/pass/charge is reused.
+A local reservation cannot consume an external grant. Unsupported cross-store atomicity denies T28
+before contact/adoption/use; a mirror or paired writes cannot supply atomicity. No separate contact phase is authorized; synthetic authority stays synthetic.
+T27 binds adoption/original receipt with fresh validator authority/claims/budget; T16 finalizes current requirements,
+and T24/T25/T26 settle validators. Original effect/accounting/finalization remain history; contrary proof
+fences dependent adoptions without eviction, terminal reopen or receipt replacement.
+
+T26 records one terminal obligation disposition: PASSED/FAILED by reference to a
+verified T24 observation plus cessation proof; CANCELLED_AFTER_START from authoritative
+cessation; or CANCELLED_WITHOUT_START from complete no-intent history plus fence or
+authoritative non-launch proof. Cancellation closes the waiting obligation, not a
+claim that no final result was produced. A delayed valid pass/fail remains admissible
+via T24 after cancellation, with usage settlement and unchanged terminal disposition;
+it cannot satisfy a successor check. It does not conflict merely by arriving late.
+Actual contradictory proof is retained with an integrity fence; neither cancellation
+nor result is silently replaced. Duplicate settlement is idempotent by obligation/proof,
+not command ID alone. With no T27 intent, bind the unstarted disposition to the check
+and accepted requirement revision; no nonexistent attempt ID is required. Unknown
+activity cannot establish cancellation or free the slot.
+If no validation began before stop and a verified result arrives later, close the
+unstarted obligation using this explicit non-dispatching rule; never launch a new
+validator after the terminal fence. Result authenticity, final effect/source/control
+and budget settlement remain independent slot-release requirements. Either T23 or
+T26 may arrive first; the last required verified settlement closes the slot atomically.
+COMPLETED with an unresolved mandatory validation obligation is inconsistent history,
+not permission to apply T26 or cancel away the completion requirement.
+
+All stop modes close future dispatch at the same serialized fence. Graceful stop
+allows only the already-authorized operation to settle within a declared deadline;
+it cannot launch its next step. Immediate stop requests bounded cancellation now.
+Neither guarantees reversal of accepted external mutations. A stop acknowledgement
+means the fence is durable, not that cessation is verified. If persistence is
+unavailable, reject the durable acknowledgement, disable dispatch in process and
+attempt only permitted emergency containment; recovery must expose the uncertainty.
+
+### 6.3 Crash and acknowledgement table
+
+| ID / crash boundary | Reconstructed fact | Required action / forbidden inference |
+| --- | --- | --- |
+| C01 before intent recording | No committed permission, budget reservation or slot to contact source/adapter | No effect/claim was permitted; reevaluate authority, stable effect key and global slot; never assume cached readiness |
+| C02 after intent but before dispatch | Intent, slot and reservations exist; source claim or dispatch may be uncertain | RECONCILIATION_REQUIRED unless non-dispatch/source claim independently proven; used retry exception cannot mint another attempt without new disposition; no automatic release/fresh key |
+| C03 after dispatch without receipt | Outcome/billing unknown; original key, claimed use and slot retained | Query original effect/source claim; apply 5.4 worst-case accounting; proof-free owner command cannot resend |
+| C04 after receipt/validator intake before application | Immutable receipt/observation and accounting/reference committed; apply key still absent | Reuse the same observation by reference after guards settle; no redispatch/re-ingestion/charge; uncertainty retains slot |
+| C05 after validation application or operation finalization before acknowledgement | Apply key/disposition or OPERATION_FINALIZED key/slot/cursor committed atomically | Same/new command for that key returns recorded disposition; never duplicate observation/check completion/finalization/slot release |
+| C06 before/after pause or stop commit | Only committed fence can be acknowledged | Replay fence first; unacknowledged command retried by same ID; unknown activity exposed |
+| C07 during export, projection or restore of an older valid chain | Internal consistency does not establish latest effect/use/budget state | Read-only until 8.1 freshness proof/complete authoritative reconciliation; no history or cap reset |
+| C08 source claim/redemption before local receipt commit | One-use source may already have reserved/consumed grant | Query original claim identity; do not re-claim, release, assume zero billing or dispatch without verified receipt; retain slot |
+| C09 during budget settlement/slot release | Outcome and accounting/slot transaction may be committed but unacknowledged | Verify/replay same event IDs and predecessor; no duplicate credit, dropped charge or extra outstanding operation |
+
+C02/C08/C09 also cover T27 validator sub-intents and T24/T26 interruption/terminal settlement.
+C01/C02/C05 cover T28 adoption before/after commit/acknowledgement: replay retains its
+origin, current checks, slot and adoption key without delivery intent or duplicate acquisition.
+Crash after a validator intent cannot become CANCELLED_WITHOUT_START merely because
+no result exists. Crash during T23/T26 cannot lose a bound late receipt or close the
+slot before independent validation/source/budget obligations are all disposed.
+
+## 7. Durable events, atomicity and recovery
+
+### 7.1 Event and storage contract
+
+One run journal has strictly increasing sequence assigned by S, unique immutable
+event ID and command ID, writer epoch, run/item/repository bindings, schema version,
+event kind, recorded timestamp, effective-time facts where relevant and previous
+event hash. Hash canonical body excluding its own hash; genesis binds format and
+initial identities. No object directly or indirectly hashes itself. A repository-
+scoped durable catalog names every run history and its identity; registration is
+committed before a run may receive intents or adopt an effect. The catalog and all event mutations
+share repository-scoped writer exclusion. Verified complete histories reconstruct
+both logical-effect outcomes and grant-use reservations across runs. A missing,
+rolled-back or unverifiable catalog/history denies all affected dispatch, not just
+the run that happened to notice it. The outstanding-operation slot and all 5.4
+budget settlements are reconstructed, not inferred from lifecycle or process locks.
+Catalog/registration crash consistency is part
+of the storage selection and fault-injection contract, never an assumed second store.
+
+The proposed storage interface is `acquire_writer`, `load_verified`,
+`commit(expected_head, transaction)`, `read_verified` and `export_checkpoint`.
+These names are prose only. Storage selection is a CP-WP-002 entry decision.
+A single framed append-only local journal is a candidate; a local transactional
+store is another. Compare crash recovery, platform sync guarantees, dependency
+cost, auditability and rollback before selection; neither is implemented here.
+
+Atomicity means all or none of intent/reservations/identity/operation slot becomes committed to a
+reader. A successful acknowledgement follows a verified write/flush/fsync barrier
+and required directory/metadata durability for the selected storage and filesystem.
+An ordinary JSON line, flush alone or atomic rename alone proves none of the full
+contract. Unsupported guarantees must be reported as unavailable and refuse the
+affected capability. Power-loss durability needs its own platform evidence; process
+crash tests are not that proof. Once storage reports uncertain commit, do not keep
+using optimistic in-memory state: close dispatch and reload/reconcile.
+
+Acknowledgements distinguish command committed, intent committed, receipt committed,
+validation observed, validation applied, operation finalized, pause requested, pause
+settled and stop fence committed.
+An operation timeout after commit is not proof that the command failed.
+
+### 7.2 Exclusion and stale ownership
+
+Use one repository-scoped OS-backed exclusive local ownership primitive on a
+verified owned path, covering the complete run catalog, all run journals, effect
+index and approval-use index. Per-run locks alone are insufficient. All runs for
+that repository resolve the same verified root; an alternate root/clone cannot
+initialize an independent authority while another execution history exists.
+Keep lock object identity stable; do not unlink/recreate it to break contention.
+PID, file age or timeout is not authority to steal ownership. Reacquisition requires
+the OS lock, new writer epoch, verified journal and reconciliation of old attempts.
+The lock is cooperative; filesystem ACLs/checked handles protect against untrusted
+writers. Old children and remote effects may survive the owner; a new epoch alone
+does not fence them. Until adapter-level fencing/cessation is proven, no new effect.
+Only the future synthetic adapter is eligible for initial offline kernel execution.
+
+### 7.3 Reconstruction, corruption and schema evolution
+
+Rebuild materialized state, outstanding slot and project effect/use/budget indexes from verified committed events
+using a pinned reducer. Each cache carries source sequence/head and reducer version;
+reporting labels stale caches, while dispatch never trusts them independently.
+Only one repository owner writes the project effect/approval-use indexes, and they
+are reconstructible, not second mutable authorities. Missing catalog entries or
+referenced histories block dispatch. Replay covers cross-run one-use consumption,
+including outstanding reservations, rather than only the run being resumed. Replay
+preserves effect equivalence, adoption dependencies and interrupted-validator recovery
+across revisions and reconstructs every reservation's
+held/charged/uncertainty fields. Old valid history cannot dispatch merely because it
+replays: recovery freshness must pass section 8.1. A missing/stale proof closes dispatch.
+
+Same command ID and payload returns the prior outcome. Same ID/different payload
+is an integrity error. Physical duplicate events, reordered sequences, gaps or
+predecessor mismatch fail verification; never sort or silently deduplicate history.
+Unknown schema/reducer versions prevent advancement. Compatibility/migration must
+be explicit, deterministic and tested, preserving original bytes and provenance;
+new interpretation cannot manufacture old permission or erase failure.
+
+A corrupt/torn tail preserves original bytes and blocks advancement. Diagnose
+uncommitted tail versus committed corruption; never silently truncate/skip bytes.
+An owner-authorized successor segment may name the preserved original digest,
+verified prefix, unresolved reservations and recovery rationale. It is not a reset
+of authority, budgets, keys or terminal states. Stronger evidence may be required
+before any side effect can be reconciled; operator enthusiasm is not receipt proof.
+
+SHA-256 is tamper evidence relative to a trusted head, not writer authenticity.
+An unanchored valid suffix rollback can self-verify. An attacker able to rewrite
+both data and local anchors can fabricate consistency. Independently protected
+head/provenance, authentic operator identity, authorization and storage permissions
+are separate controls. No malicious-writer authenticity claim is made by this v1.
+Section 8.1 turns this limitation into a dispatch gate: restored self-consistent
+history alone is read-only and never a basis for fresh effect or approval use.
+
+### 7.4 External receipt reconciliation
+
+Retain original effect key/descriptor, attempt, claim/budget IDs and history. Bounded read-only lookup
+records query/time/source/response bindings. T17 operation routes below retain evidence/accounting;
+validator non-launch follows 6.2's typed check recovery, never parent-operation replay:
+
+| Route | Permitted disposition / required proof |
+| --- | --- |
+| VERIFIED_RECEIPT | Bound authoritative final effect/usage receipt restores typed T17 cursor: PAUSED if fenced, BLOCKED if recovery/finalization remains, otherwise VALIDATING; unresolved billing/claim stays reconciliation; no success before independent validation |
+| PROVEN_NONEXECUTION | Authoritative proof covering the original request and every relevant dispatch path -> PLANNED with same key only after source-claim and budget disposition; original grant terms still apply |
+| SAFE_SAME_EFFECT_RETRY | Separately reviewed/approved contract proves repeated/concurrent submission cannot produce another mutation; original key/descriptor and effect-outcome uncertainty retained; prior claims/billing resolved, eligible retry authority/source and budget verified -> PLANNED owning the same slot; new attempt claim/receipt/redemption occurs only in T03 after its durable intent |
+| OWNER_NONDISPATCHING_DISPOSITION | Without either proof above, owner may choose STOPPED, FAILED_FINAL or report-only RECONCILIATION_REQUIRED; original unknown effect, charges, claims and slot remain; never PLANNED, runnable PAUSED, VALIDATING-success or COMPLETED |
+
+For SAFE_SAME_EFFECT_RETRY only, T17 may record a one-attempt exception binding the
+original outcome-only fence ID, effect/key/descriptor, next attempt, current reviewed
+retry-contract proof and scoped authority. Covered outcome/activity uncertainty stays
+recorded; uncovered activity or UNKNOWN source/control/billing still denies. T03
+consumes the exception atomically with its exact intent; final initiation rechecks
+that intent's consumption/proof and all other guards. Replay cannot mint another
+attempt. The fence/slot/history remain effective for every other dispatch; no pause,
+authority, integrity, breach, recovery or newer uncertainty fence is exempted.
+
+Human risk acceptance is not nonexecution evidence. No owner command converts
+uncertainty to success, releases unknown liability or restores spent permission.
+"Not found" is proof only if the external contract guarantees complete, current
+nonexecution for that operation; empty/stale searches do not qualify. Safe retry
+must cover target idempotency retention/expiry, concurrent old attempts, original
+key lookup and every reachable mutation path. Missing or expired protection denies.
+Reconciliation never performs the retry itself; T03 rechecks all current gates.
+Safe effect retry cannot bypass 5.4: unknown billing must first be authoritatively
+settled, and every retained/new attempt remains charged/reserved under the same caps.
+External one-use claims consumed by an earlier attempt are not revived: retry needs
+authority whose actual terms permit it plus the required authoritative claim.
+
+Compensation is a new explicitly approved COMPENSATES effect with a new ID and
+descriptor, durable predecessor link and independent authority/budget. It neither
+erases nor proves the unknown predecessor. Under CP-D02 that unknown predecessor
+still blocks any different operation, including compensation; execution would need
+resolution or a separately approved profile, never an undocumented exception.
+No external lookup or mutation is part of CP-WP-001 or the synthetic kernel.
+
+## 8. Storage and cross-computer checkpoint contract
+
+All locations below are future proposals, not files created by CP-WP-001.
+
+| Class | Proposed location | Handling |
+| --- | --- | --- |
+| Tracked declarative configuration | `control-plane/project.json`, `control-plane/work-items/*.json` if authorized later | Nonsecret definitions only; reviewed/pinned; not consent or active state |
+| Tracked policy/schema | `control-plane/policy/`, `tools/aegis_delivery_control/schemas/` if later justified | Closed versioned contracts; none executable/created now |
+| Local active runtime state | Windows `%LOCALAPPDATA%/ProjectAegis/control-plane/<repo-id>/`; Linux `${XDG_STATE_HOME:-$HOME/.local/state}/project-aegis/control-plane/<repo-id>/` | Outside checkout; one root lock/catalog, journals, effect/use/budget indexes and outstanding slot; restore needs independent freshness, not local consistency |
+| Sensitive/raw evidence | External sibling `raw-evidence/<run-id>/` | Worker inaccessible; classification-required encryption; never credentials |
+| Sanitized exportable evidence | External `exports/<run-id>/<export-id>/` | Immutable manifest; preview/redaction/integrity review before publication |
+| Cross-computer checkpoint | Intentional `docs/evidence/control-plane/checkpoints/<run-id>/<checkpoint-id>/` export only with later explicit approval | Sanitized snapshot with source/export heads and freshness proof; read-only until 8.1 passes, never automatic runtime commit |
+| Forbidden Git content | No allowed path | Credentials, unrestricted env dumps, sealed holdouts, raw sensitive transcripts/receipts, active journals/locks, live permission tokens |
+
+Authoritative catalogs, journals and effect/approval-use facts required for future
+deduplication MUST NOT be deleted by routine retention. A separately accepted
+history-compaction contract must preserve those facts before any retirement.
+Disposable projections/artifacts may be reviewed for deletion 30 days after terminal
+disposition and all effects settle. Raw evidence has a 30-day review date, with
+preserve-on-failure/incident holds. A review date is not automatic deletion.
+Cleanup needs owned-path verification and applicable authorization. Sanitized
+published evidence is permanent history; exclude sensitive content before publication.
+Evidence metadata includes path, bytes, digest, classification, readers, redaction,
+retention/review date, creation time, policy reference and preserve-on-failure status.
+
+Root `.gitignore` is absent at this base. Recommend only in later authorized work:
+
+```text
+/.aegis-control-plane/
+/tools/aegis_delivery_control/**/__pycache__/
+/tools/aegis_delivery_control/**/*.py[cod]
+```
+
+The scratch path is reserved defensively, not permission to store sensitive state
+inside the checkout. Ignore rules are not security controls and cannot prevent
+forced staging. Never blanket-ignore or modify existing `artifacts/recovery/` or
+`artifacts/reviews/`; their contents are unrelated user property.
+
+Checkpoint export requires a stable verified head, complete decision-bearing
+history, repository/source/item/policy/schema identities, approvals and lifecycle
+references, effect keys/receipts/obligations, export provenance and transfer terms.
+Include the complete project catalog and all history dependencies needed to rebuild
+cross-revision/run effect, approval-use and budget indexes plus outstanding slot;
+a standalone run dump is insufficient. Include validator sub-intents and terminal
+dispositions, immutable observations and application history so no launch/application
+can be invented or forgotten. Include source head (project-catalog head
+and complete run-head vector), export head (sanitized representation's manifest
+digest), authoritative source inventory and freshness/monotonicity proof references.
+Redaction produces a new representation and manifest/hash chain explicitly mapped
+to the original head; it must not claim original hashes still cover changed bytes.
+If necessary recovery facts cannot be exported safely, mark REPORT_ONLY rather
+than resumable. Never include credentials or sealed holdouts.
+
+On another computer: verify clean-clone source/export provenance; import read-only;
+verify completeness; rebuild; satisfy 8.1 freshness and reconcile later effect/use/
+budget facts; refresh/atomically claim authority when appropriate; establish exclusive
+ownership. Old-host inactivity proves neither latest history nor absence of later
+manual/other-host activity. If old-host fencing or freshness cannot be established,
+execution remains blocked. An offline simulation may test these gates, not bypass them.
+Git is a transport for an intentional reviewed checkpoint, not a transactional
+runtime database, distributed lock or proof of exclusive execution ownership.
+
+### 8.1 Mandatory recovery freshness gate
+
+Every import/restore/recovered history must obtain one of these complete proofs
+before dispatch (synthetic proof only in CP-WP-002):
+
+1. Independently protected monotonic authoritative head: read the current project
+   catalog/run-head vector and monotonic epoch from a trusted source that the local
+   journal/checkpoint writer cannot roll back. Verify authentic binding, freshness
+   and nondecreasing sequence against source_head. Equal numbers with different
+   hashes are contradictions; older valid chains are rollback. Fetch and verify all
+   missing later events before enabling dispatch; an anchor mismatch is not cured
+   by declaring the old host inactive. The source must advance durably with protected
+   effect/use/budget commits or an unresolved write-ahead pending marker; anchoring
+   only at export leaves an unsafe gap. Its commit/recovery protocol is a later
+   implementation gate, not an assumed service or local sidecar.
+2. Complete authoritative reconciliation: use an independently current source
+   inventory, not just the old checkpoint's list, to account for all registered runs,
+   effects/receipts, outstanding operations, budget liabilities and approval claim/
+   consumption sources, including other hosts/manual paths. Each source supplies a
+   complete current watermark or equivalent proof of absence/additions. Record the
+   recovered head/vector and proofs; reconcile later events before dispatch. Partial
+   lookup or an operator assertion of completeness does not qualify.
+
+In the selected mode, unavailable, stale or contradictory proof denies dispatch.
+Do not silently downgrade a failed anchor check to partial reconciliation; mode 2
+must independently satisfy every requirement. Without either complete proof, import
+stays read-only/report-only or RECONCILIATION_REQUIRED. No self-consistent chain,
+Git SHA, local head file, old-host inactivity or human risk acceptance substitutes.
+The proof must be current at dispatch and tied to the verified reconstruction;
+later observed events invalidate it until reconciled. Actual atomic one-use claims
+still apply even after freshness succeeds; checkpoint freshness is not a spend lock.
+
+Evidence finalization follows the useful BER separation: immutable inputs before
+verification, final artifacts afterwards, detached marker outside the manifest it
+names. Controller policy metadata must be independent of BER. Hashes do not replace
+authentic evidence source or independent completion verification.
+
+## 9. Threat model and operational limitations
+
+Scope: the proposed single-host contract and future adapter boundaries. Assets:
+human authority, target repository, effect identity, budgets, journal and evidence.
+Actors: verified operator, untrusted worker, lower-trust local process, compromised
+adapter/evidence writer and malicious checkpoint supplier. No public/tenant-facing
+API exists in this proposal; SaaS tenant routes are out of scope. Repository and
+object-level authorization still apply at every state/effect/evidence boundary.
+Risks below describe attack paths against a future incorrect implementation, not
+claims of current exploitation. No residual live risk is accepted by this document.
+
+| Threat / boundary / priority | Abuse path | Required mitigation / owner | Negative proof |
+| --- | --- | --- | --- |
+| Forged authority / B1,B4 / high | Worker emits "owner approved" and seeks privileged dispatch | Authentic source verifier, deterministic scope checks; security reviewer/CP-WP-003 | Synthetic prose grant cannot authorize |
+| Stale authority / B1,B2 / high | Paused run resumes with revoked/consumed grant | Fresh lifecycle/time evaluation and serialized invalidation; engine owner | Expiry/revocation/supersession/consumption denies |
+| Duplicate effect / B2,B3,B4 / high | Revised item/new run generates a fresh key for the same completed/unknown mutation | CP-D08 immutable logical-effect identity, durable equivalence and explicit new-effect approval; kernel owner | F01 revisions/aliases cannot evade predecessor dedup |
+| Proof-free disposition / B1,B4,B5 / high | Owner accepts uncertainty and requests retry/success or disguises it as compensation | T17/7.4 proof routes, original key, non-dispatching risk disposition; engine owner | F02 risk acceptance/new-ID compensation cannot clear unknown outcome |
+| External approval race / B1,B4 / high | Other host/manual consumer spends one-use grant after local check | Source-atomic claim/redemption across every consumer; unsupported source denies; authority owner | F03 one winner; lost/expired claim and synthetic token cannot dispatch |
+| Accounting loss / B3,B5 / high | Stop, cancellation, duplicate settlement or crash refunds uncertain usage | Versioned intent-owned 5.4 lifecycle; honest actual/worst-case charges; accounting owner | F04a/F04b routes replay without free capacity, negative totals or cap reset |
+| Checkpoint rollback / B3,B6 / high | Older valid chain omits newer effect/use, even after old host stops | Mandatory independent freshness or complete current-source reconciliation (8.1); recovery owner | F05 older valid effect/use histories and unavailable/stale/contradictory proof deny |
+| Multiple operations / B3,B4 / high | Same writer starts different item while first awaits settlement/validation | Atomic repository-wide outstanding slot independent of writer lock; kernel owner | F06 sequential same-owner/different-item/run intent denied before and after crash |
+| Cross-project substitution / B2,B5,B6 / high | Valid foreign grant/receipt/checkpoint reused for this target | Bind repository and object identity everywhere; engine owner | Foreign identity rejected |
+| Prompt injection / B2,B4,B5 / high | Worker artifact asks to remove gates, expand paths or certify itself | Treat output as data; closed contract and independent validation; security reviewer | Injected plan/evidence cannot affect authority |
+| Path escape / B3,B5 / high | Local adversary swaps ancestor to redirect evidence write | Owned ACL/checked-handle capability; unsupported guarantees refuse; platform owner | Symlink/reparse swap probe with prevention versus detection recorded |
+| Writer compromise / B3,B5,B6 / high | Writer replaces content and hashes to fabricate success | State trust assumption explicitly; independent authenticity before claiming resistance; owner/security | Demonstrate limits of rewritten chain; no authenticity claim from hashes |
+| Lost/counterfeit receipts / B5 / high | Adapter fabricates success or hides a valid receipt because billing is unknown | Independent receipt verification and separate usage classification; unknown cost blocks dispatch, not observation; adapter owner | F07/F08 retain valid receipts with UNKNOWN settlement, never complete from them |
+| Terminal validation / B3,B5 / high | Stop strands slot, or cessation hides delayed result | Write-ahead T27, observation/apply separation and proof-bound T26; kernel owner | F09/F14/F15 retain failure, late results and independent obligations |
+| Validator mutation / B3,B4,B5 / high | Validator repairs or changes the target it certifies | Read-only pinned inputs, bound isolated outputs and enforced descendant/tool/network containment; adapter owner | F20 denies target/path/subprocess escape; unsupported containment refuses launch |
+| Duplicate/cross-check application / B2,B3,B5 / high | New APPLY command counts one result twice or for another check | Immutable observation binding and atomic apply-key index; kernel owner | F10/F16/F17 enforce selected-check gates, idempotency and no cost before prerequisites |
+| Schema reinterpretation / B3,B6 / medium | New reducer interprets old denial as grant | Version pin, explicit migration and golden replay; kernel owner | Unknown version and unsafe migration reject |
+| Availability/cost exhaustion / B2,B4 / medium | Huge input or endless retry consumes storage/time/budget | Bounded record/input sizes, attempts/deadlines and no autonomous retries; policy owner | Oversize/cap/deadline denies before effect |
+
+Future AI-specific scope: injection/output handling/excessive agency/fabricated
+completion map to rows above; sensitive disclosure maps to evidence/path controls;
+unbounded consumption maps to caps. Model supply chain, training poisoning, prompt
+secrecy and retrieval/vector isolation have no active surface in the synthetic
+kernel and need a fresh model before any corresponding integration. No provider,
+retrieval store or model credentials are selected here.
+
+T25 contradictory proof and T24 interrupted-validator evidence cannot erase success,
+charges or uncertainty. T28 cannot launder old approval/check results into a new revision;
+unknown compatibility or occupied slot denies. F01/F09/F19/F21 cover these boundaries.
+
+Windows evidence code currently documents detection-only mid-operation swap
+handling; process cleanup cannot prove post-leader descendant reaping. Those facts
+block stronger future guarantees, not documentation. Linux implementation presence
+also is not platform evidence: run actual capability probes in a separately
+authorized package. Distributed leases/fencing, real authority authentication,
+external idempotency and immutable signing/storage remain open implementation gates.
+
+## 10. Future tests and acceptance
+
+These are planned assertions, not executed controller tests. Use independent
+synthetic fixtures and owned temporary storage outside checkout. Record source SHA,
+OS, Python/shell versions, command, exit, skips, capability outcome and evidence head.
+
+| Test family / covered contract | Expected assertion | Layer |
+| --- | --- | --- |
+| State table T01–T28 | Allowed transitions meet guards; every unspecified pair denies | Unit/table-driven |
+| Reconstruction | Same complete catalog/journals yield states, budget/use dispositions, fences, stable effect index and outstanding slot | Unit/integration |
+| Tamper/rollback | Altered/gapped/reordered/conflicting duplicate events reject; internally valid older chain cannot dispatch without 8.1 proof | Unit/fault injection |
+| Interrupted transaction | Partial record never enables dispatch; bytes preserved, no silent repair | Fault injection |
+| Idempotency | Same command returns prior outcome; effect key stable across item/source/plan/policy revisions and runs; see F01 | Unit/integration |
+| Writer exclusion | Two different-run processes sharing an effect or one-use grant cannot advance concurrently; no lock-file deletion takeover | Multiprocess integration |
+| Pause T04–T10,T14,T24 | Fence precedes acknowledgement; pause-then-result and paused validation pass/fail are recorded without advancement; restart preserves fence | Integration/fault injection |
+| Graceful/immediate stop T18–T20 | No new step after fence; drain deadline/cancel obligations retained | Integration/fault injection |
+| Crashes C01–C09 | Inject immediately before/after every commit/acknowledgement, source claim/redemption and budget/slot settlement; no duplicate effect/use/credit | Fault injection |
+| Lost external receipt C03,T17 | Synthetic accepted effect plus missing receipt stays unresolved | Integration/fault injection |
+| Approval T13 | Expiry/revocation/supersession/consumption and late effective facts deny; predecessor never revives | Unit |
+| Concurrent one-use consumption | Local reservation is accounting only; atomic trusted-source claim and redemption are required; F03 includes other-host/manual races | Integration |
+| Identity T15 | Changed source/plan/policy/item or foreign repo fails; new run cannot evade effect index | Unit/integration |
+| Paths | Traversal/absolute/UNC/drive/ADS/device names reject | Unit |
+| Symlinks/reparse | Ancestor/leaf swaps prevented where claimed; otherwise capability unavailable | Platform capability/fault injection |
+| Evidence integrity | Missing/altered/cross-run/unfinalized artifacts cannot establish completion | Unit/integration |
+| Terminal restart T22/T23/T26 | No reopen; late receipts with known/unknown usage and validation disposition settle independently; release slot only after all proofs; never reset caps | Unit/integration |
+| PowerShell 5.1 | Desktop quoting, Unicode/spaced paths, exit codes and module invocation correct | Windows acceptance |
+| PowerShell Core | Same command contract on Windows/Linux; native exit preserved | Acceptance |
+| Linux | Actual lock/sync/no-follow behavior measured; no inferred power-loss proof | Platform capability/integration |
+| Windows | Actual path/exclusion/cleanup behavior; detection never called prevention | Platform capability/integration |
+| Clean-clone recovery | Complete catalog/histories plus 8.1 independent freshness rebuild all cross-run effect/use/budget/slot decisions; inactive old host is insufficient; see F05 | Acceptance |
+| Injection | Worker-proposed approval, paths, gate removal and completion cannot authorize | Adversarial unit/integration |
+| Schema evolution | Unknown versions block; supported conversion preserves source bytes/provenance | Unit/migration fault injection |
+| Retention safety | Routine cleanup cannot remove catalog/journals/effect-use facts needed for replay; absent dependencies block | Integration |
+| Read-only reporting | Status/export preview cannot append/advance/repair | Integration |
+
+### 10.1 Finding-specific negative acceptance families
+
+F01–F21 are required future synthetic tests, not executed runtime evidence. A
+positive control must show the narrowly permitted route alongside each denial.
+
+| ID / contract locations | Required cases and expected result |
+| --- | --- |
+| F01 / CP-D08, 5.1, T03/T15/T16/T28 | Completed and unknown effect reused by another item revision/run has the same key and cannot dispatch. Change source/plan/policy/validation only: no new effect. New-ID alias, missing equivalence/predecessor history and changed descriptor under old ID deny. Explicitly approved genuinely different/repeated effect retains its relationship; unknown predecessor still blocks repetition/global slot. T28 adopts a compatible fully settled final effect into new checks without mutation, old passes or charges; reject occupied slot (even same effect), unknown/stale/changed inputs, revoked adoption authority or terminal reopen. Duplicate/crashed adoption reuses its key once; late contrary proof fences all dependent adoptions. Initial adoption spends its own grant once; replay spends nothing; another revision/host/manual consumer cannot reuse a spent one-use grant. Unsupported source/adoption atomicity denies without contact; recurring limits still apply. Late pre-action authority breach disputes original provenance and blocks adoption; ordinary post-action expiry allows separately authorized adoption of valid history. Race late facts against adoption commit; transitive provenance remains bound and a replacement grant cannot clear historical invalidity. |
+| F02 / CP-D04, 7.4, T17 | Risk acceptance, "assume failed", stop/report and new-ID compensation cannot cause resend, success or history erasure. Nonexecution proof permits only original-key recovery with other gates met. Reviewed concurrent-safe same-key retry contract permits only its bounded route; missing proof, fresh key or unsettled billing denies. A late verified receipt still needs validation; terminal disposition never reopens. Exact one-attempt retry exception preserves unknown outcome/fence; duplicate command or C02 crash cannot reuse it for another attempt |
+| F03 / CP-D09, 5.2, C08 | Interleave two hosts/controllers and a manual consumer after identical fresh reads: exactly one authoritative claim/redemption succeeds. Local-only reservation, bypass consumer, unsupported CAS/lease, wrong binding, expired/revoked/consumed grant, unreachable/ambiguous source, lost claim receipt, clock rollback and replayed redemption all deny dispatch. Synthetic claim cannot construct/enable real adapter; own valid claim passes only its exact intent. T13 admits terminal late lifecycle facts: revoke/expire/supersede/foreign-consume before action -> disputed provenance/dependent fence, unknown ordering -> no reliance; valid own use or expiry after the governed interval is not retroactive breach. Missing ordering disputes provenance without fabricating a violation or refund. Lawful own consumption preserves lifecycle; authoritative correction clears only its exact historical fence, preserving other/newer prohibitions; replay repeats no use or clearance. |
+| F04a / CP-D10, 5.4, T10/T17/T25 | Receipt A below/equal/above R settles true A once; overrun records breach/fence. Proven non-dispatch plus zero liability releases; non-dispatch with claim/control cost consumes that cost; unknown claim/control billing retains slot and blocks another item/run. Unknown dispatch/billing or missing telemetry charges W and blocks; no known bound denies before contact. Later authoritative final usage adjusts absolute amounts; uncertainty cannot release without nonexecution AND zero-liability proof |
+| F04b / 5.4, T18–T20/T23, C09 | Cancel requested/confirmed without final usage does not refund; known cancellation bill settles; graceful stop, immediate stop and drain timeout preserve reserve or worst-case charge. Late terminal bill/refund adjusts without reopen; receipt validation failure retains cost. Crash before/after settlement, duplicate/stale release, conflicting event ID, negative values, restart/new run/revision/cap reset attempts cannot drop/double-credit usage; contradictory post-release bill adjusts to true usage, preserves release history and fences dispatch |
+| F05 / CP-D07, 7.3, 8.1, C07 | Restore older valid checkpoint after newer effect receipt and separately after newer one-use consumption: detect via independent current head/inventory and reconcile later facts before dispatch. Source/export heads cannot substitute for each other. Unavailable/stale/contradictory anchor, source rollback, omitted source/run, incomplete watermark, newer pending commit, rewritten local anchor or inactive old host gives no freshness proof. Without complete independent proof, remain read-only/report-only/reconciliation-required |
+| F06 / CP-D02, 5.3, T03, C02/C09 | Same process/owner sequentially attempts another item, then another run, while original is initiated/unsettled/uncertain/reconciling/cancelling/draining/awaiting validation: atomic intent denied for every disposition. Pause/stop, completed lock acquisition and crash/restart cannot clear slot. Proven no effect plus unknown claim/control billing still blocks another item/run. Proven final settlement/validation frees it once; approved same-effect retry retains original slot and uncertain attempt, never authorizes another effect |
+| F07 / T17, 7.4 | Valid effect receipt with missing usage or unresolved source claim is retained atomically with UNKNOWN settlement in RECONCILIATION_REQUIRED. It cannot enter VALIDATING or free the slot. After authoritative settlement, the same receipt may proceed to VALIDATING or remain PAUSED under its fence |
+| F08 / T23, 5.4 | Late valid receipt after STOPPED/FAILED_FINAL with no usage telemetry is admitted with UNKNOWN_WORST_CASE_CHARGED, unchanged terminal state and retained slot. Unknown/untrusted usage cannot become actual charge; invalid receipt cannot establish outcome. Later authoritative usage adjusts atomically without reopen or double charge. Known A followed by missing telemetry retains A even when A exceeds W; no UNKNOWN downgrade/refund |
+| F09 / T24/T26/T27, 5.3, C02/C08/C09 | Stop before any validator intent plus later verified effect/source/usage allows CANCELLED_WITHOUT_START then one slot release; no validator starts after stop. Existing intent without acknowledgement/result remains uncertain, even after restart. Verified late pass/fail and proven cancellation settle without changing terminal state; cancellation request/parent exit/unknown cessation do not. T23-before-T26 and T26-before-T23 release only after all independent obligations settle; missing bills/proofs retain slot. Validator pass/fail with missing usage retains observation/charge/slot through reconciliation and never reruns; known usage settles before progression. Proven validator non-launch keeps its VALIDATING cursor in BLOCKED pending T16 (PAUSED if fenced), never parent T03; new T27 needs fresh authority/budget. Multiple declared checks stay VALIDATING in the same slot until all settle. Pre-launch fence denial uses T25/T26. Duplicate settlement is idempotent; conflict or cancelling COMPLETED evidence rejects; stop/settlement crash cannot drop intent/receipt/charge or release twice. Launched validator with authoritative all-descendant cessation but no result uses typed T24 interruption: known costs retain BLOCKED/VALIDATING/check/slot pending T16; unknown costs stay reconciliation, never nonexecution/refund. Missing telemetry cannot downgrade an already retained result. RESULT first with unknown cessation then authoritative cessation-only proof attaches to that RESULT, clears only its resolved uncertainty and adds no interruption/blocker; T17 restores application when eligible. Timeout/parent exit deny. T16 applies any eligible original RESULT before retry; final failure forbids successor, recoverable failure needs remediation. Only unavailable result permits new-attempt choice. Result before new intent invalidates stale recovery; after intent benign historical result cannot satisfy successor or invalidate its consumed choice, but UNKNOWN liability/contradiction still fences. Late mandatory terminal-policy failure commits its bound stop obligation/fence at intake and uses approved T18/T19; neither pre-handoff nor already-started successor can advance/finalize around it. Crash preserves blocker, eligible observation head, consumed recovery and accounting; T24 clears only exact proof-resolved activity/source/budget uncertainty, retaining every other fence. |
+| F10 / T01/T11/T16/T27 | Empty check set rejects at acceptance before intent/contact. Independent required checks A/B: ingest/apply A once while B is unstarted; remain VALIDATING with slot held; after B passes, BLOCKED/FINALIZING retains slot even if an aggregate gate is pending. Clearing it permits distinct T16 finalization once without reapplying B; only then advance/complete. A's application never requires unrelated B already evaluated |
+| F11 / T10, T17, F07 | Initial receipt has verified usage but unresolved source/control claim: T10 retains receipt in reconciliation, no T27 contact. After authoritative claim settlement, restore the pending check cursor and recheck its own authority/gates before launch |
+| F12 / T25/T17/T16 | Validator non-launch without fence -> BLOCKED with VALIDATING cursor; pause -> PAUSED; unknown source/cost -> reconciliation; terminal unchanged. T02 cannot bypass recovery. Paused recovery via T14 restores BLOCKED first, then explicit bound T16 restores VALIDATING; T17 accounting settlement retains that blocker. Table/prose agree and never parent T03 |
+| F13 / T23, 5.3/5.4 | After non-dispatch/release, deliver authentic contrary effect receipt in every nonterminal state and terminal state. Retain receipt/prior proof; record true usage or UNKNOWN and integrity fence; nonterminal -> reconciliation, terminal unchanged. Preserve another slot owner's obligations. Foreign/unbound receipt changes no accepted outcome/totals/authority |
+| F14 / T12/T16/T27 | Apply recoverable A failure with settled accounting: BLOCKED retains A obligation and slot; different item/run denies. Explicit check/attempt remediation -> VALIDATING -> fresh authorized T27; prior result cannot satisfy new attempt or replay parent. T02, pause/T14 and accounting/T17 cannot evade remediation; T27 independently checks the selected recovery disposition. Terminal disposition later closes only under all 5.3 proofs |
+| F15 / T24/T26 | A produces pass/fail, ceases, cancellation is settled, then delayed result arrives: retain both cancellation and result with unchanged terminal lifecycle and honest usage. No successor application or reopen. Evidence truly contradicting cessation/non-launch is preserved with integrity fence; unknown cessation never frees slot |
+| F16 / T24/T17/T11/T12, C04/C05 | Intake with UNKNOWN stores one observation/charge; after settlement a distinct APPLY references it and emits only one disposition. Early denied APPLY stays unapplied; old command repeats denial, new eligible command succeeds once. Same/new command after success returns existing disposition even terminal; no duplicate observation/check/charge/slot release or cross-check/attempt substitution. After final pass waits on aggregate gate, distinct finalization and C05-style replay finalize/release once without reapplying pass |
+| F17 / T27 | Missing selected-check dependency, gate, authority or bounded budget denies before validator contact/spend. Change prerequisite after intent but before final launch: final recheck denies and T25 accounts for any prior claim costs. Passing A does not waive B's prerequisites; stale result cannot satisfy a remediated successor |
+| F18 / T12/T26, 5.3 | Final failure with one check commits FAILED_FINAL/permanent item fence and releases slot once after all settlement; multiple checks retain slot until T26 closes every remainder. T17 proof-free terminal entry also commits its permanent fence while unknown obligations remain; later T23/T26 settlement can close them. Crash/duplicate application cannot omit fence, close twice or block unrelated later work after settlement |
+| F19 / T25/T17, 7.4 | Before/after adapter handoff, exact authoritative nonexecution (including failed spawn with no descendants/effect) settles intent and all source/control costs. Validator -> BLOCKED/T16; operation -> proof-bound recovery. Mere error, rejected request with uncertain effect or missing bill never establishes safe retry/release. T25 accepts contrary nonexecution after COMPLETED and every other state; preserve receipt/proof/charges, integrity fence, dependent adoptions and another slot owner, no terminal reopen or liability release. Old noncontradictory proof/duplicate cannot reset newer progress. |
+| F20 / T27, 5.3 | Validator may read pinned inputs and emit bounded isolated outputs; attempted target/Git/deployment/data/authority/state repair, path escape or descendant/tool/network mutation denies. Missing containment denies launch. Remediation cannot grant target writes or bypass stable effect/occupied slot |
+| F21 / T17, 6.1 | UNKNOWN result or validator bill -> reconciliation with identified fence; authoritative settlement atomically clears only that fence and permits the original continuation when eligible. Simultaneous pause, second unknown bill, newer fence generation, revocation, breach, integrity or recovery survives; stale/cross-attempt proof cannot clear it. Crash replays settlement/clearance together. Bound safe-retry exception allows only its exact attempt while other/newer fences deny; outcome remains unknown and C02 cannot duplicate exception use. Original final receipt before/after retry intent invalidates unused exception and restores validation; post-intent T25 settles only the unlaunched retry, never replays the completed parent. T25 also clears exact uncertainty instances only after noncontradictory all-path nonexecution/source/cost proof; current recovery then proceeds through T16/7.4. Parent outcome, other attempt/bill, newer fence and all independent prohibitions survive. Original final receipt after retry exception consumption or source claim but before handoff atomically disables that retry intent; final outcome/fence check denies, T25 accounts independently, then parent validation remains reachable. Handoff-first/ambiguous order retains retry activity/claims/costs; receipt never fabricates nonexecution/refund. Crash preserves consumed exception and exact initiation-disable fence. |
+
+CP-WP-001 acceptance is document consistency, link/structure review, complete
+scenario coverage and independent architecture/security review. Existing repository
+checks remain regression evidence, not proof of this future runtime. See the
+[work-package contract](../roadmaps/resumable-control-plane-backlog.md#2-cp-wp-001-contract)
+for scope, validation and owner-authorized merge requirements.
