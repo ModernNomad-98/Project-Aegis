@@ -14,8 +14,9 @@ security, QA, audit, troubleshooting, and AI safety.
 
 ## About
 
-Returning to Behavioral Eval Runner work on another computer? Start with the
-[current recovery handoff and setup instructions](docs/evidence/ber-recovery-2026-09-11/README.md).
+Returning to the project or setting up another computer? Start with the
+[documentation index](docs/README.md) for current setup, delivered work and remaining
+calibration gates. See the [changelog](CHANGELOG.md) for recent changes.
 
 Project Aegis is a reusable engineering operating system for AI coding agents, built to
 protect, guide, and sharpen AI-assisted software development. It combines reusable skills in
@@ -139,7 +140,8 @@ operate under it. In practice it comes down to six rules:
   reality; check by default instead of waiting for proof they're wrong.
 - **Small, reviewable changes — nothing smuggled in** — diffs stay small enough for a
   human to genuinely review, and contain exactly what they claim to.
-- **A human is the gate** — the AI proposes; a person approves the merge. Always.
+- **Human authority governs the merge** — approval may be specific or a recorded
+  standing grant covering the action; verify its effective scope before use.
 - **Track every decision** — dated, written down, never rewritten.
 
 > **"Never trust, always verify — every step of the lifecycle."**
@@ -447,7 +449,8 @@ across the whole chain if you'd rather not track it yourself.
    approval path does that class require?
 2. **Verify against evidence** — run the checks; never assume state from memory.
 3. **Keep the diff small and reviewable** — one intent, exact files, nothing smuggled in.
-4. **A human approves the merge** — the assistant proposes; a person decides.
+4. **Verify human merge authority** — use the person's current instruction or an
+   applicable active grant; obtain any missing approval before merging.
 5. **Record the decision** — a dated entry in the planning record, so history never
    drifts.
 
@@ -455,8 +458,8 @@ This loop is not overhead layered on top of the discipline; it **is** the discip
 practice.
 
 **Follow the non-negotiable operating rules** (full text with rationales in
-[CONTRIBUTING.md](CONTRIBUTING.md)): evidence before merge; one session per repo at a
-time; no auto-merge — the human is the gate; and every decision tracked as a dated
+[CONTRIBUTING.md](CONTRIBUTING.md)): evidence before merge; one coordinated writer per
+checkout; no auto-merge arming; verified human authority; and every decision tracked as a dated
 entry in the reconciliation doc.
 
 **What a change looks like.** One realistic pass through the loop:
@@ -465,7 +468,8 @@ entry in the reconciliation doc.
 > scope, then composes the relevant shipped skills — say, domain modeling, test-first
 > implementation, and a security review matching the change class. It produces a small
 > diff with passing tests as evidence and opens a pull request, which the validator
-> gates in CI. A human reviews and merges. The decision lands as a dated entry in the
+> gates in CI. After review, the maintainer or an agent with applicable human
+> authorization merges the verified revision. The decision lands as a dated entry in the
 > planning record.
 
 ## Map of the system
@@ -608,6 +612,12 @@ keeps a human as the approval gate on anything irreversible. See
     mechanism owners. *e.g.* `authority-invalidation-architect`.
 
 ## Canonical reading order (for maintainers)
+
+Start with the [documentation index](docs/README.md), [changelog](CHANGELOG.md),
+[offline CI guide](docs/offline-ci.md) and source-specific
+[owner approval register](docs/approvals/APPROVAL_REGISTER.md). For BER work,
+use its [active backlog](docs/roadmaps/behavioral-eval-runner-backlog.md).
+The construction and authoring references below explain the library's design:
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).
 2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — canonical architecture audit.
@@ -903,7 +913,7 @@ the concrete, invocable rules of the
 
 | Skill | What it does | Invocation |
 |---|---|---|
-| `scoped-approval-register` | Durable append-style record of every granted approval — Status / Reason / Scope allowed / Scope FORBIDDEN / Evidence — with supersede-never-rewrite lifecycle and deny-by-default citation; composes `human-approval-boundary` (which decides WHERE approval is required). | auto + manual |
+| `scoped-approval-register` | Durable immutable grants and appended lifecycle events; derives effective authority from human evidence, expiry, use and invalidation history. Honors existing authorization before transcription, verifies persistence, and composes `human-approval-boundary` for WHERE approval is needed. | auto + manual |
 | `standing-approval-and-auto-advance` | Governed anti-approval-fatigue: named-scope standing approval for the mechanical loop, phase-advance only into already-approved phases, per-session restatement, explicit opt-out, reviewer-block path; merge-after-green strictly opt-in (never default); never covers protected-branch merge or arming auto-merge — rationale anchored to the ungoverned-auto-merge incident. | **manual only** |
 | `chat-backlog-reconciliation` | Cadenced extraction of chat-only decisions/bugs/backlog into dated repo docs, each item audited against PR/source evidence (completed/partial/active/not-active/unknown); chat "done" caps at unknown without repo proof. | auto + manual |
 | `context-co-update-ci-gate` | CI gate failing PRs that touch important paths without a context-map update (declared, reviewable no-op hatch — never silent) + the honest-update protocol (date+SHA stamps, evidence-only status moves, risk notes never deleted without proof); write-back half of `agent-startup-context-gate`. | auto + manual |
@@ -973,7 +983,7 @@ retirement):
 |---|---|---|
 | `requirements-gathering-facilitator` | Elicits requirements BEFORE a spec: separates the problem from stakeholders' solutions, draws out users/jobs and the current workaround, surfaces the implicit (assumptions, non-goals, constraints), reconciles conflict to a decider; produces a confidence-marked brief that feeds `product-spec-writer`. Facilitates; does not decide. | auto + manual |
 | `product-spec-writer` | The PRODUCT spec: problem/job, goals and explicit non-goals, scenarios, functional requirements with TESTABLE acceptance criteria, edge/error behavior, rollout intent + success metrics, open questions. Pinned ≠ `adr-writer` (a product spec is not an architecture decision record). | auto + manual |
-| `roadmap-under-uncertainty-planner` | Horizon-based roadmap (now/next/later) over a false-precision dated Gantt: confidence decaying with distance, learning-first sequencing (retire uncertainty), outcomes over feature lists, capacity slack, a re-plan cadence. Consumes a ranking from `prioritization-frame-picker`. | auto + manual |
+| `roadmap-under-uncertainty-planner` | Plans nonbinding Now/Next/Later horizons using confidence, dependencies and learning goals. Readiness and horizon movement neither create nor cancel human commitments; composes `roadmap-to-commitments-translator` for evidenced commitment decisions. | auto + manual |
 | `prioritization-frame-picker` | Picks the RIGHT prioritization frame (RICE/WSJF/value-effort/Kano/MoSCoW) instead of defaulting, marks input reliability, refuses false rigor (buckets + a sensitivity check), and pulls must-dos out of the value formula. Ranks; sequencing over time is `roadmap-under-uncertainty-planner`'s. | auto + manual |
 | `feature-flag-rollout-strategist` | The ROLLOUT strategy: flag classified by purpose, progressive stages with advance/rollback criteria, sticky targeting, guardrails + a tested kill switch, a fail-safe default, flag-debt removal. Pinned ≠ `plan-entitlement-architect`/`authorization-matrix-designer` (entitlement/permission) and ≠ `ab-test-designer` (experiment). | auto + manual |
 | `sunset-deprecation-communicator` | Sunsetting a PRODUCT feature/API to users: rationale, impact, migration path, a firm timeline, an escalating multi-channel comms plan, grandfathering, and a tombstone (not a silent 404). Pinned ≠ `skill-deprecation-planner` (retiring a library SKILL) and ≠ `api-event-architect` (standing policy). | auto + manual |
@@ -1021,7 +1031,7 @@ impact, both ways):
 | `tech-spec-writer` | The whole-design tech spec / RFC: problem/goals/non-goals, proposed design (data model, APIs, components), alternatives, cross-cutting concerns (security/perf/observability/migration/testing), risks, sign-off. Composes `adr-writer` (decisions) + `architecture-designer` (structure). ≠ one ADR, ≠ product spec. | auto + manual |
 | `design-review-facilitator` | Facilitates the design review: pre-read + right reviewers, importance-first discussion, actively elicited dissent, an EXPLICIT outcome (approved/changes/rework/blocked), captured decisions — countering rubber-stamp/bikeshed/HiPPO/no-decision. Reviews a design; doesn't write it. | auto + manual |
 | `cross-team-dependency-negotiator` | Cross-team dependencies: two-way map, early surfacing, CONCRETE commitments (deliverable+date+owner both sides), de-risking (stub/flag/parallel), honest accounting for the other team's priorities, and a pre-agreed escalation trigger. The org side; the contract is `api-event-architect`'s. | auto + manual |
-| `roadmap-to-commitments-translator` | Extracts the firm-promise subset from a roadmap: commit-able vs aspirational, capacity-grounded (velocity minus maintenance, buffered), dependency-gated, honest date RANGES, and the not-committed gap named. The inverse of `roadmap-under-uncertainty-planner`. | auto + manual |
+| `roadmap-to-commitments-translator` | Separates evidenced human commitments from readiness-based candidates. Capacity, dependencies and honest date ranges inform proposals; only an evidenced human decision creates a commitment. Names the not-committed gap and preserves commitments independently of planning horizons. | auto + manual |
 | `staff-scope-selector` | Chooses a staff+ IC's highest-leverage FUTURE scope: level-relative leverage, under-owned problems, matched to strengths, screened against the traps (only-fun/firefighting/too-narrow/invisible-glue/over-reach), with a rationale + explicit NOT-doing list. ≠ `promotion-packet-writer` (past impact). | auto + manual |
 | `promotion-packet-writer` | Assembles the promotion case: impact-not-activity, mapped to every rubric dimension, a sustained pattern, honest gap analysis, corroboration, committee language — no inflation. ≠ `staff-scope-selector` (future scope), ≠ `ai-closeout-reporter` (one task). | auto + manual |
 | `phased-work-handoff-designer` | The cross-stage handoff protocol: a decision-ID register carried across stages, per-stage changed/NOT-touched lists, proven-invocation evidence (tell-tale output), deviation flags, and a cold-start continuation contract. ≠ `ai-closeout-reporter` (one turn), ≠ `ai-sdlc-operating-model` (lifecycle). | auto + manual |
@@ -1138,7 +1148,8 @@ model-invocable:
 
 Side-effecting skills (writes, network, deploy, spend) MUST set `disable-model-invocation: true`
 and document the irreversible step under **Stop Conditions** (the standard's §5 rule — its
-single narrow approved-write exception stays auto-invocable).
+approved documentation/state exception and separate, explicitly activated TALI exception
+are defined in the [current standard](docs/skill-generation-standard.md)).
 
 ## Validation
 
@@ -1146,7 +1157,7 @@ One-time setup: the strict frontmatter parse (D50) requires PyYAML — the valid
 closed without it (CI installs it automatically):
 
 ```bash
-python -m pip install pyyaml
+python -m pip install -r requirements.txt
 ```
 
 Run from the repo root:
@@ -1157,7 +1168,7 @@ python scripts/validate-skills.py
 
 Checks: `name` matches directory; `description` present and < 1024 chars; no broad
 `allowed-tools`; `SKILL.md` < 500 lines; all required sections present; `evals/evals.json`
-exists and parses (structural only — no runner yet); `evals/trigger-evals.json` parses when
+exists and parses (structural validation, not execution of skill evals); `evals/trigger-evals.json` parses when
 present; catalog integrity (every on-disk skill is listed in the catalog and README);
 bundled-name collision and duplicate-name checks.
 
@@ -1165,28 +1176,41 @@ Behavior: `_template` is ignored. When `_template` is the only skill directory, 
 prints a "no skills found" status and exits `0`. Exit `0` = clean (warnings allowed); non-zero
 = at least one error. Run it before every commit that touches `.claude/skills/`.
 
+For the full offline test environment, install `requirements-ci.txt` instead and
+follow [the CI reproduction guide](docs/offline-ci.md). The Behavioral Eval Runner
+has offline regression and acceptance coverage; passing those tests does not
+establish live skill efficacy or measured calibration.
+
 ## CI (merge gate)
 
-Every pull request targeting `main` runs
+Every pull request targeting `main`, and every push to `main`, runs
 [`.github/workflows/validate-skills.yml`](.github/workflows/validate-skills.yml), which
-provides two required status checks:
+uses Python 3.14 and provides these jobs:
 
 | Check | What it does |
 | --- | --- |
-| `validate-skills` | Runs `python scripts/validate-skills.py` on the PR (latest Python 3.x). Fails on any validator error — same checks as running it locally. |
-| `gate-guard` | Diffs the PR against its base and **fails if the PR touches the merge gate itself** (anything under `.github/workflows/` or `scripts/validate-skills.py`). Such PRs print `This PR modifies the merge gate itself and requires manual review and merge.` and must be reviewed and merged manually by a human. |
+| `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and PR-only DCO. |
+| `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
+| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, runtime, test or dependency paths change, so those changes receive explicit review. |
 
 Notes:
 
-- Both job names are registered as required status checks — do not rename them (and keep
-  them unique across all workflows) without updating branch protection.
-- A `gate-guard` failure is not a defect; it is the intended signal that the change needs
-  human eyes. Fixing the gate to "make CI green" defeats its purpose.
-- The gate uses only `actions/checkout` and `actions/setup-python` — no third-party actions.
-- Merge is manual: a human merges each PR after the required checks pass — auto-merge is
-  never armed for this project's development, and changes touching the merge gate itself always
-  require manual review regardless (see
-  [`docs/reconciliation/auto-merge-policy.md`](docs/reconciliation/auto-merge-policy.md)).
+- Keep the required `validate-skills` and `gate-guard` names stable and unique.
+- A protected-path `gate-guard` failure is an intentional review signal; do not
+  weaken the guard to make it green. The [CI guide](docs/offline-ci.md) describes
+  the full protected surface, commands, platform skips and evidence limits.
+- Dependencies are pinned in `requirements-ci.txt` and `requirements.txt`; an SDK
+  precheck prevents silently skipping transport tests. Tests use mocks and local
+  fixtures. Installing dependencies requires package downloads.
+- `actions/checkout`, `actions/setup-python` and `actions/upload-artifact` are
+  pinned to full commit SHAs. Command logs and environment evidence are retained
+  as artifacts for 14 days, including on failures.
+- Merge follows human authority. The source repository owner's
+  [standing grants](docs/approvals/APPROVAL_REGISTER.md) permit agents to perform
+  administrator merges of authorized work without repeat consent after verification
+  and review. Auto-merge is not armed. See the
+  [current merge policy](docs/reconciliation/auto-merge-policy.md); these owner
+  grants do not transfer to consumer repositories.
 
 ## Target repository layout
 
@@ -1205,12 +1229,24 @@ Notes:
         trigger-evals.json   # when trigger overlaps another skill
 
 docs/
-  reconciliation/  research/  prompts/  roadmaps/  skills/
+  README.md                # current documentation and continuation index
+  approvals/  design/  evidence/  reconciliation/  research/
+  prompts/  roadmaps/  skills/
+  offline-ci.md
   skill-generation-standard.md
   skills-catalog.md
 
 scripts/
   validate-skills.py
+  ci/  tests/              # offline CI, validator and contract-audit checks
+  acceptance/             # deterministic PowerShell acceptance checks
+
+tools/
+  behavioral_eval_runner/  # offline core, grading and gated calibration controls
+
+requirements.txt           # pinned structural-validator dependency
+requirements-ci.txt        # pinned full CI dependencies
+CHANGELOG.md               # dated deliveries, not release tags
 ```
 
 ## Core rules
@@ -1220,7 +1256,7 @@ scripts/
 - Start with standards, templates, eval convention, and validators (Phase 0).
 - Every skill needs `SKILL.md` with clear frontmatter, concise workflow, output format,
   validation checklist, gotchas, stop conditions, and `evals/evals.json`.
-- Avoid broad `allowed-tools`; use `disable-model-invocation: true` for side-effect workflows (the standard's §5 rule — its single narrow approved-write exception stays auto-invocable).
+- Avoid broad `allowed-tools`; use `disable-model-invocation: true` for side-effect workflows, subject to the narrowly defined exceptions in the [standard's §5](docs/skill-generation-standard.md).
 - Use read-only exploration first for audits, architecture, code, security, and QA review.
 - Treat security, tenant isolation, QA evidence, and verification as first-class requirements.
 - Keep product-specific skills out of this reusable foundation.

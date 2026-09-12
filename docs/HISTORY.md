@@ -1,9 +1,16 @@
 # Project Aegis — Construction History
 
-Curated construction history of Project Aegis, phase by phase, through **D47**. The
+Curated construction history of Project Aegis: the original phase narrative through
+**D47**, followed by dated delivery updates. The
 complete authoritative record is the dated decision log in `docs/reconciliation/` —
 [`step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md). For what Project
 Aegis *is* and how to start, see the [README](../README.md).
+
+See the [changelog](../CHANGELOG.md) for recent deliveries and the
+[documentation index](README.md) for current continuation. The original phase
+narrative below preserves the state and sequence at each historical checkpoint.
+
+## Original construction through D47
 
 The repo is built in **phases**, each a validated batch that builds on the ones before it.
 **Phase 0** established the foundation — the authoring standard, templates, eval convention,
@@ -61,3 +68,27 @@ front door (175→176). **D42** built the **CONSTRAIN/CURATE design pack** —
 extension of `structured-output-validator` — making the doctrine's D41 inward-facing pillars
 real: the DESIGN skills for the AI's own operating environment (harness, context, loop) that
 produce what the agentic-security clusters review (176→179). Most recently, **D44** built the **Security scanning & orchestration pack** (D12.10, the last banked capability) — `security-scan-orchestrator`, `sast-orchestration-designer`, and `dast-safety-harness-designer` — the ORCHESTRATION layer that runs and aggregates security scans (SAST/DAST/whole-repo) and yields finding TRIAGE to the judgment skills (179→182). **D45** extended `cloud-architecture-decider` with the full deployment abstraction ladder — rung × provider × posture, adding the modern managed-platform tier and GCP — with no count change. **D46** built `authority-invalidation-architect` — the symptom-triggered owner of the "change didn't take effect" access-bug class (a removed user still sees data, a revoked role still works, logout doesn't end the session), composing the per-surface mechanism owners rather than restating them (182→183). Most recently, **D47** built `superadmin-observability-console-designer` — the cross-tenant superadmin MONITORING-console design owner, closing the three-way pointer hole (`admin-console-architect` punts telemetry to `observability-operator`, which operates backends rather than designing consoles): the layered panel IA plus the cross-tenant read-security model, composing the ~12 feed owners rather than restating them — bringing it to **184 skills** (183→184).
+
+## Delivery update — 2026-09-12
+
+Later work strengthened the library's contracts and built the Behavioral Eval
+Runner's offline core, Scenario A grading and gated calibration controls. The
+[decision log](reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)
+retains intervening decisions; the
+[BER backlog](roadmaps/behavioral-eval-runner-backlog.md) retains its separate
+phase authorizations and completion evidence.
+
+PR #89 retired an audit false positive in August. Following the loss of the
+previous computer, D62 made GitHub the durable
+continuation location for the reviewed source and useful recovery records.
+PR #88 integrated and delivered the reviewed calibration-engineering fixes;
+PR #90 reconciled shared skill contracts;
+PR #91 added permanent Linux/Windows offline CI. PR #93 preserved the owner's
+recurring read-only-agent and administrator-merge grants in the repository.
+D63 reconciles current documentation with those deliveries.
+
+The [changelog](../CHANGELOG.md) links each delivery and its evidence. Skill
+count remains at the D47 total. Measured calibration is unfinished: original
+calibration inputs remain unavailable, OD-1 remains open and WP-2B-4 remains
+blocked. The [documentation index](README.md) points returning contributors to
+current setup and the remaining work, without treating old plans as new tasks.

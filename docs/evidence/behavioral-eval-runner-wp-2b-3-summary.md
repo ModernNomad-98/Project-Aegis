@@ -1,5 +1,13 @@
 # Behavioral Eval Runner — WP-2B-3 Stages A1–A2: sanitized implementation summary
 
+> Historical implementation and preflight snapshot. Its owner-label approval
+> refers to the original hash-bound inputs, whose bytes are now unavailable.
+> PR #88's engineering corrections have since merged; this snapshot's approval
+> status is not current dispatch readiness. See the
+> [new-computer handoff](ber-recovery-2026-09-11/README.md) for missing inputs and
+> the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md) for execution
+> gates. Measured calibration and OD-1 ratification remain unfinished.
+
 **Scope: the OFFLINE Stage A1 slice of WP-2B-3 (Measured Judge Calibration and OD-1
 Ratification Gate) under BER-DEC-008 — the calibration-only provider transport,
 request/token/cost accounting, owner-label approval gate, holdout freeze gate, and the

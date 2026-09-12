@@ -2978,6 +2978,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   by this decision. See the
   [recovery handoff](../evidence/ber-recovery-2026-09-11/README.md).
 
+- **D63 (2026-09-12) — Reconcile current documentation with delivered work.**
+  At the owner's request to update documentation, changelogs and README surfaces,
+  record the completed PR #88 calibration-engineering scope, PR #89 audit
+  false-positive correction, PR #90 shared skill contracts, PR #91 permanent
+  offline CI and PR #93 owner-approval persistence. Their delivery records and
+  successful main runs are linked from the new [documentation index](../README.md)
+  and [changelog](../../CHANGELOG.md). Update active setup, contributor, CI and
+  continuation instructions; label dated design, audit and recovery narratives
+  as historical without rewriting their source bindings or prior decisions.
+  The [owner register](../approvals/APPROVAL_REGISTER.md) preserves recurring
+  read-only-agent and administrator-merge grants for this source repository;
+  those direct grants take precedence over generic skill defaults and do not
+  transfer to consumer repositories. This is documentation reconciliation,
+  not a new skill, release tag or execution authorization. Original calibration
+  input bytes remain unavailable, WP-2B-3 measured acceptance is unfinished,
+  OD-1 remains OPEN and WP-2B-4 remains BLOCKED. Offline regression CI does not
+  complete WP-2B-7's future behavioral advisory integration.
+
 ## 6. Post-merge corrections
 
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,

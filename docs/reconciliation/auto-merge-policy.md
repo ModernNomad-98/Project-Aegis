@@ -1,5 +1,29 @@
 # Auto-Merge Policy
 
+## Current policy — recorded 2026-09-12
+
+Human authority governs merges. For `ModernNomad-98/Project-Aegis`, the owner
+has granted recurring administrator-merge authority in
+[AEGIS-APR-002](../approvals/APPROVAL_REGISTER.md#aegis-apr-002-administrator-merges).
+Agents may use that grant for authorized delivery without asking for the same
+approval again. Read the full register and any later lifecycle events before use.
+The grant applies to this source repository's clones and worktrees; copied
+startup files and skills do not grant authority over a consumer repository.
+
+Verify the reviewed PR revision and both offline verification jobs before merge.
+An intentional protected-file `gate-guard` failure requires explicit review of
+the affected enforcement surfaces. The owner's grant covers administrator
+merges, including the recorded guard/review bypass; do not weaken checks or
+change repository settings to make a change mergeable. Auto-merge is not armed.
+See [offline CI](../offline-ci.md) for current job names, protected paths and
+post-merge verification, and [CONTRIBUTING](../../CONTRIBUTING.md) for delivery rules.
+
+The historical policy below predates this owner grant and the expanded offline
+CI guard. Its original dates, incident description and old guard message are
+retained as history, rather than current instructions to request repeat consent.
+
+## Historical policy and D34 correction
+
 **Recorded:** 2026-07-06
 **Repo:** `nguyenpv1980-wq/Claude-Skills` (renamed → `nguyenpv1980-wq/Project-Aegis` → `ModernNomad-98/Project-Aegis`; old URLs redirect)
 **Context:** companion decision to the CI merge gate
@@ -15,7 +39,7 @@ extends the decisions in [`step-0-reconciliation-v4.md`](step-0-reconciliation-v
 > The one time auto-merge fired — PR #7 — was the unauthorized incident recorded in §6, which
 > is precisely why merge stays human-gated.
 
-## Policy
+### Policy recorded in July 2026
 
 1. **Merge is manual — a human is the gate.** Every PR is reviewed and merged by a human
    after all required status checks (`validate-skills` and `gate-guard`) pass. **Auto-merge is
@@ -34,7 +58,7 @@ extends the decisions in [`step-0-reconciliation-v4.md`](step-0-reconciliation-v
    rename its jobs, or bypass the failing check to "make CI green"; a human merges these
    PRs deliberately after reviewing the gate change.
 
-## Rationale
+### Historical rationale
 
 The gate exists so skill-generation work lands safely: a human merges each validated PR, and
 any PR that edits the validator or the workflows must be reviewed and merged manually

@@ -1,14 +1,47 @@
 # Behavioral Eval Runner: resume on a new computer
 
-Checkpoint: 2026-09-11. The old computer is lost. GitHub is the project's
+## Current continuation — updated 2026-09-12
+
+Start new development from `main`. PR #88's engineering corrections, PR #90's
+shared contracts and PR #91's permanent offline CI are merged. The
+[documentation index](../../README.md) links the delivery records; the
+[durable backlog](../../roadmaps/behavioral-eval-runner-backlog.md) owns remaining
+work and execution gates. No recovery ZIP or old computer is required for the
+committed source. Original calibration inputs remain missing as listed below.
+
+From PowerShell with Git and Windows x64 CPython 3.14 installed:
+
+```powershell
+git clone --branch main https://github.com/ModernNomad-98/Project-Aegis.git
+Set-Location Project-Aegis
+py -3.14 -m venv ../aegis-venv
+../aegis-venv/Scripts/python.exe -m pip install -r requirements-ci.txt
+$env:PYTHONDONTWRITEBYTECODE = '1'
+../aegis-venv/Scripts/python.exe scripts/ci/check-environment.py
+../aegis-venv/Scripts/python.exe -m pip check
+../aegis-venv/Scripts/python.exe scripts/validate-skills.py
+../aegis-venv/Scripts/python.exe -m tools.behavioral_eval_runner self-check
+```
+
+Use a full-history clone and temporary storage outside the checkout. Follow
+[offline CI](../../offline-ci.md) for the full regression and acceptance commands,
+using the same virtual environment's Python. Dependency downloads require network
+access. Check current source identity and CI before continuing; historical source
+reviews do not authorize live execution of a later revision. The
+[owner register](../../approvals/APPROVAL_REGISTER.md) preserves current repository
+review/merge grants; calibration input approval remains a separate gate.
+
+## Historical recovery checkpoint — 2026-09-11
+
+The old computer is lost. GitHub is the project's
 continuation and backup location, as clarified by the owner. A separate copy of
 the locally generated recovery ZIP is optional; it is not a prerequisite for
 continuing. The owner states that this project contains no secret or personal
 data. Read-only Project Aegis agents have standing owner approval.
 
-## Current work and evidence
+### Source and evidence at that checkpoint
 
-The implementation branch is `review/ber-phase01-corrections`. Three reviewed
+The implementation branch was `review/ber-phase01-corrections`. Three reviewed
 source commits were pushed and verified at
 `8f92e916f86bc0b9df618fb6a7887bd531df8fea`, tree
 `499e7e96bd524fe024aec94ed69d11a17f783e13`:
@@ -28,19 +61,17 @@ The [durable backlog](../../roadmaps/behavioral-eval-runner-backlog.md) remains
 the continuation authority. WP-2B-3 is not DONE; OD-1 is OPEN and WP-2B-4 is
 BLOCKED. This handoff does not authorize calibration, a budget reset or a merge.
 
-## Restore the development environment
+### Reproduce the historical dependency environment
 
-From PowerShell with Git and Windows x64 CPython 3.14 installed:
+From the current repository root, use a separate environment for the archived
+hash-locked dependency set. These commands reproduce its dependencies; they do
+not repeat the old test run or authorize calibration:
 
 ```powershell
-git clone --branch review/ber-phase01-corrections https://github.com/ModernNomad-98/Project-Aegis.git
-Set-Location Project-Aegis
-py -3.14 -m venv ../aegis-venv
-../aegis-venv/Scripts/python.exe -m pip --isolated install --index-url https://pypi.org/simple --only-binary=:all: --require-hashes -r docs/evidence/ber-recovery-2026-09-11/requirements-windows-py314.txt
-../aegis-venv/Scripts/python.exe -m pip --isolated install --index-url https://pypi.org/simple -r requirements.txt
-../aegis-venv/Scripts/python.exe -m pip check
-../aegis-venv/Scripts/python.exe -B scripts/validate-skills.py
-../aegis-venv/Scripts/python.exe -B -m tools.behavioral_eval_runner self-check
+py -3.14 -m venv ../aegis-recovery-venv
+../aegis-recovery-venv/Scripts/python.exe -m pip --isolated install --index-url https://pypi.org/simple --only-binary=:all: --require-hashes -r docs/evidence/ber-recovery-2026-09-11/requirements-windows-py314.txt
+../aegis-recovery-venv/Scripts/python.exe -m pip --isolated install --index-url https://pypi.org/simple -r requirements.txt
+../aegis-recovery-venv/Scripts/python.exe -m pip check
 ```
 
 The hash-locked file records all 18 distributions from the verified SDK runtime,
@@ -92,9 +123,9 @@ surviving contracts and validators. If originals unexpectedly surface, preserve
 and verify them before deciding which replacement work remains necessary.
 Then complete execution preflight against the selected, reviewed source revision.
 
-## Record interpretation and limits
+## Historical record interpretation and limits
 
-This documentation update passed 91 validator self-test assertions and the skill
+The original 2026-09-11 documentation update passed 91 validator self-test assertions and the skill
 validator (184 skills, zero warnings), plus JSON parsing, handoff-link checks
 and `git diff --check`. Runtime source was unchanged; the historical runtime
 test results above were not rerun for these documentation additions.
@@ -117,4 +148,5 @@ Intentionally not included: redundant patches and Git bundles (the source
 history is in Git), local virtual environments, wheel binaries and backup ZIPs.
 They remain on the current computer. Missing calibration originals are still
 unrecovered. No provider request, calibration run or merge was performed for
-this documentation change.
+that original documentation change. Subsequent deliveries are linked in the
+current continuation section above.

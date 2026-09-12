@@ -1,5 +1,15 @@
 # Shared skill contracts — implementation and review record
 
+> **Delivered.** [PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90)
+> merged at `82dfebee7dadb68207bead5cb10fa3c562f21c1e`.
+> [Main verification 34674269186](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34674269186)
+> passed. The preparation narrative and estimates below are historical.
+> Its planned offline-CI follow-up subsequently shipped in
+> [PR #91](../offline-ci-2026-09-12/DELIVERY.md). The
+> [owner register](../../approvals/APPROVAL_REGISTER.md) now records recurring
+> administrator-merge authority; the narrower PR #88 grant described below
+> remains its original historical grant.
+
 Prepared 2026-09-12 from merged main `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`.
 This records the implementation candidate; submitted-revision checks and merge
 disposition are recorded separately. The owner authorized fixes, automated tests,

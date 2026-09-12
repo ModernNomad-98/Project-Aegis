@@ -14,8 +14,8 @@ the real approval record before it is trusted or merged.
 Each rule is enforceable, and each carries the reason it exists — drawn from this project's
 own proven practice, including failures it absorbed during its own construction.
 
-1. **One session per repo at a time.** Cross-repo parallel work is fine; two sessions in
-   *this* repo at once is not.
+1. **One coordinated writer per checkout.** Use isolated worktrees for separate changes;
+   read-only review agents may work in parallel under the owner's standing grant.
    *Why:* concurrent sessions share one checkout and collide — branch squatting and
    stale-memory re-merges — a proven failure mode here.
 
@@ -24,12 +24,15 @@ own proven practice, including failures it absorbed during its own construction.
    *Why:* a closeout is a claim, not proof; trusting it instead of checking is exactly how
    rot sets in.
 
-3. **No auto-merge.** Human approval is the merge gate; auto-merge is never armed.
-   *Why:* an ungoverned auto-merge is one of this project's documented incidents. The **one**
-   governed exception is the `standing-approval-and-auto-advance` (P3) pattern, which defines
-   the only safe autonomous-merge path — within a **named scope**, with an explicit
-   **opt-out**, and never extending to a protected-branch merge or arming auto-merge, which
-   stay human-only.
+3. **Merge under human authority; do not arm auto-merge.** For this source repository,
+   read the [owner approval register](docs/approvals/APPROVAL_REGISTER.md) before
+   requesting consent already granted. AEGIS-APR-002 permits administrator merges
+   of authorized work without repeated case-by-case approval. Verify the reviewed
+   revision and CI results before merging; an intentional protected-file guard
+   failure must be understood and reviewed, never weakened to produce a green check.
+   *Why:* the owner controls merge authority, including standing delegation. This
+   source-specific grant overrides generic skill defaults here and does not transfer
+   with copied skills. See the [merge policy](docs/reconciliation/auto-merge-policy.md).
 
 4. **Track every decision.** Material decisions are recorded in
    [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md)
@@ -56,11 +59,13 @@ own proven practice, including failures it absorbed during its own construction.
    neighbor session's work or pushing to the wrong branch.
 
 8. **The validator is the structural gate.** `python scripts/validate-skills.py` must pass
-   (**exit 0**) before any PR. One-time local setup: `python -m pip install pyyaml` — the
+   (**exit 0**) before any PR. One-time local setup: `python -m pip install -r requirements.txt` — the
    strict frontmatter parse (D50) requires it, and the validator fails closed without it
    (CI installs it automatically). Skills that do not register in the
    catalog and README fail validation.
-   *Why:* the validator is the one automated check that the library's structure is intact; a
+   For full offline coverage, install `requirements-ci.txt` and follow the
+   [CI reproduction guide](docs/offline-ci.md).
+   *Why:* the validator checks that the library's structure is intact; a
    red validator means the change is not shippable, full stop.
 
 ## How to add a skill
@@ -148,10 +153,14 @@ maintainer before merge; pull requests touching a security-relevant surface
 receive an additional explicit security review. Outside contributions are never
 self-merged.
 
-Those **security-relevant surfaces** are: `scripts/`, `.github/`, `AGENTS.md`,
+Those **security-relevant surfaces** include `scripts/`, `.github/`, `AGENTS.md`,
+the Behavioral Eval Runner and approval/evidence tooling under `tools/`, pinned
+dependency files, the [owner approval register](docs/approvals/APPROVAL_REGISTER.md),
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
 any skill's frontmatter invocation posture (`disable-model-invocation` or the
 MANUAL-ONLY sentinel), its **Security Rules**, or its **Stop Conditions**.
+The mechanically enforced [protected-file guard](docs/offline-ci.md) covers
+validation and execution-control paths; its list is not the full security-review scope.
 
 Before opening a PR:
 

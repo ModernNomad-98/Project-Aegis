@@ -68,14 +68,23 @@ Windows may lack symlink privileges or distinct 8.3 aliases; Linux acceptance
 does not execute Windows file-lock behavior. Hosted results must be reported as
 actually observed, not as a fixed expected count.
 
+The [delivery record](evidence/offline-ci-2026-09-12/DELIVERY.md) links the merged
+implementation and successful post-merge run. The retained
+[verification evidence](evidence/offline-ci-2026-09-12/README.md) includes 19
+successful recorded commands (nine Ubuntu, ten Windows), their raw logs and
+environment metadata. These are command records, not a count of individual tests.
+
 ## Protected files
 
 Following D60, the guard retains its original protected paths and includes the
 new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptance
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
-files. Changes to these paths require manual review and merge. Ordinary skill and
-documentation changes retain the normal route.
+files. Changes to these paths require explicit review and deliberate merge.
+The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
+authorized agents to perform administrator merges without repeat consent; see
+the [current merge policy](reconciliation/auto-merge-policy.md). Documentation
+inside protected paths also triggers the guard.
 
 The guard reads NUL-delimited paths and disables rename detection so renaming a
 protected file out of the protected set still exposes its deletion. Regressions

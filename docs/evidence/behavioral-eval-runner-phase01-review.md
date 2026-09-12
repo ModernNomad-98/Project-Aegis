@@ -1,5 +1,11 @@
 # BER Phase 0/1 — PR #88 reconciliation and local corrections
 
+> Historical review at the revision below. PR #88 subsequently merged, including
+> its reviewed corrections; see the [delivery closeout](ber-pr88-closeout-2026-09-12/README.md).
+> Open-thread and unmerged-PR statements below describe that original review
+> checkpoint. Use the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md)
+> for current continuation and measured-calibration gates.
+
 Review date: 2026-09-10. Local work is based on PR #88 head
 `ac9e1cdb020f4efb7a52e5ea606c3b329fb486e2`, whose authorization base remains
 `1c3e4931329179d9a3f9cc9ec1bb93020378c043` (PR #87). GitHub rechecked during

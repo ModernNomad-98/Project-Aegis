@@ -1,5 +1,11 @@
 # 300 Repeatable Claude Skills Roadmap
 
+This is the original strategic capability map, not a shipped-skill inventory or
+a command to build every candidate. The D12 standing rule treats it as a 300+
+target backlog, with work selected by demand and framework coverage. Current
+status lives in the [catalog](skills-catalog.md) and
+[reconciled roadmap](reconciliation/step-0-reconciliation-v4.md).
+
 This roadmap replaces the earlier 150-skill product-influenced draft with product-agnostic, repeatable Claude skills for software and SaaS architecture, design, engineering, security, AI engineering, and QA.
 
 ## What changed
@@ -24,7 +30,10 @@ This roadmap replaces the earlier 150-skill product-influenced draft with produc
 | AI Software Engineering & LLM Systems | 20 | [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-software-engineering.md) |
 | **Total** | **300** |  |
 
-## Recommended first 25 skills to turn into executable SKILL.md workflows
+## Original recommended first 25 candidates
+
+This proposed ordering is retained for history; check the current catalog before
+opening work because many capabilities have since shipped under reconciled names.
 
 1. **Architecture Decision Record Authoring** (P0) — Capture context, decision, alternatives, consequences, rollback, and operational impact for major technical choices.
 2. **System Context Mapping** (P0) — Map actors, systems, boundaries, integrations, trust zones, and ownership before design or implementation.
@@ -54,14 +63,10 @@ This roadmap replaces the earlier 150-skill product-influenced draft with produc
 
 ## Skill implementation standard
 
-Each future `skills/<skill-name>/SKILL.md` should include:
-
-- Purpose
-- When to use
-- Required inputs
-- Step-by-step workflow
-- Expected outputs
-- Validation checklist
-- Anti-patterns and stop conditions
+Create skills under `.claude/skills/<skill-name>/SKILL.md`, using the
+[current generation standard](skill-generation-standard.md) and
+[reference template](../.claude/skills/_template/SKILL.md). Follow the
+[contribution checklist](../CONTRIBUTING.md#how-to-add-a-skill) for required
+sections, invocation posture, evals, registration and verification.
 
 Keep every skill small, executable, repeatable, product-agnostic, and safe to reuse across multiple software and SaaS repositories.

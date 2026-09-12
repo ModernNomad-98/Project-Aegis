@@ -1,5 +1,14 @@
 # Behavioral Eval Runner v1 — design (specification only)
 
+> **Current-status pointer — 2026-09-12.** This approved design retains its
+> original design-time statements below. WP-2B-1/WP-2B-2 and PR #88's scoped
+> calibration engineering have since shipped; BER-DEC-008 is effective.
+> Measured calibration remains unfinished, OD-1 open and WP-2B-4 blocked.
+> Read the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md) and
+> [runner README](../../tools/behavioral_eval_runner/README.md) for current status;
+> the [v1.1 successor](behavioral-eval-runner-v1-fast-track-successor.md) governs
+> only the design scope it explicitly supersedes.
+
 **Status:** DESIGN / SPECIFICATION ONLY — nothing here is built, wired, or executed.
 **Owning skill:** [`eval-runner-designer`](../../.claude/skills/eval-runner-designer/SKILL.md)
 (+ [`references/runner-design-blueprint.md`](../../.claude/skills/eval-runner-designer/references/runner-design-blueprint.md)).
