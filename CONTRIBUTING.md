@@ -157,6 +157,8 @@ Before opening a PR:
 
 - The validator and self-tests must be green — `python scripts/validate-skills.py`
   and `python scripts/tests/test_validator.py`.
+- Review the [offline CI checks](docs/offline-ci.md) for contract-audit, BER and
+  acceptance coverage, local reproduction, and evidence retained on failures.
 - Sign off every commit under the [Developer Certificate of
   Origin](https://developercertificate.org): `git commit -s` adds the
   `Signed-off-by:` line. There is **no CLA** — Apache-2.0 §5 already governs the

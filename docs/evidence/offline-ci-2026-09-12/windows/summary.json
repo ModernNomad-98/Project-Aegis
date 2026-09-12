@@ -1,0 +1,129 @@
+{
+  "head": "b483d4e0b98d76b64c8053c99397eb5a296c7705",
+  "records": [
+    {
+      "name": "Record resolved dependency versions",
+      "exit_code": 0,
+      "tail": [
+        "typing-inspection==0.4.4",
+        "typing_extensions==4.16.0",
+        "",
+        "CHECK dependencies: exit 0"
+      ]
+    },
+    {
+      "name": "Verify SDK coverage and record host capabilities",
+      "exit_code": 0,
+      "tail": [
+        "  \"provider_requests\": \"not part of this check; suites use mocked transports\"",
+        "}",
+        "",
+        "CHECK environment: exit 0"
+      ]
+    },
+    {
+      "name": "Check CI evidence handling",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "OK (skipped=4)",
+        "",
+        "CHECK ci-tests: exit 0"
+      ]
+    },
+    {
+      "name": "Run validator self-tests",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "OK: 91 gate self-test assertion(s) passed.",
+        "",
+        "CHECK validator-tests: exit 0"
+      ]
+    },
+    {
+      "name": "Run skill validator",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "OK: 184 skill(s) valid, 0 warning(s)",
+        "",
+        "CHECK skills: exit 0"
+      ]
+    },
+    {
+      "name": "Run contract-audit self-tests",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "OK: 63 contract-audit self-test assertion(s) passed.",
+        "",
+        "CHECK contract-audit-tests: exit 0"
+      ]
+    },
+    {
+      "name": "Run BER self-check",
+      "exit_code": 0,
+      "tail": [
+        "  \"self_check\": \"PASS\"",
+        "}",
+        "",
+        "CHECK ber-self-check: exit 0"
+      ]
+    },
+    {
+      "name": "Run complete offline BER suite",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "OK (skipped=14)",
+        "",
+        "CHECK ber: exit 0"
+      ]
+    },
+    {
+      "name": "Run Scenario A acceptance in Windows PowerShell 5.1",
+      "exit_code": 0,
+      "tail": [
+        "",
+        "PASS - all 113 test(s) passed (host: C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe).",
+        "",
+        "CHECK acceptance-desktop: exit 0"
+      ]
+    },
+    {
+      "name": "Run Scenario A acceptance in PowerShell Core",
+      "status": "UNRUN",
+      "reason": "PowerShell Core absent locally"
+    },
+    {
+      "command": [
+        "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\offline-ci-venv\\Scripts\\python.exe",
+        "scripts/check_dco.py",
+        "--range",
+        "82dfebe..HEAD"
+      ],
+      "exit_code": 0,
+      "output": "Checking DCO sign-off over 82dfebe..HEAD ...\r\n\r\n  SIGNED  b483d4e0b98d  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  ci: run offline contract and BER checks on Linux and Windows\r\n\r\nOK: 1 commit(s) checked, all signed off or exempt.\r\n"
+    },
+    {
+      "command": [
+        "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\offline-ci-20260912\\actionlint-1.7.12\\actionlint.exe",
+        ".github/workflows/validate-skills.yml"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "82dfebe..HEAD"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "clean": true
+}

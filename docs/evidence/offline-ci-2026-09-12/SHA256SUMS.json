@@ -1,0 +1,82 @@
+﻿[
+    {
+        "path":  "linux-guard.json",
+        "sha256":  "e6b6fa2f756b909f9dbce9d15ed76bc709c3e2118dce1cf07e7a358c82d68849"
+    },
+    {
+        "path":  "windows/acceptance-desktop.json",
+        "sha256":  "824c08ca7ad7f835735565a13500a3d5cf699fd3f92322f538240755cc18d709"
+    },
+    {
+        "path":  "windows/acceptance-desktop.log",
+        "sha256":  "b35f3c96c4b1ac9b0433824691605b5037719692ae61cc438e46410cbf374855"
+    },
+    {
+        "path":  "windows/ber.json",
+        "sha256":  "99e517d6f0df2cb19a285a721526bc708f4c32d62f94e5dc42ad70ef7a3b6b66"
+    },
+    {
+        "path":  "windows/ber.log",
+        "sha256":  "3091646c782b5e88738f150dd9e71743929f2e30052af02cf0960826a3a3973a"
+    },
+    {
+        "path":  "windows/ber-self-check.json",
+        "sha256":  "e8338e13863de04ac645521ceebfd6a200ccb01653bbad9f64bf16e1e284e07b"
+    },
+    {
+        "path":  "windows/ber-self-check.log",
+        "sha256":  "4962da9c9f88a1f0d174d06bcd7cc69551e74a043ab2e07392907da4fd49e394"
+    },
+    {
+        "path":  "windows/ci-tests.json",
+        "sha256":  "ab2329f12343f153742c47b7149703c0acc8d8201ec9af343ad11612feea29fa"
+    },
+    {
+        "path":  "windows/ci-tests.log",
+        "sha256":  "0e01b605cd1b1a495296872258318b29a8d470d8b51cf81ada2a2f55cad1ca21"
+    },
+    {
+        "path":  "windows/contract-audit-tests.json",
+        "sha256":  "70c20636d25bd26b486e6d0089cd44feeb950a33556204981defa07a1d80a528"
+    },
+    {
+        "path":  "windows/contract-audit-tests.log",
+        "sha256":  "25e407bcaf9a7f5b374fe27a84e3e6c3c090684d470b9266922b22382ae9ad46"
+    },
+    {
+        "path":  "windows/dependencies.json",
+        "sha256":  "01f6daf8a812857bd1ef18f6cd1053419513bf7f7945d741c3fdf0d83dd315c1"
+    },
+    {
+        "path":  "windows/dependencies.log",
+        "sha256":  "26057c885ce25bce2850cb0cd97b5bc248433c19c8981d055e28bc029280f5b9"
+    },
+    {
+        "path":  "windows/environment.json",
+        "sha256":  "c9cd5af6b08f4cf6e8e9b77b9fc62e4491f6e02575ed51f2c0860898be8dd962"
+    },
+    {
+        "path":  "windows/environment.log",
+        "sha256":  "73df80e6c4ce54b073a1622cc36337ad5dd9793e9bdd34ed9bfea8a9151a57c0"
+    },
+    {
+        "path":  "windows/skills.json",
+        "sha256":  "3cea891cf9f6fe32ef337ba0771777f17177c8c578e072642786c72c76d34e01"
+    },
+    {
+        "path":  "windows/skills.log",
+        "sha256":  "0ae17a6038f0dd586cd61d5f4ea747bb5a5e0bd79b5bf2035028832e4712bc90"
+    },
+    {
+        "path":  "windows/summary.json",
+        "sha256":  "bb20acf772d99a2ce7f382ae8662be9979de738c98d22ad875b7ee641605dcf6"
+    },
+    {
+        "path":  "windows/validator-tests.json",
+        "sha256":  "c1d7d66bda9f7a94ae183404d3d5a6c11293e3557a6534e8f454492c748ae9ef"
+    },
+    {
+        "path":  "windows/validator-tests.log",
+        "sha256":  "ca1a382ea0b55d3a5ee4db0bc3092adc89656cac53c58448e3366cd7b0349e83"
+    }
+]
