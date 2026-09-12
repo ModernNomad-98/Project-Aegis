@@ -10,9 +10,9 @@ Scope: [design proposal](../../design/resumable-control-plane-v1.md) and
 This record is sanitized documentation evidence, not runtime recovery state,
 permission configuration or a competing approval register.
 
-## 1. Human authorization and limits
+## 1. Original authorization and limits (later continuation in section 9)
 
-Source: Peter Nguyen's current-session written authorization, supplied as the
+Source: Peter Nguyen's original written authorization, supplied as the
 attachment beginning "Peter Nguyen authorizes Codex to execute CP-WP-001" on
 2026-09-12. The direct human instruction remains source evidence before any
 register transcription. The approval register is intentionally unchanged.
@@ -278,6 +278,10 @@ PR #95 and the handoff after push; a0177d5's passing CI is historical for this c
 
 ## 8. Third correction cycle — complete validation lifecycle traces
 
+Delivered as `d2bb7aca68942ce921518cdfc71199737eedaac8`, tree
+`25481c0d7837f05bc636cabe88db71a22b92c19c`: 1,425 added lines, all three CI jobs passed;
+GH10-GH17 replied/resolved. Fresh review then found GH18-GH21; this cycle is historical.
+
 [Codex review at 5acf7b6](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5186022401),
 submitted 2026-09-12 09:36:11 UTC, identified eight further transition gaps. Tracked/
 staged state was clean before correction; branch, three-file scope and user-artifact
@@ -321,12 +325,41 @@ scope, DCO and hashes receive final checks before push. Future F01-F17 are unexe
 old-head CI cannot close current findings. Final head/tree, individual pushed replies,
 fresh review and exact-head CI remain PR/handoff evidence after push.
 
-## 9. Intentional omissions and continuation
+## 9. Fourth correction cycle - fences, nonexecution and validator capability
+
+[Codex review at d2bb7ac](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5186097379)
+submitted 2026-09-12 10:03:12 UTC identified four P1 findings. Tracked/staged state
+was clean before correction; same branch, three-file scope and artifact boundaries.
+
+| Finding / source | Normative correction / future negative case | Disposition |
+| --- | --- | --- |
+| GH18 P1 [final failure](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995890252) | T12/T17 commit permanent item/operation fences; T12 closes its failed check and conditionally releases the slot; T26 closes remaining checks. F18 covers single/multiple checks and crash/replay | Closed in independent document review; GitHub unresolved/unpushed |
+| GH19 P1 [nonexecution after handoff](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995890256) | T25 accepts exact authoritative nonexecution proof before/after handoff, covering descendants/effect paths and independent control costs. F19 rejects error-only proof and unknown billing | Closed in independent document review; GitHub unresolved/unpushed |
+| GH20 P1 [validator mutation](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995890258) | 5.3/T27 bind read-only pinned inputs and bounded isolated output capability; enforced subprocess/tool/network containment, unsupported denies; target repair needs its own approved effect/slot. F20 covers escape/repair | Closed in independent document review; GitHub unresolved/unpushed |
+| GH21 P1 [uncertainty fence clearance](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995890260) | 6.1/T17 bind each fence to scope/reason/originating event and clear only the exact uncertainty instance its authoritative settlement proves resolved. F21 retains other/newer/pause/authority/integrity/breach/recovery fences | Closed in independent document review; GitHub unresolved/unpushed |
+
+Both independent architecture/recovery and security/authority reviewers approve
+design SHA-256 `f34ec3ca1ed1841fa2f2035e05a049de171f487273eb99861647362b2506068d`
+as a documentation contract; no blocking findings remain in their traced paths.
+Follow-ups closed T17 terminal entry, the security P2 safe-retry dead end, and original
+receipt arrival before/after retry intent. T03/7.4/F02/F21 bind one-attempt exceptions;
+T23/T25 retain pending validation. F18-F21 table rendering was also corrected.
+Local checks exited 0: `git diff --check`, `python -B scripts/validate-skills.py`
+(184 valid, zero warnings), `python -B scripts/tests/test_validator.py` (91 assertions),
+and in-memory Markdown/link/transition checks. F01-F21 remain unexecuted future tests.
+Automatic approval review rejected the PR-description update twice, applying the
+earlier read-only instruction and declining later attachment-based authorization.
+2026-09-13 / Peter Nguyen / ACTIVE: "yes approved for commit, push and merged".
+Reason: resume CP-WP-001. Allowed: commit/push/merge PR #95; runtime/out-of-scope changes forbidden.
+Evidence: direct chat answering the three-document publishing request; no expiry stated.
+This supersedes the earlier no-merge boundary; fresh review/CI remain required before merge.
+
+## 10. Intentional omissions and continuation
 
 Only the three authorized Markdown files are created. No runtime implementation,
 schema/policy execution, shared extraction, BER/CI/dependency change, credential or
 sealed-holdout access, provider dispatch through repository code, deployment,
-database action, release, tag or merge is performed. Existing artifacts/recovery/
+database action, release or tag is performed. Existing artifacts/recovery/
 and artifacts/reviews/ remain untouched and unstaged. Root .gitignore stays absent.
 
 Controller tests and real platform/authority/receipt guarantees are future work,
@@ -334,5 +367,5 @@ not claimed by document checks or unchanged BER tests. Storage selection, real
 approval authenticity/freshness, external idempotency/fencing, Windows prevention
 and distributed ownership remain blocked implementation decisions.
 
-The next owner decision is review and acceptance/merge disposition of the single
-CP-WP-001 documentation PR. No later work package may start from that acceptance alone.
+After successful review/CI, complete the owner-approved merge and report its result.
+The next owner decision is whether to authorize separately scoped CP-WP-002; no implementation starts here.

@@ -19,8 +19,8 @@ not create grants or replace the repository's one approval register.
 
 Peter's current explicit CP-WP-001 authorization permits exactly three documents,
 the focused branch, DCO-signed commits, one PR, existing CI and in-scope corrections.
-It excludes runtime work and stops before merge. AEGIS-APR-001 remains applicable
-to read-only reviewers; AEGIS-APR-002 does not override this task's no-merge boundary.
+Runtime stays excluded. The 2026-09-13 owner continuation now permits commit/push/merge
+of PR #95; AEGIS-APR-001 and standing administrator-merge grant AEGIS-APR-002 apply.
 The task authorization source and bounded summary are in the evidence document.
 The current correction instruction continues PR #95 on this same branch: address
 all original and subsequent GitHub findings, reply/resolve only after pushing evidence, request a fresh
@@ -37,7 +37,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Field | Contract |
 | --- | --- |
 | ID / title | CP-WP-001 — Durable State, Authority and Recovery Contract |
-| Status | AUTHORIZED for documentation delivery only; owner design acceptance pending |
+| Status | AUTHORIZED for documentation delivery and merge after required review/CI; no implementation |
 | Owner | Peter Nguyen |
 | Purpose | Make safe continuation decidable from durable identity, authority, events and evidence |
 | Allowed scope | Create/correct exactly the three declarative Markdown files in section 3; reviewed design, separate backlog and sanitized evidence |
@@ -49,11 +49,11 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Spend | USD $0 task-controlled external spend; ordinary existing Codex session, approved read-only reviewers and existing GitHub CI excluded; no paid provisioning/API calls |
 | Evidence | `docs/evidence/control-plane/cp-wp-001-review.md`; final head/tree/PR/exact-head CI in PR body and final handoff to avoid self-reference |
 | Reviewers | Independent read-only architecture/recovery review and security/authority review; Peter for acceptance |
-| Permitted delivery | Focused branch, explicit-path staging, DCO-signed commits, normal push, exactly one PR to main, all-check monitoring and in-scope corrections |
-| Forbidden | Merge/auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
+| Permitted delivery | Focused branch, explicit-path staging, DCO-signed commits, normal push, exactly one PR to main, all-check monitoring, in-scope corrections and owner-approved merge |
+| Forbidden | Auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
 | Non-goals | Offline kernel, physical extraction/wrappers, actual execution/containment, distribution, dashboard, BER advancement |
-| Completion | Three-file bounded diff, local validation, independent re-reviews of all findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; PR #95 stays open/unmerged with auto-merge disabled |
-| Next owner decision | Review the delivered CP-WP-001 PR and decide its acceptance/merge disposition; later implementation needs separate authorization |
+| Completion | Three-file bounded diff, local validation, independent re-reviews of all findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; merge only the verified reviewed head under the 2026-09-13 approval; auto-merge disabled |
+| Next owner decision | After CP-WP-001 delivery, decide whether to authorize a separately scoped CP-WP-002; no automatic advancement |
 
 ### 2.1 Required evidence handling
 
@@ -93,11 +93,13 @@ selected-check prerequisites before launch. Reviewers must trace complete succes
 failure, pause/stop and restart sequences across these rules, not just clause presence.
 Include readiness/pause/reconciliation detours around recovery blockers, and a final
 check applied before its aggregate gate clears: distinct finalization must release once.
+F18-F21 require atomic final-failure fencing/settlement, proven nonexecution after
+handoff, non-mutating contained validation and identity-bound uncertainty-fence clearance.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
 sensitive evidence, unresolved authority conflict, inconsistent design, forbidden
-correction, another external resource/PR or any need to merge. Preserve all unrelated
+correction, another external resource/PR or merge without passing gates. Preserve unrelated
 work. Green CI never supplies implementation or merge permission.
 
 ## 3. CP-WP-001 exact file plan
@@ -147,8 +149,8 @@ Request fresh Codex review explicitly naming that head. Monitor all review threa
 the new review and every attached CI check to terminal status. `validate-skills`,
 `gate-guard` and `windows-offline-checks` must succeed on that head; old-head results
 are historical. New findings require the same in-scope correction/review cycle.
-Ready-for-owner-review requires no unresolved thread and no blocking fresh-review
-finding. Leave PR open/unmerged and auto-merge disabled; exceeding scope/budget stops.
+Merge readiness requires no unresolved thread and no blocking fresh-review finding.
+Merge the verified head under current owner approval; exceeding scope/budget stops.
 
 [Existing CI](../offline-ci.md) runs without PR path filters and already performs
 dependency setup, synthetic tests and evidence upload. It may run unchanged under
@@ -161,7 +163,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F17 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F21 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -212,4 +214,4 @@ No self-referential final SHA inside its own commit: final commit/tree, PR URL,
 all exact-head check conclusions and owner handoff live in the PR body/final response.
 Existing CI logs have finite retention; repository evidence records sanitized
 durable summaries and links, not an assertion that raw hosted logs last forever.
-Stop before merge and ask for the single owner review/acceptance disposition.
+After gated owner-approved merge, report its SHA and leave every later package blocked.
