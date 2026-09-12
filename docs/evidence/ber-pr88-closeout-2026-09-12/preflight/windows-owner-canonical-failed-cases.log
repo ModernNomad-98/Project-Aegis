@@ -1,0 +1,26 @@
+test_baseline_mismatch_raises (test_census.TestPinnedCorpusCensus.test_baseline_mismatch_raises) ... ok
+test_case_type_distribution_matches_design_census (test_census.TestPinnedCorpusCensus.test_case_type_distribution_matches_design_census) ... ok
+test_census_reproducible_byte_for_byte (test_census.TestPinnedCorpusCensus.test_census_reproducible_byte_for_byte) ... ok
+test_degenerate_and_subagent_findings (test_census.TestPinnedCorpusCensus.test_degenerate_and_subagent_findings) ... ok
+test_expected_baseline_counts (test_census.TestPinnedCorpusCensus.test_expected_baseline_counts) ... ok
+test_manual_only_parsed_from_frontmatter (test_census.TestPinnedCorpusCensus.test_manual_only_parsed_from_frontmatter) ... ok
+test_no_behavioral_result_language (test_census.TestPinnedCorpusCensus.test_no_behavioral_result_language) ... ok
+test_reverse_index_keeps_skill_and_subagent_distinct (test_census.TestPinnedCorpusCensus.test_reverse_index_keeps_skill_and_subagent_distinct) ... ok
+test_reverse_index_present_and_sorted (test_census.TestPinnedCorpusCensus.test_reverse_index_present_and_sorted) ... ok
+test_risk_classes_are_proposed_not_ratified (test_census.TestPinnedCorpusCensus.test_risk_classes_are_proposed_not_ratified) ... ok
+test_real_repo_tree_verification (test_materialize.TestGitSnapshot.test_real_repo_tree_verification) ... ok
+test_watchdog_kills_synthetic_child_tree (test_process_control.TestProcessTreeKill.test_watchdog_kills_synthetic_child_tree) ... ok
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestEnumerationFailsClosed.test_valid_manifests_verify_against_expected_record) ... ok
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestManifestPathsPortability.test_valid_manifests_verify_against_expected_record) ... ok
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record) ... ok
+test_ambiguity_inventory_is_classified_unverified (test_review_blockers.TestMaterializationRecordClaimBinding.test_ambiguity_inventory_is_classified_unverified) ... ok
+test_fabricated_ambiguity_inventory_not_certified (test_review_blockers.TestMaterializationRecordClaimBinding.test_fabricated_ambiguity_inventory_not_certified) ... ok
+test_top_level_verified_does_not_imply_complete_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_top_level_verified_does_not_imply_complete_record) ... ok
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_valid_manifests_verify_against_expected_record) ... ok
+test_reparse_point_refused (test_containment.TestMockContainment.test_reparse_point_refused) ... ok
+test_walk_error_is_fail_closed (test_review_blockers.TestEnumerationFailsClosed.test_walk_error_is_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 3.197s
+
+OK

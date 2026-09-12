@@ -41,7 +41,9 @@ class TestMockContainment(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        root = self._tmp.name
+        # Resolve Windows TEMP aliases before passing paths to the guarded
+        # junction fallback; do not widen its shell-safe character allowlist.
+        root = os.path.realpath(self._tmp.name)
         self.corpus = os.path.join(root, "corpus")
         self.workspace = os.path.join(root, "workspace")
         self.control = os.path.join(root, "control_plane")
@@ -124,7 +126,7 @@ class TestMockContainment(unittest.TestCase):
 
     def test_reparse_point_refused(self) -> None:
         link_parent = os.path.join(self.workspace, "linked")
-        real_target = os.path.join(self._tmp.name, "outside_dir")
+        real_target = os.path.join(os.path.dirname(self.workspace), "outside_dir")
         os.makedirs(real_target, exist_ok=True)
         created = False
         try:

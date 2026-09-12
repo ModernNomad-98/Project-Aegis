@@ -109,7 +109,9 @@ class TestMaterializationManifestIntegrity(unittest.TestCase):
     def setUp(self) -> None:
         self._temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self._temporary.cleanup)
-        self.root = self._temporary.name
+        # Production materialization records canonical paths. Match that contract
+        # when Windows TEMP uses an 8.3 alias such as PETERN~1.
+        self.root = os.path.realpath(self._temporary.name)
         manifest_dir = os.path.join(self.root, "materialization_manifests")
         os.makedirs(manifest_dir)
 

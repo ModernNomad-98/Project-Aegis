@@ -172,6 +172,32 @@ except CalibrationLedgerError:
                 approval=os.path.join(self.root, *drv.APPROVAL_ARTIFACT_RELPATH.split('/'))))
         self.assertEqual(json.loads(output.getvalue())['owner_label_approval'], 'PENDING')
 
+    def test_status_checks_each_identity_field_and_file_hash_independently(self):
+        from dataclasses import replace
+        from tools.behavioral_eval_runner.cli import _cmd_calibration_status
+
+        cases = [("matching synthetic pin", self.identity, "APPROVED")]
+        for field, value in (
+            ("dataset_id", "unrelated-dataset"),
+            ("dataset_version", "unrelated-version"),
+            ("dataset_semantic_sha256", "0" * 64),
+            ("split_map_sha256", "0" * 64),
+            ("labeling_guide_sha256", "0" * 64),
+            ("approval_artifact_sha256", "0" * 64),
+        ):
+            self.assertNotEqual(getattr(self.identity, field), value)
+            cases.append((field, replace(self.identity, **{field: value}), "PENDING"))
+        for name, expected, status in cases:
+            with self.subTest(binding=name):
+                output = io.StringIO()
+                with patch.object(drv, "PRODUCTION_APPROVED_ARTIFACTS", expected), redirect_stdout(output):
+                    _cmd_calibration_status(argparse.Namespace(
+                        approval=os.path.join(self.root, *drv.APPROVAL_ARTIFACT_RELPATH.split("/"))))
+                report = json.loads(output.getvalue())
+                self.assertEqual(report["owner_label_approval"], status)
+                self.assertFalse(report["provider_dispatch_allowed"])
+                self.assertEqual(report["provider_calls_made_by_this_command"], 0)
+
     def test_interrupted_genesis_can_recover_without_reset(self):
         driver = self._driver()
         driver.prepare()

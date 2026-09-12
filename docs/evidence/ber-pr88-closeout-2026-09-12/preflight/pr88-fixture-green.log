@@ -1,0 +1,40 @@
+python.exe : test_valid_manifests_verify_against_expected_record (tools.behavioral_eval_runner.tests.test_review_blocke
+rs.TestMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record) ... ok
+At line:5 char:1
++ & 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/phase01-sdk-v ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_valid_mani..._record) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+test_reparse_point_refused
+(tools.behavioral_eval_runner.tests.test_containment.TestMockContainment.test_reparse_point_refused) ... ok
+test_short_destination_alias_materializes_and_verifies (tools.behavioral_eval_runner.tests.test_materialize.TestSynthet
+icMaterialization.test_short_destination_alias_materializes_and_verifies) ... ERROR
+test_status_checks_each_identity_field_and_file_hash_independently (tools.behavioral_eval_runner.tests.test_calibration
+_phase01.TestBoundaryCorrections.test_status_checks_each_identity_field_and_file_hash_independently) ... ok
+
+======================================================================
+ERROR: test_short_destination_alias_materializes_and_verifies (tools.behavioral_eval_runner.tests.test_materialize.Test
+SyntheticMaterialization.test_short_destination_alias_materializes_and_verifies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\tests\test_materialize.py", line
+92, in test_short_destination_alias_materializes_and_verifies
+    self.assertTrue(verify_materialization_manifests(alias, record)["verified"])
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\materialize.py", line 943, in
+verify_materialization_manifests
+    on_disk = _enumerate_materialized_files(area_root, destination_real)
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\materialize.py", line 775, in
+_enumerate_materialized_files
+    raise MaterializationError(f"missing materialized area {area_root!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: missing materialized area
+'C:\\Users\\PeterNguyen\\AppData\\Local\\Temp\\tmpz06dhgi4\\product_fixture'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.543s
+
+FAILED (errors=1)

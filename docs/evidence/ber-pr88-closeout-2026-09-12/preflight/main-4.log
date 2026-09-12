@@ -1,0 +1,10 @@
+Checking DCO sign-off over origin/main..HEAD ...
+
+ERROR no commits found in the range - refusing to pass a check that examined nothing (a pull request always has at least one commit, so an empty range means the range itself is wrong)
+
+FAILED: 1 commit(s) missing a DCO sign-off.
+
+RECOVERY - add the missing sign-off, then force-push:
+  one commit       git commit --amend -s
+  several commits  git rebase --signoff origin/main
+  then             git push --force-with-lease

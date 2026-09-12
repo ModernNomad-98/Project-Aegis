@@ -1,0 +1,7 @@
+warning: in the working copy of 'docs/audits/aegis-060-plus-register.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/materialize.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/tests/test_calibration_phase01.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/tests/test_containment.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/tests/test_materialize.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/behavioral_eval_runner/tests/test_review_blockers.py', LF will be replaced by CRLF the next time Git touches it

@@ -1,0 +1,16 @@
+Checking DCO sign-off over origin/main..HEAD ...
+
+  SIGNED  a231bc5db820  Peter Nguyen <petern@carrotanddaikon.com>  docs: reconcile completed backlog work and retain remaining gates
+  SIGNED  6bd5abadd16a  Peter Nguyen <petern@carrotanddaikon.com>  docs: close unavailable recovery lead and plan replacement calibration
+  SIGNED  49faaab90e50  Peter Nguyen <petern@carrotanddaikon.com>  docs: preserve BER recovery handoff and setup in GitHub
+  SIGNED  8f92e916f86b  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(ber): retain incomplete response reason after deadline
+  SIGNED  c6822e1c3fd0  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(ber): preserve telemetry accounting and enforce request deadlines
+  SIGNED  40bfabc91b60  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix: enforce BER calibration execution boundaries
+  SIGNED  ac9e1cdb020f  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix: close BER WP2B3 first-live execution gates
+  SIGNED  ca19b919e5a2  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  feat: add BER WP2B3 controlled development driver
+  SIGNED  530cdefc103e  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  docs: revise BER WP2B3 candidate label set
+  SIGNED  64867662fae5  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix: harden BER WP2B3 durable execution gates
+  SIGNED  52805dc4ea2c  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  docs: bind WP-2B-3 Stage A1 summary to draft PR 88
+  SIGNED  1f94ef8c6683  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  feat: implement BER WP2B3 calibration controls
+
+OK: 12 commit(s) checked, all signed off or exempt.

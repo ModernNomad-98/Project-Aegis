@@ -529,6 +529,49 @@ def _write_file_dirfd(root_real: str, relative_path: str, content: bytes) -> Non
         os.close(root_fd)
 
 
+def _create_empty_area(destination_root: str, area_name: str) -> None:
+    """Create a zero-file surface without relaxing manifest verification.
+
+    Use the same trusted-root semantics as file writes. Windows retains the
+    documented detection-only, NON_BASELINE behavior.
+    """
+    if area_name not in ("control_plane", "runtime_surface", "product_fixture"):
+        raise MaterializationError(f"unknown materialized area {area_name!r}")
+    _refuse_reparse_points(destination_root)
+    if _POSIX_NOFOLLOW_WRITE:
+        try:
+            root_fd = _open_trusted_root_fd(destination_root)
+        except OSError as exc:
+            raise ReparsePointError(f"cannot anchor empty area: {exc}") from exc
+        try:
+            try:
+                os.mkdir(area_name, 0o700, dir_fd=root_fd)
+            except FileExistsError:
+                pass
+            area_fd = os.open(
+                area_name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                dir_fd=root_fd,
+            )
+            os.close(area_fd)
+        except OSError as exc:
+            raise ReparsePointError(f"cannot create empty area no-follow: {exc}") from exc
+        finally:
+            os.close(root_fd)
+        return
+
+    _refuse_symlink_root(destination_root)
+    destination_real = os.path.realpath(destination_root)
+    target = _safe_join(destination_real, area_name)
+    try:
+        os.mkdir(target, 0o700)
+    except FileExistsError:
+        pass
+    _refuse_reparse_points(destination_root)
+    _refuse_read_reparse(target, destination_real)
+    if not os.path.isdir(target):
+        raise MaterializationError(f"materialized area is not a directory: {area_name!r}")
+
+
 def _write_under_destination(destination_root: str, relative_path: str, content: bytes) -> None:
     """Write one file under the destination root using a TRUSTED root anchor (§4).
 
@@ -1315,11 +1358,12 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
     # trusted-root anchor (POSIX retained no-follow descriptor; Windows detection
     # fallback), so the AREA root is created relative to the trusted root and a
     # swapped area child cannot redirect a write.
-    for area_name, entries in (
+    areas = (
         ("control_plane", control_plane),
         ("runtime_surface", runtime_surface),
         ("product_fixture", dict(request.fixture.files)),
-    ):
+    )
+    for area_name, entries in areas:
         for path, content in sorted(entries.items()):
             _write_under_destination(
                 request.destination_root, f"{area_name}/{path}", content
@@ -1355,6 +1399,13 @@ def materialize(request: MaterializationRequest) -> MaterializationRecord:
             request.destination_root, relative, canonical_bytes(body)
         )
         manifest_paths[name] = _safe_join(request.destination_root, relative)
+
+    # Empty manifests still describe real directories. Let the guarded file
+    # writer establish the destination first (the Windows fallback supports
+    # absent parents), then create zero-file areas using the same root anchor.
+    for area_name, entries in areas:
+        if not entries:
+            _create_empty_area(request.destination_root, area_name)
 
     # §6.A: write-integrity is baseline ONLY when a proven capability is present.
     # A real-host default derives the platform capability (NON_BASELINE here); a

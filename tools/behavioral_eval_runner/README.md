@@ -1,4 +1,4 @@
-# Behavioral Eval Runner — WP-2B-1 offline core + WP-2B-2 grading stack
+# Behavioral Eval Runner — offline core, grading, and calibration controls
 
 The NON-LIVE control plane and minimum guardrails of the Project Aegis
 Behavioral Eval Runner, authorized by **BER-DEC-006**
@@ -11,25 +11,35 @@ plus the NON-LIVE **WP-2B-2 Scenario A Grading Stack**, authorized by
 fast-track successor
 ([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../../docs/design/behavioral-eval-runner-v1-fast-track-successor.md)) §3–§4.
 
+WP-2B-3 adds gated calibration controls and a dedicated development driver
+under **BER-DEC-008**. Their implementation and offline verification are in
+scope here; measured calibration is unfinished. The original approved input
+bytes are unavailable on this computer and in GitHub. See the
+[replacement preparation plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
+and [PR #88 closeout record](../../docs/evidence/ber-pr88-closeout-2026-09-12/README.md).
+
 ## Hard boundaries (Outcome B)
 
 - **0 model/provider dispatches, 0 live Claude Code sessions, USD $0 spend.**
-  No dispatch path exists; the Claude Code adapter denies every session with
-  `LIVE_DISPATCH_DISABLED`.
+  These are the results of the recorded offline verification. The generic
+  Claude Code adapter and judge provider deny with `LIVE_DISPATCH_DISABLED`.
+  A separate calibration development driver has a gated live path, described
+  below; no live execution or measured acceptance is claimed.
 - **R1–R5 are NOT technically solved here.** Real-host activation observation
   (R1), judge calibration (R2, BLOCKED; OD-1 OPEN), cost observability (R3),
   containment (R4), and execution-profile isolation (R5) all remain
   UNAVAILABLE/UNKNOWN and are reported that way.
-- **No live Scenario A, no generic eval execution, no CI wiring.** Python
-  standard library only; no dependencies.
+- **No live Scenario A or generic eval execution.** The offline core uses the
+  Python standard library. The dedicated calibration transport requires the
+  separately pinned SDK; its configuration tests skip when it is absent.
+  The current Actions workflow does not run the BER suite.
 - Census-proposed risk classes are **PROPOSED / NOT OWNER-RATIFIED** (OD-3).
 - **WP-2B-2 grading stack is NON-LIVE:** deterministic graders grade RECORDED
-  synthetic evidence only; the semantic judge is a scaffold with NO provider
-  implementation (the only provider object denies with
-  `LIVE_DISPATCH_DISABLED`); calibration is a deterministic/mock harness with
-  MOCK/UNRATIFIED thresholds only. Zero runner-, grading-stack-, or
-  test-harness-generated model/provider dispatches; zero actual judge calls;
-  **no measured calibration; OD-1 OPEN; R2 BLOCKED; WP-2B-3/2B-4 not started.**
+  synthetic evidence only; its generic semantic judge denies live dispatch.
+  Its calibration harness uses deterministic mocks and MOCK/UNRATIFIED
+  thresholds. WP-2B-3 adds the separate gated transport below, tested with
+  fakes and synthetic inputs. **No measured calibration; OD-1 OPEN; R2
+  BLOCKED; WP-2B-3 implementation in progress; WP-2B-4 BLOCKED.**
 
 ## What is here
 
@@ -79,6 +89,7 @@ USD $0** — every element below is exercised with fakes only.
 | Module | Delivers |
 | --- | --- |
 | `judge/calibration_errors.py` | Typed WP-2B-3 failure taxonomy with the closed BER-DEC-008 stop-reason set |
+| `judge/calibration_io.py` | Checked evidence paths and regular-file identity, delayed truncation, and cooperative cross-process locks; Windows parent-directory races remain an operational limitation |
 | `judge/calibration_credential.py` | Process-scoped consume-once credential handle (redacted repr; missing ⇒ STOP; never exercised with a real secret in Stage A1) |
 | `judge/calibration_transport.py` | Pinned provider terms (OpenAI Responses API, exact snapshot `gpt-5.5-2026-04-23`, SDK `openai==3.0.0` with recorded wheel/sdist SHA-256); lazy-import client factory with SDK retries pinned to ZERO, connect 15 s / total 300 s, exact `https://api.openai.com/v1`, `trust_env=False`, proxy/TLS/base-URL environment fail-closed; the CLOSED request-kwargs set (no tools/functions/search/code/conversation state; `store:false`; `background:false`; reasoning medium; default sampling); strict structured-output verdict schema; conservative 8,000-input-token gate |
 | `judge/calibration_ledger.py` | Append-only hash-chained accounting in integer nano-USD; pre-dispatch reservations enforcing 200 judgment attempts / 1 metadata request / 201 total, USD $175 total and single-day ceilings (stop BEFORE any cap; worst permitted token path USD $158), per-judgment 2-attempt maximum, missing-usage-telemetry ⇒ recorded worst-case charge + STOP; 90 min / 4 h / 6 h active-execution deadlines with OWNER_WAIT excluded |
@@ -93,16 +104,18 @@ The generic denial boundary is UNCHANGED: `DisabledJudgeProvider` still
 denies every dispatch with `LIVE_DISPATCH_DISABLED`, no Scenario A or
 generic-corpus execution path exists, and the runtime "openai" fragment is
 allowlisted for exactly the named calibration adapter modules. The candidate
-160-item dataset, labeling guide, and owner label-review packet live ONLY
-under the authorized external evidence root; **the development calibration
+160-item dataset, labeling guide, and owner label-review packet were kept
+under the original external evidence root and are now unavailable; their
+recorded hashes cannot reconstruct the files. **Development calibration
 has NOT started, the sealed holdout is NOT opened, OD-1 remains OPEN, and
-WP-2B-4 remains BLOCKED.**
+WP-2B-4 remains BLOCKED.** Replacement preparation uses the project's GitHub
+repository for reproducible source and review evidence, as the owner directed.
 
 ## WP-2B-3 Stage A2 — dedicated DEVELOPMENT driver (BER-DEC-008; OFFLINE)
 
 `judge/calibration_development_driver.py` is the narrowly scoped Stage A2
 DEVELOPMENT execution driver — WP-2B-3 / BER-DEC-008 / DEVELOPMENT stage /
-owner-approved dataset `1.0.0-wp2b3-candidate.2` / `gpt-5.5-2026-04-23`
+historically approved dataset `1.0.0-wp2b3-candidate.2` / `gpt-5.5-2026-04-23`
 ONLY. It is deliberately **not** part of the generic CLI (which still has no
 live-run command); its module-executable surface defaults to the offline
 `--describe` contract report:
@@ -117,7 +130,8 @@ What it enforces on top of the Stage A1 machinery it composes:
   canonical run manifest (`runs/wp2b3-development-run-manifest-v1.json`),
   derived exclusively from the ownership-marker-verified evidence root — no
   caller-selected paths; wrongly-marked roots are refused.
-- GENESIS exactly once (refused when the ledger or manifest exists); later
+- GENESIS exactly once, with recoverable initialization across the pending
+  manifest window. Existing execution history cannot be reset; later
   segments reopen the same hash-chained file and must re-prove every
   manifest binding (audited head/tree, approval hash, artifact hashes,
   model, SDK, caps) before resuming.
@@ -135,13 +149,19 @@ What it enforces on top of the Stage A1 machinery it composes:
   preflight tests use fakes, dummy sentinels, and temp roots only, and the
   REAL canonical ledger does not exist.
 
-Owner-label approval state: **APPROVED** via Peter Nguyen's hash-bound
-external approval artifact (2026-08-14; see
-`docs/evidence/behavioral-eval-runner-wp-2b-3-summary.md` §9). Development
-execution remains **NOT STARTED** pending the independent exact-head audit
-and the credentialed execution session.
+Current readiness: **BLOCKED — approved input bytes unavailable.** The
+2026-08-14 approval of the original hash-bound dataset is historical
+([summary §9](../../docs/evidence/behavioral-eval-runner-wp-2b-3-summary.md)).
+It cannot authorize replacement bytes. The production status command checks
+the full dataset identity and approval-file digest; unrelated or altered
+artifacts remain PENDING. Development execution is **NOT STARTED**. Follow
+the replacement plan for reproducible inputs, label review, new pins and the
+remaining execution gates; merging the controls does not complete those steps.
 
 ### First-live execution-gate corrections (audit of `ca19b919…`; OFFLINE)
+
+The following is historical evidence from the original input set. It does
+not establish that those files are available or reverified on this computer.
 
 The independent exact-head audit returned REQUEST CHANGES with four
 consolidated pre-provider blocker families, corrected RED→GREEN (summary
@@ -182,3 +202,12 @@ process-local TMP/TEMP. No network, no package installation, no model calls.
 The WP-2B-3 SDK-configuration tests run only where the pinned SDK is
 installed (the isolated WP-2B-3 venv) and are honestly SKIPPED elsewhere —
 they still perform no network call anywhere.
+
+Run local Git and process-tree fixtures as the checkout owner in a context
+that permits synthetic child termination. Restricted-agent sandbox failures
+do not establish a production defect or prove that sandbox containment works.
+Windows fixtures canonicalize temporary paths where the record contract
+requires them; a separate round-trip test exercises actual 8.3 destination
+aliases. POSIX no-follow directory races have separate platform tests.
+Set `PYTHONDONTWRITEBYTECODE=1` to keep test subprocesses from creating caches
+in the checkout. Retain skips and the exact tested commit with the results.
