@@ -231,6 +231,10 @@ regression evidence. F01–F06 are unexecuted future controller tests, not CI cl
 
 ## 7. Second correction cycle — late receipts and terminal validation
 
+Delivered as `5acf7b64781b50fca1865d4a4ba4bd20c1004452`, tree
+`caca8a1aaa3f1bc4c0f3023bbced6a52ba54d57c`: 1,309 added lines, all three CI jobs passed,
+GH7–GH9 replied/resolved. Its next review found GH10–GH17; these results are historical.
+
 [Fresh Codex review](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5185982724)
 at `a0177d5`, submitted 2026-09-12 09:17:05 UTC, produced two P2 findings and one P1.
 The branch/head and clean tracked/staged state were checked before these corrections;
@@ -272,7 +276,52 @@ the staged/committed scope receive final checks. F01–F09 remain unexecuted fut
 Thread replies/resolution, final head/tree, fresh review and CI are recorded in
 PR #95 and the handoff after push; a0177d5's passing CI is historical for this cycle.
 
-## 8. Intentional omissions and continuation
+## 8. Third correction cycle — complete validation lifecycle traces
+
+[Codex review at 5acf7b6](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5186022401),
+submitted 2026-09-12 09:36:11 UTC, identified eight further transition gaps. Tracked/
+staged state was clean before correction; branch, three-file scope and user-artifact
+boundaries remain unchanged. Passing prior CI is not closure of these findings.
+
+| Finding / source | Corrected normative rule / future negative trace | Disposition |
+| --- | --- | --- |
+| GH10 P1 [independent check settlement](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800088) | T11 evaluates the selected check's application guards; aggregate gates only constrain operation advancement/completion. F10: reject zero checks; apply A while B is unstarted; final pass waits on a distinct idempotent T16 finalization | Closed in independent document review; pushed reply pending |
+| GH11 P2 [initial unresolved claims](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800092) | T10 requires settled usage AND source/control claims for VALIDATING; unknown retains receipt in reconciliation. F11 denies validator contact until claim settlement | Closed in independent document review; pushed reply pending |
+| GH12 P2 [non-launch state consistency](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800096) | T17/T25 validator non-launch consistently yields BLOCKED with VALIDATING cursor pending T16, or PAUSED/reconciliation according to fence/uncertainty. F12 rejects readiness/pause/accounting detours around T16 without parent retry | Closed in independent document review; pushed reply pending |
+| GH13 P1 [nonterminal contradictory receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800104) | T23 admits unexpected/contradictory receipts in any state before ordinary routing; retains evidence/usage and fences/reconciles nonterminal work while terminal stays fixed. F13 includes another slot owner, never evicted | Closed in independent document review; pushed reply pending |
+| GH14 P1 [recoverable validation slot](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800109) | 5.3/T12 retain the unresolved recoverable check and slot through typed T16 remediation and fresh T27 launch; F14 rejects different-item dispatch and stale-attempt substitution | Closed in independent document review; pushed reply pending |
+| GH15 P2 [cancellation versus delayed result](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800116) | T26 cancellation establishes cessation/closed waiting, not absence of a produced result. Universal T24 intake preserves later bound pass/fail and usage without replacing cancellation/reopening; F15 distinguishes real contradictory proof | Closed in independent document review; pushed reply pending |
+| GH16 P1 [apply retained observation once](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800126) | T24 intake and T11/T12 APPLY_VALIDATION are distinct commands/events; atomic operation/check/attempt/observation apply key prevents duplicate application regardless of command ID. C04/C05/F16 cover denied/retried intake, apply and distinct operation finalization | Closed in independent document review; pushed reply pending |
+| GH17 P2 [validation launch prerequisites](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995800136) | T27 atomically checks the selected check's declared prerequisites/gates before launch, rechecks after intent/source claim; F17 rejects missing or changed prerequisites before validator contact | Closed in independent document review; pushed reply pending |
+
+Independent architecture/recovery and security/authority reviewers both **approve the
+documentation contract**, with no blocking findings remaining in their adversarial
+traces. They reviewed design SHA-256
+`656739099d124d5697bae6c490c305026f301d9810a9f3bde90bd904a7bc80d4`
+and backlog SHA-256 `13b58c977f2b8b91438630a7e57e7bcf51de4e7c8d7b050ad562918df9f06b36`.
+Both explicitly retained GH1-GH9 protections and traced GH10-GH17, multiple checks,
+unknown usage, failure/remediation, pause/non-launch, cancellation/late evidence and
+crash replay. These are manual document traces, not executed controller tests.
+
+Additional independent findings were corrected and re-reviewed:
+
+- Architecture MAJOR: paused non-launch could bypass required recovery. T14 now
+  restores BLOCKED; T16 is required. Security P2 also traced T02 readiness and T17
+  accounting detours: all preserve blockers, and T27 verifies bound recovery.
+- Architecture MAJOR: final pass before aggregate readiness had no later completion
+  route. T11 retains BLOCKED/FINALIZING and slot; distinct T16 finalization checks
+  already-applied results/gates and commits its own idempotent key/slot/cursor.
+- Architecture MAJOR: zero checks stranded VALIDATING. T01/5.1 reject an empty set
+  before contact; F10 covers it. C05 now explicitly includes finalization replay.
+
+Local commands exited 0: `git diff --check`, `python -B scripts/validate-skills.py`
+(184 valid, zero warnings), `python -B scripts/tests/test_validator.py` (91 assertions),
+and the in-memory Markdown/link/transition audit. Final evidence, staged/committed
+scope, DCO and hashes receive final checks before push. Future F01-F17 are unexecuted;
+old-head CI cannot close current findings. Final head/tree, individual pushed replies,
+fresh review and exact-head CI remain PR/handoff evidence after push.
+
+## 9. Intentional omissions and continuation
 
 Only the three authorized Markdown files are created. No runtime implementation,
 schema/policy execution, shared extraction, BER/CI/dependency change, credential or

@@ -86,6 +86,13 @@ add F07 receipt retention with UNKNOWN billing in reconciliation, F08 terminal
 receipt admission with classified usage, and F09 T26 non-advancing terminal validation
 settlement backed by T27 pre-launch intent. No-start proof cannot be inferred from
 missing results; no terminal settlement may waive independent slot-release evidence.
+F10–F17 trace independent multi-check application, initial unknown claims, consistent
+non-launch recovery, contradictory receipts in every state, retained recoverable-failure
+slots, delayed results after cancellation, exactly-once observation application and
+selected-check prerequisites before launch. Reviewers must trace complete success,
+failure, pause/stop and restart sequences across these rules, not just clause presence.
+Include readiness/pause/reconciliation detours around recovery blockers, and a final
+check applied before its aggregate gate clears: distinct finalization must release once.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
@@ -154,7 +161,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F09 tests, including F04a/F04b; stable identities, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F17 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
