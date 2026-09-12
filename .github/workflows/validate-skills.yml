@@ -1,4 +1,4 @@
-# Merge gate for main: skill validation + DCO sign-off + self-protection guard.
+# Merge gate for main: skill/contract/BER checks, DCO and self-protection guard.
 #
 # Job names `validate-skills` and `gate-guard` are registered as required status
 # checks — keep them unique across all workflows in this repo and do not rename
@@ -6,7 +6,8 @@
 name: validate-skills
 
 # Two events, deliberately asymmetric (decision D60):
-#   pull_request  the merge GATE — everything runs, and a failure blocks merge.
+#   pull_request  required validate-skills + gate-guard block normal merge.
+#                 Windows is additional coverage, not a registered required check.
 #   push to main  a detection LANE, not a gate — it runs after the merge has
 #                 already happened, so it cannot block anything; it exists to
 #                 catch a main that went red by a route no pull request saw
@@ -23,15 +24,27 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONIOENCODING: utf-8
+  AEGIS_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   validate-skills:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           # Full history so the DCO step below can walk the pull request's
           # commit range. Cheap on a repository this size.
           fetch-depth: 0
+
+      - name: Keep synthetic fixture storage outside the checkout
+        run: printf 'TMPDIR=%s\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
@@ -50,19 +63,41 @@ jobs:
       # PyYAML powers the spec-strict frontmatter parse (decision D50); the
       # validator fails closed without it. Pinned exactly in requirements.txt
       # (decision D55) so CI is reproducible and dependabot has a file to bump.
-      - name: Install validator dependency (PyYAML)
-        run: python -m pip install --quiet -r requirements.txt
+      - name: Install pinned offline-check dependencies
+        run: python -m pip install --quiet -r requirements-ci.txt
+
+      - name: Record resolved dependency versions
+        run: python scripts/ci/record-check.py dependencies -- python -m pip freeze
+
+      - name: Verify SDK coverage and record host capabilities
+        run: python scripts/ci/record-check.py environment -- python scripts/ci/check-environment.py
+
+      - name: Check CI evidence and protected-path handling
+        run: python scripts/ci/record-check.py ci-tests -- python scripts/tests/test_offline_ci.py
 
       # Who validates the validator (decision D55). The gate's own hard checks
       # are exercised against good/bad fixtures BEFORE it is trusted to judge
       # the library, so a refactor cannot silently disarm one.
       - name: Run validator self-tests
-        run: python scripts/tests/test_validator.py
+        run: python scripts/ci/record-check.py validator-tests -- python scripts/tests/test_validator.py
 
       # The default bash shell runs with `-eo pipefail`, so a nonzero exit
       # from the validator fails this job.
       - name: Run skill validator
-        run: python scripts/validate-skills.py
+        run: python scripts/ci/record-check.py skills -- python scripts/validate-skills.py
+
+      # Audit candidates remain advisory; these tests check the audit's behavior.
+      - name: Run contract-audit self-tests
+        run: python scripts/ci/record-check.py contract-audit-tests -- python scripts/tests/test_audit_skill_contracts.py
+
+      - name: Run BER self-check
+        run: python scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
+
+      - name: Run complete offline BER suite
+        run: python scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+
+      - name: Run Scenario A acceptance in PowerShell Core
+        run: python scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
 
       # DCO enforcement (decision D60). Lives INSIDE this already-required job
       # rather than in a job of its own, so the contract is enforced the moment
@@ -88,8 +123,89 @@ jobs:
           git fetch origin "$BASE_REF" --quiet
           python scripts/check_dco.py --range "origin/${BASE_REF}..${HEAD_SHA}"
 
+      - name: Retain offline-check evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: offline-checks-linux-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/aegis-ci/
+          retention-days: 14
+          if-no-files-found: warn
+
+  windows-offline-checks:
+    # Additional coverage; not registered in branch protection. Closeout still
+    # requires this job to pass. Do not hide failures with continue-on-error.
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          # BER fixtures verify historical authorization commits on BOTH hosts.
+          fetch-depth: 0
+
+      - name: Keep synthetic fixture storage outside the checkout
+        run: |
+          $fixtureTemp = (Get-Item -LiteralPath $env:RUNNER_TEMP).FullName
+          @("TEMP=$fixtureTemp", "TMP=$fixtureTemp") | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.14'
+
+      # One native command per step preserves its exit status in PowerShell.
+      - name: Install pinned offline-check dependencies
+        run: python -m pip install --quiet -r requirements-ci.txt
+
+      - name: Record resolved dependency versions
+        run: python scripts/ci/record-check.py dependencies -- python -m pip freeze
+
+      - name: Verify SDK coverage and record host capabilities
+        run: python scripts/ci/record-check.py environment -- python scripts/ci/check-environment.py
+
+      - name: Check CI evidence handling
+        run: python scripts/ci/record-check.py ci-tests -- python scripts/tests/test_offline_ci.py
+
+      - name: Run validator self-tests
+        run: python scripts/ci/record-check.py validator-tests -- python scripts/tests/test_validator.py
+
+      - name: Run skill validator
+        run: python scripts/ci/record-check.py skills -- python scripts/validate-skills.py
+
+      - name: Run contract-audit self-tests
+        run: python scripts/ci/record-check.py contract-audit-tests -- python scripts/tests/test_audit_skill_contracts.py
+
+      - name: Run BER self-check
+        run: python scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
+
+      - name: Run complete offline BER suite
+        run: python scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+
+      # Sequential calls in the same checkout; each harness launches its own
+      # current host. Both editions are tested, with no shell fallback.
+      - name: Run Scenario A acceptance in Windows PowerShell 5.1
+        run: python scripts/ci/record-check.py acceptance-desktop -- powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance/Test-ScenarioAEvidence.ps1
+
+      - name: Run Scenario A acceptance in PowerShell Core
+        run: python scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
+
+      - name: Retain offline-check evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: offline-checks-windows-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/aegis-ci/
+          retention-days: 14
+          if-no-files-found: warn
+
   gate-guard:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
     # Pull-request-only (decision D60): this job diffs against the pull
     # request's base, and a push event has no base_ref to diff against — it
     # would fail on a missing ref rather than on a real finding.
@@ -111,13 +227,21 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           git fetch origin "$BASE_REF" --quiet
-          changed_files="$(git diff --name-only "origin/${BASE_REF}...HEAD")"
+          # Keep old paths on renames and parse NUL records so unusual names
+          # cannot bypass a prefix check through Git's display quoting.
+          git diff --no-renames --name-only -z "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-files"
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|scripts/validate-skills\.py$|scripts/check_dco\.py$|scripts/tests/|scripts/ci/|scripts/audit-skill-contracts\.py$|scripts/acceptance/|tools\.py$|tools/__init__\.py$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          gate_files=()
           echo "Files changed in this PR:"
-          echo "${changed_files}"
-          gate_files="$(echo "${changed_files}" | grep -E '^(\.github/workflows/|\.github/CODEOWNERS$|scripts/validate-skills\.py$|scripts/check_dco\.py$|scripts/tests/)' || true)"
-          if [ -n "${gate_files}" ]; then
+          while IFS= read -r -d '' path; do
+            printf '  %q\n' "$path"
+            if [[ "$path" =~ $gate_pattern ]]; then
+              gate_files+=("$path")
+            fi
+          done < "$RUNNER_TEMP/aegis-changed-files"
+          if [ "${#gate_files[@]}" -gt 0 ]; then
             echo "Gate files touched:"
-            echo "${gate_files}"
+            printf '  %q\n' "${gate_files[@]}"
             echo "This PR modifies the merge gate or an enforcement surface and requires manual review and merge."
             exit 1
           fi

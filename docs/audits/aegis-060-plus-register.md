@@ -21,6 +21,11 @@ repairs. This current checkpoint supersedes backlog assumptions about those
 specific contracts; the frozen historical evidence and retired AEGIS-060 ID below
 remain intact. It does not close unrelated AEGIS items or measured calibration.
 
+**Delivery checkpoint:** [PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90)
+merged as `82dfebee7dadb68207bead5cb10fa3c562f21c1e`; the post-merge Actions run
+passed. Its [final correction evidence](../evidence/shared-contracts-closeout-2026-09-12/corrected-verification.md)
+also records the two addressed GitHub findings and corrected manual-skill count.
+
 ## Historical baseline (superseded where the current disposition says so)
 
 Companion to the frozen AEGIS-001..059 baseline
