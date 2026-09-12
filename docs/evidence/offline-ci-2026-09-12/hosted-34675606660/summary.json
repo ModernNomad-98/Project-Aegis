@@ -1,0 +1,364 @@
+{
+  "run_id": "34675606660",
+  "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34675606660",
+  "head_sha": "0444f46a459150b9fb2aeae168dc5d03b8135b96",
+  "conclusion": "failure",
+  "jobs": [
+    {
+      "name": "windows-offline-checks",
+      "conclusion": "success"
+    },
+    {
+      "name": "gate-guard",
+      "conclusion": "failure"
+    },
+    {
+      "name": "validate-skills",
+      "conclusion": "success"
+    }
+  ],
+  "checks": [
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "acceptance-core",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  [PASS] the worked example (below the copyable block) still demonstrates real PS-* rows",
+        "  [PASS] the worked example was not treated as the copyable block",
+        "",
+        "PASS - all 106 test(s) passed (host: /opt/microsoft/powershell/7/pwsh)."
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "ber-self-check",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  \"runner_version\": \"0.1.0-wp2b1\",",
+        "  \"schema_version\": \"1.0.0-wp2b1\",",
+        "  \"self_check\": \"PASS\"",
+        "}"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "ber",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 987 tests in 29.610s",
+        "",
+        "OK (skipped=5)"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "ci-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 8 tests in 1.137s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "contract-audit-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  PASS  real project-state template still binds as an append-only contract surface",
+        "  PASS  audit output is deterministic across runs",
+        "",
+        "OK: 69 contract-audit self-test assertion(s) passed."
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "dependencies",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "tqdm==4.70.1",
+        "truststore==0.10.4",
+        "typing-inspection==0.4.4",
+        "typing_extensions==4.16.0"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "environment",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  \"posix_evidence_atomic\": false,",
+        "  \"posix_nofollow_write\": true,",
+        "  \"provider_requests\": \"not part of this check; suites use mocked transports\"",
+        "}"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "skills",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "Validating 184 skill(s) under .claude/skills/ ...",
+        "",
+        "",
+        "OK: 184 skill(s) valid, 0 warning(s)"
+      ]
+    },
+    {
+      "platform": "offline-checks-linux-34675606660-1",
+      "label": "validator-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  PASS  evals: the observed compound wording is represented on both sides",
+        "  PASS  evals: anti-overcorrection process case and same-target-options case present",
+        "",
+        "OK: 91 gate self-test assertion(s) passed."
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "acceptance-core",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  [PASS] the worked example (below the copyable block) still demonstrates real PS-* rows",
+        "  [PASS] the worked example was not treated as the copyable block",
+        "",
+        "PASS - all 113 test(s) passed (host: C:\\Program Files\\PowerShell\\7\\pwsh.exe)."
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "acceptance-desktop",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  [PASS] the worked example (below the copyable block) still demonstrates real PS-* rows",
+        "  [PASS] the worked example was not treated as the copyable block",
+        "",
+        "PASS - all 113 test(s) passed (host: C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)."
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "ber-self-check",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  \"runner_version\": \"0.1.0-wp2b1\",",
+        "  \"schema_version\": \"1.0.0-wp2b1\",",
+        "  \"self_check\": \"PASS\"",
+        "}"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "ber",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 987 tests in 46.325s",
+        "",
+        "OK (skipped=6)"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "ci-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 8 tests in 0.982s",
+        "",
+        "OK (skipped=4)"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "contract-audit-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  PASS  real project-state template still binds as an append-only contract surface",
+        "  PASS  audit output is deterministic across runs",
+        "",
+        "OK: 70 contract-audit self-test assertion(s) passed."
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "dependencies",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "tqdm==4.70.1",
+        "truststore==0.10.4",
+        "typing-inspection==0.4.4",
+        "typing_extensions==4.16.0"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "environment",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  \"posix_evidence_atomic\": false,",
+        "  \"posix_nofollow_write\": false,",
+        "  \"provider_requests\": \"not part of this check; suites use mocked transports\"",
+        "}"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "skills",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "Validating 184 skill(s) under .claude/skills/ ...",
+        "",
+        "",
+        "OK: 184 skill(s) valid, 0 warning(s)"
+      ]
+    },
+    {
+      "platform": "offline-checks-windows-34675606660-1",
+      "label": "validator-tests",
+      "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+      "exit_code": 0,
+      "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "packages": {
+        "pyyaml": "6.0.3",
+        "openai": "3.0.0",
+        "httpx2": "2.12.0"
+      },
+      "tail": [
+        "  PASS  evals: the observed compound wording is represented on both sides",
+        "  PASS  evals: anti-overcorrection process case and same-target-options case present",
+        "",
+        "OK: 91 gate self-test assertion(s) passed."
+      ]
+    }
+  ]
+}

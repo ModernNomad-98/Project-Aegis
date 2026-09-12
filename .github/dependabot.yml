@@ -10,8 +10,8 @@
 # applying it. Pins without a bumper rot; a bumper without pins has nothing to
 # do. The two ship together or not at all.
 #
-# Expected volume is roughly one PR every few weeks across two actions and one
-# pip package. Note that a bump touching .github/workflows/** trips the
+# Actions and Python dependency pins are reviewed through pull requests.
+# A bump touching .github/workflows/** or CI requirements trips the
 # gate-guard job and therefore needs a human admin merge. That friction is
 # correct: a bot editing the merge gate should not be able to merge itself.
 version: 2
@@ -21,8 +21,8 @@ updates:
     schedule:
       interval: weekly
 
-  # Reads requirements.txt at the repo root, which is why the pyyaml pin lives
-  # in a file rather than inline in the workflow.
+  # Reads requirements.txt and requirements-ci.txt at the repo root, so the
+  # validator and optional offline SDK pins both receive reviewed updates.
   - package-ecosystem: pip
     directory: /
     schedule:

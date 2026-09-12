@@ -1,0 +1,3 @@
+# Preserve recorded bytes and their hashes across Windows/Linux checkouts.
+*.json -text -whitespace
+*.log -text -whitespace

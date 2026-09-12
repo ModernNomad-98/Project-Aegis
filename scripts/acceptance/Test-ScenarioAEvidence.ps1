@@ -41,9 +41,12 @@ $OnWindows = ($PSVersionTable.PSEdition -ne 'Core') -or ($IsWindows -eq $true)
 $script:pass = 0; $script:fail = 0
 $script:fails = New-Object System.Collections.Generic.List[string]
 function Assert {
-    param([bool] $Cond, [string] $Msg)
+    param([bool] $Cond, [string] $Msg, [string] $Details)
     if ($Cond) { $script:pass++; Write-Host "  [PASS] $Msg" -ForegroundColor Green }
-    else { $script:fail++; $script:fails.Add($Msg); Write-Host "  [FAIL] $Msg" -ForegroundColor Red }
+    else {
+        $script:fail++; $script:fails.Add($Msg); Write-Host "  [FAIL] $Msg" -ForegroundColor Red
+        if ($Details) { Write-Host $Details }
+    }
 }
 
 function Invoke-HarnessChild {
@@ -229,7 +232,7 @@ $boundaryManifest = [System.IO.File]::ReadAllText($badBoundaryManifest) | Conver
 ($boundaryManifest.steps | Where-Object { $_.file -eq '01-discovery-recorded.md' }).sha256 = Get-NormalizedSha256 $badBoundaryFile
 [System.IO.File]::WriteAllText($badBoundaryManifest, ($boundaryManifest | ConvertTo-Json -Depth 30), $Utf8NoBom)
 $boundaryResult = Invoke-BadFixture $badBoundary 'protected-boundary'
-Assert ($boundaryResult.ExitCode -ne 0 -and $boundaryResult.Output -match 'Protected (content|section header/order) changed') 'real replay rejects protected preamble change even with a matching manifest hash'
+Assert ($boundaryResult.ExitCode -ne 0 -and $boundaryResult.Output -match 'Protected (content|section header/order) changed') 'real replay rejects protected preamble change even with a matching manifest hash' $boundaryResult.Output
 $badRow = New-FixtureCopy 'badrow'
 foreach ($fn in @('07-commitment-readiness-na.md', '08-stage3-snapshot.md')) {
     $fp = Join-Path $badRow $fn; [System.IO.File]::WriteAllText($fp, (Strip-Rows ([System.IO.File]::ReadAllText($fp)) '^\| PS-010 \|'), $Utf8NoBom) }
@@ -266,7 +269,8 @@ Assert ($rl.ExitCode -ne 0) "the leak-probe run fails (tampered artifact) after 
 Assert (@(Get-ChildItem -LiteralPath $leakWd -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -ge 1) "an expected-failure run's preserved evidence is contained under the tracked -WorkDir (not leaked to temp)"
 
 $good = New-FixtureCopy 'good'
-Assert ((Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $good)).ExitCode -eq 0) "harness PASSES the real fixture sequence (with its accepted-spec artifact) via -FixtureDir"
+$goodResult = Invoke-HarnessChild -HarnessArgs @('-FixtureDir', $good)
+Assert ($goodResult.ExitCode -eq 0) "harness PASSES the real fixture sequence (with its accepted-spec artifact) via -FixtureDir" $goodResult.Output
 
 # --- Part 4: external-WorkDir ownership + physical link resolution (F6) ----------------
 Write-Host "`nPart 4 - external-WorkDir + link resolution"
@@ -274,7 +278,8 @@ $base = New-TmpDir 'owned'
 $sentinel = Join-Path $base 'SENTINEL.txt'; [System.IO.File]::WriteAllText($sentinel, "keep`n", $Utf8NoBom)
 $preRepo = Join-Path $base 'product-repo'; New-Item -ItemType Directory -Force -Path $preRepo | Out-Null
 $preFile = Join-Path $preRepo 'preexisting.txt'; [System.IO.File]::WriteAllText($preFile, "caller`n", $Utf8NoBom)
-Assert ((Invoke-HarnessChild -HarnessArgs @('-WorkDir', $base)).ExitCode -eq 0) "harness passes with a normal external physical -WorkDir"
+$ownedResult = Invoke-HarnessChild -HarnessArgs @('-WorkDir', $base)
+Assert ($ownedResult.ExitCode -eq 0) "harness passes with a normal external physical -WorkDir" $ownedResult.Output
 Assert (Test-Path -LiteralPath $sentinel) "caller SENTINEL.txt survives"
 Assert (Test-Path -LiteralPath $preFile) "caller pre-existing product-repo/preexisting.txt untouched"
 Assert (@(Get-ChildItem -LiteralPath $base -Directory -Filter 'scenario-a-run-*' -ErrorAction SilentlyContinue).Count -eq 0) "owned run child cleaned up under the caller dir"

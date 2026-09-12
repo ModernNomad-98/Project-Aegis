@@ -1,0 +1,157 @@
+Self-testing validate-skills.py and check_dco.py ...
+
+test_strict_yaml_parse - D50: frontmatter must parse under a spec-strict YAML parser.
+  PASS  strict-YAML accepts a single-quoted description containing ': ' (no errors)
+  PASS  strict-YAML rejects an unquoted ': ' (the 67-skill Codex drop, D49/D50)
+        fired: [bad-skill] frontmatter does not parse as strict YAML: mapping values are not allowed here in "<unicode string>", line 2, column ...
+  PASS  non-mapping frontmatter rejected
+        fired: [listy] frontmatter must parse to a YAML mapping, got list
+
+test_description_block_scalar - D50 follow-up: a `description:` block scalar is forbidden pre-parse.
+  PASS  block-scalar description '>' rejected
+        fired: [x] `description:` opens a YAML block scalar ('>') — forbidden by the Portability contract in docs/skill-generation-standard.md (...
+  PASS  block-scalar description '|' rejected
+        fired: [x] `description:` opens a YAML block scalar ('|') — forbidden by the Portability contract in docs/skill-generation-standard.md (...
+  PASS  a single-quoted description is not a block scalar (no errors)
+
+test_manual_only_sentinel_bidirectional - D50: `disable-model-invocation` and the sentinel must agree both ways.
+  PASS  field -> sentinel: manual-only skill missing the sentinel is rejected
+        fired: [x] disable-model-invocation is true but the parsed description does not START with the exact sentinel 'MANUAL-ONLY; never auto-i...
+  PASS  sentinel -> field: sentinel without the field is rejected
+        fired: [x] description claims MANUAL-ONLY (starts with the exact 32-char sentinel) but disable-model-invocation is not set — Claude Code...
+  PASS  field + sentinel agreeing is accepted (no errors)
+  PASS  an ordinary auto-invocable skill is accepted (no errors)
+
+test_readme_count_markers - D43: the marked counts must reconcile with the real skills on disk.
+  PASS  README fixture reconciles (SKILL-COUNT 5, 2+2 families +1) (no errors)
+  PASS  stale SKILL-COUNT marker rejected
+        fired: README SKILL-COUNT marker says 7 but 5 skill(s) exist on disk (update the marked count in the "What's in the library" intro)
+  PASS  roster family counts out of sync rejected
+        fired: README roster family counts sum to 9 + 1 orchestrator = 10, but 5 skill(s) exist on disk (a family's *(Phase/D, N)* count is out ...
+  PASS  roster that no longer matches the disk count is rejected
+        fired: README roster family counts sum to 4 + 1 orchestrator = 5, but 99 skill(s) exist on disk (a family's *(Phase/D, N)* count is out ...
+
+test_skill_end_to_end - The per-skill path over real fixture directories on disk.
+  PASS  the canonical good fixture skill validates end to end (no errors)
+  PASS  a skill missing a required section is rejected
+        fired: [missing-section] missing required section(s): Stop Conditions
+  PASS  a description over the parsed-length ceiling is rejected
+        fired: [long-description] description is 1082 chars (parsed value; must be < 1024)
+  PASS  a skill directory without SKILL.md is rejected
+        fired: [no-such-fixture] missing SKILL.md
+
+test_section_order - D55: the required sections must appear in the canonical order.
+  PASS  canonical section order accepted (no errors)
+  PASS  an optional section (Safety Rules) may interleave freely (no errors)
+  PASS  Gotchas written before Workflow is rejected
+        fired: [x] required sections are out of order: found ['Purpose', 'Use When', 'Inputs to Inspect', 'Gotchas', 'Workflow', 'Output Format'...
+  PASS  a required section written twice is rejected
+        fired: [x] duplicate required section header(s): Workflow
+  PASS  the scrambled fixture skill is rejected end to end
+        fired: [out-of-order-sections] required sections are out of order: found ['Purpose', 'Use When', 'Inputs to Inspect', 'Gotchas', 'Workfl...
+
+test_agents_schema - D55: .claude/agents/*.md must strict-parse and stay read-only.
+  PASS  an agent granting only Read, Grep, Glob is accepted (no errors)
+  PASS  `tools: Read, Write` is rejected as a privilege escalation
+        fired: [scripts/tests/fixtures/agents/widened-tools/widened-agent.md] `tools` grants ['Write'] beyond the read-only set ['Glob', 'Grep',...
+  PASS  an agent whose name disagrees with its file is rejected
+        fired: [scripts/tests/fixtures/agents/name-mismatch/name-mismatch-agent.md] frontmatter name 'some-other-name' != filename stem 'name-mi...
+  PASS  an unrecognised model is rejected
+        fired: [scripts/tests/fixtures/agents/bad-model/bad-model-agent.md] `model` 'turbo-9000' is not one of ['haiku', 'opus', 'sonnet']
+  PASS  a missing agents directory degrades quietly (no errors)
+  PASS  all 7 shipped reviewer agents conform (no errors)
+
+test_docs_paths_links - D55: guided-path and README picker links must resolve. The fixture is
+  PASS  resolving path links and a resolving picker are accepted (no errors)
+  PASS  a dangling SKILL.md link is rejected
+        fired: [D:\a\_temp\aegis-paths-elkdtxoz\paths-tree\docs\paths-dangling\dangling.md] links ../../.claude/skills/no-such-skill/SKILL.md, w...
+  PASS  a resolving link whose label names a DIFFERENT skill is rejected
+        fired: [D:\a\_temp\aegis-paths-elkdtxoz\paths-tree\docs\paths-mismatch\mismatch.md] link label `wrong-label` does not match its target s...
+  PASS  a README picker pointing at a missing path doc is rejected
+        fired: [D:\a\_temp\aegis-paths-elkdtxoz\paths-tree\README-dangling.md] links docs/paths/does-not-exist.md, which does not exist on disk ...
+  PASS  all 33 links across 3 shipped guided paths resolve (no errors)
+
+test_no_nested_fixture_skill_or_agent_dirs - Gate 2.8: no TRACKED path may nest `.claude/skills/` or `.claude/agents/`
+  PASS  no tracked nested .claude/skills or .claude/agents fixture leaks (git ls-files census)
+  PASS  real root libraries pinned non-empty (185 skills, 7 agents)
+  PASS  neutral paths-tree/dot-claude fixture source is tracked
+
+test_workflows_sha_pinned - D55: every action must be pinned to a full 40-hex commit SHA.
+  PASS  a 40-hex pin with a trailing `# vX.Y.Z`, plus a local action, is accepted (no errors)
+  PASS  a floating tag `@v7` is rejected
+        fired: [scripts/tests/fixtures/workflows/floating/floating.yml:11] `uses: actions/checkout@v7` is not pinned to a full 40-hex commit SHA...
+  PASS  an abbreviated SHA is rejected too
+        fired: [scripts/tests/fixtures/workflows/floating/floating.yml:15] `uses: actions/setup-python@ece7cb0` is not pinned to a full 40-hex c...
+  PASS  all 7 shipped action references are SHA-pinned (no errors)
+
+test_claude_bridge - D61: the repo-root CLAUDE.md startup bridge must exist and stay intact.
+  PASS  a CLAUDE.md importing @AGENTS.md and adding the routing section is accepted (no errors)
+  PASS  a CLAUDE.md whose first line is not the @AGENTS.md import is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-import.md] first line is '# CLAUDE', not the required '@AGENTS.md' import — the shared c...
+  PASS  a CLAUDE.md that imports but adds no startup-routing section is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-section.md] missing the '## Claude Code — startup routing' section — the bridge must add...
+  PASS  a missing repo-root CLAUDE.md is rejected
+        fired: [scripts/tests/fixtures/claude-bridge/no-such-file.md] the repository root must contain CLAUDE.md — Claude Code reads it at sessi...
+  PASS  the shipped repo-root CLAUDE.md bridge conforms (no errors)
+
+test_dco_signoff_required - D60: every human commit in the range must carry a DCO trailer.
+  PASS  all-signed range accepted (no errors)
+  PASS  one unsigned commit is rejected, naming its hash (a tip-only check would miss it)
+        fired: dddddddddddddddddddddddddddddddddddddddd is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  a bare "Signed-off-by:" with no identity is rejected
+        fired: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  an empty commit range fails closed rather than passing
+        fired: no commits found in the range - refusing to pass a check that examined nothing (a pull request always has at least one commit, so...
+
+test_dco_bot_exemption - D60: exactly two machine authors are exempt, and no lookalike is.
+  PASS  unsigned bot commits pass (bumps are never blocked) (no errors)
+  PASS  a mixed range fails on the human commit only
+        fired: 4444444444444444444444444444444444444444 is NOT signed off - A Contributor <a.contributor@example.com> - "Fix a thing" carries no...
+  PASS  an unlisted bot address is NOT exempt (the list stays narrow)
+        fired: 5555555555555555555555555555555555555555 is NOT signed off - A Contributor <renovate[bot]@users.noreply.github.com> - "Fix a thin...
+
+test_dco_record_parsing - D60: the git-log record stream round-trips messages with blank lines.
+  PASS  records parsed from the git-log stream feed the rules unchanged (no errors)
+
+test_startup_role_contract - PR #77: the repo-root startup instructions are role-aware (structural).
+  PASS  AGENTS.md: unconditional 'skills library' identity sentence is gone
+  PASS  AGENTS.md: explicit consumer/product-repository rule present
+  PASS  AGENTS.md: copied .claude/skills + AGENTS.md + CLAUDE.md are not source proof
+  PASS  AGENTS.md: names all four source-package landmarks
+  PASS  AGENTS.md: forbids a second/sibling product-folder redirect
+  PASS  CLAUDE.md: role detection precedes skill selection
+  PASS  CLAUDE.md: copied root instructions recognized as consumer install files
+  PASS  CLAUDE.md: copied .claude/skills alone is not source-library evidence
+  PASS  CLAUDE.md: fresh consumer repo stays the current product workspace
+  PASS  CLAUDE.md: no sibling product-folder redirect by default
+  PASS  README.md: consumer install section still instructs copying the startup files
+  PASS  README.md: copying does not convert the product repo into the source library
+  PASS  README.md: tells users to continue in the current product workspace
+  PASS  README.md: references the source-package landmark distinction
+  PASS  evals: both new IDs present exactly once; all 49 IDs unique
+  PASS  evals: consumer case has the fresh-copied-no-landmarks shape and forbids a sibling folder
+  PASS  evals: source case contains every source-package landmark and keeps source-library classification
+
+test_atomic_stage1_question_contract - PR #77: Stage 1 discovery questions are structurally atomic (deterministic).
+  PASS  orchestrator: ATOMIC-QUESTION GATE marker present
+  PASS  orchestrator: independently-answerable-target definition + semantic test
+  PASS  orchestrator: split-to-first-target, no-secondary-request, one-question-then-STOP
+  PASS  orchestrator: exact requirements-gathering-facilitator invocation preserved
+  PASS  orchestrator: cold-start Open-questions projection protected from compound bullets
+  PASS  orchestrator: interview cadence kept (not "one binding question")
+  PASS  facilitator: same one-target definition + semantic test
+  PASS  facilitator: pre-output atomicity check + no secondary answer request
+  PASS  facilitator: names "include" / "also" / "and if you can" secondary-target risks
+  PASS  facilitator: allows same-target alternatives and a single narrative process target
+  PASS  elicitation sheet: 18 atomic cards, each one Target + one single-question Ask
+  PASS  elicitation sheet: cards cover users/workaround/scope/constraints/compliance/deps/success
+  PASS  elicitation sheet: the five compound question-bank entries are gone
+  PASS  elicitation sheet: observed compound present only as an INVALID example, not a card
+  PASS  elicitation sheet: the observed compound's atomic decomposition is shown
+  PASS  evals: project-orchestrator has 49 cases, facilitator has 12
+  PASS  evals: all orchestrator and facilitator eval IDs are unique
+  PASS  evals: the three new orchestrator IDs and three new facilitator IDs each appear exactly once
+  PASS  evals: the observed compound wording is represented on both sides
+  PASS  evals: anti-overcorrection process case and same-target-options case present
+
+OK: 91 gate self-test assertion(s) passed.

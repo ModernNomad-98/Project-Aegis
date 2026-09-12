@@ -1,0 +1,26 @@
+{
+  "commit": "b483d4e0b98d76b64c8053c99397eb5a296c7705",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--init",
+    "--pull",
+    "never",
+    "--network",
+    "none",
+    "--user",
+    "65534:65534",
+    "--mount",
+    "type=bind,source=C:\\src\\Project Aegis\\Project-Aegis,target=/source,readonly",
+    "-e",
+    "PYTHONPATH=/source/artifacts/reviews/phase01-testdeps",
+    "sha256:9bd26ad900bb5e0f4dee75839e957a89ae89c2b7ab1e76050e559790e946b948",
+    "python3",
+    "-B",
+    "/source/artifacts/reviews/offline-ci-20260912/run_guard_fixtures.py",
+    "b483d4e0b98d76b64c8053c99397eb5a296c7705"
+  ],
+  "exit_code": 0,
+  "output": "HEAD is now at b483d4e ci: run offline contract and BER checks on Linux and Windows\nExact source: b483d4e0b98d76b64c8053c99397eb5a296c7705 3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]\ntest_each_enforcement_surface_requires_manual_merge (__main__.ProtectedFileGuardTests.test_each_enforcement_surface_requires_manual_merge) ... ok\ntest_ordinary_skill_and_document_changes_pass (__main__.ProtectedFileGuardTests.test_ordinary_skill_and_document_changes_pass) ... ok\ntest_renaming_a_protected_file_outside_the_set_is_still_guarded (__main__.ProtectedFileGuardTests.test_renaming_a_protected_file_outside_the_set_is_still_guarded) ... ok\ntest_unicode_and_newline_names_cannot_bypass_the_guard (__main__.ProtectedFileGuardTests.test_unicode_and_newline_names_cannot_bypass_the_guard) ... ok\ntest_failure_preserves_native_status_and_both_streams (__main__.RecorderTests.test_failure_preserves_native_status_and_both_streams) ... ok\ntest_label_cannot_escape_evidence_directory (__main__.RecorderTests.test_label_cannot_escape_evidence_directory) ... ok\ntest_missing_command_is_recorded_as_failure (__main__.RecorderTests.test_missing_command_is_recorded_as_failure) ... ok\ntest_repeated_label_cannot_replace_prior_evidence (__main__.RecorderTests.test_repeated_label_cannot_replace_prior_evidence) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 2.152s\n\nOK\n"
+}

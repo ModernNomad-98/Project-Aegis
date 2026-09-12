@@ -12,6 +12,14 @@ what authority.
 ## 1. Status and authority
 
 - **Status:** ACTIVE DURABLE BACKLOG
+- **2026-09-12 shared-contract delivery checkpoint:**
+  [PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90) merged as
+  `82dfebee7dadb68207bead5cb10fa3c562f21c1e` after specific owner authorization for
+  its administrator merge. The merged tree matches tested head `98546d8`; its
+  [main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34674269186)
+  passed. The shared-contract implementation and both GitHub review fixes are
+  delivered. [Permanent offline CI](../offline-ci.md) is the separate follow-up;
+  measured calibration, approved inputs/labels, OD-1 and WP-2B-4 remain open.
 - **2026-09-12 engineering checkpoint:** [PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)
   is merged as `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its post-merge
   Actions run passed. The scoped calibration controls/driver engineering is
