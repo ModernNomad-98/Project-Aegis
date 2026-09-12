@@ -74,3 +74,6 @@ and opaque single/multiline HTML comments. It rejects Setext/thematic-break synt
 raw HTML blocks, unclosed fences/comments and changed section structure instead of
 guessing their boundaries. Reformat unsupported documents through a separately
 reviewed structure change before using this projection-refresh check.
+Empty ATX headings are rejected; other named heading levels stay protected.
+Multiline comment openers must stand alone with no more than three leading spaces,
+so inline or indented code cannot mask a real section boundary.

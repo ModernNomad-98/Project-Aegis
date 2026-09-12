@@ -445,6 +445,7 @@ function Get-ProjectStateSections {
         $syntaxLine = $line
         if ($null -eq $fence) { $syntaxLine = Get-StateSyntaxLine $line ([ref]$inComment) }
         if ($null -eq $fence -and $syntaxLine -match '^ {0,3}(?:=+|-+)[ \t]*$') { throw 'Unsupported Setext heading/thematic-break syntax; use the flat ATX project-state template' }
+        if ($null -eq $fence -and $syntaxLine -match '^ {0,3}#{1,6}[ \t]*$') { throw 'Empty ATX heading cannot define a project-state section' }
         if ($null -eq $fence -and $syntaxLine -match '^ {0,3}<(?:[!?]|/?[A-Za-z][A-Za-z0-9-]*(?:[ \t/>]|$))') { throw 'Unsupported raw HTML block; use the flat project-state template' }
         if ($syntaxLine -match '^ {0,3}(`{3,}|~{3,})(.*)$') {
             $marker = $Matches[1]

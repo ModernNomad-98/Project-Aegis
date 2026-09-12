@@ -127,6 +127,10 @@ foreach ($bad in @($grantDoc.Replace('ACTIVE', 'REVOKED'), $grantDoc.Replace('AC
 $unknown = $grantDoc + "## Current approved scope backup`nold`n"
 Assert (-not (Test-ProjectStateTransition $unknown ($unknown.Replace('old', 'new'))).Ok) 'similar projection name stays protected'
 $projectionDoc = $grantDoc + "## Open questions`nold`n"
+foreach ($header in @('##', '## ')) {
+    $emptyHeading = $projectionDoc + "$header`nprotected body`n"
+    Assert (-not (Test-ProjectStateTransition $emptyHeading ($emptyHeading.Replace('protected body', 'changed body'))).Ok) 'empty ATX heading cannot leave an unknown section mutable'
+}
 foreach ($bad in @(($projectionDoc + "## Open questions`nnew`n"), $projectionDoc.Replace('## Open questions', '## Open questions renamed'), $grantDoc)) {
     Assert (-not (Test-ProjectStateTransition $projectionDoc $bad).Ok) 'duplicated, renamed or removed projection fails'
 }
