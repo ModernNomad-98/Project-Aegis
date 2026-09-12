@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber/calibration-owner-approval.schema.json",
+  "title": "WP-2B-3 owner label-approval artifact (BER-DEC-008 decision 34)",
+  "description": "The gate artifact for provider execution: only an explicit APPROVED record by the owner, hash-bound to the exact dataset, split map, and labeling guide, unlocks the development stage. Stage A1 status is always PENDING.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "approved_by",
+    "approval_statement",
+    "approval_date",
+    "dataset_id",
+    "dataset_version",
+    "dataset_sha256",
+    "split_map_sha256",
+    "labeling_guide_sha256"
+  ],
+  "properties": {
+    "status": {"enum": ["PENDING", "APPROVED"]},
+    "approved_by": {"type": "string", "minLength": 1},
+    "approval_statement": {"type": "string", "minLength": 1},
+    "approval_date": {"type": "string", "minLength": 1},
+    "dataset_id": {"type": "string", "minLength": 1},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "dataset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "split_map_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "labeling_guide_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

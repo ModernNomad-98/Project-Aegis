@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-ber/calibration-ledger-entry.schema.json",
+  "title": "WP-2B-3 durable calibration ledger event (BER-DEC-008 decisions 17-20, 25-27)",
+  "description": "One append-only, hash-chained event of the single-file work-package ledger. ATTEMPT_STARTED is the durable write-ahead record appended BEFORE any transport use; ATTEMPT_TERMINAL carries the complete accounting outcome (money in integer nano-USD; unknown billing is worst-case charged and marked billing_unknown, never known zero); ACTIVE_SEGMENT_* events persist the deadline clock; SEMANTIC_OUTCOME records only canonically VALIDATED verdicts or JUDGE_ERROR dispositions.",
+  "type": "object",
+  "required": ["event_kind", "event_seq", "run_id", "prev_event_sha256", "event_sha256"],
+  "properties": {
+    "event_kind": {
+      "enum": [
+        "GENESIS",
+        "SEGMENT_OPENED",
+        "ATTEMPT_STARTED",
+        "ATTEMPT_TERMINAL",
+        "ACTIVE_SEGMENT_BEGIN",
+        "ACTIVE_SEGMENT_END",
+        "SEMANTIC_OUTCOME",
+        "DEADLINE_STOP",
+        "RUN_STATE_TRANSITION"
+      ]
+    },
+    "event_seq": {"type": "integer", "minimum": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "prev_event_sha256": {"type": "string", "pattern": "^$|^[0-9a-f]{64}$"},
+    "event_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+
+    "work_package": {"enum": ["WP-2B-3"]},
+    "authorization_id": {"enum": ["BER-DEC-008"]},
+    "declared_first_segment": {"type": "boolean"},
+    "created_utc": {"type": "string"},
+    "opened_utc": {"type": "string"},
+    "prior_event_count": {"type": "integer", "minimum": 0},
+
+    "attempt_id": {"type": "string", "minLength": 1},
+    "logical_judgment_id": {"type": ["string", "null"]},
+    "attempt_number": {"type": "integer", "minimum": 1, "maximum": 2},
+    "request_kind": {"enum": ["JUDGMENT_ATTEMPT", "METADATA"]},
+    "authorized_model": {"enum": ["gpt-5.5-2026-04-23"]},
+    "dataset_sha256": {
+      "anyOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"type": "null"}
+      ]
+    },
+    "stage": {"enum": ["DEVELOPMENT", "OWNER_WAIT", "SEALED_HOLDOUT"]},
+    "reserved_utc": {"type": "string"},
+    "estimated_input_tokens": {"type": "integer", "minimum": 0, "maximum": 8000},
+    "max_output_tokens": {"type": "integer", "minimum": 0, "maximum": 25000},
+    "worst_case_charge_nanousd": {"type": "integer", "minimum": 0},
+    "day": {"type": "string", "minLength": 1},
+
+    "internal_request_id": {"type": "string", "minLength": 1},
+    "provider_response_id": {"type": ["string", "null"]},
+    "provider_request_trace_id": {"type": ["string", "null"]},
+    "requested_model": {"enum": ["gpt-5.5-2026-04-23"]},
+    "returned_model": {"type": ["string", "null"]},
+    "request_timestamp_utc": {"type": "string"},
+    "completion_timestamp_utc": {"type": "string"},
+    "latency_ms": {"type": "integer", "minimum": 0},
+    "response_status": {"type": "string", "minLength": 1},
+    "incomplete_details_reason": {"type": ["string", "null"]},
+    "input_tokens": {"type": "integer", "minimum": 0},
+    "output_tokens": {"type": "integer", "minimum": 0},
+    "reasoning_tokens": {"type": "integer", "minimum": 0},
+    "cached_input_tokens": {"type": "integer", "minimum": 0},
+    "unit_prices": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_nanousd_per_token",
+        "output_nanousd_per_token",
+        "cached_input_nanousd_per_token",
+        "price_verified_date"
+      ],
+      "properties": {
+        "input_nanousd_per_token": {"const": 5000},
+        "output_nanousd_per_token": {"const": 30000},
+        "cached_input_nanousd_per_token": {"const": 500},
+        "price_verified_date": {"type": "string", "minLength": 1}
+      }
+    },
+    "calculated_charge_nanousd": {"type": "integer", "minimum": 0},
+    "telemetry_missing": {"type": "boolean"},
+    "billing_unknown": {"type": "boolean"},
+    "retry_of_request_id": {"type": ["string", "null"]},
+    "sdk_version": {"type": "string", "minLength": 1},
+    "outcome_kind": {"type": "string", "minLength": 1},
+    "cumulative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judgments_total",
+        "attempts_total",
+        "metadata_requests",
+        "total_external_requests",
+        "input_tokens_total",
+        "output_tokens_total",
+        "reasoning_tokens_total",
+        "cached_input_tokens_total",
+        "spend_nanousd_total",
+        "day_spend_nanousd"
+      ],
+      "properties": {
+        "judgments_total": {"type": "integer", "minimum": 0},
+        "attempts_total": {"type": "integer", "minimum": 0, "maximum": 200},
+        "metadata_requests": {"type": "integer", "minimum": 0, "maximum": 1},
+        "total_external_requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 201
+        },
+        "input_tokens_total": {"type": "integer", "minimum": 0},
+        "output_tokens_total": {"type": "integer", "minimum": 0},
+        "reasoning_tokens_total": {"type": "integer", "minimum": 0},
+        "cached_input_tokens_total": {"type": "integer", "minimum": 0},
+        "spend_nanousd_total": {"type": "integer", "minimum": 0},
+        "day_spend_nanousd": {"type": "integer", "minimum": 0}
+      }
+    },
+
+    "at": {"type": "number"},
+    "stage_active_seconds": {"type": "number", "minimum": 0},
+    "total_active_seconds": {"type": "number", "minimum": 0},
+    "detail": {"type": ["string", "null"]},
+    "run_state": {"enum": ["RUN_PAUSED", "RUN_STOPPED", "OWNER_WAIT"]},
+    "reason": {"type": ["string", "null"]},
+    "outcome": {
+      "anyOf": [
+        {"enum": ["VALIDATED_PASS", "VALIDATED_FAIL", "VALIDATED_ABSTAIN"]},
+        {"type": "string", "pattern": "^JUDGE_ERROR"}
+      ]
+    },
+    "recorded_utc": {"type": "string"}
+  },
+  "additionalProperties": false
+}

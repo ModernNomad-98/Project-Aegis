@@ -1,0 +1,74 @@
+  PASS  clean-skill produces zero findings (negative fixture for every rule)
+  PASS  approved-doc-writer is silent (approved-write exception scoped to the write)
+  PASS  readonly-scratch-writer yields exactly ['EVAL-001', 'SIDE-001', 'SIDE-002', 'SIDE-003', 'SIDE-004']
+  PASS  auto-deployer yields exactly ['SIDE-004']
+  PASS  generic-approval yields exactly ['APPR-001', 'APPR-002', 'APPR-003', 'EVAL-003']
+  PASS  state-contradictor yields exactly ['STATE-001', 'STATE-002', 'STATE-003', 'STATE-004', 'STATE-005']
+  PASS  committed-roadmap yields exactly ['VOCAB-002', 'VOCAB-003']
+  PASS  durable-vague yields exactly ['ARTF-001']
+  PASS  bad-stage-router yields exactly ['ROUTE-001', 'ROUTE-001', 'ROUTE-001', 'ROUTE-001', 'ROUTE-003']
+  PASS  thin-contract yields exactly ['EVAL-002', 'EVAL-002', 'EVAL-004', 'EVAL-004', 'PARITY-001', 'PARITY-002']
+  PASS  stale-linker yields exactly ['REF-001', 'REF-002', 'REF-003', 'ROUTE-002']
+  PASS  fixture repo yields exactly 33 findings in total
+  PASS  all 27 rules fire on their own positive fixture and stay silent on their own negative fixture
+  PASS  ROUTE-001 flags the ghost skill reference
+  PASS  ROUTE-001 does not flag a real reviewer agent
+  PASS  ROUTE-003 (Stage-2 route gap) fires with a gap-driven aegis_map (AEGIS-035 + AEGIS-044)
+  PASS  ROUTE-002 carries no AEGIS mapping (census, not the unrelated AEGIS-044)
+  PASS  SIDE-004 fires per §5 class ([deploy-provision], [doc-state-write]) as candidates
+  PASS  all 13 known live mutation targets carry SIDE-004 candidates (no silent clean)
+  PASS  an approval phrase elsewhere suppresses nothing (vcs + out-of-window doc write both fire)
+  PASS  EVAL-004 separates an unknown target (P1) from a kind mismatch (P2)
+  PASS  EVAL-004: bare name + existing skill resolves silently
+  PASS  EVAL-004: `(subagent)` + existing agent resolves silently in all three machine surfaces
+  PASS  EVAL-004: dual-namespace name resolves both bare->skill and annotated->subagent with no finding
+  PASS  EVAL-004: bare name that exists only as an agent is a kind mismatch (P2)
+  PASS  EVAL-004: `(subagent)` whose name exists only as a skill is a kind mismatch (P2)
+  PASS  EVAL-004: a name in neither namespace is still an unknown target (P1), in bare and annotated form
+  PASS  EVAL-004: a non-`(subagent)` parenthetical is part of the SKILL name and fails as an unknown target
+  PASS  audit engine reports v1.13.0 for the corrected EVAL-004 semantics
+  PASS  EVAL-004: overlaps_with, expected_skill, and should_not_trigger are each independently collected (unique ghost per surface)
+  PASS  EVAL-004: a valid typed subagent resolves silently in each machine surface independently
+  PASS  EVAL-004: audit parser agrees with merged models.parse_target on kind, name, and annotation (no runtime import)
+  PASS  EVAL-004: live corpus is silent with 4 typed subagent expectations and 5 annotated overlaps intact
+  PASS  STATE-001 maps to AEGIS-002 (append-only vs mutable placeholder)
+  PASS  every finding's mechanical flag mirrors the inventory; ambiguous rules are semantic-candidates
+  PASS  negation guard covers never/don't/doesn't/no-...-ever forms
+  PASS  negation guard does not swallow a genuine overwrite instruction
+  PASS  APPEND_ONLY_DECL binds contracts, not storage-domain vocabulary
+  PASS  stage2_segment captures the Stage-2 slice and EXCLUDES Stage-3 content
+  PASS  stage2_segment returns None when no Stage-2 route exists
+  PASS  malformed ordering (Stage 3 before Stage 2) does not leak into the segment
+  PASS  duplicate/out-of-order markers: only first Stage-2..Stage-3 slice is kept
+  PASS  Stage-3 leakage cannot false-clean the ROUTE-003 route-gap condition
+  PASS  ROUTE-003 v1.12.0: shared routing markers; POSITIVE guard with negation checks BOTH sides of every phrase (pre-negated, post-disclaimed, and negated NOT COMMIT-ABLE all rejected); verdict = a classification act with its result, itself negation-checked at match level
+  PASS  ROUTE-003 verdict negation: pre-negated (not / never classify / without classifying) and post-disclaimed (but not recorded / not actually recorded) candidates are rejected; the four valid forms and the pinned live Roadmap verdict line stay clean; a negated match neither poisons nor validates an unrelated positive
+  PASS  JSON rule_inventory lists all 27 implemented rules with metadata + hit_count
+  PASS  live-corpus inventory keeps 22 zero-hit rule(s) visible and SIDE-004 carries 82 candidates
+  PASS  provenance carries counts + dirty-state + corpus hash + byte-form + engine hash, captured once
+  PASS  corpus hash is content-sensitive and excludes agents/guided-paths (inclusion boundary)
+  PASS  corpus hash follows its declared repo-relative POSIX ordering (B.md < a.md) and byte form on every platform
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cont-kiemf153\\external-secret.md' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cont-kiemf153\\repo-copy\\.claude\\skills\\stale-linker\\references\\leak.md') — input containment NOT proven here
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cont2-kbhagomz\\external-skill' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cont2-kbhagomz\\repo-copy\\.claude\\skills\\outside') — input containment NOT proven here
+  PASS  regular in-repository audited files remain accepted (exit 0)
+  PASS  an escaping Markdown link is flagged (existence is not a pass) and its content is never read
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cat-ggcs_u18\\external.md' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-cat-ggcs_u18\\repo-copy\\docs\\skills-catalog.md')
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-ag-jerbxfti\\external-agents' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-ag-jerbxfti\\repo-copy\\.claude\\agents')
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-gp-xv7vvp0x\\external-paths' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-gp-xv7vvp0x\\repo-copy\\docs\\paths')
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-af-_3i_g9_u\\external-agent.md' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-af-_3i_g9_u\\repo-copy\\.claude\\agents\\linked-agent.md')
+  SKIP  symlink privilege unavailable on this host ([WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-sr-3d0pfxvz\\external-skills' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-sr-3d0pfxvz\\repo2\\.claude\\skills')
+  PASS  a Windows junction into the audited corpus is rejected (exit 2)
+  PASS  junction helper is portable: unsupported hosts SKIP with no subprocess.run and no raise (non-Windows / no-cmd / PATH-race)
+  PASS  fixture source uses neutral dot-claude; .claude is materialized only in a temp repo
+  PASS  auxiliary inputs (catalog/agents/paths) recorded separately; corpus hash honestly scoped to the skill corpus
+ERROR no .claude/skills/ under C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\scripts\tests\fixtures\contract-audit — refusing to report a clean scan of nothing (a wrong path must fail, not pass)
+  PASS  wrong path exits 2 — never a clean scan of nothing (AEGIS-016/-017 lesson)
+ERROR refusing to write output inside .claude/skills/: C:\Users\PETERN~1\AppData\Local\Temp\aegis-fixture-lfitthm4\repo\.claude\skills\must-not-exist.json
+  PASS  output inside .claude/skills/ is refused (the tool stays read-only)
+ERROR refusing to write output inside .claude/skills/: C:\Users\PETERN~1\AppData\Local\Temp\aegis-fixture-lfitthm4\repo\.claude\agents\..\skills\escape.json
+  PASS  output-path containment refuses a ../ traversal into .claude/skills/
+  PASS  scanner enumerates exactly the on-disk corpus (184 skills)
+  PASS  real project-state template still binds as an append-only contract surface
+  PASS  audit output is deterministic across runs
+
+OK: 62 contract-audit self-test assertion(s) passed.

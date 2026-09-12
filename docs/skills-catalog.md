@@ -81,7 +81,8 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > the layered panel IA with restraint plus the cross-tenant READ-security
 > model, composing the ~12 feed owners rather than restating them (183→184).
 > `_template` remains a reference template ignored by the validator.
-> Everything under "Backlog" is planned, not built.
+> The phase register below retains completed phases as labeled history. Only
+> entries explicitly described as remaining or conditional are unbuilt work.
 
 ---
 
@@ -634,7 +635,7 @@ pinned at D18, now owned from both sides); `eval-runner-designer` designs
 execution for the eval corpus whose case INTEGRITY `skill-quality-reviewer`
 judges; `skill-usage-instrumenter` produces the evidence package
 `skill-deprecation-planner` consumes; and `skill-deprecation-planner`'s
-doc-lifecycle twin (`docs-retention-index`, D12.4) stays banked with the
+doc-lifecycle twin (`docs-retention-index`, D12.4) shipped in D25, with the
 SKILL-vs-DOC seam pinned in trigger-evals.
 
 | Skill | Source (D13) | Model-invocable? | Trigger summary |
@@ -1080,8 +1081,8 @@ Phase 8 batches.
 ✅ **Implemented** — all 9 first-pass skills moved to
 [Implemented → Skills (Phase 3)](#skills-phase-3--saas--tenant-isolation-pack) above.
 Source: [`docs/skills/02-saas-platform-architecture.md`](skills/02-saas-platform-architecture.md).
-Reconciliation §3 merges: `rls-policy-author` / `rls-negative-test-designer` are
-**deferred to Phase 4** (merged into `rls-policy-auditor`); the Phase 3 **expansion
+Reconciliation §3 merges: `rls-policy-author` / `rls-negative-test-designer` were
+**delivered in Phase 4** through `rls-policy-auditor`; the Phase 3 **expansion
 backlog** (`tenant-provisioning-designer`, `membership-invitation-designer`,
 `role-permission-architect`, `security-impact-note-author`) remains backlog, built in
 Phase 8 batches.
@@ -1189,18 +1190,32 @@ All 10 skills ✅ **implemented** (D21, 2026-07-07) — moved to
 above: the concrete rules of the Zero Trust AI Engineering Discipline (D16).
 Source: the reconciliation doc §3 D12.8 subsection (banked by D15) and
 [`docs/research/aegis-workflow-extraction-report.md`](research/aegis-workflow-extraction-report.md).
-`docs-retention-index` (P1) remains banked under D12.4; the D15 enrichment
-deltas for shipped skills remain recorded in reconciliation §3 — neither is
-part of this pack.
+`docs-retention-index` shipped separately under D12.4 / D25; the D15 enrichment
+deltas for shipped skills remain recorded in reconciliation §3 — neither belongs
+to the D12.8 pack.
 
 ### D12.1 + D12.3 — Data engineering & performance engineering (implemented)
 All 13 skills ✅ **implemented** (D23, 2026-07-07) — moved to
 [Implemented → Skills (D12.1)](#skills-d121--data-engineering-pack) and
 [Implemented → Skills (D12.3)](#skills-d123--performance-engineering-pack)
 above. Source: the reconciliation doc §3 D12 candidate-pack table (banked by
-D12) + D23 in §5. The remaining D12 packs (D12.2 product craft, D12.4 docs
-engineering incl. `docs-retention-index`, D12.5 PM interface, D12.6
-growth/analytics, D12.7 staff+ craft) remain banked candidates.
+D12) + D23 in §5.
+
+### D12.2 / D12.4 / D12.5 / D12.6 / D12.7 — implemented follow-on packs
+
+These five packs are shipped, not remaining candidates (status reconciled
+2026-09-12 against their implemented sections and skill directories):
+
+| Pack | Delivered | Completion record |
+| --- | ---: | --- |
+| [D12.2 product craft](#skills-d122--product-engineering-craft-pack) | 5 skills | D24 |
+| [D12.4 documentation engineering](#skills-d124--technical-writing--docs-engineering-pack) | 8 skills, including `docs-retention-index` | D25 |
+| [D12.5 PM interface](#skills-d125--pm--product-engineering-interface-pack) | 6 skills | D24 |
+| [D12.6 growth/analytics](#skills-d126--growth--analytics-engineering-pack) | 4 skills | D24 |
+| [D12.7 staff+ craft](#skills-d127--staff-ic-craft-pack) | 7 skills | D26 |
+
+The original capability roadmap still needs mapping for renamed, combined and
+partially covered capabilities; its remaining count is not `300 - shipped skills`.
 
 ### Phase 8 — Backlog expansion (P2)
 Remaining roadmap skills, generated in validated batches of ≤20 (see reconciliation §4.1).
@@ -1235,6 +1250,10 @@ is a 300+ target backlog, and skills ship on demand and framework coverage, not 
 ## Evals & validation note
 
 Every implemented skill must ship `evals/evals.json` (and `evals/trigger-evals.json` when its
-trigger overlaps another skill). **Evals are structurally validated only — there is no runner
-yet (decision D3).** Run `python scripts/validate-skills.py` before every commit that touches
+trigger overlaps another skill). The [offline runner core and non-live Scenario A
+grading stack](roadmaps/behavioral-eval-runner-backlog.md) are implemented
+(WP-2B-1/WP-2B-2); D3's original "no runner yet" statement is historical.
+Measured calibration and live corpus execution remain unfinished. Authored eval
+definitions and structural validation are not evidence that those evals passed
+live. Run `python scripts/validate-skills.py` before every commit that touches
 `.claude/skills/`.

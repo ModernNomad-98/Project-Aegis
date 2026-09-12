@@ -243,6 +243,17 @@ class TestAggregationUnmappedReason(unittest.TestCase):
 
 
 class TestStaticScanCannotBeBypassedByComment(unittest.TestCase):
+    def test_asyncio_exception_is_confined_to_deadline_adapter_and_its_tests(self):
+        from tools.behavioral_eval_runner.cli import _scan_ast
+        allowed = ("judge/calibration_transport.py", "tests/test_calibration_provider.py",
+                   "tests/test_calibration_transport.py")
+        for path in allowed:
+            for source in ("import asyncio", "from asyncio import Runner"):
+                self.assertEqual(_scan_ast(path, source), [])
+            self.assertTrue(_scan_ast(path, "import socket"))
+        for path in ("other.py", "tests/other.py", "other/judge/calibration_transport.py"):
+            self.assertTrue(_scan_ast(path, "import asyncio"))
+
     def test_scan_is_ast_based_not_substring(self) -> None:
         with tempfile.TemporaryDirectory() as root:
             # A file that names the old escape marker in a comment AND imports a

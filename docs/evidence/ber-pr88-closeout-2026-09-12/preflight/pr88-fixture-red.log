@@ -1,0 +1,55 @@
+python.exe : test_valid_manifests_verify_against_expected_record (tools.behavioral_eval_runner.tests.test_review_blocke
+rs.TestMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record) ... ERROR
+At line:6 char:1
++ & 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/phase01-sdk-v ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_valid_mani...cord) ... ERROR:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+test_reparse_point_refused
+(tools.behavioral_eval_runner.tests.test_containment.TestMockContainment.test_reparse_point_refused) ... FAIL
+
+======================================================================
+ERROR: test_valid_manifests_verify_against_expected_record (tools.behavioral_eval_runner.tests.test_review_blockers.Tes
+tMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\tests\test_review_blockers.py",
+line 232, in test_valid_manifests_verify_against_expected_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\materialize.py", line 852, in
+verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+FAIL: test_reparse_point_refused
+(tools.behavioral_eval_runner.tests.test_containment.TestMockContainment.test_reparse_point_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\tests\test_containment.py", line
+131, in test_reparse_point_refused
+    os.symlink(real_target, link_parent, target_is_directory=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 1314] A required privilege is not held by the client:
+'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmpnbft5gl5\\outside_dir' ->
+'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmpnbft5gl5\\workspace\\linked'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\src\Project
+Aegis\Project-Aegis\artifacts\reviews\phase01-worktree\tools\behavioral_eval_runner\tests\test_containment.py", line
+139, in test_reparse_point_refused
+    self.assertRegex(link_parent, safe)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: Regex didn't match: '^[A-Za-z0-9_:\\\\.\\- ]+$' not found in
+'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmpnbft5gl5\\workspace\\linked'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.018s
+
+FAILED (failures=1, errors=1)

@@ -1,0 +1,450 @@
+test_baseline_mismatch_raises (test_census.TestPinnedCorpusCensus.test_baseline_mismatch_raises) ... ERROR
+test_case_type_distribution_matches_design_census (test_census.TestPinnedCorpusCensus.test_case_type_distribution_matches_design_census) ... ERROR
+test_census_reproducible_byte_for_byte (test_census.TestPinnedCorpusCensus.test_census_reproducible_byte_for_byte) ... ERROR
+test_degenerate_and_subagent_findings (test_census.TestPinnedCorpusCensus.test_degenerate_and_subagent_findings) ... ERROR
+test_expected_baseline_counts (test_census.TestPinnedCorpusCensus.test_expected_baseline_counts) ... ERROR
+test_manual_only_parsed_from_frontmatter (test_census.TestPinnedCorpusCensus.test_manual_only_parsed_from_frontmatter) ... ERROR
+test_no_behavioral_result_language (test_census.TestPinnedCorpusCensus.test_no_behavioral_result_language) ... ERROR
+test_reverse_index_keeps_skill_and_subagent_distinct (test_census.TestPinnedCorpusCensus.test_reverse_index_keeps_skill_and_subagent_distinct) ... ERROR
+test_reverse_index_present_and_sorted (test_census.TestPinnedCorpusCensus.test_reverse_index_present_and_sorted) ... ERROR
+test_risk_classes_are_proposed_not_ratified (test_census.TestPinnedCorpusCensus.test_risk_classes_are_proposed_not_ratified) ... ERROR
+test_real_repo_tree_verification (test_materialize.TestGitSnapshot.test_real_repo_tree_verification) ... ERROR
+test_watchdog_kills_synthetic_child_tree (test_process_control.TestProcessTreeKill.test_watchdog_kills_synthetic_child_tree) ... ERROR
+C:\Python314\Lib\subprocess.py:1139: ResourceWarning: subprocess 39500 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestEnumerationFailsClosed.test_valid_manifests_verify_against_expected_record) ... ERROR
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestManifestPathsPortability.test_valid_manifests_verify_against_expected_record) ... ERROR
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record) ... ERROR
+test_ambiguity_inventory_is_classified_unverified (test_review_blockers.TestMaterializationRecordClaimBinding.test_ambiguity_inventory_is_classified_unverified) ... ERROR
+test_fabricated_ambiguity_inventory_not_certified (test_review_blockers.TestMaterializationRecordClaimBinding.test_fabricated_ambiguity_inventory_not_certified) ... ERROR
+test_top_level_verified_does_not_imply_complete_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_top_level_verified_does_not_imply_complete_record) ... ERROR
+test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_valid_manifests_verify_against_expected_record) ... ERROR
+test_reparse_point_refused (test_containment.TestMockContainment.test_reparse_point_refused) ... FAIL
+test_walk_error_is_fail_closed (test_review_blockers.TestEnumerationFailsClosed.test_walk_error_is_fail_closed) ... FAIL
+
+======================================================================
+ERROR: test_baseline_mismatch_raises (test_census.TestPinnedCorpusCensus.test_baseline_mismatch_raises)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 131, in test_baseline_mismatch_raises
+    broken = dict(_census())
+                  ~~~~~~~^^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_case_type_distribution_matches_design_census (test_census.TestPinnedCorpusCensus.test_case_type_distribution_matches_design_census)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 82, in test_case_type_distribution_matches_design_census
+    types = _census()["totals"]["behavior_case_types"]
+            ~~~~~~~^^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_census_reproducible_byte_for_byte (test_census.TestPinnedCorpusCensus.test_census_reproducible_byte_for_byte)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 126, in test_census_reproducible_byte_for_byte
+    first = _census()
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_degenerate_and_subagent_findings (test_census.TestPinnedCorpusCensus.test_degenerate_and_subagent_findings)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 88, in test_degenerate_and_subagent_findings
+    census = _census()
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_expected_baseline_counts (test_census.TestPinnedCorpusCensus.test_expected_baseline_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 75, in test_expected_baseline_counts
+    census = _census()
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_manual_only_parsed_from_frontmatter (test_census.TestPinnedCorpusCensus.test_manual_only_parsed_from_frontmatter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 96, in test_manual_only_parsed_from_frontmatter
+    census = _census()
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_no_behavioral_result_language (test_census.TestPinnedCorpusCensus.test_no_behavioral_result_language)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 139, in test_no_behavioral_result_language
+    governance = _census()["governance"]
+                 ~~~~~~~^^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_reverse_index_keeps_skill_and_subagent_distinct (test_census.TestPinnedCorpusCensus.test_reverse_index_keeps_skill_and_subagent_distinct)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 110, in test_reverse_index_keeps_skill_and_subagent_distinct
+    reverse = _census()["reverse_negative_neighbor_index"]
+              ~~~~~~~^^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_reverse_index_present_and_sorted (test_census.TestPinnedCorpusCensus.test_reverse_index_present_and_sorted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 102, in test_reverse_index_present_and_sorted
+    reverse = _census()["reverse_negative_neighbor_index"]
+              ~~~~~~~^^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_risk_classes_are_proposed_not_ratified (test_census.TestPinnedCorpusCensus.test_risk_classes_are_proposed_not_ratified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 117, in test_risk_classes_are_proposed_not_ratified
+    census = _census()
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_census.py", line 30, in _census
+    _CENSUS = build_census(REPO_ROOT, AUTHORIZATION_MERGE_SHA)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\census.py", line 251, in build_census
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_real_repo_tree_verification (test_materialize.TestGitSnapshot.test_real_repo_tree_verification)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_materialize.py", line 245, in test_real_repo_tree_verification
+    snapshot = GitSnapshot(REPO_ROOT, AUTHORIZATION_MERGE_SHA, expected_tree)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 318, in __init__
+    _run_git(
+    ~~~~~~~~^
+        repo_path,
+        ^^^^^^^^^^
+        ["rev-parse", "--verify", "--end-of-options", f"{source_commit}^{{tree}}"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 286, in _run_git
+    raise SnapshotVerificationError(
+    ...<2 lines>...
+    )
+tools.behavioral_eval_runner.errors.SnapshotVerificationError: git rev-parse --verify failed with exit 128: fatal: detected dubious ownership in repository at 'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912'
+'C:/src/Project Aegis/Project-Aegis/artifacts/reviews/preflight-main-20260912/.git' is owned by:
+	AzureAD/PeterNguyen (S-1-12-1-2463848790-1132923800-2147897788-858325250)
+but the current user is:
+	PN_NIMOPC/CodexSandboxOffline (S-1-5-21-3466273209-1311266877-979664246-
+
+======================================================================
+ERROR: test_watchdog_kills_synthetic_child_tree (test_process_control.TestProcessTreeKill.test_watchdog_kills_synthetic_child_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\process_control.py", line 516, in supervise
+    process.wait(timeout=30)
+    ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 1279, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 1608, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\phase01-sdk-venv\\Scripts\\python.exe', '-c', "import subprocess, sys, time\np = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\nprint(p.pid, flush=True)\ntime.sleep(120)\n"]' timed out after 30 seconds
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_process_control.py", line 81, in test_watchdog_kills_synthetic_child_tree
+    result = watchdog.supervise(supervised)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\process_control.py", line 518, in supervise
+    raise ProcessControlError(
+        f"process {process.pid} survived emergency kill"
+    ) from exc
+tools.behavioral_eval_runner.errors.ProcessControlError: process 39500 survived emergency kill
+
+======================================================================
+ERROR: test_valid_manifests_verify_against_expected_record (test_review_blockers.TestEnumerationFailsClosed.test_valid_manifests_verify_against_expected_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 232, in test_valid_manifests_verify_against_expected_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_valid_manifests_verify_against_expected_record (test_review_blockers.TestManifestPathsPortability.test_valid_manifests_verify_against_expected_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 232, in test_valid_manifests_verify_against_expected_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationManifestIntegrity.test_valid_manifests_verify_against_expected_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 232, in test_valid_manifests_verify_against_expected_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_ambiguity_inventory_is_classified_unverified (test_review_blockers.TestMaterializationRecordClaimBinding.test_ambiguity_inventory_is_classified_unverified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 548, in test_ambiguity_inventory_is_classified_unverified
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_fabricated_ambiguity_inventory_not_certified (test_review_blockers.TestMaterializationRecordClaimBinding.test_fabricated_ambiguity_inventory_not_certified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 573, in test_fabricated_ambiguity_inventory_not_certified
+    result = verify_materialization_manifests(self.root, rebound)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_top_level_verified_does_not_imply_complete_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_top_level_verified_does_not_imply_complete_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 596, in test_top_level_verified_does_not_imply_complete_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+ERROR: test_valid_manifests_verify_against_expected_record (test_review_blockers.TestMaterializationRecordClaimBinding.test_valid_manifests_verify_against_expected_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 232, in test_valid_manifests_verify_against_expected_record
+    result = verify_materialization_manifests(self.root, self.record)
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools\behavioral_eval_runner\materialize.py", line 852, in verify_materialization_manifests
+    raise MaterializationError(f"manifest path mismatch for {name!r}")
+tools.behavioral_eval_runner.errors.MaterializationError: manifest path mismatch for 'control_plane_manifest.json'
+
+======================================================================
+FAIL: test_reparse_point_refused (test_containment.TestMockContainment.test_reparse_point_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_containment.py", line 131, in test_reparse_point_refused
+    os.symlink(real_target, link_parent, target_is_directory=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 1314] A required privilege is not held by the client: 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmp76xrd2oe\\outside_dir' -> 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmp76xrd2oe\\workspace\\linked'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_containment.py", line 139, in test_reparse_point_refused
+    self.assertRegex(link_parent, safe)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: Regex didn't match: '^[A-Za-z0-9_:\\\\.\\- ]+$' not found in 'C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\tmp76xrd2oe\\workspace\\linked'
+
+======================================================================
+FAIL: test_walk_error_is_fail_closed (test_review_blockers.TestEnumerationFailsClosed.test_walk_error_is_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\src\Project Aegis\Project-Aegis\artifacts\reviews\preflight-main-20260912\tools/behavioral_eval_runner/tests\test_review_blockers.py", line 639, in test_walk_error_is_fail_closed
+    self.assertIn("enumerat", str(ctx.exception).lower())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'enumerat' not found in "manifest path mismatch for 'control_plane_manifest.json'"
+
+----------------------------------------------------------------------
+Ran 21 tests in 31.271s
+
+FAILED (failures=2, errors=19)

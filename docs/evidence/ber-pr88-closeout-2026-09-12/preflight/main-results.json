@@ -1,0 +1,109 @@
+[
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_validator.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.581,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-0.log",
+    "tail": [
+      "  PASS  evals: project-orchestrator has 47 cases, facilitator has 12",
+      "  PASS  evals: all orchestrator and facilitator eval IDs are unique",
+      "  PASS  evals: the three new orchestrator IDs and three new facilitator IDs each appear exactly once",
+      "  PASS  evals: the observed compound wording is represented on both sides",
+      "  PASS  evals: anti-overcorrection process case and same-target-options case present",
+      "",
+      "OK: 91 gate self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/validate-skills.py"
+    ],
+    "exit_code": 0,
+    "seconds": 3.858,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-1.log",
+    "tail": [
+      "Validating 184 skill(s) under .claude/skills/ ...",
+      "",
+      "",
+      "OK: 184 skill(s) valid, 0 warning(s)"
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_audit_skill_contracts.py"
+    ],
+    "exit_code": 0,
+    "seconds": 9.205,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-2.log",
+    "tail": [
+      "ERROR refusing to write output inside .claude/skills/: C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-fixture-lfitthm4\\repo\\.claude\\agents\\..\\skills\\escape.json",
+      "  PASS  output-path containment refuses a ../ traversal into .claude/skills/",
+      "  PASS  scanner enumerates exactly the on-disk corpus (184 skills)",
+      "  PASS  real project-state template still binds as an append-only contract surface",
+      "  PASS  audit output is deterministic across runs",
+      "",
+      "OK: 62 contract-audit self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "-m",
+      "tools.behavioral_eval_runner",
+      "self-check"
+    ],
+    "exit_code": 0,
+    "seconds": 1.686,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-3.log",
+    "tail": [
+      "    }",
+      "  ],",
+      "  \"live_dispatch\": \"DISABLED\",",
+      "  \"runner_version\": \"0.1.0-wp2b1\",",
+      "  \"schema_version\": \"1.0.0-wp2b1\",",
+      "  \"self_check\": \"PASS\"",
+      "}"
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/check_dco.py",
+      "--range",
+      "origin/main..HEAD"
+    ],
+    "exit_code": 1,
+    "seconds": 0.146,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-4.log",
+    "tail": [
+      "",
+      "FAILED: 1 commit(s) missing a DCO sign-off.",
+      "",
+      "RECOVERY - add the missing sign-off, then force-push:",
+      "  one commit       git commit --amend -s",
+      "  several commits  git rebase --signoff origin/main",
+      "  then             git push --force-with-lease"
+    ]
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.095,
+    "log": "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\preflight-20260912\\main-5.log",
+    "tail": []
+  }
+]

@@ -5,8 +5,10 @@ leakage rejection, partial-install scoping, path/reparse safety
 from __future__ import annotations
 
 import os
+import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 from tools.behavioral_eval_runner import AUTHORIZATION_MERGE_SHA
 from tools.behavioral_eval_runner.enums import ClaimScope, MaterializationProfile, WorkspaceRole
@@ -15,15 +17,19 @@ from tools.behavioral_eval_runner.errors import (
     PartialSurfaceViolationError,
     RoleMismatchError,
     SnapshotVerificationError,
+    MaterializationError,
+    ReparsePointError,
 )
 from tools.behavioral_eval_runner.materialize import (
     WRITE_INTEGRITY_BASELINE,
+    _POSIX_NOFOLLOW_WRITE,
     FixtureDefinition,
     GitSnapshot,
     MaterializationRequest,
     SyntheticSnapshot,
     discover_shipped_skills,
     materialize,
+    verify_materialization_manifests,
 )
 from tools.behavioral_eval_runner.tests.helpers import REPO_ROOT, synthetic_corpus_files
 
@@ -67,6 +73,26 @@ class TestSyntheticMaterialization(unittest.TestCase):
                 found.add(os.path.relpath(full, runtime_root).replace("\\", "/"))
         return found
 
+    @unittest.skipUnless(os.name == "nt", "Windows 8.3 aliases only")
+    def test_short_destination_alias_materializes_and_verifies(self) -> None:
+        destination = os.path.realpath(self.dest)
+        # A fixed, read-only command asks Windows for the short spelling of
+        # cwd. No caller path is interpolated into shell code; /d disables
+        # AutoRun and /u makes the built-in echo output unambiguous Unicode.
+        alias = subprocess.check_output(
+            'cmd /d /u /c for %I in (.) do @echo "%~fsI"',
+            cwd=destination, encoding="utf-16le", timeout=10,
+        ).strip().removeprefix('"').removesuffix('"')
+        self.assertTrue(os.path.samefile(alias, destination))
+        if os.path.normcase(alias) == os.path.normcase(destination):
+            self.skipTest("this volume supplies no distinct 8.3 alias")
+
+        record = materialize(_request(alias))
+        self.assertTrue(verify_materialization_manifests(alias, record)["verified"])
+        self.assertTrue(verify_materialization_manifests(destination, record)["verified"])
+        for path in record.manifest_paths.values():
+            self.assertEqual(os.path.normcase(path), os.path.normcase(os.path.realpath(path)))
+
     def test_real_host_default_materialization_is_non_baseline(self) -> None:
         # §6.A: with no injected write-integrity capability, a real-host
         # materialization must NOT be baseline-eligible — write-integrity is
@@ -78,6 +104,59 @@ class TestSyntheticMaterialization(unittest.TestCase):
             any("write-integrity" in r for r in record.baseline_ineligibility_reasons),
             record.baseline_ineligibility_reasons,
         )
+
+    def test_empty_fixture_materializes_and_verifies(self) -> None:
+        record = materialize(_request(self.dest))
+        self.assertEqual(record.product_fixture_manifest["files"], [])
+        self.assertTrue(os.path.isdir(os.path.join(self.dest, "product_fixture")))
+        self.assertTrue(verify_materialization_manifests(self.dest, record)["verified"])
+
+    def test_empty_control_plane_materializes_and_verifies(self) -> None:
+        record = materialize(MaterializationRequest(
+            snapshot=SyntheticSnapshot({".claude/skills/skill-a/SKILL.md": b"# skill-a"}),
+            profile=MaterializationProfile.CONSUMER_SKILLS_ONLY,
+            workspace_role=WorkspaceRole.CONSUMER,
+            claim_scope=ClaimScope.FULL_LIBRARY,
+            destination_root=self.dest,
+        ))
+        self.assertEqual(record.control_plane_manifest["files"], [])
+        self.assertTrue(os.path.isdir(os.path.join(self.dest, "control_plane")))
+        self.assertTrue(verify_materialization_manifests(self.dest, record)["verified"])
+
+    def test_removed_empty_area_is_not_verified(self) -> None:
+        record = materialize(_request(self.dest))
+        os.rmdir(os.path.join(self.dest, "product_fixture"))
+        with self.assertRaisesRegex(MaterializationError, "missing materialized area"):
+            verify_materialization_manifests(self.dest, record)
+
+    @unittest.skipUnless(os.name == "nt", "Windows writer creates absent destination parents")
+    def test_empty_control_plane_with_absent_destination(self) -> None:
+        destination = os.path.join(self.dest, "new", "destination")
+        record = materialize(MaterializationRequest(
+            snapshot=SyntheticSnapshot({".claude/skills/skill-a/SKILL.md": b"# skill-a"}),
+            profile=MaterializationProfile.CONSUMER_SKILLS_ONLY,
+            workspace_role=WorkspaceRole.CONSUMER,
+            claim_scope=ClaimScope.FULL_LIBRARY,
+            destination_root=destination,
+        ))
+        self.assertEqual(record.control_plane_manifest["files"], [])
+        self.assertTrue(verify_materialization_manifests(destination, record)["verified"])
+
+    @unittest.skipUnless(_POSIX_NOFOLLOW_WRITE, "requires POSIX no-follow directory descriptors")
+    def test_empty_area_swap_cannot_redirect_creation(self) -> None:
+        mkdir = os.mkdir
+        with tempfile.TemporaryDirectory() as outside:
+            def swap_area(path, *args, **kwargs):
+                result = mkdir(path, *args, **kwargs)
+                if path == "product_fixture" and "dir_fd" in kwargs:
+                    os.rmdir(path, dir_fd=kwargs["dir_fd"])
+                    os.symlink(outside, path, dir_fd=kwargs["dir_fd"])
+                return result
+
+            with mock.patch("os.mkdir", side_effect=swap_area):
+                with self.assertRaises(ReparsePointError):
+                    materialize(_request(self.dest))
+            self.assertEqual(os.listdir(outside), [])
 
     def test_full_library_materializes_every_shipped_skill(self) -> None:
         record = materialize(_request(self.dest))

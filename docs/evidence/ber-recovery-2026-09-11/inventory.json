@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-11",
+  "reviewed_head": "8f92e916f86bc0b9df618fb6a7887bd531df8fea",
+  "reviewed_tree": "499e7e96bd524fe024aec94ed69d11a17f783e13",
+  "authorized_external_root": "C:\\temp\\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence",
+  "required_approved_inputs": [
+    {"path": "wp2b3-owner-label-review-bundle-v2.zip", "sha256": "355fc2c42db6cb38c3672e940a46d4c1d6488a3b74beca56aa284641c937645a", "status": "missing_from_current_repository_and_expected_root", "priority": 1},
+    {"path": "dataset/wp2b3-candidate-dataset-v2.json", "sha256": "c212c1c50d1bfd25f3de496acc542d9bd3e2fc258c51eb81ba9fd7c95d11ac56", "status": "missing_from_current_repository_and_expected_root", "priority": 1},
+    {"path": "dataset/wp2b3-labeling-guide-v2-copy.md", "sha256": "05708c4052ca2a7f4a173b196dd553237741710bd09db9ff21bc7e835f9fbc2d", "status": "missing_from_current_repository_and_expected_root", "priority": 1},
+    {"path": "approvals/wp2b3-owner-label-approval-v2.json", "sha256": "b04b5aa3b0854aacf9d9e53f1e9e399062e2ac5805d6b5b6b8b052e9f9dbb675", "status": "missing_from_current_repository_and_expected_root", "priority": 1}
+  ],
+  "derived_dataset_bindings": {
+    "dataset_id": "calibration.scenario_a.wp2b3-candidate",
+    "version": "1.0.0-wp2b3-candidate.2",
+    "semantic_sha256": "b73c8d855fdf9ff304e18d2964d266fef3e97f42050443d52c872bd54ebaa5bf",
+    "derived_split_map_sha256": "08078227408b9a560afb2e5614019ef0280edda353f9d233c95adfaf4d099fca",
+    "note": "Semantic hashes are derived using the committed canonical code; they are not raw-file hashes."
+  },
+  "supporting_provenance": [
+    {"path": "approvals/wp2b3-owner-label-approval-v2-provenance.json", "sha256": "4d90ec81d23f4a8b48827827657df7920faa4c4643d944eec6fbfae3c55b0a8b", "status": "missing", "live_driver_gate_input": false},
+    {"path": "ownership-marker.json", "status": "original_missing_current_host_verification_required", "fixed_source_digest": null},
+    {"category": "historical builder script, validation reports, inventory and dependency-install records", "status": "external_originals_not_recovered", "note": "Newly generated records must not impersonate historical originals."}
+  ],
+  "execution_records": [
+    {"path": "runs/wp2b3-development-ledger-v1.jsonl", "status": "documented_not_created_through_historical_A2_A3_checkpoints"},
+    {"path": "runs/wp2b3-development-run-manifest-v1.json", "status": "documented_not_created_through_historical_A2_A3_checkpoints"},
+    {"path": "runs/wp2b3-development-result-summary-v1.json", "status": "no_completed_development_run_documented"}
+  ],
+  "historical_execution": {"documented_judgments": 0, "documented_metadata_calls": 0, "documented_spend_usd": 0, "activity_outside_documented_intervals": "unverified", "automatic_accounting_reset_permitted": false},
+  "holdout_freeze": {"production_pin": null, "status": "not_approved_or_documented_as_created"},
+  "recovery_leads": [
+    {"source": "repository and local history", "status": "no_matches", "evidence": "../reviews/approved-artifact-search-2026-09-11.json"},
+    {"source": "top-level Downloads/Documents/Desktop/OneDrive filenames on new computer", "status": "no_calibration_or_Aegis_named_entries_found", "limitations": "Not a recursive system search; cloud-only files were not hydrated."},
+    {"source": "original owner review conversation attachments", "status": "owner_confirmed_unavailable", "owner_update_date": "2026-09-11", "owner_response": "no", "note": "The owner confirmed they no longer have access to the original review conversation. This recovery lead is closed. The documented 14-entry ZIP does not include the later approval or provenance sidecar."},
+    {"source": "off-device archives or account backups", "status": "not_accessible_or_identified_in_current_session"}
+  ],
+  "current_host": {"encryption": "unverified_admin_query_denied", "evidence_root": "absent", "credential_read": false, "provider_requests_during_recovery": 0},
+  "standing_owner_preference": "Read-only agents are always allowed for the Project Aegis source library and its worktrees; owner instruction 2026-09-10."
+}
