@@ -1,5 +1,20 @@
 # AEGIS-060+ register — proposed new findings, dedup map, and batch notes
 
+**Current disposition, reconciled 2026-09-12:** AEGIS-060 is a **REJECTED
+CANDIDATE / FALSE POSITIVE; ID RETIRED AND NEVER REUSED**. Merged
+[PR #89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), commit
+`000352f55b71f0c3e897a482d279d34bfaa3d66b`, corrected EVAL-004's collapse of
+skill and subagent namespaces. The `(subagent)` annotations are valid typed
+targets; do not schedule their removal as unfinished fixture work.
+
+At this checkpoint the calibration branch predates PR #89's audit-engine changes. Its historical
+baseline below is retained for provenance; it does not reopen the rejected
+candidate or prove that this branch already contains the corrected audit engine.
+The [merged disposition](https://github.com/ModernNomad-98/Project-Aegis/blob/000352f55b71f0c3e897a482d279d34bfaa3d66b/docs/audits/aegis-060-plus-register.md)
+is authoritative. Preserve that correction when integrating branches.
+
+## Historical baseline (superseded where the current disposition says so)
+
 Companion to the frozen AEGIS-001..059 baseline
 ([Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md](volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md))
 and the corpus contract audit (`scripts/audit-skill-contracts.py`; baseline

@@ -2980,4 +2980,14 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 
 ## 6. Post-merge corrections
 
+- **2026-09-12 — Current backlog labels reconciled.** At the owner's request,
+  corrected stale completion labels against merged PRs #83/#85/#87/#89 and the
+  shipped skill directories. BER-BKL-001/-004/-006/-008 are complete for their
+  scoped offline deliverables; real-host gates and OD-1/OD-2/OD-3 remain open.
+  D12.2/.4/.5/.6/.7 and `docs-retention-index` are implemented. The older
+  AEGIS-060 candidate on the calibration branch is explicitly superseded by
+  merged main's rejection. Partial schema/policy work remains visible. See the
+  [completion crosswalk](../evidence/backlog-status-reconciliation-2026-09-12.md).
+  This records status corrections only; it changes no runtime or authorization.
+
 - **2026-07-07 — Phase 4 headline correction.** Squash commit `ee6515c` (PR #7) is titled "Phase 4: security & RLS pack (4 skills)" but actually delivered **all 9** canonical Phase 4 skills (`threat-modeler`, `appsec-implementer`, `multi-tenant-security-tester`, `rls-policy-auditor`, `secrets-identity-hardener`, `supply-chain-security-reviewer`, `security-pr-reviewer`, `secure-migration-reviewer`, `static-analysis-reviewer`); the stale "(4 skills)" headline was captured when auto-merge was armed on the 4-skill branch state, and the remaining 5 skills were pushed before the merge fired. `main` contains all 9 — validator reports 36 skills, exit 0.

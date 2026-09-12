@@ -309,10 +309,11 @@ record's existence**.
 - **Title:** Exact pinned judge model/version and its measured calibration result
 - **Phase:** 2B-0
 - **Priority:** GATE
-- **Status:** BLOCKED — WP-2B-0 ended under Outcome B / Limited Scope without the
-  measured judge calibration required by the merged design. No judge was pinned, no
-  calibration dataset was executed, and OD-1 remains OPEN. The WP-2B-0 evidence attempt
-  is complete, but the R2 technical gate is not.
+- **Status:** BLOCKED — measured calibration and OD-1 remain unfinished. The
+  WP-2B-0 evidence attempt closed under Outcome B without those results; later
+  merged BER-DEC-008 / PR #87 pinned the judge identity and pre-registered
+  thresholds. The outstanding gate is the measured result and owner ratification,
+  not repeating judge selection or the original phase authorization.
 - **Source / evidence:** Merged design §8 (measurable judge calibration; §20a-S28), §17a
   item 9, §20 D1 and R2, OD-1. Carried into this register by the owner's backlog-creation
   directive of 2026-08-10.
@@ -323,11 +324,12 @@ record's existence**.
   critical safety assertions carry a separately approved critical false-PASS bound.
 - **Dependencies:** The WP-2B-0 evidence attempt and owner disposition are complete
   through [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81); measured
-  calibration remains absent; OD-1 remains open; any future R2 work requires a new
-  reviewed and merged authorization.
-- **Trigger to begin:** BLOCKED — no further work is authorized by BER-DEC-005. A new
-  phase-specific authorization must provide the calibration scope, model budget,
-  evidence terms, and stop conditions before R2 work resumes.
+  calibration remains absent and OD-1 remains open. The later phase authorization
+  is now merged as BER-DEC-008 / PR #87; replacement inputs and current WP-2B-3
+  execution readiness remain required.
+- **Trigger to begin:** No further work is authorized by BER-DEC-005. Continue
+  through WP-2B-3's existing authorization, replacement-input approval and current
+  execution gates; this status update does not grant provider execution.
 - **Expected deliverable:** A pinned judge identity (model/version); a versioned,
   human-labeled calibration dataset (`calibration_dataset_version/hash`); and a measured
   calibration report containing the full confusion matrix, accuracy/agreement, false-PASS
@@ -339,9 +341,10 @@ record's existence**.
   met; judge failure paths resolve to `JUDGE_ERROR`, never PASS/FAIL; any later judge,
   rubric-derivation, or dataset change is recorded as requiring re-calibration and
   behavioral re-baselining.
-- **Owner decision required:** The owner accepted the incomplete/blocked WP-2B-0
-  disposition. The required judge identity, measured calibration, and OD-1 ratification
-  remain open; no baseline-eligible semantic judging is permitted.
+- **Owner decision required:** The WP-2B-0 disposition, judge identity and numeric
+  threshold pre-registration are already recorded. Replacement-label approval,
+  changed terms where applicable, holdout freeze and OD-1 result ratification remain;
+  no baseline-eligible semantic judging is permitted before the result is accepted.
 - **Explicit non-goals:** No invented threshold numbers (the design deliberately invents
   none); no production semantic judging; no hard-coded model name in the design.
 - **Related design sections:** §8, §13 (calibration-dataset identity in
@@ -815,24 +818,17 @@ the sole owner of actual advisory CI integration).
   BER-DEC-007, 2026-08-13; former title: Independent injection-resistant semantic judge)
 - **Phase:** 2B-3
 - **Priority:** GATE
-- **Status:** AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
-  [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)) — **effective only after the governance PR containing
-  BER-DEC-008 is reviewed and manually merged. Before that merge, this branch/PR is a
-  proposed authorization only, and no WP-2B-3 implementation, provider or model call,
-  credential access, implementation clone, implementation branch, or evidence-root
-  creation may occur.** BER-DEC-008 records the exact branch, the actual
-  judge/provider-call budget, the external evidence root, the evidence-handling terms,
-  the retention, the stop conditions, and the owner review this record previously
-  required. **OWNER DECISION PACKAGE APPROVED (2026-08-14):** Peter Nguyen approved the
-  complete WP-2B-3 authorization decision package at
-  [`behavioral-eval-runner-wp-2b-3-authorization-decision-package.md`](behavioral-eval-runner-wp-2b-3-authorization-decision-package.md)
-  — all 35 decisions carry his recorded disposition. Of the former begin conditions:
-  (1) judge provider and exact immutable model/snapshot identity (OpenAI API;
-  `gpt-5.5-2026-04-23`), (2) calibration dataset size and composition, (3)
-  pre-registered numeric thresholds, (4) provider-call, token, and dollar ceilings, and
-  (5) credential and evidence handling are decided and recorded; condition (6) — a
-  reviewed and manually merged BER-DEC-008 recording those exact terms — is satisfied at
-  the moment the governance PR carrying this entry is manually merged, and not before. **Historical note (governance rule
+- **Status:** AUTHORIZED - BER-DEC-008 is effective: PR #87 merged at
+  `1c3e4931329179d9a3f9cc9ec1bb93020378c043` on 2026-08-14.
+  WP-2B-3 is not DONE. Reviewed corrections and recovery documentation are
+  published on `review/ber-phase01-corrections`; integration into PR #88 and
+  its merge remain unfinished. Original calibration inputs are missing and
+  the owner confirmed the review conversation is unavailable; continue with the
+  [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md).
+  The original 35 owner decisions remain recorded in the authorization package;
+  this cleanup neither ratifies OD-1 nor changes execution limits.
+
+  **Historical note (governance rule
   5 — this record is redefined, not deleted):** the former WP-2B-3 NON-LIVE semantic-judge
   scaffold scope — the injection-resistant judge interface and system policy, delimited
   untrusted-data envelope, no-judge-tools and least-context rules, schema-validated
@@ -1132,13 +1128,20 @@ Inventory records preserve their IDs durably. Where an item overlaps an R gate o
 package, the record cross-references the authoritative record instead of duplicating (and
 risking forking) its requirements.
 
+2026-09-12 reconciliation: completed offline deliverables are marked DONE below;
+live capability and owner-decision gates remain separately tracked. The
+[completion crosswalk](../evidence/backlog-status-reconciliation-2026-09-12.md)
+records the source and merged-PR evidence for each correction. Historical
+authorization decisions in §13 remain unchanged.
+
 ### BER-BKL-001 — Split assertion-accounting coverage from assertions-actually-graded coverage
 
 - **ID:** BER-BKL-001
 - **Title:** Split assertion-accounting coverage from assertions-actually-graded coverage
 - **Phase:** 2B-1
 - **Priority:** IMPORTANT
-- **Status:** BACKLOG
+- **Status:** DONE — delivered by merged WP-2B-1 PR #83; status reconciled
+  2026-09-12. Both coverage metrics exist independently in every run report.
 - **Source / evidence:** Merged design §13 defines `assertion_coverage` as a composite
   (selected assertions graded OR explicitly unjudgeable-with-finding OR excluded by an
   approved reason); §17 condition 7 consumes it. Refinement recorded as a deferred
@@ -1148,8 +1151,9 @@ risking forking) its requirements.
   95% of assertions and a run that graded 60% while classifying 35% unjudgeable. Separate
   metrics (accounted-for vs actually graded) keep the honesty property the coverage
   metrics exist for.
-- **Dependencies:** WP-2B-1 schema work (BER-BKL-007).
-- **Trigger to begin:** WP-2B-1 AUTHORIZED and its report-schema implementation underway.
+- **Dependencies:** SATISFIED — WP-2B-1 report contracts merged in PR #83.
+  BER-BKL-007's remaining migration-policy work does not reopen these metrics.
+- **Trigger to begin:** CLOSED — implementation delivered; OD-2 remains a later gate.
 - **Expected deliverable:** Two explicitly named metrics in the run report schema — an
   assertion-accounting coverage (every selected assertion has a recorded disposition) and
   an assertions-actually-graded coverage (graded assertions only, excluding unjudgeable
@@ -1162,8 +1166,13 @@ risking forking) its requirements.
 - **Explicit non-goals:** No change to the merged design document in this backlog task; no
   weakening of any §17 coverage condition.
 - **Related design sections:** §8, §13 (coverage metrics), §17 (conditions 7–8).
-- **Completion evidence:** Merged WP-2B-1 schema PR implementing both metrics; status
-  updated here through a reviewed PR.
+- **Completion evidence:** [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83),
+  merge `72e74af6f0183fef25e353ec2bf3a851d83b5df6`;
+  [CoverageMetrics](../../tools/behavioral_eval_runner/models.py),
+  [report construction](../../tools/behavioral_eval_runner/reporting.py) and
+  [reporting regression tests](../../tools/behavioral_eval_runner/tests/test_reporting.py)
+  distinguish `assertion_accounting_coverage` from
+  `assertions_actually_graded_coverage`. No CI-promotion threshold is ratified here.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-002 — Normalize remaining prose/schema naming
@@ -1173,7 +1182,9 @@ risking forking) its requirements.
   `JUDGE_ERROR`)
 - **Phase:** 2B-1
 - **Priority:** IMPORTANT
-- **Status:** BACKLOG
+- **Status:** BACKLOG - the runner already uses closed enum/schema names; a
+  completed standalone naming sweep and disposition of residual differences are
+  not established. Keep this verification task open rather than inventing closure.
 - **Source / evidence:** Deferred normalization finding from the PR #78 review cycle,
   carried into this register by the owner's backlog-creation directive of 2026-08-10.
   Verification note (2026-08-10): the merged design at blob `94ba583…` uses the
@@ -1209,25 +1220,18 @@ risking forking) its requirements.
 - **Title:** Activation-observability evidence and claim-scope implementation
 - **Phase:** 2B-0 / 2B-2
 - **Priority:** GATE
-- **Status:** BLOCKED — R1's WP-2B-0 disposition is accepted as unavailable/unknown.
-  Activation-observer implementation cannot proceed until the later phase has a truthful
-  mechanism or separately accepted limitation. WP-2B-2 is AUTHORIZED by BER-DEC-007
-  (effective only after the governance PR containing BER-DEC-007 is manually merged), but
-  this record's activation-observer half stays BLOCKED on the R1 condition: the WP-2B-2
-  activation matcher may be built only on the 2B-0-proven mechanism, and ambiguity yields
-  `ERROR` / `AMBIGUOUS_ACTIVATION`, never a manufactured verdict.
+- **Status:** BLOCKED - the non-live Scenario A stack is DONE (merged PR #85),
+  but truthful live activation evidence or an explicitly accepted limitation
+  remains required under R1 and WP-2B-4. Do not reschedule the delivered stack.
 - **Source / evidence:** Cross-reference: **R1** (authoritative record, §6 of this file).
   Merged design §6, §17a, §20 R1.
 - **Why it matters:** Inventory visibility for the R1 gate; see R1.
-- **Dependencies:** The gate half is DONE — R1's disposition (unavailable/unknown) is
-  recorded and owner-accepted under Outcome B via
-  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The implementation
-  half requires WP-2B-2 AUTHORIZED plus a truthful activation mechanism or a separately
-  accepted limitation.
-- **Trigger to begin:** Gate half CLOSED — no further WP-2B-0 work is authorized by
-  BER-DEC-005. The implementation half's WP-2B-2 authorization is BER-DEC-007 (effective
-  only after its governance PR is manually merged); the half remains BLOCKED until a
-  truthful mechanism or separately accepted limitation exists.
+- **Dependencies:** The R1 disposition is accepted under Outcome B (PR #81); WP-2B-2
+  is DONE (PR #85). Remaining: a truthful live activation mechanism or separately
+  accepted limitation under the applicable later-phase authorization.
+- **Trigger to begin:** Spike work is CLOSED; the non-live stack is delivered. Live
+  activation-observer work waits on the remaining R1 evidence/limitation and
+  the applicable later-phase authorization, not another WP-2B-2 implementation.
 - **Expected deliverable:** R1's activation observability report — evidence/report work
   occurring only inside AUTHORIZED WP-2B-0 scope — then the 2B-2 activation observer —
   implemented only inside AUTHORIZED WP-2B-2 scope — built only on the proven mechanism
@@ -1238,11 +1242,10 @@ risking forking) its requirements.
 - **Owner decision required:** As R1.
 - **Explicit non-goals:** As R1; this record adds no requirement beyond R1 and WP-2B-2.
 - **Related design sections:** §6, §17a, §19, §20 R1, §23 item 6.
-- **Completion evidence:** Gate half: as R1 —
-  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81) (merge commit
-  `55b0c4b4f5c0cba9bbf70f63cd0ebf8212f8eae5`) and this reviewed status update.
-  Implementation half: the future merged WP-2B-2 activation-observer implementation PR
-  (still required).
+- **Completion evidence:** R1 disposition: [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81).
+  Non-live grading/activation representation: [PR #85](https://github.com/ModernNomad-98/Project-Aegis/pull/85),
+  merge `b84e43ad9f42a793c6f68c2f5aebf0abfad2b8ed`.
+  Live activation-observer proof remains outstanding; mock behavior does not close it.
 - **Supersedes / superseded by:** None (tracks R1; R1's record is authoritative for the
   gate's requirements).
 
@@ -1252,10 +1255,11 @@ risking forking) its requirements.
 - **Title:** Configuration isolation and effective per-tool-path confinement
 - **Phase:** 2B-0 / 2B-1
 - **Priority:** GATE
-- **Status:** BACKLOG — WP-2B-0 recorded R4/R5 as incomplete/blocked. The non-live
-  containment and execution-profile scaffolding may be built inside authorized WP-2B-1,
-  but no effective-containment or baseline-eligibility claim is allowed until later
-  evidence proves it.
+- **Status:** DONE — the accepted R4/R5 dispositions and the non-live WP-2B-1
+  scaffolding were delivered in PRs #81/#83; status reconciled 2026-09-12.
+  This closes the scoped offline deliverable only. Effective real-host containment,
+  profile isolation and baseline eligibility remain unresolved under R4/R5 and
+  WP-2B-4; DONE here does not assert those capabilities.
 - **Source / evidence:** Cross-reference: **R4 and R5** (authoritative records, §6 of this
   file). Merged design §5e, §15, §17a items 6–8.
 - **Why it matters:** Inventory visibility for the containment and configuration gates;
@@ -1263,12 +1267,11 @@ risking forking) its requirements.
 - **Dependencies:** The gate half is DONE — R4/R5 dispositions (incomplete/blocked) are
   recorded and owner-accepted under Outcome B via
   [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The non-live
-  scaffolding half requires WP-2B-1's BER-DEC-006 authorization to be effective (the
-  governance PR containing BER-DEC-006 merged); effective-containment evidence remains
-  a later-phase requirement.
+  scaffolding half is delivered by merged WP-2B-1 PR #83; effective-containment
+  evidence remains a later-phase requirement under R4/R5 and WP-2B-4.
 - **Trigger to begin:** Gate half CLOSED — no further WP-2B-0 work is authorized by
-  BER-DEC-005. The non-live scaffolding half begins only after the governance PR
-  containing BER-DEC-006 is merged, on `feat/behavioral-eval-runner-2b-1`.
+  BER-DEC-005. The non-live scaffolding half is also CLOSED after PR #83;
+  later host-capability work is not authorized by this completion record.
 - **Expected deliverable:** R4's containment capability report and R5's execution-profile
   isolation report — evidence work that occurred only inside AUTHORIZED WP-2B-0 scope
   and is now recorded incomplete/blocked — then the 2B-1 fail-closed, non-live
@@ -1303,35 +1306,31 @@ risking forking) its requirements.
 - **Title:** Judge selection, measurable calibration, and owner thresholds
 - **Phase:** 2B-0 / 2B-2 (non-live scaffold) / 2B-3 (measured calibration and OD-1 gate)
 - **Priority:** GATE
-- **Status:** BLOCKED — R2 remains incomplete/blocked and OD-1 remains open. Under
-  BER-DEC-007 the NON-LIVE judge/calibration scaffold and threshold-enforcement logic move
-  into WP-2B-2 (mock/recorded only), while the MEASURED calibration and OD-1 ratification
-  are owned by the redefined WP-2B-3 — the Measured Judge Calibration and OD-1 Ratification
-  Gate — which is BLOCKED, is not authorized by BER-DEC-007, and requires its own future
-  reviewed and merged authorization.
+- **Status:** BLOCKED - measured calibration and OD-1 ratification remain unfinished.
+  The non-live scaffold is DONE (PR #85); judge/model selection and numeric
+  threshold pre-registration are recorded in merged BER-DEC-008 (PR #87).
+  Replacement calibration inputs and remaining execution readiness are required;
+  do not reopen the already completed selection/authorization decisions.
 - **Source / evidence:** Cross-reference: **R2** (authoritative record, §6 of this file)
   and OD-1 (§9 of this file). Merged design §8, §17a item 9, §20 D1/OD-1/R2; v1.1 fast-track
   successor §4–§5.
 - **Why it matters:** Inventory visibility for the judge gate; see R2. WP-2B-2 delivers the
   non-live calibration harness and threshold-enforcement logic (mock/recorded only); WP-2B-3
   then completes the measured calibration and OD-1 ratification, ahead of WP-2B-4.
-- **Dependencies:** The WP-2B-0 evidence half is DONE — R2's disposition
-  (incomplete/blocked) is recorded and owner-accepted under Outcome B via
-  [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81); no judge was pinned
-  and no calibration exists. The non-live scaffold half is delivered by WP-2B-2
-  (BER-DEC-007). The measured-calibration half is owned by the redefined WP-2B-3 gate and
-  requires its own future reviewed and merged authorization.
-- **Trigger to begin:** Spike half CLOSED — no further WP-2B-0 work is authorized by
-  BER-DEC-005. The non-live scaffold is delivered under WP-2B-2 (BER-DEC-007). Otherwise
-  BLOCKED: measured judge selection and calibration belong to WP-2B-3 and require its
-  future reviewed and merged authorization; OD-1 remains open.
+- **Dependencies:** The WP-2B-0 disposition is accepted (PR #81), WP-2B-2 is DONE
+  (PR #85), and BER-DEC-008 is merged (PR #87). Remaining: the replacement-input
+  approval, current execution readiness and measured WP-2B-3 result for OD-1.
+- **Trigger to begin:** Original phase authorization is satisfied by merged PR #87.
+  Continue through the [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md)
+  and current WP-2B-3 gates; no provider call follows from this status cleanup.
 - **Expected deliverable:** the WP-2B-2 non-live calibration-harness scaffold and
   threshold-enforcement logic (mock/recorded); then WP-2B-3's pinned judge identity +
   measured calibration report, presented for OD-1 ratification.
 - **Acceptance criteria:** As R2, WP-2B-2 (non-live scaffold), and WP-2B-3 (the
   measured-calibration and OD-1 gate); design §23 items 7 and 19 hold.
-- **Owner decision required:** WP-2B-2 phase authorization (BER-DEC-007) for the non-live
-  scaffold; the future WP-2B-3 phase authorization; OD-1 ratification.
+- **Owner decision required:** Fresh approval of replacement labels and any changed
+  artifact/operating terms, holdout freeze, then OD-1 result ratification.
+  WP-2B-2 and the original WP-2B-3 phase authorizations are already recorded.
 - **Explicit non-goals:** No invented thresholds; no baseline-eligible semantic verdict
   before ratification; no measured calibration under WP-2B-2 (non-live only).
 - **Related design sections:** §8, §13, §17 criterion 9, §17a item 9, §20 D1/OD-1/R2,
@@ -1350,9 +1349,10 @@ risking forking) its requirements.
 - **Title:** Cost observability and enforceable reservation units
 - **Phase:** 2B-0 / 2B-1
 - **Priority:** GATE
-- **Status:** BACKLOG — R3's limitation is accepted. Authorized WP-2B-1 may build and
-  deterministically test runner-owned reservation and budget enforcement, but no live
-  host/provider enforcement claim is allowed.
+- **Status:** DONE — R3's accepted limitation and WP-2B-1's runner-owned offline
+  reservation, reconciliation and kill-switch implementation were delivered in
+  PRs #81/#83; status reconciled 2026-09-12. Real-host/provider cost enforcement
+  remains a live gate under R3 and WP-2B-4, not a capability proven by these mocks.
 - **Source / evidence:** Cross-reference: **R3** (authoritative record, §6 of this file).
   Merged design §11, §11a, §20 D3/R3.
 - **Why it matters:** Inventory visibility for the cost gate; see R3. WP-2B-1 then
@@ -1360,11 +1360,10 @@ risking forking) its requirements.
 - **Dependencies:** The gate half is DONE — R3's disposition (unavailable/unknown) is
   recorded and owner-accepted under Outcome B via
   [PR #81](https://github.com/ModernNomad-98/Project-Aegis/pull/81). The runner-owned,
-  non-live implementation half requires WP-2B-1's BER-DEC-006 authorization to be
-  effective (the governance PR containing BER-DEC-006 merged).
+  non-live implementation half is delivered by merged WP-2B-1 PR #83.
 - **Trigger to begin:** Spike half CLOSED — no further WP-2B-0 work is authorized by
-  BER-DEC-005. The runner-owned reservation half begins only after the governance PR
-  containing BER-DEC-006 is merged, on `feat/behavioral-eval-runner-2b-1`.
+  BER-DEC-005. The runner-owned offline reservation half is also CLOSED after
+  PR #83; later live capability evidence remains separately required.
 - **Expected deliverable:** R3's cost-observability report (disposition recorded
   unavailable/unknown); then WP-2B-1's runner-owned reservation, bounded concurrency,
   reconciliation, and kill-switch state machines exercised with configured
@@ -1398,7 +1397,10 @@ risking forking) its requirements.
 - **Title:** Final production JSON/YAML schemas and schema-migration policy
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** BACKLOG — PARTIALLY DELIVERED. PR #83 shipped versioned schemas,
+  closed enums and validating runtime records. The explicit schema-migration /
+  compatibility policy required by this entry has not been located; do not
+  schedule the existing schema implementation again or mark the whole entry DONE.
 - **Source / evidence:** Merged design §13 (every report carries `schema_version` /
   `runner_version`; versioned blocker/reason enums; canonical identities) and §5b ("the
   exact field names may be refined at build time into a better coherent schema, but every
@@ -1406,8 +1408,10 @@ risking forking) its requirements.
 - **Why it matters:** The design deliberately specifies concepts, not final serialized
   shapes. Production schemas need exact field names, types, enum registries, and a
   migration policy so later schema versions never silently reinterpret stored evidence.
-- **Dependencies:** WP-2B-1 AUTHORIZED.
-- **Trigger to begin:** WP-2B-1 schema implementation begins.
+- **Dependencies:** WP-2B-1 implementation is DONE; remaining policy work needs
+  a scoped follow-up covering version increments and reading older evidence.
+- **Trigger to begin:** Authorize the remaining migration-policy follow-up;
+  the schema implementation itself is already delivered.
 - **Expected deliverable:** Versioned JSON/YAML schemas for attempt records, case
   aggregates, run reports (three field groups), case/fixture manifests, materialization
   and execution profiles, and evidence manifests; a schema-migration policy (how
@@ -1421,8 +1425,13 @@ risking forking) its requirements.
 - **Explicit non-goals:** No change to the merged design's concepts; no free-text reason
   codes; no unversioned enums.
 - **Related design sections:** §5b, §10, §13, §18 (report-schema tests).
-- **Completion evidence:** Merged WP-2B-1 schema PR(s) with tests; status updated here
-  through a reviewed PR.
+- **Completion evidence:** Partial: [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83),
+  [schemas](../../tools/behavioral_eval_runner/schemas/),
+  [runtime records](../../tools/behavioral_eval_runner/models.py) and
+  [model tests](../../tools/behavioral_eval_runner/tests/test_enums_models.py).
+  Rejecting unsupported versions is implemented; that alone does not document
+  a migration/compatibility policy. Full closure still requires that policy
+  and its reviewed acceptance.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-008 — Machine-generated corpus census
@@ -1431,15 +1440,18 @@ risking forking) its requirements.
 - **Title:** Machine-generated, kept-current corpus census
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** DONE — the generator, pinned-snapshot census artifact and
+  reproducibility tests shipped in merged PR #83; status reconciled 2026-09-12.
+  OD-2/OD-3 and any ambiguous-file decisions remain separate owner gates.
 - **Source / evidence:** Merged design §3 (implementation-time corpus census, items a–k;
   the design-time census is evidence, not a completeness proof); owner backlog-creation
   directive of 2026-08-10.
 - **Why it matters:** Runnability, MANUAL-ONLY handling, risk classes, and OD-2's honest
   denominator all depend on a machine-produced census that stays current with the
   corpus — never on the design-time snapshot or hard-coded assumptions.
-- **Dependencies:** WP-2B-1 AUTHORIZED.
-- **Trigger to begin:** WP-2B-1 begins.
+- **Dependencies:** SATISFIED — WP-2B-1 is DONE.
+- **Trigger to begin:** CLOSED — regenerate through the existing census tool
+  when the pinned corpus changes; do not rebuild the generator as new backlog work.
 - **Expected deliverable:** A machine-generated census covering: runtime-file
   classification (`runtime_required` / `control_plane_only` /
   `ambiguous_needs_owner_review`, ambiguous failing closed); runnability (cases runnable
@@ -1458,8 +1470,14 @@ risking forking) its requirements.
 - **Explicit non-goals:** No hand-maintained counts; no assumption that the design-time
   variances are the only variances.
 - **Related design sections:** §3 (items a–k), §5a, §5b, §5c, §8, §10, §17 (OD-2 input).
-- **Completion evidence:** Merged WP-2B-1 census PR with generated output and tests;
-  status updated here through a reviewed PR.
+- **Completion evidence:** [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83),
+  [generator](../../tools/behavioral_eval_runner/census.py),
+  [committed census](../../artifacts/evidence/behavioral-eval-runner-wp-2b-1-census.json)
+  and [census tests](../../tools/behavioral_eval_runner/tests/test_census.py).
+  The recorded census digest is
+  `674017e9344c0afa2ff26539221a9ea185753ceef5bfe8c9040514a54004a22a`;
+  it is static inventory evidence, not executed behavioral results or owner
+  ratification of risk/coverage thresholds.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-009 — Evidence retention, access, encryption, redaction, and deletion policy
@@ -1468,7 +1486,11 @@ risking forking) its requirements.
 - **Title:** Evidence retention, access, encryption, redaction, and deletion policy
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG
+- **Status:** BACKLOG — PARTIALLY DELIVERED. The evidence writer and scoped
+  WP-2B-1/WP-2B-3 handling terms exist; the complete production policy requested
+  here is not established by those scoped terms. Remaining work is the final
+  policy, owner parameters and operator integration, including the recorded
+  GitHub recovery direction; do not rebuild the existing writer.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
@@ -1481,8 +1503,11 @@ risking forking) its requirements.
   temporary spike-evidence-handling terms fixed in its authorization (§2 of this file) —
   mandatory before any probe or model call; this item delivers the final
   production-grade policy in 2B-1, and the spike terms never substitute for it.
-- **Dependencies:** WP-2B-1 AUTHORIZED (the evidence writer implements the classes).
-- **Trigger to begin:** WP-2B-1 evidence-writer implementation begins.
+- **Dependencies:** The WP-2B-1 evidence writer is delivered. The complete production
+  policy and owner parameters remain separate from that implementation and the
+  temporary/scoped terms in BER-DEC-006/008.
+- **Trigger to begin:** Prepare the remaining policy and operator integration under
+  a scoped follow-up; preserve the existing writer and recorded scope limitations.
 - **Expected deliverable:** A written evidence-governance policy fixing: retention
   periods per retention class; access groups and the least-privilege read matrix;
   the encryption-at-rest mechanism and its key custody; redaction/sanitization rules
@@ -1720,6 +1745,13 @@ here reopens decisions the design already settled (D1–D10 stand, as amended on
 backlog.
 
 ### Pending numbered owner decisions (design §20)
+
+Current reconciliation (2026-09-12): OD-1 remains OPEN for measured-result
+ratification; the judge identity and numeric-threshold pre-registration were
+completed in merged PR #87. OD-2/OD-3 remain later promotion gates and OD-4 a
+future authenticity decision. The dated OD-1 notes below preserve the sequence
+of earlier states; statements such as "no BER-DEC-008 exists" are historical,
+superseded by the later authorization note and §14.
 
 - **OD-1 — Judge-calibration numeric thresholds.** OWNER DECISION REQUIRED **DURING
   2B-0**. Peter Nguyen approves the initial acceptance thresholds (accuracy/agreement,
