@@ -67,7 +67,7 @@ No active-state storage, raw evidence creation or deletion policy is executed he
 
 Acceptance requires: Role A/remote/base/grant reconciliation; explicit product/BER
 boundaries; every required reuse primitive classified; all eleven logical components
-and their authority limits; normative T01–T27 and C01–C09 coverage; identity,
+and their authority limits; normative T01–T28 and C01–C09 coverage; identity,
 idempotency, atomicity, pause/stop, corruption/schema/receipt handling; seven storage
 classes and checkpoint transfer; platform limits/threats/tests; blocked later work;
 reviewable three-file diff and actual validation evidence.
@@ -95,6 +95,10 @@ Include readiness/pause/reconciliation detours around recovery blockers, and a f
 check applied before its aggregate gate clears: distinct finalization must release once.
 F18-F21 require atomic final-failure fencing/settlement, proven nonexecution after
 handoff, non-mutating contained validation and identity-bound uncertainty-fence clearance.
+F01/F09/F19/F21 also require validation-only T28 adoption with its own free slot/current
+checks, typed ceased-validator recovery, all-state contrary nonexecution intake and T25
+exact-instance fence clearance. Independent review evidence must name the final design
+and backlog content hashes; historical hashes cannot attest changed normative bytes.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
@@ -163,7 +167,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F21 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T28/C01–C09/F01–F21 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
