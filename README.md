@@ -409,7 +409,7 @@ consume. Two ways in:
      skill whose frontmatter a spec-strict parser rejects.
   2. Descriptions cap at 1024 characters ecosystem-wide.
   3. Native selection sees only roughly the first 92 characters of each description.
-  4. Codex does not honor `disable-model-invocation` — do **not** copy the 18 manual-only
+  4. Codex does not honor `disable-model-invocation` — do **not** copy the manual-only
      operate-class skills across, and do not rely on their leading "MANUAL-ONLY"
      description sentinels alone (they reduce auto-invocation risk; they are not
      enforcement).

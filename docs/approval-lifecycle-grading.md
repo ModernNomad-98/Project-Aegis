@@ -22,9 +22,11 @@ must follow their sequence. Lifecycle facts may be transcribed later than their
 effective `at` time; recording sequence is not effective precedence.
 
 A grant adds `usage: "STANDING" | "SINGLE_USE"` and an explicitly nullable UTC
-`expires_at`. Its `approval_id` and terms are immutable. Missing terms in this
-version are malformed evidence, never a fallback to legacy behavior. A directly
-recorded human grant does not need another APPROVAL_REQUESTED event. Match the
+`expires_at`. Expiry cannot precede the grant's `at`; an equal timestamp is a
+valid interval that is already inactive. Its `approval_id` and terms are immutable.
+Missing terms in this version are malformed evidence, never a fallback to legacy
+behavior. A directly recorded human grant does not need another APPROVAL_REQUESTED
+event. Match the
 exact `target`; interpreting broader real-world scope is outside this grader.
 
 Lifecycle events use `APPROVAL_REVOKED`, `APPROVAL_CONSUMED`, `APPROVAL_EXPIRED`, or

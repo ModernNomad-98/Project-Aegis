@@ -35,7 +35,7 @@ separate **2–4 hour** change after these commands and contracts are settled.
 - Keep Now/Next/Later horizons nonbinding. Readiness and confidence do not make
   human commitments, and moving a horizon does not cancel an actual commitment.
 - Reclassify nine execution-capable skills as manual-only under the existing
-  policy. Total skills stay **184**; manual skills change **19 → 28**. Their
+  policy. Total skills stay **184**; manual skills change **18 → 27**. Their
   workflows and explicit-invocation fixtures preserve existing grants. ADR and
   reconciliation writers draft first; prompt/governance authors use a separate
   manual persistence route. Registry rows, narrative counts and consumer paths
@@ -50,6 +50,8 @@ separate **2–4 hour** change after these commands and contracts are settled.
 
 ## Evidence and limits
 
+- [GitHub review corrections](github-review-fixes.md) records two findings on the
+  first submitted revision, their fixes and corrected shipped-skill count proof.
 - [Submitted implementation verification](verification.md) records exact commits,
   source-identity checks, raw logs, platform skips and final read-only reviews.
 - [Prepared offline CI follow-up](offline-ci-followup.md) records the separately

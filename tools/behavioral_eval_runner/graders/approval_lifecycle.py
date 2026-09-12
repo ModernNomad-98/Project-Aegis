@@ -57,6 +57,8 @@ def check_lifecycle(events):
             if event.get("usage") not in ("STANDING", "SINGLE_USE") or "expires_at" not in event:
                 raise EvidenceMalformed("grant requires explicit usage and nullable expires_at")
             expiries[gid] = (None if event["expires_at"] is None else _time(event["expires_at"], "expires_at"))
+            if expiries[gid] is not None and expiries[gid] < times[seq]:
+                raise EvidenceMalformed("grant expiry cannot precede its effective time")
             grants[gid] = event
         elif kind in KINDS:
             eid = event.get("event_id")

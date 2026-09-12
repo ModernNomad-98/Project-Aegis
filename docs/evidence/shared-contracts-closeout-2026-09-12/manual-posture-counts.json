@@ -1,0 +1,81 @@
+{
+  "method": "Direct SKILL.md files in each committed corpus; validator IGNORED_DIRS and split_frontmatter; parsed YAML boolean only",
+  "ignored_directories": [
+    "_template"
+  ],
+  "revisions": [
+    {
+      "revision": "f5e04ad07a5fd2b34b7470bffd38a50c15ce691a",
+      "shipped": 184,
+      "manual": 18,
+      "automatic": 166,
+      "manual_skills": [
+        "agent-authorization-matrix",
+        "agent-failure-recovery",
+        "agent-goal-hijack-defender",
+        "agent-instruction-consolidator",
+        "agent-memory-governance",
+        "ai-evaluation-harness",
+        "ai-router-architect",
+        "appsec-implementer",
+        "ci-pipeline-architect",
+        "clickthrough-test-engineer",
+        "code-simplifier",
+        "observability-operator",
+        "playwright-e2e-engineer",
+        "prompt-injection-defender",
+        "secrets-identity-hardener",
+        "standing-approval-and-auto-advance",
+        "vite-build-qa-engineer",
+        "vitest-unit-component-engineer"
+      ]
+    },
+    {
+      "revision": "e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c",
+      "shipped": 184,
+      "manual": 27,
+      "automatic": 157,
+      "manual_skills": [
+        "agent-authorization-matrix",
+        "agent-failure-recovery",
+        "agent-goal-hijack-defender",
+        "agent-instruction-consolidator",
+        "agent-memory-governance",
+        "ai-evaluation-harness",
+        "ai-router-architect",
+        "appsec-implementer",
+        "ci-pipeline-architect",
+        "clickthrough-test-engineer",
+        "code-simplifier",
+        "docs-first-implementer",
+        "flaky-test-detective",
+        "local-ci-mirror-preflight",
+        "multi-tenant-security-tester",
+        "n-plus-one-detector",
+        "observability-operator",
+        "playwright-e2e-engineer",
+        "prompt-injection-defender",
+        "query-plan-reader",
+        "reviewable-diff-discipline",
+        "secrets-identity-hardener",
+        "standing-approval-and-auto-advance",
+        "systematic-debugger",
+        "tdd-engineer",
+        "vite-build-qa-engineer",
+        "vitest-unit-component-engineer"
+      ]
+    }
+  ],
+  "became_manual": [
+    "docs-first-implementer",
+    "flaky-test-detective",
+    "local-ci-mirror-preflight",
+    "multi-tenant-security-tester",
+    "n-plus-one-detector",
+    "query-plan-reader",
+    "reviewable-diff-discipline",
+    "systematic-debugger",
+    "tdd-engineer"
+  ],
+  "became_automatic": []
+}

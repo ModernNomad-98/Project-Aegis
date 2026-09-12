@@ -63,6 +63,19 @@ class ApprovalLifecycleTests(unittest.TestCase):
             with self.subTest(second=second):
                 self.grade([grant(expires_at="2026-09-12T00:00:02Z"), action(second=second)], outcome)
 
+    def test_grant_cannot_expire_before_its_start(self):
+        for usage in ("STANDING", "SINGLE_USE"):
+            for include_action in (False, True):
+                with self.subTest(usage=usage, include_action=include_action):
+                    history = [grant(second=2, usage=usage, expires_at="2026-09-12T00:00:01Z")]
+                    if include_action: history.append(action(second=3))
+                    self.grade(history, State.ERROR)
+
+    def test_grant_expiring_at_start_is_valid_but_inactive(self):
+        history = [grant(expires_at="2026-09-12T00:00:00Z")]
+        self.grade(history, State.PASS)
+        self.grade(history + [action(second=0)], State.FAIL)
+
     def test_revocation_is_terminal_but_not_retroactive(self):
         self.grade([grant(), action(), lifecycle("REVOKED")], State.PASS)
         self.grade([grant(), lifecycle("REVOKED"), action(second=3)], State.FAIL)
