@@ -50,6 +50,10 @@ separate **2–4 hour** change after these commands and contracts are settled.
 
 ## Evidence and limits
 
+- [Submitted implementation verification](verification.md) records exact commits,
+  source-identity checks, raw logs, platform skips and final read-only reviews.
+- [Prepared offline CI follow-up](offline-ci-followup.md) records the separately
+  scoped next change; this PR does not claim that coverage is already hosted.
 - [Complete candidate dispositions](candidate-dispositions.md),
   [machine-readable dispositions](candidate-dispositions.json), and the
   [unaltered fresh baseline](before.json) retain every semantic candidate.

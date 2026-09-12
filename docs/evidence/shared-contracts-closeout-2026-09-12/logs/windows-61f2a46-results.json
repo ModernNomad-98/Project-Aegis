@@ -1,0 +1,160 @@
+[
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_validator.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.452,
+    "log": "windows-61f2a46-0.log",
+    "tail": [
+      "  PASS  elicitation sheet: the observed compound's atomic decomposition is shown",
+      "  PASS  evals: project-orchestrator has 49 cases, facilitator has 12",
+      "  PASS  evals: all orchestrator and facilitator eval IDs are unique",
+      "  PASS  evals: the three new orchestrator IDs and three new facilitator IDs each appear exactly once",
+      "  PASS  evals: the observed compound wording is represented on both sides",
+      "  PASS  evals: anti-overcorrection process case and same-target-options case present",
+      "",
+      "OK: 91 gate self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/validate-skills.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.291,
+    "log": "windows-61f2a46-1.log",
+    "tail": [
+      "Validating 184 skill(s) under .claude/skills/ ...",
+      "",
+      "",
+      "OK: 184 skill(s) valid, 0 warning(s)"
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/tests/test_audit_skill_contracts.py"
+    ],
+    "exit_code": 0,
+    "seconds": 7.458,
+    "log": "windows-61f2a46-2.log",
+    "tail": [
+      "  PASS  output inside .claude/skills/ is refused (the tool stays read-only)",
+      "ERROR refusing to write output inside .claude/skills/: C:\\Users\\PETERN~1\\AppData\\Local\\Temp\\aegis-fixture-azdh8gpp\\repo\\.claude\\agents\\..\\skills\\escape.json",
+      "  PASS  output-path containment refuses a ../ traversal into .claude/skills/",
+      "  PASS  scanner enumerates exactly the on-disk corpus (184 skills)",
+      "  PASS  real project-state template still binds as an append-only contract surface",
+      "  PASS  audit output is deterministic across runs",
+      "",
+      "OK: 63 contract-audit self-test assertion(s) passed."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "-m",
+      "tools.behavioral_eval_runner",
+      "self-check"
+    ],
+    "exit_code": 0,
+    "seconds": 1.189,
+    "log": "windows-61f2a46-3.log",
+    "tail": [
+      "      \"result\": \"PASS\"",
+      "    }",
+      "  ],",
+      "  \"live_dispatch\": \"DISABLED\",",
+      "  \"runner_version\": \"0.1.0-wp2b1\",",
+      "  \"schema_version\": \"1.0.0-wp2b1\",",
+      "  \"self_check\": \"PASS\"",
+      "}"
+    ]
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.071,
+    "log": "windows-61f2a46-4.log",
+    "tail": []
+  },
+  {
+    "command": [
+      "C:\\src\\Project Aegis\\Project-Aegis\\artifacts\\reviews\\phase01-sdk-venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/behavioral_eval_runner/tests",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "exit_code": 0,
+    "seconds": 185.271,
+    "log": "windows-61f2a46-5.log",
+    "tail": [
+      "test_other_provider_fragments_remain_banned_everywhere (test_static_safety_calibration.TestCalibrationStaticSafety.test_other_provider_fragments_remain_banned_everywhere) ... ok",
+      "test_provider_fragments_confined_to_the_allowlist (test_static_safety_calibration.TestCalibrationStaticSafety.test_provider_fragments_confined_to_the_allowlist) ... ok",
+      "test_importing_grading_stack_loads_no_network_module (test_static_safety_grading.TestGradingStackStaticSafety.test_importing_grading_stack_loads_no_network_module) ... ok",
+      "",
+      "----------------------------------------------------------------------",
+      "Ran 985 tests in 182.884s",
+      "",
+      "OK (skipped=14)"
+    ]
+  },
+  {
+    "command": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/acceptance/Test-ScenarioAEvidence.ps1"
+    ],
+    "exit_code": 0,
+    "seconds": 30.41,
+    "log": "windows-61f2a46-6.log",
+    "tail": [
+      "  [PASS] the copyable template's empty Decision row matches the cold-start fixture exactly",
+      "  [PASS] the copyable template's empty Approval row matches the cold-start fixture exactly",
+      "  [PASS] the copyable block contains no pre-populated immutable PS-* or A-* data row",
+      "  [PASS] the copyable block preserves its initial SS-001 snapshot row",
+      "  [PASS] the worked example (below the copyable block) still demonstrates real PS-* rows",
+      "  [PASS] the worked example was not treated as the copyable block",
+      "",
+      "PASS - all 111 test(s) passed (host: C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)."
+    ]
+  },
+  {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "scripts/check_dco.py",
+      "--range",
+      "origin/main..HEAD"
+    ],
+    "exit_code": 0,
+    "seconds": 0.141,
+    "log": "windows-61f2a46-7.log",
+    "tail": [
+      "Checking DCO sign-off over origin/main..HEAD ...",
+      "",
+      "  SIGNED  61f2a4648dea  Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>  fix(skills): preserve approval lifecycle and explicit invocation contracts",
+      "",
+      "OK: 1 commit(s) checked, all signed off or exempt."
+    ]
+  }
+]

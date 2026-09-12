@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "name": "enum_sets_closed",
+      "result": "PASS"
+    },
+    {
+      "name": "canonical_encoding_stable",
+      "result": "PASS"
+    },
+    {
+      "name": "identity_behavior",
+      "result": "PASS"
+    },
+    {
+      "name": "claude_adapter_denies_live_dispatch",
+      "result": "PASS"
+    },
+    {
+      "name": "schema_files_match_code_enums",
+      "result": "PASS"
+    },
+    {
+      "name": "no_forbidden_source_patterns",
+      "result": "PASS"
+    },
+    {
+      "name": "real_host_capabilities_honest",
+      "result": "PASS"
+    },
+    {
+      "name": "aggregation_spot_checks",
+      "result": "PASS"
+    },
+    {
+      "name": "grading_enum_sets_closed",
+      "result": "PASS"
+    },
+    {
+      "name": "grading_schemas_match_code_enums",
+      "result": "PASS"
+    },
+    {
+      "name": "grading_contract_complete",
+      "result": "PASS"
+    },
+    {
+      "name": "grading_fixture_reproducible",
+      "result": "PASS"
+    },
+    {
+      "name": "judge_provider_absent_or_denied",
+      "result": "PASS"
+    },
+    {
+      "name": "judge_envelope_security_invariants",
+      "result": "PASS"
+    },
+    {
+      "name": "mock_calibration_threshold_behavior",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_gates_fail_closed",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_request_settings_closed",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_caps_and_pricing_exact",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_dataset_contract_enforced",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_provider_fragments_allowlisted",
+      "result": "PASS"
+    },
+    {
+      "name": "calibration_schemas_match_code_enums",
+      "result": "PASS"
+    }
+  ],
+  "live_dispatch": "DISABLED",
+  "runner_version": "0.1.0-wp2b1",
+  "schema_version": "1.0.0-wp2b1",
+  "self_check": "PASS"
+}
