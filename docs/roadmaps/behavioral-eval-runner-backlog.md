@@ -571,10 +571,11 @@ squash-merged implementation
 redefined as the **Measured Judge Calibration and OD-1 Ratification
 Gate** (only its former NON-LIVE scaffold scope is absorbed by WP-2B-2; historical record
 retained) — is AUTHORIZED by BER-DEC-008 (§13 of this file; governance PR
-[#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87)), **effective only after that governance PR is reviewed and
-manually merged** — before that merge it remains a proposed authorization and no WP-2B-3
-implementation may begin (Peter Nguyen approved the complete 35-decision owner package on
-2026-08-14; OD-1 remains OPEN and is NOT pre-ratified);
+[#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), merged at
+`1c3e4931329179d9a3f9cc9ec1bb93020378c043` on 2026-08-14). PR #88's reviewed
+engineering scope is also merged; measured calibration remains unfinished.
+Peter Nguyen approved the complete 35-decision owner package on 2026-08-14;
+OD-1 remains OPEN and is NOT pre-ratified;
 WP-2B-4 is the separate, BLOCKED
 Scenario A Limited-Scope Live Suite; and WP-2B-5 through WP-2B-7 remain BACKLOG (WP-2B-7 is
 the sole owner of actual advisory CI integration).
@@ -845,9 +846,12 @@ the sole owner of actual advisory CI integration).
 - **Priority:** GATE
 - **Status:** AUTHORIZED - BER-DEC-008 is effective: PR #87 merged at
   `1c3e4931329179d9a3f9cc9ec1bb93020378c043` on 2026-08-14.
-  WP-2B-3 is not DONE. Reviewed corrections and recovery documentation are
-  published on `review/ber-phase01-corrections`; integration into PR #88 and
-  its merge remain unfinished. Original calibration inputs are missing and
+  WP-2B-3 is not DONE. Reviewed engineering corrections and recovery documentation
+  were integrated and merged through PR #88 at
+  `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its
+  [closeout](../evidence/ber-pr88-closeout-2026-09-12/README.md) records verification.
+  Shared contracts and permanent offline CI subsequently shipped in PRs #90/#91.
+  Original calibration inputs are missing and
   the owner confirmed the review conversation is unavailable; continue with the
   [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md).
   The original 35 owner decisions remain recorded in the authorization package;
@@ -1097,6 +1101,10 @@ the sole owner of actual advisory CI integration).
 - **Supersedes / superseded by:** None.
 
 ### WP-2B-7 — Advisory CI and operator workflow
+
+PR #91's permanent [offline regression CI](../offline-ci.md) is delivered.
+It verifies runner implementation and synthetic acceptance fixtures; it does
+not execute the behavioral advisory lane or complete this work package.
 
 - **ID:** WP-2B-7
 - **Title:** Advisory CI integration and operator workflow
@@ -2231,7 +2239,7 @@ Explicit statements about this map:
   ratification, and every live phase remain blocked pending their own evidence and owner
   authorization, and no WP-2B-3 implementation may begin before a reviewed and manually
   merged BER-DEC-008.
-- **Current state (recorded 2026-08-14 — BER-DEC-008 governance PR
+- **Prior state (recorded 2026-08-14 — BER-DEC-008 governance PR
   [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), this governance PR, pending review and manual merge):** the
   WP-2B-2 governance closeout PR #86 is MERGED; `main` is at
   `048644084b2e7a080120d984b8f77fb21d662315` (tree
@@ -2255,6 +2263,16 @@ Explicit statements about this map:
   `feat/behavioral-eval-runner-2b-3-measured-judge-calibration`, created directly from
   the exact authorization merge commit, within BER-DEC-008's recorded budget, evidence,
   deadline, and stop terms.
+
+- **Current delivery checkpoint (2026-09-12):** PR #87 is merged and BER-DEC-008
+  is effective. PR #88's reviewed engineering scope, PR #90's shared contracts,
+  PR #91's offline CI and PR #93's persistent owner grants are delivered. See
+  the [documentation index](../README.md) for their evidence. WP-2B-3 measured
+  calibration remains unfinished because original approved inputs are missing;
+  continue with the [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md)
+  and the applicable source/input/preflight gates. OD-1 remains OPEN and WP-2B-4
+  BLOCKED. Offline regression CI does not complete WP-2B-7. The dated prior
+  states above preserve their historical source identities and conditions.
 
 ---
 
@@ -3145,7 +3163,7 @@ before doing anything else:
 4. **Read every merged Behavioral Eval Runner design successor** — including the v1.1
    fast-track successor
    ([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../design/behavioral-eval-runner-v1-fast-track-successor.md))
-   once the governance PR #84 containing it is merged. A successor is authoritative only
+   merged through governance PR #84. A successor is authoritative only
    for the scope it explicitly supersedes.
 5. **Read this backlog and the governing BER-DEC records (§13 of this file)** —
    authoritative for continuation, deferred work, and execution authority.
@@ -3160,13 +3178,17 @@ before doing anything else:
    earlier revisions of this file or anywhere else. Earlier revisions treated Phase 2B-0
    as the future next phase; that phase is DONE (Outcome B, BER-DEC-005/BER-DEC-006). The
    current registers (§7, §13), not narrative history, decide what is authorized now.
-8. **Continue the authorized WP-2B-3 implementation and pre-execution review.**
-   PR #87 is merged; PR #88 carries the implementation based directly on its
-   authorization merge. Preserve that source binding rather than rebasing onto
-   a later moving `main`. WP-2B-2 is DONE. WP-2B-3 remains subject to its exact-head
-   review, preflight, budgets, evidence controls, and later owner holdout freeze.
-   An implementation review or green offline test suite does not grant execution
-   or merge approval.
+8. **Resume from delivered source and prepare the remaining calibration inputs.**
+   PRs #87/#88/#90/#91 are merged. Use current `main` for new development and
+   follow the [replacement preparation plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md).
+   Preserve historical authorization/source bindings in the evidence; they do
+   not automatically authorize live execution at a later moving revision.
+   WP-2B-2 is DONE. Before any measured WP-2B-3 execution, resolve the selected
+   source identity and applicable authorization, obtain required input approvals,
+   and satisfy exact-revision review, preflight, budgets and evidence controls.
+   The later owner holdout freeze remains a separate gate. Green offline tests
+   do not grant execution authority; repository merge authority is recorded
+   separately in the [owner register](../approvals/APPROVAL_REGISTER.md).
 9. **WP-2B-4 (Scenario A Limited-Scope Live Suite) and later work remain unauthorized**
    unless separately authorized through their own reviewed and merged BER-DEC entries.
    WP-2B-3 authorization does not satisfy its DONE or OD-1 ratification gates.

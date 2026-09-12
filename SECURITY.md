@@ -18,13 +18,20 @@ use the private reporting flow above rather than sending email.
 
 ## Scope
 
-This is a library of agent skills and documentation, not a running service. The
-security-relevant surface is what the content can cause an agent — or a
-maintainer's CI — to do. In scope, for example:
+This source library contains agent skills, documentation, validation tooling and
+the Behavioral Eval Runner. Its security-relevant surfaces include what content
+can cause an agent or CI to do, and the runner's execution and evidence controls.
+In scope, for example:
 
 - malicious or unsafe **skill content** (instructions that could drive harmful,
   destructive, or data-exfiltrating agent behavior);
 - **validator or CI bypasses** that let unsafe content pass the gate;
 - **workflow injection** against the repository's automation;
+- bypasses of **BER approval, execution, budget or evidence-integrity controls**;
+- tampering with **owner approval provenance**, lifecycle records or pinned CI dependencies;
 - changes that **weaken a manual-only invocation posture**, a skill's Security
   Rules or Stop Conditions, or the repository's safety rules.
+
+See [CONTRIBUTING](CONTRIBUTING.md#external-contributions) for review requirements
+and [offline CI](docs/offline-ci.md#protected-files) for the enforced protected-file
+guard. The guard's path list is narrower than the full security-review scope.

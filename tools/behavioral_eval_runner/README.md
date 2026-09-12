@@ -12,8 +12,11 @@ fast-track successor
 ([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../../docs/design/behavioral-eval-runner-v1-fast-track-successor.md)) §3–§4.
 
 WP-2B-3 adds gated calibration controls and a dedicated development driver
-under **BER-DEC-008**. Their implementation and offline verification are in
-scope here; measured calibration is unfinished. The original approved input
+under **BER-DEC-008**. The reviewed engineering scope shipped in
+[PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88);
+shared approval-grader corrections followed in
+[PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90).
+Measured calibration is unfinished. The original approved input
 bytes are unavailable on this computer and in GitHub. See the
 [replacement preparation plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
 and [PR #88 closeout record](../../docs/evidence/ber-pr88-closeout-2026-09-12/README.md).
@@ -31,15 +34,18 @@ and [PR #88 closeout record](../../docs/evidence/ber-pr88-closeout-2026-09-12/RE
   UNAVAILABLE/UNKNOWN and are reported that way.
 - **No live Scenario A or generic eval execution.** The offline core uses the
   Python standard library. The dedicated calibration transport requires the
-  separately pinned SDK; its configuration tests skip when it is absent.
-  The current Actions workflow does not run the BER suite.
+  separately pinned SDK. [Offline CI](../../docs/offline-ci.md), delivered in
+  PR #91, installs it and requires an environment precheck before running the
+  BER suite on Linux and Windows. Minimal local environments without the SDK
+  skip its configuration tests and must report that gap.
 - Census-proposed risk classes are **PROPOSED / NOT OWNER-RATIFIED** (OD-3).
 - **WP-2B-2 grading stack is NON-LIVE:** deterministic graders grade RECORDED
   synthetic evidence only; its generic semantic judge denies live dispatch.
   Its calibration harness uses deterministic mocks and MOCK/UNRATIFIED
   thresholds. WP-2B-3 adds the separate gated transport below, tested with
   fakes and synthetic inputs. **No measured calibration; OD-1 OPEN; R2
-  BLOCKED; WP-2B-3 implementation in progress; WP-2B-4 BLOCKED.**
+  BLOCKED; WP-2B-3 engineering delivered, measured acceptance unfinished;
+  WP-2B-4 BLOCKED.**
 
 ## What is here
 
@@ -75,8 +81,14 @@ never lists itself or the detached marker.
 python -m tools.behavioral_eval_runner version
 python -m tools.behavioral_eval_runner capabilities
 python -m tools.behavioral_eval_runner self-check
-python -m tools.behavioral_eval_runner census --repo . --ref <sha> --verify-baseline --out census.json --canonical
+python -m tools.behavioral_eval_runner census --repo . --ref <sha> --out census.json --canonical
 ```
+
+Replace `<sha>` with the full commit SHA to inspect. The optional
+`--verify-baseline` flag checks the historical census baseline (882 behavioral
+cases and 858 trigger cases), not an arbitrary current revision. Use it only
+when reproducing that pinned historical corpus; later additions can legitimately
+change census totals without changing those baseline constants.
 
 ## WP-2B-3 Stage A1 — measured-calibration controls (BER-DEC-008; OFFLINE)
 
@@ -192,16 +204,24 @@ freeze.
 
 ## Tests
 
+Use an isolated Python 3.14 environment, full Git history and temporary storage
+outside the checkout. Install the pinned CI dependencies before running tests:
+
 ```bash
+python -m pip install -r requirements-ci.txt
+python scripts/ci/check-environment.py
 python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py" -v
 ```
 
 All tests are deterministic and offline: mocks, synthetic fixtures, local
-subprocesses for timeout/kill tests only, temp directories under the
-process-local TMP/TEMP. No network, no package installation, no model calls.
-The WP-2B-3 SDK-configuration tests run only where the pinned SDK is
-installed (the isolated WP-2B-3 venv) and are honestly SKIPPED elsewhere —
-they still perform no network call anywhere.
+Git and process-control subprocesses, and temp directories under the
+process-local TMP/TEMP. The test phase makes no network or model calls and
+installs no packages; dependency installation is a separate networked setup step.
+The WP-2B-3 SDK-configuration tests run with mocked transport in the pinned
+environment. Both hosted CI jobs require that environment, so missing SDK
+coverage cannot silently pass. Local environments without it must retain their
+explicit skips. See the [CI guide](../../docs/offline-ci.md) for the complete
+command set, PowerShell acceptance coverage and remaining platform gaps.
 
 Run local Git and process-tree fixtures as the checkout owner in a context
 that permits synthetic child termination. Restricted-agent sandbox failures

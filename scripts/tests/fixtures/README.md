@@ -1,7 +1,8 @@
-# Validator test fixtures
+# Validator and contract-audit test fixtures
 
 Everything under this directory is **synthetic input for
-`scripts/tests/test_validator.py`** (decision D55). None of it is a shipped
+`scripts/tests/test_validator.py`** (decision D55), except `contract-audit/repo/`,
+which is consumed by `scripts/tests/test_audit_skill_contracts.py`. None is a shipped
 skill, agent, workflow, or doc:
 
 - it lives outside `.claude/skills/`, `.claude/agents/`, `.github/workflows/`
@@ -24,3 +25,5 @@ gate.
 | `workflows/*/` | action SHA-pinning |
 | `readme/` | the D43 SKILL-COUNT / family-roster reconciliation |
 | `paths-tree/` | guided-path + README link resolution, in a miniature repo layout |
+| `claude-bridge/` | startup bridge imports and instruction integrity |
+| `contract-audit/repo/` | advisory contract-audit detectors and exception fixtures |

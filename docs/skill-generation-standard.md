@@ -432,8 +432,12 @@ description overlaps another skill MUST also ship `evals/trigger-evals.json`.
 
 **Evals are a repo convention, validated structurally only (decision D3):** the validator
 checks that `evals/evals.json` exists and parses as JSON (and that `trigger-evals.json`
-parses when present). **There is no eval runner yet** — do not claim evals "pass," only
-that they are present and well-formed.
+parses when present). This check does not execute per-skill eval definitions;
+report them as present and well-formed, not as passing behavioral evaluations.
+The [Behavioral Eval Runner](../tools/behavioral_eval_runner/README.md) now supplies
+an offline control plane, grading and gated calibration controls, with
+[Linux/Windows regression coverage](offline-ci.md). Those offline tests do not
+establish live skill efficacy or complete measured calibration.
 
 ---
 

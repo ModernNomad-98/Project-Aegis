@@ -1,5 +1,14 @@
 # Behavioral Eval Runner v1.1 — Fast-Track Successor (Scenario A Grading Stack)
 
+> **Current-status pointer — 2026-09-12.** The design and August 14 notice below
+> retain their original context. BER-DEC-008 is now effective through merged
+> PR #87; PR #88's reviewed calibration engineering and PR #91's offline CI have
+> shipped. Measured calibration and OD-1 ratification remain unfinished, and
+> WP-2B-4 remains blocked. Use the
+> [active backlog](../roadmaps/behavioral-eval-runner-backlog.md) for current
+> authorization and the [runner README](../../tools/behavioral_eval_runner/README.md)
+> for implemented behavior. This pointer changes no approved design or execution gate.
+
 **Status:** DESIGN / SPECIFICATION SUCCESSOR — **partial supersession** of
 [`behavioral-eval-runner-v1.md`](behavioral-eval-runner-v1.md). Nothing here is built,
 wired, or executed.

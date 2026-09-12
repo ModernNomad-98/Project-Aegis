@@ -1,5 +1,16 @@
 # PR #88 engineering closeout — 2026-09-12
 
+> **Delivered.** [PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)
+> merged at `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its tree matches tested head
+> `d53752d2b600410da122d4b85429c35f30d7c873`.
+> [Main verification 34668951280](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34668951280)
+> passed. The candidate narrative below preserves the CI and authority available
+> at preparation time. Permanent BER/contract CI subsequently shipped in
+> [PR #91](../offline-ci-2026-09-12/DELIVERY.md), and recurring administrator-merge
+> authority is now recorded in the [owner register](../../approvals/APPROVAL_REGISTER.md).
+> Measured calibration remains unfinished; see the
+> [current backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+
 This record continues the [Phase 0/1 review](../behavioral-eval-runner-phase01-review.md).
 The owner authorized implementation, offline tests, commits, pushes and normal
 merges, with PR #88 first, shared skill contracts second and permanent offline
@@ -67,17 +78,17 @@ unprivileged container. It is preflight evidence, not verification of this final
 candidate. Final verification records must identify their actual commit/tree,
 commands, environment, skips and any remaining limitations.
 
-## Completion boundary
+## Completion boundary recorded for the candidate
 
 [Candidate verification](verification.md) records the completed full platform
 suites, gates and [independent reviews](reviews.md). The PR body records the
 submitted head's checks and GitHub disposition before closeout is declared
-complete. The existing workflow checks
-validator self-tests, skill validation and DCO; it does not run BER or contract
-audit tests. Those suites require the separate recorded local verification until
-the later reviewed CI change is merged.
+complete. At preparation time the existing workflow checked
+validator self-tests, skill validation and DCO; it did not run BER or contract
+audit tests. Those suites required separate recorded local verification until
+the later reviewed CI change merged.
 
-GitHub currently requires one approving review for a normal merge. Read-only
+At preparation time GitHub required one approving review for a normal merge. Read-only
 Aegis reviews provide engineering evidence and do not impersonate that approval.
 No administrator bypass or branch-protection change is authorized by this record.
 

@@ -108,7 +108,7 @@ to fail before it counts.*
 
 ### GOVERN — hold the merge/deploy gate with human authority
 
-- **`standing-approval-and-auto-advance` (P3)** — the ONLY governed way to thin low-risk
+- **`standing-approval-and-auto-advance` (P3)** — the reusable pattern for thinning low-risk
   approval fatigue, within named scope and with an explicit opt-out; it never covers a
   protected-branch merge or arming auto-merge, which stay human-only.
 - **`merge-is-deploy-governance` (P7)** — when the platform auto-deploys on merge, treat PR
@@ -117,13 +117,19 @@ to fail before it counts.*
 - **`gated-deployment-prompt-template` (P11)** — a reusable operator prompt for risky
   operations with stop conditions, backup-then-verify gating, and evidence-calibrated ETAs.
 
+Those are the generic skill boundaries. In this source repository, the owner's
+[approval register](approvals/APPROVAL_REGISTER.md) records an explicit recurring
+administrator-merge grant that takes precedence over generic defaults. Human
+authority can be exercised through that standing delegation without repeated
+consent. It does not transfer to consumer repositories or authorize auto-merge arming.
+
 ### HAND OFF — transfer knowledge with evidence, before work begins
 
 - **`lane-authoring-guide` (P10)** — a pre-work, evidence-cited authoring guide per parallel
   lane, transferring planner-to-implementer knowledge *before* the work starts.
 
 The doctrine's answer to documentation **rot** specifically is **`docs-retention-index`
-(P1)**, banked under D12.4: a numbered index that governs every workflow doc's lifecycle —
+(P1)**, banked under D12.4 and shipped in D25: a numbered index that governs every workflow doc's lifecycle —
 retention category, reason-to-keep, superseded-by, and cleanup rule — so retiring a document
 becomes an approvable operation rather than something that never happens.
 

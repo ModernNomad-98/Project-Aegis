@@ -84,6 +84,17 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > The phase register below retains completed phases as labeled history. Only
 > entries explicitly described as remaining or conditional are unbuilt work.
 
+**Delivery update — 2026-09-12:** PR #88's calibration engineering, PR #90's
+shared-contract repairs, PR #91's permanent offline CI and PR #93's persistent
+owner grants are merged. Skill totals are unchanged. See the
+[changelog](../CHANGELOG.md) and [documentation index](README.md) for evidence
+and remaining measured-calibration work.
+
+The approval/merge descriptions below are reusable skill defaults. For work on
+this source repository, consult its [owner approval register](approvals/APPROVAL_REGISTER.md):
+the explicit recurring administrator-merge grant takes precedence here and does
+not transfer with copied skills to another repository.
+
 ---
 
 ## Skills vs. Agents
@@ -668,7 +679,7 @@ manual-only.
 
 | Skill | Source (D12.8 / report P-id) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `scoped-approval-register` | P2 | yes | Durable, append-style record of every granted approval — Status / Reason / Scope allowed / Scope FORBIDDEN / Evidence — with supersede-never-rewrite lifecycle and the deny-by-default citation rule. Composes `human-approval-boundary` (WHERE approval is required vs how the grant is recorded). |
+| `scoped-approval-register` | P2 | yes | Durable immutable grants and appended lifecycle events; derives effective authority from human evidence, expiry, use and invalidation history. Honors existing authorization before transcription, verifies persistence, and composes `human-approval-boundary` for WHERE approval is needed. |
 | `standing-approval-and-auto-advance` | P3 | **no — manual only** | The governed anti-approval-fatigue layer: named-scope standing approval for the mechanical loop, phase-advance into already-approved phases only, per-session restated approval, explicit opt-out, reviewer-block path. Merge-after-green only as explicit opt-in profile, never default; never covers protected-branch merge or arming auto-merge; rationale cites the ungoverned-auto-merge incident in `agent-authorization-matrix`'s evals. |
 | `chat-backlog-reconciliation` | P13 | yes | Cadenced extraction of chat-only decisions/bugs/backlog into dated repo docs, then per-item audit against PR/source evidence (completed/partial/active/not-active/unknown); chat claims cap at unknown without repo proof; standing rule: tracked repo docs, not stale chat. |
 | `context-co-update-ci-gate` | P8 | yes | CI gate failing PRs that touch important paths without a context-map/notes update (declared no-op escape hatch, never silent) + the update protocol (date+SHA stamps, evidence-only status moves, risk notes never deleted without proof). Write-back half of `agent-startup-context-gate`'s read loop. |
@@ -787,7 +798,7 @@ facilitation/design skills that edit nothing → **model-invocable**.
 | --- | --- | --- | --- |
 | `requirements-gathering-facilitator` | reconciliation §3 D12.5 | yes | Elicits requirements BEFORE a spec: separates the problem from stakeholders' solutions, draws out users/jobs and the current workaround, surfaces the implicit (assumptions, non-goals, constraints), reconciles conflict to a decider; produces a confidence-marked brief that feeds `product-spec-writer`. Facilitates; does not decide. |
 | `product-spec-writer` | reconciliation §3 D12.5 | yes | The PRODUCT spec: problem/job, goals and explicit non-goals, scenarios, functional requirements with TESTABLE acceptance criteria, edge/error behavior, rollout intent + success metrics, open questions. Pinned ≠ `adr-writer` (a product spec is not an architecture decision record); routes technical decisions there. |
-| `roadmap-under-uncertainty-planner` | reconciliation §3 D12.5 | yes | Horizon-based roadmap (now/next/later) over a false-precision dated Gantt: confidence decaying with distance, learning-first sequencing (retire uncertainty), outcomes over feature lists, capacity slack, a re-plan cadence. Consumes a ranking from `prioritization-frame-picker`; owns sequencing over TIME. |
+| `roadmap-under-uncertainty-planner` | reconciliation §3 D12.5 | yes | Plans nonbinding Now/Next/Later horizons using confidence, dependencies and learning goals. Readiness and horizon movement neither create nor cancel human commitments; composes `roadmap-to-commitments-translator` for evidenced commitment decisions. |
 | `prioritization-frame-picker` | reconciliation §3 D12.5 | yes | Picks the RIGHT prioritization frame (RICE/WSJF/value-effort/Kano/MoSCoW) instead of defaulting, marks input reliability, refuses false rigor (buckets + a sensitivity check), and pulls must-dos out of the value formula. Ranks; sequencing over time is `roadmap-under-uncertainty-planner`'s. |
 | `feature-flag-rollout-strategist` | reconciliation §3 D12.5 | yes | The ROLLOUT strategy: flag classified by purpose, progressive stages with advance/rollback criteria, sticky targeting, guardrails + a tested kill switch, a fail-safe default, flag-debt removal. Pinned ≠ `plan-entitlement-architect`/`authorization-matrix-designer` (entitlement/permission) and ≠ `ab-test-designer` (experiment). |
 | `sunset-deprecation-communicator` | reconciliation §3 D12.5 | yes | Sunsetting a PRODUCT feature/API to users: rationale, impact, migration path, a firm timeline, an escalating multi-channel comms plan, grandfathering, and a tombstone (not a silent 404). Pinned ≠ `skill-deprecation-planner` (retiring a library SKILL) and ≠ `api-event-architect` (standing deprecation policy). |
@@ -855,7 +866,7 @@ verdicts and edit nothing → **model-invocable**.
 | `tech-spec-writer` | reconciliation §3 D12.7 | yes | The whole-design tech spec / RFC: problem/goals/non-goals, proposed design (data model, APIs, components), alternatives, cross-cutting concerns (security/perf/observability/migration/testing), risks, sign-off. Composes `adr-writer` + `architecture-designer`. ≠ one ADR, ≠ product spec. |
 | `design-review-facilitator` | reconciliation §3 D12.7 | yes | Facilitates the design review: pre-read + right reviewers, importance-first discussion, actively elicited dissent, an EXPLICIT outcome, captured decisions — countering rubber-stamp/bikeshed/HiPPO/no-decision. Reviews a design; doesn't write it. |
 | `cross-team-dependency-negotiator` | reconciliation §3 D12.7 | yes | Cross-team dependencies: two-way map, early surfacing, CONCRETE commitments (deliverable+date+owner both sides), de-risking (stub/flag/parallel), honest accounting for the other team's priorities, and a pre-agreed escalation trigger. The interface contract is `api-event-architect`'s. |
-| `roadmap-to-commitments-translator` | reconciliation §3 D12.7 | yes | Extracts the firm-promise subset from a roadmap: commit-able vs aspirational, capacity-grounded (velocity minus maintenance, buffered), dependency-gated, honest date RANGES, and the not-committed gap named. The inverse of `roadmap-under-uncertainty-planner`. |
+| `roadmap-to-commitments-translator` | reconciliation §3 D12.7 | yes | Separates evidenced human commitments from readiness-based candidates. Capacity, dependencies and honest date ranges inform proposals; only an evidenced human decision creates a commitment. Names the not-committed gap and preserves commitments independently of planning horizons. |
 | `staff-scope-selector` | reconciliation §3 D12.7 | yes | Chooses a staff+ IC's highest-leverage FUTURE scope: level-relative leverage, under-owned problems, matched to strengths, screened against the traps (only-fun/firefighting/too-narrow/invisible-glue/over-reach), with a rationale + explicit NOT-doing list. ≠ `promotion-packet-writer`. |
 | `promotion-packet-writer` | reconciliation §3 D12.7 | yes | Assembles the promotion case: impact-not-activity, mapped to every rubric dimension, a sustained pattern, honest gap analysis, corroboration, committee language — no inflation. ≠ `staff-scope-selector` (future scope), ≠ `ai-closeout-reporter` (one task). |
 | `phased-work-handoff-designer` | reconciliation §3 D12.7 | yes | The cross-stage handoff protocol: a decision-ID register carried across stages, per-stage changed/NOT-touched lists, proven-invocation evidence (tell-tale output), deviation flags, and a cold-start continuation contract. ≠ `ai-closeout-reporter` (one turn), ≠ `ai-sdlc-operating-model` (lifecycle). |
@@ -1261,3 +1272,8 @@ Measured calibration and live corpus execution remain unfinished. Authored eval
 definitions and structural validation are not evidence that those evals passed
 live. Run `python scripts/validate-skills.py` before every commit that touches
 `.claude/skills/`.
+
+Permanent [Linux and Windows offline CI](offline-ci.md) runs the runner's
+regression suite and acceptance checks. PR #88's calibration controls and PR #90's
+approval-grader corrections are implemented; these offline checks do not close
+measured calibration, live execution or WP-2B-7's behavioral advisory lane.

@@ -87,6 +87,11 @@ pwsh -NoProfile -File "scripts/acceptance/Invoke-ScenarioAEvidence.ps1" -KeepEvi
 
 ### Windows PowerShell 5.1 (`powershell.exe`)
 
+Start Desktop acceptance from a native Windows PowerShell shell. A PowerShell
+Core → Python recorder → Desktop chain can inherit Core's module search path
+and prevent Desktop from resolving `Get-FileHash`. The hosted workflow uses
+`shell: powershell` for this step; see [offline CI](../offline-ci.md).
+
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Invoke-ScenarioAEvidence.ps1" -KeepEvidence
 ```
@@ -128,6 +133,16 @@ The harness exits **0** on all-pass and **non-zero** on any failure.
 
 - **Append-only** — deleting a preserved placeholder, or editing / deleting / reordering an
   immutable row, FAILS; a mutable projection-only refresh and the complete low-risk batch SUCCEED.
+- **Full-document refresh boundary** — only the bodies of `Current product summary`,
+  `Current approved scope`, `Current users/roles`, `Current success definition`,
+  `Open questions`, and `Next recommended action` may be refreshed. Exact headings,
+  section order, preamble, unknown sections and immutable scaffolding are protected;
+  immutable sections may gain only valid appended records. The parser uses the flat
+  ATX project-state format and rejects ambiguous or unsupported structures, including
+  Setext headings, raw HTML blocks and unclosed fences/comments. This is a restricted
+  document grammar, not a general Markdown parser. See the
+  [approval lifecycle grading guide](../approval-lifecycle-grading.md) for the
+  related trusted-plan/evidence boundary.
 - **Manifest conformance (F1)** — a per-step hash mismatch (a fixture edited without updating the
   manifest), a duplicated or an unexpected immutable ID, and an unexpected fixture file all FAIL;
   and the full sequence FAILS when a required row is removed from every version — an owner

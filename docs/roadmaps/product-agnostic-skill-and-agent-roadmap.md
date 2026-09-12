@@ -1,5 +1,10 @@
 # Product-Agnostic Claude Skills and Agents Roadmap
 
+> Historical proposal, prepared 2026-07-06. The
+> [v4 reconciliation](../reconciliation/step-0-reconciliation-v4.md) supersedes
+> its implementation plan. Use the [current catalog](../skills-catalog.md) for
+> shipped skill and agent names; the proposal tables below remain unchanged.
+
 Prepared: 2026-07-06
 Purpose: define a reusable, product-agnostic roadmap for Claude Code Skills and project subagents.
 

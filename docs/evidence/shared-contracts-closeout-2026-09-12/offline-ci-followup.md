@@ -1,5 +1,11 @@
 # Permanent offline CI — prepared follow-up
 
+> Historical prepared plan. This work shipped in
+> [PR #91](../offline-ci-2026-09-12/DELIVERY.md), including the Windows native-shell
+> correction and successful main verification. Use the
+> [current CI guide](../../offline-ci.md) for commands and coverage. Original
+> proposals and estimates below are retained for provenance.
+
 Scope already authorized in the audited plan; implementation/merge follows shared
 contracts. Estimate: 2–4 active hours plus required external review/merge waits.
 Prepared using Aegis qa-automation-architect against the current repository checks.
