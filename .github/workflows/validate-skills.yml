@@ -186,6 +186,9 @@ jobs:
       # Sequential calls in the same checkout; each harness launches its own
       # current host. Both editions are tested, with no shell fallback.
       - name: Run Scenario A acceptance in Windows PowerShell 5.1
+        # A Python intermediate launched from pwsh inherits Core's PSModulePath,
+        # which can hide Desktop's Get-FileHash. Start this recorder in Desktop.
+        shell: powershell
         run: python scripts/ci/record-check.py acceptance-desktop -- powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance/Test-ScenarioAEvidence.ps1
 
       - name: Run Scenario A acceptance in PowerShell Core
