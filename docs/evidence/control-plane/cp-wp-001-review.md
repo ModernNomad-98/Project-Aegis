@@ -266,7 +266,7 @@ PR-description update twice, applying the earlier read-only instruction and decl
 commit, push and merged". Reason: resume CP-WP-001. Allowed: commit/push/merge PR #95; runtime/out-of-scope changes forbidden. Evidence: direct chat answering the three-document
 publishing request; no expiry stated. This supersedes the earlier no-merge boundary; fresh review/CI remain required before merge.
 
-## 10. Fifth correction cycle - complete intake and validation-only reuse
+## 10. Fifth and sixth correction cycles - intake, adoption and authority
 
 [Review at 7988b89](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5186926878), submitted 2026-09-12 15:19:11 UTC, found three P1 and two P2 issues. That
 head/tree `7988b89cbdb26b21d1d960769e04808864cb98d7` / `5b8cddec05434e905f58957265fc69164151c955` had 1,497 added lines; all three CI jobs passed and GH1-GH21 were resolved. These
@@ -274,22 +274,29 @@ results are historical. The same three-file/line/time limits and merge-after-gat
 
 | Finding / source | Normative correction / future negative trace | Disposition |
 | --- | --- | --- |
-| GH22 P1 [T25 fences](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642800) | T25/6.2/F21 clear only exact proven-resolved uncertainty instances, after contradiction classification; independent/parent/newer fences survive | Closed in independent document review; pushed reply pending |
-| GH23 P2 [completed contradiction](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642803) | T25/6.2/F19 retain all-state contrary nonexecution, prior receipt/charges and integrity fence; no terminal reopen, liability release or other-slot eviction | Closed in independent document review; pushed reply pending |
-| GH24 P2 [review hash binding](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642807) | Section 9 distinguishes historical f34ec3 and authority-only a5aeee bytes; both reviewers independently reproduced that equivalence. This cycle requires actual final design/backlog hashes and new verdicts | Final reviewed hashes/verdict recorded below; pushed reply pending |
-| GH25 P1 [ceased validator](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642810) | Typed T24 interruption/T17/T16/T27/F09 retain the open check/slot, honest accounting and bound recovery; eligible results apply before retry; benign historical results cannot satisfy a successor; current uncertainty and mandatory policy fences remain | Closed in independent document review; pushed reply pending |
-| GH26 P1 [validation-only reuse](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642812) | T28/5.1/6.2/F01 atomically adopt compatible final effect evidence with current checks/free slot and immutable provenance; no repeated mutation, old pass/grant/charge or terminal reopen | Closed in independent document review; pushed reply pending |
+| GH22 P1 [T25 fences](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642800) | T25/6.2/F21 clear only exact proven-resolved uncertainty instances, after contradiction classification; independent/parent/newer fences survive | Closed in independent document review; resolved with pushed f3568c7 evidence; PR replies retained |
+| GH23 P2 [completed contradiction](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642803) | T25/6.2/F19 retain all-state contrary nonexecution, prior receipt/charges and integrity fence; no terminal reopen, liability release or other-slot eviction | Closed in independent document review; resolved with pushed f3568c7 evidence; PR replies retained |
+| GH24 P2 [review hash binding](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642807) | Section 9 distinguishes historical f34ec3 and authority-only a5aeee bytes; both reviewers independently reproduced that equivalence. This cycle requires actual final design/backlog hashes and new verdicts | Final reviewed hashes/verdict recorded below; resolved with pushed f3568c7 evidence; PR replies retained |
+| GH25 P1 [ceased validator](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642810) | Typed T24 interruption/T17/T16/T27/F09 retain the open check/slot, honest accounting and bound recovery; eligible results apply before retry; benign historical results cannot satisfy a successor; current uncertainty and mandatory policy fences remain | Closed in independent document review; resolved with pushed f3568c7 evidence; PR replies retained |
+| GH26 P1 [validation-only reuse](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996642812) | T28/5.1/6.2/F01 atomically adopt compatible final effect evidence with current checks/free slot and immutable provenance; no repeated mutation, old pass/grant/charge or terminal reopen | Closed in independent document review; resolved with pushed f3568c7 evidence; PR replies retained |
+| GH27 P1 [retry receipt race](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996700507) | T23/6.2/F21 serialize final receipt against initiation/claim contact; exact pending retry disables even after exception consumption; handoff-first uncertainty persists | Closed in independent document review; pushed reply pending |
+| GH28 P1 [adoption authority](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996700514) | T28/6.2/F01 consumes current adoption authority with adoption/slot atomically at trusted source; unsupported cross-store contact denies; predecessor grant untouched | Closed in independent document review; pushed reply pending |
+| GH29 P1 [terminal authority intake](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3996700520) | T13/5.2/F03 admit terminal late facts and fence disputed dependent provenance by effective action time; ordinary later expiry/own use is not retroactive breach | Closed in independent document review; pushed reply pending |
 
-Both independent architecture/recovery and security/authority reviewers approve the final documentation; no blocking finding remains in their traced paths.
+Fifth-cycle independent architecture/recovery and security/authority reviewers approved these exact hashes; no blocking finding remained in their traced paths.
 Design SHA-256: `9e5ee6fcb20269732608d0444919e64865aee41122dcd249e7a1979b691e4076`.
 Backlog SHA-256: `31459a5592a5ecec6668c28a4ad9dd3b1f877037251c6340eddae0ba9238e9d8`.
 Follow-up findings closed: T24 exact uncertainty clearance; result-before-cessation intake; known final failure cannot be skipped by retry; consumed recovery survives only benign historical intake.
 Late mandatory policy failure retains a bound irreversible stop obligation; late uncertainty/contradiction still fences. Catalog registration also precedes adoption.
 Actual local checks exited 0: `git diff --check`; `python -B scripts/validate-skills.py` (184 valid, zero warnings); `python -B scripts/tests/test_validator.py` (91 assertions).
 In-memory Markdown/link/ID audit passed: 39 local links/anchors, 29 tables, 50 headings, unique T01-T28/C01-C09; final expanded evidence and staged scope receive final checks.
-Complete correction diff and follow-ups were inspected. Historical prose reflow preserved facts. Final evidence content/hash is verified separately, with no self-hash embedded.
-Pushed replies, fresh exact-head review, DCO/CI and final head/tree remain PR/handoff evidence after delivery; passing 7988b89 CI does not validate this correction.
-F01-F21 remain unexecuted future controller cases; these document traces and repository checks establish no runtime capability.
+Complete diff/follow-ups were inspected; historical reflow preserved facts. Evidence hash is verified separately, never self-embedded. F01-F21 are unexecuted; no runtime capability is established.
+Pushed replies, fresh review, DCO/CI and final head/tree are PR/handoff evidence after delivery; 7988b89 CI cannot validate later corrections.
+Fifth-cycle delivery: `f3568c76761bcfaf7d2412d1aefe66fff8affe19`, tree `2064eee0182a7b9eb3a8fdcb6652b0dc4ad516e3`; 1,495 added lines, six DCO commits, all three CI jobs passed, GH1-GH26 resolved.
+[Fresh review](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5186980760) at 2026-09-12 15:41:14 UTC found GH27-GH29. Those prior checks do not validate the next correction.
+Sixth-cycle architecture/recovery and security/authority reviewers approve design SHA-256 `eb3f3fe422b418cd9fb2ff90446c4a77cd1ad2bd9472ee07cbccb7146abd48e0`; no blocking finding remains.
+Reviewed backlog SHA-256: `4efec2c0af50528547e8fd1d6f84f5331f2be42f1e8f3a64e3fcc5e11b398e69`. Validator-use origins, lawful-consumption/no-op intake and exact historical correction were also verified.
+Same local diff/skill/91-assertion/Markdown checks reran with exit 0; shortened prose preserved affected rules. Final evidence/staging checks and pushed exact-head review/CI remain required; scope/authority/artifact boundaries persist.
 
 ## 11. Intentional omissions and continuation
 

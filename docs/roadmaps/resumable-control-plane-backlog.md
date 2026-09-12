@@ -97,8 +97,9 @@ F18-F21 require atomic final-failure fencing/settlement, proven nonexecution aft
 handoff, non-mutating contained validation and identity-bound uncertainty-fence clearance.
 F01/F09/F19/F21 also require validation-only T28 adoption with its own free slot/current
 checks, typed ceased-validator recovery, all-state contrary nonexecution intake and T25
-exact-instance fence clearance. Independent review evidence must name the final design
-and backlog content hashes; historical hashes cannot attest changed normative bytes.
+exact-instance fence clearance, receipt-versus-retry serialization, source-atomic adoption approval use,
+and terminal late authority facts. Independent review evidence names final design/backlog hashes;
+historical hashes cannot attest changed normative bytes.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
