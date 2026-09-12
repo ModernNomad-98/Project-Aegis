@@ -23,7 +23,7 @@ It excludes runtime work and stops before merge. AEGIS-APR-001 remains applicabl
 to read-only reviewers; AEGIS-APR-002 does not override this task's no-merge boundary.
 The task authorization source and bounded summary are in the evidence document.
 The current correction instruction continues PR #95 on this same branch: address
-all six GitHub findings, reply/resolve only after pushing evidence, request a fresh
+all original and subsequent GitHub findings, reply/resolve only after pushing evidence, request a fresh
 exact-head Codex review and monitor it plus all CI. No second branch or PR is allowed.
 
 Status vocabulary: AUTHORIZED = the human granted the exact package;
@@ -52,7 +52,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Permitted delivery | Focused branch, explicit-path staging, DCO-signed commits, normal push, exactly one PR to main, all-check monitoring and in-scope corrections |
 | Forbidden | Merge/auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
 | Non-goals | Offline kernel, physical extraction/wrappers, actual execution/containment, distribution, dashboard, BER advancement |
-| Completion | Three-file bounded diff, local validation, independent re-reviews of all six findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; PR #95 stays open/unmerged with auto-merge disabled |
+| Completion | Three-file bounded diff, local validation, independent re-reviews of all findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; PR #95 stays open/unmerged with auto-merge disabled |
 | Next owner decision | Review the delivered CP-WP-001 PR and decide its acceptance/merge disposition; later implementation needs separate authorization |
 
 ### 2.1 Required evidence handling
@@ -67,13 +67,13 @@ No active-state storage, raw evidence creation or deletion policy is executed he
 
 Acceptance requires: Role A/remote/base/grant reconciliation; explicit product/BER
 boundaries; every required reuse primitive classified; all eleven logical components
-and their authority limits; normative T01–T25 and C01–C09 coverage; identity,
+and their authority limits; normative T01–T27 and C01–C09 coverage; identity,
 idempotency, atomicity, pause/stop, corruption/schema/receipt handling; seven storage
 classes and checkpoint transfer; platform limits/threats/tests; blocked later work;
 reviewable three-file diff and actual validation evidence.
 
 The corrected contract must cover CP-D01–CP-D10 and the negative families in
-[design section 10.1](../design/resumable-control-plane-v1.md#101-six-finding-specific-negative-acceptance-families):
+[design section 10.1](../design/resumable-control-plane-v1.md#101-finding-specific-negative-acceptance-families):
 F01 stable cross-revision/run effect identity and durable approved distinctions;
 F02 proof-free dispositions remain non-dispatching and cannot certify success;
 F03 source-atomic one-use claims across all consumers with synthetic isolation;
@@ -81,7 +81,11 @@ F04a/F04b intent-owned versioned budget settlement for every receipt/non-dispatc
 cancellation/uncertainty/terminal/restart route; F05 independently fresh checkpoint
 recovery; F06 atomic repository-wide outstanding slot across items/runs. Independent
 review must verify transitions, storage/crash rules and negative cases agree; adding
-prose or passing CI alone does not close a finding.
+prose or passing CI alone does not close a finding. The fresh-review follow-ups
+add F07 receipt retention with UNKNOWN billing in reconciliation, F08 terminal
+receipt admission with classified usage, and F09 T26 non-advancing terminal validation
+settlement backed by T27 pre-launch intent. No-start proof cannot be inferred from
+missing results; no terminal settlement may waive independent slot-release evidence.
 
 Stop on pre-existing tracked/staged changes, role/repository ambiguity, unrelated
 target-branch work, material base conflict, additional file or line/time budget,
@@ -150,7 +154,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T25/C01–C09/F01–F06 tests, including F04a/F04b; stable identities, slot/replay/budget/freshness evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T27/C01–C09/F01–F09 tests, including F04a/F04b; stable identities, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |

@@ -121,7 +121,7 @@ entry convention. No installed console script or packaging dependency is implied
 | CP-D03 | Authority and state transitions deterministic; workers untrusted | Not relaxable by worker output or implementation convenience |
 | CP-D04 | Unknown effects remain non-dispatching; proof-free owner disposition can only stop/final-fail/report | Authoritative nonexecution proof or separately reviewed safe retry using the original effect identity; never owner risk acceptance alone |
 | CP-D05 | Storage interface before selecting implementation | CP-WP-002 authorization must name selected storage and crash model |
-| CP-D06 | Terminal state never reopens; later evidence may settle obligations | New explicitly authorized run/item revision, preserving predecessor history |
+| CP-D06 | Terminal state never reopens; late receipt/accounting and validation dispositions settle obligations without advancement | New explicitly authorized run/item revision, preserving predecessor history; never replace COMPLETED evidence with cancellation |
 | CP-D07 | Imported state needs independent monotonic freshness proof or complete authoritative reconciliation before dispatch | No self-consistent chain or inactive-host exception |
 | CP-D08 | Effect dedup key excludes item/run/source/plan/policy revisions; immutable logical-effect binding survives them | Different/repeated/compensating effect needs explicit new-ID approval and durable predecessor disposition |
 | CP-D09 | External one-use grants require atomic claim/consume at the trusted source; local reservation is not authority | Real dispatch denied when source or any consuming path cannot enforce it |
@@ -282,7 +282,16 @@ cancellation may close validation as cancelled, never as passed. Proven no effec
 with unknown claim/control billing still holds the slot and denies another operation.
 
 Receipt collection, validation, pause/stop and read-only reconciliation of the owned
-operation are permitted without allocating another slot. A section 7.4-approved retry
+operation use its existing slot. Required validation obligations are registered with
+the accepted operation. T27 commits a validator sub-intent before any launch/contact,
+bound to parent intent/effect, exact check/input/attempt and its own use/budget records.
+It is a subordinate activity, not another operation or effect key. Complete verified
+history plus an effective fence can prove no start ONLY when no such intent exists;
+a recorded intent with missing launch/result acknowledgement remains uncertain unless
+authoritative non-launch proof resolves it. Absence of a result is never no-start proof.
+T26 settles validation obligations after STOPPED/FAILED_FINAL without new validation,
+business advancement or reopening; it cannot waive receipt integrity or unknown costs.
+A section 7.4-approved retry
 of the SAME logical effect may retain/transfer that slot to a new attempt; it is not
 a new operation and keeps the original uncertain attempt/accounting. Another effect,
 including compensation, cannot use that exception. T03 rechecks slot ownership and
@@ -300,7 +309,8 @@ must be declared/bounded/accounted as part of the owned operation before contact
 
 Budget records are separate from permission-use records. Version 1 dispositions
 are RESERVED, CONSUMED, ADJUSTED, RELEASED and UNKNOWN_WORST_CASE_CHARGED. Each
-reservation ID is owned by exactly one INTENT_COMMITTED, atomically binding repository,
+reservation ID is owned by exactly one INTENT_COMMITTED (including T27's typed
+validator sub-intent), atomically binding repository,
 work package, effect key, attempt, budget-policy/cap snapshot and reserved vector R.
 Use integer enforceable units per dimension; no negative/nonfinite value or float
 money. Require a defensible maximum liability W before contact (R covers W); an
@@ -326,6 +336,13 @@ the original release remains history, never a reason to discard or undercount a 
 CONSUMED/ADJUSTED/UNKNOWN may receive an evidence-backed ADJUSTED record; none resets
 historical caps or removes attempts. Totals are sums of current held+charged per
 reservation over complete history, checked for nonnegative amounts and no double use.
+
+Classify usage from all verified history, not just the incoming receipt. Missing or
+less-informative telemetry cannot downgrade prior authoritative CONSUMED/ADJUSTED
+usage to UNKNOWN/W or erase an overrun. Retain that settlement by reference with the
+new observation. Only authoritative corrected usage/refund may reduce known charges.
+Evidence of additional unresolved liability preserves known charges and records the
+additional exposure/fence; never replace a larger known amount with a smaller W.
 
 If A exceeds R/W or remaining cap, durably record actual A and a breach/dispatch
 fence in the same transaction; never reject the bill, understate usage or increase
@@ -389,21 +406,23 @@ acknowledgement, no new effect, and closed dispatch until storage is verified.
 | T08 VALIDATING | Pause validation | O -> E/S | Authentic command | Fence and validation checkpoint | Settle/cancel existing validation only | PAUSING until settled, then PAUSED | Unknown validator activity -> reconciliation | Starting new validation while paused |
 | T09 RECONCILIATION_REQUIRED | Pause | O -> E/S | Authentic command | Pause fence | Permitted read-only reconciliation | RECONCILIATION_REQUIRED | Uncertainty and fence persist | Hiding uncertainty as PAUSED |
 | T10 RUNNING/PAUSING | Receive result | Adapter observation -> E/S | Request/effect/target/input binding verified; usage evidence classified | RECEIPT_RECORDED and 5.4 CONSUMED/ADJUSTED or UNKNOWN settlement atomically; preserve slot through validation | Preserve evidence | Known budget/result -> VALIDATING or PAUSING to T07; unknown billing -> reconciliation; breach fences dispatch | Conflicting receipt/uncertain settlement retains obligations and slot | Receipt equals success; free capacity from missing telemetry; late result bypasses fence |
-| T11 VALIDATING | Required validation passes | V -> E/S | Exact result, settled accounting and all named gates verified | VALIDATION_PASSED and next/final disposition; close operation slot only when 5.3 satisfied | None | COMPLETED only if all gates met; else PLANNED next step or BLOCKED | Uncommitted validation retains slot | Worker self-certifies; skip gates; drop outstanding accounting |
-| T12 VALIDATING | Validation fails | V -> E/S | Verified failure and classification | VALIDATION_FAILED, reasons/recovery conditions; retain usage and effect outcome; close slot only under 5.3 | None | BLOCKED if recoverable; FAILED_FINAL only under final-failure rule | Interrupted check retains slot | Retry-until-green; repeat completed mutation to repair validation; erase usage |
+| T11 VALIDATING | Required validation passes | V -> E/S | Exact bound validator result; usage/source evidence classified; all named gates evaluated | VALIDATOR_OBSERVATION and 5.4 settlement/reference atomically; VALIDATION_PASSED/next disposition only with settled accounting/source and required gates; slot follows 5.3 | None | UNKNOWN cost/source -> reconciliation retaining pass; otherwise VALIDATING for another pending unblocked declared check or BLOCKED on its prerequisites; next-operation PLANNED only after current checks/accounting settle; COMPLETED only if all work/gates met | Uncommitted validation retains slot | Skip pending checks; lose validator budget; advance on UNKNOWN |
+| T12 VALIDATING | Validation fails | V -> E/S | Exact bound failure/classification; usage/source evidence classified | VALIDATOR_OBSERVATION, reasons and 5.4 settlement/reference atomically; VALIDATION_FAILED disposition when source/accounting settled; retain effect outcome; slot follows 5.3 | None | UNKNOWN cost/source -> reconciliation with failure retained; otherwise BLOCKED if recoverable or FAILED_FINAL under final-failure rule | Interrupted check retains slot | Retry-until-green; repeat completed mutation to repair validation; erase failure/usage |
 | T13 any nonterminal | Approval expires/revokes/supersedes or becomes unavailable through another use | Verifier -> E/S | Effective lifecycle/use facts; own reservation/normal consumption follows section 5 | AUTHORITY_INVALIDATED or evaluated denial; fence | Account for existing activity only | PAUSED stays PAUSED with blocker; idle -> BLOCKED; active -> PAUSING or reconciliation | Unknown freshness denies | Revive old grant; assume unknown use unused; treat own reservation as a foreign use |
 | T14 PAUSED | Resume | O -> E/S | Fresh authority/identities, independently verified recovery freshness (8.1), complete effect/use/budget indexes, exclusive owner; unresolved owned effect uses T17 instead | RESUME_ACCEPTED with cursor; retain owned slot until 5.3 closure | None; later T03 enforces global slot and source claim | PLANNED or VALIDATING | Denial leaves PAUSED with reason | Self-consistent stale checkpoint enables dispatch; resume itself dispatches |
 | T15 any nonterminal | Source/plan/policy/item binding mismatch | E/S | Mismatch detected | BINDING_MISMATCH and fence | Account for existing work only | PAUSED retains fence/blocker; idle -> BLOCKED; active/uncertain -> reconciliation | Preserve old bindings | Silently follow moving main or changed inputs |
 | T16 BLOCKED | Remediation accepted | O -> E/S | Evidence and explicit recovery/revision disposition; 5.1 predecessor and 7.4 replay restrictions still hold | BLOCKER_RESOLVED without replacing effect/use/budget history | None | PLANNED/VALIDATING only if evidence permits; PAUSED if fence retained | Unresolved conditions stay BLOCKED | Revision or owner command erases completed/unknown predecessor |
-| T17 RECONCILIATION_REQUIRED | Resolve outcome | R evidence + O where policy requires -> E/S | Exactly one 7.4 evidence route: bound final receipt; authoritative nonexecution; reviewed safe same-key retry; or proof-free non-dispatching disposition | RECONCILIATION_RECORDED with route/proof, 5.4 settlement and slot disposition; original history retained | None in this transition | Receipt -> VALIDATING; nonexecution or safe-retry proof -> PLANNED with original key (PAUSED if fence); proof-free -> STOPPED/FAILED_FINAL or report-only reconciliation, never runnable | Missing proof/telemetry/source leaves uncertainty and slot; terminal obligations persist | Risk acceptance establishes nonexecution/success; fresh key or compensating action rewrites predecessor |
+| T17 RECONCILIATION_REQUIRED | Resolve outcome | R evidence + O where policy requires -> E/S | Verified activity kind/check cursor and 7.4 evidence route; bound receipt, authoritative nonexecution, reviewed safe operation retry or proof-free terminal/report disposition | RECONCILIATION_RECORDED with receipt/proof, 5.4 settlement/reference and slot disposition; original history retained | None | UNKNOWN billing/claim retains receipt in reconciliation; settled receipt -> VALIDATING/PAUSED; operation nonexecution/safe-retry -> PLANNED/PAUSED under 7.4; validator non-launch -> VALIDATING/PAUSED for same unresolved check, never parent T03; proof-free -> STOPPED/FAILED_FINAL/report-only reconciliation | Missing proof/telemetry/source retains uncertainty and slot; terminal obligations persist | Receipt hides UNKNOWN; validator recovery retries parent effect; risk acceptance invents nonexecution/success |
 | T18 every nonterminal state | Graceful stop | O or E under approved stop rule -> S | Authentic command/rule | STOP_RECORDED, permanent fence, drain deadline and 5.4 known settlement or retained reserve/worst-case charge | Bounded already-approved drain; no new steps | STOPPED immediately; effects, accounting and slot pending until proven settled | Timeout -> T20; uncertain outcome remains worst-case charged | Stop releases budget/use/slot; business workflow advances |
 | T19 every nonterminal state | Immediate stop | O or E under approved stop rule -> S | Authentic command/rule | STOP_RECORDED, permanent fence, obligations and 5.4 uncertainty/known settlement | Best-effort allowed cancellation/kill and observation | STOPPED | Unknown outcomes/billing retain worst-case charge and slot | Cancellation means zero bill; erase accounting or promise reversal |
 | T20 STOPPED with graceful drain | Escalate immediate stop | O or approved deadline rule -> E/S | Outstanding drain/cancel obligations | STOP_ESCALATED plus evidence-backed 5.4 settlement or UNKNOWN; no automatic refund | Permitted cancellation only | STOPPED | Unknown obligations, charge and slot remain | Reopen work; refund on deadline |
 | T21 any state | Competing resume | Second process | Owner lock unavailable | No competing journal write; local denial result | None | Canonical state unchanged | Bounded refuse/wait | Unlink lock, PID/mtime takeover |
 | T22 COMPLETED/FAILED_FINAL/STOPPED | Restart/resume request | O/read interface; E denies advancement | Verified terminal event | No advancing event; optional non-authorizing observation | Reporting and separately allowed receipt reconciliation | Same terminal state | Integrity failure makes status unverified, dispatch closed | Reopen terminal run or reset budget |
-| T23 any state, including terminal | Late bound receipt/accounting evidence | R -> E/S | Existing recorded intent/effect/reservation identity, including settled/RELEASED; authoritative binding/integrity/usage verified | LATE_RECEIPT_RECORDED and 5.4 settlement atomically; contradictory release -> true-usage ADJUSTED plus integrity exception/fence; slot closes only under 5.3 | Evidence preservation only | Same lifecycle, no advancement; terminal never reopens; active work obeys any new fence | Conflicting/unknown usage retains accounting uncertainty | Ignore bill after obligation closed; reset cap; convert stopped/failed to completed |
-| T24 PAUSING | Existing validator returns | V observation -> E/S | Check began before fence; result and input bindings verified | VALIDATOR_OBSERVATION_RECORDED with pass/fail and cursor | Evidence preservation only | PAUSING until T07 accounts for activity, then PAUSED | Unknown validator activity -> reconciliation | Finalize/advance on late pass; start another check |
-| T25 RUNNING/PAUSING/STOPPED with outstanding never-handed intent | Final check denies or pause/stop fence wins | E/S | Authoritative non-dispatch proof; source claim/control-contact disposition and billing separately classified as known or unknown | NONDISPATCH_PROVEN independently of source/local use disposition; 5.4 RELEASED only for proven zero liability, otherwise CONSUMED/UNKNOWN; every unknown retains slot/accounting | None | BLOCKED/PAUSED if obligations resolved; otherwise reconciliation; STOPPED unchanged with obligations | Lost claim/control bill or unproven non-dispatch retains slot/accounting | Local release reactivates external grant; zero effect means zero control cost; reopen STOPPED |
+| T23 any state (effect receipts only when terminal) | Late terminal receipt or subsequent accounting evidence | R -> E/S | Existing recorded intent/effect/reservation identity, including settled/RELEASED; receipt binding/integrity verified; usage classified from complete history; actual charges require authoritative evidence; initial nonterminal receipts use T10/T17 | LATE_RECEIPT_RECORDED atomically with prior settlement reference, new authoritative settlement or UNKNOWN_WORST_CASE_CHARGED as 5.4 permits; contradictory release -> true-usage ADJUSTED plus exception/fence; slot follows 5.3 | Evidence preservation only | Same lifecycle, no advancement; terminal never reopens; unknown billing/claim retains obligations, slot and fence | Missing telemetry cannot discard receipt or downgrade prior known usage | Require known usage to admit receipt; bypass T10/T17; free slot on receipt alone; undercount known charges or reopen terminal |
+| T24 PAUSING | Existing validator returns | V observation -> E/S | Check began before fence; result/input binding verified; usage/source classified | VALIDATOR_OBSERVATION_RECORDED with pass/fail/cursor and atomic 5.4 settlement/reference | Evidence preservation only | UNKNOWN usage/source/activity -> reconciliation with fence and result retained; otherwise PAUSING until T07, then PAUSED | Uncommitted result retains validator/slot obligations | Finalize/advance on late pass; start another check; drop validator charge |
+| T25 RUNNING/VALIDATING/PAUSING/STOPPED with outstanding never-handed intent | Final check denies or pause/stop fence wins | E/S | Authoritative non-dispatch proof for operation or validator sub-intent; source/control/billing separately classified | NONDISPATCH_PROVEN independently of source/local use disposition; 5.4 RELEASED only for proven zero liability, otherwise CONSUMED/UNKNOWN; every unknown retains slot/accounting | None | BLOCKED/PAUSED if obligations resolved; otherwise reconciliation; STOPPED unchanged with obligations | Lost claim/control bill or unproven non-dispatch retains slot/accounting | Local release reactivates external grant; no launch means zero control cost; reopen STOPPED |
+| T26 STOPPED/FAILED_FINAL | Settle existing validation obligation | Bound V observation or checked non-launch/cancellation proof -> E/S | Exact registered obligation/check/input/attempt; complete verified history and permanent fence; classify as below; no unknown validator activity | TERMINAL_VALIDATION_SETTLED with immutable disposition/proof and atomic 5.4 settlement for any validator costs; release slot only if ALL 5.3 obligations settled | None; no new validation/dispatch | Same terminal state; preserve prior pass/fail, never business completion | Uncertain launch/cessation/result/cost keeps obligation or slot as applicable | Stop/cancel request or parent exit proves cessation; cancel away COMPLETED evidence; waive receipt verification |
+| T27 VALIDATING | Begin declared validation | E/S | Exact registered unresolved check/input, no still-valid stored result to apply, owned slot, no active/uncertain validator or fence, current scoped authority and sufficient bounded budget | Atomic VALIDATOR_INTENT_COMMITTED typed sub-intent, parent/effect/check/input/attempt binding and new use/budget reservations | Named validator only after durable sub-intent, required source claim and final serialized authority/fence check | VALIDATING, obligation active | Intent without launch/result proof remains uncertain; C02/C08/C09 apply; proven final denial follows T25/T26 | Launch without intent; repeat a stored failure; start after stop/pause; reuse parent grant or settled budget implicitly |
 
 After T24/T07, resume restores VALIDATING and applies the still-valid bound pass/fail
 observation through T11/T12. A prior failure remains binding until explicit
@@ -411,6 +430,34 @@ remediation and a newly authorized validation attempt; resume does not rerun unt
 green. Success still requires all current completion gates. If observation validity
 is uncertain, block for disposition rather than discard it. No paused observation
 itself finalizes work.
+
+T11/T12/T24/T26 account for validator sub-intents using 5.4; recording a result never
+drops a reserved validator charge. If source/billing uncertainty sends a validator
+observation to reconciliation, T17 retains its cursor and, after settlement, restores
+VALIDATING (or PAUSED under its fence) to apply that same bound pass/fail through
+T11/T12. It does not relaunch via T27 or turn a stored failure into success.
+For authoritative non-launch proof, the recorded activity kind/check cursor selects
+the recovery route: validator proof settles only that sub-intent/source/budget and
+restores the same unresolved check to VALIDATING (PAUSED if fenced). A later T27
+needs fresh scoped authority/budget; it never retries the completed parent via T03.
+T16/T25 preserve this cursor too. Operation recovery still follows 7.4's original-key
+rules. After one check passes, T11 stays VALIDATING for other declared checks until
+all current-operation obligations settle; the shared slot is not released between checks.
+
+T26 records one of: PASSED/FAILED from an independently verified final validator
+observation plus proven cessation; CANCELLED_AFTER_START from authoritative cessation
+evidence; or CANCELLED_WITHOUT_START from no T27 intent in complete verified history
+plus the effective fence, or authoritative non-launch proof for an existing intent.
+All refer to the exact prior obligation; duplicate same proof is idempotent and a
+conflicting disposition is an integrity error. Cancellation is not validation pass
+and cannot replace an already recorded pass/fail. Unknown execution is not cancellation.
+If no validation began before stop and a verified result arrives later, close the
+unstarted obligation using this explicit non-dispatching rule; never launch a new
+validator after the terminal fence. Result authenticity, final effect/source/control
+and budget settlement remain independent slot-release requirements. Either T23 or
+T26 may arrive first; the last required verified settlement closes the slot atomically.
+COMPLETED with an unresolved mandatory validation obligation is inconsistent history,
+not permission to apply T26 or cancel away the completion requirement.
 
 All stop modes close future dispatch at the same serialized fence. Graceful stop
 allows only the already-authorized operation to settle within a declared deadline;
@@ -433,6 +480,11 @@ attempt only permitted emergency containment; recovery must expose the uncertain
 | C07 during export, projection or restore of an older valid chain | Internal consistency does not establish latest effect/use/budget state | Read-only until 8.1 freshness proof/complete authoritative reconciliation; no history or cap reset |
 | C08 source claim/redemption before local receipt commit | One-use source may already have reserved/consumed grant | Query original claim identity; do not re-claim, release, assume zero billing or dispatch without verified receipt; retain slot |
 | C09 during budget settlement/slot release | Outcome and accounting/slot transaction may be committed but unacknowledged | Verify/replay same event IDs and predecessor; no duplicate credit, dropped charge or extra outstanding operation |
+
+C02/C08/C09 also cover T27 validator sub-intents and T26 terminal settlement.
+Crash after a validator intent cannot become CANCELLED_WITHOUT_START merely because
+no result exists. Crash during T23/T26 cannot lose a bound late receipt or close the
+slot before independent validation/source/budget obligations are all disposed.
 
 ## 7. Durable events, atomicity and recovery
 
@@ -527,7 +579,9 @@ history alone is read-only and never a basis for fresh effect or approval use.
 
 Persist original effect key/descriptor, attempt, source-claim and budget reservation
 identities. Lookup is bounded/read-only and records query/time/source/response
-bindings. T17 classifies one of these routes; every route records evidence and
+bindings. For an operation, T17 classifies one of these routes; validator sub-intent
+non-launch follows the typed check-cursor rule in 6.2, never parent-operation replay.
+Every route records evidence and
 accounting and retains the original history:
 
 | Route | Permitted disposition / required proof |
@@ -599,7 +653,8 @@ history, repository/source/item/policy/schema identities, approvals and lifecycl
 references, effect keys/receipts/obligations, export provenance and transfer terms.
 Include the complete project catalog and all history dependencies needed to rebuild
 cross-revision/run effect, approval-use and budget indexes plus outstanding slot;
-a standalone run dump is insufficient. Include source head (project-catalog head
+a standalone run dump is insufficient. Include validator sub-intents and terminal
+dispositions so absence of a launch cannot be invented. Include source head (project-catalog head
 and complete run-head vector), export head (sanitized representation's manifest
 digest), authoritative source inventory and freshness/monotonicity proof references.
 Redaction produces a new representation and manifest/hash chain explicitly mapped
@@ -678,7 +733,8 @@ claims of current exploitation. No residual live risk is accepted by this docume
 | Prompt injection / B2,B4,B5 / high | Worker artifact asks to remove gates, expand paths or certify itself | Treat output as data; closed contract and independent validation; security reviewer | Injected plan/evidence cannot affect authority |
 | Path escape / B3,B5 / high | Local adversary swaps ancestor to redirect evidence write | Owned ACL/checked-handle capability; unsupported guarantees refuse; platform owner | Symlink/reparse swap probe with prevention versus detection recorded |
 | Writer compromise / B3,B5,B6 / high | Writer replaces content and hashes to fabricate success | State trust assumption explicitly; independent authenticity before claiming resistance; owner/security | Demonstrate limits of rewritten chain; no authenticity claim from hashes |
-| Lost/counterfeit receipts / B5 / high | Adapter fabricates success or drops accepted-effect receipt | Bound independent receipt verification; unknown outcome blocks; adapter owner | Conflicting/missing receipt cannot complete |
+| Lost/counterfeit receipts / B5 / high | Adapter fabricates success or hides a valid receipt because billing is unknown | Independent receipt verification and separate usage classification; unknown cost blocks dispatch, not observation; adapter owner | F07/F08 retain valid receipts with UNKNOWN settlement, never complete from them |
+| Terminal validation / B3,B5 / high | Stop either strands slot forever or releases it from unproved validator cancellation | Write-ahead T27 launch and non-advancing T26 settlement; kernel owner | F09 covers never-started, late pass/fail, uncertain launch/cessation and both settlement orders |
 | Schema reinterpretation / B3,B6 / medium | New reducer interprets old denial as grant | Version pin, explicit migration and golden replay; kernel owner | Unknown version and unsafe migration reject |
 | Availability/cost exhaustion / B2,B4 / medium | Huge input or endless retry consumes storage/time/budget | Bounded record/input sizes, attempts/deadlines and no autonomous retries; policy owner | Oversize/cap/deadline denies before effect |
 
@@ -704,7 +760,7 @@ OS, Python/shell versions, command, exit, skips, capability outcome and evidence
 
 | Test family / covered contract | Expected assertion | Layer |
 | --- | --- | --- |
-| State table T01–T25 | Allowed transitions meet guards; every unspecified pair denies | Unit/table-driven |
+| State table T01–T27 | Allowed transitions meet guards; every unspecified pair denies | Unit/table-driven |
 | Reconstruction | Same complete catalog/journals yield states, budget/use dispositions, fences, stable effect index and outstanding slot | Unit/integration |
 | Tamper/rollback | Altered/gapped/reordered/conflicting duplicate events reject; internally valid older chain cannot dispatch without 8.1 proof | Unit/fault injection |
 | Interrupted transaction | Partial record never enables dispatch; bytes preserved, no silent repair | Fault injection |
@@ -720,7 +776,7 @@ OS, Python/shell versions, command, exit, skips, capability outcome and evidence
 | Paths | Traversal/absolute/UNC/drive/ADS/device names reject | Unit |
 | Symlinks/reparse | Ancestor/leaf swaps prevented where claimed; otherwise capability unavailable | Platform capability/fault injection |
 | Evidence integrity | Missing/altered/cross-run/unfinalized artifacts cannot establish completion | Unit/integration |
-| Terminal restart T22,T23 | No reopen; late effect/usage receipts settle obligations and accounting atomically, never reset caps | Unit/integration |
+| Terminal restart T22/T23/T26 | No reopen; late receipts with known/unknown usage and validation disposition settle independently; release slot only after all proofs; never reset caps | Unit/integration |
 | PowerShell 5.1 | Desktop quoting, Unicode/spaced paths, exit codes and module invocation correct | Windows acceptance |
 | PowerShell Core | Same command contract on Windows/Linux; native exit preserved | Acceptance |
 | Linux | Actual lock/sync/no-follow behavior measured; no inferred power-loss proof | Platform capability/integration |
@@ -731,9 +787,9 @@ OS, Python/shell versions, command, exit, skips, capability outcome and evidence
 | Retention safety | Routine cleanup cannot remove catalog/journals/effect-use facts needed for replay; absent dependencies block | Integration |
 | Read-only reporting | Status/export preview cannot append/advance/repair | Integration |
 
-### 10.1 Six finding-specific negative acceptance families
+### 10.1 Finding-specific negative acceptance families
 
-F01–F06 are required future synthetic tests, not executed runtime evidence. A
+F01–F09 are required future synthetic tests, not executed runtime evidence. A
 positive control must show the narrowly permitted route alongside each denial.
 
 | ID / contract locations | Required cases and expected result |
@@ -745,6 +801,9 @@ positive control must show the narrowly permitted route alongside each denial.
 | F04b / 5.4, T18–T20/T23, C09 | Cancel requested/confirmed without final usage does not refund; known cancellation bill settles; graceful stop, immediate stop and drain timeout preserve reserve or worst-case charge. Late terminal bill/refund adjusts without reopen; receipt validation failure retains cost. Crash before/after settlement, duplicate/stale release, conflicting event ID, negative values, restart/new run/revision/cap reset attempts cannot drop/double-credit usage; contradictory post-release bill adjusts to true usage, preserves release history and fences dispatch |
 | F05 / CP-D07, 7.3, 8.1, C07 | Restore older valid checkpoint after newer effect receipt and separately after newer one-use consumption: detect via independent current head/inventory and reconcile later facts before dispatch. Source/export heads cannot substitute for each other. Unavailable/stale/contradictory anchor, source rollback, omitted source/run, incomplete watermark, newer pending commit, rewritten local anchor or inactive old host gives no freshness proof. Without complete independent proof, remain read-only/report-only/reconciliation-required |
 | F06 / CP-D02, 5.3, T03, C02/C09 | Same process/owner sequentially attempts another item, then another run, while original is initiated/unsettled/uncertain/reconciling/cancelling/draining/awaiting validation: atomic intent denied for every disposition. Pause/stop, completed lock acquisition and crash/restart cannot clear slot. Proven no effect plus unknown claim/control billing still blocks another item/run. Proven final settlement/validation frees it once; approved same-effect retry retains original slot and uncertain attempt, never authorizes another effect |
+| F07 / T17, 7.4 | Valid effect receipt with missing usage or unresolved source claim is retained atomically with UNKNOWN settlement in RECONCILIATION_REQUIRED. It cannot enter VALIDATING or free the slot. After authoritative settlement, the same receipt may proceed to VALIDATING or remain PAUSED under its fence |
+| F08 / T23, 5.4 | Late valid receipt after STOPPED/FAILED_FINAL with no usage telemetry is admitted with UNKNOWN_WORST_CASE_CHARGED, unchanged terminal state and retained slot. Unknown/untrusted usage cannot become actual charge; invalid receipt cannot establish outcome. Later authoritative usage adjusts atomically without reopen or double charge. Known A followed by missing telemetry retains A even when A exceeds W; no UNKNOWN downgrade/refund |
+| F09 / T26/T27, 5.3, C02/C08/C09 | Stop before any validator intent plus later verified effect/source/usage allows CANCELLED_WITHOUT_START then one slot release; no validator starts after stop. Existing intent without acknowledgement/result remains uncertain, even after restart. Verified late pass/fail and proven cancellation settle without changing terminal state; cancellation request/parent exit/unknown cessation do not. T23-before-T26 and T26-before-T23 release only after all independent obligations settle; missing bills/proofs retain slot. Validator pass/fail with missing usage retains observation/charge/slot through reconciliation and never reruns; known usage settles before progression. Proven validator non-launch restores its unresolved check to VALIDATING/PAUSED, never parent T03; new T27 needs fresh authority/budget. Multiple declared checks stay VALIDATING in the same slot until all settle. Pre-launch fence denial uses T25/T26. Duplicate settlement is idempotent; conflict or cancelling COMPLETED evidence rejects; stop/settlement crash cannot drop intent/receipt/charge or release twice |
 
 CP-WP-001 acceptance is document consistency, link/structure review, complete
 scenario coverage and independent architecture/security review. Existing repository

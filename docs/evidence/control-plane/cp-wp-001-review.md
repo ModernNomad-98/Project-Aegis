@@ -158,7 +158,13 @@ change; the unchanged hosted CI supplies those regression jobs. No dependency
 installation, browser renderer or new validator was added. Hosted capability skips
 must be reported as observed; CI remains distinct from future controller evidence.
 
-## 6. PR #95 six-finding correction cycle
+## 6. First correction cycle — a0177d5
+
+This cycle was delivered as `a0177d556f61b9849c596604bc71d068e9bc07c0` (tree
+`7cb53e770511f7d3c22e9a57948ffa22095e9bd3`), 1,197 total added lines. Its three CI jobs
+passed, and all six original threads received evidence replies and were resolved.
+Its fresh Codex review subsequently found GH7–GH9 below; these prior results do not
+establish that the follow-up correction head is ready.
 
 Startup: `git fetch origin`, current branch/head/remote, tracked/staged diffs and
 the complete GitHub PR/reviews/threads were read successfully. Branch remained
@@ -223,7 +229,50 @@ normal push. No self-referential commit or old-head CI claim is made here. Full 
 BER/platform suites remain skipped for prose-only work; unchanged hosted CI supplies
 regression evidence. F01–F06 are unexecuted future controller tests, not CI claims.
 
-## 7. Intentional omissions and continuation
+## 7. Second correction cycle — late receipts and terminal validation
+
+[Fresh Codex review](https://github.com/ModernNomad-98/Project-Aegis/pull/95#pullrequestreview-5185982724)
+at `a0177d5`, submitted 2026-09-12 09:17:05 UTC, produced two P2 findings and one P1.
+The branch/head and clean tracked/staged state were checked before these corrections;
+the two untracked directories remained untouched. Same three-file/1,500-line scope,
+normal DCO commit/push, independent review and no-merge boundary continue to apply.
+
+| Finding / source | Corrected normative contract / negative acceptance | Disposition |
+| --- | --- | --- |
+| GH7 P2 [receipt with unresolved billing](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995758075) | T17 now retains the verified receipt with UNKNOWN settlement in RECONCILIATION_REQUIRED; only settled billing/source claims permit VALIDATING (PAUSED if fenced), agreeing with 7.4/T10. F07 covers unknown-to-settled progression and denial | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH8 P2 [late terminal receipt admission](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995758079) | T23 verifies receipt identity/integrity independently of known/unknown usage classification; missing telemetry allows atomic UNKNOWN_WORST_CASE_CHARGED while terminal state/slot/fence persist. Actual charges still require authoritative proof. F08 covers admission, invalid receipts and later settlement | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+| GH9 P1 [terminal validation settlement](https://github.com/ModernNomad-98/Project-Aegis/pull/95#discussion_r3995758081) | CP-D06, 5.3, T26/T27, crash/export/threat rules: explicit non-advancing terminal validation disposition; validator intent mandatory before launch; no-start requires complete history/fence or authoritative non-launch proof, never missing result. All source/effect/usage obligations still gate slot release. F09 covers both settlement orders, uncertainty, cancellation, replay and no terminal reopen | Verified by both independent re-reviews; GitHub closure requires pushed-head evidence |
+
+Final independent architecture/recovery and security/authority verdicts: approve
+the documentation corrections; GH7–GH9 closed for document review, GH1–GH6 safeguards
+preserved, no blocking finding. GitHub thread closure still requires pushed evidence.
+
+| Follow-up review finding | Verified disposition |
+| --- | --- |
+| R-S2 P2 — late missing telemetry could downgrade already verified usage to a smaller W | CLOSED: 5.4/T23 retain authoritative usage by reference; only authoritative correction/refund reduces it; F08 includes known A greater than W followed by missing telemetry |
+| R-A4 MAJOR — validator non-launch recovery could select PLANNED and retry the completed parent | CLOSED: T17/6.2/7.4 use activity kind and check cursor; settle only validator source/budget, restore VALIDATING/PAUSED, require fresh scoped T27 authority/budget; F09 forbids parent T03 retry |
+| R-A5 MAJOR — T11 omitted remaining VALIDATING for another declared required check | CLOSED: T11 retains the same operation slot and VALIDATING while declared checks remain; next operation requires all current obligations settled; F09 covers multiple checks |
+
+The reviewers required durable validator intent before launch for no-start proof.
+T27 supplies that contract; T11/T12/T24/T26 preserve its usage/source accounting and
+bound pass/fail observations, including UNKNOWN and pre-launch-denial paths. Tests
+remain future acceptance cases; no controller validation was executed by reviewers.
+Final reviewed design SHA-256:
+`b95277548239ead4d3c25bb839939e96f5995ec4d8ab0b67bf0e3f1788742a43`.
+Reviewed backlog SHA-256:
+`e8a6adec9d242c6c99cfd04f870c00d80aab7d25ff8b7bc194c81c81a8d52db7`.
+
+Actual local checks this cycle, all exit 0: `git diff --check`;
+`python -B scripts/validate-skills.py` (184 valid, zero warnings);
+`python -B scripts/tests/test_validator.py` (91 assertions); and the in-memory
+Markdown/scope audit (39 local links/anchors, 25 tables, 47 headings, unique
+T01–T27/C01–C09 and valid references, 1,284 lines before this evidence expansion).
+The complete diff was read, including follow-up corrections; expanded evidence and
+the staged/committed scope receive final checks. F01–F09 remain unexecuted future tests.
+Thread replies/resolution, final head/tree, fresh review and CI are recorded in
+PR #95 and the handoff after push; a0177d5's passing CI is historical for this cycle.
+
+## 8. Intentional omissions and continuation
 
 Only the three authorized Markdown files are created. No runtime implementation,
 schema/policy execution, shared extraction, BER/CI/dependency change, credential or
