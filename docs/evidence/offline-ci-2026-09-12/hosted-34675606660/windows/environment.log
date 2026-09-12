@@ -1,0 +1,10 @@
+{
+  "sdk_import_and_pin": "PASS",
+  "openai": "3.0.0",
+  "httpx2": "2.12.0",
+  "pyyaml": "6.0.3",
+  "temporary_directory": "D:\\a\\_temp",
+  "posix_evidence_atomic": false,
+  "posix_nofollow_write": false,
+  "provider_requests": "not part of this check; suites use mocked transports"
+}

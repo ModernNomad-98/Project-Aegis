@@ -1,0 +1,24 @@
+{
+  "label": "acceptance-desktop",
+  "command": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "scripts/acceptance/Test-ScenarioAEvidence.ps1"
+  ],
+  "checkout_sha": "2e2c1144ae8ff67257698a7eade217669e682887",
+  "dirty": false,
+  "event_sha": "2e2c1144ae8ff67257698a7eade217669e682887",
+  "pr_head_sha": "6d9d6dce0d0e4c6f73e7ce9357edf63bc86b975b",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "packages": {
+    "pyyaml": "6.0.3",
+    "openai": "3.0.0",
+    "httpx2": "2.12.0"
+  },
+  "exit_code": 1,
+  "elapsed_seconds": 24.944
+}

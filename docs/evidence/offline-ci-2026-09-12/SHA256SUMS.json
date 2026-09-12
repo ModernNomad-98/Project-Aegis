@@ -1,82 +1,258 @@
-﻿[
-    {
-        "path":  "linux-guard.json",
-        "sha256":  "e6b6fa2f756b909f9dbce9d15ed76bc709c3e2118dce1cf07e7a358c82d68849"
-    },
-    {
-        "path":  "windows/acceptance-desktop.json",
-        "sha256":  "824c08ca7ad7f835735565a13500a3d5cf699fd3f92322f538240755cc18d709"
-    },
-    {
-        "path":  "windows/acceptance-desktop.log",
-        "sha256":  "b35f3c96c4b1ac9b0433824691605b5037719692ae61cc438e46410cbf374855"
-    },
-    {
-        "path":  "windows/ber.json",
-        "sha256":  "99e517d6f0df2cb19a285a721526bc708f4c32d62f94e5dc42ad70ef7a3b6b66"
-    },
-    {
-        "path":  "windows/ber.log",
-        "sha256":  "3091646c782b5e88738f150dd9e71743929f2e30052af02cf0960826a3a3973a"
-    },
-    {
-        "path":  "windows/ber-self-check.json",
-        "sha256":  "e8338e13863de04ac645521ceebfd6a200ccb01653bbad9f64bf16e1e284e07b"
-    },
-    {
-        "path":  "windows/ber-self-check.log",
-        "sha256":  "4962da9c9f88a1f0d174d06bcd7cc69551e74a043ab2e07392907da4fd49e394"
-    },
-    {
-        "path":  "windows/ci-tests.json",
-        "sha256":  "ab2329f12343f153742c47b7149703c0acc8d8201ec9af343ad11612feea29fa"
-    },
-    {
-        "path":  "windows/ci-tests.log",
-        "sha256":  "0e01b605cd1b1a495296872258318b29a8d470d8b51cf81ada2a2f55cad1ca21"
-    },
-    {
-        "path":  "windows/contract-audit-tests.json",
-        "sha256":  "70c20636d25bd26b486e6d0089cd44feeb950a33556204981defa07a1d80a528"
-    },
-    {
-        "path":  "windows/contract-audit-tests.log",
-        "sha256":  "25e407bcaf9a7f5b374fe27a84e3e6c3c090684d470b9266922b22382ae9ad46"
-    },
-    {
-        "path":  "windows/dependencies.json",
-        "sha256":  "01f6daf8a812857bd1ef18f6cd1053419513bf7f7945d741c3fdf0d83dd315c1"
-    },
-    {
-        "path":  "windows/dependencies.log",
-        "sha256":  "26057c885ce25bce2850cb0cd97b5bc248433c19c8981d055e28bc029280f5b9"
-    },
-    {
-        "path":  "windows/environment.json",
-        "sha256":  "c9cd5af6b08f4cf6e8e9b77b9fc62e4491f6e02575ed51f2c0860898be8dd962"
-    },
-    {
-        "path":  "windows/environment.log",
-        "sha256":  "73df80e6c4ce54b073a1622cc36337ad5dd9793e9bdd34ed9bfea8a9151a57c0"
-    },
-    {
-        "path":  "windows/skills.json",
-        "sha256":  "3cea891cf9f6fe32ef337ba0771777f17177c8c578e072642786c72c76d34e01"
-    },
-    {
-        "path":  "windows/skills.log",
-        "sha256":  "0ae17a6038f0dd586cd61d5f4ea747bb5a5e0bd79b5bf2035028832e4712bc90"
-    },
-    {
-        "path":  "windows/summary.json",
-        "sha256":  "bb20acf772d99a2ce7f382ae8662be9979de738c98d22ad875b7ee641605dcf6"
-    },
-    {
-        "path":  "windows/validator-tests.json",
-        "sha256":  "c1d7d66bda9f7a94ae183404d3d5a6c11293e3557a6534e8f454492c748ae9ef"
-    },
-    {
-        "path":  "windows/validator-tests.log",
-        "sha256":  "ca1a382ea0b55d3a5ee4db0bc3092adc89656cac53c58448e3366cd7b0349e83"
-    }
+[
+  {
+    "path": "failure-34675434033/acceptance-desktop.json",
+    "sha256": "91cb5711fde1cd4384022339636cc8a1b5e2c3f7a7e2248fc04aa7a1ef99fb30"
+  },
+  {
+    "path": "failure-34675434033/acceptance-desktop.log",
+    "sha256": "68271bbcd1107b3587400ba940e931bfbeb1ae422b624e9bb92234f052d26172"
+  },
+  {
+    "path": "hosted-34675606660/gate-guard-actions.log",
+    "sha256": "049248816701ff3e935bb9ca1fb8e5c376bb3f3ef68225867ba89e76d6056225"
+  },
+  {
+    "path": "hosted-34675606660/jobs.json",
+    "sha256": "75bd0ab6f6306a976499edf27414be1f02b83a607743106c5cbfe868a11b0ab1"
+  },
+  {
+    "path": "hosted-34675606660/linux/acceptance-core.json",
+    "sha256": "54532af3e12fed74822bfb6a608f94f449ac4ad43f4b1d09a4ceecfd5706c763"
+  },
+  {
+    "path": "hosted-34675606660/linux/acceptance-core.log",
+    "sha256": "4999d80b5f68dc356f15a1278369a1057062207556cf6667cd36d0a6a18d0a4c"
+  },
+  {
+    "path": "hosted-34675606660/linux/ber-self-check.json",
+    "sha256": "896016cfdd0088b6e5e81f84f800a92b8bc4cd18bdef11d96a59d7d623be4702"
+  },
+  {
+    "path": "hosted-34675606660/linux/ber-self-check.log",
+    "sha256": "841b376c9be875dc96221b5eadffebc7ed3cf629a3793ddd6514cfdff29b38c5"
+  },
+  {
+    "path": "hosted-34675606660/linux/ber.json",
+    "sha256": "89968d7de35cd2d5f84da1780f31fec3c0a2f811b557088b8197b8f555666220"
+  },
+  {
+    "path": "hosted-34675606660/linux/ber.log",
+    "sha256": "c4395e6c19dc72196caebdbbdb801f570ee6bddab3cc41f3032c5f24bc529063"
+  },
+  {
+    "path": "hosted-34675606660/linux/ci-tests.json",
+    "sha256": "f1650d6919a121cfaf39d68be28dc4477414a2a7e57c156c2c844aabe9a558a5"
+  },
+  {
+    "path": "hosted-34675606660/linux/ci-tests.log",
+    "sha256": "791a48a976d1821cf47ec477f84ff33881a8c1638d48fb3fc337789774b820ff"
+  },
+  {
+    "path": "hosted-34675606660/linux/contract-audit-tests.json",
+    "sha256": "35074fa6c5400737b03edff7ec0046b02e26d514fb370b69412128496e34df9f"
+  },
+  {
+    "path": "hosted-34675606660/linux/contract-audit-tests.log",
+    "sha256": "e86f69d58b533c4bb5401fe6ebf20fefc63514b89db58bcd6a69935dbf135a4c"
+  },
+  {
+    "path": "hosted-34675606660/linux/dependencies.json",
+    "sha256": "5c624870ea0b9d90aa1ff47a5f7a8da558bb4a3594070114021a7d92cbae479e"
+  },
+  {
+    "path": "hosted-34675606660/linux/dependencies.log",
+    "sha256": "4822177c1d8025bc21017ba08e818e8188e3d2be0f977471820d4d2375ad7910"
+  },
+  {
+    "path": "hosted-34675606660/linux/environment.json",
+    "sha256": "4abf90603495c5ecc25c214378f8c2fd4610ac5c6414b11841edc8907e464445"
+  },
+  {
+    "path": "hosted-34675606660/linux/environment.log",
+    "sha256": "ee30d0b0c3fb7c6983486667cbabd23799920103c75cbd8c4a3a895d20fec267"
+  },
+  {
+    "path": "hosted-34675606660/linux/skills.json",
+    "sha256": "bb4c1c72ad427455177737c63191adf305bb418bb7ffb93561b467992c6cea04"
+  },
+  {
+    "path": "hosted-34675606660/linux/skills.log",
+    "sha256": "7f293798ea915ae2f67b008cf506651ed8dbb1b6a5402d732c8c14554f5d116d"
+  },
+  {
+    "path": "hosted-34675606660/linux/validator-tests.json",
+    "sha256": "492a9d783fb6fdd03571ed5918fc3501f1c9c54ec08603a1a08ae0fb87c653b4"
+  },
+  {
+    "path": "hosted-34675606660/linux/validator-tests.log",
+    "sha256": "3694d7bfeba55bb507e31fa91182bd59672ee635e1c1715c8a8eb37caef022f9"
+  },
+  {
+    "path": "hosted-34675606660/run.json",
+    "sha256": "c3c6670e47db0a49a730554bf588b9268c04dc5a1ff68dcc874281adabcf2d0e"
+  },
+  {
+    "path": "hosted-34675606660/summary.json",
+    "sha256": "a6a41cc3517893043546fb3786accf7d2a43725c2497459adb69c6447e7ff8b1"
+  },
+  {
+    "path": "hosted-34675606660/windows/acceptance-core.json",
+    "sha256": "1c5eefb9675e36cfa544b7f7904f7ddb82d8c620bb33a88eac3f198113f75e39"
+  },
+  {
+    "path": "hosted-34675606660/windows/acceptance-core.log",
+    "sha256": "9d876938cb2c65f1211f01c55ed056707eee286341a7fae5571b2870f9c7702d"
+  },
+  {
+    "path": "hosted-34675606660/windows/acceptance-desktop.json",
+    "sha256": "a7f08e2d909b89277ed6b1763a12da2cce82e849e19144d5f1f221ecaac157a1"
+  },
+  {
+    "path": "hosted-34675606660/windows/acceptance-desktop.log",
+    "sha256": "84cc398cff80e1dc4f03d30c949e66ee382e7c026d009c4812006e66129f59dd"
+  },
+  {
+    "path": "hosted-34675606660/windows/ber-self-check.json",
+    "sha256": "19189a4a0a115d80332197787593844e9b27adeb57dbf8401f9fc5f484222855"
+  },
+  {
+    "path": "hosted-34675606660/windows/ber-self-check.log",
+    "sha256": "4962da9c9f88a1f0d174d06bcd7cc69551e74a043ab2e07392907da4fd49e394"
+  },
+  {
+    "path": "hosted-34675606660/windows/ber.json",
+    "sha256": "ca6f83a870a2a0acb292beba588760e701d61f07c5171dbed29a5e1e6587b841"
+  },
+  {
+    "path": "hosted-34675606660/windows/ber.log",
+    "sha256": "ca1be293fe0cbdab752eed010b9fb35cd22ffee67e5ba15493ba007b1e56a135"
+  },
+  {
+    "path": "hosted-34675606660/windows/ci-tests.json",
+    "sha256": "356eeedaf7008b791b8362a91929383065cc200186542d7f514a2e7d9075da03"
+  },
+  {
+    "path": "hosted-34675606660/windows/ci-tests.log",
+    "sha256": "a67087d731170595a0ab9ec6c169484e5544bb0a0b4927a1eada50db03e93ef8"
+  },
+  {
+    "path": "hosted-34675606660/windows/contract-audit-tests.json",
+    "sha256": "ff5fe435fb5ee8fd2adadf7717df9416e6976add6c69a504e328957bc2e37de0"
+  },
+  {
+    "path": "hosted-34675606660/windows/contract-audit-tests.log",
+    "sha256": "c8f0bc99a6ac5cf3759b97d96a19b3f051bf457ba2611e1e68976122726123ce"
+  },
+  {
+    "path": "hosted-34675606660/windows/dependencies.json",
+    "sha256": "df217576ef887982017775eb10702f87b57e9fd87b6d8a6f284afde2de5a4f58"
+  },
+  {
+    "path": "hosted-34675606660/windows/dependencies.log",
+    "sha256": "26057c885ce25bce2850cb0cd97b5bc248433c19c8981d055e28bc029280f5b9"
+  },
+  {
+    "path": "hosted-34675606660/windows/environment.json",
+    "sha256": "d25feaf9e01fc55f7e950e9bd5b5ad10e6d9055aa60f68f1798d23eb18b3782a"
+  },
+  {
+    "path": "hosted-34675606660/windows/environment.log",
+    "sha256": "d5efe4778f7955f08903853d42d6794260f2d07a5339110470eb168d799cc517"
+  },
+  {
+    "path": "hosted-34675606660/windows/skills.json",
+    "sha256": "b9bfa1bdcbefd615d81900895fe4d858b3b5f398dcf4efb966fd990cf35bea14"
+  },
+  {
+    "path": "hosted-34675606660/windows/skills.log",
+    "sha256": "0ae17a6038f0dd586cd61d5f4ea747bb5a5e0bd79b5bf2035028832e4712bc90"
+  },
+  {
+    "path": "hosted-34675606660/windows/validator-tests.json",
+    "sha256": "932716f4a9db27908097d77c1725e4f6d21a7f5773d54d2472c4fcbd7c3f24f0"
+  },
+  {
+    "path": "hosted-34675606660/windows/validator-tests.log",
+    "sha256": "e8dfce2de0fccce01ec5030fa63c8ee9e88cfc585b6beabd36f8b909ad079f35"
+  },
+  {
+    "path": "linux-guard.json",
+    "sha256": "e6b6fa2f756b909f9dbce9d15ed76bc709c3e2118dce1cf07e7a358c82d68849"
+  },
+  {
+    "path": "windows/acceptance-desktop.json",
+    "sha256": "824c08ca7ad7f835735565a13500a3d5cf699fd3f92322f538240755cc18d709"
+  },
+  {
+    "path": "windows/acceptance-desktop.log",
+    "sha256": "b35f3c96c4b1ac9b0433824691605b5037719692ae61cc438e46410cbf374855"
+  },
+  {
+    "path": "windows/ber-self-check.json",
+    "sha256": "e8338e13863de04ac645521ceebfd6a200ccb01653bbad9f64bf16e1e284e07b"
+  },
+  {
+    "path": "windows/ber-self-check.log",
+    "sha256": "4962da9c9f88a1f0d174d06bcd7cc69551e74a043ab2e07392907da4fd49e394"
+  },
+  {
+    "path": "windows/ber.json",
+    "sha256": "99e517d6f0df2cb19a285a721526bc708f4c32d62f94e5dc42ad70ef7a3b6b66"
+  },
+  {
+    "path": "windows/ber.log",
+    "sha256": "3091646c782b5e88738f150dd9e71743929f2e30052af02cf0960826a3a3973a"
+  },
+  {
+    "path": "windows/ci-tests.json",
+    "sha256": "ab2329f12343f153742c47b7149703c0acc8d8201ec9af343ad11612feea29fa"
+  },
+  {
+    "path": "windows/ci-tests.log",
+    "sha256": "0e01b605cd1b1a495296872258318b29a8d470d8b51cf81ada2a2f55cad1ca21"
+  },
+  {
+    "path": "windows/contract-audit-tests.json",
+    "sha256": "70c20636d25bd26b486e6d0089cd44feeb950a33556204981defa07a1d80a528"
+  },
+  {
+    "path": "windows/contract-audit-tests.log",
+    "sha256": "25e407bcaf9a7f5b374fe27a84e3e6c3c090684d470b9266922b22382ae9ad46"
+  },
+  {
+    "path": "windows/dependencies.json",
+    "sha256": "01f6daf8a812857bd1ef18f6cd1053419513bf7f7945d741c3fdf0d83dd315c1"
+  },
+  {
+    "path": "windows/dependencies.log",
+    "sha256": "26057c885ce25bce2850cb0cd97b5bc248433c19c8981d055e28bc029280f5b9"
+  },
+  {
+    "path": "windows/environment.json",
+    "sha256": "c9cd5af6b08f4cf6e8e9b77b9fc62e4491f6e02575ed51f2c0860898be8dd962"
+  },
+  {
+    "path": "windows/environment.log",
+    "sha256": "73df80e6c4ce54b073a1622cc36337ad5dd9793e9bdd34ed9bfea8a9151a57c0"
+  },
+  {
+    "path": "windows/skills.json",
+    "sha256": "3cea891cf9f6fe32ef337ba0771777f17177c8c578e072642786c72c76d34e01"
+  },
+  {
+    "path": "windows/skills.log",
+    "sha256": "0ae17a6038f0dd586cd61d5f4ea747bb5a5e0bd79b5bf2035028832e4712bc90"
+  },
+  {
+    "path": "windows/summary.json",
+    "sha256": "bb20acf772d99a2ce7f382ae8662be9979de738c98d22ad875b7ee641605dcf6"
+  },
+  {
+    "path": "windows/validator-tests.json",
+    "sha256": "c1d7d66bda9f7a94ae183404d3d5a6c11293e3557a6534e8f454492c748ae9ef"
+  },
+  {
+    "path": "windows/validator-tests.log",
+    "sha256": "ca1a382ea0b55d3a5ee4db0bc3092adc89656cac53c58448e3366cd7b0349e83"
+  }
 ]

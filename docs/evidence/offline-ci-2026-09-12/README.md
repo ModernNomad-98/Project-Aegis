@@ -5,6 +5,9 @@ Base: PR #90 merge `82dfebee7dadb68207bead5cb10fa3c562f21c1e`.
 This checkpoint records local results before hosted verification; it is not a
 claim that the CI follow-up has merged.
 
+The subsequent [hosted verification and fix record](HOSTED.md) records successful
+Linux and Windows jobs at `0444f46`, including both PowerShell editions on Windows.
+
 ## Preflight and reviewed plan
 
 Existing unittest, validator and PowerShell runners cover the intended layers;

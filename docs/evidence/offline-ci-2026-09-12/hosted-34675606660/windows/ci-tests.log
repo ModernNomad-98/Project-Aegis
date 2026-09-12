@@ -1,0 +1,13 @@
+test_each_enforcement_surface_requires_manual_merge (__main__.ProtectedFileGuardTests.test_each_enforcement_surface_requires_manual_merge) ... skipped 'the gate-guard job executes on Linux'
+test_ordinary_skill_and_document_changes_pass (__main__.ProtectedFileGuardTests.test_ordinary_skill_and_document_changes_pass) ... skipped 'the gate-guard job executes on Linux'
+test_renaming_a_protected_file_outside_the_set_is_still_guarded (__main__.ProtectedFileGuardTests.test_renaming_a_protected_file_outside_the_set_is_still_guarded) ... skipped 'the gate-guard job executes on Linux'
+test_unicode_and_newline_names_cannot_bypass_the_guard (__main__.ProtectedFileGuardTests.test_unicode_and_newline_names_cannot_bypass_the_guard) ... skipped 'the gate-guard job executes on Linux'
+test_failure_preserves_native_status_and_both_streams (__main__.RecorderTests.test_failure_preserves_native_status_and_both_streams) ... ok
+test_label_cannot_escape_evidence_directory (__main__.RecorderTests.test_label_cannot_escape_evidence_directory) ... ok
+test_missing_command_is_recorded_as_failure (__main__.RecorderTests.test_missing_command_is_recorded_as_failure) ... ok
+test_repeated_label_cannot_replace_prior_evidence (__main__.RecorderTests.test_repeated_label_cannot_replace_prior_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.982s
+
+OK (skipped=4)

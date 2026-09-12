@@ -1,0 +1,22 @@
+{
+  "label": "dependencies",
+  "command": [
+    "python",
+    "-m",
+    "pip",
+    "freeze"
+  ],
+  "checkout_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+  "dirty": false,
+  "event_sha": "67e3503dc3c0daf7d534c3530f3aa711176a0aac",
+  "pr_head_sha": "0444f46a459150b9fb2aeae168dc5d03b8135b96",
+  "python": "3.14.7 (main, Aug  6 2026, 02:19:46) [GCC 13.3.0]",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "packages": {
+    "pyyaml": "6.0.3",
+    "openai": "3.0.0",
+    "httpx2": "2.12.0"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 0.253
+}

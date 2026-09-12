@@ -1,0 +1,319 @@
+gate-guard	Set up job	﻿2026-09-12T05:26:58.5955005Z Current runner version: '2.337.0'
+gate-guard	Set up job	2026-09-12T05:26:58.5977650Z ##[group]Runner Image Provisioner
+gate-guard	Set up job	2026-09-12T05:26:58.5978408Z Hosted Compute Agent
+gate-guard	Set up job	2026-09-12T05:26:58.5979012Z Version: 20260828.587
+gate-guard	Set up job	2026-09-12T05:26:58.5979538Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+gate-guard	Set up job	2026-09-12T05:26:58.5980194Z Build Date: 2026-08-28T16:44:25Z
+gate-guard	Set up job	2026-09-12T05:26:58.5980771Z Worker ID: {02a21bfd-a77f-4e4b-bab5-6a2526f9c917}
+gate-guard	Set up job	2026-09-12T05:26:58.5981414Z Azure Region: westus3
+gate-guard	Set up job	2026-09-12T05:26:58.5981936Z ##[endgroup]
+gate-guard	Set up job	2026-09-12T05:26:58.5983356Z ##[group]Operating System
+gate-guard	Set up job	2026-09-12T05:26:58.5983859Z Ubuntu
+gate-guard	Set up job	2026-09-12T05:26:58.5984367Z 24.04.5
+gate-guard	Set up job	2026-09-12T05:26:58.5984822Z LTS
+gate-guard	Set up job	2026-09-12T05:26:58.5985326Z ##[endgroup]
+gate-guard	Set up job	2026-09-12T05:26:58.5985782Z ##[group]Runner Image
+gate-guard	Set up job	2026-09-12T05:26:58.5986275Z Image: ubuntu-24.04
+gate-guard	Set up job	2026-09-12T05:26:58.5986806Z Version: 20260907.300.1
+gate-guard	Set up job	2026-09-12T05:26:58.5987736Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+gate-guard	Set up job	2026-09-12T05:26:58.5989301Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+gate-guard	Set up job	2026-09-12T05:26:58.5990120Z ##[endgroup]
+gate-guard	Set up job	2026-09-12T05:26:58.5991093Z ##[group]GITHUB_TOKEN Permissions
+gate-guard	Set up job	2026-09-12T05:26:58.5992832Z Contents: read
+gate-guard	Set up job	2026-09-12T05:26:58.5993564Z Metadata: read
+gate-guard	Set up job	2026-09-12T05:26:58.5994046Z ##[endgroup]
+gate-guard	Set up job	2026-09-12T05:26:58.5995970Z Secret source: Actions
+gate-guard	Set up job	2026-09-12T05:26:58.5996833Z Cache mode: write
+gate-guard	Set up job	2026-09-12T05:26:58.5997456Z Prepare workflow directory
+gate-guard	Set up job	2026-09-12T05:26:58.6335682Z Prepare all required actions
+gate-guard	Set up job	2026-09-12T05:26:58.6380420Z Getting action download info
+gate-guard	Set up job	2026-09-12T05:26:58.9144902Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+gate-guard	Set up job	2026-09-12T05:26:59.0872228Z Complete job name: gate-guard
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-12T05:26:59.1253074Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1253598Z with:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1253823Z   fetch-depth: 0
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1254090Z   repository: ModernNomad-98/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1256147Z   token: ***
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1256373Z   ssh-strict: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1256602Z   ssh-user: git
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1256838Z   persist-credentials: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1257094Z   clean: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1257332Z   sparse-checkout-cone-mode: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1257610Z   fetch-tags: false
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1257846Z   show-progress: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1258083Z   lfs: false
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1258301Z   submodules: false
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1258612Z   set-safe-directory: true
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1258883Z   allow-unsafe-pr-checkout: false
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1259215Z env:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1259443Z   PYTHONDONTWRITEBYTECODE: 1
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1259713Z   PYTHONIOENCODING: utf-8
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1260022Z   AEGIS_PR_HEAD_SHA: 0444f46a459150b9fb2aeae168dc5d03b8135b96
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1260380Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1877539Z Syncing repository: ModernNomad-98/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1878652Z ##[group]Getting Git version info
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1879064Z Working directory is '/home/runner/work/Project-Aegis/Project-Aegis'
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1879652Z [command]/usr/bin/git version
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1934404Z git version 2.55.0
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1944919Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1951660Z Temporarily overriding HOME='/home/runner/work/_temp/3b34f13f-b1de-4722-841f-3acfc0fd2658' before making global git config changes
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1953003Z Adding repository directory to the temporary git global config as a safe directory
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1955161Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Project-Aegis/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1989270Z Deleting the contents of '/home/runner/work/Project-Aegis/Project-Aegis'
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1991231Z ##[group]Determining repository object format
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1992268Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1992708Z ##[group]Initializing the repository
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.1994754Z [command]/usr/bin/git init /home/runner/work/Project-Aegis/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2081194Z hint: Using 'master' as the name for the initial branch. This default branch name
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2081868Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2082496Z hint: to use in all of your new repositories, which will suppress this warning,
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2083087Z hint: call:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2083413Z hint:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2083823Z hint: 	git config --global init.defaultBranch <name>
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2084320Z hint:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2084776Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2085520Z hint: 'development'. The just-created branch can be renamed via this command:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2086118Z hint:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2086457Z hint: 	git branch -m <name>
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2086838Z hint:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2087379Z hint: Disable this message with "git config set advice.defaultBranchName false"
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2088203Z Initialized empty Git repository in /home/runner/work/Project-Aegis/Project-Aegis/.git/
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2091029Z [command]/usr/bin/git remote add origin https://github.com/ModernNomad-98/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2125817Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2126434Z ##[group]Disabling automatic garbage collection
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2127327Z [command]/usr/bin/git config --local gc.auto 0
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2147412Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2147993Z ##[group]Setting up auth
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2148409Z Removing SSH command configuration
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2150652Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2171799Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2470003Z Removing HTTP extra header
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2472417Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2494134Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2650680Z Removing includeIf entries pointing to credentials config files
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2651517Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2672390Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2831149Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2855174Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git.path /home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2874899Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2896797Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2917689Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2936083Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2936526Z ##[group]Fetching the repository
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:26:59.2940211Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +67e3503dc3c0daf7d534c3530f3aa711176a0aac:refs/remotes/pull/91/merge
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9082179Z From https://github.com/ModernNomad-98/Project-Aegis
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9084127Z  * [new branch]      Aegis-d12-4-docs-engineering             -> origin/Aegis-d12-4-docs-engineering
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9085749Z  * [new branch]      Aegis-d12-8-workflow-patterns            -> origin/Aegis-d12-8-workflow-patterns
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9087421Z  * [new branch]      Aegis-d127-d129-d14-staff-arch-refresh   -> origin/Aegis-d127-d129-d14-staff-arch-refresh
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9089070Z  * [new branch]      Aegis-d13-library-meta-tools             -> origin/Aegis-d13-library-meta-tools
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9090888Z  * [new branch]      Aegis-d27-bank-sast-dast-scan            -> origin/Aegis-d27-bank-sast-dast-scan
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9092415Z  * [new branch]      Aegis-d28-owasp-a09-a10                  -> origin/Aegis-d28-owasp-a09-a10
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9094302Z  * [new branch]      Aegis-d29-extend-ai-cost-guardrail-llmjacking -> origin/Aegis-d29-extend-ai-cost-guardrail-llmjacking
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9096448Z  * [new branch]      Aegis-d30-bank-saas-architecture-depth   -> origin/Aegis-d30-bank-saas-architecture-depth
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9098355Z  * [new branch]      Aegis-d31-saas-arch-depth-strong         -> origin/Aegis-d31-saas-arch-depth-strong
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9100152Z  * [new branch]      Aegis-d32-saas-arch-depth-lowpri         -> origin/Aegis-d32-saas-arch-depth-lowpri
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9101870Z  * [new branch]      Aegis-d33-sweep-corrections              -> origin/Aegis-d33-sweep-corrections
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9103825Z  * [new branch]      Aegis-d34-doc-accuracy-rename-polish     -> origin/Aegis-d34-doc-accuracy-rename-polish
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9105859Z  * [new branch]      Aegis-d35-getting-started-rewrite        -> origin/Aegis-d35-getting-started-rewrite
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9108071Z  * [new branch]      Aegis-d36-getting-started-completion     -> origin/Aegis-d36-getting-started-completion
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9110092Z  * [new branch]      Aegis-d38-project-orchestrator           -> origin/Aegis-d38-project-orchestrator
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9111912Z  * [new branch]      Aegis-d39-readme-beginner-journey        -> origin/Aegis-d39-readme-beginner-journey
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9113851Z  * [new branch]      Aegis-d41-doctrine-constrain-curate      -> origin/Aegis-d41-doctrine-constrain-curate
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9115680Z  * [new branch]      Aegis-d42-constrain-curate-skills        -> origin/Aegis-d42-constrain-curate-skills
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9117552Z  * [new branch]      Aegis-d43-readme-drift-enforcement       -> origin/Aegis-d43-readme-drift-enforcement
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9119388Z  * [new branch]      Aegis-d44-sast-dast-orchestration        -> origin/Aegis-d44-sast-dast-orchestration
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9121340Z  * [new branch]      Aegis-d45-cloud-decider-modern-tier      -> origin/Aegis-d45-cloud-decider-modern-tier
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9123814Z  * [new branch]      Aegis-d46-authority-invalidation-architect -> origin/Aegis-d46-authority-invalidation-architect
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9126445Z  * [new branch]      Aegis-d47-superadmin-observability-console -> origin/Aegis-d47-superadmin-observability-console
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9128459Z  * [new branch]      Aegis-d48-cloud-security-suites          -> origin/Aegis-d48-cloud-security-suites
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9130254Z  * [new branch]      Aegis-d49-codex-compat                   -> origin/Aegis-d49-codex-compat
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9131979Z  * [new branch]      Aegis-d50-portability-enforcement        -> origin/Aegis-d50-portability-enforcement
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9133794Z  * [new branch]      Aegis-d51-guided-paths                   -> origin/Aegis-d51-guided-paths
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9135515Z  * [new branch]      Aegis-d52-audit-corrections              -> origin/Aegis-d52-audit-corrections
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9137349Z  * [new branch]      Aegis-d53-posture-alignment              -> origin/Aegis-d53-posture-alignment
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9139406Z  * [new branch]      Aegis-d54-orchestrator-correctness       -> origin/Aegis-d54-orchestrator-correctness
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9141210Z  * [new branch]      Aegis-d55-gate-hardening                 -> origin/Aegis-d55-gate-hardening
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9143057Z  * [new branch]      Aegis-d56-readme-multi-agent             -> origin/Aegis-d56-readme-multi-agent
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9144825Z  * [new branch]      Aegis-d57-about-restructure              -> origin/Aegis-d57-about-restructure
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9146856Z  * [new branch]      Aegis-d58-open-source-readiness          -> origin/Aegis-d58-open-source-readiness
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9148948Z  * [new branch]      Aegis-d59-governance-prose               -> origin/Aegis-d59-governance-prose
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9150690Z  * [new branch]      Aegis-d60-enforcement-batch              -> origin/Aegis-d60-enforcement-batch
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9152954Z  * [new branch]      Aegis-d61-claude-code-bridge             -> origin/Aegis-d61-claude-code-bridge
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9154687Z  * [new branch]      Aegis-data-perf-qa-batch                 -> origin/Aegis-data-perf-qa-batch
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9156551Z  * [new branch]      Aegis-product-pm-growth-batch            -> origin/Aegis-product-pm-growth-batch
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9158709Z  * [new branch]      audit/aegis-corpus-contract-baseline     -> origin/audit/aegis-corpus-contract-baseline
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9161113Z  * [new branch]      d9-compliance-governance-batch           -> origin/d9-compliance-governance-batch
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9163154Z  * [new branch]      design/behavioral-eval-runner-v1         -> origin/design/behavioral-eval-runner-v1
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9165106Z  * [new branch]      design/ber-wp2b2-grading-stack-successor -> origin/design/ber-wp2b2-grading-stack-successor
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9167021Z  * [new branch]      docs-bank-architecture-advisor           -> origin/docs-bank-architecture-advisor
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9168969Z  * [new branch]      docs-compliance-governance-batch         -> origin/docs-compliance-governance-batch
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9170816Z  * [new branch]      docs-contributing-operating-rules        -> origin/docs-contributing-operating-rules
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9172708Z  * [new branch]      docs-d15-extracted-workflow-patterns     -> origin/docs-d15-extracted-workflow-patterns
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9174626Z  * [new branch]      docs-d9-status-flip                      -> origin/docs-d9-status-flip
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9176240Z  * [new branch]      docs-phase4-owasp-webapp-mapping         -> origin/docs-phase4-owasp-webapp-mapping
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9178034Z  * [new branch]      docs-phase4-owasp-webapp-mapping-2       -> origin/docs-phase4-owasp-webapp-mapping-2
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9179897Z  * [new branch]      docs-phase7-5-owasp-agentic-mapping      -> origin/docs-phase7-5-owasp-agentic-mapping
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9181645Z  * [new branch]      docs-project-aegis-identity              -> origin/docs-project-aegis-identity
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9183299Z  * [new branch]      docs-qa-expansion-backlog                -> origin/docs-qa-expansion-backlog
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9185028Z  * [new branch]      docs-readme-operating-system-framing     -> origin/docs-readme-operating-system-framing
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9186828Z  * [new branch]      docs-scope-expansion-d12-d13-d14         -> origin/docs-scope-expansion-d12-d13-d14
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9188560Z  * [new branch]      docs-uncapped-roadmap-phrasing           -> origin/docs-uncapped-roadmap-phrasing
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9190430Z  * [new branch]      docs-zero-trust-engineering-discipline   -> origin/docs-zero-trust-engineering-discipline
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9192286Z  * [new branch]      docs/add-project-aegis-hero-image        -> origin/docs/add-project-aegis-hero-image
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9194104Z  * [new branch]      docs/behavioral-eval-runner-backlog      -> origin/docs/behavioral-eval-runner-backlog
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9196119Z  * [new branch]      docs/ber-wp2b2-closeout-wp2b3-decision-package -> origin/docs/ber-wp2b2-closeout-wp2b3-decision-package
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9198153Z  * [new branch]      feat/behavioral-eval-runner-2b-1         -> origin/feat/behavioral-eval-runner-2b-1
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9200324Z  * [new branch]      feat/behavioral-eval-runner-2b-2-scenario-a-grading-stack -> origin/feat/behavioral-eval-runner-2b-2-scenario-a-grading-stack
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9203063Z  * [new branch]      feat/behavioral-eval-runner-2b-3-measured-judge-calibration -> origin/feat/behavioral-eval-runner-2b-3-measured-judge-calibration
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9205352Z  * [new branch]      fix-agent-governance-audit-retrieval     -> origin/fix-agent-governance-audit-retrieval
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9207118Z  * [new branch]      fix/aegis-060-trigger-eval-targets       -> origin/fix/aegis-060-trigger-eval-targets
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9208890Z  * [new branch]      fix/aegis-stage2-evidence-driven-route   -> origin/fix/aegis-stage2-evidence-driven-route
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9210441Z  * [new branch]      fix/offline-ci                           -> origin/fix/offline-ci
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9211838Z  * [new branch]      fix/shared-skill-contracts               -> origin/fix/shared-skill-contracts
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9213593Z  * [new branch]      governance/authorize-ber-wp-2b-0         -> origin/governance/authorize-ber-wp-2b-0
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9215240Z  * [new branch]      governance/authorize-ber-wp-2b-1         -> origin/governance/authorize-ber-wp-2b-1
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9216882Z  * [new branch]      governance/authorize-ber-wp-2b-3         -> origin/governance/authorize-ber-wp-2b-3
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9218253Z  * [new branch]      main                                     -> origin/main
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9219581Z  * [new branch]      phase-1-5-ai-sdlc-governance             -> origin/phase-1-5-ai-sdlc-governance
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9221099Z  * [new branch]      phase-5-qa-e2e-evidence                  -> origin/phase-5-qa-e2e-evidence
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9222763Z  * [new branch]      phase-6-cloud-devops-reliability         -> origin/phase-6-cloud-devops-reliability
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9224462Z  * [new branch]      phase-7-5-agentic-ai-security            -> origin/phase-7-5-agentic-ai-security
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9226064Z  * [new branch]      phase-7-ai-security-llm-systems          -> origin/phase-7-ai-security-llm-systems
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9227635Z  * [new branch]      policy/tali-v3-2-2-adoption              -> origin/policy/tali-v3-2-2-adoption
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9229187Z  * [new branch]      review/ber-phase01-corrections           -> origin/review/ber-phase01-corrections
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9230800Z  * [new branch]      skill-d13-skill-quality-reviewer         -> origin/skill-d13-skill-quality-reviewer
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9232454Z  * [new branch]      spike/behavioral-eval-runner-2b-0        -> origin/spike/behavioral-eval-runner-2b-0
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9233940Z  * [new ref]         67e3503dc3c0daf7d534c3530f3aa711176a0aac -> pull/91/merge
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9236458Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9237391Z ##[group]Determining the checkout info
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9238419Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9239014Z [command]/usr/bin/git sparse-checkout disable
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9240689Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9242690Z ##[group]Checking out the ref
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9243658Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/91/merge
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9907279Z Note: switching to 'refs/remotes/pull/91/merge'.
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9907903Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9908399Z You are in 'detached HEAD' state. You can look around, make experimental
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9909627Z changes and commit them, and you can discard any commits you make in this
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9910801Z state without impacting any branches by switching back to a branch.
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9911470Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9911922Z If you want to create a new branch to retain commits you create, you may
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9913142Z do so (now or later) by using -c with the switch command. Example:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9913918Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9914186Z   git switch -c <new-branch-name>
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9914612Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9914866Z Or undo this operation with:
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9915255Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9915474Z   git switch -
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9915771Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9916275Z Turn off this advice by setting config variable advice.detachedHead to false
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9917005Z 
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9917918Z HEAD is now at 67e3503 Merge 0444f46a459150b9fb2aeae168dc5d03b8135b96 into 82dfebee7dadb68207bead5cb10fa3c562f21c1e
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9921977Z ##[endgroup]
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9953519Z [command]/usr/bin/git log -1 --format=%H
+gate-guard	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:00.9971204Z 67e3503dc3c0daf7d534c3530f3aa711176a0aac
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	﻿2026-09-12T05:27:01.0143204Z ##[group]Run git fetch origin "$BASE_REF" --quiet
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0144140Z ^[[36;1mgit fetch origin "$BASE_REF" --quiet^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0145116Z ^[[36;1m# Keep old paths on renames and parse NUL records so unusual names^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0146264Z ^[[36;1m# cannot bypass a prefix check through Git's display quoting.^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0147628Z ^[[36;1mgit diff --no-renames --name-only -z "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-files"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0150570Z ^[[36;1mgate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|scripts/validate-skills\.py$|scripts/check_dco\.py$|scripts/tests/|scripts/ci/|scripts/audit-skill-contracts\.py$|scripts/acceptance/|tools\.py$|tools/__init__\.py$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0153067Z ^[[36;1mgate_files=()^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0153677Z ^[[36;1mecho "Files changed in this PR:"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0154405Z ^[[36;1mwhile IFS= read -r -d '' path; do^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0155132Z ^[[36;1m  printf '  %q\n' "$path"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0155832Z ^[[36;1m  if [[ "$path" =~ $gate_pattern ]]; then^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0156560Z ^[[36;1m    gate_files+=("$path")^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0157183Z ^[[36;1m  fi^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0157774Z ^[[36;1mdone < "$RUNNER_TEMP/aegis-changed-files"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0158563Z ^[[36;1mif [ "${#gate_files[@]}" -gt 0 ]; then^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0159295Z ^[[36;1m  echo "Gate files touched:"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0159998Z ^[[36;1m  printf '  %q\n' "${gate_files[@]}"^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0161176Z ^[[36;1m  echo "This PR modifies the merge gate or an enforcement surface and requires manual review and merge."^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0162322Z ^[[36;1m  exit 1^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0162830Z ^[[36;1mfi^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0163654Z ^[[36;1mecho "No merge-gate or enforcement-surface files modified."^[[0m
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0196789Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0197596Z env:
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0198151Z   PYTHONDONTWRITEBYTECODE: 1
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0198789Z   PYTHONIOENCODING: utf-8
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0199497Z   AEGIS_PR_HEAD_SHA: 0444f46a459150b9fb2aeae168dc5d03b8135b96
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0200278Z   BASE_REF: main
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.0200788Z ##[endgroup]
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4158900Z Files changed in this PR:
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4159259Z   .github/dependabot.yml
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4160069Z   .github/workflows/validate-skills.yml
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4160875Z   CONTRIBUTING.md
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4161439Z   docs/audits/aegis-060-plus-register.md
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4161998Z   docs/evidence/offline-ci-2026-09-12/.gitattributes
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4162513Z   docs/evidence/offline-ci-2026-09-12/README.md
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4163131Z   docs/evidence/offline-ci-2026-09-12/SHA256SUMS.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4163680Z   docs/evidence/offline-ci-2026-09-12/linux-guard.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4164268Z   docs/evidence/offline-ci-2026-09-12/windows/acceptance-desktop.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4164791Z   docs/evidence/offline-ci-2026-09-12/windows/acceptance-desktop.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4165289Z   docs/evidence/offline-ci-2026-09-12/windows/ber-self-check.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4165804Z   docs/evidence/offline-ci-2026-09-12/windows/ber-self-check.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4166436Z   docs/evidence/offline-ci-2026-09-12/windows/ber.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4166811Z   docs/evidence/offline-ci-2026-09-12/windows/ber.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4167321Z   docs/evidence/offline-ci-2026-09-12/windows/ci-tests.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4167818Z   docs/evidence/offline-ci-2026-09-12/windows/ci-tests.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4168389Z   docs/evidence/offline-ci-2026-09-12/windows/contract-audit-tests.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4168889Z   docs/evidence/offline-ci-2026-09-12/windows/contract-audit-tests.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4169380Z   docs/evidence/offline-ci-2026-09-12/windows/dependencies.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4169897Z   docs/evidence/offline-ci-2026-09-12/windows/dependencies.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4170397Z   docs/evidence/offline-ci-2026-09-12/windows/environment.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4170961Z   docs/evidence/offline-ci-2026-09-12/windows/environment.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4171371Z   docs/evidence/offline-ci-2026-09-12/windows/skills.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4171869Z   docs/evidence/offline-ci-2026-09-12/windows/skills.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4172396Z   docs/evidence/offline-ci-2026-09-12/windows/summary.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4173021Z   docs/evidence/offline-ci-2026-09-12/windows/validator-tests.json
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4173566Z   docs/evidence/offline-ci-2026-09-12/windows/validator-tests.log
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4174218Z   docs/offline-ci.md
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4174836Z   docs/roadmaps/behavioral-eval-runner-backlog.md
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4175188Z   requirements-ci.txt
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4176229Z   scripts/acceptance/Test-ScenarioAEvidence.ps1
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4176810Z   scripts/ci/check-environment.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4177481Z   scripts/ci/record-check.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4178060Z   scripts/tests/test_offline_ci.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4178926Z Gate files touched:
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4179174Z   .github/workflows/validate-skills.yml
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4179440Z   requirements-ci.txt
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4179708Z   scripts/acceptance/Test-ScenarioAEvidence.ps1
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4179925Z   scripts/ci/check-environment.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4180105Z   scripts/ci/record-check.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4180278Z   scripts/tests/test_offline_ci.py
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4180555Z This PR modifies the merge gate or an enforcement surface and requires manual review and merge.
+gate-guard	Fail if this PR modifies the merge gate or its enforcement surfaces	2026-09-12T05:27:01.4189004Z ##[error]Process completed with exit code 1.
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-12T05:27:01.4273119Z Post job cleanup.
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4787414Z [command]/usr/bin/git version
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4812112Z git version 2.55.0
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4830920Z Temporarily overriding HOME='/home/runner/work/_temp/25de8ac6-e30f-4e2f-a84d-ecfb1d742402' before making global git config changes
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4831718Z Adding repository directory to the temporary git global config as a safe directory
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4834350Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Project-Aegis/Project-Aegis
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4856204Z Removing SSH command configuration
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4859564Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.4882816Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5042547Z Removing HTTP extra header
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5045407Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5068764Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5227484Z Removing includeIf entries pointing to credentials config files
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5230694Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5249495Z includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5250138Z includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git/worktrees/*.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5250612Z includeif.gitdir:/github/workspace/.git.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5250996Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5255749Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5271683Z /home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5278292Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-b6372283\-5fd9\-4a75\-8107\-a08051791577\.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5301649Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git/worktrees/*.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5318556Z /home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5324237Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Project-Aegis/Project-Aegis/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-b6372283\-5fd9\-4a75\-8107\-a08051791577\.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5349936Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5361612Z /github/runner_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.5366013Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-b6372283\-5fd9\-4a75\-8107\-a08051791577\.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.6677742Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.6694434Z /github/runner_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.6699072Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-b6372283\-5fd9\-4a75\-8107\-a08051791577\.config
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.6723297Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+gate-guard	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-12T05:27:01.6891616Z Removing credentials config '/home/runner/work/_temp/git-credentials-b6372283-5fd9-4a75-8107-a08051791577.config'
+gate-guard	Complete job	﻿2026-09-12T05:27:01.6994883Z Cleaning up orphan processes
