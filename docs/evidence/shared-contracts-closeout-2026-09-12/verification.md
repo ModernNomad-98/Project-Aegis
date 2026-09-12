@@ -43,8 +43,9 @@ Final acceptance output is preserved in
 complete three-file diff from the full-suite revision to the acceptance revision.
 [SHA-256 manifest](logs/sha256.json) fingerprints the attached evidence files;
 it is an integrity index, not an independent signature or provenance service.
-The log directory disables Git text normalization to preserve these original
-evidence bytes when cloned on another platform.
+The log directory disables Git text normalization and whitespace linting to
+preserve original CRLF and tool-output bytes when cloned on another platform.
+Source and documentation outside that raw-log directory retain whitespace checks.
 
 The first uncommitted full Windows run reported one failure in
 `test_plan_schema_is_bound_and_key_complete`: it assumed every schema field was
