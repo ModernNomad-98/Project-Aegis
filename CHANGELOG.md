@@ -6,6 +6,15 @@ For current setup and remaining work, see the [documentation index](docs/README.
 Earlier construction history is in [HISTORY](docs/HISTORY.md), with immutable
 decisions in the [reconciliation log](docs/reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
 
+## 2026-09-13
+
+- **Resumable delivery control contract ([PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95)):**
+  delivered the documentation-only [durable state, authority and recovery design](docs/design/resumable-control-plane-v1.md),
+  its [separate work-package register](docs/roadmaps/resumable-control-plane-backlog.md)
+  and [review evidence](docs/evidence/control-plane/cp-wp-001-review.md). No
+  controller or runtime was implemented. CP-WP-002 remains blocked pending
+  separate explicit authorization.
+
 ## 2026-09-12
 
 - **Calibration engineering ([PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)):**
