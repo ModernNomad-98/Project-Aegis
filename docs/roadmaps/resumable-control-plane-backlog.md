@@ -17,14 +17,13 @@ checks and review dispositions. Equal-authority contradictions stop dependent wo
 Current direct human instructions govern before transcription; these records do
 not create grants or replace the repository's one approval register.
 
-Peter's current explicit CP-WP-001 authorization permits exactly three documents,
-the focused branch, DCO-signed commits, one PR, existing CI and in-scope corrections.
-Runtime stays excluded. The 2026-09-13 owner continuation now permits commit/push/merge
-of PR #95; AEGIS-APR-001 and standing administrator-merge grant AEGIS-APR-002 apply.
-The task authorization source and bounded summary are in the evidence document.
-The current correction instruction continues PR #95 on this same branch: address
-all original and subsequent GitHub findings, reply/resolve only after pushing evidence, request a fresh
-exact-head Codex review and monitor it plus all CI. No second branch or PR is allowed.
+Peter authorized CP-WP-001 as exactly three documents, a focused branch,
+DCO-signed commits, one PR, existing CI and in-scope corrections. Runtime remained
+excluded. PR #95 delivered that package and merged as
+`32cbb2dff8265b2c2aaff38f2ace198417ef1646` on 2026-09-13. The task authority,
+correction cycle and bounded delivery evidence remain in the evidence document
+and PR history; they are historical instructions, not authority to reopen the
+merged branch or begin another package.
 
 Status vocabulary: AUTHORIZED = the human granted the exact package;
 READY_FOR_OWNER_REVIEW = scoped delivery evidence exists, acceptance still pending;
@@ -37,7 +36,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Field | Contract |
 | --- | --- |
 | ID / title | CP-WP-001 — Durable State, Authority and Recovery Contract |
-| Status | AUTHORIZED for documentation delivery and merge after required review/CI; no implementation |
+| Status | DONE — documentation-only contract merged in [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95) as `32cbb2dff8265b2c2aaff38f2ace198417ef1646`; no implementation |
 | Owner | Peter Nguyen |
 | Purpose | Make safe continuation decidable from durable identity, authority, events and evidence |
 | Allowed scope | Create/correct exactly the three declarative Markdown files in section 3; reviewed design, separate backlog and sanitized evidence |
@@ -53,7 +52,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Forbidden | Auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
 | Non-goals | Offline kernel, physical extraction/wrappers, actual execution/containment, distribution, dashboard, BER advancement |
 | Completion | Three-file bounded diff, local validation, independent re-reviews of all findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; merge only the verified reviewed head under the 2026-09-13 approval; auto-merge disabled |
-| Next owner decision | After CP-WP-001 delivery, decide whether to authorize a separately scoped CP-WP-002; no automatic advancement |
+| Next owner decision | Decide whether to authorize a separately scoped CP-WP-002; it remains BLOCKED and there is no automatic advancement |
 
 ### 2.1 Required evidence handling
 
@@ -107,7 +106,7 @@ sensitive evidence, unresolved authority conflict, inconsistent design, forbidde
 correction, another external resource/PR or merge without passing gates. Preserve unrelated
 work. Green CI never supplies implementation or merge permission.
 
-## 3. CP-WP-001 exact file plan
+## 3. CP-WP-001 delivered file plan
 
 | Action / file | Purpose / necessity | Protected gate surface at base |
 | --- | --- | --- |
@@ -122,7 +121,11 @@ BER documents/evidence/runtime/tests/schemas, dependencies and `.gitignore`.
 unstaged; do not inspect contents or add ignore rules for them. No index/catalog
 edit is required; these three documents cross-link each other.
 
-## 4. Validation and delivery protocol
+## 4. Historical validation and delivery protocol
+
+This section preserves the protocol that governed PR #95. It is delivery
+history, not an instruction to reopen that PR, recreate its branch or perform
+another work package.
 
 Before staging run `git diff --check`; inspect the complete correction diff and
 all resulting three-file content. Inspect Markdown heading/table/fence

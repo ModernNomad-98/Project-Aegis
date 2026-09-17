@@ -60,3 +60,21 @@ generic skill guidance that would require asking for the same approval again.
   <https://github.com/ModernNomad-98/Project-Aegis/pull/91>.
 - **Expiry / use limit:** None stated; "all administrator merge moving forward"
   is recurring authority, not consumed by PR #91 or another routine use.
+
+### AEGIS-APR-003: Pull request updates
+
+- **Event:** GRANT
+- **Status at recording:** ACTIVE
+- **Date / Grantor:** 2026-09-13 / Peter Nguyen; recorded here on 2026-09-17.
+- **Reason:** Preserve the standing pull-request update instruction across
+  sessions and computers.
+- **Scope allowed:** The owner's exact instruction was: "yes, i pre-approve all
+  updates to PRs as needed". Project Aegis pull requests may be updated as
+  needed without repeated case-by-case consent.
+- **Scope FORBIDDEN:** None additionally stated. This grant concerns updates to
+  pull requests; authority to start unrelated work or perform actions beyond a
+  pull-request update comes from the applicable task instructions.
+- **Evidence:** Direct owner instruction in the Project Aegis conversation on
+  2026-09-13, quoted above and durably transcribed in the description of
+  [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95).
+- **Expiry / use limit:** None stated; recurring use, not a one-use grant.

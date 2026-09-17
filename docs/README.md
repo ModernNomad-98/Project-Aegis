@@ -51,3 +51,15 @@ The [new-computer handoff](evidence/ber-recovery-2026-09-11/README.md) separates
 current setup from historical reproduction and records exactly what is missing.
 Original roadmap proposals and dated evidence remain useful history, rather
 than instructions to reopen completed PRs or reproduce the lost computer.
+
+## Resume delivery control-plane work
+
+Use a current `main` checkout. CP-WP-001 was a documentation-only contract and
+merged in [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95) as
+`32cbb2dff8265b2c2aaff38f2ace198417ef1646`; it did not implement a controller
+or runtime. Read the [design](design/resumable-control-plane-v1.md), the
+[work-package register](roadmaps/resumable-control-plane-backlog.md) and the
+[review evidence](evidence/control-plane/cp-wp-001-review.md) together.
+
+CP-WP-002 remains blocked. Starting it requires separate explicit authorization
+and does not follow automatically from CP-WP-001's delivery or acceptance.
