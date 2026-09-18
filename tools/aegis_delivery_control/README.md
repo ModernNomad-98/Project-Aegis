@@ -17,8 +17,15 @@ fixture. It is not a delivery integration.
   target. A committed intent is never silently redispatched after a crash.
 - `SyntheticValidationCoordinator` commits a distinct T27 validator sub-intent
   before contacting the synthetic validator ledger. T24 intake reconstructs a
-  final result from that canonical ledger, records it once, and leaves it
-  unapplied for a later T11/T12 command.
+  final result from that canonical ledger and records it once. T11 application
+  then consumes only that stored RESULT; intake never applies it implicitly.
+- T01 atomically registers the accepted revision and its non-empty validation
+  check set. T27 rejects checks outside that durable set.
+- C05 implements exactly-once PASS application: an immutable application event
+  marks the observation applied, settles its validator intent, and either keeps
+  the run `VALIDATING` for remaining declared checks or moves it to `BLOCKED`
+  for distinct T16 finalization. The operation slot remains held. FAIL remains
+  unapplied until a trusted recoverable/final classification source exists.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -82,7 +89,9 @@ settlement-tail freshness, projection tamper rejection, restart-safe lost-receip
 reconciliation, pre-commit settlement rollback, post-commit settlement replay
 without duplicate slot release, T27 validator-intent crash/replay and guard
 behavior, T24 canonical result intake without application, unknown-accounting
-reconciliation, active-validator slot retention, and cross-process writer
-exclusion. The backlog remains the source of truth for acceptance cases not yet
-implemented, including complete transition application and filesystem
+reconciliation, T01 plan/check registration and tamper detection, exactly-once
+C05 PASS application and finalization routing, active-validator slot retention,
+and cross-process writer exclusion. The backlog remains the source of truth for
+acceptance cases not yet implemented, including T12 classified failure
+application, T16 finalization, complete transition application, and filesystem
 ownership/reparse/path-swap enforcement.

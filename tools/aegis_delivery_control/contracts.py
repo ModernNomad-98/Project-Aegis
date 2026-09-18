@@ -70,6 +70,30 @@ class IntentRequest:
 
 
 @dataclass(frozen=True)
+class PlanAcceptanceRequest:
+    plan_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    revision_digest: str
+    check_ids: tuple[str, ...]
+
+    def validate(self) -> None:
+        identifiers = tuple(self.__dict__.values())[:-1]
+        if any(not value or not value.strip() for value in identifiers):
+            raise ValueError("plan identifiers and digests must be non-empty")
+        if not self.check_ids:
+            raise ValueError("accepted plan requires at least one validation check")
+        if any(not check_id or not check_id.strip() for check_id in self.check_ids):
+            raise ValueError("validation check identifiers must be non-empty")
+        if len(set(self.check_ids)) != len(self.check_ids):
+            raise ValueError("validation check identifiers must be unique")
+
+
+@dataclass(frozen=True)
 class CommitReceipt:
     command_id: str
     event_id: str
@@ -234,6 +258,36 @@ class ValidatorObservationCommand:
     def validate(self) -> None:
         if any(not value or not value.strip() for value in self.__dict__.values()):
             raise ValueError("validator observation command fields must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidationApplicationRequest:
+    application_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    revision_digest: str
+    check_id: str
+    validator_attempt_id: str
+    observation_id: str
+
+    def validate(self) -> None:
+        if any(not value or not value.strip() for value in self.__dict__.values()):
+            raise ValueError("validation application fields must be non-empty")
+
+
+@dataclass(frozen=True)
+class ApplicationReceipt:
+    application_id: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
 
 
 @dataclass(frozen=True)

@@ -19,7 +19,9 @@ from tools.aegis_delivery_control.contracts import (
     EffectObservationRequest,
     InjectedFailure,
     IntentRequest,
+    PlanAcceptanceRequest,
     StorageIntegrityError,
+    ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationRequest,
 )
@@ -92,6 +94,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
             {
                 "repositories": 0,
                 "runs": 0,
+                "validation_plans": 0,
+                "validation_requirements": 0,
                 "events": 0,
                 "command_outcomes": 0,
                 "effects": 0,
@@ -102,6 +106,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "effect_observations": 0,
                 "validator_intents": 0,
                 "validator_observations": 0,
+                "validation_applications": 0,
                 "outstanding_slot": 0,
                 "dispatch_fences": 0,
             },
@@ -124,6 +129,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
             {
                 "repositories": 1,
                 "runs": 1,
+                "validation_plans": 0,
+                "validation_requirements": 0,
                 "events": 1,
                 "command_outcomes": 1,
                 "effects": 1,
@@ -134,6 +141,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "effect_observations": 0,
                 "validator_intents": 0,
                 "validator_observations": 0,
+                "validation_applications": 0,
                 "outstanding_slot": 1,
                 "dispatch_fences": 0,
             },
@@ -579,9 +587,20 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self.store.table_counts()["effect_observations"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
 
-    def _record_effect_observation(self):
+    def _record_effect_observation(self, check_ids=("check-1", "check-2")):
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                check_ids,
+            ),
+            expected_head="",
+            writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
         committed = self.store.commit_intent(
-            self.request(), self.capability, self.authority, expected_head="", writer_epoch=1
+            self.request(), self.capability, self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
         )
         self.oracle.allowed_head = committed.event_hash
         settlement_request = BudgetSettlementRequest(
@@ -625,6 +644,73 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.oracle.allowed_head = receipt.event_hash
         return receipt
 
+    def test_t01_plan_acceptance_replays_and_rejects_empty_or_tampered_checks(self) -> None:
+        request = PlanAcceptanceRequest(
+            "plan-1", "plan-command-1", "plan-event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "revision-1", ("check-2", "check-1"),
+        )
+        first = self.store.accept_plan(
+            request, expected_head="", writer_epoch=1
+        )
+        self.oracle.allowed_head = first.event_hash
+        replay = self.store.accept_plan(
+            request, expected_head=first.event_hash, writer_epoch=2
+        )
+        self.assertTrue(replay.replayed)
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            self.store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                    "run-2", "item-2", "effect-2", "revision-2", (),
+                ),
+                expected_head=first.event_hash,
+                writer_epoch=2,
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "DELETE FROM validation_requirements WHERE plan_id = 'plan-1' AND check_id = 'check-2'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "validation-requirement"):
+            self.store.load_verified("repo-1")
+
+    def test_t01_plan_acceptance_is_atomic_across_acknowledgement_loss(self) -> None:
+        request = PlanAcceptanceRequest(
+            "plan-1", "plan-command-1", "plan-event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "revision-1", ("check-1",),
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.accept_plan(
+                request,
+                expected_head="",
+                writer_epoch=1,
+                failure_hook=raise_at("after_plan_writes_before_commit"),
+            )
+        self.assertEqual(self.store.table_counts()["validation_plans"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.accept_plan(
+                request,
+                expected_head="",
+                writer_epoch=1,
+                failure_hook=raise_at("after_plan_commit_before_acknowledgement"),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        replay = self.store.accept_plan(
+            request, expected_head=event_hash, writer_epoch=2
+        )
+        self.assertTrue(replay.replayed)
+        self.store.load_verified("repo-1")
+
     def _validator_intent(self, observation, *, suffix: str = "1", cap_units: int = 10):
         grant = SyntheticValidatorGrant(
             f"validator-grant-{suffix}",
@@ -661,6 +747,126 @@ class SQLiteStateStoreTests(unittest.TestCase):
             cap_units,
         )
         return request, capability
+
+    def _record_validator_result(self, *, verdict: str = "PASS", only_check: bool = False):
+        observation = self._record_effect_observation(
+            ("check-1",) if only_check else ("check-1", "check-2")
+        )
+        intent_request, capability = self._validator_intent(observation)
+        intent = self.store.commit_validator_intent(
+            intent_request, capability, self.authority
+        )
+        self.oracle.allowed_head = intent.event_hash
+        settlement = self.store.settle_budget(
+            BudgetSettlementRequest(
+                "validator-settlement-1", "validator-reservation-1", "",
+                BudgetDisposition.CONSUMED, 1, "validator-result-1",
+                "VALIDATOR_USAGE_REPORTED",
+            ),
+            self.authority.issue_settlement_proof(
+                "validator-proof-1", "validator-reservation-1",
+                non_dispatch_proven=False, zero_liability_proven=False,
+                all_obligations_settled=False,
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settlement.settlement_hash
+        recorded = self.store.record_validator_observation(
+            ValidatorObservationRequest(
+                "validator-observation-1", "validator-observe-command-1",
+                "validator-observation-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", "validator-intent-1", "validator-attempt-1",
+                "validator-result-1", capability.claim_id, "revision-1",
+                "check-1", "input-1", "result-digest-1", verdict, 1,
+                "validator-settlement-1", settlement.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        return recorded
+
+    def test_c05_pass_application_is_atomic_replay_safe_and_retains_slot(self) -> None:
+        self._record_validator_result()
+        request = ValidationApplicationRequest(
+            "application-1", "apply-command-1", "apply-event-1", "repo-1",
+            "run-1", "item-1", "effect-1", "revision-1", "check-1",
+            "validator-attempt-1", "validator-observation-1",
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.apply_validator_observation(
+                request,
+                failure_hook=raise_at(
+                    "after_validation_application_writes_before_commit"
+                ),
+            )
+        self.assertEqual(self.store.table_counts()["validation_applications"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.apply_validator_observation(
+                request,
+                failure_hook=raise_at(
+                    "after_validation_application_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM validation_applications WHERE application_id = 'application-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        replay = self.store.apply_validator_observation(request)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.resulting_state.value, "VALIDATING")
+        self.assertEqual(self.store.table_counts()["validation_applications"], 1)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        self.store.load_verified("repo-1")
+
+    def test_c05_last_pass_blocks_for_distinct_finalization(self) -> None:
+        self._record_validator_result(only_check=True)
+        applied = self.store.apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1", "check-1",
+                "validator-attempt-1", "validator-observation-1",
+            )
+        )
+        self.assertEqual(applied.resulting_state.value, "BLOCKED")
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_c05_denies_fail_without_trusted_classification(self) -> None:
+        self._record_validator_result(verdict="FAIL")
+        with self.assertRaisesRegex(DispatchDenied, "trusted failure classification"):
+            self.store.apply_validator_observation(
+                ValidationApplicationRequest(
+                    "application-1", "apply-command-1", "apply-event-1",
+                    "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                    "check-1", "validator-attempt-1",
+                    "validator-observation-1",
+                )
+            )
+        self.assertEqual(self.store.table_counts()["validation_applications"], 0)
+
+    def test_c05_recovery_rejects_tampered_application_projection(self) -> None:
+        self._record_validator_result(only_check=True)
+        applied = self.store.apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1", "check-1",
+                "validator-attempt-1", "validator-observation-1",
+            )
+        )
+        self.oracle.allowed_head = applied.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE validation_applications SET revision_digest = 'tampered' "
+                "WHERE application_id = 'application-1'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "validation-application"):
+            self.store.load_verified("repo-1")
 
     def test_t27_validator_intent_is_atomic_replay_safe_and_subordinate_to_slot(self) -> None:
         observation = self._record_effect_observation()
@@ -704,6 +910,13 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self.store.table_counts()["effect_observations"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
         self.store.load_verified("repo-1")
+
+    def test_t27_denies_check_not_declared_by_accepted_plan(self) -> None:
+        observation = self._record_effect_observation()
+        request, capability = self._validator_intent(observation, suffix="3")
+        with self.assertRaisesRegex(DispatchDenied, "not declared"):
+            self.store.commit_validator_intent(request, capability, self.authority)
+        self.assertEqual(self.store.table_counts()["validator_intents"], 0)
 
     def test_t27_denies_another_active_validator_and_budget_over_cap(self) -> None:
         observation = self._record_effect_observation()

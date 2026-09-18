@@ -26,6 +26,8 @@ from tools.aegis_delivery_control.contracts import (
     EffectObservationCommand,
     InjectedFailure,
     IntentRequest,
+    PlanAcceptanceRequest,
+    ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
 )
@@ -356,7 +358,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 coordinator.intake_effect_receipt(command)
             self.assertEqual(store.table_counts()["effect_observations"], 0)
 
-    def test_t24_lost_validator_result_is_intaken_but_remains_unapplied(self) -> None:
+    def test_t24_lost_validator_result_can_be_applied_and_replayed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             authority = SyntheticAuthority()
@@ -377,6 +379,14 @@ class MediatedDispatchTests(unittest.TestCase):
                 validation = SyntheticValidationCoordinator(
                     store, TransitionEngine(), authority, validator_adapter
                 )
+            plan = store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                    "run-1", "item-1", "effect-1", "revision-1", ("check-1",),
+                ),
+                expected_head="",
+                writer_epoch=1,
+            )
             operation = dispatch.dispatch(
                 IntentRequest(
                     "repo-1", "run-1", "item-1", "command-1", "event-1",
@@ -387,8 +397,8 @@ class MediatedDispatchTests(unittest.TestCase):
                 SyntheticEffectRequest(
                     "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
                 ),
-                expected_head="",
-                writer_epoch=1,
+                expected_head=plan.event_hash,
+                writer_epoch=2,
                 usage_units=1,
             )
             operation_settlement = store.settle_budget(
@@ -473,6 +483,25 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertTrue(replay.replayed)
             self.assertEqual(store.table_counts()["validator_observations"], 1)
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+            applied = validation.apply_result(
+                ValidationApplicationRequest(
+                    "application-1", "apply-command-1", "apply-event-1",
+                    "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                    "check-1", "validator-attempt-1",
+                    "validator-observation-1",
+                )
+            )
+            replay_after_apply = validation.intake_result(
+                ValidatorObservationCommand(
+                    "validator-observation-1", "validator-observe-command-1",
+                    "validator-observation-event-1", "repo-1", "run-1",
+                    "item-1", "validator-intent-1", "validator-settlement-1",
+                    validator_settlement.settlement_hash,
+                )
+            )
+            self.assertEqual(applied.resulting_state.value, "BLOCKED")
+            self.assertTrue(replay_after_apply.replayed)
+            self.assertEqual(store.table_counts()["validation_applications"], 1)
 
 
 if __name__ == "__main__":

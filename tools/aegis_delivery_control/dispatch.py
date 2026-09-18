@@ -19,6 +19,7 @@ from .authority import (
     SyntheticValidatorCapability,
 )
 from .contracts import (
+    ApplicationReceipt,
     CommitReceipt,
     DispatchDenied,
     EffectObservationCommand,
@@ -26,6 +27,7 @@ from .contracts import (
     IntentRequest,
     LifecycleState,
     ObservationReceipt,
+    ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
     ValidatorObservationRequest,
@@ -232,7 +234,7 @@ class SyntheticValidationCoordinator:
                 "synthetic validator is not the canonical repository root"
             )
         binding = self._store.load_validator_intent_binding(
-            command.validator_intent_id
+            command.validator_intent_id, require_active=False
         )
         if (
             binding.repository_id,
@@ -269,5 +271,24 @@ class SyntheticValidationCoordinator:
                 result.result_digest, result.verdict, result.usage_units,
                 command.settlement_event_id, command.settlement_hash,
             ),
+            failure_hook=failure_hook,
+        )
+
+    def apply_result(
+        self,
+        request: ValidationApplicationRequest,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ApplicationReceipt:
+        def authorize(resulting_state: LifecycleState) -> None:
+            self._engine.authorize(
+                "T11",
+                LifecycleState.VALIDATING,
+                resulting_state,
+                TRANSITIONS["T11"].required_guards,
+            )
+        return self._store.apply_validator_observation(
+            request,
+            authorize_transition=authorize,
             failure_hook=failure_hook,
         )
