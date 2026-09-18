@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | BLOCKED: accepted CP-WP-001, separate explicit authorization naming exact source/files, selected storage/crash model, budget lifecycle, synthetic freshness source and synthetic-only adapters | Independent synthetic T01–T28/C01–C09/F01–F21 tests, including F04a/F04b; complete lifecycle traces, observation/apply identity, slot/replay/budget/freshness and terminal validation evidence; synthetic authority cannot enable a real adapter |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Current kernel demonstrates atomic intent rollback/replay, coordinator-owned T03 dispatch with durable PLANNED→RUNNING state, canonical supported controller/target roots, durable claim redemption, C04 canonical full-provenance receipt intake, and C05 exactly-once PASS/recoverable/final validation application. C05 uses store-bound issuer verification, full observation binding, item/effect-scoped permanent failure fences, crash/restart replay, and conditional slot release. It also proves event-anchored settlement/fence/slot facts, worst-case unknown charging, proof-bound release and OS writer exclusion. Filesystem ownership/reparse/path-swap protection and complete T01–T28/C06–C09/F01–F21 application remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -179,11 +179,11 @@ permission for runtime work.
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.
 
-### 5.1 Provisional offline-kernel file plan
+### 5.1 Authorized offline-kernel file plan
 
-This is a planning estimate, not an authorized file set or storage decision.
-All paths are new except the noted backlog update. Logical interfaces can share
-modules; do not create services or extract BER just to match a diagram.
+AEGIS-APR-004 authorized this file set and selected the storage/crash model on
+2026-09-17. All paths are new except this backlog update. Logical interfaces can
+share modules; do not create services or extract BER just to match a diagram.
 
 | Action / file | Purpose / why needed | Protected gate surface at base |
 | --- | --- | --- |
@@ -208,6 +208,61 @@ No parent `tools/__init__.py`, requirements, runtime schema file or CI edit is
 assumed. Such additions need their own explicit future scope; parent imports, BER
 and CI changes would touch current protected surfaces. Future test plans are in
 [design section 10](../design/resumable-control-plane-v1.md#10-future-tests-and-acceptance).
+
+### 5.2 CP-WP-002 implementation evidence and remaining gate
+
+The current implementation is deliberately not marked complete. Its read-only
+CLI exposes no lifecycle mutation, network, provider, credential, shell, Git,
+deployment, production-data or real-adapter path. SQLite stores immutable
+hash-chained intent events and event-derived effect, permission-use, budget and
+slot projections in one transaction. Recovery rejects projection divergence
+before independent freshness can pass. Synthetic capabilities and settlement
+proofs are issuer-verifiable. One state database atomically records claim
+redemption with intent, and a separate durable synthetic target ledger preserves
+accepted effects and receipts across adapter instances. These facts do not
+establish protection against filesystem path replacement/permission attacks or
+real source-atomic authority consumption.
+
+Focused local evidence through 2026-09-19 includes the package `unittest` suite
+on Windows and an actual second-process writer-lock denial. This evidence covers
+important portions of T03/T21/T22/T23, C01-C04/C07-C09 and F03-F07. C04 now
+admits only a canonical receipt carrying the complete repository/run/item/effect/
+attempt/source binding, then writes its budget settlement and observation in one
+transaction without releasing the operation slot. Injected failure between those
+writes rolls both back; lost acknowledgement survives reopening, verifies from
+immutable history and replays without duplicate events or accounting. Conflicting
+durable identities and tampered observation projections fail closed. The focused
+suite passed 63 tests, and independent QA and security rereviews accepted C04
+without a remaining major finding. C05 now atomically applies stored validator
+observations exactly once: PASS routes through T11; signed full-binding
+recoverable/final classifications route through T12. Recoverable failures retain
+the slot in `BLOCKED`; final failures enter `FAILED_FINAL`, install a permanent
+item/effect fence, and release only when no independent check obligation remains.
+Committed failure applications replay after restart without resupplying evidence;
+rebound identities, forged evidence, unsupported policies and projection tampering
+fail closed. The accepted plan durably pins the classification issuer fingerprint,
+and every mutation verifies raw event-chain integrity before trusting projections.
+Unrelated item/effect work remains eligible after a fully settled final failure.
+The package suite passed 81 tests locally. Independent QA and security rereviews
+accepted C05 with no remaining implementation finding; CI wiring remains the
+documented, separately authorized follow-up below. C09
+now
+includes injected failure after settlement/slot writes before commit and after
+commit before acknowledgement: the former rolls back fully and retries to one
+exact charge/release, while the latter replays the same event without duplicate
+accounting or slot release. This does
+not yet establish the complete normative rows. Before DONE, complete executable
+finalization records and crash replay for C06; then
+cover the remaining F01-F21 families, especially multi-check validation,
+stop/late-receipt ordering, adoption, exact fence clearance and complete
+transition application. Add filesystem ownership/reparse/path-swap protections
+and durable application paths for the remaining lifecycle rows. Re-run independent
+architecture, security and QA reviews against the resulting exact head. Power-loss
+durability and any real authority/execution capability remain unavailable, not
+inferred from these process-level tests.
+The delivery-control suite is not yet wired into repository CI; AEGIS-APR-004
+does not authorize workflow changes, so CI gating remains a declared follow-up
+rather than a silent scope expansion.
 
 ## 6. Handoff contract
 

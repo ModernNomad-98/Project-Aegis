@@ -21,11 +21,21 @@ fixture. It is not a delivery integration.
   then consumes only that stored RESULT; intake never applies it implicitly.
 - T01 atomically registers the accepted revision and its non-empty validation
   check set. T27 rejects checks outside that durable set.
-- C05 implements exactly-once PASS application: an immutable application event
-  marks the observation applied, settles its validator intent, and either keeps
-  the run `VALIDATING` for remaining declared checks or moves it to `BLOCKED`
-  for distinct T16 finalization. The operation slot remains held. FAIL remains
-  unapplied until a trusted recoverable/final classification source exists.
+- C04 admits effect receipts only through the canonical coordinator. Receipts
+  carry repository, run, item, effect, attempt, claim, payload and receipt
+  identity. Intake atomically appends receipt-backed budget settlement and
+  observation events, retains the operation slot, and replays an identical
+  command without duplicate accounting.
+- C05 implements exactly-once PASS and classified FAIL application. An immutable
+  application event marks the observation applied and settles its validator
+  intent. PASS remains `VALIDATING` for pending checks or moves to `BLOCKED` for
+  distinct T16 finalization. Issuer-verified `RECOVERABLE` failure moves to
+  `BLOCKED` with the slot retained; `FINAL` moves to `FAILED_FINAL`, installs a
+  permanent item/effect fence, and releases the slot only when no independent
+  validation obligation remains. Committed applications replay from durable
+  state without resupplying classification evidence. Plan acceptance durably
+  pins the synthetic classification issuer, and every mutating path verifies
+  raw event sequence, predecessor, body hash and row bindings before projections.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -86,12 +96,16 @@ The tests cover the T01-T28 transition registry and deny-by-default behavior,
 atomic intent rollback and replay, mediated T03 dispatch, durable cross-instance
 claim redemption in one state database, budget uncertainty/release rules,
 settlement-tail freshness, projection tamper rejection, restart-safe lost-receipt
-reconciliation, pre-commit settlement rollback, post-commit settlement replay
+reconciliation, atomic C04 settlement and observation rollback, post-commit
+reopen and replay, complete receipt-provenance substitution denial, conflicting
+identity and observation-projection tamper rejection, pre-commit settlement
+rollback, post-commit settlement replay
 without duplicate slot release, T27 validator-intent crash/replay and guard
 behavior, T24 canonical result intake without application, unknown-accounting
 reconciliation, T01 plan/check registration and tamper detection, exactly-once
-C05 PASS application and finalization routing, active-validator slot retention,
-and cross-process writer exclusion. The backlog remains the source of truth for
-acceptance cases not yet implemented, including T12 classified failure
-application, T16 finalization, complete transition application, and filesystem
+C05 PASS/recoverable/final application, signed full-binding classification,
+scoped terminal fencing, crash/restart replay, rebound denial, conditional slot
+release, active-validator slot retention, and cross-process writer exclusion.
+The backlog remains the source of truth for acceptance cases not yet implemented,
+including T16 finalization, complete transition application, and filesystem
 ownership/reparse/path-swap enforcement.

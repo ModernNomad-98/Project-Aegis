@@ -14,6 +14,8 @@ from typing import BinaryIO, Callable, Mapping
 from .authority import (
     SyntheticAuthority,
     SyntheticCapability,
+    SyntheticClassificationEvidence,
+    SyntheticOperatorCapability,
     SyntheticSettlementProof,
     SyntheticValidatorCapability,
 )
@@ -22,13 +24,16 @@ from .contracts import (
     BudgetDisposition,
     BudgetSettlementRequest,
     CommitReceipt,
+    ControlReceipt,
     DispatchDenied,
     EffectObservationRequest,
+    FailureClassification,
     FreshnessOracle,
     InjectedFailure,
     IntentRequest,
     LifecycleState,
     ObservationReceipt,
+    PauseBeforeDispatchRequest,
     PlanAcceptanceRequest,
     SettlementReceipt,
     StorageIntegrityError,
@@ -37,6 +42,7 @@ from .contracts import (
     ValidatorIntentBinding,
     ValidatorObservationRequest,
 )
+from .engine import TRANSITIONS, TransitionEngine
 
 
 FailureHook = Callable[[str], None]
@@ -117,6 +123,7 @@ class SQLiteStateStore:
         self._database_path = database_path
         self._freshness_oracle = freshness_oracle
         self._repository_id = repository_id
+        self._classification_authority: SyntheticAuthority | None = None
         expected = default_state_root(repository_id) / "state.sqlite3"
         self._is_canonical = database_path.resolve(
             strict=False
@@ -140,6 +147,14 @@ class SQLiteStateStore:
     @property
     def is_canonical(self) -> bool:
         return self._is_canonical
+
+    def _bind_classification_authority(self, authority: SyntheticAuthority) -> None:
+        if (
+            self._classification_authority is not None
+            and self._classification_authority is not authority
+        ):
+            raise DispatchDenied("classification authority is already bound")
+        self._classification_authority = authority
 
     def _bind_repository(self, connection: sqlite3.Connection) -> None:
         connection.execute(
@@ -212,6 +227,7 @@ class SQLiteStateStore:
                 item_id TEXT NOT NULL,
                 logical_effect_id TEXT NOT NULL,
                 revision_digest TEXT NOT NULL,
+                classification_issuer_fingerprint TEXT,
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 body_json TEXT NOT NULL
@@ -371,6 +387,12 @@ class SQLiteStateStore:
                 validator_attempt_id TEXT NOT NULL,
                 observation_id TEXT NOT NULL UNIQUE REFERENCES validator_observations(observation_id),
                 verdict TEXT NOT NULL CHECK (verdict IN ('PASS', 'FAIL')),
+                classification TEXT CHECK (classification IN ('RECOVERABLE', 'FINAL') OR classification IS NULL),
+                classification_id TEXT,
+                classification_policy_id TEXT,
+                classification_policy_version TEXT,
+                classification_digest TEXT,
+                continuation_cursor TEXT,
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL,
@@ -379,11 +401,45 @@ class SQLiteStateStore:
                 UNIQUE (
                     repository_id, run_id, logical_effect_id, check_id,
                     validator_attempt_id, observation_id
+                ),
+                CHECK (
+                    (verdict = 'PASS' AND classification IS NULL)
+                    OR (verdict = 'FAIL' AND classification IS NOT NULL)
                 )
+            );
+            CREATE TABLE IF NOT EXISTS control_actions (
+                control_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                request_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                settled_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                action TEXT NOT NULL CHECK (action IN ('PAUSE')),
+                reason_code TEXT NOT NULL,
+                continuation_cursor TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_scope_digest TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL,
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS operator_redemptions (
+                claim_id TEXT PRIMARY KEY,
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                grant_id TEXT NOT NULL,
+                command_id TEXT NOT NULL UNIQUE,
+                run_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                scope_digest TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS dispatch_fences (
                 fence_id TEXT PRIMARY KEY,
                 repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                item_id TEXT,
+                logical_effect_id TEXT,
                 reason_code TEXT NOT NULL,
                 originating_event_id TEXT NOT NULL
             );
@@ -398,6 +454,25 @@ class SQLiteStateStore:
             COMMIT;
             """
         )
+        fence_columns = {
+            str(row["name"])
+            for row in connection.execute("PRAGMA table_info(dispatch_fences)")
+        }
+        if "item_id" not in fence_columns:
+            connection.execute("ALTER TABLE dispatch_fences ADD COLUMN item_id TEXT")
+        if "logical_effect_id" not in fence_columns:
+            connection.execute(
+                "ALTER TABLE dispatch_fences ADD COLUMN logical_effect_id TEXT"
+            )
+        plan_columns = {
+            str(row["name"])
+            for row in connection.execute("PRAGMA table_info(validation_plans)")
+        }
+        if "classification_issuer_fingerprint" not in plan_columns:
+            connection.execute(
+                "ALTER TABLE validation_plans ADD COLUMN "
+                "classification_issuer_fingerprint TEXT"
+            )
 
     @staticmethod
     def effect_key(repository_id: str, logical_effect_id: str) -> str:
@@ -451,6 +526,10 @@ class SQLiteStateStore:
         request.validate()
         if request.repository_id != self._repository_id:
             raise DispatchDenied("plan targets a different repository")
+        if self._classification_authority is None:
+            raise DispatchDenied(
+                "plan acceptance requires a bound classification authority"
+            )
         if writer_epoch <= 0:
             raise ValueError("writer_epoch must be positive")
         payload = {**request.__dict__, "check_ids": sorted(request.check_ids)}
@@ -502,6 +581,10 @@ class SQLiteStateStore:
                 )
                 body = {
                     **payload,
+                    "classification_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                        if self._classification_authority is not None else None
+                    ),
                     "event_kind": "PLAN_ACCEPTED",
                     "lifecycle_from": None,
                     "lifecycle_to": LifecycleState.PLANNED.value,
@@ -521,12 +604,17 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "INSERT INTO validation_plans VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO validation_plans ("
+                    "plan_id, command_id, event_id, repository_id, run_id, item_id, "
+                    "logical_effect_id, revision_digest, "
+                    "classification_issuer_fingerprint, payload_digest, event_hash, "
+                    "body_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         request.plan_id, request.command_id, request.event_id,
                         request.repository_id, request.run_id, request.item_id,
                         request.logical_effect_id, request.revision_digest,
-                        payload_digest, event_hash, body_json,
+                        body["classification_issuer_fingerprint"], payload_digest,
+                        event_hash, body_json,
                     ),
                 )
                 connection.executemany(
@@ -554,6 +642,218 @@ class SQLiteStateStore:
                 connection.rollback()
                 raise
         return CommitReceipt(request.command_id, request.event_id, 1, event_hash, False)
+
+    def pause_before_dispatch(
+        self,
+        request: PauseBeforeDispatchRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("pause command targets another repository")
+        capability_binding = (
+            capability.repository_id, capability.run_id, capability.action,
+        )
+        if capability_binding != (request.repository_id, request.run_id, "PAUSE"):
+            raise DispatchDenied("synthetic operator capability does not bind this pause")
+        payload = {
+            **request.__dict__,
+            "action": "PAUSE",
+            "capability_claim_id": capability.claim_id,
+            "capability_grant_id": capability.grant_id,
+            "capability_scope_digest": capability.scope_digest,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    prior = connection.execute(
+                        "SELECT * FROM control_actions WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "pause command outcome lost its control action"
+                        )
+                    connection.rollback()
+                    return self._control_receipt(prior, replayed=True)
+                prior = connection.execute(
+                    "SELECT * FROM control_actions WHERE control_id = ? OR request_event_id = ? "
+                    "OR settled_event_id = ?",
+                    (
+                        request.pause_id, request.request_event_id,
+                        request.settled_event_id,
+                    ),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "pause identity was reused with a different payload"
+                        )
+                    connection.rollback()
+                    return self._control_receipt(prior, replayed=True)
+                authority.verify_operator_for_action(capability)
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ?",
+                    (capability.claim_id,),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator capability was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied("pause command does not bind the run")
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state not in {LifecycleState.PLANNED, LifecycleState.BLOCKED}:
+                    raise DispatchDenied(
+                        "T04 requires durable PLANNED or BLOCKED state"
+                    )
+                if authorize_transition is not None:
+                    authorize_transition(current_state, LifecycleState.PAUSED)
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                requested_body = {
+                    **payload,
+                    "event_id": request.request_event_id,
+                    "event_kind": "PAUSE_REQUESTED",
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": current_state.value,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                requested_hash = self._event_hash(requested_body)
+                requested_json = json.dumps(
+                    requested_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'PAUSE_REQUESTED', ?, ?, ?)",
+                    (
+                        request.request_event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch, previous_hash,
+                        requested_hash, requested_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
+                    (
+                        request.fence_id, request.repository_id,
+                        request.reason_code, request.request_event_id,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_pause_requested_before_settled")
+                settled_body = {
+                    **payload,
+                    "event_id": request.settled_event_id,
+                    "event_kind": "PAUSE_SETTLED",
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": LifecycleState.PAUSED.value,
+                    "previous_event_hash": requested_hash,
+                    "request_event_hash": requested_hash,
+                    "schema_version": 1,
+                    "sequence": sequence + 1,
+                    "writer_epoch": writer_epoch,
+                }
+                settled_hash = self._event_hash(settled_body)
+                settled_json = json.dumps(
+                    settled_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'PAUSE_SETTLED', ?, ?, ?)",
+                    (
+                        request.settled_event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence + 1,
+                        request.command_id, writer_epoch, requested_hash,
+                        settled_hash, settled_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO control_actions VALUES (?, ?, ?, ?, ?, ?, ?, 'PAUSE', ?, ?, ?, ?, ?, ?, ?, 'PAUSED', ?)",
+                    (
+                        request.pause_id, request.command_id,
+                        request.request_event_id, request.settled_event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.reason_code, request.continuation_cursor,
+                        capability.claim_id, capability.grant_id,
+                        capability.scope_digest, payload_digest, settled_hash,
+                        settled_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES (?, ?, ?, ?, ?, 'PAUSE', ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest,
+                        request.settled_event_id, sequence + 1, settled_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSED', head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (sequence + 1, settled_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (settled_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_pause_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_pause_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.pause_id, request.command_id, request.settled_event_id,
+            sequence + 1, settled_hash, LifecycleState.PAUSED, False,
+        )
 
     def commit_intent(
         self,
@@ -658,8 +958,10 @@ class SQLiteStateStore:
                 if connection.execute("SELECT 1 FROM outstanding_slot").fetchone():
                     raise DispatchDenied("another operation owns the repository slot")
                 if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? LIMIT 1",
-                    (request.repository_id,),
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "(reason_code <> 'FAILED_FINAL_APPLICATION' OR item_id = ? OR "
+                    "logical_effect_id = ?) LIMIT 1",
+                    (request.repository_id, request.item_id, request.logical_effect_id),
                 ).fetchone():
                     raise DispatchDenied("repository has an active dispatch fence")
 
@@ -820,7 +1122,7 @@ class SQLiteStateStore:
             replayed=False,
         )
 
-    def settle_budget(
+    def _settle_budget(
         self,
         request: BudgetSettlementRequest,
         proof: SyntheticSettlementProof,
@@ -1011,7 +1313,7 @@ class SQLiteStateStore:
                 )
                 if charged_units > int(reservation["cap_units"]):
                     connection.execute(
-                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?)",
+                        "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
                         (
                             f"budget-breach:{request.settlement_event_id}",
                             reservation["repository_id"],
@@ -1034,9 +1336,12 @@ class SQLiteStateStore:
                             "slot release requires every validator obligation settled"
                         )
                     deleted = connection.execute(
-                        "DELETE FROM outstanding_slot WHERE repository_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                        "DELETE FROM outstanding_slot WHERE repository_id = ? "
+                        "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ? "
+                        "AND generation = 1",
                         (
                             reservation["repository_id"],
+                            reservation["run_id"],
                             reservation["logical_effect_id"],
                             reservation["attempt_id"],
                         ),
@@ -1073,7 +1378,7 @@ class SQLiteStateStore:
             replayed=False,
         )
 
-    def record_effect_observation(
+    def _record_effect_observation(
         self,
         request: EffectObservationRequest,
         *,
@@ -1131,6 +1436,24 @@ class SQLiteStateStore:
                     connection.rollback()
                     return self._observation_receipt(prior, replayed=True)
 
+                if connection.execute(
+                    "SELECT 1 FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone():
+                    raise StorageIntegrityError(
+                        "observation event ID was already used by another fact"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM events WHERE event_id = ?",
+                    (request.settlement_event_id,),
+                ).fetchone() and not connection.execute(
+                    "SELECT 1 FROM budget_settlements WHERE settlement_event_id = ?",
+                    (request.settlement_event_id,),
+                ).fetchone():
+                    raise StorageIntegrityError(
+                        "settlement event ID was already used by another fact"
+                    )
+
                 run = connection.execute(
                     "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
                     (request.run_id, request.repository_id),
@@ -1177,7 +1500,154 @@ class SQLiteStateStore:
                     (request.settlement_event_id,),
                 ).fetchone()
                 if settlement is None:
-                    raise DispatchDenied("observation accounting settlement does not exist")
+                    if request.settlement_hash:
+                        raise DispatchDenied(
+                            "observation settlement hash has no durable settlement"
+                        )
+                    reservation = connection.execute(
+                        "SELECT * FROM budget_reservations WHERE repository_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                        (
+                            request.repository_id,
+                            request.logical_effect_id,
+                            request.attempt_id,
+                        ),
+                    ).fetchone()
+                    if reservation is None or (
+                        reservation["run_id"], reservation["item_id"]
+                    ) != (request.run_id, request.item_id):
+                        raise DispatchDenied(
+                            "observation accounting does not bind the receipt attempt"
+                        )
+                    disposition = (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        if request.usage_units is None
+                        else BudgetDisposition.CONSUMED
+                    )
+                    charged_units = (
+                        int(reservation["worst_case_units"])
+                        if request.usage_units is None
+                        else request.usage_units
+                    )
+                    uncertainty = request.usage_units is None
+                    settlement_sequence = int(run["head_sequence"]) + 1
+                    settlement_previous_hash = str(run["head_hash"])
+                    settlement_writer_epoch = int(
+                        connection.execute(
+                            "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events WHERE repository_id = ?",
+                            (request.repository_id,),
+                        ).fetchone()[0]
+                    )
+                    settlement_payload = {
+                        "actual_units": request.usage_units,
+                        "all_obligations_settled": False,
+                        "disposition": disposition.value,
+                        "evidence_digest": request.source_receipt_id,
+                        "expected_previous_hash": reservation[
+                            "settlement_head_hash"
+                        ],
+                        "non_dispatch_proven": False,
+                        "reason_code": (
+                            "USAGE_UNKNOWN"
+                            if request.usage_units is None
+                            else "USAGE_REPORTED"
+                        ),
+                        "release_slot": False,
+                        "reservation_id": reservation["reservation_id"],
+                        "settlement_event_id": request.settlement_event_id,
+                        "zero_liability_proven": False,
+                    }
+                    settlement_payload_digest = self._event_hash(
+                        settlement_payload
+                    )
+                    settlement_body = {
+                        **settlement_payload,
+                        "charged_units": charged_units,
+                        "command_id": f"settlement:{request.settlement_event_id}",
+                        "event_id": request.settlement_event_id,
+                        "event_kind": "BUDGET_SETTLED",
+                        "held_units": 0,
+                        "item_id": request.item_id,
+                        "previous_event_hash": settlement_previous_hash,
+                        "repository_id": request.repository_id,
+                        "run_id": request.run_id,
+                        "schema_version": 1,
+                        "sequence": settlement_sequence,
+                        "uncertainty": uncertainty,
+                        "writer_epoch": settlement_writer_epoch,
+                    }
+                    settlement_hash = self._event_hash(settlement_body)
+                    settlement_json = json.dumps(
+                        settlement_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO budget_settlements VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            request.settlement_event_id,
+                            reservation["reservation_id"],
+                            reservation["settlement_head_hash"],
+                            settlement_hash,
+                            disposition.value,
+                            0,
+                            charged_units,
+                            int(uncertainty),
+                            request.source_receipt_id,
+                            settlement_payload["reason_code"],
+                            settlement_payload_digest,
+                            settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE budget_reservations SET held_units = 0, charged_units = ?, uncertainty = ?, disposition = ?, settlement_head_hash = ? WHERE reservation_id = ?",
+                        (
+                            charged_units,
+                            int(uncertainty),
+                            disposition.value,
+                            settlement_hash,
+                            reservation["reservation_id"],
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            request.settlement_event_id,
+                            request.repository_id,
+                            request.run_id,
+                            request.item_id,
+                            settlement_sequence,
+                            f"settlement:{request.settlement_event_id}",
+                            settlement_writer_epoch,
+                            1,
+                            "BUDGET_SETTLED",
+                            settlement_previous_hash,
+                            settlement_hash,
+                            settlement_json,
+                        ),
+                    )
+                    if charged_units > int(reservation["cap_units"]):
+                        connection.execute(
+                            "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
+                            (
+                                f"budget-breach:{request.settlement_event_id}",
+                                request.repository_id,
+                                "BUDGET_CAP_EXCEEDED",
+                                request.settlement_event_id,
+                            ),
+                        )
+                    if failure_hook is not None:
+                        failure_hook(
+                            "after_observation_settlement_before_observation"
+                        )
+                    settlement = connection.execute(
+                        "SELECT s.*, r.repository_id, r.run_id, r.item_id, r.logical_effect_id, r.attempt_id "
+                        "FROM budget_settlements s JOIN budget_reservations r ON r.reservation_id = s.reservation_id "
+                        "WHERE s.settlement_event_id = ?",
+                        (request.settlement_event_id,),
+                    ).fetchone()
+                    if settlement is None:
+                        raise StorageIntegrityError(
+                            "observation settlement projection was not written"
+                        )
+                settlement_hash = str(settlement["settlement_hash"])
                 settlement_binding = (
                     settlement["repository_id"],
                     settlement["run_id"],
@@ -1193,7 +1663,7 @@ class SQLiteStateStore:
                     request.item_id,
                     request.logical_effect_id,
                     request.attempt_id,
-                    request.settlement_hash,
+                    settlement_hash,
                     request.source_receipt_id,
                 )
                 if settlement_binding != expected_settlement_binding:
@@ -1232,8 +1702,14 @@ class SQLiteStateStore:
                         "observation attempt does not own the outstanding slot"
                     )
 
-                sequence = int(run["head_sequence"]) + 1
-                previous_event_hash = str(run["head_hash"])
+                if request.settlement_hash:
+                    sequence = int(run["head_sequence"]) + 1
+                    previous_event_hash = str(run["head_hash"])
+                else:
+                    sequence = int(
+                        json.loads(settlement["body_json"])["sequence"]
+                    ) + 1
+                    previous_event_hash = settlement_hash
                 writer_epoch = int(
                     connection.execute(
                         "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events WHERE repository_id = ?",
@@ -1242,6 +1718,7 @@ class SQLiteStateStore:
                 )
                 body = {
                     **request.__dict__,
+                    "settlement_hash": settlement_hash,
                     "command_payload_digest": command_payload_digest,
                     "event_kind": "RECEIPT_RECORDED",
                     "lifecycle_from": LifecycleState.RUNNING.value,
@@ -1287,7 +1764,7 @@ class SQLiteStateStore:
                         request.payload_digest,
                         request.usage_units,
                         request.settlement_event_id,
-                        request.settlement_hash,
+                        settlement_hash,
                         observation_digest,
                         command_payload_digest,
                         event_hash,
@@ -1318,6 +1795,11 @@ class SQLiteStateStore:
                 connection.commit()
                 if failure_hook is not None:
                     failure_hook("after_observation_commit_before_acknowledgement")
+            except sqlite3.IntegrityError as exc:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "observation durable identity conflicts with recorded state"
+                ) from exc
             except BaseException:
                 connection.rollback()
                 raise
@@ -1494,8 +1976,10 @@ class SQLiteStateStore:
                 ).fetchone():
                     raise DispatchDenied("another validator obligation is active")
                 if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? LIMIT 1",
-                    (request.repository_id,),
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "(reason_code <> 'FAILED_FINAL_APPLICATION' OR item_id = ? OR "
+                    "logical_effect_id = ?) LIMIT 1",
+                    (request.repository_id, request.item_id, request.logical_effect_id),
                 ).fetchone():
                     raise DispatchDenied("repository has an active dispatch fence")
                 aggregate = int(
@@ -1652,7 +2136,7 @@ class SQLiteStateStore:
             False,
         )
 
-    def record_validator_observation(
+    def _record_validator_observation(
         self,
         request: ValidatorObservationRequest,
         *,
@@ -1879,17 +2363,24 @@ class SQLiteStateStore:
             sequence, event_hash, resulting_state, False,
         )
 
-    def apply_validator_observation(
+    def _apply_validator_observation(
         self,
         request: ValidationApplicationRequest,
         *,
-        authorize_transition: Callable[[LifecycleState], None] | None = None,
+        classification: SyntheticClassificationEvidence | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ApplicationReceipt:
         request.validate()
         if request.repository_id != self._repository_id:
             raise DispatchDenied("validation application targets another repository")
-        payload_digest = self._event_hash(request.__dict__)
+        classification_digest = (
+            self._event_hash(classification.__dict__)
+            if classification is not None
+            else None
+        )
+        payload_digest = self._event_hash(
+            {**request.__dict__, "classification_digest": classification_digest}
+        )
         natural_binding = (
             request.repository_id, request.run_id, request.logical_effect_id,
             request.check_id, request.validator_attempt_id,
@@ -1910,44 +2401,47 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "independent recovery freshness proof failed"
                     )
+                prior = connection.execute(
+                    "SELECT * FROM validation_applications WHERE command_id = ? OR "
+                    "application_id = ? OR observation_id = ? OR "
+                    "(repository_id = ? AND run_id = ? AND logical_effect_id = ? "
+                    "AND check_id = ? AND validator_attempt_id = ? AND observation_id = ?)",
+                    (
+                        request.command_id, request.application_id,
+                        request.observation_id, *natural_binding,
+                    ),
+                ).fetchone()
+                if prior is not None:
+                    prior_binding = (
+                        prior["application_id"], prior["command_id"],
+                        prior["event_id"], prior["repository_id"], prior["run_id"],
+                        prior["item_id"], prior["logical_effect_id"],
+                        prior["revision_digest"], prior["check_id"],
+                        prior["validator_attempt_id"], prior["observation_id"],
+                    )
+                    requested_full_binding = tuple(request.__dict__.values())
+                    if prior_binding != requested_full_binding:
+                        raise StorageIntegrityError(
+                            "validation application identity was reused with another result"
+                        )
+                    if (
+                        classification is not None
+                        and prior["classification_digest"] != classification_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "validation application replay supplied a contradictory "
+                            "failure classification"
+                        )
+                    connection.rollback()
+                    return self._application_receipt(prior, replayed=True)
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
                 ).fetchone()
                 if prior_command is not None:
-                    if prior_command["payload_digest"] != payload_digest:
-                        raise StorageIntegrityError(
-                            "command ID was reused with a different payload"
-                        )
-                    prior = connection.execute(
-                        "SELECT * FROM validation_applications WHERE command_id = ?",
-                        (request.command_id,),
-                    ).fetchone()
-                    if prior is None:
-                        raise StorageIntegrityError(
-                            "validation application command lost its projection"
-                        )
-                    connection.rollback()
-                    return self._application_receipt(prior, replayed=True)
-                prior = connection.execute(
-                    "SELECT * FROM validation_applications WHERE "
-                    "application_id = ? OR observation_id = ? OR "
-                    "(repository_id = ? AND run_id = ? AND logical_effect_id = ? "
-                    "AND check_id = ? AND validator_attempt_id = ? AND observation_id = ?)",
-                    (request.application_id, request.observation_id, *natural_binding),
-                ).fetchone()
-                if prior is not None:
-                    prior_binding = (
-                        prior["repository_id"], prior["run_id"],
-                        prior["logical_effect_id"], prior["check_id"],
-                        prior["validator_attempt_id"], prior["observation_id"],
+                    raise StorageIntegrityError(
+                        "validation application command lost its projection"
                     )
-                    if prior_binding != natural_binding:
-                        raise StorageIntegrityError(
-                            "validation application identity was reused with another result"
-                        )
-                    connection.rollback()
-                    return self._application_receipt(prior, replayed=True)
 
                 run = connection.execute(
                     "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
@@ -2003,9 +2497,53 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "unapplied observation and active intent projections disagree"
                     )
-                if observation["verdict"] != "PASS":
-                    raise DispatchDenied(
-                        "FAIL application requires a trusted failure classification"
+                if observation["verdict"] == "PASS":
+                    if classification is not None:
+                        raise DispatchDenied(
+                            "PASS application does not accept a failure classification"
+                        )
+                    transition_id = "T11"
+                elif observation["verdict"] == "FAIL":
+                    if classification is None:
+                        raise DispatchDenied(
+                            "FAIL application requires a trusted failure classification"
+                        )
+                    if self._classification_authority is None:
+                        raise DispatchDenied(
+                            "FAIL application requires the bound classification authority"
+                        )
+                    if plan["classification_issuer_fingerprint"] != (
+                        self._classification_authority.issuer_fingerprint
+                    ):
+                        raise DispatchDenied(
+                            "failure classification issuer does not match the accepted plan"
+                        )
+                    self._classification_authority.verify_classification(classification)
+                    classification_binding = (
+                        classification.repository_id, classification.run_id,
+                        classification.item_id, classification.logical_effect_id,
+                        classification.revision_digest, classification.check_id,
+                        classification.validator_attempt_id,
+                        classification.observation_id,
+                        classification.observation_event_hash,
+                        classification.result_digest,
+                    )
+                    observation_full_binding = (
+                        observation["repository_id"], observation["run_id"],
+                        observation["item_id"], observation["logical_effect_id"],
+                        observation["revision_digest"], observation["check_id"],
+                        observation["validator_attempt_id"],
+                        observation["observation_id"], observation["event_hash"],
+                        observation["result_digest"],
+                    )
+                    if classification_binding != observation_full_binding:
+                        raise DispatchDenied(
+                            "failure classification does not bind the recorded observation"
+                        )
+                    transition_id = "T12"
+                else:
+                    raise StorageIntegrityError(
+                        "validator observation has an unsupported verdict"
                     )
                 settlement = connection.execute(
                     "SELECT s.*, r.held_units AS current_held_units, "
@@ -2023,8 +2561,10 @@ class SQLiteStateStore:
                 ):
                     raise DispatchDenied("validator accounting is not fully settled")
                 if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? LIMIT 1",
-                    (request.repository_id,),
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "(reason_code <> 'FAILED_FINAL_APPLICATION' OR item_id = ? OR "
+                    "logical_effect_id = ?) LIMIT 1",
+                    (request.repository_id, request.item_id, request.logical_effect_id),
                 ).fetchone() is not None:
                     raise DispatchDenied("repository has an active dispatch fence")
 
@@ -2035,13 +2575,41 @@ class SQLiteStateStore:
                     "WHERE a.plan_id = r.plan_id AND a.check_id = r.check_id) LIMIT 1",
                     (plan["plan_id"], request.check_id),
                 ).fetchone()
-                resulting_state = (
-                    LifecycleState.VALIDATING
-                    if another_pending is not None
-                    else LifecycleState.BLOCKED
+                slot_released = False
+                if transition_id == "T11":
+                    verdict = "PASS"
+                    continuation_cursor = None
+                    resulting_state = (
+                        LifecycleState.VALIDATING
+                        if another_pending is not None
+                        else LifecycleState.BLOCKED
+                    )
+                    if another_pending is None:
+                        continuation_cursor = "FINALIZING"
+                elif classification.classification == FailureClassification.RECOVERABLE.value:
+                    verdict = "FAIL"
+                    continuation_cursor = LifecycleState.VALIDATING.value
+                    resulting_state = LifecycleState.BLOCKED
+                else:
+                    verdict = "FAIL"
+                    continuation_cursor = None
+                    resulting_state = LifecycleState.FAILED_FINAL
+                    remaining_active_validator = connection.execute(
+                        "SELECT 1 FROM validator_intents WHERE repository_id = ? "
+                        "AND run_id = ? AND status = 'ACTIVE' AND validator_intent_id <> ? "
+                        "LIMIT 1",
+                        (
+                            request.repository_id, request.run_id,
+                            observation["validator_intent_id"],
+                        ),
+                    ).fetchone()
+                    slot_released = (
+                        another_pending is None and remaining_active_validator is None
+                    )
+                TransitionEngine().authorize(
+                    transition_id, LifecycleState.VALIDATING, resulting_state,
+                    TRANSITIONS[transition_id].required_guards,
                 )
-                if authorize_transition is not None:
-                    authorize_transition(resulting_state)
                 sequence = int(run["head_sequence"]) + 1
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
@@ -2050,37 +2618,66 @@ class SQLiteStateStore:
                         (request.repository_id,),
                     ).fetchone()[0]
                 )
+                event_kind = (
+                    "VALIDATION_PASSED" if verdict == "PASS" else "VALIDATION_FAILED"
+                )
                 body = {
                     **request.__dict__,
                     "plan_id": plan["plan_id"],
-                    "verdict": "PASS",
+                    "verdict": verdict,
+                    "classification": (
+                        classification.classification
+                        if classification is not None else None
+                    ),
+                    "classification_id": (
+                        classification.classification_id
+                        if classification is not None else None
+                    ),
+                    "classification_policy_id": (
+                        classification.policy_id
+                        if classification is not None else None
+                    ),
+                    "classification_policy_version": (
+                        classification.policy_version
+                        if classification is not None else None
+                    ),
+                    "classification_digest": classification_digest,
+                    "continuation_cursor": continuation_cursor,
                     "command_payload_digest": payload_digest,
-                    "event_kind": "VALIDATION_PASSED",
+                    "event_kind": event_kind,
                     "lifecycle_from": LifecycleState.VALIDATING.value,
                     "lifecycle_to": resulting_state.value,
                     "previous_event_hash": previous_hash,
                     "schema_version": 1,
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
+                    "slot_released": slot_released,
                 }
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
-                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'VALIDATION_PASSED', ?, ?, ?)",
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
                     (
                         request.event_id, request.repository_id, request.run_id,
                         request.item_id, sequence, request.command_id,
-                        writer_epoch, previous_hash, event_hash, body_json,
+                        writer_epoch, event_kind, previous_hash, event_hash,
+                        body_json,
                     ),
                 )
                 connection.execute(
-                    "INSERT INTO validation_applications VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PASS', ?, ?, ?, ?)",
+                    "INSERT INTO validation_applications VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         request.application_id, request.command_id,
                         request.event_id, request.repository_id, request.run_id,
                         request.item_id, request.logical_effect_id, plan["plan_id"],
                         request.revision_digest, request.check_id,
                         request.validator_attempt_id, request.observation_id,
+                        verdict,
+                        body["classification"], body["classification_id"],
+                        body["classification_policy_id"],
+                        body["classification_policy_version"],
+                        classification_digest, continuation_cursor,
                         payload_digest, event_hash, resulting_state.value, body_json,
                     ),
                 )
@@ -2092,6 +2689,43 @@ class SQLiteStateStore:
                     "UPDATE validator_intents SET status = 'SETTLED' WHERE validator_intent_id = ?",
                     (observation["validator_intent_id"],),
                 )
+                if resulting_state is LifecycleState.FAILED_FINAL:
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            f"failed-final:{request.application_id}",
+                            request.repository_id, request.item_id,
+                            request.logical_effect_id,
+                            "FAILED_FINAL_APPLICATION",
+                            request.event_id,
+                        ),
+                    )
+                    if slot_released:
+                        slot_row = connection.execute(
+                            "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                            (request.repository_id,),
+                        ).fetchone()
+                        if slot_row is None or slot_row["run_id"] != request.run_id:
+                            raise StorageIntegrityError(
+                                "final failure classification did not own the "
+                                "outstanding slot"
+                            )
+                        deleted = connection.execute(
+                            "DELETE FROM outstanding_slot WHERE repository_id = ? "
+                            "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ? "
+                            "AND generation = 1",
+                            (
+                                request.repository_id,
+                                request.run_id,
+                                slot_row["logical_effect_id"],
+                                slot_row["attempt_id"],
+                            ),
+                        ).rowcount
+                        if deleted != 1:
+                            raise StorageIntegrityError(
+                                "final failure classification did not release the "
+                                "outstanding slot"
+                            )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -2176,6 +2810,18 @@ class SQLiteStateStore:
         )
 
     @staticmethod
+    def _control_receipt(
+        row: sqlite3.Row, *, replayed: bool
+    ) -> ControlReceipt:
+        return ControlReceipt(
+            str(row["control_id"]), str(row["command_id"]),
+            str(row["settled_event_id"]),
+            int(json.loads(row["body_json"])["sequence"]),
+            str(row["event_hash"]), LifecycleState(str(row["resulting_state"])),
+            replayed,
+        )
+
+    @staticmethod
     def _observation_receipt(
         row: sqlite3.Row, *, replayed: bool
     ) -> ObservationReceipt:
@@ -2189,48 +2835,69 @@ class SQLiteStateStore:
             replayed=replayed,
         )
 
+    def _verify_event_history(
+        self, connection: sqlite3.Connection, repository_id: str
+    ) -> None:
+        catalog_head, run_heads = self._heads(connection, repository_id)
+        for run_id, expected_head in run_heads.items():
+            previous_hash = ""
+            expected_sequence = 1
+            rows = connection.execute(
+                "SELECT * FROM events WHERE run_id = ? ORDER BY sequence",
+                (run_id,),
+            ).fetchall()
+            for row in rows:
+                if int(row["sequence"]) != expected_sequence:
+                    raise StorageIntegrityError("event sequence is not contiguous")
+                if row["previous_event_hash"] != previous_hash:
+                    raise StorageIntegrityError("event predecessor hash mismatch")
+                try:
+                    body = json.loads(row["body_json"])
+                except (TypeError, json.JSONDecodeError) as error:
+                    raise StorageIntegrityError(
+                        "event body is not valid JSON"
+                    ) from error
+                if self._event_hash(body) != row["event_hash"]:
+                    raise StorageIntegrityError("event body hash mismatch")
+                bindings = {
+                    "command_id": row["command_id"],
+                    "event_id": row["event_id"],
+                    "event_kind": row["event_kind"],
+                    "item_id": row["item_id"],
+                    "previous_event_hash": row["previous_event_hash"],
+                    "repository_id": row["repository_id"],
+                    "run_id": row["run_id"],
+                    "schema_version": row["schema_version"],
+                    "sequence": row["sequence"],
+                    "writer_epoch": row["writer_epoch"],
+                }
+                if any(body.get(key) != value for key, value in bindings.items()):
+                    raise StorageIntegrityError("event body binding mismatch")
+                previous_hash = str(row["event_hash"])
+                expected_sequence += 1
+            if previous_hash != expected_head:
+                raise StorageIntegrityError(
+                    "run head does not match verified history"
+                )
+            run_projection = connection.execute(
+                "SELECT head_sequence FROM runs WHERE run_id = ? "
+                "AND repository_id = ?",
+                (run_id, repository_id),
+            ).fetchone()
+            if (
+                run_projection is None
+                or int(run_projection["head_sequence"]) != expected_sequence - 1
+            ):
+                raise StorageIntegrityError(
+                    "run head sequence diverges from verified history"
+                )
+        if run_heads and catalog_head not in set(run_heads.values()):
+            raise StorageIntegrityError("catalog head is absent from run histories")
+
     def load_verified(self, repository_id: str) -> tuple[str, dict[str, str]]:
         """Verify immutable history and independent synthetic freshness."""
         with closing(self._connect()) as connection:
             catalog_head, run_heads = self._heads(connection, repository_id)
-            for run_id, expected_head in run_heads.items():
-                previous_hash = ""
-                expected_sequence = 1
-                rows = connection.execute(
-                    "SELECT * FROM events WHERE run_id = ? ORDER BY sequence",
-                    (run_id,),
-                ).fetchall()
-                for row in rows:
-                    if int(row["sequence"]) != expected_sequence:
-                        raise StorageIntegrityError("event sequence is not contiguous")
-                    if row["previous_event_hash"] != previous_hash:
-                        raise StorageIntegrityError("event predecessor hash mismatch")
-                    try:
-                        body = json.loads(row["body_json"])
-                    except (TypeError, json.JSONDecodeError) as error:
-                        raise StorageIntegrityError("event body is not valid JSON") from error
-                    if self._event_hash(body) != row["event_hash"]:
-                        raise StorageIntegrityError("event body hash mismatch")
-                    bindings = {
-                        "command_id": row["command_id"],
-                        "event_id": row["event_id"],
-                        "event_kind": row["event_kind"],
-                        "item_id": row["item_id"],
-                        "previous_event_hash": row["previous_event_hash"],
-                        "repository_id": row["repository_id"],
-                        "run_id": row["run_id"],
-                        "schema_version": row["schema_version"],
-                        "sequence": row["sequence"],
-                        "writer_epoch": row["writer_epoch"],
-                    }
-                    if any(body.get(key) != value for key, value in bindings.items()):
-                        raise StorageIntegrityError("event body binding mismatch")
-                    previous_hash = str(row["event_hash"])
-                    expected_sequence += 1
-                if previous_hash != expected_head:
-                    raise StorageIntegrityError("run head does not match verified history")
-            if run_heads and catalog_head not in set(run_heads.values()):
-                raise StorageIntegrityError("catalog head is absent from run histories")
             self._verify_projections(connection, repository_id)
             if not self._freshness_oracle.verify(
                 repository_id, catalog_head, run_heads
@@ -2241,6 +2908,7 @@ class SQLiteStateStore:
     def _verify_projections(
         self, connection: sqlite3.Connection, repository_id: str
     ) -> None:
+        self._verify_event_history(connection, repository_id)
         event_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND event_kind = 'INTENT_COMMITTED'",
             (repository_id,),
@@ -2358,6 +3026,31 @@ class SQLiteStateStore:
                 for body in applications
             }
         )
+        pause_settled_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND event_kind = 'PAUSE_SETTLED'",
+            (repository_id,),
+        ).fetchall()
+        pauses = [json.loads(row["body_json"]) for row in pause_settled_rows]
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    self._event_hash(
+                        {
+                            key: body[key]
+                            for key in PauseBeforeDispatchRequest.__dataclass_fields__
+                        }
+                        | {
+                            "action": body["action"],
+                            "capability_claim_id": body["capability_claim_id"],
+                            "capability_grant_id": body["capability_grant_id"],
+                            "capability_scope_digest": body["capability_scope_digest"],
+                        }
+                    ),
+                    body["event_id"], body["sequence"], self._event_hash(body),
+                )
+                for body in pauses
+            }
+        )
         actual_outcomes = {
             row["command_id"]: (
                 row["payload_digest"],
@@ -2378,6 +3071,7 @@ class SQLiteStateStore:
                 body["command_id"], body["event_id"], body["run_id"],
                 body["item_id"], body["logical_effect_id"],
                 body["revision_digest"],
+                body.get("classification_issuer_fingerprint"),
                 self._event_hash(
                     {
                         key: body[key]
@@ -2392,7 +3086,9 @@ class SQLiteStateStore:
             row["plan_id"]: (
                 row["command_id"], row["event_id"], row["run_id"],
                 row["item_id"], row["logical_effect_id"],
-                row["revision_digest"], row["payload_digest"], row["event_hash"],
+                row["revision_digest"],
+                row["classification_issuer_fingerprint"],
+                row["payload_digest"], row["event_hash"],
             )
             for row in connection.execute(
                 "SELECT * FROM validation_plans WHERE repository_id = ?",
@@ -2426,7 +3122,11 @@ class SQLiteStateStore:
                 body["item_id"], body["logical_effect_id"], body["plan_id"],
                 body["revision_digest"], body["check_id"],
                 body["validator_attempt_id"], body["observation_id"],
-                body["verdict"], body["command_payload_digest"],
+                body["verdict"], body["classification"],
+                body["classification_id"], body["classification_policy_id"],
+                body["classification_policy_version"],
+                body["classification_digest"], body["continuation_cursor"],
+                body["command_payload_digest"],
                 self._event_hash(body), body["lifecycle_to"],
             )
             for body in applications
@@ -2437,7 +3137,11 @@ class SQLiteStateStore:
                 row["item_id"], row["logical_effect_id"], row["plan_id"],
                 row["revision_digest"], row["check_id"],
                 row["validator_attempt_id"], row["observation_id"],
-                row["verdict"], row["payload_digest"], row["event_hash"],
+                row["verdict"], row["classification"],
+                row["classification_id"], row["classification_policy_id"],
+                row["classification_policy_version"],
+                row["classification_digest"], row["continuation_cursor"],
+                row["payload_digest"], row["event_hash"],
                 row["resulting_state"],
             )
             for row in connection.execute(
@@ -2448,6 +3152,48 @@ class SQLiteStateStore:
         if actual_applications != expected_applications:
             raise StorageIntegrityError(
                 "validation-application projection diverges from event history"
+            )
+        expected_controls = {
+            body["pause_id"]: (
+                body["command_id"], body["request_event_id"], body["event_id"],
+                body["run_id"], body["item_id"], body["action"],
+                body["reason_code"], body["continuation_cursor"],
+                body["capability_claim_id"], body["capability_grant_id"],
+                body["capability_scope_digest"],
+                self._event_hash(
+                    {
+                        key: body[key]
+                        for key in PauseBeforeDispatchRequest.__dataclass_fields__
+                    }
+                    | {
+                        "action": body["action"],
+                        "capability_claim_id": body["capability_claim_id"],
+                        "capability_grant_id": body["capability_grant_id"],
+                        "capability_scope_digest": body["capability_scope_digest"],
+                    }
+                ),
+                self._event_hash(body), body["lifecycle_to"], body,
+            )
+            for body in pauses
+        }
+        actual_controls = {
+            row["control_id"]: (
+                row["command_id"], row["request_event_id"],
+                row["settled_event_id"], row["run_id"], row["item_id"],
+                row["action"], row["reason_code"], row["continuation_cursor"],
+                row["capability_claim_id"], row["capability_grant_id"],
+                row["capability_scope_digest"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"],
+                json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM control_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_controls != expected_controls:
+            raise StorageIntegrityError(
+                "control-action projection diverges from event history"
             )
         expected_effects = {
             body["logical_effect_id"]: (
@@ -2530,6 +3276,29 @@ class SQLiteStateStore:
         if actual_redemptions != expected_redemptions:
             raise StorageIntegrityError(
                 "capability-redemption projection diverges from event history"
+            )
+
+        expected_operator_redemptions = {
+            body["capability_claim_id"]: (
+                body["capability_grant_id"], body["command_id"],
+                body["run_id"], body["action"],
+                body["capability_scope_digest"],
+            )
+            for body in pauses
+        }
+        actual_operator_redemptions = {
+            row["claim_id"]: (
+                row["grant_id"], row["command_id"], row["run_id"],
+                row["action"], row["scope_digest"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM operator_redemptions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_operator_redemptions != expected_operator_redemptions:
+            raise StorageIntegrityError(
+                "operator-redemption projection diverges from event history"
             )
 
         expected_observations = {
@@ -2746,9 +3515,32 @@ class SQLiteStateStore:
                 (repository_id,),
             )
         }
-        expected_fences: dict[str, tuple[str, str]] = {}
+        expected_fences: dict[str, tuple[str | None, str | None, str, str]] = {}
+        expected_fences.update(
+            {
+                body["fence_id"]: (
+                    None, None, body["reason_code"], body["request_event_id"]
+                )
+                for body in pauses
+            }
+        )
+        expected_fences.update(
+            {
+                f"failed-final:{body['application_id']}": (
+                    body["item_id"], body["logical_effect_id"],
+                    "FAILED_FINAL_APPLICATION", body["event_id"]
+                )
+                for body in applications
+                if body["lifecycle_to"] == LifecycleState.FAILED_FINAL.value
+            }
+        )
         visited_settlements: set[str] = set()
         operation_reservation_ids = {body["reservation_id"] for body in intents}
+        validation_released_effects = {
+            body["logical_effect_id"]
+            for body in applications
+            if body.get("slot_released") is True
+        }
         slot_obligations: list[sqlite3.Row] = []
         for reservation in reservations:
             rows = connection.execute(
@@ -2806,7 +3598,7 @@ class SQLiteStateStore:
                 )
                 if int(row["charged_units"]) > int(reservation["cap_units"]):
                     expected_fences[f"budget-breach:{settlement_id}"] = (
-                        "BUDGET_CAP_EXCEEDED",
+                        None, None, "BUDGET_CAP_EXCEEDED",
                         settlement_id,
                     )
 
@@ -2842,13 +3634,19 @@ class SQLiteStateStore:
             if (
                 not slot_released_ever
                 and reservation["reservation_id"] in operation_reservation_ids
+                and reservation["logical_effect_id"]
+                not in validation_released_effects
             ):
                 slot_obligations.append(reservation)
 
         actual_fences = {
-            row["fence_id"]: (row["reason_code"], row["originating_event_id"])
+            row["fence_id"]: (
+                row["item_id"], row["logical_effect_id"], row["reason_code"],
+                row["originating_event_id"],
+            )
             for row in connection.execute(
-                "SELECT fence_id, reason_code, originating_event_id FROM dispatch_fences WHERE repository_id = ?",
+                "SELECT fence_id, item_id, logical_effect_id, reason_code, "
+                "originating_event_id FROM dispatch_fences WHERE repository_id = ?",
                 (repository_id,),
             )
         }
@@ -2900,8 +3698,12 @@ class SQLiteStateStore:
         if slot_obligations:
             reservation = slot_obligations[0]
             if slot is None or (
-                slot["logical_effect_id"], slot["attempt_id"]
-            ) != (reservation["logical_effect_id"], reservation["attempt_id"]):
+                slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
+                int(slot["generation"]),
+            ) != (
+                reservation["run_id"], reservation["logical_effect_id"],
+                reservation["attempt_id"], 1,
+            ):
                 raise StorageIntegrityError("slot projection diverges from event history")
 
     def table_counts(self) -> dict[str, int]:
@@ -2921,6 +3723,8 @@ class SQLiteStateStore:
             "validator_intents",
             "validator_observations",
             "validation_applications",
+            "control_actions",
+            "operator_redemptions",
             "outstanding_slot",
             "dispatch_fences",
         )

@@ -16,17 +16,21 @@ from .adapters import (
 from .authority import (
     SyntheticAuthority,
     SyntheticCapability,
+    SyntheticClassificationEvidence,
+    SyntheticOperatorCapability,
     SyntheticValidatorCapability,
 )
 from .contracts import (
     ApplicationReceipt,
     CommitReceipt,
+    ControlReceipt,
     DispatchDenied,
     EffectObservationCommand,
     EffectObservationRequest,
     IntentRequest,
     LifecycleState,
     ObservationReceipt,
+    PauseBeforeDispatchRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
@@ -64,6 +68,31 @@ class SyntheticDispatchCoordinator:
         self._engine = engine
         self._authority = authority
         self._adapter = adapter
+
+    def pause_before_dispatch(
+        self,
+        request: PauseBeforeDispatchRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T04",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T04"].required_guards,
+            )
+
+        return self._store.pause_before_dispatch(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
 
     def dispatch(
         self,
@@ -106,6 +135,7 @@ class SyntheticDispatchCoordinator:
             effect,
             self._authority,
             commit,
+            intent,
             usage_units=usage_units,
             lose_receipt=lose_receipt,
         )
@@ -118,6 +148,10 @@ class SyntheticDispatchCoordinator:
         failure_hook: FailureHook | None = None,
     ) -> ObservationReceipt:
         command.validate()
+        if command.settlement_hash:
+            raise DispatchDenied(
+                "canonical observation intake derives its settlement hash"
+            )
         if command.repository_id != self._store._repository_id:
             raise DispatchDenied("observation targets a different repository")
         if not self._adapter.is_canonical_for(command.repository_id):
@@ -128,10 +162,16 @@ class SyntheticDispatchCoordinator:
         if receipt is None or not receipt.accepted:
             raise DispatchDenied("canonical synthetic receipt is unavailable")
         receipt_binding = (
+            receipt.repository_id,
+            receipt.run_id,
+            receipt.item_id,
             receipt.logical_effect_id,
             receipt.attempt_id,
         )
         command_binding = (
+            command.repository_id,
+            command.run_id,
+            command.item_id,
             command.logical_effect_id,
             command.attempt_id,
         )
@@ -148,7 +188,7 @@ class SyntheticDispatchCoordinator:
             resulting_state,
             TRANSITIONS["T10"].required_guards,
         )
-        return self._store.record_effect_observation(
+        return self._store._record_effect_observation(
             EffectObservationRequest(
                 observation_id=command.observation_id,
                 command_id=command.command_id,
@@ -163,7 +203,7 @@ class SyntheticDispatchCoordinator:
                 payload_digest=receipt.payload_digest,
                 usage_units=receipt.usage_units,
                 settlement_event_id=command.settlement_event_id,
-                settlement_hash=command.settlement_hash,
+                settlement_hash="",
             ),
             failure_hook=failure_hook,
         )
@@ -185,6 +225,7 @@ class SyntheticValidationCoordinator:
         self._engine = engine
         self._authority = authority
         self._adapter = adapter
+        self._store._bind_classification_authority(authority)
 
     def launch(
         self,
@@ -261,7 +302,7 @@ class SyntheticValidationCoordinator:
             resulting_state,
             TRANSITIONS["T24"].required_guards,
         )
-        return self._store.record_validator_observation(
+        return self._store._record_validator_observation(
             ValidatorObservationRequest(
                 command.observation_id, command.command_id, command.event_id,
                 command.repository_id, command.run_id, command.item_id,
@@ -278,17 +319,11 @@ class SyntheticValidationCoordinator:
         self,
         request: ValidationApplicationRequest,
         *,
+        classification: SyntheticClassificationEvidence | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ApplicationReceipt:
-        def authorize(resulting_state: LifecycleState) -> None:
-            self._engine.authorize(
-                "T11",
-                LifecycleState.VALIDATING,
-                resulting_state,
-                TRANSITIONS["T11"].required_guards,
-            )
-        return self._store.apply_validator_observation(
+        return self._store._apply_validator_observation(
             request,
-            authorize_transition=authorize,
+            classification=classification,
             failure_hook=failure_hook,
         )

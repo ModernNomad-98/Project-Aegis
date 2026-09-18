@@ -78,3 +78,31 @@ generic skill guidance that would require asking for the same approval again.
   2026-09-13, quoted above and durably transcribed in the description of
   [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95).
 - **Expiry / use limit:** None stated; recurring use, not a one-use grant.
+
+### AEGIS-APR-004: CP-WP-002 offline kernel implementation
+
+- **Event:** GRANT
+- **Status at recording:** ACTIVE
+- **Date / Grantor:** 2026-09-17 / Peter Nguyen.
+- **Reason:** Authorize the separately gated CP-WP-002 offline state and
+  recovery kernel after completion of CP-WP-001.
+- **Scope allowed:** The owner's exact instruction was: "a", selecting option
+  A, "Approve the proposed CP-WP-002 scope", in direct response to the
+  2026-09-17 approval request. That proposal authorizes implementation under
+  `tools/aegis_delivery_control/` using a standard-library SQLite transactional
+  store under the OS user-state directory, a repository-wide stable OS lock,
+  one outstanding synthetic operation, process-crash atomicity with
+  `synchronous=FULL`, fail-closed uncertain/corrupt/stale recovery, an injected
+  synthetic freshness oracle, synthetic-only adapters, the complete versioned
+  budget lifecycle, and synthetic T01-T28, C01-C09 and F01-F21 tests. It also
+  authorizes the corresponding README and update to
+  `docs/roadmaps/resumable-control-plane-backlog.md` with scope and evidence.
+- **Scope FORBIDDEN:** As stated in the proposal: no BER changes, dependency or
+  CI changes, production data, external or provider calls, releases, Git
+  mutation by the kernel, or artifact-directory changes. No real authority
+  source, credential, deployment or real execution adapter is authorized.
+- **Evidence:** Current-session owner message on 2026-09-17, quoted above,
+  responding to the immediately preceding structured approval request whose
+  option A and proposed technical contract are summarized in this entry.
+- **Expiry / use limit:** Applies to the proposed CP-WP-002 implementation
+  package; no calendar expiry stated.

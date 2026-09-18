@@ -13,7 +13,7 @@ from .authority import (
     SyntheticCapability,
     SyntheticValidatorCapability,
 )
-from .contracts import CommitReceipt, DispatchDenied
+from .contracts import CommitReceipt, DispatchDenied, IntentRequest
 from .storage import default_state_root
 
 
@@ -30,6 +30,9 @@ class SyntheticEffectRequest:
 class SyntheticReceipt:
     receipt_id: str
     claim_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
     logical_effect_id: str
     attempt_id: str
     payload_digest: str
@@ -79,6 +82,9 @@ class SyntheticExecutionAdapter:
                 CREATE TABLE IF NOT EXISTS synthetic_effects (
                     claim_id TEXT PRIMARY KEY,
                     receipt_id TEXT NOT NULL UNIQUE,
+                    repository_id TEXT NOT NULL,
+                    run_id TEXT NOT NULL,
+                    item_id TEXT NOT NULL,
                     logical_effect_id TEXT NOT NULL,
                     attempt_id TEXT NOT NULL,
                     payload_digest TEXT NOT NULL,
@@ -109,6 +115,9 @@ class SyntheticExecutionAdapter:
         return SyntheticReceipt(
             receipt_id=str(row["receipt_id"]),
             claim_id=str(row["claim_id"]),
+            repository_id=str(row["repository_id"]),
+            run_id=str(row["run_id"]),
+            item_id=str(row["item_id"]),
             logical_effect_id=str(row["logical_effect_id"]),
             attempt_id=str(row["attempt_id"]),
             payload_digest=str(row["payload_digest"]),
@@ -124,6 +133,7 @@ class SyntheticExecutionAdapter:
         request: SyntheticEffectRequest,
         authority: SyntheticAuthority,
         commit: CommitReceipt,
+        intent: IntentRequest,
         *,
         usage_units: int | None = 0,
         lose_receipt: bool = False,
@@ -166,10 +176,13 @@ class SyntheticExecutionAdapter:
                 ).fetchone():
                     raise DispatchDenied("synthetic capability was already redeemed")
                 connection.execute(
-                    "INSERT INTO synthetic_effects VALUES (?, ?, ?, ?, ?, ?, 1)",
+                    "INSERT INTO synthetic_effects VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
                     (
                         capability.claim_id,
                         receipt_id,
+                        intent.repository_id,
+                        intent.run_id,
+                        intent.item_id,
                         request.logical_effect_id,
                         request.attempt_id,
                         request.payload_digest,
@@ -183,6 +196,9 @@ class SyntheticExecutionAdapter:
         receipt = SyntheticReceipt(
             receipt_id=receipt_id,
             claim_id=capability.claim_id,
+            repository_id=intent.repository_id,
+            run_id=intent.run_id,
+            item_id=intent.item_id,
             logical_effect_id=request.logical_effect_id,
             attempt_id=request.attempt_id,
             payload_digest=request.payload_digest,

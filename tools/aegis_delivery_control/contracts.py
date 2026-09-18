@@ -28,6 +28,13 @@ class BudgetDisposition(str, Enum):
     UNKNOWN_WORST_CASE_CHARGED = "UNKNOWN_WORST_CASE_CHARGED"
 
 
+class FailureClassification(str, Enum):
+    """Closed T12 disposition: retryable versus permanently terminal."""
+
+    RECOVERABLE = "RECOVERABLE"
+    FINAL = "FINAL"
+
+
 @dataclass(frozen=True)
 class IntentRequest:
     repository_id: str
@@ -117,9 +124,8 @@ class EffectObservationCommand:
     settlement_hash: str
 
     def validate(self) -> None:
-        if any(
-            not value or not value.strip() for value in self.__dict__.values()
-        ):
+        required = tuple(self.__dict__.values())[:-1]
+        if any(not value or not value.strip() for value in required):
             raise ValueError("observation command identifiers must be non-empty")
 
 
@@ -154,7 +160,6 @@ class EffectObservationRequest:
             self.source_claim_id,
             self.payload_digest,
             self.settlement_event_id,
-            self.settlement_hash,
         )
         if any(not value or not value.strip() for value in required):
             raise ValueError("observation identifiers and digests must be non-empty")
@@ -282,6 +287,37 @@ class ValidationApplicationRequest:
 @dataclass(frozen=True)
 class ApplicationReceipt:
     application_id: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class PauseBeforeDispatchRequest:
+    pause_id: str
+    command_id: str
+    request_event_id: str
+    settled_event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    reason_code: str
+    continuation_cursor: str
+
+    def validate(self) -> None:
+        if any(not value or not value.strip() for value in self.__dict__.values()):
+            raise ValueError("pause command fields must be non-empty")
+        if self.request_event_id == self.settled_event_id:
+            raise ValueError("pause request and settlement event IDs must differ")
+
+
+@dataclass(frozen=True)
+class ControlReceipt:
+    control_id: str
     command_id: str
     event_id: str
     sequence: int

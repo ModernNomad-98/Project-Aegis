@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -20,12 +21,14 @@ from tools.aegis_delivery_control.authority import (
     SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.contracts import (
+    ApplicationReceipt,
     BudgetDisposition,
     BudgetSettlementRequest,
     DispatchDenied,
     EffectObservationCommand,
     InjectedFailure,
     IntentRequest,
+    LifecycleState,
     PlanAcceptanceRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
@@ -36,7 +39,7 @@ from tools.aegis_delivery_control.dispatch import (
     SyntheticValidationCoordinator,
 )
 from tools.aegis_delivery_control.engine import TransitionEngine
-from tools.aegis_delivery_control.storage import SQLiteStateStore
+from tools.aegis_delivery_control.storage import SQLiteStateStore, raise_at
 
 
 class AlwaysFreshOracle:
@@ -288,25 +291,6 @@ class MediatedDispatchTests(unittest.TestCase):
                 lose_receipt=True,
             )
             self.assertIsNone(dispatched.effect)
-            settlement_request = BudgetSettlementRequest(
-                "settlement-1",
-                "reservation-1",
-                "",
-                BudgetDisposition.CONSUMED,
-                1,
-                adapter.reconcile(capability.claim_id).receipt_id,
-                "USAGE_REPORTED",
-            )
-            proof = authority.issue_settlement_proof(
-                "proof-1",
-                "reservation-1",
-                non_dispatch_proven=False,
-                zero_liability_proven=False,
-                all_obligations_settled=False,
-            )
-            settlement = store.settle_budget(
-                settlement_request, proof, authority
-            )
             command = EffectObservationCommand(
                 "observation-1",
                 "observe-command-1",
@@ -318,17 +302,46 @@ class MediatedDispatchTests(unittest.TestCase):
                 "attempt-1",
                 capability.claim_id,
                 "settlement-1",
-                settlement.settlement_hash,
+                "",
             )
 
-            receipt = coordinator.intake_effect_receipt(command)
-            replay = coordinator.intake_effect_receipt(command)
-
-            self.assertFalse(receipt.replayed)
-            self.assertTrue(replay.replayed)
-            self.assertEqual(receipt.event_hash, replay.event_hash)
-            self.assertEqual(store.table_counts()["effect_observations"], 1)
+            with self.assertRaises(InjectedFailure):
+                coordinator.intake_effect_receipt(
+                    command,
+                    failure_hook=raise_at(
+                        "after_observation_settlement_before_observation"
+                    ),
+                )
+            self.assertEqual(store.table_counts()["budget_settlements"], 0)
+            self.assertEqual(store.table_counts()["effect_observations"], 0)
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+
+            with self.assertRaises(InjectedFailure):
+                coordinator.intake_effect_receipt(
+                    command,
+                    failure_hook=raise_at(
+                        "after_observation_commit_before_acknowledgement"
+                    ),
+                )
+            with patch.dict(os.environ, self.state_environment(root)):
+                recovered_store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+            recovered_store.load_verified("repo-1")
+            recovered_coordinator = SyntheticDispatchCoordinator(
+                recovered_store, TransitionEngine(), authority, adapter
+            )
+            replay = recovered_coordinator.intake_effect_receipt(command)
+
+            self.assertTrue(replay.replayed)
+            self.assertEqual(recovered_store.table_counts()["events"], 3)
+            self.assertEqual(
+                recovered_store.table_counts()["budget_settlements"], 1
+            )
+            self.assertEqual(
+                recovered_store.table_counts()["effect_observations"], 1
+            )
+            self.assertEqual(recovered_store.table_counts()["outstanding_slot"], 1)
             with self.assertRaisesRegex(DispatchDenied, "already redeemed"):
                 coordinator.dispatch(
                     intent,
@@ -336,27 +349,59 @@ class MediatedDispatchTests(unittest.TestCase):
                     SyntheticEffectRequest(
                         "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
                     ),
-                    expected_head=receipt.event_hash,
+                    expected_head=replay.event_hash,
                     writer_epoch=2,
                 )
 
     def test_c04_canonical_receipt_cannot_be_substituted_across_attempts(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
+            authority = SyntheticAuthority()
+            grant = SyntheticGrant(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            authority.register(grant)
+            capability = authority.claim(*grant.__dict__.values())
             with patch.dict(os.environ, self.state_environment(root)):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
                 coordinator = SyntheticDispatchCoordinator(
-                    store, TransitionEngine(), SyntheticAuthority(), adapter
+                    store, TransitionEngine(), authority, adapter
                 )
+            coordinator.dispatch(
+                IntentRequest(
+                    "repo-1", "run-1", "item-1", "command-1", "event-1",
+                    "effect-1", "payload-1", "attempt-1", "permission-1",
+                    "reservation-1", "budget-1", 1, 1, 2,
+                ),
+                capability,
+                SyntheticEffectRequest(
+                    "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
+                ),
+                expected_head="",
+                writer_epoch=1,
+                usage_units=1,
+                lose_receipt=True,
+            )
             command = EffectObservationCommand(
                 "observation-1", "observe-command-1", "observation-event-1",
-                "repo-1", "run-1", "item-1", "effect-1", "attempt-2",
-                "missing-claim", "settlement-1", "settlement-hash",
+                "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                capability.claim_id, "settlement-1", "",
             )
-            with self.assertRaisesRegex(DispatchDenied, "unavailable"):
-                coordinator.intake_effect_receipt(command)
+            substitutions = {
+                "repository_id": "repo-2",
+                "run_id": "run-2",
+                "item_id": "item-2",
+                "logical_effect_id": "effect-2",
+                "attempt_id": "attempt-2",
+            }
+            for field, value in substitutions.items():
+                with self.subTest(field=field), self.assertRaises(DispatchDenied):
+                    coordinator.intake_effect_receipt(
+                        replace(command, **{field: value})
+                    )
             self.assertEqual(store.table_counts()["effect_observations"], 0)
+            self.assertEqual(store.table_counts()["budget_settlements"], 0)
 
     def test_t24_lost_validator_result_can_be_applied_and_replayed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -401,24 +446,12 @@ class MediatedDispatchTests(unittest.TestCase):
                 writer_epoch=2,
                 usage_units=1,
             )
-            operation_settlement = store.settle_budget(
-                BudgetSettlementRequest(
-                    "settlement-1", "reservation-1", "",
-                    BudgetDisposition.CONSUMED, 1, operation.effect.receipt_id,
-                    "USAGE_REPORTED",
-                ),
-                authority.issue_settlement_proof(
-                    "proof-1", "reservation-1", non_dispatch_proven=False,
-                    zero_liability_proven=False, all_obligations_settled=False,
-                ),
-                authority,
-            )
             operation_observation = dispatch.intake_effect_receipt(
                 EffectObservationCommand(
                     "observation-1", "observe-command-1", "observation-event-1",
                     "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
                     operation_capability.claim_id, "settlement-1",
-                    operation_settlement.settlement_hash,
+                    "",
                 )
             )
             validator_grant = SyntheticValidatorGrant(
@@ -449,7 +482,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             self.assertIsNone(launched.result)
             result = validator_adapter.reconcile(validator_capability.claim_id)
-            validator_settlement = store.settle_budget(
+            validator_settlement = store._settle_budget(
                 BudgetSettlementRequest(
                     "validator-settlement-1", "validator-reservation-1", "",
                     BudgetDisposition.CONSUMED, 1, result.result_id,
@@ -502,6 +535,46 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(applied.resulting_state.value, "BLOCKED")
             self.assertTrue(replay_after_apply.replayed)
             self.assertEqual(store.table_counts()["validation_applications"], 1)
+
+    def test_c05_coordinator_forwards_classification_to_store_boundary(self) -> None:
+        authority = SyntheticAuthority(b"c" * 32)
+        classification = authority.issue_classification(
+            "classification-1", "repo-1", "run-1", "item-1", "effect-1",
+            "revision-1", "check-1", "validator-attempt-1",
+            "validator-observation-1", "observation-hash", "result-digest-1",
+            verdict="FAIL", policy_id="failure-policy", policy_version="1",
+            classification="FINAL",
+        )
+
+        class CapturingStore:
+            is_canonical = True
+
+            def _bind_classification_authority(self, bound_authority):
+                self.authority = bound_authority
+
+            def _apply_validator_observation(self, request, **kwargs):
+                self.classification = kwargs["classification"]
+                return ApplicationReceipt(
+                    request.application_id, request.command_id, request.event_id,
+                    1, "event-hash", LifecycleState.FAILED_FINAL, False,
+                )
+
+        store = CapturingStore()
+        coordinator = SyntheticValidationCoordinator(
+            store, TransitionEngine(), authority, None
+        )
+        result = coordinator.apply_result(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1", "validator-observation-1",
+            ),
+            classification=classification,
+        )
+
+        self.assertEqual(result.resulting_state, LifecycleState.FAILED_FINAL)
+        self.assertIs(store.classification, classification)
+        self.assertIs(store.authority, authority)
 
 
 if __name__ == "__main__":

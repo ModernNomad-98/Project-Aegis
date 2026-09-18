@@ -617,6 +617,13 @@ Start with the [documentation index](docs/README.md), [changelog](CHANGELOG.md),
 [offline CI guide](docs/offline-ci.md) and source-specific
 [owner approval register](docs/approvals/APPROVAL_REGISTER.md). For BER work,
 use its [active backlog](docs/roadmaps/behavioral-eval-runner-backlog.md).
+The experimental offline delivery-control kernel is under active development;
+use its [implementation guide](tools/aegis_delivery_control/README.md) for
+current guarantees and limitations, and its
+[durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
+Its current locally validated milestones include C04 atomic receipt observation
+and C05 exactly-once classified validation application; the backlog records the
+remaining review and completion gates.
 The construction and authoring references below explain the library's design:
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).

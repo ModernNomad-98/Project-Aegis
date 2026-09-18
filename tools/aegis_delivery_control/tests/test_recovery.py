@@ -14,7 +14,11 @@ from tools.aegis_delivery_control.authority import (
     SyntheticCapability,
     SyntheticGrant,
 )
-from tools.aegis_delivery_control.contracts import CommitReceipt, DispatchDenied
+from tools.aegis_delivery_control.contracts import (
+    CommitReceipt,
+    DispatchDenied,
+    IntentRequest,
+)
 
 
 class SyntheticBoundaryTests(unittest.TestCase):
@@ -54,6 +58,14 @@ class SyntheticBoundaryTests(unittest.TestCase):
     def commit() -> CommitReceipt:
         return CommitReceipt("command-1", "event-1", 1, "event-hash-1", False)
 
+    @staticmethod
+    def intent() -> IntentRequest:
+        return IntentRequest(
+            "repo-1", "run-1", "item-1", "command-1", "event-1",
+            "effect-1", "payload-1", "attempt-1", "permission-1",
+            "reservation-1", "budget-1", 1, 1, 2,
+        )
+
     def test_f03_one_use_grant_has_exactly_one_claim_winner(self) -> None:
         capability = self.claim()
         self.assertEqual(capability.grant_id, "grant-1")
@@ -75,6 +87,7 @@ class SyntheticBoundaryTests(unittest.TestCase):
                 self.request(),
                 self.authority,
                 self.commit(),
+                self.intent(),
                 usage_units=None,
                 lose_receipt=True,
             )
@@ -86,7 +99,7 @@ class SyntheticBoundaryTests(unittest.TestCase):
         self.assertIsNone(recovered.usage_units)
         with self.assertRaisesRegex(DispatchDenied, "already redeemed"):
             adapter._execute_committed(
-                capability, self.request(), self.authority, self.commit()
+                capability, self.request(), self.authority, self.commit(), self.intent()
             )
 
     def test_f03_capability_cannot_be_rebound(self) -> None:
@@ -101,7 +114,7 @@ class SyntheticBoundaryTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(DispatchDenied, "does not bind"):
             adapter._execute_committed(
-                capability, wrong_request, self.authority, self.commit()
+                capability, wrong_request, self.authority, self.commit(), self.intent()
             )
 
     def test_f03_forged_capability_is_not_issuer_verifiable(self) -> None:
@@ -118,7 +131,7 @@ class SyntheticBoundaryTests(unittest.TestCase):
         def redeem() -> bool:
             try:
                 adapter._execute_committed(
-                    capability, self.request(), self.authority, self.commit()
+                    capability, self.request(), self.authority, self.commit(), self.intent()
                 )
             except DispatchDenied:
                 return False
