@@ -31,6 +31,8 @@ from tools.aegis_delivery_control.contracts import (
     ApplicationReceipt,
     BudgetDisposition,
     BudgetSettlementRequest as BudgetSettlementContract,
+    BindingMismatchKind,
+    BindingMismatchRequest,
     CommitReceipt,
     DispatchDenied,
     EffectObservationCommand,
@@ -38,7 +40,7 @@ from tools.aegis_delivery_control.contracts import (
     InjectedFailure,
     IntentRequest,
     LifecycleState,
-    PlanAcceptanceRequest,
+    PlanAcceptanceRequest as PlanAcceptanceContract,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -63,6 +65,15 @@ def BudgetSettlementRequest(*args, **kwargs):
     kwargs.setdefault("logical_effect_id", "effect-1")
     kwargs.setdefault("attempt_id", "attempt-1")
     return BudgetSettlementContract(*args, **kwargs)
+
+
+def PlanAcceptanceRequest(*args, **kwargs):
+    """Build a newly accepted synthetic plan with explicit immutable pins."""
+    kwargs.setdefault("source_tree_digest", "source-tree-1")
+    kwargs.setdefault("item_definition_digest", "item-definition-1")
+    kwargs.setdefault("plan_schema_version", "plan-schema-1")
+    kwargs.setdefault("reducer_version", "reducer-1")
+    return PlanAcceptanceContract(*args, **kwargs)
 
 
 class AlwaysFreshOracle:
@@ -221,6 +232,51 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(receipt.resulting_state, LifecycleState.STOPPED)
             self.assertNotEqual(receipt.event_hash, plan.event_hash)
             store.load_verified("repo-1")
+
+    def test_coordinator_mediates_t15_without_adapter_contact(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            authority = SyntheticAuthority()
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            plan = store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                    "run-1", "item-1", "effect-1", "revision-1",
+                    "descriptor-1", "scope-1", "budget-1", ("check-1",),
+                ),
+                expected_head="", writer_epoch=1,
+            )
+            request = BindingMismatchRequest(
+                "mismatch-1", "observation-1", "mismatch-command-1",
+                "mismatch-event-1", "repo-1", "run-1", "item-1", "effect-1",
+                BindingMismatchKind.POLICY,
+                store._complete_policy_digest(
+                    PlanAcceptanceRequest(
+                        "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                        "run-1", "item-1", "effect-1", "revision-1",
+                        "descriptor-1", "scope-1", "budget-1", ("check-1",),
+                    ),
+                    authority,
+                ),
+                "changed-policy", plan.event_hash, "BINDING_MISMATCH_POLICY",
+            )
+            with patch.object(
+                adapter, "_execute_committed",
+                side_effect=AssertionError("T15 contacted the adapter"),
+            ) as contact:
+                receipt = coordinator.record_binding_mismatch(
+                    request, authority.issue_binding_observation(request),
+                    expected_head=plan.event_hash, writer_epoch=2,
+                )
+            self.assertEqual(receipt.resulting_state, LifecycleState.BLOCKED)
+            contact.assert_not_called()
 
     def test_coordinator_exposes_t20_stop_escalation(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

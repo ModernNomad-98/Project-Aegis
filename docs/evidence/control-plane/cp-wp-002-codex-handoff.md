@@ -7,7 +7,7 @@ Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - R-STOP-01/02/03 AND AGGREGATE STOP GATE `APPROVE`**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13 AND T15 `APPROVE`**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -383,8 +383,49 @@ zero warnings; validator self-tests passed 91 assertions; diff-check was clean
 apart from line-ending notices.
 
 T13 is `YES/YES/YES`. Only its C08/F03 slices are accepted; complete cross-family
-C08/F03 traceability remains `UNVERIFIED`. Commit/push and exact-head hosted
-evidence remain pending until this reviewed stage is committed.
+C08/F03 traceability remains `UNVERIFIED`. T13 was committed and pushed as
+`7114bc79b0f960d94c8a78b093781268532ebd41`; all three hosted checks passed on
+that exact head.
+
+### Stage 8 - T15 immutable binding mismatch
+
+The T15 plan required two `REVISE` audits before `APPROVE`. Corrections added an
+explicit source-tree pin rather than overloading revision identity, strict
+all-or-none source/item/schema/reducer pins for every new acceptance, complete
+semantic-plan and policy identities, issuer-authenticated current-head
+observations, exact SOURCE/ITEM/PLAN/POLICY mapping, store-owned fence identity,
+an atomic legacy-schema migration and narrow F01 non-mutation boundaries. The
+first focused tests proved the prior gaps: unpinned plans were accepted and the
+store had no typed `record_binding_mismatch` route.
+
+Changed production files: `contracts.py` adds typed mismatch kinds/requests and
+the four acceptance pins; `authority.py` signs and verifies exact synthetic
+observations; `dispatch.py` exposes the engine-authorized T15 route; `storage.py`
+adds compatible plan migration, semantic/policy derivation, atomic mismatch
+persistence/fencing/routing and historical recovery. `test_storage.py`,
+`test_dispatch.py` and `test_recovery.py` provide pinned synthetic builders and
+14 focused acceptance, mapping, migration, crash/replay, lifecycle, F01-boundary,
+recovery and tamper tests. The three status READMEs, backlog and this handoff are
+the only documentation changes. Canonical design, approvals, BER, CI,
+dependencies, artifacts/caches and real authority/adapters were intentionally
+untouched.
+
+Initial implementation review returned `REVISE`: a BLOCKED/FINALIZING run that
+still owned the repository slot was incorrectly treated as idle. Routing now
+derives active/uncertain status transactionally from the historical prefix and
+obligation-bearing cursor, persists it, and recomputes it during recovery. The
+reviewer's exact reproduction now enters `RECONCILIATION_REQUIRED` while
+retaining cursor and slot; corrected review returned `APPROVE` with no remaining
+blocker or major and independently passed all 14 focused tests.
+
+The complete package passed 256 tests; skill validation reported 184 valid and
+zero warnings; validator self-tests passed 91 assertions; diff-check was clean
+apart from line-ending notices. T15 is `YES/YES/YES`. Its narrow F01 controls
+prove that mismatch handling does not change the effect identity/descriptor,
+accepted plan/revision, outstanding slot or accounting projections and cannot
+re-enable readiness. Full F01 remains `UNVERIFIED` for T28. Commit/push and
+exact-head hosted evidence for Stage 8 remain pending until this reviewed stage
+is committed.
 
 ## 8. Proven invocations
 
@@ -423,6 +464,11 @@ evidence remain pending until this reviewed stage is committed.
 | T13 complete delivery-control package | `Ran 242 tests in 21.120s`; `OK` |
 | T13 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed |
 | Independent T13 implementation review | Initial and intermediate `REVISE` findings corrected; final `APPROVE`, no remaining blocker/major; 16 focused tests passed independently |
+| T15 focused first falsifications | Unpinned plan acceptance failed to reject; typed mismatch failed because `record_binding_mismatch` was absent; both passed after the narrow implementation |
+| T15 focused suite | `Ran 14 tests`; `OK` |
+| T15 complete delivery-control package | `Ran 256 tests in 19.733s`; `OK` |
+| T15 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent T15 implementation review | Initial `REVISE` for active BLOCKED routing; corrected final `APPROVE`, no remaining blocker/major; 14 focused tests passed independently |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -513,7 +559,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 242 passing tests, a registry entry or an earlier milestone
+complete from the 256 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -543,7 +589,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
 | T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
-| T15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
 | T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T18 | YES | YES | YES | Graceful-stop and terminal-closure slices independently accepted |
@@ -580,7 +626,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T28 |
+| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 identity/non-mutation boundary slice accepted; full family remains ordered with T28 |
 | F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
@@ -613,7 +659,7 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T15, then T14 (T13 complete and independently accepted).
+1. T15 complete and independently accepted; T14 next.
 2. T05-T09.
 3. T17 with F02/F11/F12/F21.
 4. T22.
@@ -707,8 +753,8 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02 and R-STOP-03 are independently accepted as recorded in
-  Stages 4-6; later exact-head backlog and final review gates remain.
+- R-STOP-01, R-STOP-02, R-STOP-03, T13 and T15 are independently accepted as
+  recorded in Stages 4-8; later exact-head backlog and final review gates remain.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -721,6 +767,6 @@ owner before interpreting it more broadly.
 
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
-stop findings and T13 are complete. The next code change follows the documented
-order at T15, then T14, not dashboard work. Keep PR #99 draft until every remaining backlog
+stop findings, T13 and T15 are complete. The next code change follows the
+documented order at T14, then T05-T09, not dashboard work. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

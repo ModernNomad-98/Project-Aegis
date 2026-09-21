@@ -59,6 +59,47 @@ class GovernedOrder(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class BindingMismatchKind(str, Enum):
+    SOURCE = "SOURCE"
+    ITEM = "ITEM"
+    PLAN = "PLAN"
+    POLICY = "POLICY"
+
+
+@dataclass(frozen=True)
+class BindingMismatchRequest:
+    mismatch_id: str
+    observation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    mismatch_kind: BindingMismatchKind
+    expected_digest: str
+    observed_digest: str
+    evidence_head: str
+    reason_code: str
+
+    def validate(self) -> None:
+        if not isinstance(self.mismatch_kind, BindingMismatchKind):
+            raise ValueError("binding mismatch kind is unsupported")
+        required = (
+            self.mismatch_id, self.observation_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.expected_digest,
+            self.observed_digest, self.evidence_head, self.reason_code,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("binding mismatch identifiers must be non-empty")
+        if self.expected_digest == self.observed_digest:
+            raise ValueError("binding mismatch values must differ")
+        expected_reason = f"BINDING_MISMATCH_{self.mismatch_kind.value}"
+        if self.reason_code != expected_reason:
+            raise ValueError("binding mismatch reason does not match its kind")
+
+
 @dataclass(frozen=True)
 class AuthorityLifecycleFactRequest:
     fact_id: str
@@ -207,11 +248,40 @@ class PlanAcceptanceRequest:
     budget_policy_digest: str
     check_ids: tuple[str, ...]
     aggregate_gate_ids: tuple[str, ...] = ()
+    source_tree_digest: str | None = None
+    item_definition_digest: str | None = None
+    plan_schema_version: str | None = None
+    reducer_version: str | None = None
 
     def validate(self) -> None:
-        identifiers = tuple(self.__dict__.values())[:-2]
+        identifiers = (
+            self.plan_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.revision_digest,
+            self.effect_descriptor_digest,
+            self.permission_scope_digest,
+            self.budget_policy_digest,
+        )
         if any(not value or not value.strip() for value in identifiers):
             raise ValueError("plan identifiers and digests must be non-empty")
+        immutable_pins = (
+            self.source_tree_digest,
+            self.item_definition_digest,
+            self.plan_schema_version,
+            self.reducer_version,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in immutable_pins
+        ):
+            raise ValueError(
+                "new plan acceptance requires all immutable binding pins"
+            )
         if not self.check_ids:
             raise ValueError("accepted plan requires at least one validation check")
         if any(not check_id or not check_id.strip() for check_id in self.check_ids):

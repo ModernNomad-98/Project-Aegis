@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from .contracts import (
     AuthorityLifecycleFactRequest,
+    BindingMismatchRequest,
     BudgetSettlementRequest,
     DispatchDenied,
     FailureClassification,
@@ -224,6 +225,14 @@ class SyntheticAuthorityLifecycleEvidence:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticBindingObservation:
+    observation_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -267,6 +276,63 @@ class SyntheticAuthority:
                 payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True
             ).encode("utf-8")
         ).hexdigest()
+
+    @staticmethod
+    def _binding_mismatch_digest(request: BindingMismatchRequest) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **request.__dict__,
+                    "mismatch_kind": request.mismatch_kind.value,
+                },
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_binding_observation(
+        self, request: BindingMismatchRequest
+    ) -> SyntheticBindingObservation:
+        request.validate()
+        request_digest = self._binding_mismatch_digest(request)
+        return SyntheticBindingObservation(
+            request.observation_id,
+            request_digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "BINDING_MISMATCH_OBSERVATION",
+                observation_id=request.observation_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_binding_observation(
+        self,
+        observation: SyntheticBindingObservation,
+        request: BindingMismatchRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in observation.__dict__.values()
+        ):
+            raise DispatchDenied("binding mismatch observation is malformed")
+        request_digest = self._binding_mismatch_digest(request)
+        expected_mac = self._mac(
+            "BINDING_MISMATCH_OBSERVATION",
+            observation_id=observation.observation_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            observation.observation_id != request.observation_id
+            or observation.request_digest != request_digest
+            or observation.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(observation.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied("binding mismatch observation was not issued here")
 
     def issue_authority_lifecycle_evidence(
         self, proof_id: str, request: AuthorityLifecycleFactRequest

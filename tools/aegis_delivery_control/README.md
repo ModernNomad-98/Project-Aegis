@@ -58,6 +58,14 @@ fixture. It is not a delivery integration.
   lifecycle; lawful own consumption permits only its exact in-flight action to
   continue while denying later reuse. Recovery reconstructs typed supersession
   graphs, stacked prohibitions and exact correction generations.
+- T15 now pins the accepted source tree, item definition, plan schema and
+  reducer, and derives domain-separated semantic-plan and complete-policy
+  digests. Issuer-signed current-head SOURCE/ITEM/PLAN/POLICY mismatch
+  observations atomically append `BINDING_MISMATCH`, a store-derived scoped
+  fence and the deterministic lifecycle result. Idle work blocks, paused work
+  stays paused, and active or uncertain work enters reconciliation without
+  changing the accepted effect identity, plan, slot or accounting projections.
+  Legacy unpinned plan events remain readable but cannot accept a new T15 fact.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -111,7 +119,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 242 tests successfully, and
+controller. The complete local package suite ran 256 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -129,6 +137,9 @@ late-adjustment and alias/tamper coverage. The aggregate stop gate is `APPROVE`.
 T13 authority lifecycle intake also received independent implementation
 `APPROVE` after stacked-correction, typed supersession, cross-kind redemption,
 own-consumption continuation, crash/replay, recovery and tamper review.
+T15 binding-mismatch handling received independent implementation `APPROVE`
+after its initial active-`BLOCKED` routing finding was corrected and re-tested
+against idle, paused, active, uncertain and terminal cases.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

@@ -438,6 +438,41 @@ This promotes T13 itself to `YES/YES/YES`. It establishes the T13 slices of C08
 and F03 only; full cross-family C08/F03 traceability remains `UNVERIFIED`. T15 is
 the next ordered item, followed by T14. PR #99 remains draft and not merge-ready.
 
+### 5.8 T15 immutable binding-mismatch checkpoint
+
+T15 is implemented and independently accepted. New plan acceptance requires
+explicit source-tree, item-definition, plan-schema and reducer pins. Acceptance
+persists a domain-separated semantic-plan digest and a complete-policy digest
+covering permission/budget policy, checks/gates, failure-classification policy
+and issuer, finalization policy and issuer, schema and reducer. Historical
+unpinned plan events remain readable with NULL derived fields, but cannot accept
+a new mismatch fact.
+
+Typed SOURCE, ITEM, PLAN and POLICY mismatch requests carry an issuer-signed,
+current-head synthetic observation. Storage rederives the accepted value, owns
+the deterministic reason-keyed fence identity and atomically records the event,
+fresh observation, projection, fence, command outcome, catalog/run heads and
+lifecycle. PAUSED retains its state and fence; truly idle work becomes BLOCKED;
+active or uncertain work, including BLOCKED/FINALIZING with the outstanding
+slot, becomes RECONCILIATION_REQUIRED. Terminal states reject T15. Recovery
+recomputes the plan/policy digests, evidence MAC, historical activity predicate,
+route, fence and full projection/fence union.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Two `REVISE` rounds added explicit source pins, authenticated/store-derived observations, complete policy identity, strict legacy migration, exact kind mapping and narrow F01 boundaries; corrected plan `APPROVE` |
+| Focused first falsifications | Unpinned plan was initially accepted; the first typed mismatch then failed because `record_binding_mismatch` was absent; both became green through the narrow implementation path |
+| Focused T15 suite | Exit 0; 14 tests; `OK` |
+| Complete delivery-control package | Exit 0; 256 tests; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | Initial `REVISE` found active BLOCKED work incorrectly treated as idle; historical-prefix activity routing and regression coverage corrected it; final `APPROVE`, no remaining blocker/major; reviewer passed 14 focused tests |
+
+This promotes T15 itself to `YES/YES/YES`. The narrow F01 non-mutation controls
+show that T15 does not change an existing effect key/descriptor, accepted plan,
+slot or accounting state, but full F01 remains `UNVERIFIED` for the later T28
+work. T14 is the next ordered item. PR #99 remains draft and not merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

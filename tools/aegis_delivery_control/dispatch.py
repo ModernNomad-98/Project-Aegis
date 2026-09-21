@@ -15,6 +15,7 @@ from .adapters import (
 from .authority import (
     SyntheticAuthority,
     SyntheticAuthorityLifecycleEvidence,
+    SyntheticBindingObservation,
     SyntheticCapability,
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
@@ -24,6 +25,7 @@ from .authority import (
 from .contracts import (
     ApplicationReceipt,
     AuthorityLifecycleFactRequest,
+    BindingMismatchRequest,
     CommitReceipt,
     ControlReceipt,
     DispatchDenied,
@@ -148,6 +150,31 @@ class SyntheticDispatchCoordinator:
 
         return self._store.record_authority_fact(
             request, evidence, self._authority,
+            expected_head=expected_head,
+            writer_epoch=writer_epoch,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def record_binding_mismatch(
+        self,
+        request: BindingMismatchRequest,
+        observation: SyntheticBindingObservation,
+        *,
+        expected_head: str,
+        writer_epoch: int,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T15", current_state, resulting_state,
+                TRANSITIONS["T15"].required_guards,
+            )
+
+        return self._store.record_binding_mismatch(
+            request, observation, self._authority,
             expected_head=expected_head,
             writer_epoch=writer_epoch,
             authorize_transition=authorize,

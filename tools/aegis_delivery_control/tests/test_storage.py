@@ -28,6 +28,8 @@ from tools.aegis_delivery_control.adapters import (
 from tools.aegis_delivery_control.contracts import (
     AuthorityFactKind,
     AuthorityLifecycleFactRequest,
+    BindingMismatchKind,
+    BindingMismatchRequest,
     BudgetDisposition,
     BudgetSettlementRequest as BudgetSettlementContract,
     DispatchDenied,
@@ -38,7 +40,7 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     GovernedOrder,
     PauseBeforeDispatchRequest,
-    PlanAcceptanceRequest,
+    PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
     StopMode,
     StopEscalationRequest,
@@ -74,6 +76,15 @@ def BudgetSettlementRequest(*args, **kwargs):
     else:
         kwargs.setdefault("attempt_id", "attempt-1")
     return BudgetSettlementContract(*args, **kwargs)
+
+
+def PlanAcceptanceRequest(*args, **kwargs):
+    """Build a newly accepted synthetic plan with explicit immutable pins."""
+    kwargs.setdefault("source_tree_digest", "source-tree-1")
+    kwargs.setdefault("item_definition_digest", "item-definition-1")
+    kwargs.setdefault("plan_schema_version", "plan-schema-1")
+    kwargs.setdefault("reducer_version", "reducer-1")
+    return PlanAcceptanceContract(*args, **kwargs)
 
 
 class MutableFreshnessOracle:
@@ -328,8 +339,788 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operator_redemptions": 0,
                 "outstanding_slot": 0,
                 "dispatch_fences": 0,
+                "binding_mismatches": 0,
             },
         )
+
+    def test_t15_new_plan_requires_explicit_immutable_binding_pins(self) -> None:
+        with self.assertRaisesRegex(ValueError, "immutable binding pins"):
+            self.store.accept_plan(
+                PlanAcceptanceContract(
+                    "plan-unpinned", "command-unpinned", "event-unpinned",
+                    "repo-1", "run-unpinned", "item-unpinned", "effect-unpinned",
+                    "revision-unpinned", "descriptor-unpinned", "scope-unpinned",
+                    "budget-unpinned", ("check-unpinned",),
+                ),
+                expected_head="",
+                writer_epoch=1,
+            )
+        with self.assertRaisesRegex(ValueError, "immutable binding pins"):
+            PlanAcceptanceContract(
+                "plan-partial", "command-partial", "event-partial",
+                "repo-1", "run-partial", "item-partial", "effect-partial",
+                "revision-partial", "descriptor-partial", "scope-partial",
+                "budget-partial", ("check-partial",),
+                source_tree_digest="only-one-pin",
+            ).validate()
+        with self.assertRaisesRegex(ValueError, "must differ"):
+            BindingMismatchRequest(
+                "mismatch-equal", "observation-equal", "command-equal",
+                "event-equal", "repo-1", "run-1", "item-1", "effect-1",
+                BindingMismatchKind.SOURCE, "same", "same", "head",
+                "BINDING_MISMATCH_SOURCE",
+            ).validate()
+
+    def test_t15_persists_semantic_and_complete_policy_bindings(self) -> None:
+        receipt = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-pinned", "command-pinned", "event-pinned",
+                "repo-1", "run-pinned", "item-pinned", "effect-pinned",
+                "revision-pinned", "descriptor-pinned", "scope-pinned",
+                "budget-pinned", ("check-b", "check-a"), ("gate-b", "gate-a"),
+                source_tree_digest="source-pinned",
+                item_definition_digest="item-definition-pinned",
+                plan_schema_version="schema-pinned",
+                reducer_version="reducer-pinned",
+            ),
+            expected_head="",
+            writer_epoch=1,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(validation_plans)")
+            }
+            row = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = 'plan-pinned'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+        finally:
+            connection.close()
+        expected_columns = {
+            "source_tree_digest", "item_definition_digest",
+            "plan_schema_version", "reducer_version",
+            "accepted_plan_semantic_digest", "complete_policy_digest",
+        }
+        self.assertTrue(expected_columns.issubset(columns))
+        self.assertEqual(row["source_tree_digest"], "source-pinned")
+        self.assertEqual(row["item_definition_digest"], "item-definition-pinned")
+        self.assertTrue(row["accepted_plan_semantic_digest"])
+        self.assertTrue(row["complete_policy_digest"])
+        self.assertEqual(body["failure_policy_id"], "failure-policy")
+        self.assertEqual(body["failure_policy_version"], "1")
+        self.oracle.allowed_head = receipt.event_hash
+        catalog_head, run_heads = self.store.load_verified("repo-1")
+        self.assertEqual(catalog_head, receipt.event_hash)
+        self.assertEqual(run_heads["run-pinned"], receipt.event_hash)
+
+    def test_t15_source_mismatch_atomically_fences_and_blocks_idle_run(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="",
+            writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        request = BindingMismatchRequest(
+            "mismatch-1", "observation-1", "mismatch-command-1",
+            "mismatch-event-1", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            plan.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        receipt = self.store.record_binding_mismatch(
+            request,
+            self.authority.issue_binding_observation(request),
+            self.authority,
+            expected_head=plan.event_hash,
+            writer_epoch=2,
+        )
+        self.assertEqual(receipt.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            mismatch = connection.execute(
+                "SELECT mismatch_kind, fence_id FROM binding_mismatches"
+            ).fetchone()
+            fences = connection.execute(
+                "SELECT reason_code FROM dispatch_fences"
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(mismatch[0], BindingMismatchKind.SOURCE.value)
+        self.assertTrue(mismatch[1].startswith("binding:"))
+        self.assertEqual(fences, [("BINDING_MISMATCH_SOURCE",)])
+        self.oracle.allowed_head = receipt.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        self.assertEqual(catalog_head, receipt.event_hash)
+        self.assertEqual(run_heads["run-1"], receipt.event_hash)
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-after-t15", "readiness-command-after-t15",
+                "readiness-event-after-t15", "repo-1", "run-1", "item-1",
+                "plan-1", "revision-1", receipt.event_hash, None,
+                "inputs-after-t15", True,
+            )
+        )
+        self.assertEqual(readiness.resulting_state, LifecycleState.BLOCKED)
+        self.oracle.allowed_head = readiness.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t15_exact_kind_mapping_recovery_and_observation_freshness(self) -> None:
+        head = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        ).event_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()
+            expected_by_kind = {
+                BindingMismatchKind.SOURCE: plan["source_tree_digest"],
+                BindingMismatchKind.ITEM: plan["item_definition_digest"],
+                BindingMismatchKind.PLAN: plan["accepted_plan_semantic_digest"],
+                BindingMismatchKind.POLICY: plan["complete_policy_digest"],
+            }
+        finally:
+            connection.close()
+        first_request = None
+        for index, (kind, expected) in enumerate(expected_by_kind.items(), start=2):
+            self.oracle.allowed_head = head
+            request = BindingMismatchRequest(
+                f"mismatch-{index}", f"observation-{index}",
+                f"mismatch-command-{index}", f"mismatch-event-{index}",
+                "repo-1", "run-1", "item-1", "effect-1", kind,
+                str(expected), f"observed-{kind.value.lower()}", head,
+                f"BINDING_MISMATCH_{kind.value}",
+            )
+            receipt = self.store.record_binding_mismatch(
+                request, self.authority.issue_binding_observation(request),
+                self.authority, expected_head=head, writer_epoch=index,
+            )
+            self.assertEqual(receipt.resulting_state, LifecycleState.BLOCKED)
+            head = receipt.event_hash
+            if first_request is None:
+                first_request = request
+        self.oracle.allowed_head = head
+        self.store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            recorded_kinds = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT mismatch_kind FROM binding_mismatches"
+                )
+            }
+        finally:
+            connection.close()
+        self.assertEqual(
+            recorded_kinds, {kind.value for kind in BindingMismatchKind}
+        )
+        assert first_request is not None
+        replayed_observation = replace(
+            first_request,
+            mismatch_id="mismatch-rebound",
+            command_id="mismatch-command-rebound",
+            event_id="mismatch-event-rebound",
+            evidence_head=head,
+        )
+        with self.assertRaisesRegex(StorageIntegrityError, "identity was rebound"):
+            self.store.record_binding_mismatch(
+                replayed_observation,
+                self.authority.issue_binding_observation(replayed_observation),
+                self.authority,
+                expected_head=head,
+                writer_epoch=6,
+            )
+
+    def test_t15_rejects_forged_stale_and_store_unverified_mismatch(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        valid = BindingMismatchRequest(
+            "mismatch-1", "observation-1", "mismatch-command-1",
+            "mismatch-event-1", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            plan.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        forged = replace(
+            self.authority.issue_binding_observation(valid), issuer_mac="0" * 64
+        )
+        with self.assertRaisesRegex(DispatchDenied, "not issued here"):
+            self.store.record_binding_mismatch(
+                valid, forged, self.authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+            )
+        cross_bound = replace(
+            valid, mismatch_id="mismatch-cross", command_id="command-cross",
+            event_id="event-cross", observed_digest="source-tree-cross",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "not issued here"):
+            self.store.record_binding_mismatch(
+                cross_bound,
+                self.authority.issue_binding_observation(valid),
+                self.authority,
+                expected_head=plan.event_hash,
+                writer_epoch=2,
+            )
+        wrong_expected = replace(
+            valid, mismatch_id="mismatch-2", observation_id="observation-2",
+            command_id="mismatch-command-2", event_id="mismatch-event-2",
+            expected_digest="caller-invented-binding",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "accepted binding"):
+            self.store.record_binding_mismatch(
+                wrong_expected,
+                self.authority.issue_binding_observation(wrong_expected),
+                self.authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+            )
+        stale = replace(
+            valid, mismatch_id="mismatch-3", observation_id="observation-3",
+            command_id="mismatch-command-3", event_id="mismatch-event-3",
+            evidence_head="stale-head",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "evidence head is stale"):
+            self.store.record_binding_mismatch(
+                stale, self.authority.issue_binding_observation(stale),
+                self.authority,
+                expected_head="stale-head", writer_epoch=2,
+            )
+        foreign_item = replace(
+            valid, mismatch_id="mismatch-foreign",
+            observation_id="observation-foreign",
+            command_id="command-foreign", event_id="event-foreign",
+            item_id="item-foreign",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "accepted plan"):
+            self.store.record_binding_mismatch(
+                foreign_item,
+                self.authority.issue_binding_observation(foreign_item),
+                self.authority,
+                expected_head=plan.event_hash,
+                writer_epoch=2,
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
+
+    def test_t15_recovery_rejects_rehashed_forged_observation(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        request = BindingMismatchRequest(
+            "mismatch-1", "observation-1", "mismatch-command-1",
+            "mismatch-event-1", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            plan.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        receipt = self.store.record_binding_mismatch(
+            request, self.authority.issue_binding_observation(request),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone()[0]
+            )
+            body["observation_issuer_mac"] = "0" * 64
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            forged_hash = self.store._event_hash(body)
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (forged_hash, body_json, request.event_id),
+            )
+            connection.execute(
+                "UPDATE binding_mismatches SET issuer_mac = ?, event_hash = ?, "
+                "body_json = ? WHERE mismatch_id = ?",
+                ("0" * 64, forged_hash, body_json, request.mismatch_id),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (forged_hash, request.command_id),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = ?",
+                (forged_hash, request.run_id),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                (forged_hash, request.repository_id),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.assertNotEqual(forged_hash, receipt.event_hash)
+        self.oracle.allowed_head = forged_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "binding mismatch proof or schema"
+        ):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t15_recovery_rederives_plan_and_policy_digests(self) -> None:
+        receipt = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()
+            original_body_json = plan["body_json"]
+            original_body = json.loads(original_body_json)
+            original_values = {
+                "accepted_plan_semantic_digest": plan[
+                    "accepted_plan_semantic_digest"
+                ],
+                "complete_policy_digest": plan["complete_policy_digest"],
+            }
+        finally:
+            connection.close()
+        for field in original_values:
+            with self.subTest(field=field):
+                forged_body = dict(original_body)
+                forged_body[field] = f"forged-{field}"
+                forged_body_json = json.dumps(
+                    forged_body, sort_keys=True, separators=(",", ":")
+                )
+                forged_hash = self.store._event_hash(forged_body)
+                connection = sqlite3.connect(self.database_path)
+                try:
+                    connection.execute(
+                        "UPDATE events SET event_hash = ?, body_json = ? "
+                        "WHERE event_id = 'plan-event-1'",
+                        (forged_hash, forged_body_json),
+                    )
+                    connection.execute(
+                        f"UPDATE validation_plans SET {field} = ?, "
+                        "event_hash = ?, body_json = ? WHERE plan_id = 'plan-1'",
+                        (forged_body[field], forged_hash, forged_body_json),
+                    )
+                    connection.execute(
+                        "UPDATE command_outcomes SET event_hash = ? "
+                        "WHERE command_id = 'plan-command-1'",
+                        (forged_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                        (forged_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE repositories SET catalog_head = ? "
+                        "WHERE repository_id = 'repo-1'",
+                        (forged_hash,),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                self.oracle.allowed_head = forged_hash
+                with self.assertRaisesRegex(
+                    StorageIntegrityError,
+                    "plan (semantic|policy) digest diverges",
+                ):
+                    self.store.load_verified("repo-1", authority=self.authority)
+                connection = sqlite3.connect(self.database_path)
+                try:
+                    connection.execute(
+                        "UPDATE events SET event_hash = ?, body_json = ? "
+                        "WHERE event_id = 'plan-event-1'",
+                        (receipt.event_hash, original_body_json),
+                    )
+                    connection.execute(
+                        f"UPDATE validation_plans SET {field} = ?, "
+                        "event_hash = ?, body_json = ? WHERE plan_id = 'plan-1'",
+                        (
+                            original_values[field], receipt.event_hash,
+                            original_body_json,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE command_outcomes SET event_hash = ? "
+                        "WHERE command_id = 'plan-command-1'",
+                        (receipt.event_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                        (receipt.event_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE repositories SET catalog_head = ? "
+                        "WHERE repository_id = 'repo-1'",
+                        (receipt.event_hash,),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                self.oracle.allowed_head = receipt.event_hash
+                self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t15_crash_replay_is_atomic_and_preserves_effect_identity(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        request = BindingMismatchRequest(
+            "mismatch-1", "observation-1", "mismatch-command-1",
+            "mismatch-event-1", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.ITEM, "item-definition-1", "item-definition-2",
+            plan.event_hash, "BINDING_MISMATCH_ITEM",
+        )
+        observation = self.authority.issue_binding_observation(request)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            immutable_before = {
+                table: tuple(connection.execute(f"SELECT * FROM {table}"))
+                for table in (
+                    "validation_plans", "validation_requirements", "effects",
+                    "permission_uses", "budget_reservations", "outstanding_slot",
+                )
+            }
+            database_before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.record_binding_mismatch(
+                request, observation, self.authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+                failure_hook=raise_at(
+                    "after_binding_mismatch_writes_before_commit"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(tuple(connection.iterdump()), database_before)
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.record_binding_mismatch(
+                request, observation, self.authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+                failure_hook=raise_at(
+                    "after_binding_mismatch_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            committed_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+            immutable_after = {
+                table: tuple(connection.execute(f"SELECT * FROM {table}"))
+                for table in immutable_before
+            }
+        finally:
+            connection.close()
+        self.assertEqual(immutable_after, immutable_before)
+        self.oracle.allowed_head = committed_head
+        replay = self.store.record_binding_mismatch(
+            request, observation, self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, committed_head)
+        with self.assertRaisesRegex(DispatchDenied, "durable PLANNED state"):
+            self.store.commit_intent(
+                self.request(), self.capability, self.authority,
+                expected_head=committed_head, writer_epoch=3,
+            )
+
+    def test_t15_partial_plan_binding_schema_is_rejected_without_completion(self) -> None:
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "ALTER TABLE validation_plans DROP COLUMN complete_policy_digest"
+            )
+            connection.commit()
+            before_columns = tuple(
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(validation_plans)"
+                )
+            )
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "partially migrated"):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after_columns = tuple(
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(validation_plans)"
+                )
+            )
+        finally:
+            connection.close()
+        self.assertEqual(after_columns, before_columns)
+
+    def test_t15_active_mismatch_reconciles_without_changing_effect_or_slot(self) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            effects_before = tuple(connection.execute("SELECT * FROM effects"))
+            slot_before = tuple(
+                connection.execute("SELECT * FROM outstanding_slot")
+            )
+            plan_before = tuple(
+                connection.execute("SELECT * FROM validation_plans")
+            )
+        finally:
+            connection.close()
+        request = BindingMismatchRequest(
+            "mismatch-active", "observation-active", "command-active",
+            "event-active", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            committed.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        receipt = self.store.record_binding_mismatch(
+            request, self.authority.issue_binding_observation(request),
+            self.authority,
+            expected_head=committed.event_hash, writer_epoch=3,
+        )
+        self.assertEqual(
+            receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                tuple(connection.execute("SELECT * FROM effects")),
+                effects_before,
+            )
+            self.assertEqual(
+                tuple(connection.execute("SELECT * FROM outstanding_slot")),
+                slot_before,
+            )
+            self.assertEqual(
+                tuple(connection.execute("SELECT * FROM validation_plans")),
+                plan_before,
+            )
+        finally:
+            connection.close()
+
+    def test_t15_lifecycle_route_is_closed_and_preserves_paused(self) -> None:
+        expected = {
+            LifecycleState.PLANNED: LifecycleState.BLOCKED,
+            LifecycleState.BLOCKED: LifecycleState.BLOCKED,
+            LifecycleState.PAUSED: LifecycleState.PAUSED,
+            LifecycleState.RUNNING: LifecycleState.RECONCILIATION_REQUIRED,
+            LifecycleState.PAUSING: LifecycleState.RECONCILIATION_REQUIRED,
+            LifecycleState.VALIDATING: LifecycleState.RECONCILIATION_REQUIRED,
+            LifecycleState.RECONCILIATION_REQUIRED: (
+                LifecycleState.RECONCILIATION_REQUIRED
+            ),
+        }
+        for current, resulting in expected.items():
+            with self.subTest(current=current):
+                self.assertEqual(
+                    self.store._binding_mismatch_route(
+                        current, active_or_uncertain=False
+                    ),
+                    resulting,
+                )
+        self.assertEqual(
+            self.store._binding_mismatch_route(
+                LifecycleState.BLOCKED, active_or_uncertain=True
+            ),
+            LifecycleState.RECONCILIATION_REQUIRED,
+        )
+        for terminal in (
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+        ):
+            with self.subTest(terminal=terminal):
+                with self.assertRaisesRegex(DispatchDenied, "nonterminal"):
+                    self.store._binding_mismatch_route(
+                        terminal, active_or_uncertain=False
+                    )
+
+    def test_t15_blocked_owned_slot_routes_to_reconciliation(self) -> None:
+        self._prepare_finalization()
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state_before = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor, head_hash "
+                "FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()
+            writer_epoch = connection.execute(
+                "SELECT MAX(writer_epoch) + 1 FROM events"
+            ).fetchone()[0]
+            slot_before = tuple(
+                connection.execute("SELECT * FROM outstanding_slot")
+            )
+        finally:
+            connection.close()
+        self.assertEqual(state_before[:2], ("BLOCKED", "FINALIZING"))
+        self.assertEqual(len(slot_before), 1)
+        request = BindingMismatchRequest(
+            "mismatch-blocked", "observation-blocked", "command-blocked",
+            "event-blocked", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            state_before[2], "BINDING_MISMATCH_SOURCE",
+        )
+        observation = self.authority.issue_binding_observation(request)
+        with self.assertRaises(InjectedFailure):
+            self.store.record_binding_mismatch(
+                request, observation, self.authority,
+                expected_head=state_before[2], writer_epoch=writer_epoch,
+                failure_hook=raise_at(
+                    "after_binding_mismatch_writes_before_commit"
+                ),
+            )
+        self.assertEqual(
+            self.store.load_run_lifecycle("run-1"), LifecycleState.BLOCKED
+        )
+        receipt = self.store.record_binding_mismatch(
+            request, observation, self.authority,
+            expected_head=state_before[2], writer_epoch=writer_epoch,
+        )
+        self.assertEqual(
+            receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state_after = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs "
+                "WHERE run_id = 'run-1'"
+            ).fetchone()
+            slot_after = tuple(
+                connection.execute("SELECT * FROM outstanding_slot")
+            )
+        finally:
+            connection.close()
+        self.assertEqual(
+            state_after, ("RECONCILIATION_REQUIRED", "FINALIZING")
+        )
+        self.assertEqual(slot_after, slot_before)
+        self.oracle.allowed_head = receipt.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t15_paused_run_retains_pause_and_terminal_run_rejects(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request("t15"), self._pause_capability("t15"),
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = BindingMismatchRequest(
+            "mismatch-paused", "observation-paused", "command-paused",
+            "event-paused", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-2",
+            paused.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        mismatch = self.store.record_binding_mismatch(
+            request, self.authority.issue_binding_observation(request),
+            self.authority,
+            expected_head=paused.event_hash, writer_epoch=3,
+        )
+        self.assertEqual(mismatch.resulting_state, LifecycleState.PAUSED)
+        self.oracle.allowed_head = mismatch.event_hash
+        stopped = self.store.stop(
+            self._stop_request(StopMode.IMMEDIATE, "t15"),
+            self._stop_capability(StopMode.IMMEDIATE, "t15"),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            policy_digest = connection.execute(
+                "SELECT complete_policy_digest FROM validation_plans "
+                "WHERE plan_id = 'plan-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        terminal_request = BindingMismatchRequest(
+            "mismatch-terminal", "observation-terminal", "command-terminal",
+            "event-terminal", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.POLICY,
+            policy_digest,
+            "changed-policy", stopped.event_hash, "BINDING_MISMATCH_POLICY",
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(DispatchDenied, "nonterminal"):
+            self.store.record_binding_mismatch(
+                terminal_request,
+                self.authority.issue_binding_observation(terminal_request),
+                self.authority,
+                expected_head=stopped.event_hash,
+                writer_epoch=5,
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
 
     def test_t03_requires_exact_accepted_plan_and_rejects_run_substitution(self) -> None:
         connection = sqlite3.connect(self.database_path)
@@ -476,6 +1267,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operator_redemptions": 0,
                 "outstanding_slot": 1,
                 "dispatch_fences": 0,
+                "binding_mismatches": 0,
             },
         )
 
@@ -2731,6 +3523,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "aggregate_gate_ids", "gate_set_digest",
                 "finalization_policy_id", "finalization_policy_version",
                 "finalization_issuer_fingerprint",
+                "failure_policy_id", "failure_policy_version",
+                "source_tree_digest", "item_definition_digest",
+                "plan_schema_version", "reducer_version",
+                "accepted_plan_semantic_digest", "complete_policy_digest",
             ):
                 body.pop(key)
             body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
@@ -2738,7 +3534,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             payload_digest = self.store._event_hash(
                 {
                     key: body[key]
-                    for key in PlanAcceptanceRequest.__dataclass_fields__
+                    for key in PlanAcceptanceContract.__dataclass_fields__
                     if key in body
                 }
             )
@@ -2773,6 +3569,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "aggregate_gate_ids_json", "gate_set_digest",
                 "finalization_policy_id", "finalization_policy_version",
                 "finalization_issuer_fingerprint",
+                "source_tree_digest", "item_definition_digest",
+                "plan_schema_version", "reducer_version",
+                "accepted_plan_semantic_digest", "complete_policy_digest",
             ):
                 connection.execute(
                     f"ALTER TABLE validation_plans DROP COLUMN {column_name}"
@@ -2800,11 +3599,18 @@ class SQLiteStateStoreTests(unittest.TestCase):
             gate_json = connection.execute(
                 "SELECT aggregate_gate_ids_json FROM validation_plans"
             ).fetchone()[0]
+            migrated_bindings = connection.execute(
+                "SELECT source_tree_digest, item_definition_digest, "
+                "plan_schema_version, reducer_version, "
+                "accepted_plan_semantic_digest, complete_policy_digest "
+                "FROM validation_plans"
+            ).fetchone()
         finally:
             connection.close()
         self.assertIn("continuation_cursor", run_columns)
         self.assertIn("finalization_issuer_fingerprint", plan_columns)
         self.assertIsNone(gate_json)
+        self.assertEqual(migrated_bindings, (None,) * 6)
         self.assertNotEqual(accepted.event_hash, event_hash)
         connection = sqlite3.connect(self.database_path)
         try:

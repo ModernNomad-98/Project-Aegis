@@ -22,9 +22,18 @@ from tools.aegis_delivery_control.contracts import (
     DispatchDenied,
     IntentRequest,
     OperationLaunchReceipt,
-    PlanAcceptanceRequest,
+    PlanAcceptanceRequest as PlanAcceptanceContract,
 )
 from tools.aegis_delivery_control.storage import SQLiteStateStore, default_state_root
+
+
+def PlanAcceptanceRequest(*args, **kwargs):
+    """Build a newly accepted synthetic plan with explicit immutable pins."""
+    kwargs.setdefault("source_tree_digest", "source-tree-1")
+    kwargs.setdefault("item_definition_digest", "item-definition-1")
+    kwargs.setdefault("plan_schema_version", "plan-schema-1")
+    kwargs.setdefault("reducer_version", "reducer-1")
+    return PlanAcceptanceContract(*args, **kwargs)
 
 
 class MutableFreshnessOracle:

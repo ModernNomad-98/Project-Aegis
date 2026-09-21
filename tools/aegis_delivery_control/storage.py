@@ -13,12 +13,15 @@ from pathlib import Path
 from typing import BinaryIO, Callable, Mapping, cast
 
 from .authority import (
+    SYNTHETIC_FAILURE_POLICY_ID,
+    SYNTHETIC_FAILURE_POLICY_VERSION,
     SYNTHETIC_FINALIZATION_POLICY_ID,
     SYNTHETIC_FINALIZATION_POLICY_VERSION,
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
     SyntheticAuthority,
     SyntheticAuthorityLifecycleEvidence,
+    SyntheticBindingObservation,
     SyntheticCapability,
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
@@ -33,6 +36,8 @@ from .contracts import (
     ApplicationReceipt,
     AuthorityFactKind,
     AuthorityLifecycleFactRequest,
+    BindingMismatchKind,
+    BindingMismatchRequest,
     BudgetDisposition,
     BudgetSettlementRequest,
     CommitReceipt,
@@ -111,6 +116,7 @@ _EVENT_KINDS = frozenset(
     {
         "ADAPTER_CONTACT_CLAIMED",
         "AUTHORITY_EVALUATED",
+        "BINDING_MISMATCH",
         "BLOCKER_RESOLVED",
         "BUDGET_SETTLED",
         "INTENT_COMMITTED",
@@ -138,6 +144,7 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
     {
         "ADAPTER_CONTACT_CLAIMED",
         "AUTHORITY_EVALUATED",
+        "BINDING_MISMATCH",
         "BLOCKER_RESOLVED",
         "INTENT_COMMITTED",
         "LATE_RECEIPT_RECORDED",
@@ -184,6 +191,7 @@ _LIFECYCLE_ROUTES: Mapping[
 ] = {
     "ADAPTER_CONTACT_CLAIMED": _PRESERVE_LIFECYCLE_ROUTES,
     "AUTHORITY_EVALUATED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "BINDING_MISMATCH": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BLOCKER_RESOLVED": frozenset(
         {(LifecycleState.BLOCKED, LifecycleState.VALIDATING)}
     ),
@@ -707,7 +715,13 @@ class SQLiteStateStore:
                 finalization_issuer_fingerprint TEXT,
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
-                body_json TEXT NOT NULL
+                body_json TEXT NOT NULL,
+                source_tree_digest TEXT,
+                item_definition_digest TEXT,
+                plan_schema_version TEXT,
+                reducer_version TEXT,
+                accepted_plan_semantic_digest TEXT,
+                complete_policy_digest TEXT
             );
             CREATE TABLE IF NOT EXISTS validation_requirements (
                 plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
@@ -1158,6 +1172,31 @@ class SQLiteStateStore:
                 reason_code TEXT NOT NULL,
                 originating_event_id TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS binding_mismatches (
+                mismatch_id TEXT PRIMARY KEY,
+                observation_id TEXT NOT NULL UNIQUE,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                mismatch_kind TEXT NOT NULL CHECK (
+                    mismatch_kind IN ('SOURCE', 'ITEM', 'PLAN', 'POLICY')
+                ),
+                expected_digest TEXT NOT NULL,
+                observed_digest TEXT NOT NULL,
+                evidence_head TEXT NOT NULL,
+                reason_code TEXT NOT NULL,
+                request_digest TEXT NOT NULL,
+                issuer_fingerprint TEXT NOT NULL,
+                issuer_mac TEXT NOT NULL,
+                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL,
+                body_json TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS outstanding_slot (
                 singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
                 repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
@@ -1226,6 +1265,7 @@ class SQLiteStateStore:
                 connection.execute(
                     f"ALTER TABLE validation_plans ADD COLUMN {column_name} TEXT"
                 )
+        SQLiteStateStore._migrate_plan_binding_schema(connection)
         run_columns = {
             str(row["name"])
             for row in connection.execute("PRAGMA table_info(runs)")
@@ -1234,6 +1274,80 @@ class SQLiteStateStore:
             connection.execute("ALTER TABLE runs ADD COLUMN continuation_cursor TEXT")
         SQLiteStateStore._migrate_validation_recovery_schema(connection)
         SQLiteStateStore._migrate_terminal_validation_schema(connection)
+
+    @staticmethod
+    def _migrate_plan_binding_schema(connection: sqlite3.Connection) -> None:
+        base_columns = (
+            "plan_id", "command_id", "event_id", "repository_id", "run_id",
+            "item_id", "logical_effect_id", "revision_digest",
+            "effect_descriptor_digest", "permission_scope_digest",
+            "budget_policy_digest", "classification_issuer_fingerprint",
+            "aggregate_gate_ids_json", "gate_set_digest",
+            "finalization_policy_id", "finalization_policy_version",
+            "finalization_issuer_fingerprint", "payload_digest", "event_hash",
+            "body_json",
+        )
+        columns = (
+            "source_tree_digest",
+            "item_definition_digest",
+            "plan_schema_version",
+            "reducer_version",
+            "accepted_plan_semantic_digest",
+            "complete_policy_digest",
+        )
+        existing = {
+            str(row["name"])
+            for row in connection.execute("PRAGMA table_info(validation_plans)")
+        }
+        present = set(columns) & existing
+        if present and present != set(columns):
+            raise StorageIntegrityError(
+                "validation plan binding schema is partially migrated"
+            )
+        if existing not in (set(base_columns), set(base_columns) | set(columns)):
+            raise StorageIntegrityError(
+                "validation plan binding schema is incompatible"
+            )
+        if present:
+            return
+        rows_before = [
+            tuple(row[column] for column in base_columns)
+            for row in connection.execute("SELECT * FROM validation_plans")
+        ]
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            for column_name in columns:
+                connection.execute(
+                    f"ALTER TABLE validation_plans ADD COLUMN {column_name} TEXT"
+                )
+            migrated_columns = {
+                str(row["name"])
+                for row in connection.execute(
+                    "PRAGMA table_info(validation_plans)"
+                )
+            }
+            rows_after = connection.execute(
+                "SELECT * FROM validation_plans"
+            ).fetchall()
+            if migrated_columns != set(base_columns) | set(columns) or [
+                tuple(row[column] for column in base_columns)
+                for row in rows_after
+            ] != rows_before or any(
+                row[column] is not None
+                for row in rows_after
+                for column in columns
+            ):
+                raise StorageIntegrityError(
+                    "validation plan binding migration changed historical rows"
+                )
+            if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                raise StorageIntegrityError(
+                    "validation plan binding migration violates foreign keys"
+                )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
 
     @staticmethod
     def _migrate_validation_recovery_schema(
@@ -1698,6 +1812,78 @@ class SQLiteStateStore:
     def _event_hash(body: Mapping[str, object]) -> str:
         encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
+
+    @classmethod
+    def _accepted_plan_semantic_digest(
+        cls, request: PlanAcceptanceRequest
+    ) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T15:ACCEPTED_PLAN_SEMANTIC:v1",
+                "repository_id": request.repository_id,
+                "run_id": request.run_id,
+                "item_id": request.item_id,
+                "logical_effect_id": request.logical_effect_id,
+                "revision_digest": request.revision_digest,
+                "source_tree_digest": request.source_tree_digest,
+                "item_definition_digest": request.item_definition_digest,
+                "effect_descriptor_digest": request.effect_descriptor_digest,
+                "permission_scope_digest": request.permission_scope_digest,
+                "budget_policy_digest": request.budget_policy_digest,
+                "check_ids": sorted(request.check_ids),
+                "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+                "plan_schema_version": request.plan_schema_version,
+                "reducer_version": request.reducer_version,
+            }
+        )
+
+    @classmethod
+    def _complete_policy_digest(
+        cls, request: PlanAcceptanceRequest, authority: SyntheticAuthority
+    ) -> str:
+        return cls._complete_policy_digest_from_bindings(
+            request,
+            classification_issuer_fingerprint=authority.issuer_fingerprint,
+            failure_policy_id=SYNTHETIC_FAILURE_POLICY_ID,
+            failure_policy_version=SYNTHETIC_FAILURE_POLICY_VERSION,
+            finalization_policy_id=SYNTHETIC_FINALIZATION_POLICY_ID,
+            finalization_policy_version=SYNTHETIC_FINALIZATION_POLICY_VERSION,
+            finalization_issuer_fingerprint=(
+                authority.finalization_issuer_fingerprint
+            ),
+        )
+
+    @classmethod
+    def _complete_policy_digest_from_bindings(
+        cls,
+        request: PlanAcceptanceRequest,
+        *,
+        classification_issuer_fingerprint: str,
+        failure_policy_id: str,
+        failure_policy_version: str,
+        finalization_policy_id: str,
+        finalization_policy_version: str,
+        finalization_issuer_fingerprint: str,
+    ) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T15:COMPLETE_POLICY:v1",
+                "permission_scope_digest": request.permission_scope_digest,
+                "budget_policy_digest": request.budget_policy_digest,
+                "check_ids": sorted(request.check_ids),
+                "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+                "failure_policy_id": failure_policy_id,
+                "failure_policy_version": failure_policy_version,
+                "classification_issuer_fingerprint": (
+                    classification_issuer_fingerprint
+                ),
+                "finalization_policy_id": finalization_policy_id,
+                "finalization_policy_version": finalization_policy_version,
+                "finalization_issuer_fingerprint": finalization_issuer_fingerprint,
+                "plan_schema_version": request.plan_schema_version,
+                "reducer_version": request.reducer_version,
+            }
+        )
 
     @staticmethod
     def _verify_operator_replay_issuer(
@@ -4251,6 +4437,11 @@ class SQLiteStateStore:
                 event_kind = str(row["event_kind"])
                 if event_kind == "PAUSE_SETTLED":
                     active_fences[str(body["fence_id"])] = (None, None)
+                elif event_kind == "BINDING_MISMATCH":
+                    active_fences[str(body["fence_id"])] = (
+                        str(body["item_id"]),
+                        str(body["logical_effect_id"]),
+                    )
                 elif event_kind == "STOP_RECORDED":
                     active_fences[str(body["fence_id"])] = (
                         str(body["item_id"]),
@@ -4501,6 +4692,10 @@ class SQLiteStateStore:
         gate_set_digest = self._event_hash(
             {"aggregate_gate_ids": payload["aggregate_gate_ids"]}
         )
+        accepted_plan_semantic_digest = self._accepted_plan_semantic_digest(request)
+        complete_policy_digest = self._complete_policy_digest(
+            request, self._classification_authority
+        )
         with RepositoryWriterLock(self._database_path.parent), closing(
             self._connect()
         ) as connection:
@@ -4563,6 +4758,10 @@ class SQLiteStateStore:
                     "finalization_issuer_fingerprint": (
                         self._classification_authority.finalization_issuer_fingerprint
                     ),
+                    "failure_policy_id": SYNTHETIC_FAILURE_POLICY_ID,
+                    "failure_policy_version": SYNTHETIC_FAILURE_POLICY_VERSION,
+                    "accepted_plan_semantic_digest": accepted_plan_semantic_digest,
+                    "complete_policy_digest": complete_policy_digest,
                     "event_kind": "PLAN_ACCEPTED",
                     "lifecycle_from": None,
                     "lifecycle_to": LifecycleState.PLANNED.value,
@@ -4590,8 +4789,12 @@ class SQLiteStateStore:
                     "classification_issuer_fingerprint, aggregate_gate_ids_json, "
                     "gate_set_digest, finalization_policy_id, "
                     "finalization_policy_version, finalization_issuer_fingerprint, "
+                    "source_tree_digest, item_definition_digest, "
+                    "plan_schema_version, reducer_version, "
+                    "accepted_plan_semantic_digest, complete_policy_digest, "
                     "payload_digest, event_hash, body_json) VALUES ("
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    "?, ?, ?, ?, ?, ?)",
                     (
                         request.plan_id, request.command_id, request.event_id,
                         request.repository_id, request.run_id, request.item_id,
@@ -4603,7 +4806,14 @@ class SQLiteStateStore:
                         json.dumps(payload["aggregate_gate_ids"], separators=(",", ":")),
                         gate_set_digest, body["finalization_policy_id"],
                         body["finalization_policy_version"],
-                        body["finalization_issuer_fingerprint"], payload_digest,
+                        body["finalization_issuer_fingerprint"],
+                        request.source_tree_digest,
+                        request.item_definition_digest,
+                        request.plan_schema_version,
+                        request.reducer_version,
+                        accepted_plan_semantic_digest,
+                        complete_policy_digest,
+                        payload_digest,
                         event_hash, body_json,
                     ),
                 )
@@ -10526,6 +10736,52 @@ class SQLiteStateStore:
         return LifecycleState.BLOCKED
 
     @staticmethod
+    def _binding_mismatch_route(
+        current_state: LifecycleState,
+        *,
+        active_or_uncertain: bool,
+    ) -> LifecycleState:
+        if current_state in {
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+        }:
+            raise DispatchDenied("T15 requires a nonterminal run")
+        if current_state is LifecycleState.PAUSED:
+            return LifecycleState.PAUSED
+        if active_or_uncertain or current_state in {
+            LifecycleState.RUNNING,
+            LifecycleState.PAUSING,
+            LifecycleState.VALIDATING,
+            LifecycleState.RECONCILIATION_REQUIRED,
+        }:
+            return LifecycleState.RECONCILIATION_REQUIRED
+        return LifecycleState.BLOCKED
+
+    @classmethod
+    def _binding_mismatch_fence_id(
+        cls,
+        request: BindingMismatchRequest,
+        observation: SyntheticBindingObservation,
+    ) -> str:
+        digest = cls._event_hash(
+            {
+                "domain": "AEGIS:T15:BINDING_MISMATCH_FENCE:v1",
+                "repository_id": request.repository_id,
+                "run_id": request.run_id,
+                "item_id": request.item_id,
+                "logical_effect_id": request.logical_effect_id,
+                "mismatch_kind": request.mismatch_kind.value,
+                "expected_digest": request.expected_digest,
+                "observed_digest": request.observed_digest,
+                "observation_id": observation.observation_id,
+                "event_id": request.event_id,
+                "reason_code": request.reason_code,
+            }
+        )
+        return f"binding:{digest}"
+
+    @staticmethod
     def _verify_authority_boundary(
         connection: sqlite3.Connection,
         request: AuthorityLifecycleFactRequest,
@@ -10594,6 +10850,257 @@ class SQLiteStateStore:
             return None
         return (
             str(row["grant_id"]), str(row["scope_digest"]), expected_action,
+        )
+
+    def record_binding_mismatch(
+        self,
+        request: BindingMismatchRequest,
+        observation: SyntheticBindingObservation,
+        authority: SyntheticAuthority,
+        *,
+        expected_head: str,
+        writer_epoch: int,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("binding mismatch targets another repository")
+        if writer_epoch <= 0:
+            raise ValueError("writer_epoch must be positive")
+        self._bind_classification_authority(authority)
+        authority.verify_binding_observation(observation, request)
+        request_payload = {
+            **request.__dict__,
+            "mismatch_kind": request.mismatch_kind.value,
+        }
+        payload_digest = self._event_hash(
+            request_payload
+            | {
+                "observation_request_digest": observation.request_digest,
+                "observation_issuer_fingerprint": observation.issuer_fingerprint,
+                "observation_issuer_mac": observation.issuer_mac,
+            }
+        )
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    prior = connection.execute(
+                        "SELECT * FROM binding_mismatches WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None or prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "binding mismatch command ID was rebound"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["mismatch_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM binding_mismatches WHERE mismatch_id = ? OR "
+                    "observation_id = ? OR event_id = ?",
+                    (
+                        request.mismatch_id, observation.observation_id,
+                        request.event_id,
+                    ),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "binding mismatch identity was rebound"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"]
+                ) != (
+                    request.item_id, request.item_id, request.logical_effect_id
+                ):
+                    raise DispatchDenied(
+                        "binding mismatch does not bind the accepted plan"
+                    )
+                if any(
+                    plan[field] is None
+                    for field in (
+                        "source_tree_digest", "item_definition_digest",
+                        "plan_schema_version", "reducer_version",
+                        "accepted_plan_semantic_digest", "complete_policy_digest",
+                    )
+                ):
+                    raise DispatchDenied(
+                        "binding mismatch requires a pinned accepted plan"
+                    )
+                if run["head_hash"] != request.evidence_head or (
+                    expected_head != request.evidence_head
+                ):
+                    raise DispatchDenied("binding mismatch evidence head is stale")
+                expected_by_kind = {
+                    BindingMismatchKind.SOURCE: plan["source_tree_digest"],
+                    BindingMismatchKind.ITEM: plan["item_definition_digest"],
+                    BindingMismatchKind.PLAN: plan[
+                        "accepted_plan_semantic_digest"
+                    ],
+                    BindingMismatchKind.POLICY: plan["complete_policy_digest"],
+                }
+                derived_expected = str(expected_by_kind[request.mismatch_kind])
+                if request.expected_digest != derived_expected:
+                    raise DispatchDenied(
+                        "binding mismatch expected value is not the accepted binding"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                _, active_slot, _ = (
+                    self._historical_repository_activity(
+                        connection, request.repository_id, writer_epoch
+                    )
+                )
+                cursor = run["continuation_cursor"]
+                cursor_has_obligation = (
+                    cursor in {LifecycleState.VALIDATING.value, "FINALIZING"}
+                    or (
+                        isinstance(cursor, str)
+                        and cursor.startswith("validation-recovery:")
+                    )
+                )
+                slot_matches = active_slot is not None and (
+                    active_slot[0], active_slot[1]
+                ) == (request.run_id, request.logical_effect_id)
+                active_or_uncertain = (
+                    slot_matches
+                    or cursor_has_obligation
+                )
+                resulting_state = self._binding_mismatch_route(
+                    current_state,
+                    active_or_uncertain=active_or_uncertain,
+                )
+                if authorize_transition is not None:
+                    authorize_transition(current_state, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                self._require_new_writer_epoch(
+                    connection, request.repository_id, writer_epoch
+                )
+                fence_id = self._binding_mismatch_fence_id(request, observation)
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE fence_id = ?",
+                    (fence_id,),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "binding mismatch fence identity was rebound"
+                    )
+                body = request_payload | {
+                    "event_kind": "BINDING_MISMATCH",
+                    "observation_request_digest": observation.request_digest,
+                    "observation_issuer_fingerprint": (
+                        observation.issuer_fingerprint
+                    ),
+                    "observation_issuer_mac": observation.issuer_mac,
+                    "payload_digest": payload_digest,
+                    "fence_id": fence_id,
+                    "active_or_uncertain": active_or_uncertain,
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": resulting_state.value,
+                    "previous_event_hash": request.evidence_head,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'BINDING_MISMATCH', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, request.evidence_head, event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        fence_id, request.repository_id, request.item_id,
+                        request.logical_effect_id, request.reason_code,
+                        request.event_id,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO binding_mismatches VALUES ("
+                    + ", ".join("?" for _ in range(21))
+                    + ")",
+                    (
+                        request.mismatch_id, observation.observation_id,
+                        request.command_id, request.event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.mismatch_kind.value,
+                        request.expected_digest, request.observed_digest,
+                        request.evidence_head, request.reason_code,
+                        observation.request_digest,
+                        observation.issuer_fingerprint, observation.issuer_mac,
+                        fence_id, payload_digest, event_hash,
+                        resulting_state.value, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, sequence, event_hash,
+                        request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_binding_mismatch_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_binding_mismatch_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.mismatch_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
         )
 
     def record_authority_fact(
@@ -11702,6 +12209,143 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "authority-fact projection diverges from event history"
             )
+        mismatch_event_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'BINDING_MISMATCH' ORDER BY writer_epoch, sequence",
+            (repository_id,),
+        ).fetchall()
+        binding_mismatches = [
+            json.loads(row["body_json"]) for row in mismatch_event_rows
+        ]
+        for body in binding_mismatches:
+            try:
+                expected_body_fields = set(
+                    BindingMismatchRequest.__dataclass_fields__
+                ) | {
+                    "event_kind", "observation_request_digest",
+                    "observation_issuer_fingerprint", "observation_issuer_mac",
+                    "payload_digest", "fence_id", "lifecycle_from",
+                    "lifecycle_to", "active_or_uncertain",
+                    "previous_event_hash", "schema_version", "sequence",
+                    "writer_epoch",
+                }
+                if set(body) != expected_body_fields or (
+                    body.get("schema_version") != 1
+                    or type(body.get("active_or_uncertain")) is not bool
+                    or type(body.get("sequence")) is not int
+                    or type(body.get("writer_epoch")) is not int
+                    or int(body["sequence"]) <= 1
+                    or int(body["writer_epoch"]) <= 0
+                ):
+                    raise ValueError("binding mismatch event schema is invalid")
+                values = {
+                    key: body[key]
+                    for key in BindingMismatchRequest.__dataclass_fields__
+                }
+                values["mismatch_kind"] = BindingMismatchKind(
+                    body["mismatch_kind"]
+                )
+                mismatch_request = BindingMismatchRequest(**values)
+                mismatch_request.validate()
+                if self._classification_authority is None:
+                    raise StorageIntegrityError(
+                        "binding mismatch recovery requires the recorded issuer"
+                    )
+                self._require_plan_issuer(
+                    connection, repository_id, str(body["run_id"]),
+                    self._classification_authority,
+                )
+                observation = SyntheticBindingObservation(
+                    str(body["observation_id"]),
+                    str(body["observation_request_digest"]),
+                    str(body["observation_issuer_fingerprint"]),
+                    str(body["observation_issuer_mac"]),
+                )
+                self._classification_authority.verify_binding_observation(
+                    observation, mismatch_request
+                )
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ?",
+                    (repository_id, body["run_id"]),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"]
+                ) != (body["item_id"], body["logical_effect_id"]):
+                    raise ValueError("binding mismatch plan binding is invalid")
+                expected_by_kind = {
+                    BindingMismatchKind.SOURCE: plan["source_tree_digest"],
+                    BindingMismatchKind.ITEM: plan["item_definition_digest"],
+                    BindingMismatchKind.PLAN: plan[
+                        "accepted_plan_semantic_digest"
+                    ],
+                    BindingMismatchKind.POLICY: plan["complete_policy_digest"],
+                }
+                if body["expected_digest"] != expected_by_kind[
+                    mismatch_request.mismatch_kind
+                ]:
+                    raise ValueError("binding mismatch expected value is invalid")
+                expected_fence_id = self._binding_mismatch_fence_id(
+                    mismatch_request, observation
+                )
+                if body["fence_id"] != expected_fence_id or (
+                    body["previous_event_hash"] != body["evidence_head"]
+                ):
+                    raise ValueError("binding mismatch fence or head is invalid")
+                expected_payload_digest = self._event_hash(
+                    {
+                        **mismatch_request.__dict__,
+                        "mismatch_kind": mismatch_request.mismatch_kind.value,
+                    }
+                    | {
+                        "observation_request_digest": observation.request_digest,
+                        "observation_issuer_fingerprint": (
+                            observation.issuer_fingerprint
+                        ),
+                        "observation_issuer_mac": observation.issuer_mac,
+                    }
+                )
+                if body["payload_digest"] != expected_payload_digest:
+                    raise ValueError("binding mismatch payload digest is invalid")
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "binding mismatch proof or schema is invalid"
+                ) from error
+        expected_binding_mismatches = {
+            body["mismatch_id"]: (
+                body["observation_id"], body["command_id"], body["event_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["mismatch_kind"], body["expected_digest"],
+                body["observed_digest"], body["evidence_head"],
+                body["reason_code"], body["observation_request_digest"],
+                body["observation_issuer_fingerprint"],
+                body["observation_issuer_mac"], body["fence_id"],
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in binding_mismatches
+        }
+        actual_binding_mismatches = {
+            row["mismatch_id"]: (
+                row["observation_id"], row["command_id"], row["event_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["mismatch_kind"], row["expected_digest"],
+                row["observed_digest"], row["evidence_head"],
+                row["reason_code"], row["request_digest"],
+                row["issuer_fingerprint"], row["issuer_mac"], row["fence_id"],
+                row["payload_digest"], row["event_hash"],
+                row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM binding_mismatches WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_binding_mismatches != expected_binding_mismatches:
+            raise StorageIntegrityError(
+                "binding-mismatch projection diverges from event history"
+            )
         expected_outcomes = {
             body["command_id"]: (
                 self._payload_digest(
@@ -11759,6 +12403,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in authority_facts
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in binding_mismatches
             }
         )
         observation_event_rows = connection.execute(
@@ -12039,6 +12692,75 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "command-outcome projection diverges from event history"
             )
+        binding_fields = (
+            "source_tree_digest", "item_definition_digest",
+            "plan_schema_version", "reducer_version",
+        )
+        for body in plans:
+            present = tuple(field in body for field in binding_fields)
+            if any(present) != all(present):
+                raise StorageIntegrityError(
+                    "accepted plan has a partial immutable binding"
+                )
+            if all(present):
+                try:
+                    plan_request = PlanAcceptanceRequest(
+                        plan_id=body["plan_id"],
+                        command_id=body["command_id"],
+                        event_id=body["event_id"],
+                        repository_id=body["repository_id"],
+                        run_id=body["run_id"],
+                        item_id=body["item_id"],
+                        logical_effect_id=body["logical_effect_id"],
+                        revision_digest=body["revision_digest"],
+                        effect_descriptor_digest=body["effect_descriptor_digest"],
+                        permission_scope_digest=body["permission_scope_digest"],
+                        budget_policy_digest=body["budget_policy_digest"],
+                        check_ids=tuple(body["check_ids"]),
+                        aggregate_gate_ids=tuple(body["aggregate_gate_ids"]),
+                        source_tree_digest=body["source_tree_digest"],
+                        item_definition_digest=body["item_definition_digest"],
+                        plan_schema_version=body["plan_schema_version"],
+                        reducer_version=body["reducer_version"],
+                    )
+                    plan_request.validate()
+                except (KeyError, TypeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "accepted plan binding is invalid"
+                    ) from error
+                if body.get("accepted_plan_semantic_digest") != (
+                    self._accepted_plan_semantic_digest(plan_request)
+                ):
+                    raise StorageIntegrityError(
+                        "accepted plan semantic digest diverges from its bindings"
+                    )
+                if body.get("complete_policy_digest") != (
+                    self._complete_policy_digest_from_bindings(
+                        plan_request,
+                        classification_issuer_fingerprint=body[
+                            "classification_issuer_fingerprint"
+                        ],
+                        failure_policy_id=body["failure_policy_id"],
+                        failure_policy_version=body["failure_policy_version"],
+                        finalization_policy_id=body["finalization_policy_id"],
+                        finalization_policy_version=body[
+                            "finalization_policy_version"
+                        ],
+                        finalization_issuer_fingerprint=body[
+                            "finalization_issuer_fingerprint"
+                        ],
+                    )
+                ):
+                    raise StorageIntegrityError(
+                        "accepted plan policy digest diverges from its bindings"
+                    )
+            elif (
+                body.get("accepted_plan_semantic_digest") is not None
+                or body.get("complete_policy_digest") is not None
+            ):
+                raise StorageIntegrityError(
+                    "legacy plan cannot carry derived binding digests"
+                )
         expected_plans = {
             body["plan_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -12058,6 +12780,12 @@ class SQLiteStateStore:
                 body.get("finalization_policy_id"),
                 body.get("finalization_policy_version"),
                 body.get("finalization_issuer_fingerprint"),
+                body.get("source_tree_digest"),
+                body.get("item_definition_digest"),
+                body.get("plan_schema_version"),
+                body.get("reducer_version"),
+                body.get("accepted_plan_semantic_digest"),
+                body.get("complete_policy_digest"),
                 self._event_hash(
                     {
                         key: body[key]
@@ -12082,6 +12810,10 @@ class SQLiteStateStore:
                 row["finalization_policy_id"],
                 row["finalization_policy_version"],
                 row["finalization_issuer_fingerprint"],
+                row["source_tree_digest"], row["item_definition_digest"],
+                row["plan_schema_version"], row["reducer_version"],
+                row["accepted_plan_semantic_digest"],
+                row["complete_policy_digest"],
                 row["payload_digest"], row["event_hash"],
             )
             for row in connection.execute(
@@ -12993,6 +13725,15 @@ class SQLiteStateStore:
         )
         expected_fences.update(
             {
+                str(body["fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    str(body["reason_code"]), str(body["event_id"]),
+                )
+                for body in binding_mismatches
+            }
+        )
+        expected_fences.update(
+            {
                 f"failed-final:{body['application_id']}": (
                     body["item_id"], body["logical_effect_id"],
                     "FAILED_FINAL_APPLICATION", body["event_id"]
@@ -13595,6 +14336,51 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "authority lifecycle semantics are invalid"
                     ) from error
+            if row["event_kind"] == "BINDING_MISMATCH":
+                try:
+                    predecessor_state = LifecycleState(
+                        expected_lifecycle[run_id]
+                    )
+                    _, historical_slot, _ = (
+                        self._historical_repository_activity(
+                            connection,
+                            str(body["repository_id"]),
+                            int(body["writer_epoch"]),
+                        )
+                    )
+                    predecessor_cursor = expected_cursors.get(run_id)
+                    cursor_has_obligation = (
+                        predecessor_cursor
+                        in {LifecycleState.VALIDATING.value, "FINALIZING"}
+                        or (
+                            isinstance(predecessor_cursor, str)
+                            and predecessor_cursor.startswith(
+                                "validation-recovery:"
+                            )
+                        )
+                    )
+                    slot_matches = historical_slot is not None and (
+                        historical_slot[0], historical_slot[1]
+                    ) == (body["run_id"], body["logical_effect_id"])
+                    active_or_uncertain = (
+                        slot_matches
+                        or cursor_has_obligation
+                    )
+                    expected_state = self._binding_mismatch_route(
+                        predecessor_state,
+                        active_or_uncertain=active_or_uncertain,
+                    )
+                    if (
+                        body["active_or_uncertain"] is not active_or_uncertain
+                        or
+                        body["lifecycle_from"] != predecessor_state.value
+                        or body["lifecycle_to"] != expected_state.value
+                    ):
+                        raise ValueError("binding mismatch lifecycle route diverges")
+                except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "binding mismatch lifecycle semantics are invalid"
+                    ) from error
             if row["event_kind"] == "OPERATION_FINALIZED":
                 try:
                     predecessor_state = LifecycleState(
@@ -13881,6 +14667,7 @@ class SQLiteStateStore:
             "operator_redemptions",
             "outstanding_slot",
             "dispatch_fences",
+            "binding_mismatches",
         )
         with closing(self._connect()) as connection:
             return {
