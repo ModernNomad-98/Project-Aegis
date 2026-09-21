@@ -468,8 +468,11 @@ self-tests passed 91 assertions; and diff-check was clean apart from line-ending
 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition because the
 exact public-path clean VALIDATING route depends on T08. C06/C07 and
 F03/F05/F06/F12/F14/F21 also remain `UNVERIFIED`; only their narrow interactions
-with this reviewed slice were exercised. Commit, push and hosted-check evidence
-will be appended after the reviewed working tree is delivered.
+with this reviewed slice were exercised. The reviewed implementation was
+committed with DCO sign-off and pushed as
+`c3c94bf3d367380d1ff60835fb72cb300e69c3e4`. On that exact head, `gate-guard`
+passed in 3 seconds, `validate-skills` in 1m18s and `windows-offline-checks` in
+3m23s. PR #99 remained open, draft and blocked as intended.
 
 ## 8. Proven invocations
 
@@ -523,6 +526,10 @@ will be appended after the reviewed working tree is delivered.
 | T14 complete delivery-control package | `Ran 277 tests in 22.194s`; `OK` |
 | T14 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent T14 implementation review | Initial `REVISE` with four MAJOR recovery findings; corrected `APPROVE`, no remaining blocker/major; reviewer independently ran 21 tests in 0.982s |
+| `git commit -s -m "feat(control-plane): add pause-source resume recovery"` | Commit `c3c94bf3d367380d1ff60835fb72cb300e69c3e4`; signed-off; 11 files changed |
+| `git push origin feat/cp-wp-002-offline-kernel` after T14 | Remote branch advanced `384b3eb..c3c94bf` |
+| Live PR #99 read before T14 delivery | OPEN; DRAFT; BLOCKED; head `384b3eb5b7e9880dd920477cb1bd98e90e6a29c6`; prior three checks successful |
+| Hosted checks on exact T14 implementation head | `gate-guard` passed in 3s; `validate-skills` passed in 1m18s; `windows-offline-checks` passed in 3m23s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3

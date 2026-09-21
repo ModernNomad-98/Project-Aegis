@@ -501,6 +501,7 @@ event bodies. Partial schemas and malformed prefixes fail transactionally.
 | Complete delivery-control package | Exit 0; 277 tests in 22.194 seconds; `OK` |
 | Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent implementation review | Initial `REVISE` found surplus-schema acceptance, non-null cursor replay, true-legacy projection and cross-run validator divergences; corrected final `APPROVE`, no remaining blocker/major; reviewer passed 21 focused tests in 0.982 seconds |
+| Commit/push and hosted checks | Signed-off commit `c3c94bf3d367380d1ff60835fb72cb300e69c3e4` pushed to the existing branch; `gate-guard` passed in 3s, `validate-skills` in 1m18s and `windows-offline-checks` in 3m23s; PR #99 remained open, draft and blocked |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
 
 T14 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. The
