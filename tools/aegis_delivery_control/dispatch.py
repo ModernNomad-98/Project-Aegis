@@ -34,6 +34,7 @@ from .contracts import (
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
     StopMode,
+    StopEscalationRequest,
     StopRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
@@ -119,6 +120,31 @@ class SyntheticDispatchCoordinator:
             )
 
         return self._store.stop(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def escalate_stop(
+        self,
+        request: StopEscalationRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T20",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T20"].required_guards,
+            )
+
+        return self._store.escalate_stop(
             request,
             capability,
             self._authority,

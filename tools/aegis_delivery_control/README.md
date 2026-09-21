@@ -42,8 +42,13 @@ fixture. It is not a delivery integration.
   accounting obligations. T26 now accepts an exact already-applied T11/T12
   application as terminal closure evidence, without reapplying validation or
   reopening lifecycle, and releases the slot only after every check and accounting
-  obligation is closed. This R-STOP-01 slice is independently accepted; the two
-  remaining stop findings below are release blockers.
+  obligation is closed. T20 now escalates an expired graceful drain through a
+  typed synthetic operator route, atomically classifies every ambiguous reserved
+  obligation as `UNKNOWN_WORST_CASE_CHARGED`, records `STOP_ESCALATED`, and
+  retains terminal lifecycle, fence, cursor and slot. Recovery binds the exact
+  stop, plan, item, effect, slot and historical accounting snapshot. R-STOP-01
+  and R-STOP-02 are independently accepted; the remaining stop finding below is
+  a release blocker.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -97,20 +102,21 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 209 tests successfully, and
-`git diff --check` passed. R-STOP-01 received independent implementation
-`APPROVE` after focused route, migration, crash/replay and tamper validation:
+controller. The complete local package suite ran 219 tests successfully, and
+`git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
+implementation `APPROVE` after focused route, migration, accounting,
+crash/replay, recovery and tamper validation:
 
 1. stopping from `BLOCKED/FINALIZING` or a recoverable validation-failure state
   can now use T26 to bind the already-applied validation evidence and release the
-  repository-wide slot atomically after every obligation closes.
+  repository-wide slot atomically after every obligation closes; and
+2. expired graceful drains can now use the typed T20 operator route to classify
+  ambiguous reservations at worst case and durably record an idempotent
+  escalation without releasing the outstanding slot.
 
-The stop gate remains `REVISE` because two major findings are unresolved:
+The stop gate remains `REVISE` because one major finding is unresolved:
 
-1. T20 graceful-to-immediate escalation is declared in the transition registry
-  but lacks a typed request, coordinator/storage transaction, event/recovery
-  handling, and tests; and
-2. immediate stop after adapter contact but before receipt does not atomically
+1. immediate stop after adapter contact but before receipt does not atomically
   classify the uncertainty as `UNKNOWN_WORST_CASE_CHARGED`.
 
 These findings must be corrected and independently approved before merge. They

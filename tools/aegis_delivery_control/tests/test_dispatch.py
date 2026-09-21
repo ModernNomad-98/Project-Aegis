@@ -40,6 +40,8 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     PlanAcceptanceRequest,
     StopMode,
+    StopEscalationRequest,
+    StopEscalationSettlement,
     StopRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
@@ -218,6 +220,68 @@ class MediatedDispatchTests(unittest.TestCase):
 
             self.assertEqual(receipt.resulting_state, LifecycleState.STOPPED)
             self.assertNotEqual(receipt.event_hash, plan.event_hash)
+            store.load_verified("repo-1")
+
+    def test_coordinator_exposes_t20_stop_escalation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            authority = SyntheticAuthority()
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            effect_grant = SyntheticGrant(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "command-1", "event-1",
+                "effect-1", "descriptor-1", "attempt-1", "permission-1",
+                "reservation-1", "budget-1", 1, 2, 5,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            committed = store.commit_intent(
+                intent, effect_capability, authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+            )
+            store.claim_operation_launch(intent, committed)
+            stop_grant = SyntheticOperatorGrant(
+                "stop-grant-1", "repo-1", "run-1", "STOP_GRACEFUL",
+                "stop-scope-1",
+            )
+            authority.register_operator(stop_grant)
+            graceful = StopRequest(
+                "stop-1", "stop-command-1", "stop-event-1", "repo-1",
+                "run-1", StopMode.GRACEFUL, "OPERATOR_STOP",
+                "2000-01-01T00:00:00Z",
+            )
+            coordinator.stop(
+                graceful,
+                authority.claim_operator(*stop_grant.__dict__.values()),
+            )
+            escalation_grant = SyntheticOperatorGrant(
+                "escalation-grant-1", "repo-1", "run-1", "STOP_ESCALATE",
+                "escalation-scope-1",
+            )
+            authority.register_operator(escalation_grant)
+            escalated = coordinator.escalate_stop(
+                StopEscalationRequest(
+                    "escalation-1", "escalation-command-1",
+                    "escalation-event-1", "repo-1", "run-1", "stop-1",
+                    "stop-event-1", "2000-01-01T00:00:00Z",
+                    "GRACEFUL_DEADLINE_EXPIRED",
+                    (StopEscalationSettlement(
+                        "reservation-1", "escalation-settlement-1", ""
+                    ),),
+                ),
+                authority.claim_operator(*escalation_grant.__dict__.values()),
+            )
+            self.assertEqual(escalated.resulting_state, LifecycleState.STOPPED)
             store.load_verified("repo-1")
 
     def test_shared_store_allows_only_one_cross_instance_dispatch(self) -> None:

@@ -696,6 +696,76 @@ class StopRequest:
 
 
 @dataclass(frozen=True)
+class StopEscalationSettlement:
+    reservation_id: str
+    settlement_event_id: str
+    expected_previous_hash: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.reservation_id, self.settlement_event_id)
+        ):
+            raise ValueError("escalation settlement identifiers must be non-empty")
+        if not isinstance(self.expected_previous_hash, str):
+            raise ValueError("escalation settlement predecessor must be a string")
+
+
+@dataclass(frozen=True)
+class StopEscalationRequest:
+    escalation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    source_stop_id: str
+    source_stop_event_id: str
+    expected_drain_deadline_utc: str
+    reason_code: str
+    unknown_settlements: tuple[StopEscalationSettlement, ...] = ()
+
+    def validate(self) -> None:
+        required = (
+            self.escalation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.source_stop_id,
+            self.source_stop_event_id,
+            self.expected_drain_deadline_utc,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("stop escalation fields must be non-empty")
+        try:
+            datetime.strptime(
+                self.expected_drain_deadline_utc, "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError as exc:
+            raise ValueError(
+                "stop escalation deadline must use YYYY-MM-DDTHH:MM:SSZ"
+            ) from exc
+        if not isinstance(self.unknown_settlements, tuple):
+            raise ValueError("stop escalation settlements must be a tuple")
+        for settlement in self.unknown_settlements:
+            if not isinstance(settlement, StopEscalationSettlement):
+                raise ValueError("stop escalation settlement has an invalid type")
+            settlement.validate()
+        reservation_ids = [item.reservation_id for item in self.unknown_settlements]
+        event_ids = [item.settlement_event_id for item in self.unknown_settlements]
+        if len(set(reservation_ids)) != len(reservation_ids):
+            raise ValueError("stop escalation repeats a reservation")
+        if len(set(event_ids)) != len(event_ids):
+            raise ValueError("stop escalation repeats a settlement event")
+        if self.event_id in event_ids:
+            raise ValueError("stop escalation and settlement event IDs must differ")
+
+
+@dataclass(frozen=True)
 class ControlReceipt:
     control_id: str
     command_id: str

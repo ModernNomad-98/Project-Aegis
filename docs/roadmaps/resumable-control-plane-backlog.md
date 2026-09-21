@@ -343,6 +343,41 @@ and F06/F09/F14/F18. Full-row and full-family traceability remain `UNVERIFIED`.
 R-STOP-02 and R-STOP-03 remain major blockers; the aggregate stop gate remains
 `REVISE`, PR #99 remains draft, and no merge, release or deployment is ready.
 
+### 5.5 R-STOP-02 graceful-stop escalation checkpoint
+
+R-STOP-02 is corrected and independently accepted. T20 now has a typed
+`StopEscalationRequest`, a synthetic operator-only coordinator route, and one
+idempotent SQLite transaction bound to the exact graceful stop, persisted drain
+deadline, accepted plan/run/item/effect, retained slot attempt/generation and
+complete unresolved drain snapshot. The store's injected UTC clock must reach
+the recorded deadline; the caller's deadline is binding evidence, not authority.
+
+At escalation, every ambiguous `RESERVED` obligation in the snapshot is
+atomically classified `UNKNOWN_WORST_CASE_CHARGED` through ordinary versioned
+budget-settlement events. Known and already-unknown settlements are retained.
+The transaction then records `STOP_ESCALATED`, operator redemption, command
+outcome and projection without changing the terminal lifecycle, fence, cursor or
+repository-wide slot. Recovery reconstructs the historical prefix, validates
+the source/plan/slot identities and exact obligation/accounting snapshots, and
+continues to accept later authoritative adjustments and terminal slot release.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: exact ambiguous-reservation conversion, historical-prefix validation, drain predicate and operator route required clarification |
+| Corrected plan re-audit | `APPROVE`; no findings; synthetic operator route accepted, approved-rule scheduler explicitly omitted |
+| Focused first falsification | Failed because the coordinator lacked `escalate_stop`, then passed after the narrow implementation |
+| Focused T20 suite after review correction | Exit 0; 10 tests ran; `OK` |
+| `python -m unittest tools.aegis_delivery_control.tests.test_storage` | Exit 0; 177 tests ran in 14.474 seconds; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py'` | Exit 0; 219 tests ran in 19.387 seconds; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | Initial `REVISE` for self-consistent item retargeting; corrected re-review `APPROVE`, no findings; reviewer independently passed 10 focused tests and reproduced fail-closed retarget recovery |
+
+This checkpoint establishes T20's operator route and its C06/C09/F04b slices.
+It does not claim an approved deadline-rule scheduler. R-STOP-03 remains a major
+blocker, so the aggregate stop gate remains `REVISE`, PR #99 remains draft, and
+no merge, release or deployment is ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

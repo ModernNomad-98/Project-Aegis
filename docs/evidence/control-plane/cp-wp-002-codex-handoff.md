@@ -7,7 +7,7 @@ Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - R-STOP-01 `APPROVE`; AGGREGATE STOP GATE `REVISE`**
+Status: **IN PROGRESS - NOT MERGE-READY - R-STOP-01/02 `APPROVE`; AGGREGATE STOP GATE `REVISE`**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -50,6 +50,14 @@ tools/behavioral_eval_runner/__pycache__/
 tools/behavioral_eval_runner/adapters/__pycache__/
 tools/behavioral_eval_runner/graders/__pycache__/
 tools/behavioral_eval_runner/judge/__pycache__/
+```
+
+Stage 5's local validator invocation also generated these untracked cache paths;
+they are preserved and must likewise not be staged or deleted:
+
+```text
+scripts/__pycache__/
+scripts/tests/__pycache__/
 ```
 
 Do not stage, delete, broadly inspect or add ignore rules for the artifact
@@ -274,10 +282,51 @@ blocker, major, minor or nit finding and independently ran nine focused tests.
 The accepted trace is limited to the R-STOP-01 slices of T18/T19/T26, C05/C09 and
 F06/F09/F14/F18; complete rows/families remain `UNVERIFIED`.
 
-Commit and push evidence are deliberately pending until this complete reviewed
-and validated stage is committed. PR #99 remains open, draft and blocked; its
-pre-edit head was `9aa1c7418fa57b9fc01206680d409c86220c37de` with all three
-hosted checks successful.
+Commit `a60cdd7b0340123a37473bdd8b57887a2b317072` contains this reviewed stage and
+is pushed to the existing branch. PR #99 remains open, draft and blocked; all
+three hosted checks passed on that exact head.
+
+### Stage 5 - R-STOP-02 graceful-stop escalation
+
+The initial plan audit returned `REVISE`: it required atomic conversion of every
+ambiguous reserved obligation, historical-prefix validation, an exact drain
+predicate and an honest authority route. The corrected plan received independent
+`APPROVE` before editing. It selected the canonical synthetic operator route;
+no approved-rule deadline scheduler is implemented or claimed.
+
+Changed files:
+
+- `tools/aegis_delivery_control/contracts.py`: added typed escalation and
+  per-reservation settlement requests.
+- `tools/aegis_delivery_control/authority.py`: added the synthetic
+  `STOP_ESCALATE` operator action.
+- `tools/aegis_delivery_control/dispatch.py`: added the coordinator T20 route.
+- `tools/aegis_delivery_control/storage.py`: added the atomic escalation,
+  ordinary versioned UNKNOWN settlements, event/projection/recovery validation,
+  injected UTC deadline check and historical obligation/accounting proof.
+- `tools/aegis_delivery_control/tests/test_dispatch.py` and
+  `test_storage.py`: added coordinator, deadline, coverage, crash/replay, later
+  adjustment/release/restart and self-consistent tamper regressions.
+- Root/package routing docs, the durable backlog and this handoff: synchronized
+  only observed R-STOP-02 evidence and the remaining R-STOP-03 blocker.
+
+Intentionally untouched: canonical design, approval register, BER, CI,
+dependencies, adapters, artifact/cache paths, real authority/execution surfaces,
+releases and deployments. R-STOP-03 received no implementation change.
+
+The first focused coordinator test failed because `escalate_stop` did not exist,
+then passed after the narrow implementation. The storage module passed 177 tests
+and the full package passed 219. The initial implementation review returned
+`REVISE` for a self-consistent escalation item-retarget recovery gap. Recovery
+now binds item/effect to the exact source stop and accepted plan/run, and the
+projection persists item/effect/slot identity. The corrected independent review
+returned `APPROVE` with no findings; its 10 focused tests passed and its former
+retarget probe failed closed with `StorageIntegrityError`.
+
+The accepted trace is T20's operator route and its C06/C09/F04b slices. Complete
+cross-family trace remains as shown below, and R-STOP-03 keeps the aggregate stop
+gate at `REVISE`. Commit/push evidence for Stage 5 remains pending until this
+reviewed and validated stage is committed.
 
 ## 8. Proven invocations
 
@@ -306,6 +355,12 @@ hosted checks successful.
 | `python -m unittest tools.aegis_delivery_control.tests.test_storage` | `Ran 168 tests in 14.231s`; `OK` |
 | `python -m unittest discover -s tools/aegis_delivery_control/tests -v` | `Ran 209 tests in 16.666s`; `OK` |
 | Independent R-STOP-01 implementation review | `APPROVE`; no findings; independent 9-test focused run passed |
+| R-STOP-02 initial / corrected plan audits | `REVISE`, then `APPROVE`; operator route selected and deadline scheduler omitted honestly |
+| R-STOP-02 focused first test | Failed because coordinator `escalate_stop` was absent; passed after implementation |
+| R-STOP-02 focused suite after review correction | `Ran 10 tests`; `OK` |
+| `python -m unittest tools.aegis_delivery_control.tests.test_storage` after R-STOP-02 | `Ran 177 tests in 14.474s`; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py'` after R-STOP-02 | `Ran 219 tests in 19.387s`; `OK` |
+| R-STOP-02 initial / corrected implementation reviews | `REVISE` for item-retarget recovery gap, then `APPROVE`; reviewer independently passed 10 focused tests and the former probe failed closed |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -316,7 +371,7 @@ findings are code-review evidence, not an executable test receipt.
 
 ## 9. Independent stop gate - aggregate `REVISE`
 
-R-STOP-01 is accepted. R-STOP-02 and R-STOP-03 still block every later backlog
+R-STOP-01 and R-STOP-02 are accepted. R-STOP-03 still blocks every later backlog
 slice and merge.
 
 ### R-STOP-01 - RESOLVED - independent `APPROVE`
@@ -330,11 +385,11 @@ Review anchors:
 
 - [`contracts.py`](../../../tools/aegis_delivery_control/contracts.py#L493)
 - [`engine.py`](../../../tools/aegis_delivery_control/engine.py#L49)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4299)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L7701)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L8392)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L8814)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L11358)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4670)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L8659)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L9350)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L9840)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L12444)
 
 Resolution: T26 accepts a typed `VALIDATION_APPLICATION` reference to the exact
 already-applied observation/application and latest validator attempt. It preserves
@@ -344,31 +399,33 @@ closes. Tests cover T18 and T19 from both affected predecessor states, denial of
 unrelated dispatch before closure, dispatch after closure, C05/C09 crash/replay,
 legacy migration, superseded attempts and tampering. Independent plan and
 implementation reviews both ended `APPROVE`; the aggregate stop gate remains
-`REVISE` solely because R-STOP-02 and R-STOP-03 remain open.
+`REVISE` solely because R-STOP-03 remains open.
 
-### R-STOP-02 - MAJOR - T20 is declaration-only
+### R-STOP-02 - RESOLVED - independent `APPROVE`
 
-T20 exists in the registry but has no typed escalation request,
-coordinator/storage operation, registered `STOP_ESCALATED` event,
-projection/recovery validation or tests. A persisted graceful deadline cannot
-currently produce the canonical auditable escalation.
+T20 has a typed request, operator-authorized coordinator route and an atomic,
+idempotent storage transaction bound to the exact graceful stop/deadline,
+accepted plan/run identity, retained slot and complete unresolved obligation
+snapshot. Ambiguous reservations become versioned
+`UNKNOWN_WORST_CASE_CHARGED` settlements before the same transaction records
+`STOP_ESCALATED`; known accounting, lifecycle, fence, cursor and slot are
+preserved. Recovery validates the historical prefix and remains valid after
+later authoritative correction and terminal release.
 
 Review anchors:
 
 - [`engine.py`](../../../tools/aegis_delivery_control/engine.py#L51)
-- [`contracts.py`](../../../tools/aegis_delivery_control/contracts.py#L660)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4299)
+- [`contracts.py`](../../../tools/aegis_delivery_control/contracts.py#L715)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4897)
 - [canonical T20](../../design/resumable-control-plane-v1.md#L447)
 
-Required correction: implement a typed, idempotent T20 transaction bound to the
-original graceful stop and deadline, with outstanding-obligation and deadline
-checks, recovery validation, tamper tests and both commit-boundary crash tests.
-
-Source conflict to resolve explicitly before editing: one prior transient session
-note said "T20 remains excluded", while the canonical design, AEGIS-APR-004's
-complete T01-T28 scope and the current independent stop gate require T20. The
-durable sources authorize T20, but do not silently decide its sequencing. Record
-the plan-audit resolution; do not treat the old note as a superseding decision.
+Resolution: the plan audit reconciled the transient exclusion note against the
+canonical design and AEGIS-APR-004, selecting the canonical O route while
+explicitly omitting an unapproved deadline-rule scheduler. Focused coverage
+includes deadline and drain predicates, exact settlement coverage, C06/C09
+commit boundaries, replay, later T23/T26 correction/release/restart, projection
+and historical tamper. The initial implementation review's item-retarget finding
+was corrected; re-review returned `APPROVE` with no findings.
 
 ### R-STOP-03 - MAJOR - post-contact uncertainty is underclassified
 
@@ -380,8 +437,8 @@ stop/fence/state but does not atomically classify that bounded exposure as
 Review anchors:
 
 - [`adapters.py`](../../../tools/aegis_delivery_control/adapters.py#L455)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4299)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L5290)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4670)
+- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L6248)
 - [canonical T19](../../design/resumable-control-plane-v1.md#L446)
 
 Required correction: atomically preserve the obligation and worst-case charge
@@ -391,7 +448,7 @@ usage correction, replay, tamper and crash-boundary tests.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 209 passing tests, a registry entry or an earlier milestone
+complete from the 219 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -424,9 +481,9 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
 | T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
-| T18 | YES | YES | NO | R-STOP-01 closure slice accepted; aggregate stop gate blocked by R-STOP-02 |
+| T18 | YES | YES | NO | R-STOP-01 closure slice accepted; aggregate stop gate blocked by R-STOP-03 |
 | T19 | YES | YES | NO | R-STOP-01 closure slice accepted; R-STOP-03 remains |
-| T20 | NO | NO | NO | Declaration only; R-STOP-02 |
+| T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
 | T21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | T22 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T23 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
@@ -462,7 +519,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
-| F04b | UNVERIFIED | UNVERIFIED | NO | R-STOP-02 and R-STOP-03 affect stop accounting |
+| F04b | UNVERIFIED | UNVERIFIED | NO | R-STOP-02 escalation slice accepted; R-STOP-03 still affects stop accounting |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 global-slot slice accepted; full family trace remains |
 | F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
@@ -484,8 +541,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 Immediate order:
 
 1. R-STOP-01 terminal slot closure - complete; independent `APPROVE`.
-2. R-STOP-02 T20 scope/sequence reconciliation, then implementation if the
-   plan audit confirms the durable-source reading above.
+2. R-STOP-02 T20 graceful-stop escalation - complete; independent `APPROVE`.
 3. R-STOP-03 post-contact worst-case accounting.
 4. Focused stop tests, complete package suite, integrity diagnostics and
    a fresh independent stop review.
@@ -571,20 +627,25 @@ owner before interpreting it more broadly.
   commit corrected those statements and records the current `REVISE` gate.
 - **Historical pause after final review:** the three stop findings were initially
   preserved rather than patched without a new plan audit because the user
-  requested a pause and handoff. Stage 4 subsequently corrected R-STOP-01 only
-  after its plan audit returned `APPROVE`.
+  requested a pause and handoff. Stages 4 and 5 subsequently corrected
+  R-STOP-01 and R-STOP-02 only after their plan audits returned `APPROVE`.
 - **Validation-command correction:** the first custom Markdown link audit used
   an empty parent path for root-level files and emitted PowerShell `Join-Path`/
   `Test-Path` errors. No pass was claimed from it; the corrected command checked
   103 local links successfully after the final audit corrections.
+- **Unavailable generic test runner:** a Stage 5 attempt to invoke
+  `python -m pytest scripts/tests -q` failed because `pytest` is not installed.
+  No dependency was added. The repository-native
+  `python scripts/tests/test_validator.py` completed all 91 self-test assertions,
+  and the delivery-control suite uses `unittest` as recorded above.
 - **Large accumulated diff:** `ba13394` is a 15-file checkpoint of work developed
   across prior stages. It is intentionally a draft recovery point, not an ideal
   review-sized completion commit.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-02 and R-STOP-03 have not been fixed. R-STOP-01 is fixed and
-  independently accepted as recorded in Stage 4.
+- R-STOP-03 has not been fixed. R-STOP-01 and R-STOP-02 are independently
+  accepted as recorded in Stages 4 and 5.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -596,7 +657,7 @@ owner before interpreting it more broadly.
 ## 15. Next entry criterion
 
 Codex may continue only after each cold-start preflight matches this handoff and
-the next finding's narrow plan has independently passed review. R-STOP-01 is
-complete. The next code change is R-STOP-02, not dashboard work, R-STOP-03 or a
-later T/C/F family. Keep PR #99 draft until the aggregate stop review returns
+the next finding's narrow plan has independently passed review. R-STOP-01 and
+R-STOP-02 are complete. The next code change is R-STOP-03, not dashboard work or
+a later T/C/F family. Keep PR #99 draft until the aggregate stop review returns
 `APPROVE`; no merge or deployment decision is currently due.

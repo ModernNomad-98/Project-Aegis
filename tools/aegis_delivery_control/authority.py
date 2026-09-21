@@ -438,7 +438,9 @@ class SyntheticAuthority:
     def register_operator(self, grant: SyntheticOperatorGrant) -> None:
         if any(not value for value in grant.__dict__.values()):
             raise ValueError("synthetic operator grant fields must be non-empty")
-        if grant.action not in {"PAUSE", "STOP_GRACEFUL", "STOP_IMMEDIATE"}:
+        if grant.action not in {
+            "PAUSE", "STOP_GRACEFUL", "STOP_IMMEDIATE", "STOP_ESCALATE",
+        }:
             raise ValueError("unsupported synthetic operator action")
         with self._lock:
             if grant.grant_id in self._operator_grants:

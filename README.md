@@ -622,9 +622,9 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 209-test package suite passes locally and R-STOP-01 terminal slot
-closure has independent `APPROVE`, while R-STOP-02 and R-STOP-03 remain major
-blocking findings. Read the
+its full 219-test package suite passes locally and R-STOP-01 terminal slot
+closure plus R-STOP-02 graceful-stop escalation have independent `APPROVE`,
+while R-STOP-03 remains a major blocking finding. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
 continuing. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:

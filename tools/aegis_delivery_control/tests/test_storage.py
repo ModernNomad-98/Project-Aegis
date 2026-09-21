@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from datetime import datetime, timezone
 import json
 import multiprocessing
 import sqlite3
@@ -36,6 +37,8 @@ from tools.aegis_delivery_control.contracts import (
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
     StopMode,
+    StopEscalationRequest,
+    StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
     TerminalValidationSettlementRequest,
@@ -116,7 +119,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
         database_path = Path(self.temporary_directory.name) / "state.sqlite3"
         self.database_path = database_path
         self.oracle = MutableFreshnessOracle()
-        self.store = SQLiteStateStore(database_path, self.oracle, "repo-1")
+        self.store = SQLiteStateStore(
+            database_path,
+            self.oracle,
+            "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
         self.authority = SyntheticAuthority()
         self.store._bind_classification_authority(self.authority)
         self.authority.register(
@@ -312,6 +320,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_launches": 0,
                 "control_actions": 0,
                 "stop_actions": 0,
+                "stop_escalations": 0,
                 "operator_redemptions": 0,
                 "outstanding_slot": 0,
                 "dispatch_fences": 0,
@@ -459,6 +468,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_launches": 0,
                 "control_actions": 0,
                 "stop_actions": 0,
+                "stop_escalations": 0,
                 "operator_redemptions": 0,
                 "outstanding_slot": 1,
                 "dispatch_fences": 0,
@@ -2860,6 +2870,14 @@ class SQLiteStateStoreTests(unittest.TestCase):
             grant.scope_digest,
         )
 
+    def _stop_escalation_capability(self, suffix: str = "1"):
+        grant = SyntheticOperatorGrant(
+            f"escalation-grant-{suffix}", "repo-1", "run-1",
+            "STOP_ESCALATE", f"escalation-scope-{suffix}",
+        )
+        self.authority.register_operator(grant)
+        return self.authority.claim_operator(*grant.__dict__.values())
+
     @staticmethod
     def _stop_request(
         mode: StopMode = StopMode.IMMEDIATE, suffix: str = "1"
@@ -4247,6 +4265,644 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertTrue(replay.replayed)
         self.assertEqual(replay.event_hash, committed.event_hash)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_t20_escalation_atomically_charges_unknown_and_replays(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful_request = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful_request,
+            self._stop_capability(StopMode.GRACEFUL),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalation_request = StopEscalationRequest(
+            "escalation-1", "escalation-command-1", "escalation-event-1",
+            "repo-1", "run-1", graceful_request.stop_id,
+            graceful_request.event_id,
+            graceful_request.drain_deadline_utc,
+            "GRACEFUL_DEADLINE_EXPIRED",
+            (
+                StopEscalationSettlement(
+                    "reservation-1", "escalation-settlement-event-1", ""
+                ),
+            ),
+        )
+        capability = self._stop_escalation_capability()
+
+        escalated = self.store.escalate_stop(
+            escalation_request, capability, self.authority
+        )
+        self.oracle.allowed_head = escalated.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT held_units, charged_units, uncertainty, disposition "
+                "FROM budget_reservations WHERE reservation_id = ?",
+                ("reservation-1",),
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(
+            accounting,
+            (0, 5, 1, BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value),
+        )
+        self.assertEqual(escalated.resulting_state, LifecycleState.STOPPED)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        replay = self.store.escalate_stop(
+            escalation_request, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, escalated.event_hash)
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
+        self.store.load_verified("repo-1")
+
+    def test_t20_crash_boundaries_are_atomic_and_exactly_once(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalation = StopEscalationRequest(
+            "escalation-1", "escalation-command-1", "escalation-event-1",
+            "repo-1", "run-1", graceful.stop_id, graceful.event_id,
+            graceful.drain_deadline_utc, "GRACEFUL_DEADLINE_EXPIRED",
+            (StopEscalationSettlement(
+                "reservation-1", "escalation-settlement-event-1", ""
+            ),),
+        )
+        capability = self._stop_escalation_capability()
+
+        with self.assertRaises(InjectedFailure):
+            self.store.escalate_stop(
+                escalation, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_stop_escalation_writes_before_commit"
+                ),
+            )
+        self.assertEqual(self.store.table_counts()["stop_escalations"], 0)
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 0)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT disposition FROM budget_reservations WHERE "
+                    "reservation_id = 'reservation-1'"
+                ).fetchone()[0],
+                BudgetDisposition.RESERVED.value,
+            )
+        finally:
+            connection.close()
+
+        with self.assertRaises(InjectedFailure):
+            self.store.escalate_stop(
+                escalation, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_stop_escalation_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            escalation_hash = connection.execute(
+                "SELECT event_hash FROM stop_escalations WHERE "
+                "escalation_id = 'escalation-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = escalation_hash
+        replay = self.store.escalate_stop(
+            escalation, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(self.store.table_counts()["stop_escalations"], 1)
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
+        self.assertEqual(self.store.table_counts()["operator_redemptions"], 2)
+        self.store.load_verified("repo-1")
+
+    def test_t20_denies_predeadline_immediate_and_no_activity(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = self._stop_request(StopMode.GRACEFUL)
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalation = StopEscalationRequest(
+            "escalation-1", "escalation-command-1", "escalation-event-1",
+            "repo-1", "run-1", graceful.stop_id, graceful.event_id,
+            graceful.drain_deadline_utc, "GRACEFUL_DEADLINE_EXPIRED",
+            (StopEscalationSettlement(
+                "reservation-1", "escalation-settlement-event-1", ""
+            ),),
+        )
+        with self.assertRaisesRegex(DispatchDenied, "has not expired"):
+            self.store.escalate_stop(
+                escalation, self._stop_escalation_capability(), self.authority
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            oracle = MutableFreshnessOracle()
+            store = SQLiteStateStore(
+                Path(directory) / "state.sqlite3", oracle, "repo-1"
+            )
+            authority = SyntheticAuthority()
+            store._bind_classification_authority(authority)
+            plan = store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-x", "plan-command-x", "plan-event-x", "repo-1",
+                    "run-x", "item-x", "effect-x", "revision-x",
+                    "descriptor-x", "scope-x", "budget-x", ("check-x",),
+                ),
+                expected_head="", writer_epoch=1,
+            )
+            oracle.allowed_head = plan.event_hash
+            stop_grant = SyntheticOperatorGrant(
+                "stop-grant-x", "repo-1", "run-x", "STOP_GRACEFUL",
+                "stop-scope-x",
+            )
+            authority.register_operator(stop_grant)
+            stop_capability = authority.claim_operator(
+                *stop_grant.__dict__.values()
+            )
+            no_activity_stop = StopRequest(
+                "stop-x", "stop-command-x", "stop-event-x", "repo-1",
+                "run-x", StopMode.GRACEFUL, "OPERATOR_STOP",
+                "2000-01-01T00:00:00Z",
+            )
+            stopped_x = store.stop(
+                no_activity_stop, stop_capability, authority
+            )
+            oracle.allowed_head = stopped_x.event_hash
+            escalation_grant = SyntheticOperatorGrant(
+                "escalation-grant-x", "repo-1", "run-x", "STOP_ESCALATE",
+                "escalation-scope-x",
+            )
+            authority.register_operator(escalation_grant)
+            escalation_capability = authority.claim_operator(
+                *escalation_grant.__dict__.values()
+            )
+            with self.assertRaisesRegex(DispatchDenied, "drain obligations"):
+                store.escalate_stop(
+                    StopEscalationRequest(
+                        "escalation-x", "escalation-command-x",
+                        "escalation-event-x", "repo-1", "run-x", "stop-x",
+                        "stop-event-x", "2000-01-01T00:00:00Z",
+                        "GRACEFUL_DEADLINE_EXPIRED",
+                    ),
+                    escalation_capability,
+                    authority,
+                )
+
+    def test_t20_retains_known_and_existing_unknown_accounting(self) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        intent_request, validator_capability = self._validator_intent(observation)
+        intent = self.store.commit_validator_intent(
+            intent_request, validator_capability, self.authority
+        )
+        self.oracle.allowed_head = intent.event_hash
+        unknown = BudgetSettlementRequest(
+            "validator-unknown-1", "validator-reservation-1", "",
+            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+            "deadline-unknown", "VALIDATOR_DRAIN_UNKNOWN",
+        )
+        settled = self.store._settle_budget(
+            unknown,
+            self.authority.issue_settlement_proof("validator-proof-1", unknown),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalated = self.store.escalate_stop(
+            StopEscalationRequest(
+                "escalation-1", "escalation-command-1",
+                "escalation-event-1", "repo-1", "run-1", graceful.stop_id,
+                graceful.event_id, graceful.drain_deadline_utc,
+                "GRACEFUL_DEADLINE_EXPIRED",
+            ),
+            self._stop_escalation_capability(),
+            self.authority,
+        )
+        self.oracle.allowed_head = escalated.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT reservation_id, disposition, charged_units, "
+                "settlement_head_hash FROM budget_reservations ORDER BY "
+                "reservation_id"
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(len(accounting), 2)
+        self.assertEqual(accounting[0][1], BudgetDisposition.CONSUMED.value)
+        self.assertEqual(
+            accounting[1],
+            (
+                "validator-reservation-1",
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                2,
+                settled.settlement_hash,
+            ),
+        )
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 2)
+        self.store.load_verified("repo-1")
+
+    def test_t20_history_survives_later_adjustment_release_and_restart(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalated = self.store.escalate_stop(
+            StopEscalationRequest(
+                "escalation-1", "escalation-command-1",
+                "escalation-event-1", "repo-1", "run-1", graceful.stop_id,
+                graceful.event_id, graceful.drain_deadline_utc,
+                "GRACEFUL_DEADLINE_EXPIRED",
+                (StopEscalationSettlement(
+                    "reservation-1", "escalation-settlement-event-1", ""
+                ),),
+            ),
+            self._stop_escalation_capability(), self.authority,
+        )
+        self.oracle.allowed_head = escalated.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            unknown_hash = connection.execute(
+                "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        adjustment_request = BudgetSettlementRequest(
+            "late-adjustment-event-1", "reservation-1", unknown_hash,
+            BudgetDisposition.ADJUSTED, 2, "late-receipt-1",
+            "AUTHORITATIVE_LATE_USAGE",
+        )
+        adjusted = self.store._settle_budget(
+            adjustment_request,
+            self.authority.issue_settlement_proof(
+                "late-adjustment-proof-1", adjustment_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = adjusted.settlement_hash
+        late = self.store._record_effect_observation(
+            EffectObservationRequest(
+                "late-observation-1", "late-observe-command-1",
+                "late-observation-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "late-receipt-1",
+                self.capability.claim_id, "descriptor-digest", 2,
+                "late-adjustment-event-1", adjusted.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = late.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            plan_id, plan_hash = connection.execute(
+                "SELECT plan_id, event_hash FROM validation_plans WHERE "
+                "run_id = 'run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        terminal = self.store.settle_terminal_validation(
+            TerminalValidationSettlementRequest(
+                "terminal-settlement-1", "terminal-command-1",
+                "terminal-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", plan_id, "revision-1", "check-1", "PLAN",
+                plan_id, plan_hash, "CANCELLED_WITHOUT_START",
+            )
+        )
+        self.assertTrue(terminal.slot_released)
+        self.oracle.allowed_head = terminal.event_hash
+        reopened = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        reopened.load_verified("repo-1")
+
+    def test_t20_recovery_rejects_self_consistent_snapshot_tamper(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        escalated = self.store.escalate_stop(
+            StopEscalationRequest(
+                "escalation-1", "escalation-command-1",
+                "escalation-event-1", "repo-1", "run-1", graceful.stop_id,
+                graceful.event_id, graceful.drain_deadline_utc,
+                "GRACEFUL_DEADLINE_EXPIRED",
+                (StopEscalationSettlement(
+                    "reservation-1", "escalation-settlement-event-1", ""
+                ),),
+            ),
+            self._stop_escalation_capability(), self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM stop_escalations WHERE "
+                    "escalation_id = 'escalation-1'"
+                ).fetchone()["body_json"]
+            )
+            body["obligation_snapshot"][0]["activity_id"] = "forged-launch"
+            forged_hash = self.store._event_hash(body)
+            body_json = json.dumps(
+                body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                "event_id = 'escalation-event-1'",
+                (forged_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE stop_escalations SET event_hash = ?, body_json = ? "
+                "WHERE escalation_id = 'escalation-1'",
+                (forged_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE "
+                "command_id = 'escalation-command-1'",
+                (forged_hash,),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (forged_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (forged_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = forged_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "obligation snapshot"
+        ):
+            self.store.load_verified("repo-1")
+
+    def test_t20_recovery_rejects_self_consistent_item_retarget(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        self.store.escalate_stop(
+            StopEscalationRequest(
+                "escalation-1", "escalation-command-1",
+                "escalation-event-1", "repo-1", "run-1", graceful.stop_id,
+                graceful.event_id, graceful.drain_deadline_utc,
+                "GRACEFUL_DEADLINE_EXPIRED",
+                (StopEscalationSettlement(
+                    "reservation-1", "escalation-settlement-event-1", ""
+                ),),
+            ),
+            self._stop_escalation_capability(), self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM stop_escalations WHERE "
+                    "escalation_id = 'escalation-1'"
+                ).fetchone()["body_json"]
+            )
+            body["item_id"] = "forged-item"
+            forged_hash = self.store._event_hash(body)
+            body_json = json.dumps(
+                body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET item_id = ?, event_hash = ?, "
+                "body_json = ? WHERE event_id = 'escalation-event-1'",
+                ("forged-item", forged_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE stop_escalations SET item_id = ?, event_hash = ?, "
+                "body_json = ? WHERE escalation_id = 'escalation-1'",
+                ("forged-item", forged_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE "
+                "command_id = 'escalation-command-1'",
+                (forged_hash,),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (forged_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (forged_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = forged_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "source binding"
+        ):
+            self.store.load_verified("repo-1")
+
+    def test_t20_rejects_incomplete_stale_and_forged_requests(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        graceful = replace(
+            self._stop_request(StopMode.GRACEFUL),
+            drain_deadline_utc="2000-01-01T00:00:00Z",
+        )
+        stopped = self.store.stop(
+            graceful, self._stop_capability(StopMode.GRACEFUL), self.authority
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        base = StopEscalationRequest(
+            "escalation-1", "escalation-command-1", "escalation-event-1",
+            "repo-1", "run-1", graceful.stop_id, graceful.event_id,
+            graceful.drain_deadline_utc, "GRACEFUL_DEADLINE_EXPIRED",
+            (StopEscalationSettlement(
+                "reservation-1", "escalation-settlement-event-1", ""
+            ),),
+        )
+        capability = self._stop_escalation_capability()
+        with self.assertRaisesRegex(DispatchDenied, "exactly cover"):
+            self.store.escalate_stop(
+                replace(base, unknown_settlements=()),
+                capability,
+                self.authority,
+            )
+        with self.assertRaisesRegex(DispatchDenied, "stale"):
+            self.store.escalate_stop(
+                replace(
+                    base,
+                    unknown_settlements=(StopEscalationSettlement(
+                        "reservation-1", "escalation-settlement-event-1",
+                        "stale-hash",
+                    ),),
+                ),
+                capability,
+                self.authority,
+            )
+        with self.assertRaisesRegex(DispatchDenied, "was not issued here"):
+            self.store.escalate_stop(
+                base,
+                replace(capability, issuer_mac="forged"),
+                self.authority,
+            )
+        with self.assertRaisesRegex(DispatchDenied, "deadline binding"):
+            self.store.escalate_stop(
+                replace(
+                    base,
+                    expected_drain_deadline_utc="1999-01-01T00:00:00Z",
+                ),
+                capability,
+                self.authority,
+            )
+
+    def test_t20_rejects_immediate_stop_as_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            oracle = MutableFreshnessOracle()
+            store = SQLiteStateStore(
+                Path(directory) / "state.sqlite3", oracle, "repo-1"
+            )
+            authority = SyntheticAuthority()
+            store._bind_classification_authority(authority)
+            effect_grant = SyntheticGrant(
+                "grant-x", "repo-1", "effect-x", "attempt-x", "scope-x"
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            intent = IntentRequest(
+                "repo-1", "run-x", "item-x", "command-x", "event-x",
+                "effect-x", "descriptor-x", "attempt-x", "permission-x",
+                "reservation-x", "budget-x", 1, 2, 5,
+            )
+            plan = store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-x", "plan-command-x", "plan-event-x", "repo-1",
+                    "run-x", "item-x", "effect-x", "revision-x",
+                    "descriptor-x", "scope-x", "budget-x", ("check-x",),
+                ),
+                expected_head="", writer_epoch=1,
+            )
+            oracle.allowed_head = plan.event_hash
+            committed = store.commit_intent(
+                intent, effect_capability, authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+            )
+            oracle.allowed_head = committed.event_hash
+            launched = store.claim_operation_launch(intent, committed)
+            oracle.allowed_head = launched.event_hash
+            stop_grant = SyntheticOperatorGrant(
+                "stop-grant-x", "repo-1", "run-x", "STOP_IMMEDIATE",
+                "stop-scope-x",
+            )
+            authority.register_operator(stop_grant)
+            immediate = StopRequest(
+                "stop-x", "stop-command-x", "stop-event-x", "repo-1",
+                "run-x", StopMode.IMMEDIATE, "OPERATOR_STOP",
+            )
+            stopped = store.stop(
+                immediate,
+                authority.claim_operator(*stop_grant.__dict__.values()),
+                authority,
+            )
+            oracle.allowed_head = stopped.event_hash
+            escalation_grant = SyntheticOperatorGrant(
+                "escalation-grant-x", "repo-1", "run-x", "STOP_ESCALATE",
+                "escalation-scope-x",
+            )
+            authority.register_operator(escalation_grant)
+            with self.assertRaisesRegex(DispatchDenied, "graceful stop"):
+                store.escalate_stop(
+                    StopEscalationRequest(
+                        "escalation-x", "escalation-command-x",
+                        "escalation-event-x", "repo-1", "run-x", "stop-x",
+                        "stop-event-x", "2000-01-01T00:00:00Z",
+                        "GRACEFUL_DEADLINE_EXPIRED",
+                        (StopEscalationSettlement(
+                            "reservation-x", "escalation-settlement-x", ""
+                        ),),
+                    ),
+                    authority.claim_operator(*escalation_grant.__dict__.values()),
+                    authority,
+                )
 
     def test_r_stop_01_t18_closes_applied_pass(self) -> None:
         self._assert_r_stop_01_application_closure(

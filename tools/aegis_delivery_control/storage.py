@@ -8,6 +8,7 @@ import os
 import sqlite3
 import sys
 from contextlib import closing
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import BinaryIO, Callable, Mapping, cast
 
@@ -49,6 +50,8 @@ from .contracts import (
     ReadinessEvaluationRequest,
     SettlementReceipt,
     StopMode,
+    StopEscalationRequest,
+    StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
     TerminalValidationSettlementReceipt,
@@ -116,6 +119,7 @@ _EVENT_KINDS = frozenset(
         "READINESS_EVALUATED",
         "RECEIPT_RECORDED",
         "STOP_RECORDED",
+        "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
         "VALIDATION_PASSED",
@@ -140,6 +144,7 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "READINESS_EVALUATED",
         "RECEIPT_RECORDED",
         "STOP_RECORDED",
+        "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
         "VALIDATION_PASSED",
@@ -219,6 +224,9 @@ _LIFECYCLE_ROUTES: Mapping[
                 LifecycleState.STOPPED,
             }
         }
+    ),
+    "STOP_ESCALATED": frozenset(
+        {(LifecycleState.STOPPED, LifecycleState.STOPPED)}
     ),
     "TERMINAL_VALIDATION_SETTLED": frozenset(
         {
@@ -527,12 +535,15 @@ class SQLiteStateStore:
         database_path: Path,
         freshness_oracle: FreshnessOracle,
         repository_id: str,
+        *,
+        utc_now: Callable[[], datetime] | None = None,
     ) -> None:
         if not repository_id.strip():
             raise ValueError("repository_id must be non-empty")
         self._database_path = database_path
         self._freshness_oracle = freshness_oracle
         self._repository_id = repository_id
+        self._utc_now = utc_now or (lambda: datetime.now(timezone.utc))
         self._classification_authority: SyntheticAuthority | None = None
         expected = default_state_root(repository_id) / "state.sqlite3"
         self._is_canonical = database_path.resolve(
@@ -1027,6 +1038,28 @@ class SQLiteStateStore:
                 drain_deadline_utc TEXT,
                 retained_continuation_cursor TEXT,
                 fence_id TEXT NOT NULL UNIQUE,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_scope_digest TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS stop_escalations (
+                escalation_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                slot_attempt_id TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                source_stop_id TEXT NOT NULL UNIQUE REFERENCES stop_actions(stop_id),
+                source_stop_event_id TEXT NOT NULL,
+                drain_deadline_utc TEXT NOT NULL,
+                escalated_at_utc TEXT NOT NULL,
+                reason_code TEXT NOT NULL,
                 capability_claim_id TEXT NOT NULL UNIQUE,
                 capability_grant_id TEXT NOT NULL,
                 capability_scope_digest TEXT NOT NULL,
@@ -1711,6 +1744,344 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "STOP_RECORDED event semantics are invalid"
             ) from error
+
+    @classmethod
+    def _validate_stop_escalation_event_body(
+        cls, body: Mapping[str, object]
+    ) -> None:
+        expected_fields = {
+            "accounting_snapshot", "action", "capability_claim_id",
+            "capability_grant_id", "capability_issuer_fingerprint",
+            "capability_scope_digest", "command_id",
+            "expected_drain_deadline_utc",
+            "escalated_at_utc", "escalation_id", "event_id", "event_kind",
+            "item_id", "lifecycle_from", "lifecycle_to",
+            "logical_effect_id", "obligation_snapshot", "payload_digest",
+            "previous_event_hash", "reason_code", "repository_id", "run_id",
+            "schema_version", "sequence", "slot_attempt_id",
+            "slot_generation", "source_stop_event_id", "source_stop_id",
+            "unknown_settlements", "writer_epoch",
+        }
+        if (
+            type(body.get("schema_version")) is not int
+            or body.get("schema_version") != 1
+            or set(body) != expected_fields
+        ):
+            raise StorageIntegrityError(
+                "unsupported STOP_ESCALATED event schema"
+            )
+        try:
+            settlements_raw = body["unknown_settlements"]
+            if not isinstance(settlements_raw, list):
+                raise ValueError("escalation settlements are not a list")
+            settlements = tuple(
+                StopEscalationSettlement(
+                    reservation_id=cast(str, item["reservation_id"]),
+                    settlement_event_id=cast(str, item["settlement_event_id"]),
+                    expected_previous_hash=cast(
+                        str, item["expected_previous_hash"]
+                    ),
+                )
+                for item in settlements_raw
+            )
+            request = StopEscalationRequest(
+                escalation_id=cast(str, body["escalation_id"]),
+                command_id=cast(str, body["command_id"]),
+                event_id=cast(str, body["event_id"]),
+                repository_id=cast(str, body["repository_id"]),
+                run_id=cast(str, body["run_id"]),
+                source_stop_id=cast(str, body["source_stop_id"]),
+                source_stop_event_id=cast(str, body["source_stop_event_id"]),
+                expected_drain_deadline_utc=cast(
+                    str, body["expected_drain_deadline_utc"]
+                ),
+                reason_code=cast(str, body["reason_code"]),
+                unknown_settlements=settlements,
+            )
+            request.validate()
+            if (
+                body["event_kind"] != "STOP_ESCALATED"
+                or body["action"] != "STOP_ESCALATE"
+                or body["lifecycle_from"] != LifecycleState.STOPPED.value
+                or body["lifecycle_to"] != LifecycleState.STOPPED.value
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+                or type(body["slot_generation"]) is not int
+                or int(body["slot_generation"]) <= 0
+                or not isinstance(body["obligation_snapshot"], list)
+                or not body["obligation_snapshot"]
+                or not isinstance(body["accounting_snapshot"], list)
+            ):
+                raise ValueError("stop escalation event binding is invalid")
+            escalated_at = datetime.strptime(
+                cast(str, body["escalated_at_utc"]), "%Y-%m-%dT%H:%M:%SZ"
+            )
+            deadline = datetime.strptime(
+                request.expected_drain_deadline_utc, "%Y-%m-%dT%H:%M:%SZ"
+            )
+            if escalated_at < deadline:
+                raise ValueError("stop escalation precedes its deadline")
+            TransitionEngine().authorize(
+                "T20",
+                LifecycleState(cast(str, body["lifecycle_from"])),
+                LifecycleState(cast(str, body["lifecycle_to"])),
+                TRANSITIONS["T20"].required_guards,
+            )
+            payload = {
+                key: value
+                for key, value in request.__dict__.items()
+                if key != "unknown_settlements"
+            } | {
+                "unknown_settlements": [
+                    item.__dict__ for item in request.unknown_settlements
+                ],
+                "action": body["action"],
+                "capability_claim_id": body["capability_claim_id"],
+                "capability_grant_id": body["capability_grant_id"],
+                "capability_issuer_fingerprint": body[
+                    "capability_issuer_fingerprint"
+                ],
+                "capability_scope_digest": body["capability_scope_digest"],
+            }
+            if body["payload_digest"] != cls._event_hash(payload):
+                raise ValueError("stop escalation payload digest mismatch")
+        except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+            raise StorageIntegrityError(
+                "STOP_ESCALATED event semantics are invalid"
+            ) from error
+
+    def _validate_stop_escalation_history(
+        self, connection: sqlite3.Connection, body: Mapping[str, object]
+    ) -> None:
+        sequence = int(body["sequence"])
+        source_event = connection.execute(
+            "SELECT sequence FROM events WHERE event_id = ? AND event_kind = "
+            "'STOP_RECORDED' AND repository_id = ? AND run_id = ?",
+            (
+                body["source_stop_event_id"], body["repository_id"],
+                body["run_id"],
+            ),
+        ).fetchone()
+        fence = connection.execute(
+            "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+            "originating_event_id = ? AND reason_code = 'STOPPED_RUN'",
+            (body["repository_id"], body["source_stop_event_id"]),
+        ).fetchone()
+        if (
+            source_event is None
+            or int(source_event["sequence"]) >= sequence
+            or fence is None
+        ):
+            raise StorageIntegrityError(
+                "stop escalation source history is invalid"
+            )
+        operation_reservation = connection.execute(
+            "SELECT * FROM budget_reservations WHERE repository_id = ? AND "
+            "run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+            (
+                body["repository_id"], body["run_id"],
+                body["logical_effect_id"], body["slot_attempt_id"],
+            ),
+        ).fetchone()
+        if operation_reservation is None or not self._operation_slot_current_before(
+            connection,
+            operation_reservation,
+            sequence,
+            expected_generation=int(body["slot_generation"]),
+        ):
+            raise StorageIntegrityError(
+                "stop escalation slot snapshot diverges from history"
+            )
+
+        expected_activities: list[dict[str, object]] = []
+        launch = connection.execute(
+            "SELECT launch.* FROM operation_launches AS launch JOIN events AS "
+            "event ON event.event_id = launch.event_id WHERE "
+            "launch.repository_id = ? AND launch.run_id = ? AND "
+            "launch.logical_effect_id = ? AND launch.attempt_id = ? AND "
+            "event.sequence < ?",
+            (
+                body["repository_id"], body["run_id"],
+                body["logical_effect_id"], body["slot_attempt_id"], sequence,
+            ),
+        ).fetchone()
+        observed = connection.execute(
+            "SELECT 1 FROM effect_observations AS observation JOIN events AS "
+            "event ON event.event_id = observation.event_id WHERE "
+            "observation.repository_id = ? AND observation.run_id = ? AND "
+            "observation.logical_effect_id = ? AND observation.attempt_id = ? "
+            "AND event.sequence < ?",
+            (
+                body["repository_id"], body["run_id"],
+                body["logical_effect_id"], body["slot_attempt_id"], sequence,
+            ),
+        ).fetchone()
+        if launch is not None and observed is None:
+            contacts = connection.execute(
+                "SELECT contact.contact_id FROM adapter_contacts AS contact "
+                "JOIN events AS event ON event.event_id = contact.event_id "
+                "WHERE contact.repository_id = ? AND contact.run_id = ? AND "
+                "contact.contact_kind = 'EFFECT' AND contact.source_id = ? "
+                "AND event.sequence < ? ORDER BY contact.contact_id",
+                (
+                    body["repository_id"], body["run_id"],
+                    launch["launch_id"], sequence,
+                ),
+            ).fetchall()
+            expected_activities.append(
+                {
+                    "activity_id": str(launch["launch_id"]),
+                    "attempt_id": str(body["slot_attempt_id"]),
+                    "contact_ids": [str(row["contact_id"]) for row in contacts],
+                    "kind": "OPERATION",
+                    "reservation_id": str(
+                        operation_reservation["reservation_id"]
+                    ),
+                }
+            )
+        validator_intents = connection.execute(
+            "SELECT intent.* FROM validator_intents AS intent JOIN events AS "
+            "intent_event ON intent_event.event_id = intent.event_id WHERE "
+            "intent.repository_id = ? AND intent.run_id = ? AND "
+            "intent_event.sequence < ? AND NOT EXISTS (SELECT 1 FROM "
+            "validator_observations AS observation JOIN events AS event ON "
+            "event.event_id = observation.event_id WHERE "
+            "observation.validator_intent_id = intent.validator_intent_id "
+            "AND event.sequence < ?) AND NOT EXISTS (SELECT 1 FROM "
+            "validator_cessations AS cessation JOIN events AS event ON "
+            "event.event_id = cessation.event_id WHERE "
+            "cessation.validator_intent_id = intent.validator_intent_id AND "
+            "event.sequence < ?) ORDER BY intent.validator_intent_id",
+            (body["repository_id"], body["run_id"], sequence, sequence, sequence),
+        ).fetchall()
+        for intent in validator_intents:
+            contacts = connection.execute(
+                "SELECT contact.contact_id FROM adapter_contacts AS contact "
+                "JOIN events AS event ON event.event_id = contact.event_id "
+                "WHERE contact.repository_id = ? AND contact.run_id = ? AND "
+                "contact.contact_kind = 'VALIDATOR' AND contact.source_id = ? "
+                "AND event.sequence < ? ORDER BY contact.contact_id",
+                (
+                    body["repository_id"], body["run_id"],
+                    intent["validator_intent_id"], sequence,
+                ),
+            ).fetchall()
+            expected_activities.append(
+                {
+                    "activity_id": str(intent["validator_intent_id"]),
+                    "attempt_id": str(intent["validator_attempt_id"]),
+                    "contact_ids": [str(row["contact_id"]) for row in contacts],
+                    "kind": "VALIDATOR",
+                    "reservation_id": str(intent["reservation_id"]),
+                }
+            )
+        expected_activities.sort(
+            key=lambda item: (str(item["kind"]), str(item["activity_id"]))
+        )
+        if body["obligation_snapshot"] != expected_activities:
+            raise StorageIntegrityError(
+                "stop escalation obligation snapshot diverges from history"
+            )
+
+        reservation_ids = {
+            str(row["reservation_id"])
+            for row in connection.execute(
+                "SELECT reservation_id FROM budget_reservations WHERE "
+                "repository_id = ? AND run_id = ?",
+                (body["repository_id"], body["run_id"]),
+            )
+        }
+        expected_accounting: list[dict[str, object]] = []
+        for reservation_id in sorted(reservation_ids):
+            reservation = connection.execute(
+                "SELECT disposition, settlement_head_hash FROM "
+                "budget_reservations WHERE reservation_id = ?",
+                (reservation_id,),
+            ).fetchone()
+            if reservation is None:
+                raise StorageIntegrityError(
+                    "stop escalation accounting reservation is absent"
+                )
+            historical = connection.execute(
+                "SELECT settlement.disposition, settlement.settlement_hash "
+                "FROM budget_settlements AS settlement JOIN events AS event "
+                "ON event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND event.sequence < ? ORDER "
+                "BY event.sequence DESC LIMIT 1",
+                (reservation_id, sequence),
+            ).fetchone()
+            expected_accounting.append(
+                {
+                    "disposition": (
+                        BudgetDisposition.RESERVED.value
+                        if historical is None
+                        else str(historical["disposition"])
+                    ),
+                    "reservation_id": reservation_id,
+                    "settlement_head_hash": (
+                        "" if historical is None
+                        else str(historical["settlement_hash"])
+                    ),
+                }
+            )
+        if body["accounting_snapshot"] != expected_accounting:
+            raise StorageIntegrityError(
+                "stop escalation accounting snapshot diverges from history"
+            )
+        unknown_by_reservation = {
+            item["reservation_id"]: item
+            for item in cast(list[dict[str, object]], body["unknown_settlements"])
+        }
+        for reservation_id, item in unknown_by_reservation.items():
+            settlement = connection.execute(
+                "SELECT settlement.*, event.sequence, event.writer_epoch FROM "
+                "budget_settlements AS settlement JOIN events AS event ON "
+                "event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.settlement_event_id = ? AND "
+                "settlement.reservation_id = ?",
+                (item["settlement_event_id"], reservation_id),
+            ).fetchone()
+            if settlement is None or (
+                settlement["previous_hash"], settlement["disposition"],
+                settlement["evidence_digest"], settlement["reason_code"],
+                settlement["writer_epoch"],
+            ) != (
+                item["expected_previous_hash"],
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                f"stop-escalation:{body['escalation_id']}",
+                "GRACEFUL_DRAIN_UNKNOWN", body["writer_epoch"],
+            ) or int(settlement["sequence"]) >= sequence:
+                raise StorageIntegrityError(
+                    "stop escalation unknown settlement diverges from history"
+                )
+        snapshot_by_reservation = {
+            item["reservation_id"]: item
+            for item in cast(list[dict[str, object]], body["accounting_snapshot"])
+        }
+        for reservation_id, item in snapshot_by_reservation.items():
+            unknown_spec = unknown_by_reservation.get(reservation_id)
+            if unknown_spec is None:
+                if item["disposition"] == BudgetDisposition.RESERVED.value:
+                    raise StorageIntegrityError(
+                        "stop escalation omitted ambiguous accounting"
+                    )
+                continue
+            settlement_hash = connection.execute(
+                "SELECT settlement_hash FROM budget_settlements WHERE "
+                "settlement_event_id = ?",
+                (unknown_spec["settlement_event_id"],),
+            ).fetchone()
+            if settlement_hash is None or (
+                item["disposition"], item["settlement_head_hash"]
+            ) != (
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                settlement_hash["settlement_hash"],
+            ):
+                raise StorageIntegrityError(
+                    "stop escalation unknown classification is incomplete"
+                )
 
     def _validate_effect_observation_event(
         self,
@@ -4521,6 +4892,593 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.stop_id, request.command_id, request.event_id, sequence,
             event_hash, LifecycleState.STOPPED, False,
+        )
+
+    def escalate_stop(
+        self,
+        request: StopEscalationRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("stop escalation targets another repository")
+        if (
+            capability.repository_id,
+            capability.run_id,
+            capability.action,
+        ) != (request.repository_id, request.run_id, "STOP_ESCALATE"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this escalation"
+            )
+        request_payload = {
+            key: value
+            for key, value in request.__dict__.items()
+            if key != "unknown_settlements"
+        } | {
+            "unknown_settlements": [
+                item.__dict__ for item in request.unknown_settlements
+            ],
+            "action": "STOP_ESCALATE",
+            "capability_claim_id": capability.claim_id,
+            "capability_grant_id": capability.grant_id,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "capability_scope_digest": capability.scope_digest,
+        }
+        payload_digest = self._event_hash(request_payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    prior = connection.execute(
+                        "SELECT * FROM stop_escalations WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "stop escalation command lost its projection"
+                        )
+                    self._verify_operator_replay_issuer(prior, authority)
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    body = json.loads(prior["body_json"])
+                    connection.rollback()
+                    return ControlReceipt(
+                        request.escalation_id,
+                        request.command_id,
+                        request.event_id,
+                        int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState.STOPPED,
+                        True,
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM stop_escalations WHERE escalation_id = ? "
+                    "OR event_id = ? OR source_stop_id = ?",
+                    (
+                        request.escalation_id,
+                        request.event_id,
+                        request.source_stop_id,
+                    ),
+                ).fetchone()
+                if prior is not None:
+                    authority.verify_operator_issued(capability)
+                    self._verify_operator_replay_issuer(prior, authority)
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "stop escalation identity was reused with a different payload"
+                        )
+                    body = json.loads(prior["body_json"])
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["escalation_id"]),
+                        str(prior["command_id"]),
+                        str(prior["event_id"]),
+                        int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState.STOPPED,
+                        True,
+                    )
+                authority.verify_operator_for_action(capability)
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE "
+                    "claim_id = ? OR grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                source = connection.execute(
+                    "SELECT * FROM stop_actions WHERE stop_id = ? AND "
+                    "event_id = ? AND repository_id = ? AND run_id = ?",
+                    (
+                        request.source_stop_id,
+                        request.source_stop_event_id,
+                        request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if source is None or source["mode"] != StopMode.GRACEFUL.value:
+                    raise DispatchDenied(
+                        "T20 requires the exact recorded graceful stop"
+                    )
+                if source["drain_deadline_utc"] != (
+                    request.expected_drain_deadline_utc
+                ):
+                    raise DispatchDenied("stop escalation deadline binding mismatch")
+                now = self._utc_now()
+                if now.tzinfo is None or now.utcoffset() is None:
+                    raise StorageIntegrityError("stop escalation clock is not UTC-aware")
+                escalated_at_utc = now.astimezone(timezone.utc).strftime(
+                    "%Y-%m-%dT%H:%M:%SZ"
+                )
+                deadline = datetime.strptime(
+                    request.expected_drain_deadline_utc,
+                    "%Y-%m-%dT%H:%M:%SZ",
+                ).replace(tzinfo=timezone.utc)
+                if now.astimezone(timezone.utc) < deadline:
+                    raise DispatchDenied("graceful drain deadline has not expired")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                if run is None or run["lifecycle_state"] != (
+                    LifecycleState.STOPPED.value
+                ):
+                    raise DispatchDenied("T20 requires the stopped source run")
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T20",
+                        LifecycleState.STOPPED,
+                        LifecycleState.STOPPED,
+                        TRANSITIONS["T20"].required_guards,
+                    )
+                else:
+                    authorize_transition(
+                        LifecycleState.STOPPED, LifecycleState.STOPPED
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ? "
+                    "AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if slot is None:
+                    raise DispatchDenied(
+                        "stop escalation requires retained drain obligations"
+                    )
+                if (
+                    source["item_id"] != run["item_id"]
+                    or source["logical_effect_id"]
+                    != slot["logical_effect_id"]
+                ):
+                    raise StorageIntegrityError(
+                        "stop escalation source target binding is inconsistent"
+                    )
+                activities: list[dict[str, object]] = []
+                launch = connection.execute(
+                    "SELECT * FROM operation_launches WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id,
+                        request.run_id,
+                        slot["logical_effect_id"],
+                        slot["attempt_id"],
+                    ),
+                ).fetchone()
+                operation_observation = connection.execute(
+                    "SELECT 1 FROM effect_observations WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id,
+                        request.run_id,
+                        slot["logical_effect_id"],
+                        slot["attempt_id"],
+                    ),
+                ).fetchone()
+                operation_reservation = connection.execute(
+                    "SELECT reservation_id FROM budget_reservations WHERE "
+                    "repository_id = ? AND run_id = ? AND logical_effect_id = ? "
+                    "AND attempt_id = ?",
+                    (
+                        request.repository_id,
+                        request.run_id,
+                        slot["logical_effect_id"],
+                        slot["attempt_id"],
+                    ),
+                ).fetchone()
+                if launch is not None and operation_observation is None:
+                    if operation_reservation is None:
+                        raise StorageIntegrityError(
+                            "stop escalation operation lost its reservation"
+                        )
+                    contacts = connection.execute(
+                        "SELECT contact_id FROM adapter_contacts WHERE "
+                        "repository_id = ? AND run_id = ? AND contact_kind = "
+                        "'EFFECT' AND source_id = ? ORDER BY contact_id",
+                        (
+                            request.repository_id,
+                            request.run_id,
+                            launch["launch_id"],
+                        ),
+                    ).fetchall()
+                    activities.append(
+                        {
+                            "activity_id": str(launch["launch_id"]),
+                            "attempt_id": str(slot["attempt_id"]),
+                            "contact_ids": [
+                                str(row["contact_id"]) for row in contacts
+                            ],
+                            "kind": "OPERATION",
+                            "reservation_id": str(
+                                operation_reservation["reservation_id"]
+                            ),
+                        }
+                    )
+                validator_rows = connection.execute(
+                    "SELECT intent.* FROM validator_intents AS intent WHERE "
+                    "intent.repository_id = ? AND intent.run_id = ? AND "
+                    "intent.status = 'ACTIVE' AND NOT EXISTS (SELECT 1 FROM "
+                    "validator_observations AS observation WHERE "
+                    "observation.validator_intent_id = intent.validator_intent_id) "
+                    "AND NOT EXISTS (SELECT 1 FROM validator_cessations AS "
+                    "cessation WHERE cessation.validator_intent_id = "
+                    "intent.validator_intent_id) ORDER BY intent.validator_intent_id",
+                    (request.repository_id, request.run_id),
+                ).fetchall()
+                for intent in validator_rows:
+                    contacts = connection.execute(
+                        "SELECT contact_id FROM adapter_contacts WHERE "
+                        "repository_id = ? AND run_id = ? AND contact_kind = "
+                        "'VALIDATOR' AND source_id = ? ORDER BY contact_id",
+                        (
+                            request.repository_id,
+                            request.run_id,
+                            intent["validator_intent_id"],
+                        ),
+                    ).fetchall()
+                    activities.append(
+                        {
+                            "activity_id": str(intent["validator_intent_id"]),
+                            "attempt_id": str(intent["validator_attempt_id"]),
+                            "contact_ids": [
+                                str(row["contact_id"]) for row in contacts
+                            ],
+                            "kind": "VALIDATOR",
+                            "reservation_id": str(intent["reservation_id"]),
+                        }
+                    )
+                activities.sort(key=lambda item: (str(item["kind"]), str(item["activity_id"])))
+                if not activities:
+                    raise DispatchDenied(
+                        "stop escalation has no qualifying drain activity"
+                    )
+                activity_reservation_ids = {
+                    str(item["reservation_id"]) for item in activities
+                }
+                placeholders = ",".join(
+                    "?" for _ in activity_reservation_ids
+                )
+                activity_reservations = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id IN ("
+                    + placeholders + ") ORDER BY reservation_id",
+                    tuple(sorted(activity_reservation_ids)),
+                ).fetchall()
+                if {
+                    str(row["reservation_id"])
+                    for row in activity_reservations
+                } != activity_reservation_ids:
+                    raise StorageIntegrityError(
+                        "stop escalation activity lost its reservation"
+                    )
+                reservations = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                    "AND run_id = ? ORDER BY reservation_id",
+                    (request.repository_id, request.run_id),
+                ).fetchall()
+                ambiguous_ids = {
+                    str(row["reservation_id"])
+                    for row in reservations
+                    if (
+                        str(row["reservation_id"])
+                        in activity_reservation_ids
+                        and row["disposition"]
+                        == BudgetDisposition.RESERVED.value
+                    )
+                }
+                supplied = {
+                    item.reservation_id: item
+                    for item in request.unknown_settlements
+                }
+                if set(supplied) != ambiguous_ids:
+                    raise DispatchDenied(
+                        "stop escalation settlements do not exactly cover ambiguous reservations"
+                    )
+                for row in reservations:
+                    item = supplied.get(str(row["reservation_id"]))
+                    if item is not None and row["settlement_head_hash"] != (
+                        item.expected_previous_hash
+                    ):
+                        raise DispatchDenied(
+                            "stale stop escalation settlement predecessor"
+                        )
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                sequence = int(run["head_sequence"])
+                previous_hash = str(run["head_hash"])
+                settlement_hashes: dict[str, str] = {}
+                for reservation in reservations:
+                    reservation_id = str(reservation["reservation_id"])
+                    settlement_spec = supplied.get(reservation_id)
+                    if settlement_spec is None:
+                        continue
+                    settlement_request = BudgetSettlementRequest(
+                        settlement_event_id=settlement_spec.settlement_event_id,
+                        reservation_id=reservation_id,
+                        expected_previous_hash=settlement_spec.expected_previous_hash,
+                        disposition=BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED,
+                        actual_units=None,
+                        evidence_digest=f"stop-escalation:{request.escalation_id}",
+                        reason_code="GRACEFUL_DRAIN_UNKNOWN",
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=str(reservation["item_id"]),
+                        logical_effect_id=str(reservation["logical_effect_id"]),
+                        attempt_id=str(reservation["attempt_id"]),
+                    )
+                    settlement_request.validate()
+                    held_units, charged_units, uncertainty = (
+                        _derive_settlement_accounting(
+                            BudgetDisposition(str(reservation["disposition"])),
+                            int(reservation["charged_units"]),
+                            int(reservation["worst_case_units"]),
+                            settlement_request.disposition,
+                            None,
+                            False,
+                            False,
+                            False,
+                        )
+                    )
+                    settlement_payload = {
+                        **settlement_request.__dict__,
+                        "disposition": settlement_request.disposition.value,
+                        "settlement_binding_version": 3,
+                    }
+                    settlement_payload_digest = self._event_hash(
+                        settlement_payload
+                    )
+                    sequence += 1
+                    settlement_body = {
+                        **settlement_payload,
+                        "charged_units": charged_units,
+                        "command_id": (
+                            f"settlement:{settlement_spec.settlement_event_id}"
+                        ),
+                        "contradiction": False,
+                        "event_id": settlement_spec.settlement_event_id,
+                        "event_kind": "BUDGET_SETTLED",
+                        "held_units": held_units,
+                        "previous_event_hash": previous_hash,
+                        "schema_version": 1,
+                        "sequence": sequence,
+                        "uncertainty": uncertainty,
+                        "writer_epoch": writer_epoch,
+                    }
+                    settlement_hash = self._event_hash(settlement_body)
+                    settlement_json = json.dumps(
+                        settlement_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                        "'BUDGET_SETTLED', ?, ?, ?)",
+                        (
+                            settlement_spec.settlement_event_id,
+                            request.repository_id,
+                            request.run_id,
+                            reservation["item_id"],
+                            sequence,
+                            settlement_body["command_id"],
+                            writer_epoch,
+                            previous_hash,
+                            settlement_hash,
+                            settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO budget_settlements VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            settlement_spec.settlement_event_id,
+                            reservation_id,
+                            settlement_spec.expected_previous_hash,
+                            settlement_hash,
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            held_units,
+                            charged_units,
+                            int(uncertainty),
+                            settlement_request.evidence_digest,
+                            settlement_request.reason_code,
+                            settlement_payload_digest,
+                            settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE budget_reservations SET held_units = ?, "
+                        "charged_units = ?, uncertainty = ?, disposition = ?, "
+                        "settlement_head_hash = ? WHERE reservation_id = ?",
+                        (
+                            held_units,
+                            charged_units,
+                            int(uncertainty),
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            settlement_hash,
+                            reservation_id,
+                        ),
+                    )
+                    settlement_hashes[reservation_id] = settlement_hash
+                    previous_hash = settlement_hash
+                accounting_snapshot = [
+                    {
+                        "disposition": (
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                            if str(row["reservation_id"]) in settlement_hashes
+                            else str(row["disposition"])
+                        ),
+                        "reservation_id": str(row["reservation_id"]),
+                        "settlement_head_hash": settlement_hashes.get(
+                            str(row["reservation_id"]),
+                            str(row["settlement_head_hash"]),
+                        ),
+                    }
+                    for row in reservations
+                ]
+                sequence += 1
+                body = {
+                    **request_payload,
+                    "accounting_snapshot": accounting_snapshot,
+                    "escalated_at_utc": escalated_at_utc,
+                    "event_kind": "STOP_ESCALATED",
+                    "item_id": str(run["item_id"]),
+                    "lifecycle_from": LifecycleState.STOPPED.value,
+                    "lifecycle_to": LifecycleState.STOPPED.value,
+                    "logical_effect_id": str(slot["logical_effect_id"]),
+                    "obligation_snapshot": activities,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "slot_attempt_id": str(slot["attempt_id"]),
+                    "slot_generation": int(slot["generation"]),
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'STOP_ESCALATED', ?, ?, ?)",
+                    (
+                        request.event_id,
+                        request.repository_id,
+                        request.run_id,
+                        run["item_id"],
+                        sequence,
+                        request.command_id,
+                        writer_epoch,
+                        previous_hash,
+                        event_hash,
+                        body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO stop_escalations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        request.escalation_id,
+                        request.command_id,
+                        request.event_id,
+                        request.repository_id,
+                        request.run_id,
+                        run["item_id"],
+                        slot["logical_effect_id"],
+                        slot["attempt_id"],
+                        slot["generation"],
+                        request.source_stop_id,
+                        request.source_stop_event_id,
+                        request.expected_drain_deadline_utc,
+                        escalated_at_utc,
+                        request.reason_code,
+                        capability.claim_id,
+                        capability.grant_id,
+                        capability.scope_digest,
+                        payload_digest,
+                        event_hash,
+                        body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        capability.claim_id,
+                        request.repository_id,
+                        capability.grant_id,
+                        request.command_id,
+                        request.run_id,
+                        "STOP_ESCALATE",
+                        capability.scope_digest,
+                        authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id,
+                        payload_digest,
+                        request.event_id,
+                        sequence,
+                        event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_sequence = ?, head_hash = ? "
+                    "WHERE run_id = ?",
+                    (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? "
+                    "WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_stop_escalation_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_stop_escalation_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as exc:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "stop escalation durable identity conflicts with recorded state"
+                ) from exc
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.escalation_id,
+            request.command_id,
+            request.event_id,
+            sequence,
+            event_hash,
+            LifecycleState.STOPPED,
+            False,
         )
 
     def commit_intent(
@@ -9377,7 +10335,8 @@ class SQLiteStateStore:
         catalog_head, run_heads = self._heads(connection, repository_id)
         epoch_groups: dict[int, list[sqlite3.Row]] = {}
         for row in connection.execute(
-            "SELECT run_id, sequence, command_id, writer_epoch, event_kind "
+            "SELECT event_id, run_id, sequence, command_id, writer_epoch, "
+            "event_kind, body_json "
             "FROM events WHERE repository_id = ? ORDER BY writer_epoch, rowid",
             (repository_id,),
         ):
@@ -9385,16 +10344,40 @@ class SQLiteStateStore:
         for rows in epoch_groups.values():
             if len(rows) == 1:
                 continue
-            if (
+            pause_epoch = (
                 len(rows) != 2
                 or tuple(row["event_kind"] for row in rows)
                 != ("PAUSE_REQUESTED", "PAUSE_SETTLED")
                 or rows[0]["run_id"] != rows[1]["run_id"]
                 or rows[0]["command_id"] != rows[1]["command_id"]
                 or int(rows[0]["sequence"]) + 1 != int(rows[1]["sequence"])
+            ) is False
+            escalation_epoch = False
+            if rows[-1]["event_kind"] == "STOP_ESCALATED" and all(
+                row["event_kind"] == "BUDGET_SETTLED" for row in rows[:-1]
             ):
+                try:
+                    escalation_body = json.loads(rows[-1]["body_json"])
+                    expected_settlement_ids = {
+                        item["settlement_event_id"]
+                        for item in escalation_body["unknown_settlements"]
+                    }
+                    escalation_epoch = (
+                        len({row["run_id"] for row in rows}) == 1
+                        and all(
+                            int(rows[index]["sequence"]) + 1
+                            == int(rows[index + 1]["sequence"])
+                            for index in range(len(rows) - 1)
+                        )
+                        and {
+                            row["event_id"] for row in rows[:-1]
+                        } == expected_settlement_ids
+                    )
+                except (KeyError, TypeError, json.JSONDecodeError):
+                    escalation_epoch = False
+            if not pause_epoch and not escalation_epoch:
                 raise StorageIntegrityError(
-                    "writer epoch is reused outside one atomic pause"
+                    "writer epoch is reused outside one atomic control action"
                 )
         for run_id, expected_head in run_heads.items():
             previous_hash = ""
@@ -9782,6 +10765,54 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "stop plan binding diverges from accepted target"
                 )
+        escalation_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? "
+            "AND event_kind = 'STOP_ESCALATED'",
+            (repository_id,),
+        ).fetchall()
+        stop_escalations = [
+            json.loads(row["body_json"]) for row in escalation_rows
+        ]
+        for body in stop_escalations:
+            self._validate_stop_escalation_event_body(body)
+            source = connection.execute(
+                "SELECT * FROM stop_actions WHERE stop_id = ? AND "
+                "event_id = ? AND repository_id = ? AND run_id = ?",
+                (
+                    body["source_stop_id"], body["source_stop_event_id"],
+                    body["repository_id"], body["run_id"],
+                ),
+            ).fetchone()
+            plan_binding = connection.execute(
+                "SELECT plan.repository_id, plan.run_id, plan.item_id, "
+                "plan.logical_effect_id, run.item_id AS run_item_id FROM "
+                "validation_plans AS plan JOIN runs AS run ON run.run_id = "
+                "plan.run_id WHERE plan.repository_id = ? AND plan.run_id = ?",
+                (body["repository_id"], body["run_id"]),
+            ).fetchone()
+            if source is None or (
+                source["mode"], source["drain_deadline_utc"],
+                source["item_id"], source["logical_effect_id"],
+            ) != (
+                StopMode.GRACEFUL.value,
+                body["expected_drain_deadline_utc"],
+                body["item_id"], body["logical_effect_id"],
+            ):
+                raise StorageIntegrityError(
+                    "stop escalation source binding diverges from history"
+                )
+            if plan_binding is None or (
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["item_id"],
+            ) != (
+                plan_binding["repository_id"], plan_binding["run_id"],
+                plan_binding["item_id"], plan_binding["logical_effect_id"],
+                plan_binding["run_item_id"],
+            ):
+                raise StorageIntegrityError(
+                    "stop escalation plan binding diverges from accepted target"
+                )
+            self._validate_stop_escalation_history(connection, body)
         expected_outcomes.update(
             {
                 body["command_id"]: (
@@ -9812,6 +10843,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in stops
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in stop_escalations
             }
         )
         actual_outcomes = {
@@ -10184,6 +11224,41 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "stop-action projection diverges from event history"
             )
+        expected_stop_escalations = {
+            body["escalation_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"],
+                body["slot_attempt_id"], body["slot_generation"],
+                body["source_stop_id"], body["source_stop_event_id"],
+                body["expected_drain_deadline_utc"],
+                body["escalated_at_utc"],
+                body["reason_code"], body["capability_claim_id"],
+                body["capability_grant_id"], body["capability_scope_digest"],
+                body["payload_digest"], self._event_hash(body), body,
+            )
+            for body in stop_escalations
+        }
+        actual_stop_escalations = {
+            row["escalation_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["source_stop_id"], row["source_stop_event_id"],
+                row["drain_deadline_utc"], row["escalated_at_utc"],
+                row["reason_code"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["payload_digest"], row["event_hash"],
+                json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM stop_escalations WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_stop_escalations != expected_stop_escalations:
+            raise StorageIntegrityError(
+                "stop-escalation projection diverges from event history"
+            )
         expected_effects = {
             body["logical_effect_id"]: (
                 self.effect_key(repository_id, body["logical_effect_id"]),
@@ -10285,6 +11360,17 @@ class SQLiteStateStore:
                         body.get("capability_issuer_fingerprint"),
                 )
                 for body in stops
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_claim_id"]: (
+                    body["capability_grant_id"], body["command_id"],
+                    body["run_id"], body["action"],
+                    body["capability_scope_digest"],
+                    body.get("capability_issuer_fingerprint"),
+                )
+                for body in stop_escalations
             }
         )
         actual_operator_redemptions = {
@@ -11447,6 +12533,7 @@ class SQLiteStateStore:
             "operation_launches",
             "control_actions",
             "stop_actions",
+            "stop_escalations",
             "operator_redemptions",
             "outstanding_slot",
             "dispatch_fences",
