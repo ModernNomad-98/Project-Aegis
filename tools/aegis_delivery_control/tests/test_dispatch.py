@@ -124,6 +124,12 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t07_coordinator_exposes_activity_pause_settlement_route(self) -> None:
+        self.assertTrue(
+            hasattr(SyntheticDispatchCoordinator, "settle_activity_pause"),
+            "T07 requires a coordinator-owned activity settlement route",
+        )
+
     def test_t05_coordinator_exposes_local_execution_pause_route(self) -> None:
         self.assertTrue(
             hasattr(SyntheticDispatchCoordinator, "pause_local_execution"),

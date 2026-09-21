@@ -870,6 +870,46 @@ class ResumeRequest:
 
 
 @dataclass(frozen=True)
+class ResumeActivitySettlementRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    expected_preserved_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "activity-settlement resume identifiers and evidence must be non-empty"
+            )
+        if self.expected_preserved_continuation_cursor != (
+            f"operation-recovery:{self.attempt_id}"
+        ):
+            raise ValueError(
+                "activity-settlement resume requires its operation recovery cursor"
+            )
+
+
+@dataclass(frozen=True)
 class PauseLocalExecutionRequest:
     pause_id: str
     command_id: str
@@ -910,6 +950,53 @@ class PauseLocalExecutionRequest:
             or self.expected_slot_generation <= 0
         ):
             raise ValueError("local pause slot generation must be positive")
+
+
+@dataclass(frozen=True)
+class PauseActivitySettlementRequest:
+    settlement_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    nonexecution_event_id: str
+    nonexecution_event_hash: str
+    reservation_id: str
+    settlement_head_hash: str
+    expected_slot_generation: int
+    continuation_cursor: str
+
+    def validate(self) -> None:
+        string_values = tuple(self.__dict__.values())[:-2] + (
+            self.continuation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in string_values
+        ):
+            raise ValueError(
+                "activity pause settlement fields must be non-empty"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "activity pause settlement slot generation must be positive"
+            )
+        if self.continuation_cursor != f"operation-recovery:{self.attempt_id}":
+            raise ValueError(
+                "activity pause settlement requires its operation recovery cursor"
+            )
 
 
 @dataclass(frozen=True)

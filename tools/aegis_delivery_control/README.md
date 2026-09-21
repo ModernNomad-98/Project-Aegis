@@ -92,6 +92,16 @@ fixture. It is not a delivery integration.
   no observe/cancel/retry call; later known or unknown receipts use T23 and do
   not reopen dispatch. Recovery verifies the full contact body/order and
   prefix-derived settlement head.
+- T07 now settles the exact T05 local pause only after the same reservation's
+  authoritative T25 `NONDISPATCH_PROVEN` release proves zero liability, no
+  uncertainty or contradiction, and every obligation settled without releasing
+  the operation slot. The atomic `PAUSE_SETTLED` event retains the pause fence,
+  slot and `operation-recovery` cursor while advancing `PAUSING -> PAUSED`.
+  Recovery independently derives the latest pre-T07 settlement, so intervening
+  non-accounting facts remain valid. Its distinct T14 activity-resume route
+  clears only that pause fence and returns to `BLOCKED`, retaining the exact
+  slot generation, recovery cursor and every other blocker. Other T07 source
+  families and the complete T14 transition remain unverified pending T08/T24.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -145,7 +155,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 307 tests successfully, and
+controller. The complete local package suite ran 318 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -180,6 +190,12 @@ T06 contacted external-mutation pause received independent implementation
 worst-case reconciliation and the implementation was corrected to verify the
 complete historical contact body/order and prefix-derived accounting head.
 It performs no adapter observe/cancel/retry and does not claim T07 settlement.
+The reviewed T07 slice now accepts only the exact T05/T25 local nonexecution
+combination, retains the slot and fence in PAUSED, and supports a separate
+BLOCKED-only T14 activity resume. Its initial implementation review found two
+recovery/generation findings; prefix-derived settlement-head validation and
+exact source-generation binding closed them, and corrected review returned
+`APPROVE`. Other T07 source families and full T14 promotion remain deferred.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
@@ -207,7 +223,7 @@ release, active-validator slot retention, cross-process writer exclusion, and
 T18/T19 stop request, persistence, recovery, replay, late-evidence and fencing
 behavior, plus T26 closure by exact already-applied PASS/recoverable-failure
 evidence across T18/T19, crash/replay, migration and tamper boundaries. Passing
-tests do not cover the two unresolved checkpoint findings.
+tests do not establish the remaining complete T/C/F families.
 The backlog remains the source of truth for acceptance cases not yet implemented,
-including complete transition application, the unresolved stop cases above, and
+including complete transition application and
 filesystem ownership/reparse/path-swap enforcement.

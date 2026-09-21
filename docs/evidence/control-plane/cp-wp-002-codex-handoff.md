@@ -8,7 +8,7 @@ Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Latest reviewed implementation checkpoint: `39b3268adc984e3d0b10e55a42fe37a172229e60`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15, T14 CORE SLICE, T05 AND T06 `APPROVE`**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15, T14 CORE SLICE, T05, T06 AND NARROW T07 SLICE `APPROVE`**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -549,6 +549,59 @@ and `windows-offline-checks` in 2m49s. PR #99 remains open, draft and blocked.
 T06 is `YES/YES/YES`; narrow C03/C06/F06/F07/F08 evidence does not promote
 those complete families. T07 is next.
 
+### Stage 12 - T07 local nonexecution settlement slice
+
+The T07 plan required three `REVISE` audits before `APPROVE`. Corrections
+removed any invented operator-authority cessation proof, included the prior
+T25/T17/T14 interaction matrix, separated the new activity settlement from
+legacy T04 projections and preserved the signed bytes of historical
+`ResumeRequest` records by using a distinct versioned T14 activity route.
+
+Changed production files: `contracts.py` adds typed T07 settlement and activity
+resume requests; `authority.py` signs/verifies the distinct resume evidence;
+`dispatch.py` exposes the coordinator routes; `storage.py` adds closed schemas,
+atomic event/projection transactions, exact T05/T25/slot/fence binding,
+BLOCKED-only activity resume and historical recovery. `test_storage.py` and
+`test_dispatch.py` add contract/coordinator, crash/replay, accounting, late
+receipt, tamper, recovery and resume regressions. Status READMEs, the durable
+backlog and this handoff are the only documentation changes.
+
+The accepted slice requires the exact T05 local pause and the same
+reservation's latest authoritative T25 `NONDISPATCH_PROVEN` settlement:
+`RELEASED`, zero liability, all obligations settled, no uncertainty or
+contradiction and no slot release. T07 atomically records a distinct
+`ACTIVITY_SETTLEMENT` `PAUSE_SETTLED`, advances `PAUSING -> PAUSED`, and retains
+the pause fence, outstanding slot, accounting head and operation-recovery
+cursor. The separate T14 activity route clears only that pause fence and moves
+to `BLOCKED`, retaining the cursor, slot and every unrelated blocker/fence.
+
+Initial implementation review returned `REVISE` with two MAJOR findings.
+Recovery incorrectly required the T07 journal predecessor to equal the T25
+settlement hash, rejecting a valid intervening non-accounting event; T14 also
+hardcoded slot generation 1. Recovery now independently derives the latest
+pre-T07 reservation settlement, while normal event-chain verification governs
+the journal predecessor. Runtime and recovery share an exact T07
+event/projection generation binding. A real intervening T13
+`SOURCE_UNAVAILABLE/UNKNOWN` regression retains both fences and survives
+verified reload; a non-1 generation regression prevents reintroduction of the
+constant. Corrected independent review returned `APPROVE` with no remaining
+blocker or major and independently passed the three correction tests.
+
+Local evidence is 296 affected storage/dispatch tests, 318 complete package
+tests, 184 valid skills with zero warnings, 8 script tests with 4 expected
+skips, 91 gate self-test assertions, compileall and clean diff checks apart from
+line-ending notices. Commit,
+push and exact-head hosted-check evidence remain pending until this reviewed
+stage is committed. Canonical design, approval register, BER, dependencies, CI,
+CLI, adapters, artifact/cache paths, real authority/adapters and external
+systems were intentionally untouched.
+
+T07 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition because
+this checkpoint establishes only the T05-local/T25-authoritative nonexecution
+source. T08, T24 and other source families remain outstanding; full T14 also
+remains `UNVERIFIED`. Narrow C06/F06/F12 interactions do not promote those
+complete families. T08 is next and PR #99 remains open, draft and blocked.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -625,6 +678,12 @@ those complete families. T07 is next.
 | `git commit -s -m "feat(control-plane): fence contacted pause uncertainty"` | Commit `39b3268adc984e3d0b10e55a42fe37a172229e60`; signed-off; 5 files changed |
 | `git push origin feat/cp-wp-002-offline-kernel` after T06 | Remote branch advanced `0cdb6d1..39b3268` |
 | Hosted checks on exact T06 implementation head | `gate-guard` passed in 7s; `validate-skills` passed in 1m20s; `windows-offline-checks` passed in 2m49s |
+| T07 plan audits | Three `REVISE` rounds, then `APPROVE`; cessation authority, T25/T17/T14 interactions, projection separation and legacy signed-request compatibility were made explicit |
+| T07 correction-focused suite | `Ran 3 tests in 0.197s`; `OK` |
+| T07 affected storage/dispatch modules | `Ran 296 tests in 24.830s`; `OK` |
+| T07 complete delivery-control package | `Ran 318 tests in 25.638s`; `OK` |
+| T07 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent T07 implementation reviews | Initial `REVISE` for two MAJOR settlement-prefix and slot-generation recovery defects; corrected `APPROVE`, no remaining blocker/major; reviewer independently ran 3 correction tests in 0.194s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -715,7 +774,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 307 passing tests, a registry entry or an earlier milestone
+complete from the 318 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -737,14 +796,14 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
-| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05-local/T25-authoritative nonexecution settlement and BLOCKED-only T14 recovery slice independently accepted; T08/T24/other source families remain |
 | T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
-| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED resume slice independently accepted; clean VALIDATING public path awaits T08 |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED resume plus T07 activity-recovery-to-BLOCKED slices independently accepted; clean VALIDATING public path awaits T08 |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
 | T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
@@ -771,7 +830,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | C03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 preserves original effect key/slot and worst-case accounting through missing-receipt reconciliation; complete family trace remains |
 | C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
 | C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
-| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06 pre/post-commit rollback/replay, atomic uncertainty settlement and durable-fence slices accepted; full crash family remains unverified |
+| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06/T07 pre/post-commit rollback/replay, atomic settlement and durable-fence slices accepted; full crash family remains unverified |
 | C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
 | C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
@@ -788,13 +847,13 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05/T06 pause, slot-retention and serialized contact/receipt slices accepted; full family trace remains |
+| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05/T06/T07 pause, settlement, slot-retention and serialized contact/receipt slices accepted; full family trace remains |
 | F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention/worst-case reconciliation slice accepted; full family trace remains |
 | F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 and T06 post-contact/late-adjustment slices accepted; full family trace remains |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
 | F10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
-| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution PAUSED/recovery slice accepted; validator nonlaunch and T17 completion remain |
 | F13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 recoverable-failure stop slice accepted; full trace remains |
 | F15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
@@ -815,8 +874,8 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T15, T05 and T06 complete and independently accepted; T14 core slice accepted with full transition still UNVERIFIED pending T08.
-2. T07-T09 next.
+1. T15, T05 and T06 complete and independently accepted; T07 local-nonexecution and T14 core slices accepted with both complete transitions still UNVERIFIED pending T08/T24.
+2. T08-T09 next.
 3. T17 with F02/F11/F12/F21.
 4. T22.
 5. T28 with F01.
@@ -909,13 +968,15 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06 and the T14
-  PLANNED/BLOCKED core slice are independently accepted as recorded in Stages
-  4-10; full T14 remains UNVERIFIED pending T08 and later exact-head/final
+- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, the narrow T07
+  local-nonexecution slice and the T14 core slices are independently accepted
+  as recorded in Stages 4-12; complete T07/T14 remain UNVERIFIED pending
+  T08/T24 and later exact-head/final
   review gates remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
-  treats bare contact as reconciliation uncertainty. T07-T09 remain the next
-  ordered work; no T07 settlement is inferred from either pause request.
+  treats bare contact as reconciliation uncertainty. T07 accepts only an exact
+  T05 plus authoritative T25 nonexecution source; it is not inferred from a
+  pause request. T08-T09 remain the next ordered work.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -928,7 +989,7 @@ owner before interpreting it more broadly.
 
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
-stop findings, T13, T15, T05, T06 and the reviewed T14 core slice are accepted. The
-next code change follows the documented order at T07-T09; T08 must close the public
+stop findings, T13, T15, T05, T06 and the reviewed T07/T14 slices are accepted. The
+next code change follows the documented order at T08-T09; T08 must close the public
 VALIDATING resume gap before full T14 promotion. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

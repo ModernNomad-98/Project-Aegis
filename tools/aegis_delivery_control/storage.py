@@ -20,6 +20,7 @@ from .authority import (
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
     SyntheticAuthority,
+    SyntheticActivityResumeEvidence,
     SyntheticAuthorityLifecycleEvidence,
     SyntheticBindingObservation,
     SyntheticCapability,
@@ -56,10 +57,12 @@ from .contracts import (
     OperationLaunchReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
+    ResumeActivitySettlementRequest,
     ResumeRequest,
     SettlementReceipt,
     StopMode,
@@ -249,6 +252,7 @@ _LIFECYCLE_ROUTES: Mapping[
         {
             (LifecycleState.PLANNED, LifecycleState.PAUSED),
             (LifecycleState.BLOCKED, LifecycleState.PAUSED),
+            (LifecycleState.PAUSING, LifecycleState.PAUSED),
         }
     ),
     "PLAN_ACCEPTED": frozenset({(None, LifecycleState.PLANNED)}),
@@ -1161,7 +1165,7 @@ class SQLiteStateStore:
                 pause_id TEXT PRIMARY KEY,
                 command_id TEXT NOT NULL UNIQUE,
                 event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
-                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                fence_id TEXT NOT NULL UNIQUE,
                 repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
                 run_id TEXT NOT NULL REFERENCES runs(run_id),
                 item_id TEXT NOT NULL,
@@ -1222,6 +1226,32 @@ class SQLiteStateStore:
                 ),
                 body_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS activity_pause_settlements (
+                settlement_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                source_pause_id TEXT NOT NULL,
+                source_pause_event_id TEXT NOT NULL,
+                source_pause_event_hash TEXT NOT NULL,
+                pause_fence_id TEXT NOT NULL,
+                intent_event_id TEXT NOT NULL,
+                intent_event_hash TEXT NOT NULL,
+                nonexecution_event_id TEXT NOT NULL UNIQUE,
+                nonexecution_event_hash TEXT NOT NULL UNIQUE,
+                reservation_id TEXT NOT NULL REFERENCES budget_reservations(reservation_id),
+                settlement_head_hash TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                continuation_cursor TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSED'),
+                body_json TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS resume_actions (
                 resume_id TEXT PRIMARY KEY,
                 command_id TEXT NOT NULL UNIQUE,
@@ -1256,6 +1286,43 @@ class SQLiteStateStore:
                 resulting_state TEXT NOT NULL CHECK (
                     resulting_state IN ('PLANNED', 'VALIDATING', 'BLOCKED')
                 ),
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS activity_resume_actions (
+                resume_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                source_settlement_id TEXT NOT NULL,
+                source_settlement_event_id TEXT NOT NULL,
+                source_settlement_event_hash TEXT NOT NULL,
+                source_pause_id TEXT NOT NULL,
+                source_pause_event_id TEXT NOT NULL,
+                source_pause_event_hash TEXT NOT NULL,
+                pause_fence_id TEXT NOT NULL,
+                expected_preserved_continuation_cursor TEXT NOT NULL,
+                expected_catalog_head TEXT NOT NULL,
+                expected_run_head TEXT NOT NULL,
+                expected_run_heads_digest TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                evidence_proof_id TEXT NOT NULL UNIQUE,
+                evidence_request_digest TEXT NOT NULL,
+                evidence_issuer_fingerprint TEXT NOT NULL,
+                evidence_issuer_mac TEXT NOT NULL,
+                blocker_codes_json TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state = 'BLOCKED'),
                 body_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS stop_actions (
@@ -1365,6 +1432,7 @@ class SQLiteStateStore:
                 "ALTER TABLE dispatch_fences ADD COLUMN logical_effect_id TEXT"
             )
         SQLiteStateStore._migrate_control_action_schema(connection)
+        SQLiteStateStore._migrate_local_pause_schema(connection)
         operator_redemption_columns = {
             str(row["name"])
             for row in connection.execute(
@@ -1598,6 +1666,101 @@ class SQLiteStateStore:
             if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
                 raise StorageIntegrityError(
                     "control action preserved-state migration violates foreign keys"
+                )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_local_pause_schema(connection: sqlite3.Connection) -> None:
+        foreign_keys = connection.execute(
+            "PRAGMA foreign_key_list(local_pause_actions)"
+        ).fetchall()
+        if not any(
+            str(row["table"]) == "dispatch_fences"
+            and str(row["from"]) == "fence_id"
+            for row in foreign_keys
+        ):
+            return
+        columns = tuple(
+            str(row["name"])
+            for row in connection.execute(
+                "PRAGMA table_info(local_pause_actions)"
+            )
+        )
+        expected_columns = (
+            "pause_id", "command_id", "event_id", "fence_id",
+            "repository_id", "run_id", "item_id", "logical_effect_id",
+            "attempt_id", "intent_event_id", "intent_event_hash",
+            "slot_generation", "reason_code", "capability_claim_id",
+            "capability_grant_id", "capability_repository_id",
+            "capability_run_id", "capability_action",
+            "capability_scope_digest", "capability_issuer_mac",
+            "capability_issuer_fingerprint", "payload_digest", "event_hash",
+            "resulting_state", "body_json",
+        )
+        if columns != expected_columns:
+            raise StorageIntegrityError(
+                "local pause fence schema is incompatible"
+            )
+        row_count = int(
+            connection.execute(
+                "SELECT COUNT(*) FROM local_pause_actions"
+            ).fetchone()[0]
+        )
+        column_sql = ", ".join(expected_columns)
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            connection.execute(
+                "ALTER TABLE local_pause_actions RENAME TO "
+                "local_pause_actions_legacy"
+            )
+            connection.execute(
+                """
+                CREATE TABLE local_pause_actions (
+                    pause_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    fence_id TEXT NOT NULL UNIQUE,
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    attempt_id TEXT NOT NULL,
+                    intent_event_id TEXT NOT NULL,
+                    intent_event_hash TEXT NOT NULL,
+                    slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                    reason_code TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_repository_id TEXT NOT NULL,
+                    capability_run_id TEXT NOT NULL,
+                    capability_action TEXT NOT NULL CHECK (capability_action = 'PAUSE'),
+                    capability_scope_digest TEXT NOT NULL,
+                    capability_issuer_mac TEXT NOT NULL,
+                    capability_issuer_fingerprint TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSING'),
+                    body_json TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                f"INSERT INTO local_pause_actions ({column_sql}) "
+                f"SELECT {column_sql} FROM local_pause_actions_legacy"
+            )
+            connection.execute("DROP TABLE local_pause_actions_legacy")
+            if int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM local_pause_actions"
+                ).fetchone()[0]
+            ) != row_count or connection.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "local pause fence migration changed history"
                 )
             connection.commit()
         except BaseException:
@@ -2320,6 +2483,62 @@ class SQLiteStateStore:
             )
 
     @staticmethod
+    def _validate_activity_pause_settlement_event_body(
+        body: Mapping[str, object],
+    ) -> None:
+        expected_fields = set(
+            PauseActivitySettlementRequest.__dataclass_fields__
+        ) | {
+            "event_kind", "lifecycle_from", "lifecycle_to",
+            "pause_binding_version", "pause_kind", "payload_digest",
+            "preserved_lifecycle", "previous_event_hash", "schema_version",
+            "sequence", "source_kind", "writer_epoch",
+        }
+        integer_fields = {
+            "expected_slot_generation", "pause_binding_version",
+            "schema_version", "sequence", "writer_epoch",
+        }
+        if (
+            set(body) != expected_fields
+            or body.get("pause_kind") != "ACTIVITY_SETTLEMENT"
+            or body.get("source_kind") != "NONDISPATCH_PROVEN"
+            or body.get("event_kind") != "PAUSE_SETTLED"
+            or body.get("lifecycle_from") != LifecycleState.PAUSING.value
+            or body.get("lifecycle_to") != LifecycleState.PAUSED.value
+            or body.get("preserved_lifecycle")
+            != LifecycleState.RUNNING.value
+            or body.get("pause_binding_version") != 1
+            or body.get("schema_version") != 1
+            or any(
+                type(body.get(field)) is not int
+                or int(cast(int, body.get(field))) <= 0
+                for field in integer_fields
+            )
+            or any(
+                not isinstance(body.get(field), str)
+                or not cast(str, body.get(field)).strip()
+                for field in expected_fields.difference(integer_fields)
+            )
+        ):
+            raise StorageIntegrityError(
+                "unsupported activity PAUSE_SETTLED event schema"
+            )
+
+    @classmethod
+    def _activity_pause_slot_generation(
+        cls,
+        source: Mapping[str, object],
+        source_body: Mapping[str, object],
+    ) -> int:
+        cls._validate_activity_pause_settlement_event_body(source_body)
+        generation = int(source["slot_generation"])
+        if generation != source_body["expected_slot_generation"]:
+            raise StorageIntegrityError(
+                "activity pause settlement slot generation diverges from its event"
+            )
+        return generation
+
+    @staticmethod
     def _validate_external_pause_event_body(body: Mapping[str, object]) -> None:
         expected_fields = set(
             PauseExternalMutationRequest.__dataclass_fields__
@@ -2468,6 +2687,76 @@ class SQLiteStateStore:
         ):
             raise StorageIntegrityError(
                 "unsupported RESUME_ACCEPTED event schema"
+            )
+
+    @staticmethod
+    def _validate_activity_resume_event_body(
+        body: Mapping[str, object],
+    ) -> None:
+        expected_fields = set(
+            ResumeActivitySettlementRequest.__dataclass_fields__
+        ) | {
+            "action", "blocker_codes", "capability_evidence",
+            "capability_issuer_fingerprint", "continuation_cursor",
+            "event_kind", "indexes_complete", "lifecycle_from",
+            "lifecycle_to", "payload_digest", "preserved_lifecycle",
+            "previous_event_hash", "request_digest", "resume_binding_version",
+            "resume_evidence", "resume_kind", "schema_version", "sequence",
+            "verified_run_heads_digest", "writer_epoch",
+        }
+        capability = body.get("capability_evidence")
+        evidence = body.get("resume_evidence")
+        blockers = body.get("blocker_codes")
+        non_string_fields = {
+            "blocker_codes", "capability_evidence", "indexes_complete",
+            "resume_binding_version", "resume_evidence", "schema_version",
+            "sequence", "writer_epoch",
+        }
+        if (
+            set(body) != expected_fields
+            or body.get("resume_kind") != "ACTIVITY_SETTLEMENT"
+            or body.get("resume_binding_version") != 2
+            or body.get("action") != "RESUME"
+            or body.get("event_kind") != "RESUME_ACCEPTED"
+            or body.get("lifecycle_from") != LifecycleState.PAUSED.value
+            or body.get("lifecycle_to") != LifecycleState.BLOCKED.value
+            or body.get("preserved_lifecycle")
+            != LifecycleState.RUNNING.value
+            or body.get("schema_version") != 1
+            or type(body.get("sequence")) is not int
+            or int(cast(int, body.get("sequence"))) <= 0
+            or type(body.get("writer_epoch")) is not int
+            or int(cast(int, body.get("writer_epoch"))) <= 0
+            or body.get("indexes_complete") is not True
+            or not isinstance(capability, Mapping)
+            or set(capability)
+            != set(SyntheticOperatorCapability.__dataclass_fields__)
+            or not isinstance(evidence, Mapping)
+            or set(evidence)
+            != set(SyntheticActivityResumeEvidence.__dataclass_fields__)
+            or not isinstance(blockers, list)
+            or cast(list[object], blockers)
+            != sorted(set(cast(list[str], blockers)))
+            or any(
+                not isinstance(code, str) or not code.strip()
+                for code in cast(list[object], blockers)
+            )
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], capability).values()
+            )
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], evidence).values()
+            )
+            or any(
+                not isinstance(body.get(field), str)
+                or not cast(str, body.get(field)).strip()
+                for field in expected_fields.difference(non_string_fields)
+            )
+        ):
+            raise StorageIntegrityError(
+                "unsupported activity RESUME_ACCEPTED event schema"
             )
 
     @classmethod
@@ -5012,7 +5301,13 @@ class SQLiteStateStore:
                         str(body["logical_effect_id"]),
                     )
                 elif event_kind == "PAUSE_SETTLED":
-                    active_fences[str(body["fence_id"])] = (None, None)
+                    if body.get("pause_kind") == "ACTIVITY_SETTLEMENT":
+                        if str(body["pause_fence_id"]) not in active_fences:
+                            raise ValueError(
+                                "activity settlement lost its active pause fence"
+                            )
+                    else:
+                        active_fences[str(body["fence_id"])] = (None, None)
                 elif event_kind == "RESUME_ACCEPTED":
                     if active_fences.pop(str(body["pause_fence_id"]), None) is None:
                         raise ValueError("resume cleared an inactive pause fence")
@@ -6451,6 +6746,410 @@ class SQLiteStateStore:
             event_hash, LifecycleState.RECONCILIATION_REQUIRED, False,
         )
 
+    def settle_activity_pause(
+        self,
+        request: PauseActivitySettlementRequest,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "activity pause settlement targets another repository"
+            )
+        payload = {
+            **request.__dict__,
+            "pause_kind": "ACTIVITY_SETTLEMENT",
+            "pause_binding_version": 1,
+            "source_kind": "NONDISPATCH_PROVEN",
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    prior = connection.execute(
+                        "SELECT * FROM activity_pause_settlements WHERE "
+                        "command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if (
+                        prior_command["payload_digest"] != payload_digest
+                        or prior is None
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "activity settlement command identity was reused"
+                        )
+                    connection.rollback()
+                    body = json.loads(prior["body_json"])
+                    return ControlReceipt(
+                        str(prior["settlement_id"]),
+                        str(prior["command_id"]),
+                        str(prior["event_id"]),
+                        int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState.PAUSED,
+                        True,
+                    )
+                prior = connection.execute(
+                    "SELECT 1 FROM activity_pause_settlements WHERE "
+                    "settlement_id = ? OR event_id = ?",
+                    (request.settlement_id, request.event_id),
+                ).fetchone()
+                if prior is not None:
+                    raise StorageIntegrityError(
+                        "activity settlement identity lost its command outcome"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied(
+                        "activity settlement does not bind the recorded run"
+                    )
+                if LifecycleState(str(run["lifecycle_state"])) is not (
+                    LifecycleState.PAUSING
+                ):
+                    raise DispatchDenied("T07 requires durable PAUSING state")
+                plan = connection.execute(
+                    "SELECT item_id, logical_effect_id FROM validation_plans "
+                    "WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"]
+                ) != (request.item_id, request.logical_effect_id):
+                    raise DispatchDenied(
+                        "activity settlement does not bind the accepted plan"
+                    )
+                source_pause = connection.execute(
+                    "SELECT * FROM local_pause_actions WHERE pause_id = ? AND "
+                    "event_id = ? AND event_hash = ? AND fence_id = ? AND "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                        request.pause_fence_id,
+                        request.repository_id,
+                        request.run_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        request.attempt_id,
+                    ),
+                ).fetchone()
+                if source_pause is None or (
+                    source_pause["intent_event_id"],
+                    source_pause["intent_event_hash"],
+                    int(source_pause["slot_generation"]),
+                ) != (
+                    request.intent_event_id,
+                    request.intent_event_hash,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied(
+                        "activity settlement does not bind the exact T05 pause"
+                    )
+                source_pause_event = connection.execute(
+                    "SELECT sequence, writer_epoch, body_json FROM events WHERE "
+                    "event_id = ? AND event_hash = ? AND event_kind = "
+                    "'PAUSE_REQUESTED'",
+                    (
+                        request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                    ),
+                ).fetchone()
+                if source_pause_event is None:
+                    raise StorageIntegrityError(
+                        "activity settlement lost its T05 source event"
+                    )
+                self._validate_local_pause_event_body(
+                    json.loads(source_pause_event["body_json"])
+                )
+                intent = connection.execute(
+                    "SELECT sequence, body_json FROM events WHERE event_id = ? "
+                    "AND event_hash = ? AND event_kind = 'INTENT_COMMITTED'",
+                    (request.intent_event_id, request.intent_event_hash),
+                ).fetchone()
+                if intent is None:
+                    raise DispatchDenied(
+                        "activity settlement does not bind the durable intent"
+                    )
+                intent_body = json.loads(intent["body_json"])
+                if (
+                    intent_body.get("item_id"),
+                    intent_body.get("logical_effect_id"),
+                    intent_body.get("attempt_id"),
+                    intent_body.get("reservation_id"),
+                ) != (
+                    request.item_id,
+                    request.logical_effect_id,
+                    request.attempt_id,
+                    request.reservation_id,
+                ):
+                    raise DispatchDenied(
+                        "activity settlement changed the durable attempt"
+                    )
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND item_id = ? AND logical_effect_id = ? "
+                    "AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id,
+                        request.repository_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        request.source_pause_event_id,
+                    ),
+                ).fetchone()
+                if fence is None:
+                    raise DispatchDenied(
+                        "activity settlement pause fence is not active"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied(
+                        "activity settlement does not retain the exact slot"
+                    )
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE "
+                    "reservation_id = ? AND repository_id = ? AND run_id = ? "
+                    "AND item_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.reservation_id, request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                if reservation is None or (
+                    reservation["settlement_head_hash"]
+                    != request.settlement_head_hash
+                ):
+                    raise DispatchDenied(
+                        "activity settlement accounting head is stale"
+                    )
+                nonexecution = connection.execute(
+                    "SELECT event.sequence, event.writer_epoch, event.body_json, "
+                    "settlement.* FROM events AS event JOIN budget_settlements "
+                    "AS settlement ON settlement.settlement_event_id = "
+                    "event.event_id WHERE event.event_id = ? AND "
+                    "event.event_hash = ? AND event.event_kind = "
+                    "'NONDISPATCH_PROVEN' AND settlement.reservation_id = ? AND "
+                    "settlement.settlement_hash = ?",
+                    (
+                        request.nonexecution_event_id,
+                        request.nonexecution_event_hash,
+                        request.reservation_id,
+                        request.settlement_head_hash,
+                    ),
+                ).fetchone()
+                if nonexecution is None:
+                    raise DispatchDenied(
+                        "activity settlement lacks exact T25 evidence"
+                    )
+                proof_body = json.loads(nonexecution["body_json"])
+                if (
+                    int(source_pause_event["sequence"])
+                    >= int(nonexecution["sequence"])
+                    or proof_body.get("repository_id") != request.repository_id
+                    or proof_body.get("run_id") != request.run_id
+                    or proof_body.get("item_id") != request.item_id
+                    or proof_body.get("logical_effect_id")
+                    != request.logical_effect_id
+                    or proof_body.get("attempt_id") != request.attempt_id
+                    or proof_body.get("reservation_id") != request.reservation_id
+                    or proof_body.get("disposition")
+                    != BudgetDisposition.RELEASED.value
+                    or proof_body.get("non_dispatch_proven") is not True
+                    or proof_body.get("zero_liability_proven") is not True
+                    or proof_body.get("all_obligations_settled") is not True
+                    or proof_body.get("release_slot") is not False
+                    or proof_body.get("contradiction") is not False
+                    or proof_body.get("uncertainty") is not False
+                ):
+                    raise DispatchDenied(
+                        "T25 evidence does not prove settled local activity"
+                    )
+                launches = connection.execute(
+                    "SELECT launch_id FROM operation_launches WHERE "
+                    "repository_id = ? AND run_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchall()
+                if len(launches) > 1 or any(
+                    connection.execute(
+                        "SELECT 1 FROM adapter_contacts WHERE repository_id = ? "
+                        "AND contact_kind = 'EFFECT' AND source_id = ?",
+                        (
+                            request.repository_id,
+                            f"EFFECT:{launch['launch_id']}",
+                        ),
+                    ).fetchone()
+                    is not None
+                    for launch in launches
+                ):
+                    raise DispatchDenied(
+                        "contacted activity cannot use local T07 settlement"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM effect_observations WHERE repository_id = ? "
+                    "AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.logical_effect_id,
+                        request.attempt_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "observed activity cannot use nonexecution T07 settlement"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM validator_intents WHERE repository_id = ? "
+                    "AND run_id = ? AND status = 'ACTIVE'",
+                    (request.repository_id, request.run_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "activity settlement cannot hide active validation"
+                    )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T07", LifecycleState.PAUSING,
+                        LifecycleState.PAUSED,
+                        TRANSITIONS["T07"].required_guards,
+                    )
+                else:
+                    authorize_transition(
+                        LifecycleState.PAUSING, LifecycleState.PAUSED
+                    )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                body = {
+                    **payload,
+                    "event_kind": "PAUSE_SETTLED",
+                    "lifecycle_from": LifecycleState.PAUSING.value,
+                    "lifecycle_to": LifecycleState.PAUSED.value,
+                    "payload_digest": payload_digest,
+                    "preserved_lifecycle": LifecycleState.RUNNING.value,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'PAUSE_SETTLED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch, run["head_hash"],
+                        event_hash, body_json,
+                    ),
+                )
+                values = (
+                    request.settlement_id, request.command_id,
+                    request.event_id, request.repository_id, request.run_id,
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id, request.source_pause_id,
+                    request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.intent_event_id, request.intent_event_hash,
+                    request.nonexecution_event_id,
+                    request.nonexecution_event_hash, request.reservation_id,
+                    request.settlement_head_hash,
+                    request.expected_slot_generation,
+                    request.continuation_cursor, payload_digest, event_hash,
+                    LifecycleState.PAUSED.value, body_json,
+                )
+                connection.execute(
+                    "INSERT INTO activity_pause_settlements VALUES ("
+                    + ", ".join("?" for _ in values) + ")",
+                    values,
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest,
+                        request.event_id, sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSED', "
+                    "continuation_cursor = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (
+                        request.continuation_cursor, sequence, event_hash,
+                        request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_activity_pause_settlement_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_activity_pause_settlement_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as exc:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "activity pause settlement identity conflicts with state"
+                ) from exc
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.settlement_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.PAUSED, False,
+        )
+
     def pause_before_dispatch(
         self,
         request: PauseBeforeDispatchRequest,
@@ -7031,6 +7730,372 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.resume_id, request.command_id, request.event_id, sequence,
             event_hash, resulting_state, False,
+        )
+
+    def resume_activity_settlement(
+        self,
+        request: ResumeActivitySettlementRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticActivityResumeEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "activity-settlement resume targets another repository"
+            )
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, "RESUME"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this activity resume"
+            )
+        capability_evidence = dict(capability.__dict__)
+        resume_evidence = dict(evidence.__dict__)
+        payload = {
+            **request.__dict__,
+            "action": "RESUME",
+            "resume_kind": "ACTIVITY_SETTLEMENT",
+            "resume_binding_version": 2,
+            "capability_evidence": capability_evidence,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "resume_evidence": resume_evidence,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_activity_resume_evidence(evidence, request)
+                    prior = connection.execute(
+                        "SELECT * FROM activity_resume_actions WHERE "
+                        "command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if (
+                        prior is None
+                        or prior_command["payload_digest"] != payload_digest
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "activity resume command identity was reused"
+                        )
+                    connection.rollback()
+                    body = json.loads(prior["body_json"])
+                    return ControlReceipt(
+                        str(prior["resume_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(body["sequence"]),
+                        str(prior["event_hash"]), LifecycleState.BLOCKED,
+                        True,
+                    )
+                actual_vector_digest = self._run_heads_digest(run_heads)
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or run_heads.get(request.run_id)
+                    != request.expected_run_head
+                    or request.expected_run_heads_digest
+                    != actual_vector_digest
+                ):
+                    raise DispatchDenied(
+                        "activity resume current head vector does not match history"
+                    )
+                authority.verify_operator_for_action(capability)
+                authority.verify_activity_resume_evidence(evidence, request)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "activity resume does not bind the accepted run and plan"
+                    )
+                if (
+                    LifecycleState(str(run["lifecycle_state"]))
+                    is not LifecycleState.PAUSED
+                    or run["continuation_cursor"]
+                    != request.expected_preserved_continuation_cursor
+                ):
+                    raise DispatchDenied(
+                        "activity resume requires its durable PAUSED cursor"
+                    )
+                source = connection.execute(
+                    "SELECT * FROM activity_pause_settlements WHERE "
+                    "settlement_id = ? AND event_id = ? AND event_hash = ? AND "
+                    "source_pause_id = ? AND source_pause_event_id = ? AND "
+                    "source_pause_event_hash = ? AND pause_fence_id = ? AND "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.source_settlement_id,
+                        request.source_settlement_event_id,
+                        request.source_settlement_event_hash,
+                        request.source_pause_id, request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                        request.pause_fence_id, request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                if source is None or source["continuation_cursor"] != (
+                    request.expected_preserved_continuation_cursor
+                ):
+                    raise DispatchDenied(
+                        "activity resume does not bind the exact T07 source"
+                    )
+                source_slot_generation = self._activity_pause_slot_generation(
+                    source, json.loads(source["body_json"])
+                )
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.source_pause_event_id,
+                    ),
+                ).fetchone()
+                if fence is None:
+                    raise DispatchDenied(
+                        "activity resume pause fence is not active"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, source_slot_generation,
+                ):
+                    raise DispatchDenied(
+                        "activity resume does not retain the operation slot"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM validator_intents WHERE repository_id = ? "
+                    "AND run_id = ? AND status = 'ACTIVE' LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone() is not None or self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id
+                ):
+                    raise DispatchDenied(
+                        "activity resume requires T17 for unresolved activity"
+                    )
+                blocker_codes = {"OPERATION_RECOVERY_PENDING"}
+                latest_readiness = connection.execute(
+                    "SELECT evaluation.body_json FROM readiness_evaluations AS "
+                    "evaluation JOIN events AS event ON event.event_id = "
+                    "evaluation.event_id WHERE evaluation.repository_id = ? "
+                    "AND evaluation.run_id = ? ORDER BY event.writer_epoch "
+                    "DESC LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if latest_readiness is not None:
+                    blocker_codes.update(
+                        str(code)
+                        for code in json.loads(
+                            latest_readiness["body_json"]
+                        ).get("blocker_codes", ())
+                        if code != "DISPATCH_FENCE_PRESENT"
+                    )
+                other_fence = connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? "
+                    "AND fence_id <> ? AND (item_id IS NULL OR item_id = ?) "
+                    "AND (logical_effect_id IS NULL OR logical_effect_id = ?) "
+                    "LIMIT 1",
+                    (
+                        request.repository_id, request.pause_fence_id,
+                        request.item_id, request.logical_effect_id,
+                    ),
+                ).fetchone()
+                if other_fence is not None:
+                    blocker_codes.add("NON_PAUSE_FENCE_PRESENT")
+                resulting_state = LifecycleState.BLOCKED
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T14", LifecycleState.PAUSED, resulting_state,
+                        TRANSITIONS["T14"].required_guards,
+                    )
+                else:
+                    authorize_transition(LifecycleState.PAUSED, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                body = {
+                    **payload,
+                    "blocker_codes": sorted(blocker_codes),
+                    "continuation_cursor": (
+                        request.expected_preserved_continuation_cursor
+                    ),
+                    "event_kind": "RESUME_ACCEPTED",
+                    "indexes_complete": True,
+                    "lifecycle_from": LifecycleState.PAUSED.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "preserved_lifecycle": LifecycleState.RUNNING.value,
+                    "previous_event_hash": request.expected_run_head,
+                    "request_digest": evidence.request_digest,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "verified_run_heads_digest": actual_vector_digest,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RESUME_ACCEPTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch,
+                        request.expected_run_head, event_hash, body_json,
+                    ),
+                )
+                deleted = connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.source_pause_event_id,
+                    ),
+                ).rowcount
+                if deleted != 1:
+                    raise StorageIntegrityError(
+                        "activity resume did not clear exactly one pause fence"
+                    )
+                values = (
+                    request.resume_id, request.command_id, request.event_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.plan_id, request.revision_digest,
+                    request.source_settlement_id,
+                    request.source_settlement_event_id,
+                    request.source_settlement_event_hash,
+                    request.source_pause_id, request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.expected_preserved_continuation_cursor,
+                    request.expected_catalog_head, request.expected_run_head,
+                    request.expected_run_heads_digest, capability.claim_id,
+                    capability.grant_id, capability.scope_digest,
+                    authority.issuer_fingerprint, capability.issuer_mac,
+                    evidence.proof_id, evidence.request_digest,
+                    evidence.issuer_fingerprint, evidence.issuer_mac,
+                    json.dumps(
+                        sorted(blocker_codes), separators=(",", ":")
+                    ),
+                    payload_digest, event_hash, resulting_state.value,
+                    body_json,
+                )
+                connection.execute(
+                    "INSERT INTO activity_resume_actions VALUES ("
+                    + ", ".join("?" for _ in values) + ")",
+                    values,
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RESUME', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id,
+                        request.run_id, capability.scope_digest,
+                        authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'BLOCKED', "
+                    "continuation_cursor = ?, head_sequence = ?, head_hash = ? "
+                    "WHERE run_id = ?",
+                    (
+                        request.expected_preserved_continuation_cursor,
+                        sequence, event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_activity_resume_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_activity_resume_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as exc:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "activity resume durable identity conflicts with state"
+                ) from exc
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.resume_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
         )
 
     def stop(
@@ -14412,7 +15477,23 @@ class SQLiteStateStore:
             "SELECT body_json FROM events WHERE repository_id = ? AND event_kind = 'PAUSE_SETTLED'",
             (repository_id,),
         ).fetchall()
-        pauses = [json.loads(row["body_json"]) for row in pause_settled_rows]
+        all_pause_settlements = [
+            json.loads(row["body_json"]) for row in pause_settled_rows
+        ]
+        pauses = [
+            body for body in all_pause_settlements
+            if body.get("pause_kind") is None
+        ]
+        activity_pause_settlements = [
+            body for body in all_pause_settlements
+            if body.get("pause_kind") == "ACTIVITY_SETTLEMENT"
+        ]
+        if len(pauses) + len(activity_pause_settlements) != len(
+            all_pause_settlements
+        ):
+            raise StorageIntegrityError(
+                "unsupported PAUSE_SETTLED event discriminator"
+            )
         local_pause_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'PAUSE_REQUESTED' AND "
@@ -14762,12 +15843,215 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "external pause proof or schema is invalid"
                 ) from error
+        for body in activity_pause_settlements:
+            self._validate_activity_pause_settlement_event_body(body)
+            try:
+                request = PauseActivitySettlementRequest(
+                    **{
+                        key: body[key]
+                        for key in (
+                            PauseActivitySettlementRequest.__dataclass_fields__
+                        )
+                    }
+                )
+                request.validate()
+                expected_payload = {
+                    **request.__dict__,
+                    "pause_kind": "ACTIVITY_SETTLEMENT",
+                    "pause_binding_version": 1,
+                    "source_kind": "NONDISPATCH_PROVEN",
+                }
+                if body["payload_digest"] != self._event_hash(expected_payload):
+                    raise DispatchDenied(
+                        "activity settlement payload binding mismatch"
+                    )
+                source = connection.execute(
+                    "SELECT pause.*, event.sequence, event.writer_epoch FROM "
+                    "local_pause_actions AS pause JOIN events AS event ON "
+                    "event.event_id = pause.event_id WHERE pause.pause_id = ? "
+                    "AND pause.event_id = ? AND pause.event_hash = ? AND "
+                    "pause.fence_id = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                        request.pause_fence_id,
+                    ),
+                ).fetchone()
+                proof = connection.execute(
+                    "SELECT settlement.*, event.sequence, event.writer_epoch, "
+                    "event.body_json AS event_body_json FROM budget_settlements "
+                    "AS settlement JOIN events AS event ON event.event_id = "
+                    "settlement.settlement_event_id WHERE "
+                    "settlement.settlement_event_id = ? AND "
+                    "settlement.settlement_hash = ? AND "
+                    "settlement.reservation_id = ? AND event.event_kind = "
+                    "'NONDISPATCH_PROVEN'",
+                    (
+                        request.nonexecution_event_id,
+                        request.nonexecution_event_hash,
+                        request.reservation_id,
+                    ),
+                ).fetchone()
+                intent = connection.execute(
+                    "SELECT event_hash, body_json, sequence, writer_epoch FROM "
+                    "events WHERE event_id = ? AND event_kind = "
+                    "'INTENT_COMMITTED'",
+                    (request.intent_event_id,),
+                ).fetchone()
+                if source is None or proof is None or intent is None:
+                    raise DispatchDenied(
+                        "activity settlement historical source is unavailable"
+                    )
+                proof_body = json.loads(proof["event_body_json"])
+                intent_body = json.loads(intent["body_json"])
+                if (
+                    source["repository_id"], source["run_id"],
+                    source["item_id"], source["logical_effect_id"],
+                    source["attempt_id"], source["intent_event_id"],
+                    source["intent_event_hash"], int(source["slot_generation"]),
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.intent_event_id, request.intent_event_hash,
+                    request.expected_slot_generation,
+                ) or (
+                    intent["event_hash"], intent_body.get("reservation_id"),
+                    intent_body.get("attempt_id"),
+                ) != (
+                    request.intent_event_hash, request.reservation_id,
+                    request.attempt_id,
+                ):
+                    raise DispatchDenied(
+                        "activity settlement historical attempt was rebound"
+                    )
+                if not (
+                    int(source["writer_epoch"])
+                    < int(proof["writer_epoch"])
+                    < int(body["writer_epoch"])
+                ) or not (
+                    int(source["sequence"])
+                    < int(proof["sequence"])
+                    < int(body["sequence"])
+                ):
+                    raise DispatchDenied(
+                        "activity settlement evidence order is invalid"
+                    )
+                if (
+                    request.settlement_head_hash
+                    != request.nonexecution_event_hash
+                    or proof_body.get("repository_id") != request.repository_id
+                    or proof_body.get("run_id") != request.run_id
+                    or proof_body.get("item_id") != request.item_id
+                    or proof_body.get("logical_effect_id")
+                    != request.logical_effect_id
+                    or proof_body.get("attempt_id") != request.attempt_id
+                    or proof_body.get("reservation_id") != request.reservation_id
+                    or proof_body.get("disposition")
+                    != BudgetDisposition.RELEASED.value
+                    or proof_body.get("non_dispatch_proven") is not True
+                    or proof_body.get("zero_liability_proven") is not True
+                    or proof_body.get("all_obligations_settled") is not True
+                    or proof_body.get("release_slot") is not False
+                    or proof_body.get("contradiction") is not False
+                    or proof_body.get("uncertainty") is not False
+                ):
+                    raise DispatchDenied(
+                        "activity settlement T25 proof is not fully settled"
+                    )
+                prefix_settlement = connection.execute(
+                    "SELECT settlement.settlement_event_id, "
+                    "settlement.settlement_hash, settlement.disposition FROM "
+                    "budget_settlements AS settlement JOIN events AS event ON "
+                    "event.event_id = settlement.settlement_event_id WHERE "
+                    "settlement.reservation_id = ? AND event.writer_epoch < ? "
+                    "ORDER BY event.writer_epoch DESC LIMIT 1",
+                    (request.reservation_id, int(body["writer_epoch"])),
+                ).fetchone()
+                if prefix_settlement is None or (
+                    prefix_settlement["settlement_event_id"],
+                    prefix_settlement["settlement_hash"],
+                    prefix_settlement["disposition"],
+                ) != (
+                    request.nonexecution_event_id,
+                    request.nonexecution_event_hash,
+                    BudgetDisposition.RELEASED.value,
+                ):
+                    raise DispatchDenied(
+                        "activity settlement changed its prefix accounting head"
+                    )
+                historical_fences, historical_slot, active_validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
+                )
+                if request.pause_fence_id not in historical_fences or (
+                    historical_slot != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                    )
+                ):
+                    raise DispatchDenied(
+                        "activity settlement historical fence or slot mismatch"
+                    )
+                if any(
+                    validator_run_id == request.run_id
+                    for _, validator_run_id in active_validators
+                ):
+                    raise DispatchDenied(
+                        "activity settlement hid active validation"
+                    )
+                contact = connection.execute(
+                    "SELECT 1 FROM adapter_contacts AS contact JOIN events AS "
+                    "event ON event.event_id = contact.event_id JOIN "
+                    "operation_launches AS launch ON contact.source_id = "
+                    "'EFFECT:' || launch.launch_id WHERE "
+                    "contact.repository_id = ? AND contact.contact_kind = "
+                    "'EFFECT' AND launch.run_id = ? AND "
+                    "launch.logical_effect_id = ? AND launch.attempt_id = ? "
+                    "AND event.writer_epoch < ? LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.attempt_id,
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchone()
+                observation = connection.execute(
+                    "SELECT 1 FROM effect_observations AS observation JOIN "
+                    "events AS event ON event.event_id = observation.event_id "
+                    "WHERE observation.repository_id = ? AND "
+                    "observation.logical_effect_id = ? AND "
+                    "observation.attempt_id = ? AND event.writer_epoch < ?",
+                    (
+                        request.repository_id, request.logical_effect_id,
+                        request.attempt_id, int(body["writer_epoch"]),
+                    ),
+                ).fetchone()
+                if contact is not None or observation is not None:
+                    raise DispatchDenied(
+                        "activity settlement contradicted nonexecution"
+                    )
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "activity pause settlement proof or schema is invalid"
+                ) from error
         resume_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'RESUME_ACCEPTED'",
             (repository_id,),
         ).fetchall()
-        resumes = [json.loads(row["body_json"]) for row in resume_rows]
+        all_resumes = [json.loads(row["body_json"]) for row in resume_rows]
+        resumes = [
+            body for body in all_resumes if body.get("resume_kind") is None
+        ]
+        activity_resumes = [
+            body for body in all_resumes
+            if body.get("resume_kind") == "ACTIVITY_SETTLEMENT"
+        ]
+        if len(resumes) + len(activity_resumes) != len(all_resumes):
+            raise StorageIntegrityError(
+                "unsupported RESUME_ACCEPTED event discriminator"
+            )
         for body in resumes:
             self._validate_resume_event_body(body)
             try:
@@ -14946,6 +16230,182 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "resume capability, evidence, or historical route is invalid"
                 ) from error
+        for body in activity_resumes:
+            self._validate_activity_resume_event_body(body)
+            try:
+                if self._classification_authority is None:
+                    raise DispatchDenied("activity resume authority is not bound")
+                request = ResumeActivitySettlementRequest(
+                    **{
+                        key: body[key]
+                        for key in (
+                            ResumeActivitySettlementRequest.__dataclass_fields__
+                        )
+                    }
+                )
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                evidence = SyntheticActivityResumeEvidence(
+                    **body["resume_evidence"]
+                )
+                self._classification_authority.verify_operator_issued(
+                    capability
+                )
+                self._classification_authority.verify_activity_resume_evidence(
+                    evidence, request
+                )
+                expected_payload = {
+                    **request.__dict__,
+                    "action": "RESUME",
+                    "resume_kind": "ACTIVITY_SETTLEMENT",
+                    "resume_binding_version": 2,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                    "resume_evidence": dict(evidence.__dict__),
+                }
+                if (
+                    body["payload_digest"] != self._event_hash(expected_payload)
+                    or body["request_digest"] != evidence.request_digest
+                    or capability.action != "RESUME"
+                    or capability.repository_id != request.repository_id
+                    or capability.run_id != request.run_id
+                ):
+                    raise DispatchDenied(
+                        "activity resume evidence binding mismatch"
+                    )
+                prefix_rows = connection.execute(
+                    "SELECT run_id, event_hash FROM events WHERE "
+                    "repository_id = ? AND writer_epoch < ? ORDER BY "
+                    "writer_epoch, rowid",
+                    (repository_id, int(body["writer_epoch"])),
+                ).fetchall()
+                prefix_heads: dict[str, str] = {}
+                prefix_catalog_head = ""
+                for prefix_row in prefix_rows:
+                    prefix_heads[str(prefix_row["run_id"])] = str(
+                        prefix_row["event_hash"]
+                    )
+                    prefix_catalog_head = str(prefix_row["event_hash"])
+                if (
+                    request.expected_catalog_head != prefix_catalog_head
+                    or request.expected_run_head
+                    != prefix_heads.get(request.run_id)
+                    or request.expected_run_heads_digest
+                    != self._run_heads_digest(prefix_heads)
+                    or body["previous_event_hash"]
+                    != request.expected_run_head
+                    or body["verified_run_heads_digest"]
+                    != request.expected_run_heads_digest
+                ):
+                    raise DispatchDenied(
+                        "activity resume historical head vector mismatch"
+                    )
+                source = connection.execute(
+                    "SELECT settlement.*, event.writer_epoch, event.body_json "
+                    "AS event_body_json FROM activity_pause_settlements AS "
+                    "settlement JOIN events AS event ON event.event_id = "
+                    "settlement.event_id WHERE settlement.settlement_id = ? "
+                    "AND settlement.event_id = ? AND settlement.event_hash = ?",
+                    (
+                        request.source_settlement_id,
+                        request.source_settlement_event_id,
+                        request.source_settlement_event_hash,
+                    ),
+                ).fetchone()
+                if source is None or int(source["writer_epoch"]) >= int(
+                    body["writer_epoch"]
+                ) or (
+                    source["repository_id"], source["run_id"],
+                    source["item_id"], source["logical_effect_id"],
+                    source["attempt_id"], source["source_pause_id"],
+                    source["source_pause_event_id"],
+                    source["source_pause_event_hash"],
+                    source["pause_fence_id"], source["continuation_cursor"],
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.source_pause_id, request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.expected_preserved_continuation_cursor,
+                ):
+                    raise DispatchDenied(
+                        "activity resume historical T07 source mismatch"
+                    )
+                source_body = json.loads(source["event_body_json"])
+                source_slot_generation = self._activity_pause_slot_generation(
+                    source, source_body
+                )
+                historical_fences, historical_slot, active_validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
+                )
+                if request.pause_fence_id not in historical_fences or (
+                    historical_slot != (
+                        request.run_id, request.logical_effect_id,
+                        request.attempt_id, source_slot_generation,
+                    )
+                ):
+                    raise DispatchDenied(
+                        "activity resume historical fence or slot mismatch"
+                    )
+                if any(
+                    validator_run_id == request.run_id
+                    for _, validator_run_id in active_validators
+                ) or self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id,
+                    before_sequence=int(body["sequence"]),
+                ):
+                    raise DispatchDenied(
+                        "activity resume bypassed unresolved activity"
+                    )
+                blockers = {"OPERATION_RECOVERY_PENDING"}
+                latest_readiness = connection.execute(
+                    "SELECT evaluation.body_json FROM readiness_evaluations AS "
+                    "evaluation JOIN events AS event ON event.event_id = "
+                    "evaluation.event_id WHERE evaluation.repository_id = ? "
+                    "AND evaluation.run_id = ? AND event.writer_epoch < ? "
+                    "ORDER BY event.writer_epoch DESC LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchone()
+                if latest_readiness is not None:
+                    blockers.update(
+                        str(code)
+                        for code in json.loads(
+                            latest_readiness["body_json"]
+                        ).get("blocker_codes", ())
+                        if code != "DISPATCH_FENCE_PRESENT"
+                    )
+                for fence_id, scope in historical_fences.items():
+                    if fence_id == request.pause_fence_id:
+                        continue
+                    if (scope[0] is None or scope[0] == request.item_id) and (
+                        scope[1] is None
+                        or scope[1] == request.logical_effect_id
+                    ):
+                        blockers.add("NON_PAUSE_FENCE_PRESENT")
+                if (
+                    body["blocker_codes"] != sorted(blockers)
+                    or body["continuation_cursor"]
+                    != request.expected_preserved_continuation_cursor
+                    or body["lifecycle_to"] != LifecycleState.BLOCKED.value
+                ):
+                    raise DispatchDenied(
+                        "activity resume historical route mismatch"
+                    )
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "activity resume proof or historical route is invalid"
+                ) from error
         stop_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? "
             "AND event_kind = 'STOP_RECORDED'",
@@ -15070,7 +16530,25 @@ class SQLiteStateStore:
                     body["payload_digest"], body["event_id"],
                     body["sequence"], self._event_hash(body),
                 )
+                for body in activity_pause_settlements
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
                 for body in resumes
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in activity_resumes
             }
         )
         expected_outcomes.update(
@@ -15621,6 +17099,50 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "external-pause projection diverges from event history"
             )
+        expected_activity_pause_settlements = {
+            body["settlement_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["source_pause_id"],
+                body["source_pause_event_id"],
+                body["source_pause_event_hash"], body["pause_fence_id"],
+                body["intent_event_id"], body["intent_event_hash"],
+                body["nonexecution_event_id"],
+                body["nonexecution_event_hash"], body["reservation_id"],
+                body["settlement_head_hash"],
+                body["expected_slot_generation"],
+                body["continuation_cursor"], body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"], body,
+            )
+            for body in activity_pause_settlements
+        }
+        actual_activity_pause_settlements = {
+            row["settlement_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["attempt_id"],
+                row["source_pause_id"], row["source_pause_event_id"],
+                row["source_pause_event_hash"], row["pause_fence_id"],
+                row["intent_event_id"], row["intent_event_hash"],
+                row["nonexecution_event_id"],
+                row["nonexecution_event_hash"], row["reservation_id"],
+                row["settlement_head_hash"], int(row["slot_generation"]),
+                row["continuation_cursor"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"],
+                json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM activity_pause_settlements WHERE "
+                "repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if (
+            actual_activity_pause_settlements
+            != expected_activity_pause_settlements
+        ):
+            raise StorageIntegrityError(
+                "activity-pause-settlement projection diverges from history"
+            )
         expected_resumes = {
             body["resume_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -15675,6 +17197,65 @@ class SQLiteStateStore:
         if actual_resumes != expected_resumes:
             raise StorageIntegrityError(
                 "resume-action projection diverges from event history"
+            )
+        expected_activity_resumes = {
+            body["resume_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["plan_id"],
+                body["revision_digest"], body["source_settlement_id"],
+                body["source_settlement_event_id"],
+                body["source_settlement_event_hash"],
+                body["source_pause_id"], body["source_pause_event_id"],
+                body["source_pause_event_hash"], body["pause_fence_id"],
+                body["expected_preserved_continuation_cursor"],
+                body["expected_catalog_head"], body["expected_run_head"],
+                body["expected_run_heads_digest"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["resume_evidence"]["proof_id"],
+                body["resume_evidence"]["request_digest"],
+                body["resume_evidence"]["issuer_fingerprint"],
+                body["resume_evidence"]["issuer_mac"],
+                json.dumps(body["blocker_codes"], separators=(",", ":")),
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"], body,
+            )
+            for body in activity_resumes
+        }
+        actual_activity_resumes = {
+            row["resume_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["attempt_id"],
+                row["plan_id"], row["revision_digest"],
+                row["source_settlement_id"],
+                row["source_settlement_event_id"],
+                row["source_settlement_event_hash"], row["source_pause_id"],
+                row["source_pause_event_id"],
+                row["source_pause_event_hash"], row["pause_fence_id"],
+                row["expected_preserved_continuation_cursor"],
+                row["expected_catalog_head"], row["expected_run_head"],
+                row["expected_run_heads_digest"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["evidence_proof_id"],
+                row["evidence_request_digest"],
+                row["evidence_issuer_fingerprint"],
+                row["evidence_issuer_mac"], row["blocker_codes_json"],
+                row["payload_digest"], row["event_hash"],
+                row["resulting_state"], json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM activity_resume_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_activity_resumes != expected_activity_resumes:
+            raise StorageIntegrityError(
+                "activity-resume projection diverges from event history"
             )
         expected_stops = {
             body["stop_id"]: (
@@ -15865,6 +17446,17 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in resumes
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "RESUME",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in activity_resumes
             }
         )
         expected_operator_redemptions.update(
@@ -16794,6 +18386,17 @@ class SQLiteStateStore:
                 )
             del expected_fences[body["pause_fence_id"]]
 
+        for body in activity_resumes:
+            source_fence = expected_fences.get(body["pause_fence_id"])
+            if (
+                source_fence is None
+                or source_fence[3] != body["source_pause_event_id"]
+            ):
+                raise StorageIntegrityError(
+                    "activity resume source pause fence diverges from history"
+                )
+            del expected_fences[body["pause_fence_id"]]
+
         actual_fences = {
             row["fence_id"]: (
                 row["item_id"], row["logical_effect_id"], row["reason_code"],
@@ -17147,9 +18750,15 @@ class SQLiteStateStore:
             if "lifecycle_to" in body:
                 expected_lifecycle[run_id] = str(body["lifecycle_to"])
                 if row["event_kind"] == "RESUME_ACCEPTED":
-                    expected_cursors[run_id] = body[
-                        "preserved_continuation_cursor"
-                    ]
+                    expected_cursors[run_id] = body.get(
+                        "preserved_continuation_cursor",
+                        body.get("continuation_cursor"),
+                    )
+                elif (
+                    row["event_kind"] == "PAUSE_SETTLED"
+                    and body.get("pause_kind") == "ACTIVITY_SETTLEMENT"
+                ):
+                    expected_cursors[run_id] = body["continuation_cursor"]
                 elif row["event_kind"] in {
                     "VALIDATION_PASSED", "VALIDATION_FAILED",
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",

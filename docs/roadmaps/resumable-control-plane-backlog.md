@@ -601,6 +601,45 @@ and F08, but those complete families remain `UNVERIFIED`. No authenticated
 active/drainable PAUSING route or T07 settlement is claimed. T07 through T09 are
 next in their documented order; PR #99 remains draft and not merge-ready.
 
+### 5.12 T07 local nonexecution settlement checkpoint
+
+The reviewed T07 slice settles only an exact T05 local-execution pause whose
+same attempt and reservation have an authoritative T25 `NONDISPATCH_PROVEN`
+settlement. That proof must be the reservation's latest pre-T07 accounting
+head, `RELEASED`, zero-liability, non-uncertain, non-contradictory and complete,
+with `release_slot=false`. One transaction appends the distinct
+`ACTIVITY_SETTLEMENT` `PAUSE_SETTLED` event and projection, advances
+`PAUSING -> PAUSED`, and retains the pause fence, outstanding slot, T25
+accounting and `operation-recovery:<attempt>` cursor.
+
+The associated versioned T14 activity-resume route uses a distinct typed
+request/evidence/projection so legacy T04 signed bytes remain unchanged. It
+clears only the exact T05 fence and returns `PAUSED -> BLOCKED`, retaining the
+recovery cursor, outstanding slot and every non-pause fence/blocker. Runtime and
+recovery bind the slot generation to the exact T07 projection/event pair rather
+than assuming generation 1. Recovery derives the latest reservation settlement
+from the historical prefix independently of journal chaining, so a legitimate
+intervening T13 non-accounting fact remains recoverable.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Three `REVISE` rounds closed authority/cessation overclaim, missing T25/T17/T14 interactions, projection separation and legacy signed-request compatibility; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused falsification and correction tests | Initial typed-contract/coordinator tests failed before implementation; final correction suite passed 3 tests in 0.197 seconds |
+| Affected storage/dispatch modules | Exit 0; 296 tests in 24.830 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 318 tests in 25.638 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR recovery defects: journal predecessor was incorrectly equated with T25 head and T14 assumed slot generation 1. Prefix-derived accounting and exact T07 generation binding, with intervening-T13 and non-1 regressions, closed both. Final `APPROVE`, no remaining blocker/major; reviewer independently passed 3 correction tests in 0.194 seconds |
+| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, artifacts/caches, real authority/adapters and external systems |
+
+T07 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition: this
+checkpoint proves only the T05-local/T25-authoritative nonexecution source. T08
+validation-pause and T24/other source families remain ordered work, so full T14
+also remains `UNVERIFIED`. The accepted slice informs C06 and F06/F12 but does
+not promote those complete families. T08 is next; PR #99 remains draft and not
+merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

@@ -25,6 +25,7 @@ from tools.aegis_delivery_control.authority import (
     SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.adapters import (
+    SyntheticExecutionAdapter,
     SyntheticValidatorAdapter,
     SyntheticValidatorRequest,
 )
@@ -43,10 +44,12 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     GovernedOrder,
     PauseBeforeDispatchRequest,
+    PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
+    ResumeActivitySettlementRequest,
     ResumeRequest,
     StopMode,
     StopEscalationRequest,
@@ -134,6 +137,12 @@ def _settle_until_terminated(
 
 
 class SQLiteStateStoreTests(unittest.TestCase):
+    def test_t07_exposes_typed_activity_pause_settlement_contract(self) -> None:
+        self.assertTrue(
+            hasattr(contract_types, "PauseActivitySettlementRequest"),
+            "T07 requires a typed PauseActivitySettlementRequest contract",
+        )
+
     def test_t05_exposes_typed_local_execution_pause_contract(self) -> None:
         self.assertTrue(
             hasattr(contract_types, "PauseLocalExecutionRequest"),
@@ -280,6 +289,495 @@ class SQLiteStateStoreTests(unittest.TestCase):
             writer_epoch=writer_epoch,
             failure_hook=failure_hook,
         )
+
+    def _prepare_t07_activity_settlement(self):
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        pause_grant = SyntheticOperatorGrant(
+            "pause-grant-1", "repo-1", "run-1", "PAUSE", "pause-scope-1"
+        )
+        self.authority.register_operator(pause_grant)
+        pause = self.store.pause_local_execution(
+            PauseLocalExecutionRequest(
+                "pause-1", "pause-command-1", "pause-event-1",
+                "pause-fence-1", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", committed.event_id,
+                committed.event_hash, 1, "OPERATOR_PAUSE_LOCAL_EXECUTION",
+            ),
+            self.authority.claim_operator(*pause_grant.__dict__.values()),
+            self.authority,
+        )
+        self.oracle.allowed_head = pause.event_hash
+        nonexecution_request = BudgetSettlementRequest(
+            "nonexecution-1", "reservation-1", "",
+            BudgetDisposition.RELEASED, None,
+            "nonexecution-evidence-1", "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True, zero_liability_proven=True,
+            release_slot=False, all_obligations_settled=True,
+        )
+        nonexecution = self.store._settle_budget(
+            nonexecution_request,
+            self.authority.issue_settlement_proof(
+                "nonexecution-proof-1", nonexecution_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = nonexecution.settlement_hash
+        request = PauseActivitySettlementRequest(
+            "activity-settlement-1", "activity-settlement-command-1",
+            "activity-settlement-event-1", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-1", "pause-1", pause.event_id,
+            pause.event_hash, "pause-fence-1", committed.event_id,
+            committed.event_hash, "nonexecution-1",
+            nonexecution.settlement_hash, "reservation-1",
+            nonexecution.settlement_hash, 1,
+            "operation-recovery:attempt-1",
+        )
+        return request, pause, nonexecution
+
+    def test_t07_settles_exact_t05_after_authoritative_t25_proof(self) -> None:
+        request, _, nonexecution = self._prepare_t07_activity_settlement()
+
+        receipt = self.store.settle_activity_pause(request)
+        self.oracle.allowed_head = receipt.event_hash
+
+        self.assertEqual(receipt.resulting_state, LifecycleState.PAUSED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs "
+                "WHERE run_id = 'run-1'"
+            ).fetchone()
+            reservation = connection.execute(
+                "SELECT disposition, settlement_head_hash FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot WHERE "
+                "repository_id = 'repo-1'"
+            ).fetchone()
+            fence = connection.execute(
+                "SELECT originating_event_id FROM dispatch_fences WHERE "
+                "fence_id = 'pause-fence-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run, ("PAUSED", "operation-recovery:attempt-1"))
+        self.assertEqual(
+            reservation,
+            ("RELEASED", nonexecution.settlement_hash),
+            "T07 must reference rather than duplicate the T25 settlement",
+        )
+        self.assertEqual(slot, ("attempt-1", 1))
+        self.assertEqual(fence, ("pause-event-1",))
+        self.store.load_verified("repo-1")
+
+    def test_t07_recovery_accepts_intervening_nonaccounting_fact(self) -> None:
+        request, _, nonexecution = self._prepare_t07_activity_settlement()
+        fact = AuthorityLifecycleFactRequest(
+            "fact-between-t25-t07", "fact-between-t25-t07-command",
+            "fact-between-t25-t07-event", "repo-1", "run-1", "item-1",
+            "effect-1", "EFFECT", "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.SOURCE_UNAVAILABLE, GovernedOrder.UNKNOWN,
+            "INTENT", request.intent_event_id, request.intent_event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "fact-between-t25-t07-proof", fact
+            ),
+            self.authority,
+            expected_head=nonexecution.settlement_hash,
+            writer_epoch=5,
+        )
+        self.assertEqual(recorded.resulting_state, LifecycleState.PAUSING)
+        self.oracle.allowed_head = recorded.event_hash
+
+        settled = self.store.settle_activity_pause(request)
+        self.oracle.allowed_head = settled.event_hash
+
+        connection = sqlite3.connect(self.database_path)
+        try:
+            previous_hash = connection.execute(
+                "SELECT previous_event_hash FROM events WHERE event_id = ?",
+                (settled.event_id,),
+            ).fetchone()[0]
+            fences = {
+                row[0] for row in connection.execute(
+                    "SELECT fence_id FROM dispatch_fences"
+                )
+            }
+        finally:
+            connection.close()
+        self.assertEqual(previous_hash, recorded.event_hash)
+        self.assertEqual(
+            request.nonexecution_event_hash, nonexecution.settlement_hash
+        )
+        self.assertIn(request.pause_fence_id, fences)
+        self.assertIn("authority:fact-between-t25-t07", fences)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_resumes_t07_only_to_blocked_with_recovery_cursor(self) -> None:
+        settlement_request, pause, _ = self._prepare_t07_activity_settlement()
+        settled = self.store.settle_activity_pause(settlement_request)
+        self.oracle.allowed_head = settled.event_hash
+        _, run_heads = self.store.load_verified("repo-1")
+        resume_grant = SyntheticOperatorGrant(
+            "resume-grant-1", "repo-1", "run-1", "RESUME",
+            "resume-scope-1",
+        )
+        self.authority.register_operator(resume_grant)
+        request = ResumeActivitySettlementRequest(
+            "activity-resume-1", "activity-resume-command-1",
+            "activity-resume-event-1", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-1", "plan:run-1", "revision-1",
+            settlement_request.settlement_id, settled.event_id,
+            settled.event_hash, settlement_request.source_pause_id,
+            pause.event_id, pause.event_hash, "pause-fence-1",
+            "operation-recovery:attempt-1", settled.event_hash,
+            settled.event_hash, self.store._run_heads_digest(run_heads),
+        )
+        receipt = self.store.resume_activity_settlement(
+            request,
+            self.authority.claim_operator(*resume_grant.__dict__.values()),
+            self.authority.issue_activity_resume_evidence(
+                "activity-resume-proof-1", request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = receipt.event_hash
+
+        self.assertEqual(receipt.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs "
+                "WHERE run_id = 'run-1'"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot"
+            ).fetchone()
+            pause_fence = connection.execute(
+                "SELECT 1 FROM dispatch_fences WHERE fence_id = "
+                "'pause-fence-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run, ("BLOCKED", "operation-recovery:attempt-1"))
+        self.assertEqual(slot, ("attempt-1", 1))
+        self.assertIsNone(pause_fence)
+        self.store.load_verified("repo-1")
+
+    def test_t14_slot_generation_is_derived_from_exact_t07_source(self) -> None:
+        settlement_request, _, _ = self._prepare_t07_activity_settlement()
+        settled = self.store.settle_activity_pause(settlement_request)
+        connection = self.store._connect()
+        try:
+            source = connection.execute(
+                "SELECT * FROM activity_pause_settlements WHERE "
+                "settlement_id = ?",
+                (settlement_request.settlement_id,),
+            ).fetchone()
+            source_body = json.loads(source["body_json"])
+        finally:
+            connection.close()
+        future_body = {
+            **source_body,
+            "expected_slot_generation": 2,
+        }
+
+        self.assertEqual(
+            self.store._activity_pause_slot_generation(
+                {**dict(source), "slot_generation": 2}, future_body
+            ),
+            2,
+        )
+        with self.assertRaisesRegex(StorageIntegrityError, "slot generation"):
+            self.store._activity_pause_slot_generation(source, future_body)
+        self.oracle.allowed_head = settled.event_hash
+        self.store.load_verified("repo-1")
+
+    def test_t07_crash_is_atomic_and_committed_retry_replays(self) -> None:
+        request, _, nonexecution = self._prepare_t07_activity_settlement()
+        with self.assertRaises(InjectedFailure):
+            self.store.settle_activity_pause(
+                request,
+                failure_hook=raise_at(
+                    "after_activity_pause_settlement_writes_before_commit"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+            count = connection.execute(
+                "SELECT COUNT(*) FROM activity_pause_settlements"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual((state, count), ("PAUSING", 0))
+        self.assertEqual(self.oracle.allowed_head, nonexecution.settlement_hash)
+
+        with self.assertRaises(InjectedFailure):
+            self.store.settle_activity_pause(
+                request,
+                failure_hook=raise_at(
+                    "after_activity_pause_settlement_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            committed_hash = connection.execute(
+                "SELECT event_hash FROM activity_pause_settlements"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = committed_hash
+        replay = self.store.settle_activity_pause(request)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, committed_hash)
+        self.store.load_verified("repo-1")
+
+    def test_t07_rejects_stale_or_rebound_t25_accounting(self) -> None:
+        request, _, _ = self._prepare_t07_activity_settlement()
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(DispatchDenied, "accounting head"):
+            self.store.settle_activity_pause(
+                replace(request, settlement_head_hash="rebound-head")
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
+
+    def test_t23_late_receipt_after_t07_preserves_history_and_slot(self) -> None:
+        request, _, nonexecution = self._prepare_t07_activity_settlement()
+        settled = self.store.settle_activity_pause(request)
+        self.oracle.allowed_head = settled.event_hash
+        late_accounting_request = BudgetSettlementRequest(
+            "late-accounting-1", "reservation-1",
+            nonexecution.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            "late-receipt-1", "USAGE_REPORTED",
+        )
+        late_accounting = self.store._settle_budget(
+            late_accounting_request,
+            self.authority.issue_settlement_proof(
+                "late-accounting-proof-1", late_accounting_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = late_accounting.settlement_hash
+        observation = self.store._record_effect_observation(
+            EffectObservationRequest(
+                "late-observation-1", "late-observation-command-1",
+                "late-observation-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "late-receipt-1",
+                self.capability.claim_id, "descriptor-digest", 2,
+                "late-accounting-1", late_accounting.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = observation.event_hash
+
+        self.assertEqual(
+            observation.resulting_state,
+            LifecycleState.RECONCILIATION_REQUIRED,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            event_kind = connection.execute(
+                "SELECT event_kind FROM events WHERE event_id = "
+                "'late-observation-event-1'"
+            ).fetchone()[0]
+            slot_count = connection.execute(
+                "SELECT COUNT(*) FROM outstanding_slot"
+            ).fetchone()[0]
+            fences = {
+                row[0] for row in connection.execute(
+                    "SELECT reason_code FROM dispatch_fences"
+                )
+            }
+        finally:
+            connection.close()
+        self.assertEqual(event_kind, "LATE_RECEIPT_RECORDED")
+        self.assertEqual(slot_count, 1)
+        self.assertIn("LATE_ACCOUNTING_AFTER_RELEASE", fences)
+        self.store.load_verified("repo-1")
+        resume_grant = SyntheticOperatorGrant(
+            "late-resume-grant-1", "repo-1", "run-1", "RESUME",
+            "late-resume-scope-1",
+        )
+        self.authority.register_operator(resume_grant)
+        _, run_heads = self.store.load_verified("repo-1")
+        resume_request = ResumeActivitySettlementRequest(
+            "late-resume-1", "late-resume-command-1", "late-resume-event-1",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            "plan:run-1", "revision-1", request.settlement_id,
+            settled.event_id, settled.event_hash, request.source_pause_id,
+            request.source_pause_event_id, request.source_pause_event_hash,
+            request.pause_fence_id, request.continuation_cursor,
+            observation.event_hash, observation.event_hash,
+            self.store._run_heads_digest(run_heads),
+        )
+        with self.assertRaisesRegex(DispatchDenied, "PAUSED"):
+            self.store.resume_activity_settlement(
+                resume_request,
+                self.authority.claim_operator(*resume_grant.__dict__.values()),
+                self.authority.issue_activity_resume_evidence(
+                    "late-resume-proof-1", resume_request
+                ),
+                self.authority,
+            )
+
+    def test_t07_recovery_rejects_self_consistent_source_retarget(self) -> None:
+        request, _, _ = self._prepare_t07_activity_settlement()
+        settled = self.store.settle_activity_pause(request)
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM activity_pause_settlements"
+                ).fetchone()["body_json"]
+            )
+            body["source_pause_event_hash"] = "retargeted-pause-hash"
+            rebound = PauseActivitySettlementRequest(
+                **{
+                    key: body[key]
+                    for key in PauseActivitySettlementRequest.__dataclass_fields__
+                }
+            )
+            body["payload_digest"] = self.store._event_hash(
+                {
+                    **rebound.__dict__,
+                    "pause_kind": "ACTIVITY_SETTLEMENT",
+                    "pause_binding_version": 1,
+                    "source_kind": "NONDISPATCH_PROVEN",
+                }
+            )
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                "event_id = ?",
+                (event_hash, body_json, settled.event_id),
+            )
+            connection.execute(
+                "UPDATE activity_pause_settlements SET "
+                "source_pause_event_hash = ?, payload_digest = ?, "
+                "event_hash = ?, body_json = ?",
+                (
+                    body["source_pause_event_hash"], body["payload_digest"],
+                    event_hash, body_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, "
+                "event_hash = ? WHERE command_id = ?",
+                (body["payload_digest"], event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "activity pause settlement"
+        ):
+            self.store.load_verified("repo-1")
+
+    def test_t07_accepts_launched_precontact_only_after_canonical_t25_seal(
+        self,
+    ) -> None:
+        intent_request = self.request()
+        committed = self._commit_planned_intent(
+            intent_request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(intent_request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        pause_grant = SyntheticOperatorGrant(
+            "launched-pause-grant-1", "repo-1", "run-1", "PAUSE",
+            "launched-pause-scope-1",
+        )
+        self.authority.register_operator(pause_grant)
+        pause = self.store.pause_local_execution(
+            PauseLocalExecutionRequest(
+                "launched-pause-1", "launched-pause-command-1",
+                "launched-pause-event-1", "launched-pause-fence-1",
+                "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                committed.event_id, committed.event_hash, 1,
+                "OPERATOR_PAUSE_LOCAL_EXECUTION",
+            ),
+            self.authority.claim_operator(*pause_grant.__dict__.values()),
+            self.authority,
+        )
+        self.oracle.allowed_head = pause.event_hash
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = target_path.resolve()
+        attestation = self.authority.issue_nonexecution_attestation(
+            "launched-nonexecution-attestation-1",
+            "launched-nonexecution-seal-1", "EFFECT",
+            adapter._target_digest("repo-1"), self.capability.claim_id,
+            f"EFFECT:{launched.launch_id}", launched.event_hash,
+            "reservation-1", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1",
+        )
+        seal = adapter.seal_nonexecution(attestation, self.authority)
+        nonexecution_request = BudgetSettlementRequest(
+            "launched-nonexecution-1", "reservation-1", "",
+            BudgetDisposition.RELEASED, None,
+            "launched-nonexecution-evidence-1", "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True, zero_liability_proven=True,
+            release_slot=False, all_obligations_settled=True,
+            nonexecution_seal_id=seal.seal_id,
+        )
+        nonexecution = self.store._settle_budget(
+            nonexecution_request,
+            self.authority.issue_settlement_proof(
+                "launched-nonexecution-proof-1", nonexecution_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = nonexecution.settlement_hash
+        settled = self.store.settle_activity_pause(
+            PauseActivitySettlementRequest(
+                "launched-activity-settlement-1",
+                "launched-activity-settlement-command-1",
+                "launched-activity-settlement-event-1", "repo-1", "run-1",
+                "item-1", "effect-1", "attempt-1", "launched-pause-1",
+                pause.event_id, pause.event_hash, "launched-pause-fence-1",
+                committed.event_id, committed.event_hash,
+                "launched-nonexecution-1", nonexecution.settlement_hash,
+                "reservation-1", nonexecution.settlement_hash, 1,
+                "operation-recovery:attempt-1",
+            )
+        )
+        self.oracle.allowed_head = settled.event_hash
+
+        self.assertEqual(settled.resulting_state, LifecycleState.PAUSED)
+        self.store.load_verified("repo-1")
 
     def _rewrite_application_tail(self, body: dict[str, object]) -> str:
         event_hash = self.store._event_hash(body)

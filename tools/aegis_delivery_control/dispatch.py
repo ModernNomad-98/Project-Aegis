@@ -14,6 +14,7 @@ from .adapters import (
 )
 from .authority import (
     SyntheticAuthority,
+    SyntheticActivityResumeEvidence,
     SyntheticAuthorityLifecycleEvidence,
     SyntheticBindingObservation,
     SyntheticCapability,
@@ -38,9 +39,11 @@ from .contracts import (
     ObservationReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     ResumeRequest,
+    ResumeActivitySettlementRequest,
     StopMode,
     StopEscalationRequest,
     StopRequest,
@@ -180,6 +183,55 @@ class SyntheticDispatchCoordinator:
         return self._store.pause_external_mutation(
             request,
             capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def settle_activity_pause(
+        self,
+        request: PauseActivitySettlementRequest,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T07",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T07"].required_guards,
+            )
+
+        return self._store.settle_activity_pause(
+            request,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def resume_activity_settlement(
+        self,
+        request: ResumeActivitySettlementRequest,
+        capability: SyntheticOperatorCapability,
+        resume_evidence: SyntheticActivityResumeEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T14",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T14"].required_guards,
+            )
+
+        return self._store.resume_activity_settlement(
+            request,
+            capability,
+            resume_evidence,
             self._authority,
             authorize_transition=authorize,
             failure_hook=failure_hook,
