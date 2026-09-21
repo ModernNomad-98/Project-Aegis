@@ -924,6 +924,7 @@ hot journal.
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
 | Independent implementation review | Initial `REVISE` found two MAJOR gaps: a write-capable auxiliary proof-ledger handle and an escaping structural JSON exception. Shared read-only auxiliary connections and verifier-boundary normalization closed both; corrected review returned `APPROVE`, no remaining blocker or major, and independently passed all 11 focused tests |
+| Commit/push and hosted checks | Signed implementation commit `39ad374a172122c14d06070f65c1e033da3b5c83` pushed to the existing branch; exact-head `gate-guard` passed in 4s, `validate-skills` in 1m24s and `windows-offline-checks` in 2m14s; local and remote heads matched, `ba13394` remained an ancestor, and PR #99 remained open, draft and blocked |
 | T/C/F traceability | T22 is implemented, tested and independently accepted. Adds narrow evidence to CP-D06/CP-D10, C07 and F04b without promoting those broader families |
 | Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |

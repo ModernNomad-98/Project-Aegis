@@ -6,7 +6,7 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed checkpoint before T22: `3406e3e22f80f461e35f529900c289c7b93c46ac`
+Latest pushed implementation checkpoint: `39ad374a172122c14d06070f65c1e033da3b5c83`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
 Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, REVIEWED T05-T09/T13-T15, ORDERED T17 SLICES AND T22 `APPROVE`; T28 AND LATER BACKLOG OPEN**
 
@@ -987,8 +987,11 @@ The complete delivery-control package passed 384 tests in 53.243 seconds after
 review corrections. Repository validation found 184 valid skills with zero
 warnings, 8 script tests passed with 4 expected skips, all 91 gate self-test
 assertions passed, compileall passed and `git diff --check` exited 0 with Windows
-line-ending notices only. This commit cannot name its own final SHA or hosted
-check results; those belong in a succeeding evidence update after push.
+line-ending notices only. Signed implementation commit
+`39ad374a172122c14d06070f65c1e033da3b5c83` was pushed to the existing branch;
+exact-head hosted checks passed (`gate-guard` in 4s, `validate-skills` in 1m24s
+and `windows-offline-checks` in 2m14s). Local and remote heads matched, `ba13394`
+remained an ancestor and live PR #99 remained open, draft and blocked.
 
 T22 is implemented, tested and independently accepted. C07 and F04b receive
 narrow accepted evidence but remain conservatively `UNVERIFIED` as complete
@@ -1126,6 +1129,7 @@ families. T28 with F01 is next. PR #99 remains open, draft and blocked.
 | T22 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Independent T22 implementation review | Initial `REVISE` found two MAJOR read-only auxiliary-ledger and structural-JSON failure gaps; corrected `APPROVE`, no remaining blocker or major |
 | `git diff --check` after T22 corrections | Exit 0; Windows line-ending notices only |
+| T22 commit, push and hosted checks | Signed implementation commit `39ad374a172122c14d06070f65c1e033da3b5c83` pushed; local and remote heads matched; `ba13394` remained an ancestor; exact-head `gate-guard`, `validate-skills` and `windows-offline-checks` passed; PR #99 remained OPEN/DRAFT/BLOCKED |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
