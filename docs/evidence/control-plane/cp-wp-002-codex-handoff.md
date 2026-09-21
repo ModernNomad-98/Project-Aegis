@@ -6,8 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
+Latest reviewed implementation checkpoint: `13bda54b9bc63e962a3900ac16640fd2bb18d304`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15 AND T14 CORE SLICE `APPROVE`**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15, T14 CORE SLICE AND T05 `APPROVE`**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -99,7 +100,7 @@ below existed in the approval register when this handoff was prepared.
 | AEGIS-APR-003 | Updating Project Aegis pull requests as needed | Unrelated work outside the applicable task |
 | AEGIS-APR-004 | CP-WP-002 under `tools/aegis_delivery_control/`; standard-library SQLite, stable OS lock, one outstanding synthetic operation, synthetic authority/adapters, complete T01-T28/C01-C09/F01-F21 tests, package README and backlog updates | BER, dependencies, CI changes, production data, providers/external calls, releases, deployment, kernel Git mutation, artifact changes, credentials, real authority or real adapters |
 | Direct user instruction, prior session `fccf4968-b86b-44d4-9371-8ef2ce8fe1ba`, turn 2118 | "implement the exact order, run pre-flight. For each item, plan first, the audit and scrutinize that plan, once that is done, implment. Pre-approve for commit/push/administrative merge. Loop until backlogs are completely cleared" | Waiving scope, validation, independent review, release safety or deployment authorization |
-| Current user instruction | Pause, save progress, synchronize GitHub/documentation, create this Codex handoff, and carry current rules/backlogs/pre-approval without assumption | Deleting the repository or delivery-control package; inventing new authority |
+| Current user instruction | Continue the durable backlog in order; commit/push/merge are pre-approved, and repeat correction/review loops until the backlog is complete | Bypassing scope, validation, independent review, readiness gates, release safety or deployment authority |
 
 Delivery state at handoff preparation:
 
@@ -474,6 +475,40 @@ committed with DCO sign-off and pushed as
 passed in 3 seconds, `validate-skills` in 1m18s and `windows-offline-checks` in
 3m23s. PR #99 remained open, draft and blocked as intended.
 
+### Stage 10 - T05 local-execution pause
+
+The exact cold-start preflight matched at `52e73db`: local, remote and PR heads
+agreed; `ba13394` remained an ancestor; PR #99 was open, draft and blocked;
+tracked state was clean; preserved untracked paths matched; and no applicable
+approval was revoked, expired, consumed or superseded.
+
+The initial plan audit returned `REVISE` with three MAJOR findings. The corrected
+plan accepts both committed-intent/pre-launch and launched/pre-contact RUNNING
+histories, persists the complete signed operator capability, uses a closed
+`LOCAL_EXECUTION` discriminator distinct from T04 and binds the exact intent,
+attempt and slot generation. Re-audit returned `APPROVE` before edits.
+
+TDD first established missing typed-contract, state-owner and coordinator
+routes. The implementation now atomically records `PAUSE_REQUESTED`, an
+item/effect fence, full operator evidence/redemption and RUNNING to PAUSING while
+retaining the outstanding attempt, permission use, reservation, launch and
+cursor. Contacted attempts deny to T06. The request-only synthetic path performs
+no cancellation/drain contact and makes no child-cessation inference.
+
+The initial implementation review returned `REVISE` for one MAJOR: a
+self-consistently rehashed retained cursor was not bound to the historical
+predecessor. Ordered replay now compares both predecessor lifecycle and cursor
+before applying T05; its tamper regression fails closed. Final independent
+review returned `APPROVE` with no remaining blocker or major.
+
+Reviewed code commit `13bda54b9bc63e962a3900ac16640fd2bb18d304` is
+DCO-signed and pushed. Its 17 focused tests, 272 affected storage/dispatch tests,
+294 complete package tests, 184-skill validator and 91 validator self-test
+assertions passed. Exact-head hosted checks passed: `gate-guard` 4s,
+`validate-skills` 1m18s and `windows-offline-checks` 3m22s. PR #99 remained
+open, draft and blocked. T05 is `YES/YES/YES`; the narrower C06/F06 evidence does
+not promote those complete families. T06 is next.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -530,6 +565,16 @@ passed in 3 seconds, `validate-skills` in 1m18s and `windows-offline-checks` in
 | `git push origin feat/cp-wp-002-offline-kernel` after T14 | Remote branch advanced `384b3eb..c3c94bf` |
 | Live PR #99 read before T14 delivery | OPEN; DRAFT; BLOCKED; head `384b3eb5b7e9880dd920477cb1bd98e90e6a29c6`; prior three checks successful |
 | Hosted checks on exact T14 implementation head | `gate-guard` passed in 3s; `validate-skills` passed in 1m18s; `windows-offline-checks` passed in 3m23s |
+| T05 initial / corrected plan audits | `REVISE` for three MAJOR pre-launch/authenticity/schema gaps, then `APPROVE`; no remaining blocker/major |
+| T05 focused first falsifications | Missing typed contract, state-owner method and coordinator route failed before their narrow implementations |
+| T05 focused suite after review correction | `Ran 17 tests in 0.675s`; `OK` |
+| T05 affected storage/dispatch modules | `Ran 272 tests in 22.140s`; `OK` |
+| T05 complete delivery-control package | `Ran 294 tests in 23.893s`; `OK` |
+| T05 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent T05 implementation review | Initial `REVISE` for one MAJOR predecessor-cursor recovery gap; corrected `APPROVE`, no remaining blocker/major; reviewer independently ran 17 focused tests in 0.743s |
+| `git commit -s -m "feat(control-plane): add local execution pause fence"` | Commit `13bda54b9bc63e962a3900ac16640fd2bb18d304`; signed-off; 5 files changed |
+| `git push origin feat/cp-wp-002-offline-kernel` after T05 | Remote branch advanced `52e73db..13bda54` |
+| Hosted checks on exact T05 implementation head | `gate-guard` passed in 4s; `validate-skills` passed in 1m18s; `windows-offline-checks` passed in 3m22s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -620,7 +665,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 277 passing tests, a registry entry or an earlier milestone
+complete from the 294 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -640,7 +685,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical readiness work exists; exact-head trace required |
 | T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
 | T04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| T05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
@@ -676,7 +721,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | C03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
 | C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
-| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05 pre/post-commit rollback/replay and durable-fence slice accepted; full crash family remains unverified |
 | C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
 | C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
@@ -693,7 +738,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 global-slot slice accepted; full family trace remains |
+| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05 pause/slot-retention and serialized contact slice accepted; full family trace remains |
 | F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
 | F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 post-contact/late-adjustment slice accepted; full family trace remains |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
@@ -720,8 +765,8 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T15 complete and independently accepted; T14 core slice accepted with full transition still UNVERIFIED pending T08.
-2. T05-T09 next.
+1. T15 and T05 complete and independently accepted; T14 core slice accepted with full transition still UNVERIFIED pending T08.
+2. T06-T09 next.
 3. T17 with F02/F11/F12/F21.
 4. T22.
 5. T28 with F01.
@@ -814,9 +859,12 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15 and the T14 PLANNED/BLOCKED core
-  slice are independently accepted as recorded in Stages 4-9; full T14 remains
-  UNVERIFIED pending T08 and later exact-head/final review gates remain.
+- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05 and the T14
+  PLANNED/BLOCKED core slice are independently accepted as recorded in Stages
+  4-10; full T14 remains UNVERIFIED pending T08 and later exact-head/final
+  review gates remain.
+- T05 performs no cancel/drain contact; T06-T09 and T07 settlement remain the
+  next ordered work rather than being inferred from PAUSING.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -829,7 +877,7 @@ owner before interpreting it more broadly.
 
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
-stop findings, T13, T15 and the reviewed T14 core slice are accepted. The next
-code change follows the documented order at T05-T09; T08 must close the public
+stop findings, T13, T15, T05 and the reviewed T14 core slice are accepted. The
+next code change follows the documented order at T06-T09; T08 must close the public
 VALIDATING resume gap before full T14 promotion. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

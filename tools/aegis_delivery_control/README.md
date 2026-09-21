@@ -75,6 +75,14 @@ fixture. It is not a delivery integration.
   historical route. Pre-T14 pause projections migrate transactionally without
   rewriting immutable event bodies. A public-path clean VALIDATING resume still
   depends on the ordered T08 pause-validation work and remains unverified.
+- T05 now accepts an authenticated pause command for the exact repository slot
+  owner in either the committed-intent/pre-launch or launched/pre-contact
+  window. One transaction records a discriminated `PAUSE_REQUESTED`, an
+  item/effect fence, full signed operator evidence and `RUNNING -> PAUSING`
+  while retaining the attempt, reservation, permission use and cursor. A
+  contacted attempt is denied to T06. This synthetic path performs no
+  cancel/drain side effect and never treats parent exit or a pause request as
+  cessation evidence.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -128,7 +136,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 277 tests successfully, and
+controller. The complete local package suite ran 294 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -154,6 +162,10 @@ The T14 PLANNED/BLOCKED resume slice received independent implementation
 validation, non-null cursor reconstruction, true legacy cursor migration and
 run-scoped active-validator recovery. T14 remains `UNVERIFIED` as a complete
 transition until T08 supplies the public clean-VALIDATING pause/resume path.
+T05 local-execution pause received independent implementation `APPROVE` after
+the initial plan was corrected for the pre-launch window, durable capability
+authenticity and T04/T05 schema separation, and the implementation was corrected
+to bind its retained cursor to the recovered historical predecessor.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

@@ -507,8 +507,52 @@ event bodies. Partial schemas and malformed prefixes fail transactionally.
 T14 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. The
 reviewed PLANNED/BLOCKED resume slice and narrow C06/C07 and F03/F05/F06/F12/F14/F21
 interactions do not establish those complete families. Exact public-path clean
-VALIDATING resume is intentionally deferred to the ordered T08 work. T05-T09 is
-next; PR #99 remains draft and not merge-ready.
+VALIDATING resume is intentionally deferred to the ordered T08 work. At this
+checkpoint T05-T09 was next; section 5.10 records the completed T05 successor.
+PR #99 remains draft and not merge-ready.
+
+### 5.10 T05 local-execution pause checkpoint
+
+T05 is implemented and independently accepted for the synthetic request-only
+local-execution boundary. `PauseLocalExecutionRequest` binds the exact committed
+intent event/hash, repository slot owner and generation. The store admits both
+valid RUNNING windows: committed intent before launch and a launch with no
+adapter contact. A contacted attempt is denied to the ordered T06 route.
+
+The single atomic transaction appends a closed-schema, explicitly
+`LOCAL_EXECUTION` `PAUSE_REQUESTED`, installs an item/effect fence, persists the
+full signed operator capability and redemption, advances RUNNING to PAUSING and
+retains the outstanding slot, permission use, budget reservation, launch and
+continuation cursor. The coordinator performs no cancel/drain contact: this
+offline kernel has no trusted local-child cancellation adapter, so neither a
+pause request nor parent exit is represented as cessation proof. Contact and
+pause serialize under the repository writer boundary; only the committed
+contact or committed fence can win.
+
+Recovery reconstructs and verifies the exact intent and historical slot,
+issuer MAC, closed T05/T04-discriminated event shape, projection/redemption/fence
+union, predecessor lifecycle and predecessor-derived continuation cursor.
+Self-consistent event/projection/head rewrites of capability fields, cursor or
+surplus schema fail closed.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` found three MAJOR gaps: launch was over-required, the capability MAC was not durably recoverable and T05 was not separated from T04 history; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused first falsifications | Typed contract failed because it was absent; store route failed because `pause_local_execution` was absent; coordinator route failed because it was absent; each passed after its narrow implementation |
+| Focused T05 suite | Exit 0; 17 tests in 0.675 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 272 tests in 22.140 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 294 tests in 23.893 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found a forgeable retained cursor; prefix-derived cursor validation and a self-consistent tamper regression corrected it; final `APPROVE`, no remaining blocker/major; reviewer independently passed 17 focused tests in 0.743 seconds |
+| Commit/push and hosted checks | Signed-off commit `13bda54b9bc63e962a3900ac16640fd2bb18d304` pushed to the existing branch; `gate-guard` passed in 4s, `validate-skills` in 1m18s and `windows-offline-checks` in 3m22s; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+This promotes T05 itself to `YES/YES/YES`. Its accepted crash/replay and
+repository-slot-retention slices inform C06 and F06, but both complete families
+remain `UNVERIFIED`. No cancel/drain adapter or T07 settlement is claimed. T06
+through T09 are next in their documented order; PR #99 remains draft and not
+merge-ready.
 
 ## 6. Handoff contract
 
