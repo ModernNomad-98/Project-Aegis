@@ -60,6 +60,7 @@ from .contracts import (
     PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
+    PauseValidationRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
     ResumeActivitySettlementRequest,
@@ -163,6 +164,8 @@ _EVENT_KINDS = frozenset(
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
+        "VALIDATION_PAUSE_CHECKPOINTED",
+        "VALIDATION_PAUSE_REQUESTED",
         "VALIDATION_PASSED",
         "VALIDATOR_CESSATION_RECORDED",
         "VALIDATOR_INTENT_COMMITTED",
@@ -191,6 +194,8 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
+        "VALIDATION_PAUSE_CHECKPOINTED",
+        "VALIDATION_PAUSE_REQUESTED",
         "VALIDATION_PASSED",
         "VALIDATOR_CESSATION_RECORDED",
         "VALIDATOR_INTENT_COMMITTED",
@@ -270,6 +275,18 @@ _LIFECYCLE_ROUTES: Mapping[
             (LifecycleState.PAUSED, LifecycleState.PLANNED),
             (LifecycleState.PAUSED, LifecycleState.VALIDATING),
             (LifecycleState.PAUSED, LifecycleState.BLOCKED),
+        }
+    ),
+    "VALIDATION_PAUSE_REQUESTED": frozenset(
+        {(LifecycleState.VALIDATING, LifecycleState.VALIDATING)}
+    ),
+    "VALIDATION_PAUSE_CHECKPOINTED": frozenset(
+        {
+            (LifecycleState.VALIDATING, LifecycleState.PAUSED),
+            (
+                LifecycleState.VALIDATING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
         }
     ),
     "STOP_RECORDED": frozenset(
@@ -1250,6 +1267,62 @@ class SQLiteStateStore:
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSED'),
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS validation_pause_actions (
+                pause_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                request_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                checkpoint_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                fence_id TEXT NOT NULL UNIQUE,
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                reason_code TEXT NOT NULL,
+                preserved_continuation_cursor TEXT,
+                checkpoint_kind TEXT NOT NULL CHECK (checkpoint_kind IN (
+                    'IDLE', 'ELIGIBLE_RESULT_SETTLED',
+                    'UNCONTACTED_UNRESOLVED', 'CONTACTED_UNRESOLVED'
+                )),
+                slot_attempt_id TEXT,
+                slot_generation INTEGER CHECK (
+                    slot_generation IS NULL OR slot_generation > 0
+                ),
+                validator_intent_id TEXT,
+                validator_intent_event_id TEXT,
+                validator_intent_event_hash TEXT,
+                validator_attempt_id TEXT,
+                check_id TEXT,
+                reservation_id TEXT,
+                settlement_head_hash TEXT,
+                contact_id TEXT,
+                contact_event_id TEXT,
+                contact_event_hash TEXT,
+                contact_target_digest TEXT,
+                observation_id TEXT,
+                observation_event_id TEXT,
+                observation_event_hash TEXT,
+                observation_settlement_event_id TEXT,
+                observation_settlement_event_hash TEXT,
+                unknown_settlement_event_id TEXT,
+                unknown_settlement_hash TEXT,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_repository_id TEXT NOT NULL,
+                capability_run_id TEXT NOT NULL,
+                capability_action TEXT NOT NULL CHECK (capability_action = 'PAUSE'),
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                request_event_hash TEXT NOT NULL UNIQUE,
+                checkpoint_event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (
+                    resulting_state IN ('PAUSED', 'RECONCILIATION_REQUIRED')
+                ),
                 body_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS resume_actions (
@@ -5300,6 +5373,11 @@ class SQLiteStateStore:
                         str(body["item_id"]),
                         str(body["logical_effect_id"]),
                     )
+                elif event_kind == "VALIDATION_PAUSE_REQUESTED":
+                    active_fences[str(body["fence_id"])] = (
+                        str(body["item_id"]),
+                        str(body["logical_effect_id"]),
+                    )
                 elif event_kind == "PAUSE_SETTLED":
                     if body.get("pause_kind") == "ACTIVITY_SETTLEMENT":
                         if str(body["pause_fence_id"]) not in active_fences:
@@ -5560,6 +5638,290 @@ class SQLiteStateStore:
         if active_validators:
             blockers.add("VALIDATOR_ACTIVITY_ACTIVE")
         return tuple(sorted(blockers))
+
+    def _validator_pause_checkpoint(
+        self,
+        connection: sqlite3.Connection,
+        repository_id: str,
+        run_id: str,
+        *,
+        before_writer_epoch: int | None = None,
+    ) -> dict[str, object]:
+        cutoff = "" if before_writer_epoch is None else " AND event.writer_epoch < ?"
+        parameters: tuple[object, ...] = (repository_id, run_id)
+        if before_writer_epoch is not None:
+            parameters += (before_writer_epoch,)
+        intents = connection.execute(
+            "SELECT intent.*, event.writer_epoch AS intent_writer_epoch FROM "
+            "validator_intents AS intent JOIN events AS event ON event.event_id = "
+            "intent.event_id WHERE intent.repository_id = ? AND intent.run_id = ?"
+            + cutoff + " ORDER BY event.writer_epoch, event.sequence",
+            parameters,
+        ).fetchall()
+        if before_writer_epoch is None:
+            active_ids = {
+                str(row["validator_intent_id"])
+                for row in intents
+                if row["status"] == "ACTIVE"
+            }
+            slot = connection.execute(
+                "SELECT run_id, logical_effect_id, attempt_id, generation FROM "
+                "outstanding_slot WHERE repository_id = ?",
+                (repository_id,),
+            ).fetchone()
+            slot_binding = None if slot is None else (
+                str(slot["run_id"]), str(slot["logical_effect_id"]),
+                str(slot["attempt_id"]), int(slot["generation"]),
+            )
+        else:
+            _, slot_binding, historical_active = (
+                self._historical_repository_activity(
+                    connection, repository_id, before_writer_epoch
+                )
+            )
+            active_ids = {
+                intent_id
+                for intent_id, active_run_id in historical_active
+                if active_run_id == run_id
+            }
+        active = [
+            row for row in intents
+            if str(row["validator_intent_id"]) in active_ids
+        ]
+        if len(active) > 1:
+            raise StorageIntegrityError(
+                "validation pause checkpoint found multiple active validators"
+            )
+        empty = {
+            "expected_slot_attempt_id": None,
+            "expected_slot_generation": None,
+            "validator_intent_id": None,
+            "validator_intent_event_id": None,
+            "validator_intent_event_hash": None,
+            "validator_attempt_id": None,
+            "check_id": None,
+            "reservation_id": None,
+            "expected_settlement_head_hash": None,
+            "contact_id": None,
+            "contact_event_id": None,
+            "contact_event_hash": None,
+            "contact_target_digest": None,
+            "observation_id": None,
+            "observation_event_id": None,
+            "observation_event_hash": None,
+            "observation_settlement_event_id": None,
+            "observation_settlement_event_hash": None,
+        }
+        if not active:
+            return {
+                "checkpoint_kind": "IDLE",
+                **empty,
+                "settlement_disposition": None,
+                "settlement_uncertainty": None,
+                "settlement_charged_units": None,
+                "worst_case_units": None,
+            }
+        intent = active[0]
+        expected_slot = (
+            run_id,
+            str(intent["logical_effect_id"]),
+            str(intent["parent_attempt_id"]),
+        )
+        if slot_binding is None or slot_binding[:3] != expected_slot:
+            raise StorageIntegrityError(
+                "active validator is detached from its operation slot"
+            )
+        reservation = connection.execute(
+            "SELECT * FROM budget_reservations WHERE reservation_id = ? AND "
+            "repository_id = ? AND run_id = ? AND item_id = ? AND "
+            "logical_effect_id = ? AND attempt_id = ?",
+            (
+                intent["reservation_id"], repository_id, run_id,
+                intent["item_id"], intent["logical_effect_id"],
+                intent["validator_attempt_id"],
+            ),
+        ).fetchone()
+        if reservation is None:
+            raise StorageIntegrityError(
+                "active validator lost its budget reservation"
+            )
+        if before_writer_epoch is None:
+            settlement_head = str(reservation["settlement_head_hash"])
+            settlement_disposition = str(reservation["disposition"])
+            settlement_uncertainty = bool(reservation["uncertainty"])
+            settlement_charged_units = int(reservation["charged_units"])
+        else:
+            historical_settlement = connection.execute(
+                "SELECT settlement.* FROM budget_settlements AS settlement "
+                "JOIN events AS event ON event.event_id = "
+                "settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND event.writer_epoch < ? "
+                "ORDER BY event.writer_epoch DESC, event.sequence DESC LIMIT 1",
+                (intent["reservation_id"], before_writer_epoch),
+            ).fetchone()
+            if historical_settlement is None:
+                settlement_head = ""
+                settlement_disposition = BudgetDisposition.RESERVED.value
+                settlement_uncertainty = False
+                settlement_charged_units = 0
+            else:
+                settlement_head = str(historical_settlement["settlement_hash"])
+                settlement_disposition = str(
+                    historical_settlement["disposition"]
+                )
+                settlement_uncertainty = bool(
+                    historical_settlement["uncertainty"]
+                )
+                settlement_charged_units = int(
+                    historical_settlement["charged_units"]
+                )
+
+        contact_parameters: tuple[object, ...] = (
+            f"VALIDATOR:{intent['validator_intent_id']}",
+        )
+        contact_cutoff = ""
+        if before_writer_epoch is not None:
+            contact_cutoff = " AND event.writer_epoch < ?"
+            contact_parameters += (before_writer_epoch,)
+        contacts = connection.execute(
+            "SELECT contact.*, event.writer_epoch, event.sequence FROM "
+            "adapter_contacts AS contact JOIN events AS event ON "
+            "event.event_id = contact.event_id WHERE contact.source_id = ? "
+            "AND contact.contact_kind = 'VALIDATOR'" + contact_cutoff,
+            contact_parameters,
+        ).fetchall()
+        if len(contacts) > 1:
+            raise StorageIntegrityError(
+                "active validator has multiple durable contacts"
+            )
+        contact = None if not contacts else contacts[0]
+        observation_parameters: tuple[object, ...] = (
+            intent["validator_intent_id"],
+        )
+        observation_cutoff = ""
+        if before_writer_epoch is not None:
+            observation_cutoff = " AND event.writer_epoch < ?"
+            observation_parameters += (before_writer_epoch,)
+        observations = connection.execute(
+            "SELECT observation.*, event.writer_epoch, event.sequence FROM "
+            "validator_observations AS observation JOIN events AS event ON "
+            "event.event_id = observation.event_id WHERE "
+            "observation.validator_intent_id = ?" + observation_cutoff
+            + " ORDER BY event.writer_epoch, event.sequence",
+            observation_parameters,
+        ).fetchall()
+        if len(observations) > 1:
+            raise StorageIntegrityError(
+                "active validator has multiple durable RESULT observations"
+            )
+        observation = None if not observations else observations[0]
+        eligible = False
+        if observation is not None:
+            observation_applied = bool(observation["applied"])
+            if before_writer_epoch is not None:
+                observation_applied = connection.execute(
+                    "SELECT 1 FROM validation_applications AS application "
+                    "JOIN events AS event ON event.event_id = application.event_id "
+                    "WHERE application.observation_id = ? AND "
+                    "event.writer_epoch < ? LIMIT 1",
+                    (observation["observation_id"], before_writer_epoch),
+                ).fetchone() is not None
+            cessation_parameters: tuple[object, ...] = (
+                intent["validator_intent_id"],
+            )
+            cessation_cutoff = ""
+            if before_writer_epoch is not None:
+                cessation_cutoff = " AND event.writer_epoch < ?"
+                cessation_parameters += (before_writer_epoch,)
+            cessations = connection.execute(
+                "SELECT cessation.*, event.writer_epoch AS cessation_writer_epoch, "
+                "event.sequence AS cessation_sequence FROM "
+                "validator_cessations AS cessation "
+                "JOIN events AS event ON event.event_id = cessation.event_id "
+                "WHERE cessation.validator_intent_id = ?" + cessation_cutoff
+                + " ORDER BY event.writer_epoch, event.sequence",
+                cessation_parameters,
+            ).fetchall()
+            cessation_consistent = len(cessations) == 1 and (
+                bool(cessations[0]["result_available"])
+                and cessations[0]["result_id"]
+                == observation["source_result_id"]
+                and cessations[0]["result_digest"]
+                == observation["result_digest"]
+                and cessations[0]["validator_attempt_id"]
+                == intent["validator_attempt_id"]
+                and cessations[0]["check_id"] == intent["check_id"]
+                and (
+                    int(cessations[0]["cessation_writer_epoch"]),
+                    int(cessations[0]["cessation_sequence"]),
+                )
+                > (
+                    int(observation["writer_epoch"]),
+                    int(observation["sequence"]),
+                )
+            )
+            eligible = (
+                contact is not None
+                and not observation_applied
+                and observation["validator_attempt_id"]
+                == intent["validator_attempt_id"]
+                and observation["check_id"] == intent["check_id"]
+                and observation["settlement_hash"] == settlement_head
+                and settlement_disposition
+                in {
+                    BudgetDisposition.CONSUMED.value,
+                    BudgetDisposition.ADJUSTED.value,
+                }
+                and not settlement_uncertainty
+                and observation["usage_units"] is not None
+                and int(observation["usage_units"])
+                == settlement_charged_units
+                and cessation_consistent
+            )
+        checkpoint_kind = (
+            "ELIGIBLE_RESULT_SETTLED"
+            if eligible
+            else (
+                "CONTACTED_UNRESOLVED"
+                if contact is not None
+                else "UNCONTACTED_UNRESOLVED"
+            )
+        )
+        return {
+            "checkpoint_kind": checkpoint_kind,
+            "expected_slot_attempt_id": str(intent["parent_attempt_id"]),
+            "expected_slot_generation": int(slot_binding[3]),
+            "validator_intent_id": str(intent["validator_intent_id"]),
+            "validator_intent_event_id": str(intent["event_id"]),
+            "validator_intent_event_hash": str(intent["event_hash"]),
+            "validator_attempt_id": str(intent["validator_attempt_id"]),
+            "check_id": str(intent["check_id"]),
+            "reservation_id": str(intent["reservation_id"]),
+            "expected_settlement_head_hash": settlement_head,
+            "contact_id": None if contact is None else str(contact["contact_id"]),
+            "contact_event_id": None if contact is None else str(contact["event_id"]),
+            "contact_event_hash": None if contact is None else str(contact["event_hash"]),
+            "contact_target_digest": None if contact is None else str(contact["target_digest"]),
+            "observation_id": (
+                str(observation["observation_id"]) if eligible else None
+            ),
+            "observation_event_id": (
+                str(observation["event_id"]) if eligible else None
+            ),
+            "observation_event_hash": (
+                str(observation["event_hash"]) if eligible else None
+            ),
+            "observation_settlement_event_id": (
+                str(observation["settlement_event_id"]) if eligible else None
+            ),
+            "observation_settlement_event_hash": (
+                str(observation["settlement_hash"]) if eligible else None
+            ),
+            "settlement_disposition": settlement_disposition,
+            "settlement_uncertainty": settlement_uncertainty,
+            "settlement_charged_units": settlement_charged_units,
+            "worst_case_units": int(reservation["worst_case_units"]),
+        }
 
     def accept_plan(
         self,
@@ -7394,6 +7756,511 @@ class SQLiteStateStore:
             sequence + 1, settled_hash, LifecycleState.PAUSED, False,
         )
 
+    def pause_validation(
+        self,
+        request: PauseValidationRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("validation pause targets another repository")
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, "PAUSE"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this validation pause"
+            )
+        capability_evidence = dict(capability.__dict__)
+        payload = {
+            **request.__dict__,
+            "pause_kind": "VALIDATION_CHECKPOINT",
+            "pause_binding_version": 1,
+            "capability_evidence": capability_evidence,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+        }
+        payload_digest = self._event_hash(payload)
+        snapshot_fields = (
+            "expected_slot_attempt_id", "expected_slot_generation",
+            "validator_intent_id", "validator_intent_event_id",
+            "validator_intent_event_hash", "validator_attempt_id", "check_id",
+            "reservation_id", "expected_settlement_head_hash", "contact_id",
+            "contact_event_id", "contact_event_hash", "contact_target_digest",
+            "observation_id", "observation_event_id",
+            "observation_event_hash", "observation_settlement_event_id",
+            "observation_settlement_event_hash",
+        )
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                prior = connection.execute(
+                    "SELECT * FROM validation_pause_actions WHERE command_id = ? "
+                    "OR pause_id = ? OR request_event_id = ? OR "
+                    "checkpoint_event_id = ?",
+                    (
+                        request.command_id, request.pause_id,
+                        request.request_event_id, request.checkpoint_event_id,
+                    ),
+                ).fetchone()
+                if prior_command is not None or prior is not None:
+                    authority.verify_operator_issued(capability)
+                    if prior is None or prior_command is None:
+                        raise StorageIntegrityError(
+                            "validation pause replay lost a durable projection"
+                        )
+                    recorded_capability = (
+                        prior["capability_claim_id"],
+                        prior["capability_grant_id"],
+                        prior["capability_repository_id"],
+                        prior["capability_run_id"],
+                        prior["capability_action"],
+                        prior["capability_scope_digest"],
+                        prior["capability_issuer_mac"],
+                        prior["capability_issuer_fingerprint"],
+                    )
+                    if recorded_capability != (
+                        *capability.__dict__.values(),
+                        authority.issuer_fingerprint,
+                    ) or prior["payload_digest"] != payload_digest or (
+                        prior_command["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "validation pause replay supplied different evidence"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["pause_id"]), str(prior["command_id"]),
+                        str(prior["checkpoint_event_id"]),
+                        int(json.loads(prior["body_json"])["sequence"]),
+                        str(prior["checkpoint_event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                authority.verify_operator_for_action(capability)
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "validation pause does not bind the accepted run and plan"
+                    )
+                if LifecycleState(str(run["lifecycle_state"])) is not (
+                    LifecycleState.VALIDATING
+                ):
+                    raise DispatchDenied("T08 requires durable VALIDATING state")
+                if request.expected_preserved_continuation_cursor != (
+                    run["continuation_cursor"]
+                ):
+                    raise DispatchDenied(
+                        "validation pause preserved cursor is stale"
+                    )
+                checkpoint = self._validator_pause_checkpoint(
+                    connection, request.repository_id, request.run_id
+                )
+                if request.expected_checkpoint_kind != checkpoint[
+                    "checkpoint_kind"
+                ] or any(
+                    getattr(request, field) != checkpoint[field]
+                    for field in snapshot_fields
+                ):
+                    raise DispatchDenied(
+                        "validation pause checkpoint does not match verified history"
+                    )
+                if checkpoint["validator_intent_id"] is not None:
+                    validator = connection.execute(
+                        "SELECT revision_digest, check_id FROM validator_intents "
+                        "WHERE validator_intent_id = ?",
+                        (checkpoint["validator_intent_id"],),
+                    ).fetchone()
+                    if validator is None or (
+                        validator["revision_digest"], validator["check_id"],
+                    ) != (request.revision_digest, checkpoint["check_id"]):
+                        raise DispatchDenied(
+                            "validation pause active validator is outside the plan"
+                        )
+                    if connection.execute(
+                        "SELECT 1 FROM validation_requirements WHERE plan_id = ? "
+                        "AND check_id = ?",
+                        (request.plan_id, checkpoint["check_id"]),
+                    ).fetchone() is None:
+                        raise DispatchDenied(
+                            "validation pause check is not declared by the plan"
+                        )
+                if checkpoint["contact_target_digest"] is not None and (
+                    checkpoint["contact_target_digest"]
+                    != self._adapter_target_digest(
+                        request.repository_id, "VALIDATOR"
+                    )
+                ):
+                    raise DispatchDenied(
+                        "validation pause contact targets a noncanonical ledger"
+                    )
+                resulting_state = (
+                    LifecycleState.PAUSED
+                    if checkpoint["checkpoint_kind"]
+                    in {"IDLE", "ELIGIBLE_RESULT_SETTLED"}
+                    else LifecycleState.RECONCILIATION_REQUIRED
+                )
+                if authorize_transition is not None:
+                    authorize_transition(
+                        LifecycleState.VALIDATING, resulting_state
+                    )
+                sequence = int(run["head_sequence"])
+                previous_hash = str(run["head_hash"])
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                unknown_settlement_event_id = None
+                unknown_settlement_hash = None
+                if (
+                    checkpoint["checkpoint_kind"] == "CONTACTED_UNRESOLVED"
+                    and checkpoint["settlement_disposition"]
+                    == BudgetDisposition.RESERVED.value
+                ):
+                    settlement_binding = {
+                        "pause_id": request.pause_id,
+                        "checkpoint_event_id": request.checkpoint_event_id,
+                        "validator_intent_id": checkpoint["validator_intent_id"],
+                        "contact_id": checkpoint["contact_id"],
+                        "contact_event_hash": checkpoint["contact_event_hash"],
+                        "reservation_id": checkpoint["reservation_id"],
+                        "expected_previous_hash": checkpoint[
+                            "expected_settlement_head_hash"
+                        ],
+                    }
+                    binding_digest = self._event_hash(settlement_binding)
+                    unknown_settlement_event_id = (
+                        "validation-pause-unknown:" + binding_digest
+                    )
+                    settlement_request = BudgetSettlementRequest(
+                        settlement_event_id=unknown_settlement_event_id,
+                        reservation_id=str(checkpoint["reservation_id"]),
+                        expected_previous_hash=str(
+                            checkpoint["expected_settlement_head_hash"]
+                        ),
+                        disposition=(
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        ),
+                        actual_units=None,
+                        evidence_digest=binding_digest,
+                        reason_code="VALIDATION_PAUSE_CONTACT_RESULT_UNKNOWN",
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        attempt_id=str(checkpoint["validator_attempt_id"]),
+                    )
+                    settlement_request.validate()
+                    settlement_payload = {
+                        **settlement_request.__dict__,
+                        "disposition": settlement_request.disposition.value,
+                        "settlement_binding_version": 3,
+                    }
+                    settlement_payload_digest = self._event_hash(
+                        settlement_payload
+                    )
+                    sequence += 1
+                    settlement_body = {
+                        **settlement_payload,
+                        "charged_units": int(checkpoint["worst_case_units"]),
+                        "command_id": (
+                            f"settlement:{unknown_settlement_event_id}"
+                        ),
+                        "contradiction": False,
+                        "event_id": unknown_settlement_event_id,
+                        "event_kind": "BUDGET_SETTLED",
+                        "held_units": 0,
+                        "previous_event_hash": previous_hash,
+                        "schema_version": 1,
+                        "sequence": sequence,
+                        "uncertainty": True,
+                        "writer_epoch": writer_epoch,
+                    }
+                    unknown_settlement_hash = self._event_hash(
+                        settlement_body
+                    )
+                    settlement_json = json.dumps(
+                        settlement_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                        "'BUDGET_SETTLED', ?, ?, ?)",
+                        (
+                            unknown_settlement_event_id,
+                            request.repository_id, request.run_id,
+                            request.item_id, sequence,
+                            settlement_body["command_id"], writer_epoch,
+                            previous_hash, unknown_settlement_hash,
+                            settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO budget_settlements VALUES "
+                        "(?, ?, ?, ?, ?, 0, ?, 1, ?, ?, ?, ?)",
+                        (
+                            unknown_settlement_event_id,
+                            checkpoint["reservation_id"],
+                            checkpoint["expected_settlement_head_hash"],
+                            unknown_settlement_hash,
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            checkpoint["worst_case_units"], binding_digest,
+                            settlement_request.reason_code,
+                            settlement_payload_digest, settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE budget_reservations SET held_units = 0, "
+                        "charged_units = worst_case_units, uncertainty = 1, "
+                        "disposition = ?, settlement_head_hash = ? WHERE "
+                        "reservation_id = ?",
+                        (
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            unknown_settlement_hash,
+                            checkpoint["reservation_id"],
+                        ),
+                    )
+                    previous_hash = unknown_settlement_hash
+                    if failure_hook is not None:
+                        failure_hook(
+                            "after_validation_pause_unknown_settlement_before_request"
+                        )
+                sequence += 1
+                request_body = {
+                    **payload,
+                    "event_id": request.request_event_id,
+                    "event_kind": "VALIDATION_PAUSE_REQUESTED",
+                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                request_hash = self._event_hash(request_body)
+                request_json = json.dumps(
+                    request_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'VALIDATION_PAUSE_REQUESTED', ?, ?, ?)",
+                    (
+                        request.request_event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch, previous_hash,
+                        request_hash, request_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        request.fence_id, request.repository_id,
+                        request.item_id, request.logical_effect_id,
+                        request.reason_code, request.request_event_id,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_pause_request_before_checkpoint"
+                    )
+                sequence += 1
+                checkpoint_snapshot = {
+                    **checkpoint,
+                    "unknown_settlement_event_id": (
+                        unknown_settlement_event_id
+                    ),
+                    "unknown_settlement_hash": unknown_settlement_hash,
+                    "resulting_settlement_disposition": (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                        if unknown_settlement_event_id is not None
+                        else checkpoint["settlement_disposition"]
+                    ),
+                }
+                checkpoint_body = {
+                    **payload,
+                    "checkpoint_snapshot": checkpoint_snapshot,
+                    "event_id": request.checkpoint_event_id,
+                    "event_kind": "VALIDATION_PAUSE_CHECKPOINTED",
+                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request_hash,
+                    "request_event_hash": request_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                checkpoint_hash = self._event_hash(checkpoint_body)
+                checkpoint_json = json.dumps(
+                    checkpoint_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'VALIDATION_PAUSE_CHECKPOINTED', ?, ?, ?)",
+                    (
+                        request.checkpoint_event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch, request_hash,
+                        checkpoint_hash, checkpoint_json,
+                    ),
+                )
+                columns = (
+                    "pause_id", "command_id", "request_event_id",
+                    "checkpoint_event_id", "fence_id", "repository_id",
+                    "run_id", "item_id", "logical_effect_id", "plan_id",
+                    "revision_digest", "reason_code",
+                    "preserved_continuation_cursor", "checkpoint_kind",
+                    "slot_attempt_id", "slot_generation",
+                    "validator_intent_id", "validator_intent_event_id",
+                    "validator_intent_event_hash", "validator_attempt_id",
+                    "check_id", "reservation_id", "settlement_head_hash",
+                    "contact_id", "contact_event_id", "contact_event_hash",
+                    "contact_target_digest", "observation_id",
+                    "observation_event_id", "observation_event_hash",
+                    "observation_settlement_event_id",
+                    "observation_settlement_event_hash",
+                    "unknown_settlement_event_id", "unknown_settlement_hash",
+                    "capability_claim_id", "capability_grant_id",
+                    "capability_repository_id", "capability_run_id",
+                    "capability_action", "capability_scope_digest",
+                    "capability_issuer_mac", "capability_issuer_fingerprint",
+                    "payload_digest", "request_event_hash",
+                    "checkpoint_event_hash", "resulting_state", "body_json"
+                )
+                values = (
+                    request.pause_id, request.command_id,
+                    request.request_event_id, request.checkpoint_event_id,
+                    request.fence_id, request.repository_id, request.run_id,
+                    request.item_id, request.logical_effect_id, request.plan_id,
+                    request.revision_digest, request.reason_code,
+                    request.expected_preserved_continuation_cursor,
+                    checkpoint["checkpoint_kind"],
+                    checkpoint["expected_slot_attempt_id"],
+                    checkpoint["expected_slot_generation"],
+                    checkpoint["validator_intent_id"],
+                    checkpoint["validator_intent_event_id"],
+                    checkpoint["validator_intent_event_hash"],
+                    checkpoint["validator_attempt_id"], checkpoint["check_id"],
+                    checkpoint["reservation_id"],
+                    checkpoint["expected_settlement_head_hash"],
+                    checkpoint["contact_id"], checkpoint["contact_event_id"],
+                    checkpoint["contact_event_hash"],
+                    checkpoint["contact_target_digest"],
+                    checkpoint["observation_id"],
+                    checkpoint["observation_event_id"],
+                    checkpoint["observation_event_hash"],
+                    checkpoint["observation_settlement_event_id"],
+                    checkpoint["observation_settlement_event_hash"],
+                    unknown_settlement_event_id, unknown_settlement_hash,
+                    capability.claim_id, capability.grant_id,
+                    capability.repository_id, capability.run_id,
+                    capability.action, capability.scope_digest,
+                    capability.issuer_mac, authority.issuer_fingerprint,
+                    payload_digest, request_hash, checkpoint_hash,
+                    resulting_state.value, checkpoint_json,
+                )
+                connection.execute(
+                    "INSERT INTO validation_pause_actions ("
+                    + ", ".join(columns) + ") VALUES ("
+                    + ", ".join("?" for _ in values) + ")",
+                    values,
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'PAUSE', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest, authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest,
+                        request.checkpoint_event_id, sequence, checkpoint_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, sequence, checkpoint_hash,
+                        request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (checkpoint_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_pause_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_pause_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.pause_id, request.command_id,
+            request.checkpoint_event_id, sequence, checkpoint_hash,
+            resulting_state, False,
+        )
+
     def resume(
         self,
         request: ResumeRequest,
@@ -7523,9 +8390,48 @@ class SQLiteStateStore:
                         request.run_id,
                     ),
                 ).fetchone()
+                source_is_validation = False
+                if source is None:
+                    source = connection.execute(
+                        "SELECT * FROM validation_pause_actions WHERE "
+                        "pause_id = ? AND checkpoint_event_id = ? AND "
+                        "repository_id = ? AND run_id = ? AND "
+                        "resulting_state = 'PAUSED' AND checkpoint_kind IN "
+                        "('IDLE', 'ELIGIBLE_RESULT_SETTLED')",
+                        (
+                            request.source_pause_id,
+                            request.source_pause_settled_event_id,
+                            request.repository_id, request.run_id,
+                        ),
+                    ).fetchone()
+                    source_is_validation = source is not None
+                source_event_hash = (
+                    None
+                    if source is None
+                    else (
+                        source["checkpoint_event_hash"]
+                        if source_is_validation else source["event_hash"]
+                    )
+                )
+                source_preserved_lifecycle = (
+                    LifecycleState.VALIDATING.value
+                    if source_is_validation
+                    else (
+                        None if source is None
+                        else source["preserved_lifecycle"]
+                    )
+                )
+                source_preserved_cursor = (
+                    None if source is None else source[
+                        "preserved_continuation_cursor"
+                    ]
+                )
+                source_originating_event_id = (
+                    None if source is None else source["request_event_id"]
+                )
                 if source is None or (
-                    source["event_hash"], source["preserved_lifecycle"],
-                    source["preserved_continuation_cursor"],
+                    source_event_hash, source_preserved_lifecycle,
+                    source_preserved_cursor,
                 ) != (
                     request.source_pause_settled_event_hash,
                     request.expected_preserved_lifecycle.value,
@@ -7539,7 +8445,7 @@ class SQLiteStateStore:
                     "repository_id = ? AND originating_event_id = ?",
                     (
                         request.pause_fence_id, request.repository_id,
-                        source["request_event_id"],
+                        source_originating_event_id,
                     ),
                 ).fetchone()
                 if fence is None:
@@ -7549,7 +8455,18 @@ class SQLiteStateStore:
                     "AND run_id = ? AND status = 'ACTIVE' LIMIT 1",
                     (request.repository_id, request.run_id),
                 ).fetchone()
-                if owned_active_validator is not None or (
+                validator_checkpoint = (
+                    None
+                    if owned_active_validator is None
+                    else self._validator_pause_checkpoint(
+                        connection, request.repository_id, request.run_id
+                    )
+                )
+                if (
+                    validator_checkpoint is not None
+                    and validator_checkpoint["checkpoint_kind"]
+                    != "ELIGIBLE_RESULT_SETTLED"
+                ) or (
                     self._unresolved_contact_reservations(
                         connection, request.repository_id, request.run_id
                     )
@@ -7589,9 +8506,9 @@ class SQLiteStateStore:
                 ).fetchone()
                 if slot is not None and slot["run_id"] != request.run_id:
                     blocker_codes.add("OTHER_OPERATION_SLOT_OCCUPIED")
-                preserved_cursor = source["preserved_continuation_cursor"]
+                preserved_cursor = source_preserved_cursor
                 preserved_lifecycle = LifecycleState(
-                    str(source["preserved_lifecycle"])
+                    str(source_preserved_lifecycle)
                 )
                 if preserved_cursor == LifecycleState.VALIDATING.value and (
                     connection.execute(
@@ -7659,7 +8576,7 @@ class SQLiteStateStore:
                     "repository_id = ? AND originating_event_id = ?",
                     (
                         request.pause_fence_id, request.repository_id,
-                        source["request_event_id"],
+                        source_originating_event_id,
                     ),
                 ).rowcount
                 if deleted != 1:
@@ -13499,7 +14416,9 @@ class SQLiteStateStore:
     def load_validator_intent_binding(
         self, validator_intent_id: str, *, require_active: bool = True
     ) -> ValidatorIntentBinding:
-        with closing(self._connect()) as connection:
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
             self._verify_projections(connection, self._repository_id)
             row = connection.execute(
                 "SELECT * FROM validator_intents WHERE validator_intent_id = ?",
@@ -13517,7 +14436,9 @@ class SQLiteStateStore:
             )
 
     def load_run_lifecycle(self, run_id: str) -> LifecycleState:
-        with closing(self._connect()) as connection:
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
             self._verify_projections(connection, self._repository_id)
             row = connection.execute(
                 "SELECT lifecycle_state FROM runs WHERE run_id = ? AND repository_id = ?",
@@ -14844,11 +15765,43 @@ class SQLiteStateStore:
                     )
                 except (KeyError, TypeError, json.JSONDecodeError):
                     external_pause_epoch = False
+            validation_pause_epoch = False
+            if (
+                len(rows) in {2, 3}
+                and tuple(row["event_kind"] for row in rows[-2:])
+                == (
+                    "VALIDATION_PAUSE_REQUESTED",
+                    "VALIDATION_PAUSE_CHECKPOINTED",
+                )
+                and (len(rows) == 2 or rows[0]["event_kind"] == "BUDGET_SETTLED")
+                and len({row["run_id"] for row in rows}) == 1
+                and all(
+                    int(rows[index]["sequence"]) + 1
+                    == int(rows[index + 1]["sequence"])
+                    for index in range(len(rows) - 1)
+                )
+                and rows[-2]["command_id"] == rows[-1]["command_id"]
+            ):
+                try:
+                    checkpoint_body = json.loads(rows[-1]["body_json"])
+                    unknown_id = checkpoint_body["checkpoint_snapshot"].get(
+                        "unknown_settlement_event_id"
+                    )
+                    validation_pause_epoch = (
+                        (len(rows) == 2 and unknown_id is None)
+                        or (
+                            len(rows) == 3
+                            and unknown_id == rows[0]["event_id"]
+                        )
+                    )
+                except (KeyError, TypeError, json.JSONDecodeError):
+                    validation_pause_epoch = False
             if not (
                 pause_epoch
                 or escalation_epoch
                 or immediate_stop_epoch
                 or external_pause_epoch
+                or validation_pause_epoch
             ):
                 raise StorageIntegrityError(
                     "writer epoch is reused outside one atomic control action: "
@@ -15471,6 +16424,210 @@ class SQLiteStateStore:
                     self._event_hash(body),
                 )
                 for body in finalizations
+            }
+        )
+        validation_pause_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'VALIDATION_PAUSE_CHECKPOINTED'",
+            (repository_id,),
+        ).fetchall()
+        validation_pauses = [
+            json.loads(row["body_json"]) for row in validation_pause_rows
+        ]
+        for body in validation_pauses:
+            try:
+                request = PauseValidationRequest(
+                    **{
+                        key: body[key]
+                        for key in PauseValidationRequest.__dataclass_fields__
+                    }
+                )
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied(
+                        "validation pause recovery requires its authority"
+                    )
+                self._classification_authority.verify_operator_issued(
+                    capability
+                )
+                payload = {
+                    **request.__dict__,
+                    "pause_kind": "VALIDATION_CHECKPOINT",
+                    "pause_binding_version": 1,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                }
+                payload_fields = set(payload)
+                checkpoint_fields = payload_fields | {
+                    "checkpoint_snapshot", "event_id", "event_kind",
+                    "lifecycle_from", "lifecycle_to", "payload_digest",
+                    "previous_event_hash", "request_event_hash",
+                    "schema_version", "sequence", "writer_epoch",
+                }
+                request_event = connection.execute(
+                    "SELECT * FROM events WHERE event_id = ? AND "
+                    "repository_id = ? AND run_id = ? AND event_kind = "
+                    "'VALIDATION_PAUSE_REQUESTED'",
+                    (
+                        request.request_event_id, repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if request_event is None:
+                    raise ValueError(
+                        "validation pause request event is unavailable"
+                    )
+                request_body = json.loads(request_event["body_json"])
+                request_fields = payload_fields | {
+                    "event_id", "event_kind", "lifecycle_from",
+                    "lifecycle_to", "payload_digest", "previous_event_hash",
+                    "schema_version", "sequence", "writer_epoch",
+                }
+                derived = self._validator_pause_checkpoint(
+                    connection, repository_id, request.run_id,
+                    before_writer_epoch=int(body["writer_epoch"]),
+                )
+                snapshot = body["checkpoint_snapshot"]
+                snapshot_fields = {
+                    "checkpoint_kind", "expected_slot_attempt_id",
+                    "expected_slot_generation", "validator_intent_id",
+                    "validator_intent_event_id",
+                    "validator_intent_event_hash", "validator_attempt_id",
+                    "check_id", "reservation_id",
+                    "expected_settlement_head_hash", "contact_id",
+                    "contact_event_id", "contact_event_hash",
+                    "contact_target_digest", "observation_id",
+                    "observation_event_id", "observation_event_hash",
+                    "observation_settlement_event_id",
+                    "observation_settlement_event_hash",
+                    "settlement_disposition", "settlement_uncertainty",
+                    "settlement_charged_units", "worst_case_units",
+                }
+                if (
+                    set(body) != checkpoint_fields
+                    or set(request_body) != request_fields
+                    or not isinstance(snapshot, Mapping)
+                    or set(snapshot) != snapshot_fields
+                    | {
+                        "unknown_settlement_event_id",
+                        "unknown_settlement_hash",
+                        "resulting_settlement_disposition",
+                    }
+                    or any(snapshot[key] != derived[key] for key in snapshot_fields)
+                    or body["payload_digest"] != self._event_hash(payload)
+                    or request_body["payload_digest"]
+                    != body["payload_digest"]
+                    or body["capability_issuer_fingerprint"]
+                    != self._classification_authority.issuer_fingerprint
+                    or (
+                        capability.repository_id, capability.run_id,
+                        capability.action,
+                    ) != (repository_id, request.run_id, "PAUSE")
+                    or body["event_kind"]
+                    != "VALIDATION_PAUSE_CHECKPOINTED"
+                    or request_body["event_kind"]
+                    != "VALIDATION_PAUSE_REQUESTED"
+                    or body["lifecycle_from"]
+                    != LifecycleState.VALIDATING.value
+                    or request_body["lifecycle_from"]
+                    != LifecycleState.VALIDATING.value
+                    or request_body["lifecycle_to"]
+                    != LifecycleState.VALIDATING.value
+                    or body["request_event_hash"]
+                    != request_event["event_hash"]
+                    or body["previous_event_hash"]
+                    != request_event["event_hash"]
+                    or int(request_body["sequence"]) + 1
+                    != int(body["sequence"])
+                    or int(request_body["writer_epoch"])
+                    != int(body["writer_epoch"])
+                ):
+                    raise ValueError(
+                        "validation pause checkpoint schema or proof is invalid"
+                    )
+                expected_result = (
+                    LifecycleState.PAUSED.value
+                    if derived["checkpoint_kind"]
+                    in {"IDLE", "ELIGIBLE_RESULT_SETTLED"}
+                    else LifecycleState.RECONCILIATION_REQUIRED.value
+                )
+                if body["lifecycle_to"] != expected_result:
+                    raise ValueError(
+                        "validation pause route diverges from its checkpoint"
+                    )
+                unknown_event_id = snapshot["unknown_settlement_event_id"]
+                unknown_hash = snapshot["unknown_settlement_hash"]
+                if derived["checkpoint_kind"] == "CONTACTED_UNRESOLVED" and (
+                    derived["settlement_disposition"]
+                    == BudgetDisposition.RESERVED.value
+                ):
+                    binding = {
+                        "pause_id": request.pause_id,
+                        "checkpoint_event_id": request.checkpoint_event_id,
+                        "validator_intent_id": derived["validator_intent_id"],
+                        "contact_id": derived["contact_id"],
+                        "contact_event_hash": derived["contact_event_hash"],
+                        "reservation_id": derived["reservation_id"],
+                        "expected_previous_hash": derived[
+                            "expected_settlement_head_hash"
+                        ],
+                    }
+                    digest = self._event_hash(binding)
+                    settlement = connection.execute(
+                        "SELECT * FROM budget_settlements WHERE "
+                        "settlement_event_id = ? AND reservation_id = ?",
+                        (
+                            "validation-pause-unknown:" + digest,
+                            derived["reservation_id"],
+                        ),
+                    ).fetchone()
+                    if settlement is None or (
+                        unknown_event_id != settlement["settlement_event_id"]
+                        or unknown_hash != settlement["settlement_hash"]
+                        or settlement["previous_hash"]
+                        != derived["expected_settlement_head_hash"]
+                        or settlement["disposition"]
+                        != BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                        or int(settlement["charged_units"])
+                        != int(derived["worst_case_units"])
+                        or not bool(settlement["uncertainty"])
+                        or settlement["evidence_digest"] != digest
+                        or settlement["reason_code"]
+                        != "VALIDATION_PAUSE_CONTACT_RESULT_UNKNOWN"
+                        or snapshot["resulting_settlement_disposition"]
+                        != BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                    ):
+                        raise ValueError(
+                            "validation pause uncertainty settlement is invalid"
+                        )
+                elif (
+                    unknown_event_id is not None
+                    or unknown_hash is not None
+                    or snapshot["resulting_settlement_disposition"]
+                    != derived["settlement_disposition"]
+                ):
+                    raise ValueError(
+                        "validation pause recorded a surplus uncertainty settlement"
+                    )
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+                json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "validation pause proof or schema is invalid"
+                ) from error
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in validation_pauses
             }
         )
         pause_settled_rows = connection.execute(
@@ -16120,10 +17277,37 @@ class SQLiteStateStore:
                         request.source_pause_settled_event_hash,
                     ),
                 ).fetchone()
+                source_is_validation = False
+                if source is None:
+                    source = connection.execute(
+                        "SELECT * FROM validation_pause_actions WHERE "
+                        "pause_id = ? AND checkpoint_event_id = ? AND "
+                        "checkpoint_event_hash = ? AND resulting_state = "
+                        "'PAUSED' AND checkpoint_kind IN "
+                        "('IDLE', 'ELIGIBLE_RESULT_SETTLED')",
+                        (
+                            request.source_pause_id,
+                            request.source_pause_settled_event_id,
+                            request.source_pause_settled_event_hash,
+                        ),
+                    ).fetchone()
+                    source_is_validation = source is not None
+                source_preserved_lifecycle = (
+                    LifecycleState.VALIDATING.value
+                    if source_is_validation
+                    else (
+                        None if source is None
+                        else source["preserved_lifecycle"]
+                    )
+                )
+                source_cursor = (
+                    None if source is None else source[
+                        "preserved_continuation_cursor"
+                    ]
+                )
                 if source is None or (
                     source["repository_id"], source["run_id"], source["item_id"],
-                    source["preserved_lifecycle"],
-                    source["preserved_continuation_cursor"],
+                    source_preserved_lifecycle, source_cursor,
                 ) != (
                     request.repository_id, request.run_id, request.item_id,
                     request.expected_preserved_lifecycle.value,
@@ -16179,7 +17363,7 @@ class SQLiteStateStore:
                     )
                 if historical_slot is not None and historical_slot[0] != request.run_id:
                     blockers.add("OTHER_OPERATION_SLOT_OCCUPIED")
-                cursor = source["preserved_continuation_cursor"]
+                cursor = source_cursor
                 if cursor == LifecycleState.VALIDATING.value and (
                     connection.execute(
                         "SELECT 1 FROM validation_applications AS application "
@@ -16204,7 +17388,19 @@ class SQLiteStateStore:
                     validator_run_id == request.run_id
                     for _, validator_run_id in active_validators
                 )
-                if owned_active_validator or self._unresolved_contact_reservations(
+                validator_checkpoint = (
+                    None
+                    if not owned_active_validator
+                    else self._validator_pause_checkpoint(
+                        connection, repository_id, request.run_id,
+                        before_writer_epoch=int(body["writer_epoch"]),
+                    )
+                )
+                if (
+                    validator_checkpoint is not None
+                    and validator_checkpoint["checkpoint_kind"]
+                    != "ELIGIBLE_RESULT_SETTLED"
+                ) or self._unresolved_contact_reservations(
                     connection, request.repository_id, request.run_id,
                     before_sequence=int(body["sequence"]),
                 ):
@@ -16212,7 +17408,7 @@ class SQLiteStateStore:
                         "resume history bypassed unresolved owned activity"
                     )
                 expected_state = _derive_resume_route(
-                    LifecycleState(str(source["preserved_lifecycle"])),
+                    LifecycleState(str(source_preserved_lifecycle)),
                     cursor,
                     tuple(sorted(blockers)),
                 )
@@ -16220,7 +17416,7 @@ class SQLiteStateStore:
                     body["blocker_codes"] != sorted(blockers)
                     or body["lifecycle_to"] != expected_state.value
                     or body["preserved_lifecycle"]
-                    != source["preserved_lifecycle"]
+                    != source_preserved_lifecycle
                     or body["preserved_continuation_cursor"] != cursor
                 ):
                     raise DispatchDenied("resume historical route mismatch")
@@ -17143,6 +18339,82 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "activity-pause-settlement projection diverges from history"
             )
+        expected_validation_pauses = {}
+        for body in validation_pauses:
+            snapshot = body["checkpoint_snapshot"]
+            request_event_hash = connection.execute(
+                "SELECT event_hash FROM events WHERE event_id = ?",
+                (body["request_event_id"],),
+            ).fetchone()["event_hash"]
+            expected_validation_pauses[body["pause_id"]] = (
+                body["command_id"], body["request_event_id"], body["event_id"],
+                body["fence_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["plan_id"],
+                body["revision_digest"], body["reason_code"],
+                body["expected_preserved_continuation_cursor"],
+                body["expected_checkpoint_kind"],
+                body["expected_slot_attempt_id"],
+                body["expected_slot_generation"],
+                body["validator_intent_id"],
+                body["validator_intent_event_id"],
+                body["validator_intent_event_hash"],
+                body["validator_attempt_id"], body["check_id"],
+                body["reservation_id"], body["expected_settlement_head_hash"],
+                body["contact_id"], body["contact_event_id"],
+                body["contact_event_hash"], body["contact_target_digest"],
+                body["observation_id"], body["observation_event_id"],
+                body["observation_event_hash"],
+                body["observation_settlement_event_id"],
+                body["observation_settlement_event_hash"],
+                snapshot["unknown_settlement_event_id"],
+                snapshot["unknown_settlement_hash"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["repository_id"],
+                body["capability_evidence"]["run_id"],
+                body["capability_evidence"]["action"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_evidence"]["issuer_mac"],
+                body["capability_issuer_fingerprint"], body["payload_digest"],
+                request_event_hash, self._event_hash(body),
+                body["lifecycle_to"], body,
+            )
+        actual_validation_pauses = {
+            row["pause_id"]: (
+                row["command_id"], row["request_event_id"],
+                row["checkpoint_event_id"], row["fence_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["plan_id"],
+                row["revision_digest"], row["reason_code"],
+                row["preserved_continuation_cursor"], row["checkpoint_kind"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["validator_intent_id"], row["validator_intent_event_id"],
+                row["validator_intent_event_hash"],
+                row["validator_attempt_id"], row["check_id"],
+                row["reservation_id"], row["settlement_head_hash"],
+                row["contact_id"], row["contact_event_id"],
+                row["contact_event_hash"], row["contact_target_digest"],
+                row["observation_id"], row["observation_event_id"],
+                row["observation_event_hash"],
+                row["observation_settlement_event_id"],
+                row["observation_settlement_event_hash"],
+                row["unknown_settlement_event_id"],
+                row["unknown_settlement_hash"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_repository_id"],
+                row["capability_run_id"], row["capability_action"],
+                row["capability_scope_digest"], row["capability_issuer_mac"],
+                row["capability_issuer_fingerprint"], row["payload_digest"],
+                row["request_event_hash"], row["checkpoint_event_hash"],
+                row["resulting_state"], json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM validation_pause_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_validation_pauses != expected_validation_pauses:
+            raise StorageIntegrityError(
+                "validation-pause projection diverges from event history"
+            )
         expected_resumes = {
             body["resume_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -17435,6 +18707,17 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in external_pauses
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "PAUSE",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in validation_pauses
             }
         )
         expected_operator_redemptions.update(
@@ -17937,6 +19220,15 @@ class SQLiteStateStore:
         )
         expected_fences.update(
             {
+                body["fence_id"]: (
+                    body["item_id"], body["logical_effect_id"],
+                    body["reason_code"], body["request_event_id"],
+                )
+                for body in validation_pauses
+            }
+        )
+        expected_fences.update(
+            {
                 str(body["fence_id"]): (
                     str(body["item_id"]), str(body["logical_effect_id"]),
                     "AUTHORITY_CURRENT_DENIAL", str(body["event_id"]),
@@ -18374,13 +19666,22 @@ class SQLiteStateStore:
 
         for body in resumes:
             source_fence = expected_fences.get(body["pause_fence_id"])
-            if source_fence is None or source_fence[3] != (
-                connection.execute(
-                    "SELECT request_event_id FROM control_actions WHERE "
-                    "control_id = ?",
+            source_action = connection.execute(
+                "SELECT request_event_id FROM control_actions WHERE "
+                "control_id = ?",
+                (body["source_pause_id"],),
+            ).fetchone()
+            if source_action is None:
+                source_action = connection.execute(
+                    "SELECT request_event_id FROM validation_pause_actions "
+                    "WHERE pause_id = ? AND resulting_state = 'PAUSED'",
                     (body["source_pause_id"],),
-                ).fetchone() or {"request_event_id": None}
-            )["request_event_id"]:
+                ).fetchone()
+            if (
+                source_fence is None
+                or source_action is None
+                or source_fence[3] != source_action["request_event_id"]
+            ):
                 raise StorageIntegrityError(
                     "resume source pause fence diverges from history"
                 )
@@ -18947,6 +20248,7 @@ class SQLiteStateStore:
             "control_actions",
             "local_pause_actions",
             "external_pause_actions",
+            "validation_pause_actions",
             "resume_actions",
             "stop_actions",
             "stop_escalations",

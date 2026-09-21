@@ -42,12 +42,16 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
+    PauseValidationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
+    ResumeRequest,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
     StopRequest,
+    StorageIntegrityError,
     ValidationApplicationRequest,
+    ValidatorCessationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
 )
@@ -124,6 +128,918 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t08_validation_pause_contract_and_coordinator_route(self) -> None:
+        request = PauseValidationRequest(
+            pause_id="validation-pause-1",
+            command_id="validation-pause-command-1",
+            request_event_id="validation-pause-request-event-1",
+            checkpoint_event_id="validation-pause-checkpoint-event-1",
+            fence_id="validation-pause-fence-1",
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            plan_id="plan-1",
+            revision_digest="revision-1",
+            reason_code="OPERATOR_PAUSE_VALIDATION",
+            expected_preserved_continuation_cursor="validation:plan-1",
+            expected_checkpoint_kind="IDLE",
+            expected_slot_attempt_id=None,
+            expected_slot_generation=None,
+            validator_intent_id=None,
+            validator_intent_event_id=None,
+            validator_intent_event_hash=None,
+            validator_attempt_id=None,
+            check_id=None,
+            reservation_id=None,
+            expected_settlement_head_hash=None,
+            contact_id=None,
+            contact_event_id=None,
+            contact_event_hash=None,
+            contact_target_digest=None,
+            observation_id=None,
+            observation_event_id=None,
+            observation_event_hash=None,
+            observation_settlement_event_id=None,
+            observation_settlement_event_hash=None,
+        )
+        request.validate()
+        self.assertTrue(
+            hasattr(SyntheticDispatchCoordinator, "pause_validation"),
+            "T08 requires a coordinator-owned validation pause route",
+        )
+        with self.assertRaisesRegex(ValueError, "active validator tuple"):
+            replace(request, expected_slot_attempt_id="validator-attempt-1").validate()
+
+    def test_t08_idle_validation_pauses_without_adapter_contact_and_recovers(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            authority = SyntheticAuthority()
+            effect_grant = SyntheticGrant(
+                "grant-t08", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "command-t08", "event-t08",
+                "effect-1", "payload-1", "attempt-1", "permission-t08",
+                "reservation-t08", "budget-1", 1, 1, 10,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            coordinator.dispatch(
+                intent,
+                effect_capability,
+                SyntheticEffectRequest(
+                    "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
+                ),
+                expected_head=plan.event_hash,
+                writer_epoch=2,
+                usage_units=1,
+            )
+            coordinator.intake_effect_receipt(
+                EffectObservationCommand(
+                    "observation-t08", "observe-command-t08",
+                    "observation-event-t08", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", effect_capability.claim_id,
+                    "settlement-t08", "",
+                )
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-t08", "repo-1", "run-1", "PAUSE",
+                "pause-scope-t08",
+            )
+            authority.register_operator(pause_grant)
+            request = PauseValidationRequest(
+                pause_id="validation-pause-t08",
+                command_id="validation-pause-command-t08",
+                request_event_id="validation-pause-request-t08",
+                checkpoint_event_id="validation-pause-checkpoint-t08",
+                fence_id="validation-pause-fence-t08",
+                repository_id="repo-1",
+                run_id="run-1",
+                item_id="item-1",
+                logical_effect_id="effect-1",
+                plan_id="plan:run-1",
+                revision_digest="revision-1",
+                reason_code="OPERATOR_PAUSE_VALIDATION",
+                expected_preserved_continuation_cursor=None,
+                expected_checkpoint_kind="IDLE",
+                expected_slot_attempt_id=None,
+                expected_slot_generation=None,
+                validator_intent_id=None,
+                validator_intent_event_id=None,
+                validator_intent_event_hash=None,
+                validator_attempt_id=None,
+                check_id=None,
+                reservation_id=None,
+                expected_settlement_head_hash=None,
+                contact_id=None,
+                contact_event_id=None,
+                contact_event_hash=None,
+                contact_target_digest=None,
+                observation_id=None,
+                observation_event_id=None,
+                observation_event_hash=None,
+                observation_settlement_event_id=None,
+                observation_settlement_event_hash=None,
+            )
+            receipt = coordinator.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(receipt.resulting_state, LifecycleState.PAUSED)
+            self.assertEqual(store.load_run_lifecycle("run-1"), LifecycleState.PAUSED)
+            self.assertIsNotNone(adapter.reconcile(effect_capability.claim_id))
+            catalog_head, run_heads = store.load_verified(
+                "repo-1", authority=authority
+            )
+            resume_grant = SyntheticOperatorGrant(
+                "resume-grant-t08", "repo-1", "run-1", "RESUME",
+                "resume-scope-t08",
+            )
+            authority.register_operator(resume_grant)
+            resume_request = ResumeRequest(
+                "resume-t08", "resume-command-t08", "resume-event-t08",
+                "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+                "revision-1", request.pause_id, request.checkpoint_event_id,
+                receipt.event_hash, request.fence_id,
+                LifecycleState.VALIDATING, None, catalog_head,
+                run_heads["run-1"], store._run_heads_digest(run_heads),
+            )
+            resumed = coordinator.resume(
+                resume_request,
+                authority.claim_operator(*resume_grant.__dict__.values()),
+                authority.issue_resume_evidence(
+                    "resume-proof-t08", resume_request
+                ),
+            )
+            self.assertEqual(resumed.resulting_state, LifecycleState.VALIDATING)
+            self.assertEqual(
+                store.load_run_lifecycle("run-1"), LifecycleState.VALIDATING
+            )
+
+    def test_t08_uncontacted_validator_is_fenced_without_budget_charge(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                validator_intent, validator_capability, committed,
+            ) = self._prepare_t08_active_validator(root, contact=False)
+            request = self._t08_pause_request(store, suffix="uncontacted")
+            self.assertEqual(
+                request.expected_checkpoint_kind, "UNCONTACTED_UNRESOLVED"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-uncontacted", "repo-1", "run-1", "PAUSE",
+                "pause-scope-uncontacted",
+            )
+            authority.register_operator(pause_grant)
+            receipt = dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(
+                receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                accounting = connection.execute(
+                    "SELECT disposition, held_units, charged_units, uncertainty "
+                    "FROM budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+                contacts = connection.execute(
+                    "SELECT COUNT(*) FROM adapter_contacts WHERE contact_kind = "
+                    "'VALIDATOR'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(accounting, ("RESERVED", 1, 0, 0))
+            self.assertEqual(contacts, 0)
+            self.assertIsNone(
+                validator_adapter.reconcile(validator_capability.claim_id)
+            )
+            with self.assertRaisesRegex(DispatchDenied, "VALIDATING state"):
+                store._contact_committed_validator(
+                    validator_intent, validator_capability, committed,
+                    validator_adapter._target_digest("repo-1"), authority,
+                )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_contacted_validator_is_atomically_worst_case_charged(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                _validator_intent, validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(root, contact=True)
+            request = self._t08_pause_request(store, suffix="contacted")
+            self.assertEqual(
+                request.expected_checkpoint_kind, "CONTACTED_UNRESOLVED"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-contacted", "repo-1", "run-1", "PAUSE",
+                "pause-scope-contacted",
+            )
+            authority.register_operator(pause_grant)
+            receipt = dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(
+                receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                accounting = connection.execute(
+                    "SELECT disposition, held_units, charged_units, uncertainty "
+                    "FROM budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+                projection = connection.execute(
+                    "SELECT unknown_settlement_event_id, "
+                    "unknown_settlement_hash FROM validation_pause_actions"
+                ).fetchone()
+                fence_count = connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?",
+                    (request.fence_id,),
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(
+                accounting, ("UNKNOWN_WORST_CASE_CHARGED", 0, 2, 1)
+            )
+            self.assertTrue(projection[0].startswith("validation-pause-unknown:"))
+            self.assertTrue(projection[1])
+            self.assertEqual(fence_count, 1)
+            self.assertIsNone(
+                validator_adapter.reconcile(validator_capability.claim_id)
+            )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_settled_result_pauses_resumes_and_applies_without_rerun(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                _validator_intent, validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=True, cessation=True
+            )
+            request = self._t08_pause_request(store, suffix="settled-result")
+            self.assertEqual(
+                request.expected_checkpoint_kind, "ELIGIBLE_RESULT_SETTLED"
+            )
+            result_before = validator_adapter.reconcile(
+                validator_capability.claim_id
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-settled-result", "repo-1", "run-1", "PAUSE",
+                "pause-scope-settled-result",
+            )
+            authority.register_operator(pause_grant)
+            paused = dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(paused.resulting_state, LifecycleState.PAUSED)
+            catalog_head, run_heads = store.load_verified(
+                "repo-1", authority=authority
+            )
+            resume_grant = SyntheticOperatorGrant(
+                "resume-grant-settled-result", "repo-1", "run-1", "RESUME",
+                "resume-scope-settled-result",
+            )
+            authority.register_operator(resume_grant)
+            resume_request = ResumeRequest(
+                "resume-settled-result", "resume-command-settled-result",
+                "resume-event-settled-result", "repo-1", "run-1", "item-1",
+                "effect-1", "plan:run-1", "revision-1", request.pause_id,
+                request.checkpoint_event_id, paused.event_hash,
+                request.fence_id, LifecycleState.VALIDATING, None,
+                catalog_head, run_heads["run-1"],
+                store._run_heads_digest(run_heads),
+            )
+            resumed = dispatch.resume(
+                resume_request,
+                authority.claim_operator(*resume_grant.__dict__.values()),
+                authority.issue_resume_evidence(
+                    "resume-proof-settled-result", resume_request
+                ),
+            )
+            self.assertEqual(resumed.resulting_state, LifecycleState.VALIDATING)
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            applied = validation.apply_result(
+                ValidationApplicationRequest(
+                    "application-settled-result", "apply-command-settled-result",
+                    "apply-event-settled-result", "repo-1", "run-1", "item-1",
+                    "effect-1", "revision-1", "check-1",
+                    "validator-attempt-1", "validator-observation-t08",
+                )
+            )
+            self.assertEqual(applied.resulting_state, LifecycleState.BLOCKED)
+            self.assertEqual(
+                validator_adapter.reconcile(validator_capability.claim_id),
+                result_before,
+            )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_result_without_authoritative_cessation_stays_in_reconciliation(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, _validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=True, cessation=False
+            )
+            request = self._t08_pause_request(
+                store, suffix="result-without-cessation"
+            )
+            self.assertEqual(
+                request.expected_checkpoint_kind, "CONTACTED_UNRESOLVED"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-result-without-cessation", "repo-1", "run-1",
+                "PAUSE", "pause-scope-result-without-cessation",
+            )
+            authority.register_operator(pause_grant)
+            paused = dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(
+                paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                accounting = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+                observations = connection.execute(
+                    "SELECT COUNT(*) FROM validator_observations WHERE "
+                    "observation_id = 'validator-observation-t08'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(accounting, ("CONSUMED", 1, 0))
+            self.assertEqual(observations, 1)
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_existing_validator_accounting_is_never_downgraded_or_recharged(
+        self,
+    ) -> None:
+        cases = (
+            (BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None, 2, 1),
+            (BudgetDisposition.CONSUMED, 1, 1, 0),
+        )
+        for disposition, actual_units, charged_units, uncertainty in cases:
+            with self.subTest(disposition=disposition.value), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (
+                    authority, store, dispatch, _validator_adapter,
+                    _validator_intent, _validator_capability, _committed,
+                ) = self._prepare_t08_active_validator(root, contact=True)
+                settlement_request = BudgetSettlementRequest(
+                    f"pre-pause-settlement-{disposition.value}",
+                    "validator-reservation-t08", "", disposition,
+                    actual_units, f"evidence-{disposition.value}",
+                    f"PRE_PAUSE_{disposition.value}",
+                    attempt_id="validator-attempt-1",
+                )
+                store._settle_budget(
+                    settlement_request,
+                    authority.issue_settlement_proof(
+                        f"proof-{disposition.value}", settlement_request
+                    ),
+                    authority,
+                )
+                request = self._t08_pause_request(
+                    store, suffix=disposition.value.lower()
+                )
+                pause_grant = SyntheticOperatorGrant(
+                    f"pause-grant-{disposition.value}", "repo-1", "run-1",
+                    "PAUSE", f"pause-scope-{disposition.value}",
+                )
+                authority.register_operator(pause_grant)
+                dispatch.pause_validation(
+                    request,
+                    authority.claim_operator(*pause_grant.__dict__.values()),
+                )
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    accounting = connection.execute(
+                        "SELECT disposition, charged_units, uncertainty FROM "
+                        "budget_reservations WHERE reservation_id = "
+                        "'validator-reservation-t08'"
+                    ).fetchone()
+                    settlement_count = connection.execute(
+                        "SELECT COUNT(*) FROM budget_settlements WHERE "
+                        "reservation_id = 'validator-reservation-t08'"
+                    ).fetchone()[0]
+                    synthetic_settlement = connection.execute(
+                        "SELECT unknown_settlement_event_id FROM "
+                        "validation_pause_actions"
+                    ).fetchone()[0]
+                finally:
+                    connection.close()
+                self.assertEqual(
+                    accounting,
+                    (disposition.value, charged_units, uncertainty),
+                )
+                self.assertEqual(settlement_count, 1)
+                self.assertIsNone(synthetic_settlement)
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t08_validation_pause_crash_boundaries_are_atomic_and_replayable(
+        self,
+    ) -> None:
+        rollback_points = (
+            "after_validation_pause_unknown_settlement_before_request",
+            "after_validation_pause_request_before_checkpoint",
+            "after_validation_pause_writes_before_commit",
+        )
+        for point in rollback_points:
+            with self.subTest(point=point), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (
+                    authority, store, dispatch, _validator_adapter,
+                    _validator_intent, _validator_capability, _committed,
+                ) = self._prepare_t08_active_validator(root, contact=True)
+                request = self._t08_pause_request(store, suffix=point)
+                pause_grant = SyntheticOperatorGrant(
+                    f"pause-grant-{point}", "repo-1", "run-1", "PAUSE",
+                    f"pause-scope-{point}",
+                )
+                authority.register_operator(pause_grant)
+                capability = authority.claim_operator(
+                    *pause_grant.__dict__.values()
+                )
+                with self.assertRaises(InjectedFailure):
+                    dispatch.pause_validation(
+                        request, capability, failure_hook=raise_at(point)
+                    )
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    counts = connection.execute(
+                        "SELECT (SELECT COUNT(*) FROM validation_pause_actions), "
+                        "(SELECT COUNT(*) FROM events WHERE event_kind IN "
+                        "('VALIDATION_PAUSE_REQUESTED', "
+                        "'VALIDATION_PAUSE_CHECKPOINTED')), "
+                        "(SELECT COUNT(*) FROM budget_settlements WHERE "
+                        "settlement_event_id LIKE 'validation-pause-unknown:%')"
+                    ).fetchone()
+                    accounting = connection.execute(
+                        "SELECT disposition FROM budget_reservations WHERE "
+                        "reservation_id = 'validator-reservation-t08'"
+                    ).fetchone()[0]
+                finally:
+                    connection.close()
+                self.assertEqual(counts, (0, 0, 0))
+                self.assertEqual(accounting, "RESERVED")
+                recovered = dispatch.pause_validation(request, capability)
+                self.assertFalse(recovered.replayed)
+                store.load_verified("repo-1", authority=authority)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, _validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(root, contact=True)
+            request = self._t08_pause_request(store, suffix="post-commit")
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-post-commit", "repo-1", "run-1", "PAUSE",
+                "pause-scope-post-commit",
+            )
+            authority.register_operator(pause_grant)
+            capability = authority.claim_operator(*pause_grant.__dict__.values())
+            with self.assertRaises(InjectedFailure):
+                dispatch.pause_validation(
+                    request, capability,
+                    failure_hook=raise_at(
+                        "after_validation_pause_commit_before_acknowledgement"
+                    ),
+                )
+            replay = dispatch.pause_validation(request, capability)
+            self.assertTrue(replay.replayed)
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_recovery_rejects_every_persisted_operator_capability_tamper(
+        self,
+    ) -> None:
+        tampered_values = {
+            "capability_claim_id": "tampered-claim",
+            "capability_grant_id": "tampered-grant",
+            "capability_repository_id": "tampered-repository",
+            "capability_run_id": "tampered-run",
+            "capability_action": "tampered-action",
+            "capability_scope_digest": "tampered-scope",
+            "capability_issuer_mac": "tampered-mac",
+            "capability_issuer_fingerprint": "tampered-fingerprint",
+        }
+        for column, value in tampered_values.items():
+            with self.subTest(column=column), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (
+                    authority, store, dispatch, _validator_adapter,
+                    _validator_intent, _validator_capability, _committed,
+                ) = self._prepare_t08_active_validator(root, contact=False)
+                request = self._t08_pause_request(store, suffix=f"tamper-{column}")
+                pause_grant = SyntheticOperatorGrant(
+                    f"pause-grant-{column}", "repo-1", "run-1", "PAUSE",
+                    f"pause-scope-{column}",
+                )
+                authority.register_operator(pause_grant)
+                dispatch.pause_validation(
+                    request,
+                    authority.claim_operator(*pause_grant.__dict__.values()),
+                )
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    connection.execute("PRAGMA ignore_check_constraints = ON")
+                    connection.execute(
+                        f"UPDATE validation_pause_actions SET {column} = ?",
+                        (value,),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(
+                    StorageIntegrityError, "validation-pause projection"
+                ):
+                    store.load_verified("repo-1", authority=authority)
+
+    def test_t08_recovery_rejects_self_consistent_checkpoint_surplus_field(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, _validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(root, contact=False)
+            request = self._t08_pause_request(store, suffix="surplus")
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-surplus", "repo-1", "run-1", "PAUSE",
+                "pause-scope-surplus",
+            )
+            authority.register_operator(pause_grant)
+            dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.checkpoint_event_id,),
+                ).fetchone()
+                body = json.loads(row["body_json"])
+                body["surplus_field"] = "forbidden"
+                event_hash = store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?",
+                    (event_hash, body_json, request.checkpoint_event_id),
+                )
+                connection.execute(
+                    "UPDATE validation_pause_actions SET "
+                    "checkpoint_event_hash = ?, body_json = ? WHERE pause_id = ?",
+                    (event_hash, body_json, request.pause_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "command_id = ?",
+                    (event_hash, request.command_id),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                    (event_hash,),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'",
+                    (event_hash,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "validation pause proof"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t08_recovery_rejects_self_consistent_contact_retarget(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, _validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(root, contact=True)
+            request = self._t08_pause_request(store, suffix="contact-retarget")
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-contact-retarget", "repo-1", "run-1", "PAUSE",
+                "pause-scope-contact-retarget",
+            )
+            authority.register_operator(pause_grant)
+            dispatch.pause_validation(
+                request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            retargeted = replace(
+                request, contact_event_hash="retargeted-contact-hash"
+            )
+            retargeted.validate()
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                request_row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.request_event_id,),
+                ).fetchone()
+                checkpoint_row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.checkpoint_event_id,),
+                ).fetchone()
+                request_body = json.loads(request_row["body_json"])
+                checkpoint_body = json.loads(checkpoint_row["body_json"])
+                payload = {
+                    **retargeted.__dict__,
+                    "pause_kind": "VALIDATION_CHECKPOINT",
+                    "pause_binding_version": 1,
+                    "capability_evidence": checkpoint_body[
+                        "capability_evidence"
+                    ],
+                    "capability_issuer_fingerprint": checkpoint_body[
+                        "capability_issuer_fingerprint"
+                    ],
+                }
+                payload_digest = store._event_hash(payload)
+                for key, value in retargeted.__dict__.items():
+                    request_body[key] = value
+                    checkpoint_body[key] = value
+                request_body["payload_digest"] = payload_digest
+                request_hash = store._event_hash(request_body)
+                request_json = json.dumps(
+                    request_body, sort_keys=True, separators=(",", ":")
+                )
+                checkpoint_body["payload_digest"] = payload_digest
+                checkpoint_body["previous_event_hash"] = request_hash
+                checkpoint_body["request_event_hash"] = request_hash
+                checkpoint_body["checkpoint_snapshot"][
+                    "contact_event_hash"
+                ] = retargeted.contact_event_hash
+                checkpoint_hash = store._event_hash(checkpoint_body)
+                checkpoint_json = json.dumps(
+                    checkpoint_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?",
+                    (request_hash, request_json, request.request_event_id),
+                )
+                connection.execute(
+                    "UPDATE events SET previous_event_hash = ?, event_hash = ?, "
+                    "body_json = ? WHERE event_id = ?",
+                    (
+                        request_hash, checkpoint_hash, checkpoint_json,
+                        request.checkpoint_event_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE validation_pause_actions SET contact_event_hash = ?, "
+                    "payload_digest = ?, request_event_hash = ?, "
+                    "checkpoint_event_hash = ?, body_json = ? WHERE pause_id = ?",
+                    (
+                        retargeted.contact_event_hash, payload_digest,
+                        request_hash, checkpoint_hash, checkpoint_json,
+                        request.pause_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET payload_digest = ?, "
+                    "event_hash = ? WHERE command_id = ?",
+                    (payload_digest, checkpoint_hash, request.command_id),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                    (checkpoint_hash,),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'",
+                    (checkpoint_hash,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "validation pause proof"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t08_pause_and_validator_contact_race_has_only_bounded_outcomes(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                validator_intent, validator_capability, committed,
+            ) = self._prepare_t08_active_validator(root, contact=False)
+            request = self._t08_pause_request(store, suffix="contact-race")
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-contact-race", "repo-1", "run-1", "PAUSE",
+                "pause-scope-contact-race",
+            )
+            authority.register_operator(pause_grant)
+            pause_capability = authority.claim_operator(
+                *pause_grant.__dict__.values()
+            )
+            barrier = threading.Barrier(2)
+
+            def pause():
+                barrier.wait()
+                try:
+                    return dispatch.pause_validation(request, pause_capability)
+                except DispatchDenied:
+                    return None
+
+            def contact():
+                barrier.wait()
+                try:
+                    store._contact_committed_validator(
+                        validator_intent, validator_capability, committed,
+                        validator_adapter._target_digest("repo-1"), authority,
+                    )
+                    return True
+                except DispatchDenied:
+                    return False
+
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                pause_future = executor.submit(pause)
+                contact_future = executor.submit(contact)
+                pause_result = pause_future.result()
+                contact_result = contact_future.result()
+            self.assertNotEqual(pause_result is not None, contact_result)
+            if contact_result:
+                request = self._t08_pause_request(
+                    store, suffix="contact-race-followup"
+                )
+                pause_result = dispatch.pause_validation(
+                    request, pause_capability
+                )
+            self.assertIsNotNone(pause_result)
+            self.assertEqual(
+                pause_result.resulting_state,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                counts = connection.execute(
+                    "SELECT (SELECT COUNT(*) FROM validation_pause_actions), "
+                    "(SELECT COUNT(*) FROM adapter_contacts WHERE contact_kind = "
+                    "'VALIDATOR'), (SELECT COUNT(*) FROM budget_settlements "
+                    "WHERE settlement_event_id LIKE "
+                    "'validation-pause-unknown:%'), "
+                    "(SELECT COUNT(*) FROM outstanding_slot), "
+                    "(SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?)",
+                    (request.fence_id,),
+                ).fetchone()
+                accounting = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(counts[0], 1)
+            self.assertEqual(counts[3:], (1, 1))
+            if counts[1] == 0:
+                self.assertEqual(counts[2], 0)
+                self.assertEqual(accounting, ("RESERVED", 0, 0))
+            else:
+                self.assertEqual((counts[1], counts[2]), (1, 1))
+                self.assertEqual(
+                    accounting, ("UNKNOWN_WORST_CASE_CHARGED", 2, 1)
+                )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t08_pause_and_result_intake_race_retains_result_in_reconciliation(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=True, intake_result=False
+            )
+            request = self._t08_pause_request(store, suffix="result-race")
+            self.assertEqual(
+                request.expected_checkpoint_kind, "CONTACTED_UNRESOLVED"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-result-race", "repo-1", "run-1", "PAUSE",
+                "pause-scope-result-race",
+            )
+            authority.register_operator(pause_grant)
+            pause_capability = authority.claim_operator(
+                *pause_grant.__dict__.values()
+            )
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                settlement_hash = connection.execute(
+                    "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                    "reservation_id = 'validator-reservation-t08'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            observation_command = ValidatorObservationCommand(
+                "validator-observation-t08", "validator-observe-command-t08",
+                "validator-observe-event-t08", "repo-1", "run-1", "item-1",
+                "validator-intent-t08", "validator-settlement-t08",
+                settlement_hash,
+            )
+            barrier = threading.Barrier(2)
+
+            def pause():
+                barrier.wait()
+                try:
+                    return dispatch.pause_validation(request, pause_capability)
+                except DispatchDenied:
+                    return None
+
+            def intake():
+                barrier.wait()
+                try:
+                    return validation.intake_result(observation_command)
+                except DispatchDenied:
+                    return None
+
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                pause_future = executor.submit(pause)
+                intake_future = executor.submit(intake)
+                paused = pause_future.result()
+                observed = intake_future.result()
+            if observed is None:
+                observed = validation.intake_result(observation_command)
+            if paused is None:
+                paused = dispatch.pause_validation(request, pause_capability)
+            self.assertEqual(
+                paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            self.assertEqual(
+                observed.resulting_state,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                counts = connection.execute(
+                    "SELECT (SELECT COUNT(*) FROM validation_pause_actions), "
+                    "(SELECT COUNT(*) FROM validator_observations), "
+                    "(SELECT COUNT(*) FROM budget_settlements WHERE "
+                    "reservation_id = 'validator-reservation-t08'), "
+                    "(SELECT COUNT(*) FROM outstanding_slot), "
+                    "(SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?)",
+                    (request.fence_id,),
+                ).fetchone()
+                accounting = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(counts, (1, 1, 1, 1, 1))
+            self.assertEqual(accounting, ("CONSUMED", 1, 0))
+            store.load_verified("repo-1", authority=authority)
+
     def test_t07_coordinator_exposes_activity_pause_settlement_route(self) -> None:
         self.assertTrue(
             hasattr(SyntheticDispatchCoordinator, "settle_activity_pause"),
@@ -494,6 +1410,193 @@ class MediatedDispatchTests(unittest.TestCase):
             ),
             expected_head=expected_head,
             writer_epoch=writer_epoch,
+        )
+
+    def _prepare_t08_active_validator(
+        self,
+        root: Path,
+        *,
+        contact: bool,
+        result: bool = False,
+        cessation: bool = False,
+        intake_result: bool = True,
+    ):
+        authority = SyntheticAuthority()
+        effect_grant = SyntheticGrant(
+            "effect-grant-t08", "repo-1", "effect-1", "attempt-1", "scope-1"
+        )
+        authority.register(effect_grant)
+        effect_capability = authority.claim(*effect_grant.__dict__.values())
+        with patch.dict(os.environ, self.state_environment(root)):
+            store = SQLiteStateStore.open_canonical(
+                "repo-1", AlwaysFreshOracle()
+            )
+            effect_adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            validator_adapter = SyntheticValidatorAdapter.open_canonical("repo-1")
+        dispatch = SyntheticDispatchCoordinator(
+            store, TransitionEngine(), authority, effect_adapter
+        )
+        operation = IntentRequest(
+            "repo-1", "run-1", "item-1", "operation-command-t08",
+            "operation-event-t08", "effect-1", "payload-1", "attempt-1",
+            "operation-permission-t08", "operation-reservation-t08",
+            "budget-1", 1, 1, 10,
+        )
+        plan = self._accept_operation_plan(store, operation)
+        dispatch.dispatch(
+            operation, effect_capability,
+            SyntheticEffectRequest(
+                "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
+            ),
+            expected_head=plan.event_hash, writer_epoch=2, usage_units=1,
+        )
+        parent = dispatch.intake_effect_receipt(
+            EffectObservationCommand(
+                "parent-observation-t08", "parent-observe-command-t08",
+                "parent-observe-event-t08", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", effect_capability.claim_id,
+                "operation-settlement-t08", "",
+            )
+        )
+        validator_grant = SyntheticValidatorGrant(
+            "validator-grant-t08", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-1", "read-only-1",
+        )
+        authority.register_validator(validator_grant)
+        validator_capability = authority.claim_validator(
+            *validator_grant.__dict__.values()
+        )
+        validator_intent = ValidatorIntentRequest(
+            "validator-intent-t08", "validator-command-t08",
+            "validator-event-t08", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1", "parent-observation-t08", parent.event_hash,
+            "revision-1", "check-1", "input-1", "validator-attempt-1",
+            "validator-permission-t08", "validator-reservation-t08",
+            "budget-1", 1, 2, 10,
+        )
+        if result:
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            launched = validation.launch(
+                validator_intent,
+                validator_capability,
+                SyntheticValidatorRequest(
+                    "repo-1", "effect-1", "revision-1", "check-1",
+                    "input-1", "validator-attempt-1", "read-only-1",
+                    "result-digest-t08", "PASS",
+                ),
+                usage_units=1,
+            )
+            committed = launched.intent
+            settlement_request = BudgetSettlementRequest(
+                "validator-settlement-t08", "validator-reservation-t08", "",
+                BudgetDisposition.CONSUMED, 1,
+                launched.result.result_id, "VALIDATOR_USAGE_REPORTED",
+                attempt_id="validator-attempt-1",
+            )
+            settlement = store._settle_budget(
+                settlement_request,
+                authority.issue_settlement_proof(
+                    "validator-settlement-proof-t08", settlement_request
+                ),
+                authority,
+            )
+            if intake_result:
+                validation.intake_result(
+                    ValidatorObservationCommand(
+                        "validator-observation-t08",
+                        "validator-observe-command-t08",
+                        "validator-observe-event-t08", "repo-1", "run-1",
+                        "item-1", "validator-intent-t08",
+                        "validator-settlement-t08", settlement.settlement_hash,
+                    )
+                )
+            if cessation:
+                cessation_attestation = (
+                    authority.issue_validator_cessation_attestation(
+                        "cessation-attestation-t08", "cessation-t08",
+                        validator_adapter._target_digest("repo-1"),
+                        validator_capability.claim_id,
+                        "VALIDATOR:validator-intent-t08",
+                        committed.event_hash, "repo-1", "run-1", "item-1",
+                        "effect-1", "revision-1", "check-1",
+                        "validator-attempt-1",
+                    )
+                )
+                cessation_seal = validator_adapter.seal_cessation(
+                    cessation_attestation, authority
+                )
+                store.record_validator_cessation(
+                    ValidatorCessationRequest(
+                        "cessation-t08", "cessation-command-t08",
+                        "cessation-event-t08", "repo-1", "run-1", "item-1",
+                        "effect-1", "validator-intent-t08",
+                        "validator-attempt-1", "revision-1", "check-1",
+                        cessation_seal.cessation_hash,
+                    ),
+                    authority,
+                )
+        else:
+            committed = store.commit_validator_intent(
+                validator_intent, validator_capability, authority
+            )
+        if contact and not result:
+            store._contact_committed_validator(
+                validator_intent, validator_capability, committed,
+                validator_adapter._target_digest("repo-1"), authority,
+            )
+        return (
+            authority, store, dispatch, validator_adapter, validator_intent,
+            validator_capability, committed,
+        )
+
+    @staticmethod
+    def _t08_pause_request(
+        store: SQLiteStateStore,
+        *,
+        suffix: str,
+    ) -> PauseValidationRequest:
+        connection = store._connect()
+        try:
+            checkpoint = store._validator_pause_checkpoint(
+                connection, "repo-1", "run-1"
+            )
+            cursor = connection.execute(
+                "SELECT continuation_cursor FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()["continuation_cursor"]
+        finally:
+            connection.close()
+        return PauseValidationRequest(
+            pause_id=f"validation-pause-{suffix}",
+            command_id=f"validation-pause-command-{suffix}",
+            request_event_id=f"validation-pause-request-{suffix}",
+            checkpoint_event_id=f"validation-pause-checkpoint-{suffix}",
+            fence_id=f"validation-pause-fence-{suffix}",
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            plan_id="plan:run-1",
+            revision_digest="revision-1",
+            reason_code="OPERATOR_PAUSE_VALIDATION",
+            expected_preserved_continuation_cursor=cursor,
+            expected_checkpoint_kind=str(checkpoint["checkpoint_kind"]),
+            **{
+                field: checkpoint[field]
+                for field in (
+                    "expected_slot_attempt_id", "expected_slot_generation",
+                    "validator_intent_id", "validator_intent_event_id",
+                    "validator_intent_event_hash", "validator_attempt_id",
+                    "check_id", "reservation_id",
+                    "expected_settlement_head_hash", "contact_id",
+                    "contact_event_id", "contact_event_hash",
+                    "contact_target_digest", "observation_id",
+                    "observation_event_id", "observation_event_hash",
+                    "observation_settlement_event_id",
+                    "observation_settlement_event_hash",
+                )
+            },
         )
 
     def _prepare_t25_effect(self, root: Path):

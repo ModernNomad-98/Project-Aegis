@@ -812,6 +812,147 @@ class OperationFinalizationReceipt:
 
 
 @dataclass(frozen=True)
+class PauseValidationRequest:
+    pause_id: str
+    command_id: str
+    request_event_id: str
+    checkpoint_event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    reason_code: str
+    expected_preserved_continuation_cursor: str | None
+    expected_checkpoint_kind: str
+    expected_slot_attempt_id: str | None
+    expected_slot_generation: int | None
+    validator_intent_id: str | None
+    validator_intent_event_id: str | None
+    validator_intent_event_hash: str | None
+    validator_attempt_id: str | None
+    check_id: str | None
+    reservation_id: str | None
+    expected_settlement_head_hash: str | None
+    contact_id: str | None
+    contact_event_id: str | None
+    contact_event_hash: str | None
+    contact_target_digest: str | None
+    observation_id: str | None
+    observation_event_id: str | None
+    observation_event_hash: str | None
+    observation_settlement_event_id: str | None
+    observation_settlement_event_hash: str | None
+
+    def validate(self) -> None:
+        required = (
+            self.pause_id,
+            self.command_id,
+            self.request_event_id,
+            self.checkpoint_event_id,
+            self.fence_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.reason_code,
+            self.expected_checkpoint_kind,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("validation pause identifiers and evidence must be non-empty")
+        if self.request_event_id == self.checkpoint_event_id:
+            raise ValueError("validation pause event IDs must differ")
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "validation pause preserved cursor must be non-empty or absent"
+            )
+        checkpoint_kinds = {
+            "IDLE",
+            "ELIGIBLE_RESULT_SETTLED",
+            "UNCONTACTED_UNRESOLVED",
+            "CONTACTED_UNRESOLVED",
+        }
+        if self.expected_checkpoint_kind not in checkpoint_kinds:
+            raise ValueError("validation pause checkpoint kind must be closed and typed")
+
+        active = (
+            self.expected_slot_attempt_id,
+            self.expected_slot_generation,
+            self.validator_intent_id,
+            self.validator_intent_event_id,
+            self.validator_intent_event_hash,
+            self.validator_attempt_id,
+            self.check_id,
+            self.reservation_id,
+            self.expected_settlement_head_hash,
+        )
+        active_present = any(value is not None for value in active)
+        if active_present:
+            active_strings = active[:1] + active[2:8]
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in active_strings
+            ) or not isinstance(self.expected_settlement_head_hash, str):
+                raise ValueError("validation pause active validator tuple must be all-or-none")
+            if (
+                type(self.expected_slot_generation) is not int
+                or self.expected_slot_generation <= 0
+            ):
+                raise ValueError("validation pause slot generation must be positive")
+        elif any(value is not None for value in active):
+            raise ValueError("validation pause active validator tuple must be all-or-none")
+
+        contact = (
+            self.contact_id,
+            self.contact_event_id,
+            self.contact_event_hash,
+            self.contact_target_digest,
+        )
+        contact_present = any(value is not None for value in contact)
+        if contact_present and (
+            not active_present
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in contact
+            )
+        ):
+            raise ValueError("validation pause contact tuple must be all-or-none")
+
+        observation = (
+            self.observation_id,
+            self.observation_event_id,
+            self.observation_event_hash,
+            self.observation_settlement_event_id,
+            self.observation_settlement_event_hash,
+        )
+        observation_present = any(value is not None for value in observation)
+        if observation_present and any(
+            not isinstance(value, str) or not value.strip()
+            for value in observation
+        ):
+            raise ValueError("validation pause observation tuple must be all-or-none")
+
+        expected_shape = {
+            "IDLE": (False, False, False),
+            "UNCONTACTED_UNRESOLVED": (True, False, False),
+            "CONTACTED_UNRESOLVED": (True, True, False),
+            "ELIGIBLE_RESULT_SETTLED": (True, True, True),
+        }[self.expected_checkpoint_kind]
+        if (active_present, contact_present, observation_present) != expected_shape:
+            raise ValueError("validation pause checkpoint tuple does not match its kind")
+
+
+@dataclass(frozen=True)
 class ResumeRequest:
     resume_id: str
     command_id: str

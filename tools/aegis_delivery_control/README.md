@@ -73,8 +73,9 @@ fixture. It is not a delivery integration.
   recovery and FINALIZING blockers in BLOCKED. Recovery verifies the complete
   run-head vector, signed request/capability evidence, exact event schema and
   historical route. Pre-T14 pause projections migrate transactionally without
-  rewriting immutable event bodies. A public-path clean VALIDATING resume still
-  depends on the ordered T08 pause-validation work and remains unverified.
+  rewriting immutable event bodies. The reviewed T08 source now supplies the
+  public clean-VALIDATING resume path; full T14 remains unverified while its
+  other ordered source families remain outstanding.
 - T05 now accepts an authenticated pause command for the exact repository slot
   owner in either the committed-intent/pre-launch or launched/pre-contact
   window. One transaction records a discriminated `PAUSE_REQUESTED`, an
@@ -101,7 +102,18 @@ fixture. It is not a delivery integration.
   non-accounting facts remain valid. Its distinct T14 activity-resume route
   clears only that pause fence and returns to `BLOCKED`, retaining the exact
   slot generation, recovery cursor and every other blocker. Other T07 source
-  families and the complete T14 transition remain unverified pending T08/T24.
+  families and the complete T14 transition remain unverified pending T24 and
+  other ordered sources.
+- T08 now accepts a typed, issuer-authenticated pause-validation request bound
+  to one exact shared runtime/recovery checkpoint. Idle work, or a matching
+  RESULT observation with known accounting and authoritative validator
+  cessation, enters PAUSED. Uncontacted unresolved work retains RESERVED
+  accounting; contacted unresolved work atomically settles a still-RESERVED
+  budget as `UNKNOWN_WORST_CASE_CHARGED`; both enter
+  `RECONCILIATION_REQUIRED`. Pause performs no adapter call or cancellation and
+  retains the repository slot, cursor and application obligation. T14 can clear
+  only this exact T08 fence and return a clean eligible checkpoint to
+  VALIDATING; unresolved checkpoints cannot resume through T14.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -155,7 +167,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 318 tests successfully, and
+controller. The complete local package suite ran 331 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -180,7 +192,9 @@ The T14 PLANNED/BLOCKED resume slice received independent implementation
 `APPROVE` after four recovery findings were corrected: exact event-schema
 validation, non-null cursor reconstruction, true legacy cursor migration and
 run-scoped active-validator recovery. T14 remains `UNVERIFIED` as a complete
-transition until T08 supplies the public clean-VALIDATING pause/resume path.
+transition; the independently accepted T08 slice now supplies its public clean
+VALIDATING path, while other ordered source families still prevent full T14
+promotion.
 T05 local-execution pause received independent implementation `APPROVE` after
 the initial plan was corrected for the pre-launch window, durable capability
 authenticity and T04/T05 schema separation, and the implementation was corrected
@@ -196,6 +210,14 @@ BLOCKED-only T14 activity resume. Its initial implementation review found two
 recovery/generation findings; prefix-derived settlement-head validation and
 exact source-generation binding closed them, and corrected review returned
 `APPROVE`. Other T07 source families and full T14 promotion remain deferred.
+The reviewed T08 slice uses one exact checkpoint across runtime, T14 and
+recovery. Its initial implementation review found two MAJOR gaps: a RESULT
+checkpoint could omit authoritative cessation, and deterministic pause/contact
+and pause/result races were not tested. Exact cessation ordering, serialized
+verified reads and the two race regressions closed both; corrected independent
+review returned `APPROVE`. T08 remains `UNVERIFIED` as a complete transition
+because authenticated active/drain/cancel and broader cessation source families
+are still ordered work.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

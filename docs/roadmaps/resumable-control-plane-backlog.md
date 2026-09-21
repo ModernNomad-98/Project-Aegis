@@ -637,8 +637,47 @@ T07 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition: this
 checkpoint proves only the T05-local/T25-authoritative nonexecution source. T08
 validation-pause and T24/other source families remain ordered work, so full T14
 also remains `UNVERIFIED`. The accepted slice informs C06 and F06/F12 but does
-not promote those complete families. T08 is next; PR #99 remains draft and not
+not promote those complete families. The T08 slice below is next; PR #99 remains draft and not
 merge-ready.
+
+### 5.13 T08 validation-pause checkpoint
+
+The reviewed T08 slice introduces a distinct typed pause-validation request and
+one exact checkpoint shared by runtime, T14 and recovery. `IDLE` and an
+`ELIGIBLE_RESULT_SETTLED` checkpoint with an exact RESULT observation, known
+accounting and authoritative validator cessation enter `PAUSED`. Unresolved
+work enters `RECONCILIATION_REQUIRED`: uncontacted work retains its RESERVED
+budget, while contacted work atomically settles a still-RESERVED budget as
+`UNKNOWN_WORST_CASE_CHARGED`. The transaction retains the repository-wide slot,
+validation cursor and result-application obligation, and performs no adapter
+observe, cancel or retry call.
+
+The associated T14 route accepts only the exact clean T08 PAUSED source, clears
+only its pause fence and resumes `VALIDATING`. It rejects unresolved T08
+checkpoints. Recovery independently derives the same checkpoint from the
+historical prefix, validates the full signed operator capability and closed
+event/projection schemas, and verifies the deterministic uncertainty settlement.
+Repository writer serialization prevents a verifier from accepting a mixed
+projection/event snapshot while contact or result intake commits.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` identified three checkpoint/cessation/race gaps; the corrected narrow plan received `APPROVE` before editing |
+| Focused falsification and race tests | 13 T08 tests passed locally in 2.536 seconds; the two deterministic race tests passed in three repeated runs |
+| Affected dispatch module | 40 tests passed in 4.925 seconds |
+| Complete delivery-control package | 331 tests passed in 28.693 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: zero cessation was accepted as eligible and pause/contact plus pause/result races lacked deterministic coverage. Both were corrected; final `APPROVE`, no remaining blocker/major; reviewer independently passed 13 focused tests in 2.479 seconds |
+| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T08 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. This
+slice proves the synthetic idle, exact settled-result, uncontacted uncertainty
+and contacted worst-case branches plus the clean VALIDATING T14 route; it does
+not claim authenticated active drain/cancel or every T17/T24 cessation source.
+T14 and the implicated C/F families likewise remain `UNVERIFIED`. T09 is next;
+PR #99 remains draft and not merge-ready.
 
 ## 6. Handoff contract
 
