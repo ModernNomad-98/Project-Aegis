@@ -6,7 +6,7 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed implementation checkpoint before Stage 18: `6111f3126c90ec9650a38bb5f634990e55c123a5`
+Latest pushed implementation checkpoint: `a6b2d8624400d7af3be2cb309db01864d6e8e472`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
 Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE AND REVIEWED T05-T09/T13-T15 PLUS ORDERED T17 SLICES `APPROVE`; T22 AND LATER BACKLOG OPEN**
 
@@ -927,6 +927,10 @@ The storage module passed 279 tests in 32.924 seconds and the complete
 delivery-control package passed 373 tests in 47.700 seconds. Repository
 validation found 184 valid skills with zero warnings, 8 script tests passed with
 4 expected skips, all 91 gate self-test assertions passed and compileall passed.
+Signed-off commit `a6b2d8624400d7af3be2cb309db01864d6e8e472`
+was pushed to the existing branch. On that exact head, `gate-guard` passed in 5
+seconds, `validate-skills` in 1m7s and `windows-offline-checks` in 3m1s. PR #99
+remained open, draft and blocked.
 
 This stage adds accepted slice evidence to T14/T16/T17/T25 and generation-aware
 T10/T11/T12/T23/T26/T27 behavior, plus C03/C04/C06 and
@@ -1058,6 +1062,7 @@ open, draft and blocked.
 | T17 nonexecution/safe-retry complete delivery-control package | `Ran 373 tests in 47.700s`; `OK` |
 | T17 nonexecution/safe-retry repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Independent T17 nonexecution/safe-retry implementation review | Initial `REVISE` closed three generation/action/pause-replay findings; two later migration BLOCKERs corrected exact-HEAD terminal schema and proof-prefix T25 backfill. Final `APPROVE`, no remaining blocker or major; reviewer independently passed both migration probes |
+| T17 nonexecution/safe-retry delivery | Signed-off commit `a6b2d8624400d7af3be2cb309db01864d6e8e472` pushed; exact-head `gate-guard` passed in 5s, `validate-skills` in 1m7s and `windows-offline-checks` in 3m1s; PR #99 remained OPEN/DRAFT/BLOCKED |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
