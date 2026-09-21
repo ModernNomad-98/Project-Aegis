@@ -2,4 +2,4 @@
 -r requirements.txt
 # Must agree with calibration_transport.AUTHORIZED_SDK_VERSION.
 # Tests use fake transports and synthetic credentials, never a real provider call.
-openai==3.0.0
+openai==3.15.0
