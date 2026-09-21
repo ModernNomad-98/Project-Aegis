@@ -798,6 +798,53 @@ authoritative nonexecution resolution and authenticated concurrent-safe
 same-effect retry remain next in their documented order. PR #99 remains draft
 and not merge-ready.
 
+### 5.17 T17 verified-receipt reconciliation checkpoint
+
+The reviewed `VERIFIED_RECEIPT` slice accepts only an exact durable effect
+receipt plus authoritative current accounting. Its synthetic lookup evidence is
+a closed, domain-separated MAC over the exact catalog/run heads, canonical
+timezone-aware query time, governed query-after event, derived source identity,
+response identity/digest, mandatory `KNOWN` classification and sorted prior
+`SOURCE_CONTROL` uncertainty bindings. Runtime and recovery independently
+derive those bindings from immutable receipt and uncertainty history.
+
+Every applicable operation uncertainty for the current repository/run/item/
+effect/attempt must be named exactly. Billing clearance proves the complete
+settlement ancestry from each uncertain head to the current `CONSUMED` or
+`ADJUSTED` head. One SQLite transaction appends the reconciliation event,
+resolution rows, route-specific action projection and command outcome, deletes
+only the exact uncertainty fences, and updates the run/catalog heads. The
+server-derived `operation-validation:v1` cursor routes uncovered reconciliation
+to `RECONCILIATION_REQUIRED`, a retained same-run pause to `PAUSED`, other
+recovery/finalization blockers to `BLOCKED`, and a clean prefix to `VALIDATING`.
+Exact replay occurs before mutable freshness and state guards.
+
+Semantic version 2 adds the separate
+`verified_receipt_reconciliation_actions` projection without changing legacy
+validator reconciliation bodies, hashes or rows. Recovery re-verifies the
+signed lookup, exact action/resolution sets, settlement ancestry, route and
+deleted-fence history. Version 2 never recreates a missing table or cleared
+fence; the operation-uncertainty reopen audit excludes only resolutions backed
+by an exact verified-receipt event/action pair.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Initial plan received two `REVISE` rounds for ordered source evidence and replay/pause reducer semantics; corrected plan received `APPROVE` before editing |
+| Focused falsification and regressions | Four-category T06 late receipt routes to `PAUSED`; observation-only billing ancestry routes to `VALIDATING`; forged/stale source/response/order, `UNKNOWN`, missing/surplus schema, slot/set substitutions, crash rollback/commit, replay under denied freshness, resolution/action tamper and migration cases pass |
+| Complete delivery-control package | 368 tests passed in 45.506 seconds after review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: incomplete query/time/source/response proof and replay behind mutable freshness. Typed lookup/order derivation and replay reordering closed both; corrected review returned `APPROVE`, no remaining blocker or major, with 3 focused tests independently passing |
+| T/C/F traceability | Adds narrow accepted evidence to T17, C03/C04/C06 and F02/F04a/F07/F11/F12/F21; all complete families retain their prior status |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED`. Authoritative
+`PROVEN_NONEXECUTION` is next, followed by authenticated concurrent-safe
+`SAFE_SAME_EFFECT_RETRY`. The existing validator-only T09-after-T17 resume
+projection is intentionally unchanged; operation-sourced T14 clearance remains
+deferred. PR #99 remains draft and not merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

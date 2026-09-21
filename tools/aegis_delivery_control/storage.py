@@ -32,6 +32,7 @@ from .authority import (
     SyntheticReconciliationResumeEvidence,
     SyntheticSettlementProof,
     SyntheticSourceControlEvidence,
+    SyntheticSourceControlSettlementEvidence,
     SyntheticValidationRecoveryAttestation,
     SyntheticValidatorCessationAttestation,
     SyntheticValidatorCapability,
@@ -67,12 +68,15 @@ from .contracts import (
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
     ReconciliationPauseResumeRequest,
+    ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ResumeActivitySettlementRequest,
     ResumeRequest,
     SettlementReceipt,
     SourceControlClassification,
     SourceControlEvidenceRequest,
+    SourceControlSettlementRequest,
+    SourceControlUncertaintyBinding,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -789,7 +793,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1}:
+        if semantic_version not in {0, 1, 2}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -810,7 +814,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version == 1 and (
+        if semantic_version in {1, 2} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -1735,6 +1739,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_operation_uncertainty_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_verified_receipt_reconciliation_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -1756,13 +1763,66 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1}:
+            if version not in {0, 1, 2}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
             expected = SQLiteStateStore._expected_operation_uncertainties(
                 connection
             )
+            resolved_operation_ids: set[str] = set()
+            if version == 2:
+                table_exists = connection.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                    "name = 'verified_receipt_reconciliation_actions'"
+                ).fetchone()
+                if table_exists is not None:
+                    for event in connection.execute(
+                        "SELECT * FROM events WHERE event_kind = "
+                        "'RECONCILIATION_RECORDED'"
+                    ):
+                        body = json.loads(str(event["body_json"]))
+                        if body.get("route") != "VERIFIED_RECEIPT":
+                            continue
+                        action = connection.execute(
+                            "SELECT * FROM "
+                            "verified_receipt_reconciliation_actions WHERE "
+                            "reconciliation_id = ? AND event_id = ?",
+                            (body.get("reconciliation_id"), event["event_id"]),
+                        ).fetchone()
+                        if (
+                            action is None
+                            or action["body_json"] != event["body_json"]
+                            or action["event_hash"] != event["event_hash"]
+                            or SQLiteStateStore._event_hash(body)
+                            != event["event_hash"]
+                        ):
+                            raise StorageIntegrityError(
+                                "verified-receipt resolution source is invalid"
+                            )
+                        for uncertainty_id in body.get(
+                            "resolved_uncertainty_ids", ()
+                        ):
+                            if uncertainty_id not in expected:
+                                raise StorageIntegrityError(
+                                    "verified receipt resolved an unknown "
+                                    "operation uncertainty"
+                                )
+                            resolution = connection.execute(
+                                "SELECT * FROM uncertainty_resolutions WHERE "
+                                "uncertainty_id = ? AND reconciliation_id = ? "
+                                "AND event_id = ?",
+                                (
+                                    uncertainty_id,
+                                    body["reconciliation_id"],
+                                    body["event_id"],
+                                ),
+                            ).fetchone()
+                            if resolution is None:
+                                raise StorageIntegrityError(
+                                    "verified-receipt resolution is missing"
+                                )
+                            resolved_operation_ids.add(str(uncertainty_id))
             source_ids = {
                 str(row["event_id"])
                 for row in connection.execute(
@@ -1877,6 +1937,7 @@ class SQLiteStateStore:
             expected_fences = {
                 uncertainty_id: fence
                 for uncertainty_id, (_instance, fence) in expected.items()
+                if uncertainty_id not in resolved_operation_ids
             }
             operation_reason_codes = {
                 "OPERATION_OUTCOME_UNKNOWN",
@@ -1906,9 +1967,122 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "operation-uncertainty projection diverges from history"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 1:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                1, 2,
+            }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
+                )
+            if manage_transaction:
+                connection.commit()
+        except BaseException:
+            if manage_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_verified_receipt_reconciliation_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+    ) -> None:
+        table_name = "verified_receipt_reconciliation_actions"
+        table_sql = """
+            CREATE TABLE verified_receipt_reconciliation_actions (
+                reconciliation_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                route TEXT NOT NULL CHECK (route = 'VERIFIED_RECEIPT'),
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                observation_id TEXT NOT NULL REFERENCES effect_observations(observation_id),
+                observation_event_id TEXT NOT NULL REFERENCES events(event_id),
+                observation_event_hash TEXT NOT NULL,
+                source_evidence_id TEXT NOT NULL UNIQUE,
+                source_evidence_digest TEXT NOT NULL,
+                source_issuer_fingerprint TEXT NOT NULL,
+                source_issuer_mac TEXT NOT NULL,
+                source_query_id TEXT NOT NULL,
+                source_queried_at_utc TEXT NOT NULL,
+                source_query_after_event_id TEXT NOT NULL REFERENCES events(event_id),
+                source_query_after_event_hash TEXT NOT NULL,
+                source_authority_id TEXT NOT NULL,
+                source_response_id TEXT NOT NULL,
+                source_response_digest TEXT NOT NULL,
+                source_resulting_classification TEXT NOT NULL CHECK (
+                    source_resulting_classification = 'KNOWN'
+                ),
+                source_bindings_json TEXT NOT NULL,
+                settlement_event_id TEXT NOT NULL REFERENCES events(event_id),
+                settlement_hash TEXT NOT NULL,
+                resolved_uncertainty_ids_json TEXT NOT NULL,
+                slot_attempt_id TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                validation_cursor TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL,
+                body_json TEXT NOT NULL
+            )
+        """
+
+        def canonical_schema(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {1, 2}:
+                raise StorageIntegrityError(
+                    "verified-receipt semantic version is unsupported"
+                )
+            existing = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                (table_name,),
+            ).fetchone()
+            if version == 1:
+                if existing is not None:
+                    raise StorageIntegrityError(
+                        "verified-receipt schema is partially migrated"
+                    )
+                for row in connection.execute(
+                    "SELECT body_json FROM events WHERE event_kind = "
+                    "'RECONCILIATION_RECORDED'"
+                ):
+                    try:
+                        if json.loads(str(row["body_json"])).get("route") == (
+                            "VERIFIED_RECEIPT"
+                        ):
+                            raise StorageIntegrityError(
+                                "verified-receipt event predates its projection"
+                            )
+                    except json.JSONDecodeError as error:
+                        raise StorageIntegrityError(
+                            "reconciliation history is not valid JSON"
+                        ) from error
+                connection.execute(table_sql)
+                connection.execute("PRAGMA user_version = 2")
+                existing = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                    (table_name,),
+                ).fetchone()
+            if existing is None or canonical_schema(str(existing["sql"])) != (
+                canonical_schema(table_sql)
+            ):
+                raise StorageIntegrityError(
+                    "verified-receipt action schema is missing or incompatible"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 2:
+                raise StorageIntegrityError(
+                    "verified-receipt migration did not advance"
                 )
             if manage_transaction:
                 connection.commit()
@@ -3176,6 +3350,103 @@ class SQLiteStateStore:
     def _event_hash(body: Mapping[str, object]) -> str:
         encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
+
+    @staticmethod
+    def _verified_receipt_payload(
+        request: ReconcileVerifiedReceiptRequest,
+    ) -> dict[str, object]:
+        return {
+            **{
+                key: (
+                    value.value
+                    if key == "source_control_resulting_classification"
+                    else value
+                )
+                for key, value in request.__dict__.items()
+                if key not in {
+                    "resolved_uncertainty_ids", "source_control_bindings"
+                }
+            },
+            "resolved_uncertainty_ids": list(
+                request.resolved_uncertainty_ids
+            ),
+            "source_control_bindings": [
+                dict(binding.__dict__)
+                for binding in request.source_control_bindings
+            ],
+            "reconciliation_binding_version": 2,
+            "route": "VERIFIED_RECEIPT",
+        }
+
+    @staticmethod
+    def _source_control_settlement_request(
+        request: ReconcileVerifiedReceiptRequest,
+    ) -> SourceControlSettlementRequest:
+        return SourceControlSettlementRequest(
+            repository_id=request.repository_id,
+            run_id=request.run_id,
+            item_id=request.item_id,
+            logical_effect_id=request.logical_effect_id,
+            attempt_id=request.attempt_id,
+            observation_id=request.observation_id,
+            observation_event_hash=request.observation_event_hash,
+            source_receipt_id=request.source_receipt_id,
+            source_claim_id=request.source_claim_id,
+            source_payload_digest=request.source_payload_digest,
+            expected_catalog_head=request.expected_catalog_head,
+            expected_run_head=request.expected_run_head,
+            authoritative_query_id=request.source_control_query_id,
+            authoritative_queried_at_utc=(
+                request.source_control_queried_at_utc
+            ),
+            authoritative_query_after_event_id=(
+                request.source_control_query_after_event_id
+            ),
+            authoritative_query_after_event_hash=(
+                request.source_control_query_after_event_hash
+            ),
+            authoritative_source_id=request.source_control_authority_id,
+            authoritative_response_id=request.source_control_response_id,
+            authoritative_response_digest=(
+                request.source_control_response_digest
+            ),
+            resulting_classification=(
+                request.source_control_resulting_classification
+            ),
+            covered_source_bindings=request.source_control_bindings,
+        )
+
+    @classmethod
+    def _source_control_response_digest(
+        cls, observation: Mapping[str, object]
+    ) -> str:
+        return cls._event_hash(
+            {
+                "accepted": True,
+                "domain": "AEGIS:T17:SOURCE_CONTROL_RESPONSE:v1",
+                "payload_digest": observation["payload_digest"],
+                "source_claim_id": observation["source_claim_id"],
+                "source_receipt_id": observation["source_receipt_id"],
+                "usage_units": observation["usage_units"],
+            }
+        )
+
+    def _verify_source_control_settlement_authority(
+        self, request: ReconcileVerifiedReceiptRequest,
+    ) -> None:
+        if self._classification_authority is None:
+            raise DispatchDenied(
+                "source/control settlement authority is unavailable"
+            )
+        evidence = SyntheticSourceControlSettlementEvidence(
+            evidence_id=request.source_control_evidence_id,
+            request_digest=request.source_control_evidence_digest,
+            issuer_fingerprint=request.source_control_issuer_fingerprint,
+            issuer_mac=request.source_control_issuer_mac,
+        )
+        self._classification_authority.verify_source_control_settlement_evidence(
+            evidence, self._source_control_settlement_request(request)
+        )
 
     @classmethod
     def _uncertainty_id(
@@ -5607,7 +5878,7 @@ class SQLiteStateStore:
                 f"{observation['validator_attempt_id']}"
             )
             expected_state, expected_route_cursor = (
-                self._validator_reconciliation_route_at_prefix(
+                self._reconciliation_route_at_prefix(
                     connection,
                     repository_id=request.repository_id,
                     run_id=request.run_id,
@@ -5638,7 +5909,318 @@ class SQLiteStateStore:
                 "validator reconciliation semantics are invalid"
             ) from error
 
-    def _validator_reconciliation_route_at_prefix(
+    def _validate_verified_receipt_reconciliation_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            ReconcileVerifiedReceiptRequest.__dataclass_fields__
+        ) | {
+            "continuation_cursor", "event_kind", "lifecycle_from",
+            "lifecycle_to", "payload_digest", "previous_event_hash",
+            "reconciliation_binding_version", "route", "schema_version",
+            "sequence", "writer_epoch",
+        }
+        try:
+            if (
+                set(body) != expected_fields
+                or type(body["schema_version"]) is not int
+                or body["schema_version"] != 1
+                or type(body["reconciliation_binding_version"]) is not int
+                or body["reconciliation_binding_version"] != 2
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+                or not isinstance(body["resolved_uncertainty_ids"], list)
+                or not isinstance(body["source_control_bindings"], list)
+            ):
+                raise ValueError(
+                    "verified-receipt reconciliation schema is invalid"
+                )
+            values = {
+                field: body[field]
+                for field in ReconcileVerifiedReceiptRequest.__dataclass_fields__
+            }
+            values["resolved_uncertainty_ids"] = tuple(
+                values["resolved_uncertainty_ids"]
+            )
+            values["source_control_bindings"] = tuple(
+                SourceControlUncertaintyBinding(**binding)
+                for binding in values["source_control_bindings"]
+            )
+            values["source_control_resulting_classification"] = (
+                SourceControlClassification(
+                    values["source_control_resulting_classification"]
+                )
+            )
+            request = ReconcileVerifiedReceiptRequest(**values)
+            request.validate()
+            self._verify_source_control_settlement_authority(request)
+            payload = self._verified_receipt_payload(request)
+            if (
+                body["payload_digest"] != self._event_hash(payload)
+                or body["event_kind"] != "RECONCILIATION_RECORDED"
+                or body["route"] != "VERIFIED_RECEIPT"
+                or predecessor_state
+                is not LifecycleState.RECONCILIATION_REQUIRED
+                or body["lifecycle_from"]
+                != LifecycleState.RECONCILIATION_REQUIRED.value
+                or request.expected_continuation_cursor != predecessor_cursor
+                or request.expected_run_head != body["previous_event_hash"]
+            ):
+                raise ValueError(
+                    "verified-receipt reconciliation binding is invalid"
+                )
+            prior_catalog = connection.execute(
+                "SELECT event_hash FROM events WHERE repository_id = ? AND "
+                "(writer_epoch < ? OR (writer_epoch = ? AND sequence < ?)) "
+                "ORDER BY writer_epoch DESC, sequence DESC LIMIT 1",
+                (
+                    request.repository_id, body["writer_epoch"],
+                    body["writer_epoch"], body["sequence"],
+                ),
+            ).fetchone()
+            if prior_catalog is None or prior_catalog["event_hash"] != (
+                request.expected_catalog_head
+            ):
+                raise ValueError(
+                    "verified-receipt catalog prefix is invalid"
+                )
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                "repository_id = ? AND run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            observation = connection.execute(
+                "SELECT observation.*, event.writer_epoch, event.sequence "
+                "FROM effect_observations AS observation JOIN events AS "
+                "event ON event.event_id = observation.event_id WHERE "
+                "observation.observation_id = ? AND observation.event_id = ?",
+                (request.observation_id, request.observation_event_id),
+            ).fetchone()
+            if plan is None or observation is None or (
+                plan["item_id"], plan["logical_effect_id"],
+                plan["revision_digest"],
+            ) != (
+                request.item_id, request.logical_effect_id,
+                request.revision_digest,
+            ) or (
+                observation["event_hash"], observation["repository_id"],
+                observation["run_id"], observation["item_id"],
+                observation["logical_effect_id"], observation["attempt_id"],
+                observation["source_receipt_id"],
+                observation["source_claim_id"], observation["payload_digest"],
+            ) != (
+                request.observation_event_hash, request.repository_id,
+                request.run_id, request.item_id,
+                request.logical_effect_id, request.attempt_id,
+                request.source_receipt_id, request.source_claim_id,
+                request.source_payload_digest,
+            ) or int(observation["writer_epoch"]) >= int(body["writer_epoch"]):
+                raise ValueError(
+                    "verified-receipt source or plan is invalid"
+                )
+            if (
+                request.source_control_authority_id
+                != "synthetic-source-control:v1:"
+                + request.source_claim_id
+                or request.source_control_response_id
+                != request.source_receipt_id
+                or request.source_control_response_digest
+                != self._source_control_response_digest(observation)
+            ):
+                raise ValueError(
+                    "verified-receipt lookup source or response is invalid"
+                )
+            reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                "AND attempt_id = ?",
+                (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                ),
+            ).fetchone()
+            settlement = None if reservation is None else (
+                self._validated_operation_settlement(
+                    connection,
+                    settlement_event_id=request.settlement_event_id,
+                    settlement_hash=request.settlement_hash,
+                    reservation_id=str(reservation["reservation_id"]),
+                )
+            )
+            latest_settlement = connection.execute(
+                "SELECT settlement.settlement_event_id FROM "
+                "budget_settlements AS settlement JOIN events AS event ON "
+                "event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND (event.writer_epoch < ? "
+                "OR (event.writer_epoch = ? AND event.sequence < ?)) ORDER BY "
+                "event.writer_epoch DESC, event.sequence DESC LIMIT 1",
+                (
+                    None if reservation is None else reservation["reservation_id"],
+                    body["writer_epoch"], body["writer_epoch"],
+                    body["sequence"],
+                ),
+            ).fetchone()
+            if (
+                reservation is None
+                or settlement is None
+                or latest_settlement is None
+                or latest_settlement["settlement_event_id"]
+                != request.settlement_event_id
+                or bool(settlement["uncertainty"])
+                or settlement["disposition"] not in {
+                    BudgetDisposition.CONSUMED.value,
+                    BudgetDisposition.ADJUSTED.value,
+                }
+            ):
+                raise ValueError(
+                    "verified-receipt accounting proof is invalid"
+                )
+            if not self._operation_slot_current_before(
+                connection, reservation, int(body["sequence"]),
+                expected_generation=request.expected_slot_generation,
+            ) or request.expected_slot_attempt_id != request.attempt_id:
+                raise ValueError("verified-receipt slot proof is invalid")
+            rows = connection.execute(
+                "SELECT instance.*, origin.event_kind, origin.writer_epoch, "
+                "origin.sequence, origin.body_json AS origin_body FROM "
+                "uncertainty_instances AS instance JOIN "
+                "events AS origin ON origin.event_id = instance.origin_event_id "
+                "LEFT JOIN uncertainty_resolutions AS resolution ON "
+                "resolution.uncertainty_id = instance.uncertainty_id LEFT JOIN "
+                "events AS resolved_event ON resolved_event.event_id = "
+                "resolution.event_id WHERE instance.repository_id = ? AND "
+                "instance.run_id = ? AND instance.item_id = ? AND "
+                "instance.logical_effect_id = ? AND instance.attempt_id = ? "
+                "AND instance.check_id IS NULL AND origin.writer_epoch < ? "
+                "AND (resolved_event.event_id IS NULL OR "
+                "resolved_event.writer_epoch > ? OR ("
+                "resolved_event.writer_epoch = ? AND "
+                "resolved_event.sequence >= ?)) ORDER BY "
+                "instance.uncertainty_id",
+                (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    body["writer_epoch"], body["writer_epoch"],
+                    body["writer_epoch"], body["sequence"],
+                ),
+            ).fetchall()
+            if tuple(str(row["uncertainty_id"]) for row in rows) != (
+                request.resolved_uncertainty_ids
+            ):
+                raise ValueError(
+                    "verified receipt does not resolve the exact prefix set"
+                )
+            latest_origin = max(
+                rows,
+                key=lambda row: (
+                    int(row["writer_epoch"]), int(row["sequence"])
+                ),
+            )
+            if (
+                request.source_control_query_after_event_id
+                != latest_origin["origin_event_id"]
+                or request.source_control_query_after_event_hash
+                != latest_origin["origin_event_hash"]
+            ):
+                raise ValueError(
+                    "verified-receipt lookup ordering is invalid"
+                )
+            expected_bindings: list[SourceControlUncertaintyBinding] = []
+            for row in rows:
+                origin_body = json.loads(str(row["origin_body"]))
+                event_kind = str(row["event_kind"])
+                if event_kind in {
+                    "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
+                } and (
+                    origin_body.get("source_receipt_id"),
+                    origin_body.get("source_claim_id"),
+                    origin_body.get("payload_digest"),
+                ) != (
+                    request.source_receipt_id, request.source_claim_id,
+                    request.source_payload_digest,
+                ):
+                    raise ValueError(
+                        "verified receipt crossed a source-receipt boundary"
+                    )
+                if row["uncertainty_kind"] == "BILLING" and not (
+                    self._settlement_descends_from(
+                        connection,
+                        reservation_id=str(reservation["reservation_id"]),
+                        current_hash=request.settlement_hash,
+                        ancestor_hash=str(row["settlement_head_hash"]),
+                    )
+                ):
+                    raise ValueError(
+                        "verified-receipt accounting ancestry is invalid"
+                    )
+                if row["uncertainty_kind"] == "SOURCE_CONTROL":
+                    prior_id = None
+                    prior_digest = None
+                    if event_kind in {
+                        "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
+                    }:
+                        prior_id = origin_body.get(
+                            "source_control_evidence_id"
+                        )
+                        prior_digest = origin_body.get(
+                            "source_control_evidence_digest"
+                        )
+                    expected_bindings.append(
+                        SourceControlUncertaintyBinding(
+                            str(row["uncertainty_id"]),
+                            str(row["origin_event_id"]),
+                            str(row["origin_event_hash"]),
+                            None if prior_id is None else str(prior_id),
+                            None if prior_digest is None else str(prior_digest),
+                        )
+                    )
+            expected_cursor = (
+                "operation-validation:v1:"
+                f"{request.observation_id}:{request.attempt_id}:"
+                f"{request.plan_id}:{request.revision_digest}"
+            )
+            expected_state, expected_route_cursor = (
+                self._reconciliation_route_at_prefix(
+                    connection,
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    validator_observation_id=None,
+                    validator_check_id=None,
+                    validator_attempt_id=None,
+                    resolved_uncertainty_ids=request.resolved_uncertainty_ids,
+                    boundary_sequence=int(body["sequence"]),
+                    boundary_writer_epoch=int(body["writer_epoch"]),
+                    preserved_cursor=predecessor_cursor,
+                    validation_cursor=expected_cursor,
+                    blocked_cursor=expected_cursor,
+                )
+            )
+            if (
+                tuple(expected_bindings) != request.source_control_bindings
+                or request.expected_validation_cursor != expected_cursor
+                or body["lifecycle_to"] != expected_state.value
+                or body["continuation_cursor"] != expected_route_cursor
+            ):
+                raise ValueError(
+                    "verified-receipt proof or route is invalid"
+                )
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "verified-receipt reconciliation semantics are invalid"
+            ) from error
+
+    def _reconciliation_route_at_prefix(
         self,
         connection: sqlite3.Connection,
         *,
@@ -5646,24 +6228,36 @@ class SQLiteStateStore:
         run_id: str,
         item_id: str,
         logical_effect_id: str,
-        validator_observation_id: str,
-        validator_check_id: str,
-        validator_attempt_id: str,
+        validator_observation_id: str | None,
+        validator_check_id: str | None,
+        validator_attempt_id: str | None,
         resolved_uncertainty_ids: tuple[str, ...],
         boundary_sequence: int,
         boundary_writer_epoch: int,
         preserved_cursor: str | None,
         validation_cursor: str,
         cleared_fence_ids: tuple[str, ...] = (),
+        blocked_cursor: str | None = None,
     ) -> tuple[LifecycleState, str | None]:
-        """Derive T17 routing only from evidence preceding one event.
+        """Derive shared T17 routing only from evidence preceding one event.
 
         The same prefix replay is used while writing and while recovering.  It
         deliberately does not consult the mutable dispatch-fence projection,
         whose present value can include later resume or correction events.
         """
 
-        selected = connection.execute(
+        validator_binding = (
+            validator_observation_id,
+            validator_check_id,
+            validator_attempt_id,
+        )
+        if any(value is None for value in validator_binding) and not all(
+            value is None for value in validator_binding
+        ):
+            raise DispatchDenied(
+                "reconciliation validator binding is incomplete"
+            )
+        selected = None if validator_observation_id is None else connection.execute(
             "SELECT intent.event_id AS intent_event_id, event.writer_epoch, "
             "event.sequence FROM validator_observations AS observation JOIN "
             "validator_intents AS intent ON intent.validator_intent_id = "
@@ -5676,11 +6270,11 @@ class SQLiteStateStore:
                 validator_attempt_id,
             ),
         ).fetchone()
-        if selected is None:
+        if validator_observation_id is not None and selected is None:
             raise DispatchDenied(
                 "validator reconciliation lost its selected attempt"
             )
-        successor = connection.execute(
+        successor = None if selected is None else connection.execute(
             "SELECT 1 FROM validator_intents AS intent JOIN events AS event ON "
             "event.event_id = intent.event_id WHERE intent.repository_id = ? "
             "AND intent.run_id = ? AND intent.check_id = ? AND "
@@ -5696,7 +6290,7 @@ class SQLiteStateStore:
                 boundary_sequence,
             ),
         ).fetchone()
-        recovery_successor = connection.execute(
+        recovery_successor = None if selected is None else connection.execute(
             "SELECT 1 FROM validation_recoveries AS recovery JOIN events AS "
             "event ON event.event_id = recovery.event_id WHERE "
             "recovery.repository_id = ? AND recovery.run_id = ? AND "
@@ -5892,7 +6486,10 @@ class SQLiteStateStore:
         if recoverable_applications or any(
             category == "BLOCKER" for category, _ in active_fences.values()
         ):
-            return LifecycleState.BLOCKED, preserved_cursor
+            return (
+                LifecycleState.BLOCKED,
+                preserved_cursor if blocked_cursor is None else blocked_cursor,
+            )
         return LifecycleState.VALIDATING, validation_cursor
 
     def _validate_reconciliation_pause_resume_event(
@@ -6052,7 +6649,7 @@ class SQLiteStateStore:
                     "reconciliation pause resume observation is missing"
                 )
             derived_state, derived_cursor = (
-                self._validator_reconciliation_route_at_prefix(
+                self._reconciliation_route_at_prefix(
                     connection,
                     repository_id=request.repository_id,
                     run_id=request.run_id,
@@ -10847,6 +11444,603 @@ class SQLiteStateStore:
             event_hash, LifecycleState.RECONCILIATION_REQUIRED, False,
         )
 
+    @classmethod
+    def _settlement_descends_from(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        reservation_id: str,
+        current_hash: str,
+        ancestor_hash: str,
+    ) -> bool:
+        cursor = current_hash
+        visited: set[str] = set()
+        while cursor:
+            if cursor == ancestor_hash:
+                return True
+            if cursor in visited:
+                raise StorageIntegrityError(
+                    "budget settlement ancestry contains a cycle"
+                )
+            visited.add(cursor)
+            row = connection.execute(
+                "SELECT settlement_event_id, previous_hash FROM "
+                "budget_settlements WHERE reservation_id = ? AND "
+                "settlement_hash = ?",
+                (reservation_id, cursor),
+            ).fetchone()
+            if row is None:
+                raise StorageIntegrityError(
+                    "budget settlement ancestry is incomplete"
+                )
+            cls._validated_operation_settlement(
+                connection,
+                settlement_event_id=str(row["settlement_event_id"]),
+                settlement_hash=cursor,
+                reservation_id=reservation_id,
+            )
+            cursor = str(row["previous_hash"])
+        return False
+
+    def reconcile_verified_receipt(
+        self,
+        request: ReconcileVerifiedReceiptRequest,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "verified-receipt reconciliation targets another repository"
+            )
+        self._verify_source_control_settlement_authority(request)
+        payload = self._verified_receipt_payload(request)
+        command_payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+
+                # Exact replay precedes all guards whose projections can move.
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    if prior_command["payload_digest"] != command_payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    prior = connection.execute(
+                        "SELECT * FROM verified_receipt_reconciliation_actions "
+                        "WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "verified-receipt outcome lost its projection"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["reconciliation_id"]),
+                        str(prior["command_id"]), str(prior["event_id"]),
+                        int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM verified_receipt_reconciliation_actions "
+                    "WHERE reconciliation_id = ? OR event_id = ? OR "
+                    "source_evidence_id = ?",
+                    (
+                        request.reconciliation_id, request.event_id,
+                        request.source_control_evidence_id,
+                    ),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != command_payload_digest:
+                        raise StorageIntegrityError(
+                            "verified-receipt identity was reused with different "
+                            "evidence"
+                        )
+                    outcome = connection.execute(
+                        "SELECT sequence FROM command_outcomes WHERE command_id = ?",
+                        (prior["command_id"],),
+                    ).fetchone()
+                    if outcome is None:
+                        raise StorageIntegrityError(
+                            "verified-receipt projection lost its outcome"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["reconciliation_id"]),
+                        str(prior["command_id"]), str(prior["event_id"]),
+                        int(outcome["sequence"]), str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "verified-receipt event ID was already used"
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied(
+                        "verified receipt does not bind the run"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state is not LifecycleState.RECONCILIATION_REQUIRED:
+                    raise DispatchDenied(
+                        "T17 requires durable RECONCILIATION_REQUIRED state"
+                    )
+                if (
+                    catalog_head != request.expected_catalog_head
+                    or run["head_hash"] != request.expected_run_head
+                    or run["continuation_cursor"]
+                    != request.expected_continuation_cursor
+                ):
+                    raise DispatchDenied(
+                        "verified-receipt reconciliation head or cursor is stale"
+                    )
+                expected_validation_cursor = (
+                    "operation-validation:v1:"
+                    f"{request.observation_id}:{request.attempt_id}:"
+                    f"{request.plan_id}:{request.revision_digest}"
+                )
+                if request.expected_validation_cursor != expected_validation_cursor:
+                    raise DispatchDenied(
+                        "verified-receipt validation cursor is not canonical"
+                    )
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (
+                        request.plan_id, request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "verified receipt does not bind the accepted plan"
+                    )
+                observation = connection.execute(
+                    "SELECT observation.*, event.writer_epoch, event.sequence "
+                    "FROM effect_observations AS observation JOIN events AS "
+                    "event ON event.event_id = observation.event_id WHERE "
+                    "observation.observation_id = ? AND observation.event_id = ?",
+                    (request.observation_id, request.observation_event_id),
+                ).fetchone()
+                if observation is None or (
+                    observation["event_hash"], observation["repository_id"],
+                    observation["run_id"], observation["item_id"],
+                    observation["logical_effect_id"], observation["attempt_id"],
+                    observation["source_receipt_id"],
+                    observation["source_claim_id"],
+                    observation["payload_digest"],
+                ) != (
+                    request.observation_event_hash, request.repository_id,
+                    request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.source_receipt_id, request.source_claim_id,
+                    request.source_payload_digest,
+                ):
+                    raise DispatchDenied(
+                        "verified receipt does not bind the durable observation"
+                    )
+                if (
+                    request.source_control_authority_id
+                    != "synthetic-source-control:v1:"
+                    + request.source_claim_id
+                    or request.source_control_response_id
+                    != request.source_receipt_id
+                    or request.source_control_response_digest
+                    != self._source_control_response_digest(observation)
+                ):
+                    raise DispatchDenied(
+                        "verified receipt lookup source or response is invalid"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ) or request.expected_slot_attempt_id != request.attempt_id:
+                    raise DispatchDenied(
+                        "verified-receipt reconciliation does not own the exact "
+                        "operation slot"
+                    )
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                    "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                    "AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                if reservation is None:
+                    raise DispatchDenied(
+                        "verified receipt has no operation reservation"
+                    )
+                settlement = self._validated_operation_settlement(
+                    connection,
+                    settlement_event_id=request.settlement_event_id,
+                    settlement_hash=request.settlement_hash,
+                    reservation_id=str(reservation["reservation_id"]),
+                )
+                if (
+                    reservation["settlement_head_hash"]
+                    != request.settlement_hash
+                    or bool(settlement["uncertainty"])
+                    or BudgetDisposition(str(settlement["disposition"]))
+                    not in {
+                        BudgetDisposition.CONSUMED,
+                        BudgetDisposition.ADJUSTED,
+                    }
+                ):
+                    raise DispatchDenied(
+                        "verified receipt requires authoritative current accounting"
+                    )
+
+                boundary_writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                rows = connection.execute(
+                    "SELECT instance.*, origin.event_kind, origin.writer_epoch, "
+                    "origin.sequence, origin.body_json AS origin_body, "
+                    "fence.reason_code FROM uncertainty_instances AS instance "
+                    "JOIN events AS origin ON origin.event_id = "
+                    "instance.origin_event_id JOIN dispatch_fences AS fence ON "
+                    "fence.fence_id = instance.fence_id LEFT JOIN "
+                    "uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND resolution.uncertainty_id IS NULL AND "
+                    "origin.writer_epoch < ? ORDER BY instance.uncertainty_id",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                        boundary_writer_epoch,
+                    ),
+                ).fetchall()
+                if not rows or tuple(
+                    str(row["uncertainty_id"]) for row in rows
+                ) != request.resolved_uncertainty_ids:
+                    raise DispatchDenied(
+                        "verified receipt must settle the exact applicable "
+                        "operation uncertainty set"
+                    )
+                latest_origin = max(
+                    rows,
+                    key=lambda row: (
+                        int(row["writer_epoch"]), int(row["sequence"])
+                    ),
+                )
+                if (
+                    request.source_control_query_after_event_id
+                    != latest_origin["origin_event_id"]
+                    or request.source_control_query_after_event_hash
+                    != latest_origin["origin_event_hash"]
+                ):
+                    raise DispatchDenied(
+                        "verified receipt lookup does not follow every "
+                        "uncertainty origin"
+                    )
+                reason_codes = {
+                    "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+                    "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+                    "BILLING": "EFFECT_BILLING_UNKNOWN",
+                    "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+                }
+                expected_source_bindings: list[
+                    SourceControlUncertaintyBinding
+                ] = []
+                for row in rows:
+                    kind = str(row["uncertainty_kind"])
+                    if row["reason_code"] != reason_codes.get(kind):
+                        raise StorageIntegrityError(
+                            "operation uncertainty fence is rebound"
+                        )
+                    origin_body = json.loads(str(row["origin_body"]))
+                    if str(row["event_kind"]) in {
+                        "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
+                    } and (
+                        origin_body.get("source_receipt_id"),
+                        origin_body.get("source_claim_id"),
+                        origin_body.get("payload_digest"),
+                    ) != (
+                        request.source_receipt_id, request.source_claim_id,
+                        request.source_payload_digest,
+                    ):
+                        raise DispatchDenied(
+                            "verified receipt cannot clear another receipt's "
+                            "uncertainty"
+                        )
+                    if str(row["event_kind"]) not in {
+                        "PAUSE_REQUESTED", "RECEIPT_RECORDED",
+                        "LATE_RECEIPT_RECORDED",
+                    }:
+                        raise StorageIntegrityError(
+                            "operation uncertainty has an unsupported origin"
+                        )
+                    if kind == "BILLING" and not self._settlement_descends_from(
+                        connection,
+                        reservation_id=str(reservation["reservation_id"]),
+                        current_hash=request.settlement_hash,
+                        ancestor_hash=str(row["settlement_head_hash"]),
+                    ):
+                        raise DispatchDenied(
+                            "authoritative settlement does not descend from the "
+                            "uncertain accounting head"
+                        )
+                    if kind == "SOURCE_CONTROL":
+                        prior_id = None
+                        prior_digest = None
+                        if str(row["event_kind"]) in {
+                            "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
+                        }:
+                            prior_id = origin_body.get(
+                                "source_control_evidence_id"
+                            )
+                            prior_digest = origin_body.get(
+                                "source_control_evidence_digest"
+                            )
+                        expected_source_bindings.append(
+                            SourceControlUncertaintyBinding(
+                                str(row["uncertainty_id"]),
+                                str(row["origin_event_id"]),
+                                str(row["origin_event_hash"]),
+                                None if prior_id is None else str(prior_id),
+                                None if prior_digest is None else str(prior_digest),
+                            )
+                        )
+                if tuple(expected_source_bindings) != (
+                    request.source_control_bindings
+                ):
+                    raise DispatchDenied(
+                        "source/control settlement does not cover the exact "
+                        "ordered uncertainty set"
+                    )
+
+                resulting_state, continuation_cursor = (
+                    self._reconciliation_route_at_prefix(
+                        connection,
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        validator_observation_id=None,
+                        validator_check_id=None,
+                        validator_attempt_id=None,
+                        resolved_uncertainty_ids=(
+                            request.resolved_uncertainty_ids
+                        ),
+                        boundary_sequence=int(run["head_sequence"]) + 1,
+                        boundary_writer_epoch=boundary_writer_epoch,
+                        preserved_cursor=request.expected_continuation_cursor,
+                        validation_cursor=expected_validation_cursor,
+                        blocked_cursor=expected_validation_cursor,
+                    )
+                )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T17", current_state, resulting_state,
+                        TRANSITIONS["T17"].required_guards,
+                    )
+                else:
+                    authorize_transition(current_state, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                body = {
+                    **payload,
+                    "continuation_cursor": continuation_cursor,
+                    "event_kind": "RECONCILIATION_RECORDED",
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": command_payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": boundary_writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RECONCILIATION_RECORDED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        boundary_writer_epoch, previous_hash, event_hash,
+                        body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_verified_receipt_event_before_clearance"
+                    )
+                for row in rows:
+                    kind = str(row["uncertainty_kind"])
+                    if kind == "BILLING":
+                        proof_kind = "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                        proof_event_id = request.settlement_event_id
+                        proof_event_hash = request.settlement_hash
+                    elif kind == "SOURCE_CONTROL":
+                        proof_kind = "ORDERED_SOURCE_CONTROL_SETTLEMENT"
+                        proof_event_id = request.event_id
+                        proof_event_hash = event_hash
+                    else:
+                        proof_kind = "AUTHORITATIVE_EFFECT_RECEIPT"
+                        proof_event_id = request.observation_event_id
+                        proof_event_hash = request.observation_event_hash
+                    resolution_body = {
+                        "event_id": request.event_id,
+                        "proof_event_hash": proof_event_hash,
+                        "proof_event_id": proof_event_id,
+                        "proof_kind": proof_kind,
+                        "reconciliation_id": request.reconciliation_id,
+                        "schema_version": 1,
+                        "uncertainty_id": row["uncertainty_id"],
+                    }
+                    connection.execute(
+                        "INSERT INTO uncertainty_resolutions VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            row["uncertainty_id"], request.reconciliation_id,
+                            request.event_id, proof_kind, proof_event_id,
+                            proof_event_hash,
+                            json.dumps(
+                                resolution_body, sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        ),
+                    )
+                    if connection.execute(
+                        "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                        "repository_id = ? AND reason_code = ?",
+                        (
+                            row["fence_id"], request.repository_id,
+                            reason_codes[kind],
+                        ),
+                    ).rowcount != 1:
+                        raise StorageIntegrityError(
+                            "resolved operation uncertainty fence is absent or "
+                            "rebound"
+                        )
+                connection.execute(
+                    "INSERT INTO verified_receipt_reconciliation_actions ("
+                    "reconciliation_id, command_id, event_id, repository_id, "
+                    "run_id, item_id, logical_effect_id, attempt_id, route, "
+                    "plan_id, revision_digest, observation_id, "
+                    "observation_event_id, observation_event_hash, "
+                    "source_evidence_id, source_evidence_digest, "
+                    "source_issuer_fingerprint, source_issuer_mac, "
+                    "source_query_id, source_queried_at_utc, "
+                    "source_query_after_event_id, "
+                    "source_query_after_event_hash, source_authority_id, "
+                    "source_response_id, source_response_digest, "
+                    "source_resulting_classification, source_bindings_json, "
+                    "settlement_event_id, settlement_hash, "
+                    "resolved_uncertainty_ids_json, slot_attempt_id, "
+                    "slot_generation, validation_cursor, payload_digest, "
+                    "event_hash, resulting_state, body_json) VALUES ("
+                    + ", ".join("?" for _ in range(37)) + ")",
+                    (
+                        request.reconciliation_id, request.command_id,
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.attempt_id, "VERIFIED_RECEIPT", request.plan_id,
+                        request.revision_digest, request.observation_id,
+                        request.observation_event_id,
+                        request.observation_event_hash,
+                        request.source_control_evidence_id,
+                        request.source_control_evidence_digest,
+                        request.source_control_issuer_fingerprint,
+                        request.source_control_issuer_mac,
+                        request.source_control_query_id,
+                        request.source_control_queried_at_utc,
+                        request.source_control_query_after_event_id,
+                        request.source_control_query_after_event_hash,
+                        request.source_control_authority_id,
+                        request.source_control_response_id,
+                        request.source_control_response_digest,
+                        request.source_control_resulting_classification.value,
+                        json.dumps(
+                            [dict(value.__dict__) for value in (
+                                request.source_control_bindings
+                            )],
+                            sort_keys=True, separators=(",", ":"),
+                        ),
+                        request.settlement_event_id, request.settlement_hash,
+                        json.dumps(request.resolved_uncertainty_ids),
+                        request.expected_slot_attempt_id,
+                        request.expected_slot_generation,
+                        expected_validation_cursor, command_payload_digest,
+                        event_hash, resulting_state.value, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, command_payload_digest,
+                        request.event_id, sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, continuation_cursor, sequence,
+                        event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_verified_receipt_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_verified_receipt_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as error:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "verified-receipt durable identity conflicts with recorded "
+                    "state"
+                ) from error
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.reconciliation_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
+        )
+
     def reconcile_validator_result(
         self,
         request: ReconcileValidatorResultRequest,
@@ -11153,7 +12347,7 @@ class SQLiteStateStore:
                     ).fetchone()[0]
                 )
                 resulting_state, continuation_cursor = (
-                    self._validator_reconciliation_route_at_prefix(
+                    self._reconciliation_route_at_prefix(
                         connection,
                         repository_id=request.repository_id,
                         run_id=request.run_id,
@@ -11919,7 +13113,7 @@ class SQLiteStateStore:
                     "WHERE repository_id = ?", (request.repository_id,),
                 ).fetchone()[0])
                 derived_state, derived_cursor = (
-                    self._validator_reconciliation_route_at_prefix(
+                    self._reconciliation_route_at_prefix(
                         connection,
                         repository_id=request.repository_id,
                         run_id=request.run_id,
@@ -19957,6 +21151,21 @@ class SQLiteStateStore:
         reconciliations = [
             json.loads(row["body_json"]) for row in reconciliation_event_rows
         ]
+        validator_reconciliations = [
+            body for body in reconciliations
+            if body.get("route") == "VALIDATOR_RESULT"
+        ]
+        verified_receipt_reconciliations = [
+            body for body in reconciliations
+            if body.get("route") == "VERIFIED_RECEIPT"
+        ]
+        if len(reconciliations) != (
+            len(validator_reconciliations)
+            + len(verified_receipt_reconciliations)
+        ):
+            raise StorageIntegrityError(
+                "reconciliation history contains an unknown route"
+            )
         reconciliation_resume_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'RECONCILIATION_PAUSE_RESUMED'",
@@ -22901,7 +24110,7 @@ class SQLiteStateStore:
 
         expected_resolutions: dict[str, tuple[object, ...]] = {}
         expected_reconciliation_actions: dict[str, tuple[object, ...]] = {}
-        for body in reconciliations:
+        for body in validator_reconciliations:
             for uncertainty_id in body["resolved_uncertainty_ids"]:
                 if uncertainty_id not in expected_uncertainties:
                     raise StorageIntegrityError(
@@ -22961,6 +24170,80 @@ class SQLiteStateStore:
                 self._event_hash(body), body["lifecycle_to"],
                 json.dumps(body, sort_keys=True, separators=(",", ":")),
             )
+        expected_verified_receipt_actions: dict[
+            str, tuple[object, ...]
+        ] = {}
+        for body in verified_receipt_reconciliations:
+            for uncertainty_id in body["resolved_uncertainty_ids"]:
+                if uncertainty_id not in expected_uncertainties:
+                    raise StorageIntegrityError(
+                        "verified receipt resolves an unknown uncertainty"
+                    )
+                if uncertainty_id in expected_resolutions:
+                    raise StorageIntegrityError(
+                        "uncertainty instance is resolved more than once"
+                    )
+                kind = str(expected_uncertainties[uncertainty_id][1])
+                if kind == "BILLING":
+                    proof_kind = "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                    proof_event_id = body["settlement_event_id"]
+                    proof_event_hash = body["settlement_hash"]
+                elif kind == "SOURCE_CONTROL":
+                    proof_kind = "ORDERED_SOURCE_CONTROL_SETTLEMENT"
+                    proof_event_id = body["event_id"]
+                    proof_event_hash = self._event_hash(body)
+                else:
+                    proof_kind = "AUTHORITATIVE_EFFECT_RECEIPT"
+                    proof_event_id = body["observation_event_id"]
+                    proof_event_hash = body["observation_event_hash"]
+                resolution_body = {
+                    "event_id": body["event_id"],
+                    "proof_event_hash": proof_event_hash,
+                    "proof_event_id": proof_event_id,
+                    "proof_kind": proof_kind,
+                    "reconciliation_id": body["reconciliation_id"],
+                    "schema_version": 1,
+                    "uncertainty_id": uncertainty_id,
+                }
+                expected_resolutions[uncertainty_id] = (
+                    body["reconciliation_id"], body["event_id"],
+                    proof_kind, proof_event_id, proof_event_hash,
+                    json.dumps(
+                        resolution_body, sort_keys=True, separators=(",", ":")
+                    ),
+                )
+            expected_verified_receipt_actions[body["reconciliation_id"]] = (
+                body["command_id"], body["event_id"],
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["attempt_id"],
+                "VERIFIED_RECEIPT", body["plan_id"],
+                body["revision_digest"], body["observation_id"],
+                body["observation_event_id"],
+                body["observation_event_hash"],
+                body["source_control_evidence_id"],
+                body["source_control_evidence_digest"],
+                body["source_control_issuer_fingerprint"],
+                body["source_control_issuer_mac"],
+                body["source_control_query_id"],
+                body["source_control_queried_at_utc"],
+                body["source_control_query_after_event_id"],
+                body["source_control_query_after_event_hash"],
+                body["source_control_authority_id"],
+                body["source_control_response_id"],
+                body["source_control_response_digest"],
+                body["source_control_resulting_classification"],
+                json.dumps(
+                    body["source_control_bindings"],
+                    sort_keys=True, separators=(",", ":"),
+                ),
+                body["settlement_event_id"], body["settlement_hash"],
+                json.dumps(body["resolved_uncertainty_ids"]),
+                body["expected_slot_attempt_id"],
+                body["expected_slot_generation"],
+                body["expected_validation_cursor"], body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
         actual_resolutions = {
             row["uncertainty_id"]: (
                 row["reconciliation_id"], row["event_id"],
@@ -22995,6 +24278,38 @@ class SQLiteStateStore:
         if actual_reconciliation_actions != expected_reconciliation_actions:
             raise StorageIntegrityError(
                 "reconciliation-action projection diverges from event history"
+            )
+        actual_verified_receipt_actions = {
+            row["reconciliation_id"]: (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["attempt_id"], row["route"], row["plan_id"],
+                row["revision_digest"], row["observation_id"],
+                row["observation_event_id"], row["observation_event_hash"],
+                row["source_evidence_id"], row["source_evidence_digest"],
+                row["source_issuer_fingerprint"], row["source_issuer_mac"],
+                row["source_query_id"], row["source_queried_at_utc"],
+                row["source_query_after_event_id"],
+                row["source_query_after_event_hash"],
+                row["source_authority_id"], row["source_response_id"],
+                row["source_response_digest"],
+                row["source_resulting_classification"],
+                row["source_bindings_json"], row["settlement_event_id"],
+                row["settlement_hash"],
+                row["resolved_uncertainty_ids_json"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["validation_cursor"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM verified_receipt_reconciliation_actions "
+                "WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_verified_receipt_actions != expected_verified_receipt_actions:
+            raise StorageIntegrityError(
+                "verified-receipt projection diverges from event history"
             )
 
         expected_validator_cessations = {
@@ -23917,10 +25232,20 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "reconciliation has no valid predecessor state"
                     ) from error
-                self._validate_validator_reconciliation_event(
-                    connection, body, predecessor_state,
-                    expected_cursors.get(run_id),
-                )
+                if body.get("route") == "VALIDATOR_RESULT":
+                    self._validate_validator_reconciliation_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
+                elif body.get("route") == "VERIFIED_RECEIPT":
+                    self._validate_verified_receipt_reconciliation_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
+                else:
+                    raise StorageIntegrityError(
+                        "reconciliation event has an unknown route"
+                    )
             if row["event_kind"] == "RECONCILIATION_PAUSE_RESUMED":
                 try:
                     predecessor_state = LifecycleState(
@@ -24373,6 +25698,7 @@ class SQLiteStateStore:
             "uncertainty_instances",
             "uncertainty_resolutions",
             "reconciliation_actions",
+            "verified_receipt_reconciliation_actions",
             "validation_pause_actions",
             "resume_actions",
             "reconciliation_resume_actions",

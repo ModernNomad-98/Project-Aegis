@@ -131,8 +131,17 @@ fixture. It is not a delivery integration.
   known historical accounting is not downgraded by missing telemetry. The
   version-0-to-1 semantic migration is atomic, rejects malformed or disguised
   legacy rows and validates settlement projections against immutable history;
-  version 1 verifies exact rows/fences without healing. Verified-receipt,
-  nonexecution and safe-retry reconciliation remain unverified.
+  version 1 verifies exact rows/fences without healing.
+- The reviewed T17 verified-receipt route records a closed, MAC-bound
+  query/time/source/response envelope with mandatory `KNOWN` classification.
+  It binds the exact durable receipt, accepted plan, repository slot and heads,
+  proves every billing uncertainty through the complete settlement ancestry,
+  and atomically records the reconciliation event, exact resolutions, fence
+  deletions, action projection and next typed cursor. Same-run pauses route to
+  `PAUSED`, remaining recovery/finalization blockers route to `BLOCKED`, and a
+  clean prefix routes to `VALIDATING`; replay precedes mutable freshness and
+  state guards. Semantic version 2, recovery and reopen validate the exact
+  route-specific projection without rewriting legacy validator history.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -186,7 +195,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 364 tests successfully, and
+controller. The complete local package suite ran 368 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -252,8 +261,10 @@ historical fence replay and full source rebinding. Two exact T09 fences now
 clear sequentially without losing the typed validation-application cursor.
 The reviewed operation-uncertainty foundation now adds typed source/control
 evidence, conditional operation uncertainty, an atomic semantic migration and
-exact-set recovery without promoting T17. Verified-receipt, nonexecution and
-safe-retry reconciliation remain ordered T17 work, so T17 and full T14 remain
+exact-set recovery without promoting T17. The reviewed verified-receipt slice
+adds proof-bound operation clearance, full accounting ancestry, typed routing
+and exact replay/recovery. Authoritative nonexecution and safe-retry
+reconciliation remain ordered T17 work, so T17 and full T14 remain
 `UNVERIFIED`.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider

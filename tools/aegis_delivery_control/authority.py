@@ -19,6 +19,7 @@ from .contracts import (
     ResumeActivitySettlementRequest,
     ResumeRequest,
     SourceControlEvidenceRequest,
+    SourceControlSettlementRequest,
 )
 
 SYNTHETIC_FAILURE_POLICY_ID = "failure-policy"
@@ -269,6 +270,14 @@ class SyntheticSourceControlEvidence:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticSourceControlSettlementEvidence:
+    evidence_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -388,6 +397,85 @@ class SyntheticAuthority:
             or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
         ):
             raise DispatchDenied("source/control evidence was not issued here")
+
+    @staticmethod
+    def _source_control_settlement_digest(
+        request: SourceControlSettlementRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **{
+                        key: (
+                            value.value
+                            if key == "resulting_classification"
+                            else value
+                        )
+                        for key, value in request.__dict__.items()
+                        if key != "covered_source_bindings"
+                    },
+                    "covered_source_bindings": [
+                        binding.__dict__
+                        for binding in request.covered_source_bindings
+                    ],
+                },
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_source_control_settlement_evidence(
+        self,
+        evidence_id: str,
+        request: SourceControlSettlementRequest,
+    ) -> SyntheticSourceControlSettlementEvidence:
+        request.validate()
+        if not isinstance(evidence_id, str) or not evidence_id.strip():
+            raise ValueError(
+                "source/control settlement evidence ID must be non-empty"
+            )
+        request_digest = self._source_control_settlement_digest(request)
+        return SyntheticSourceControlSettlementEvidence(
+            evidence_id,
+            request_digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "SOURCE_CONTROL_SETTLEMENT_EVIDENCE",
+                evidence_id=evidence_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_source_control_settlement_evidence(
+        self,
+        evidence: SyntheticSourceControlSettlementEvidence,
+        request: SourceControlSettlementRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied(
+                "source/control settlement evidence is malformed"
+            )
+        request_digest = self._source_control_settlement_digest(request)
+        expected_mac = self._mac(
+            "SOURCE_CONTROL_SETTLEMENT_EVIDENCE",
+            evidence_id=evidence.evidence_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied(
+                "source/control settlement evidence was not issued here"
+            )
 
     @staticmethod
     def _resume_request_digest(request: ResumeRequest) -> str:

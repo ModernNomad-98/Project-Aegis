@@ -24,6 +24,7 @@ from .authority import (
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
     SyntheticSourceControlEvidence,
+    SyntheticSourceControlSettlementEvidence,
     SyntheticValidatorCapability,
 )
 from .contracts import (
@@ -46,6 +47,7 @@ from .contracts import (
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
     PauseValidationRequest,
+    ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ReconciliationPauseResumeRequest,
     ResumeRequest,
@@ -581,6 +583,41 @@ class SyntheticDispatchCoordinator:
                 source_control_issuer_mac=source_control_evidence.issuer_mac,
             ),
             authority=self._authority,
+            failure_hook=failure_hook,
+        )
+
+    def reconcile_verified_receipt(
+        self,
+        request: ReconcileVerifiedReceiptRequest,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        """Resolve operation uncertainty from one durable verified receipt."""
+        request.validate()
+        evidence = SyntheticSourceControlSettlementEvidence(
+            evidence_id=request.source_control_evidence_id,
+            request_digest=request.source_control_evidence_digest,
+            issuer_fingerprint=request.source_control_issuer_fingerprint,
+            issuer_mac=request.source_control_issuer_mac,
+        )
+        self._authority.verify_source_control_settlement_evidence(
+            evidence,
+            self._store._source_control_settlement_request(request),
+        )
+
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T17",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T17"].required_guards,
+            )
+
+        return self._store.reconcile_verified_receipt(
+            request,
+            authorize_transition=authorize,
             failure_hook=failure_hook,
         )
 

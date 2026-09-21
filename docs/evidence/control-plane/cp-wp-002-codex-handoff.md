@@ -6,9 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest reviewed implementation checkpoint: `2bd6112215d78937bb23d694aa933eebf8d417e2`
+Latest pushed implementation checkpoint: `d06ea1d92caa2d23bcb5085da287052f5b55a289`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE AND REVIEWED T05-T09/T13-T15/T17 SLICES PLUS THE T17 OPERATION-UNCERTAINTY FOUNDATION `APPROVE`; COMPLETE T17 AND LATER BACKLOG OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE AND REVIEWED T05-T09/T13-T15/T17 SLICES INCLUDING VERIFIED_RECEIPT `APPROVE`; COMPLETE T17 AND LATER BACKLOG OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -824,6 +824,67 @@ authoritative nonexecution resolution and authenticated concurrent-safe
 same-effect retry remain next in the canonical order. PR #99 remains open,
 draft and blocked.
 
+### Stage 17 - T17 verified-receipt reconciliation
+
+The reviewed `VERIFIED_RECEIPT` slice binds one durable effect receipt to the
+accepted plan/revision, exact repository slot and current catalog/run heads. Its
+synthetic read-only lookup evidence is a domain-separated MAC over a canonical
+timezone-aware query time, governed query-after event ID/hash, derived source
+identity, response ID/digest, mandatory `KNOWN` result and sorted exact prior
+`SOURCE_CONTROL` bindings. Runtime and recovery derive the expected source,
+response and ordering from immutable receipt and uncertainty history rather
+than trusting caller labels.
+
+The request must name every applicable unresolved operation uncertainty for the
+same repository/run/item/effect/attempt. Each billing resolution proves the full
+settlement ancestry from its recorded uncertain head to the current
+authoritative `CONSUMED` or `ADJUSTED` head. A single transaction records the
+event, action, exact resolutions and command outcome, deletes only the covered
+uncertainty fences and advances the run/catalog heads. The server-derived
+`operation-validation:v1` cursor routes an uncovered reconciliation obligation
+to `RECONCILIATION_REQUIRED`, a retained same-run pause to `PAUSED`, other
+recovery/finalization blockers to `BLOCKED`, and a clean prefix to
+`VALIDATING`. Exact replay follows request/evidence and projection-integrity
+verification but precedes mutable freshness, head, lifecycle, slot and
+uncertainty guards.
+
+Semantic version 2 adds a distinct exact
+`verified_receipt_reconciliation_actions` projection. The v1-to-v2 migration
+does not rewrite validator reconciliation events, hashes or rows; missing,
+partial or incompatible v2 state fails closed. Reopen recognizes only exact
+verified-receipt event/action/resolution pairs before excluding their cleared
+fences, and complete recovery re-verifies the lookup MAC, order, settlement
+ancestry, route and exact projections.
+
+The initial implementation review returned `REVISE` for two MAJOR gaps: the
+lookup proof lacked explicit query/time/source/response/result bindings, and
+exact replay followed the mutable freshness gate. The closed typed lookup
+envelope, derived order/source/response checks and replay reordering corrected
+both. Final independent verdict: `APPROVE`, no remaining blocker or major; the
+reviewer independently passed the three core focused tests.
+
+Changed production files are `authority.py`, `contracts.py`, `dispatch.py` and
+`storage.py`; `test_dispatch.py` and `test_storage.py` add schema inventory,
+migration, typed-evidence, settlement-ancestry, routing, denial, crash/replay,
+reopen and tamper coverage. Status READMEs, the durable backlog and this handoff
+record only observed evidence. Canonical design, approval register, BER,
+dependencies, CI, CLI, adapters, preserved artifact/cache contents, real
+authority/adapters and external systems remain intentionally untouched.
+
+The complete delivery-control package passed 368 tests in 45.506 seconds.
+Repository validation found 184 valid skills with zero warnings, 8 script tests
+passed with 4 expected skips, all 91 gate self-test assertions passed,
+compileall passed and `git diff --check` exited 0 with Windows line-ending
+notices only.
+
+This stage adds narrow evidence to T17, C03/C04/C06 and
+F02/F04a/F07/F11/F12/F21 without promoting any complete family. T17 remains
+`UNVERIFIED/UNVERIFIED/UNVERIFIED`; authoritative `PROVEN_NONEXECUTION` is next,
+then authenticated concurrent-safe `SAFE_SAME_EFFECT_RETRY`. The existing
+validator-only T09-after-T17 T14 projection is intentionally unchanged, so
+operation-sourced T14 clearance remains deferred. PR #99 remains open, draft
+and blocked.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -939,6 +1000,10 @@ draft and blocked.
 | T17 operation-uncertainty repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | `git diff --check` after final operation-uncertainty corrections | Exit 0; Windows line-ending notices only |
 | Independent T17 operation-uncertainty implementation review | Two `REVISE` rounds closed six MAJOR evidence/MAC/atomicity/legacy-audit/settlement-projection findings; final `APPROVE`, no remaining blocker or major |
+| T17 verified-receipt focused falsification | Four-category T06 late receipt retained the operator pause and routed to typed `PAUSED`; observation-only billing ancestry routed cleanly to `VALIDATING`; stale order, wrong source/response, `UNKNOWN`, missing/surplus schema, stale slot, forged MAC, crash and projection tamper probes denied or replayed exactly as required |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -p "test_*.py"` after verified-receipt review corrections | `Ran 368 tests in 45.506s`; `OK` |
+| T17 verified-receipt repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent T17 verified-receipt implementation review | Initial `REVISE` closed two MAJOR typed lookup-envelope and replay-order findings; corrected review `APPROVE`, no remaining blocker or major; reviewer independently passed 3 focused tests |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -1061,7 +1126,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, T07 activity-recovery-to-BLOCKED, T08 clean recovery-to-VALIDATING and sequential exact T09-after-T17 PAUSED/VALIDATING slices independently accepted; other source families remain |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
-| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact validator-result/cessation/accounting reconciliation and operation-uncertainty foundation independently accepted; verified-receipt, nonexecution and safe-retry routes remain ordered |
+| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact validator-result and verified-receipt routes plus operation-uncertainty foundation independently accepted; authoritative nonexecution and safe-retry routes remain ordered |
 | T18 | YES | YES | YES | Graceful-stop and terminal-closure slices independently accepted |
 | T19 | YES | YES | YES | Terminal closure and post-contact uncertainty slices independently accepted |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
@@ -1097,18 +1162,18 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
 | F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 identity/non-mutation boundary slice accepted; full family remains ordered with T28 |
-| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 validator-result exact-set/fence-clearance and operation-uncertainty identity foundation accepted; proof-bound operation resolution/retry remains |
+| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 validator-result and verified-receipt exact-set/fence-clearance plus operation-uncertainty identity accepted; nonexecution/safe-retry completion remains |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
-| F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 conditional historical-settlement billing foundation accepted; complete receipt/nonexecution accounting trace remains |
+| F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 verified-receipt full settlement ancestry and conditional billing foundation accepted; complete nonexecution accounting trace remains |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05/T06/T07/T09 pause, settlement, slot-retention and serialized contact/receipt slices accepted; full family trace remains |
-| F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention plus T17 typed source/control and conditional billing foundation accepted; settlement route remains |
+| F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention plus T17 typed source/control settlement and verified-receipt clearance accepted; complete family remains |
 | F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 and T06 post-contact/late-adjustment slices accepted; full family trace remains |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
 | F10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 repository-prefix, superseded-attempt, later-history exclusion and typed source/control uncertainty foundation accepted; complete claim-settlement route remains |
-| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution, T17 validator-result PAUSED/recovery and operation semantic-migration foundations accepted; operation/nonlaunch completion remains |
+| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 typed query/time/source/response settlement, repository-prefix and exact-origin ordering accepted; complete claim-settlement family remains |
+| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution plus T17 validator/verified-receipt PAUSED/recovery and semantic migration accepted; operation/nonlaunch completion remains |
 | F13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 recoverable-failure stop slice accepted; full trace remains |
 | F15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
@@ -1117,7 +1182,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal closure slice accepted; full family trace remains |
 | F19 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | F20 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 persistence plus T17 exact uncertainty derivation/migration/recovery and sequential T14 clearance slices accepted; proof-bound operation clearance and complete family remain |
+| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 persistence plus T17 exact derivation/migration/recovery and proof-bound verified-receipt clearance accepted; nonexecution/retry and complete family remain |
 
 Immediate order:
 
@@ -1130,7 +1195,7 @@ Immediate order:
 Prior-session routing context for work after stop approval was:
 
 1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
-2. Complete the remaining T17 verified-receipt, authoritative nonexecution and authenticated safe-retry work with F02/F11/F12/F21; the validator-result/T09-resume slice and operation-uncertainty foundation are independently accepted.
+2. Complete the remaining T17 authoritative nonexecution and authenticated safe-retry work with F02/F11/F12/F21; the validator-result, verified-receipt, T09-resume and operation-uncertainty slices are independently accepted.
 3. T22.
 4. T28 with F01.
 5. Cross-family F05/F06/F13/F20.
@@ -1224,18 +1289,19 @@ owner before interpreting it more broadly.
 
 - R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, the narrow T07
   local-nonexecution slice, T08 validation-pause slice, T14 core/T09-source
-  slices, T17 validator-result slice and T17 operation-uncertainty foundation
-  are independently accepted as recorded in Stages 4-16; complete T07/T08/T14
-  and T17 remain UNVERIFIED pending operation reconciliation, T24 and other
+  slices, T17 validator-result and verified-receipt slices and T17
+  operation-uncertainty foundation are independently accepted as recorded in
+  Stages 4-17; complete T07/T08/T14 and T17 remain UNVERIFIED pending remaining
+  operation reconciliation, T24 and other
   source families, and later exact-head/final review gates remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
   pause request. T08 adds no adapter cancellation or drain side effect. T09
   retains reconciliation uncertainty and performs no adapter call. The T17
-  foundation derives and preserves uncertainty but does not resolve it. The
-  remaining verified-receipt, authoritative nonexecution and safe-retry routes
-  are the next ordered work.
+  foundation derives and preserves uncertainty; the verified-receipt route now
+  resolves only its exact proof-covered set. Authoritative nonexecution and
+  safe-retry are the next ordered work.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -1250,8 +1316,9 @@ Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
 stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accepted.
 T09 and the narrow T17 validator-result/T14 T09-source slice are also
-independently accepted, as is the T17 operation-uncertainty foundation. The next
-code change continues T17 in documented order with verified-receipt,
-authoritative nonexecution, authenticated safe retry and the remaining
+independently accepted, as are the T17 operation-uncertainty foundation and
+verified-receipt route. The next code change
+continues T17 in documented order with authoritative nonexecution,
+authenticated safe retry and the remaining
 F02/F11/F12/F21 obligations. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

@@ -969,6 +969,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_instances": 0,
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
+                "verified_receipt_reconciliation_actions": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
@@ -1906,6 +1907,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_instances": 0,
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
+                "verified_receipt_reconciliation_actions": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
@@ -3616,6 +3618,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     row["uncertainty_id"],
                 ),
             )
+            connection.execute(
+                "DROP TABLE verified_receipt_reconciliation_actions"
+            )
             connection.execute("PRAGMA user_version = 0")
             connection.commit()
         finally:
@@ -3668,7 +3673,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 1)
+        self.assertEqual(semantic_version, 2)
         migrated.load_verified("repo-1", authority=self.authority)
 
     def test_c04_conflicting_durable_identities_fail_closed(self) -> None:

@@ -970,6 +970,271 @@ class ReconcileValidatorResultRequest:
 
 
 @dataclass(frozen=True)
+class SourceControlUncertaintyBinding:
+    uncertainty_id: str
+    origin_event_id: str
+    origin_event_hash: str
+    prior_evidence_id: str | None = None
+    prior_evidence_digest: str | None = None
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.uncertainty_id,
+                self.origin_event_id,
+                self.origin_event_hash,
+            )
+        ):
+            raise ValueError("source/control uncertainty binding is incomplete")
+        if (self.prior_evidence_id is None) != (
+            self.prior_evidence_digest is None
+        ):
+            raise ValueError(
+                "source/control prior evidence must be complete or absent"
+            )
+        if self.prior_evidence_id is not None and any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.prior_evidence_id,
+                self.prior_evidence_digest,
+            )
+        ):
+            raise ValueError("source/control prior evidence is malformed")
+
+
+@dataclass(frozen=True)
+class SourceControlSettlementRequest:
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    observation_id: str
+    observation_event_hash: str
+    source_receipt_id: str
+    source_claim_id: str
+    source_payload_digest: str
+    expected_catalog_head: str
+    expected_run_head: str
+    authoritative_query_id: str
+    authoritative_queried_at_utc: str
+    authoritative_query_after_event_id: str
+    authoritative_query_after_event_hash: str
+    authoritative_source_id: str
+    authoritative_response_id: str
+    authoritative_response_digest: str
+    resulting_classification: SourceControlClassification
+    covered_source_bindings: tuple[SourceControlUncertaintyBinding, ...]
+
+    def validate(self) -> None:
+        values = (
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.observation_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.authoritative_query_id,
+            self.authoritative_queried_at_utc,
+            self.authoritative_query_after_event_id,
+            self.authoritative_query_after_event_hash,
+            self.authoritative_source_id,
+            self.authoritative_response_id,
+            self.authoritative_response_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip() for value in values
+        ):
+            raise ValueError(
+                "source/control settlement identifiers must be non-empty"
+            )
+        try:
+            observed_at = datetime.fromisoformat(
+                self.authoritative_queried_at_utc
+            )
+        except ValueError as error:
+            raise ValueError(
+                "source/control settlement query time is invalid"
+            ) from error
+        if (
+            observed_at.tzinfo is None
+            or observed_at.utcoffset() is None
+            or observed_at.isoformat()
+            != self.authoritative_queried_at_utc
+        ):
+            raise ValueError(
+                "source/control settlement query time must be canonical and "
+                "timezone-aware"
+            )
+        if self.resulting_classification is not (
+            SourceControlClassification.KNOWN
+        ):
+            raise ValueError(
+                "source/control settlement must result in KNOWN"
+            )
+        if (
+            not isinstance(self.covered_source_bindings, tuple)
+        ):
+            raise ValueError(
+                "source/control settlement bindings must be a tuple"
+            )
+        for binding in self.covered_source_bindings:
+            if not isinstance(binding, SourceControlUncertaintyBinding):
+                raise ValueError("source/control settlement binding is invalid")
+            binding.validate()
+        identities = tuple(
+            binding.uncertainty_id for binding in self.covered_source_bindings
+        )
+        if len(set(identities)) != len(identities) or identities != tuple(
+            sorted(identities)
+        ):
+            raise ValueError(
+                "source/control settlement bindings must be distinct and sorted"
+            )
+
+
+@dataclass(frozen=True)
+class ReconcileVerifiedReceiptRequest:
+    reconciliation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    observation_id: str
+    observation_event_id: str
+    observation_event_hash: str
+    source_receipt_id: str
+    source_claim_id: str
+    source_payload_digest: str
+    settlement_event_id: str
+    settlement_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    source_control_bindings: tuple[SourceControlUncertaintyBinding, ...]
+    source_control_query_id: str
+    source_control_queried_at_utc: str
+    source_control_query_after_event_id: str
+    source_control_query_after_event_hash: str
+    source_control_authority_id: str
+    source_control_response_id: str
+    source_control_response_digest: str
+    source_control_resulting_classification: SourceControlClassification
+    source_control_evidence_id: str
+    source_control_evidence_digest: str
+    source_control_issuer_fingerprint: str
+    source_control_issuer_mac: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+    expected_validation_cursor: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.reconciliation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.plan_id,
+            self.revision_digest,
+            self.observation_id,
+            self.observation_event_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.settlement_event_id,
+            self.settlement_hash,
+            self.source_control_query_id,
+            self.source_control_queried_at_utc,
+            self.source_control_query_after_event_id,
+            self.source_control_query_after_event_hash,
+            self.source_control_authority_id,
+            self.source_control_response_id,
+            self.source_control_response_digest,
+            self.source_control_evidence_id,
+            self.source_control_evidence_digest,
+            self.source_control_issuer_fingerprint,
+            self.source_control_issuer_mac,
+            self.expected_slot_attempt_id,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_validation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "verified-receipt reconciliation bindings must be non-empty"
+            )
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "verified-receipt predecessor cursor must be non-empty or absent"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "verified-receipt slot generation must be positive"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "verified-receipt uncertainty IDs must be distinct and sorted"
+            )
+        SourceControlSettlementRequest(
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.observation_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.source_control_query_id,
+            self.source_control_queried_at_utc,
+            self.source_control_query_after_event_id,
+            self.source_control_query_after_event_hash,
+            self.source_control_authority_id,
+            self.source_control_response_id,
+            self.source_control_response_digest,
+            self.source_control_resulting_classification,
+            self.source_control_bindings,
+        ).validate()
+
+
+@dataclass(frozen=True)
 class PauseReconciliationRequest:
     pause_id: str
     command_id: str

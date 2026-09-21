@@ -46,11 +46,14 @@ from tools.aegis_delivery_control.contracts import (
     PauseReconciliationRequest,
     PauseValidationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
+    ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ReconciliationPauseResumeRequest,
     ResumeRequest,
     SourceControlClassification,
     SourceControlEvidenceRequest,
+    SourceControlSettlementRequest,
+    SourceControlUncertaintyBinding,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -91,6 +94,11 @@ def PlanAcceptanceRequest(*args, **kwargs):
 class AlwaysFreshOracle:
     def verify(self, repository_id, catalog_head, run_heads):
         return repository_id == "repo-1"
+
+
+class NeverFreshOracle:
+    def verify(self, repository_id, catalog_head, run_heads):
+        return False
 
 
 def _launch_validator_until_terminated(
@@ -134,6 +142,39 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t17_ordered_source_control_settlement_evidence_is_exact(self) -> None:
+        authority = SyntheticAuthority(b"s" * 32)
+        binding = SourceControlUncertaintyBinding(
+            "uncertainty-source-1", "pause-event-1", "pause-hash-1"
+        )
+        request = SourceControlSettlementRequest(
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", attempt_id="attempt-1",
+            observation_id="observation-1",
+            observation_event_hash="observation-hash-1",
+            source_receipt_id="receipt-1", source_claim_id="claim-1",
+            source_payload_digest="payload-1",
+            expected_catalog_head="catalog-head-1",
+            expected_run_head="run-head-1",
+            authoritative_query_id="query-1",
+            authoritative_queried_at_utc="2026-09-21T12:00:00+00:00",
+            authoritative_query_after_event_id="pause-event-1",
+            authoritative_query_after_event_hash="pause-hash-1",
+            authoritative_source_id="synthetic-source-control:v1:claim-1",
+            authoritative_response_id="receipt-1",
+            authoritative_response_digest="response-digest-1",
+            resulting_classification=SourceControlClassification.KNOWN,
+            covered_source_bindings=(binding,),
+        )
+        evidence = authority.issue_source_control_settlement_evidence(
+            "source-settlement-1", request
+        )
+        authority.verify_source_control_settlement_evidence(evidence, request)
+        with self.assertRaisesRegex(DispatchDenied, "was not issued here"):
+            authority.verify_source_control_settlement_evidence(
+                evidence, replace(request, expected_run_head="newer-run-head")
+            )
+
     def test_t17_retained_validator_result_contract_and_coordinator_route(
         self,
     ) -> None:
@@ -729,6 +770,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.commit()
             finally:
@@ -773,6 +817,75 @@ class MediatedDispatchTests(unittest.TestCase):
                     store._database_path, store._freshness_oracle, "repo-1"
                 )
 
+    def test_t17_v1_to_v2_preserves_validator_history_exactly(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            (
+                authority, store, validation, request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                Path(directory), "v1-to-v2-preservation"
+            )
+            validation.reconcile_result(request)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                before = connection.execute(
+                    "SELECT event_hash, body_json FROM events WHERE event_kind "
+                    "= 'RECONCILIATION_RECORDED'"
+                ).fetchone()
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
+                connection.execute("PRAGMA user_version = 1")
+                connection.commit()
+            finally:
+                connection.close()
+            migrated = SQLiteStateStore(
+                store._database_path, store._freshness_oracle, "repo-1"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                after = connection.execute(
+                    "SELECT event_hash, body_json FROM events WHERE event_kind "
+                    "= 'RECONCILIATION_RECORDED'"
+                ).fetchone()
+                version = connection.execute(
+                    "PRAGMA user_version"
+                ).fetchone()[0]
+                action_count = connection.execute(
+                    "SELECT COUNT(*) FROM "
+                    "verified_receipt_reconciliation_actions"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(after, before)
+            self.assertEqual(version, 2)
+            self.assertEqual(action_count, 0)
+            migrated.load_verified("repo-1", authority=authority)
+
+    def test_t17_v2_missing_verified_receipt_projection_fails_closed(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStateStore(
+                Path(directory) / "state.sqlite3",
+                AlwaysFreshOracle(), "repo-1",
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "verified-receipt action schema is missing or incompatible",
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+
     def test_t17_semantic_version_reopen_is_stable_and_surplus_fails_closed(
         self,
     ) -> None:
@@ -789,7 +902,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 1
+                    connection.execute("PRAGMA user_version").fetchone()[0], 2
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -816,7 +929,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 2")
+                connection.execute("PRAGMA user_version = 3")
             finally:
                 connection.close()
             with self.assertRaisesRegex(
@@ -850,6 +963,9 @@ class MediatedDispatchTests(unittest.TestCase):
                         observation[6],
                     ),
                 ).fetchone()[0]
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -902,6 +1018,9 @@ class MediatedDispatchTests(unittest.TestCase):
                         observation[6],
                     ),
                 ).fetchone()[0]
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -954,6 +1073,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 settlement_event_id = connection.execute(
                     "SELECT settlement_event_id FROM effect_observations LIMIT 1"
                 ).fetchone()[0]
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "UPDATE budget_settlements SET disposition = ?, "
@@ -1007,6 +1129,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES (?, 'repo-1', "
@@ -1057,6 +1182,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "UPDATE validator_observations SET event_hash = ? WHERE "
@@ -1106,6 +1234,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "DROP TABLE verified_receipt_reconciliation_actions"
+                )
                 connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "UPDATE effect_observations SET source_claim_id = "
@@ -3220,6 +3351,579 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(adjusted, ("ADJUSTED", 1, 0))
             self.assertEqual(event_kind, "LATE_RECEIPT_RECORDED")
             self.assertEqual(retained, (1, 1))
+
+            connection = store._connect()
+            try:
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()
+                repository = connection.execute(
+                    "SELECT * FROM repositories WHERE repository_id = 'repo-1'"
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = "
+                    "'repo-1'"
+                ).fetchone()
+                observation = connection.execute(
+                    "SELECT * FROM effect_observations WHERE observation_id = "
+                    "'late-observation-1'"
+                ).fetchone()
+                uncertainties = connection.execute(
+                    "SELECT * FROM uncertainty_instances WHERE run_id = 'run-1' "
+                    "ORDER BY uncertainty_id"
+                ).fetchall()
+            finally:
+                connection.close()
+            source_rows = [
+                row for row in uncertainties
+                if row["uncertainty_kind"] == "SOURCE_CONTROL"
+            ]
+            source_bindings = tuple(
+                SourceControlUncertaintyBinding(
+                    str(row["uncertainty_id"]),
+                    str(row["origin_event_id"]),
+                    str(row["origin_event_hash"]),
+                )
+                for row in source_rows
+            )
+            source_request = SourceControlSettlementRequest(
+                repository_id="repo-1", run_id="run-1", item_id="item-1",
+                logical_effect_id="effect-1", attempt_id="attempt-1",
+                observation_id="late-observation-1",
+                observation_event_hash=observation["event_hash"],
+                source_receipt_id=canonical_before_pause.receipt_id,
+                source_claim_id=canonical_before_pause.claim_id,
+                source_payload_digest=canonical_before_pause.payload_digest,
+                expected_catalog_head=repository["catalog_head"],
+                expected_run_head=run["head_hash"],
+                authoritative_query_id="source-query-1",
+                authoritative_queried_at_utc=(
+                    "2026-09-21T12:00:00+00:00"
+                ),
+                authoritative_query_after_event_id=(
+                    "external-pause-event-1"
+                ),
+                authoritative_query_after_event_hash=(
+                    source_rows[0]["origin_event_hash"]
+                ),
+                authoritative_source_id=(
+                    "synthetic-source-control:v1:"
+                    + canonical_before_pause.claim_id
+                ),
+                authoritative_response_id=canonical_before_pause.receipt_id,
+                authoritative_response_digest=(
+                    store._source_control_response_digest(observation)
+                ),
+                resulting_classification=SourceControlClassification.KNOWN,
+                covered_source_bindings=source_bindings,
+            )
+            source_evidence = authority.issue_source_control_settlement_evidence(
+                "source-settlement-evidence-1", source_request
+            )
+            validation_cursor = (
+                "operation-validation:v1:late-observation-1:attempt-1:"
+                "plan:run-1:revision-1"
+            )
+            reconcile_request = ReconcileVerifiedReceiptRequest(
+                    reconciliation_id="verified-receipt-reconciliation-1",
+                    command_id="verified-receipt-command-1",
+                    event_id="verified-receipt-event-1",
+                    repository_id="repo-1", run_id="run-1",
+                    item_id="item-1", logical_effect_id="effect-1",
+                    attempt_id="attempt-1", plan_id="plan:run-1",
+                    revision_digest="revision-1",
+                    observation_id="late-observation-1",
+                    observation_event_id=observation["event_id"],
+                    observation_event_hash=observation["event_hash"],
+                    source_receipt_id=canonical_before_pause.receipt_id,
+                    source_claim_id=canonical_before_pause.claim_id,
+                    source_payload_digest=canonical_before_pause.payload_digest,
+                    settlement_event_id=observation["settlement_event_id"],
+                    settlement_hash=observation["settlement_hash"],
+                    resolved_uncertainty_ids=tuple(
+                        str(row["uncertainty_id"])
+                        for row in uncertainties
+                    ),
+                    source_control_bindings=source_bindings,
+                    source_control_query_id=source_request.authoritative_query_id,
+                    source_control_queried_at_utc=(
+                        source_request.authoritative_queried_at_utc
+                    ),
+                    source_control_query_after_event_id=(
+                        source_request.authoritative_query_after_event_id
+                    ),
+                    source_control_query_after_event_hash=(
+                        source_request.authoritative_query_after_event_hash
+                    ),
+                    source_control_authority_id=(
+                        source_request.authoritative_source_id
+                    ),
+                    source_control_response_id=(
+                        source_request.authoritative_response_id
+                    ),
+                    source_control_response_digest=(
+                        source_request.authoritative_response_digest
+                    ),
+                    source_control_resulting_classification=(
+                        SourceControlClassification.KNOWN
+                    ),
+                    source_control_evidence_id=source_evidence.evidence_id,
+                    source_control_evidence_digest=(
+                        source_evidence.request_digest
+                    ),
+                    source_control_issuer_fingerprint=(
+                        source_evidence.issuer_fingerprint
+                    ),
+                    source_control_issuer_mac=source_evidence.issuer_mac,
+                    expected_slot_attempt_id="attempt-1",
+                    expected_slot_generation=int(slot["generation"]),
+                    expected_catalog_head=repository["catalog_head"],
+                    expected_run_head=run["head_hash"],
+                    expected_continuation_cursor=run["continuation_cursor"],
+                    expected_validation_cursor=validation_cursor,
+                )
+
+            def retargeted_lookup(
+                suffix: str, **changes: object
+            ) -> ReconcileVerifiedReceiptRequest:
+                retargeted_source = replace(source_request, **changes)
+                retargeted_evidence = (
+                    authority.issue_source_control_settlement_evidence(
+                        f"retargeted-source-evidence-{suffix}",
+                        retargeted_source,
+                    )
+                )
+                return replace(
+                    reconcile_request,
+                    source_control_query_after_event_id=(
+                        retargeted_source.authoritative_query_after_event_id
+                    ),
+                    source_control_query_after_event_hash=(
+                        retargeted_source.authoritative_query_after_event_hash
+                    ),
+                    source_control_authority_id=(
+                        retargeted_source.authoritative_source_id
+                    ),
+                    source_control_response_id=(
+                        retargeted_source.authoritative_response_id
+                    ),
+                    source_control_response_digest=(
+                        retargeted_source.authoritative_response_digest
+                    ),
+                    source_control_evidence_id=retargeted_evidence.evidence_id,
+                    source_control_evidence_digest=(
+                        retargeted_evidence.request_digest
+                    ),
+                    source_control_issuer_fingerprint=(
+                        retargeted_evidence.issuer_fingerprint
+                    ),
+                    source_control_issuer_mac=retargeted_evidence.issuer_mac,
+                )
+
+            for substituted in (
+                replace(
+                    reconcile_request,
+                    expected_slot_generation=(
+                        reconcile_request.expected_slot_generation + 1
+                    ),
+                ),
+                replace(
+                    reconcile_request,
+                    resolved_uncertainty_ids=tuple(sorted(
+                        reconcile_request.resolved_uncertainty_ids
+                        + ("uncertainty:fabricated",)
+                    )),
+                ),
+                replace(
+                    reconcile_request,
+                    source_control_issuer_mac="forged-source-mac",
+                ),
+                retargeted_lookup(
+                    "stale-order",
+                    authoritative_query_after_event_id=(
+                        dispatched.intent.event_id
+                    ),
+                    authoritative_query_after_event_hash=(
+                        dispatched.intent.event_hash
+                    ),
+                ),
+                retargeted_lookup(
+                    "wrong-source",
+                    authoritative_source_id="synthetic-source-control:v1:other",
+                ),
+                retargeted_lookup(
+                    "wrong-response",
+                    authoritative_response_id="other-receipt",
+                    authoritative_response_digest="other-response-digest",
+                ),
+            ):
+                with self.assertRaises(DispatchDenied):
+                    coordinator.reconcile_verified_receipt(substituted)
+            with self.assertRaisesRegex(ValueError, "must result in KNOWN"):
+                replace(
+                    source_request,
+                    resulting_classification=(
+                        SourceControlClassification.UNKNOWN
+                    ),
+                ).validate()
+            self.assertEqual(
+                store.table_counts()[
+                    "verified_receipt_reconciliation_actions"
+                ],
+                0,
+            )
+
+            for boundary in (
+                "after_verified_receipt_event_before_clearance",
+                "after_verified_receipt_writes_before_commit",
+            ):
+                with self.assertRaises(InjectedFailure):
+                    coordinator.reconcile_verified_receipt(
+                        reconcile_request, failure_hook=raise_at(boundary)
+                    )
+                self.assertEqual(
+                    store.table_counts()[
+                        "verified_receipt_reconciliation_actions"
+                    ],
+                    0,
+                )
+                store.load_verified("repo-1", authority=authority)
+
+            with self.assertRaises(InjectedFailure):
+                coordinator.reconcile_verified_receipt(
+                    reconcile_request,
+                    failure_hook=raise_at(
+                        "after_verified_receipt_commit_before_acknowledgement"
+                    ),
+                )
+            store.load_verified("repo-1", authority=authority)
+            reconciled = coordinator.reconcile_verified_receipt(
+                reconcile_request
+            )
+            self.assertTrue(reconciled.replayed)
+            self.assertEqual(reconciled.resulting_state, LifecycleState.PAUSED)
+            connection = store._connect()
+            try:
+                self.assertEqual(
+                    connection.execute(
+                        "SELECT COUNT(*) FROM uncertainty_resolutions WHERE "
+                        "reconciliation_id = ?",
+                        (reconciled.control_id,),
+                    ).fetchone()[0],
+                    4,
+                )
+                self.assertEqual(
+                    connection.execute(
+                        "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id "
+                        "LIKE 'uncertainty:%'"
+                    ).fetchone()[0],
+                    0,
+                )
+                self.assertEqual(
+                    tuple(connection.execute(
+                        "SELECT lifecycle_state, continuation_cursor FROM runs "
+                        "WHERE run_id = 'run-1'"
+                    ).fetchone()),
+                    (LifecycleState.PAUSED.value, validation_cursor),
+                )
+            finally:
+                connection.close()
+            store.load_verified("repo-1", authority=authority)
+            replay = coordinator.reconcile_verified_receipt(reconcile_request)
+            self.assertTrue(replay.replayed)
+            self.assertEqual(replay.event_hash, reconciled.event_hash)
+            store._freshness_oracle = NeverFreshOracle()
+            stale_freshness_replay = coordinator.reconcile_verified_receipt(
+                reconcile_request
+            )
+            self.assertTrue(stale_freshness_replay.replayed)
+            self.assertEqual(
+                stale_freshness_replay.event_hash, reconciled.event_hash
+            )
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "command ID was reused with a different payload",
+            ):
+                coordinator.reconcile_verified_receipt(
+                    replace(
+                        reconcile_request,
+                        event_id="conflicting-replay-event",
+                    )
+                )
+            store._freshness_oracle = AlwaysFreshOracle()
+
+            connection = store._connect()
+            try:
+                recorded_body = json.loads(connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (reconcile_request.event_id,),
+                ).fetchone()[0])
+                surplus_body = dict(recorded_body)
+                surplus_body["surplus_lookup_field"] = "forbidden"
+                missing_body = dict(recorded_body)
+                missing_body.pop("source_control_response_digest")
+                for malformed in (surplus_body, missing_body):
+                    with self.assertRaisesRegex(
+                        StorageIntegrityError,
+                        "verified-receipt reconciliation semantics are invalid",
+                    ):
+                        store._validate_verified_receipt_reconciliation_event(
+                            connection,
+                            malformed,
+                            LifecycleState.RECONCILIATION_REQUIRED,
+                            reconcile_request.expected_continuation_cursor,
+                        )
+            finally:
+                connection.close()
+
+            connection = store._connect()
+            try:
+                action_digest = connection.execute(
+                    "SELECT source_response_digest FROM "
+                    "verified_receipt_reconciliation_actions WHERE "
+                    "reconciliation_id = ?",
+                    (reconcile_request.reconciliation_id,),
+                ).fetchone()[0]
+                connection.execute(
+                    "UPDATE verified_receipt_reconciliation_actions SET "
+                    "source_response_digest = 'tampered-response' WHERE "
+                    "reconciliation_id = ?",
+                    (reconcile_request.reconciliation_id,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "verified-receipt projection diverges"
+            ):
+                store.load_verified("repo-1", authority=authority)
+            connection = store._connect()
+            try:
+                connection.execute(
+                    "UPDATE verified_receipt_reconciliation_actions SET "
+                    "source_response_digest = ? WHERE reconciliation_id = ?",
+                    (action_digest, reconcile_request.reconciliation_id),
+                )
+                resolution = connection.execute(
+                    "SELECT * FROM uncertainty_resolutions ORDER BY "
+                    "uncertainty_id LIMIT 1"
+                ).fetchone()
+                connection.execute(
+                    "DELETE FROM uncertainty_resolutions WHERE uncertainty_id = ?",
+                    (resolution["uncertainty_id"],),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "uncertainty-resolution projection diverges",
+            ):
+                store.load_verified("repo-1", authority=authority)
+            connection = store._connect()
+            try:
+                connection.execute(
+                    "INSERT INTO uncertainty_resolutions VALUES (?, ?, ?, ?, "
+                    "?, ?, ?)",
+                    tuple(resolution),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t17_verified_receipt_reconciles_observation_billing_ancestry(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            authority = SyntheticAuthority()
+            grant = SyntheticGrant(
+                "billing-grant", "repo-1", "effect-1", "attempt-1",
+                "scope-1",
+            )
+            authority.register(grant)
+            capability = authority.claim(*grant.__dict__.values())
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "billing-command",
+                "billing-event", "effect-1", "payload-1", "attempt-1",
+                "billing-permission", "billing-reservation", "budget-1",
+                1, 2, 5,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            coordinator.dispatch(
+                intent, capability,
+                SyntheticEffectRequest(
+                    "repo-1", "effect-1", "attempt-1", "scope-1",
+                    "payload-1",
+                ),
+                expected_head=plan.event_hash, writer_epoch=2,
+                usage_units=None, lose_receipt=True,
+            )
+            receipt = adapter.reconcile(capability.claim_id)
+            self.assertIsNotNone(receipt)
+            observed = coordinator.intake_effect_receipt(
+                EffectObservationCommand(
+                    "billing-observation", "billing-observe-command",
+                    "billing-observe-event", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", capability.claim_id,
+                    "billing-unknown-settlement", "",
+                )
+            )
+            self.assertEqual(
+                observed.resulting_state,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            connection = store._connect()
+            try:
+                observation = connection.execute(
+                    "SELECT * FROM effect_observations WHERE observation_id = "
+                    "'billing-observation'"
+                ).fetchone()
+                uncertainty = connection.execute(
+                    "SELECT * FROM uncertainty_instances WHERE origin_event_id "
+                    "= 'billing-observe-event'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(uncertainty["uncertainty_kind"], "BILLING")
+            adjusted = store._settle_budget(
+                BudgetSettlementRequest(
+                    "billing-authoritative-settlement", "billing-reservation",
+                    observation["settlement_hash"],
+                    BudgetDisposition.ADJUSTED, 1,
+                    "billing-authoritative-evidence", "AUTHORITATIVE_USAGE",
+                ),
+                authority.issue_settlement_proof(
+                    "billing-authoritative-proof",
+                    BudgetSettlementRequest(
+                        "billing-authoritative-settlement",
+                        "billing-reservation", observation["settlement_hash"],
+                        BudgetDisposition.ADJUSTED, 1,
+                        "billing-authoritative-evidence",
+                        "AUTHORITATIVE_USAGE",
+                    ),
+                ),
+                authority,
+            )
+            connection = store._connect()
+            try:
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()
+                repository = connection.execute(
+                    "SELECT * FROM repositories WHERE repository_id = 'repo-1'"
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = "
+                    "'repo-1'"
+                ).fetchone()
+            finally:
+                connection.close()
+            source_request = SourceControlSettlementRequest(
+                repository_id="repo-1", run_id="run-1", item_id="item-1",
+                logical_effect_id="effect-1", attempt_id="attempt-1",
+                observation_id="billing-observation",
+                observation_event_hash=observation["event_hash"],
+                source_receipt_id=receipt.receipt_id,
+                source_claim_id=receipt.claim_id,
+                source_payload_digest=receipt.payload_digest,
+                expected_catalog_head=repository["catalog_head"],
+                expected_run_head=run["head_hash"],
+                authoritative_query_id="billing-query",
+                authoritative_queried_at_utc=(
+                    "2026-09-21T12:01:00+00:00"
+                ),
+                authoritative_query_after_event_id=observation["event_id"],
+                authoritative_query_after_event_hash=observation["event_hash"],
+                authoritative_source_id=(
+                    "synthetic-source-control:v1:" + receipt.claim_id
+                ),
+                authoritative_response_id=receipt.receipt_id,
+                authoritative_response_digest=(
+                    store._source_control_response_digest(observation)
+                ),
+                resulting_classification=SourceControlClassification.KNOWN,
+                covered_source_bindings=(),
+            )
+            source_evidence = authority.issue_source_control_settlement_evidence(
+                "billing-source-evidence", source_request
+            )
+            validation_cursor = (
+                "operation-validation:v1:billing-observation:attempt-1:"
+                "plan:run-1:revision-1"
+            )
+            reconciled = coordinator.reconcile_verified_receipt(
+                ReconcileVerifiedReceiptRequest(
+                    reconciliation_id="billing-reconciliation",
+                    command_id="billing-reconcile-command",
+                    event_id="billing-reconcile-event",
+                    repository_id="repo-1", run_id="run-1",
+                    item_id="item-1", logical_effect_id="effect-1",
+                    attempt_id="attempt-1", plan_id="plan:run-1",
+                    revision_digest="revision-1",
+                    observation_id="billing-observation",
+                    observation_event_id=observation["event_id"],
+                    observation_event_hash=observation["event_hash"],
+                    source_receipt_id=receipt.receipt_id,
+                    source_claim_id=receipt.claim_id,
+                    source_payload_digest=receipt.payload_digest,
+                    settlement_event_id=adjusted.settlement_event_id,
+                    settlement_hash=adjusted.settlement_hash,
+                    resolved_uncertainty_ids=(
+                        str(uncertainty["uncertainty_id"]),
+                    ),
+                    source_control_bindings=(),
+                    source_control_query_id=source_request.authoritative_query_id,
+                    source_control_queried_at_utc=(
+                        source_request.authoritative_queried_at_utc
+                    ),
+                    source_control_query_after_event_id=(
+                        source_request.authoritative_query_after_event_id
+                    ),
+                    source_control_query_after_event_hash=(
+                        source_request.authoritative_query_after_event_hash
+                    ),
+                    source_control_authority_id=(
+                        source_request.authoritative_source_id
+                    ),
+                    source_control_response_id=(
+                        source_request.authoritative_response_id
+                    ),
+                    source_control_response_digest=(
+                        source_request.authoritative_response_digest
+                    ),
+                    source_control_resulting_classification=(
+                        SourceControlClassification.KNOWN
+                    ),
+                    source_control_evidence_id=source_evidence.evidence_id,
+                    source_control_evidence_digest=(
+                        source_evidence.request_digest
+                    ),
+                    source_control_issuer_fingerprint=(
+                        source_evidence.issuer_fingerprint
+                    ),
+                    source_control_issuer_mac=source_evidence.issuer_mac,
+                    expected_slot_attempt_id="attempt-1",
+                    expected_slot_generation=int(slot["generation"]),
+                    expected_catalog_head=repository["catalog_head"],
+                    expected_run_head=run["head_hash"],
+                    expected_continuation_cursor=run["continuation_cursor"],
+                    expected_validation_cursor=validation_cursor,
+                )
+            )
+            self.assertEqual(
+                reconciled.resulting_state, LifecycleState.VALIDATING
+            )
+            store.load_verified("repo-1", authority=authority)
 
     def test_t14_coordinator_exposes_resume_route(self) -> None:
         self.assertTrue(
