@@ -629,7 +629,7 @@ intervening T13 non-accounting fact remains recoverable.
 | Complete delivery-control package | Exit 0; 318 tests in 25.638 seconds; `OK` |
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent implementation review | Initial `REVISE` found two MAJOR recovery defects: journal predecessor was incorrectly equated with T25 head and T14 assumed slot generation 1. Prefix-derived accounting and exact T07 generation binding, with intervening-T13 and non-1 regressions, closed both. Final `APPROVE`, no remaining blocker/major; reviewer independently passed 3 correction tests in 0.194 seconds |
-| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Commit/push and hosted checks | Signed-off commit `a0d27bbdd64d7d86bf080355ca933d28760244ab` pushed to the existing branch; `gate-guard` passed in 5s, `validate-skills` in 1m19s and `windows-offline-checks` in 2m58s; PR #99 remained open, draft and blocked |
 | Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, artifacts/caches, real authority/adapters and external systems |
 

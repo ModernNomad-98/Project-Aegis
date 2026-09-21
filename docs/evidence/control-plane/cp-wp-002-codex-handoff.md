@@ -642,8 +642,11 @@ Local evidence is 13 focused tests in 2.536 seconds, three repeated passes of
 the two race tests, 40 dispatch tests, 331 complete package tests, 184 valid
 skills with zero warnings, 8 script tests with 4 expected skips, 91 gate
 self-test assertions, compileall and clean diff checks apart from line-ending
-notices. Commit, push and exact-head hosted-check evidence remain pending until
-this reviewed stage is committed. Canonical design, approval register, BER,
+notices. Reviewed code was committed with DCO sign-off and pushed as
+`a0d27bbdd64d7d86bf080355ca933d28760244ab`. On that exact head,
+`gate-guard` passed in 5 seconds, `validate-skills` in 1m19s and
+`windows-offline-checks` in 2m58s. PR #99 remained open, draft and blocked.
+Canonical design, approval register, BER,
 dependencies, CI, CLI, adapters, preserved artifact/cache paths, real
 authority/adapters and external systems were intentionally untouched. The
 validator run added `scripts/ci/__pycache__/` to the preserved untracked cache
@@ -743,6 +746,9 @@ open, draft and blocked.
 | T08 complete delivery-control package | `Ran 331 tests in 28.693s`; `OK` |
 | T08 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent T08 implementation review | Initial `REVISE` for two MAJOR cessation/race gaps; corrected `APPROVE`, no remaining blocker/major; reviewer independently ran 13 focused tests in 2.479s |
+| `git commit -s -m "feat(control-plane): checkpoint validation pause"` | Commit `a0d27bbdd64d7d86bf080355ca933d28760244ab`; signed-off; 10 files changed |
+| `git push origin feat/cp-wp-002-offline-kernel` after T08 | Remote branch advanced `511f590..a0d27bb` |
+| Hosted checks on exact T08 implementation head | `gate-guard` passed in 5s; `validate-skills` passed in 1m19s; `windows-offline-checks` passed in 2m58s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
