@@ -4147,6 +4147,401 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(cursor, "FINALIZING")
 
+    def _terminal_application_request(
+        self, disposition: str
+    ) -> TerminalValidationSettlementRequest:
+        connection = sqlite3.connect(self.database_path)
+        try:
+            application_hash = connection.execute(
+                "SELECT event_hash FROM validation_applications "
+                "WHERE application_id = 'application-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        return TerminalValidationSettlementRequest(
+            "terminal-settlement-1", "terminal-command-1",
+            "terminal-event-1", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", "check-1",
+            "VALIDATION_APPLICATION", "application-1", application_hash,
+            disposition, "validator-intent-1", "validator-attempt-1",
+        )
+
+    def _assert_r_stop_01_application_closure(
+        self, *, verdict: str, mode: StopMode
+    ) -> None:
+        if verdict == "PASS":
+            self._prepare_finalization()
+            expected_cursor = "FINALIZING"
+            disposition = "PASSED"
+        else:
+            self._prepare_recoverable_application()
+            expected_cursor = LifecycleState.VALIDATING.value
+            disposition = "FAILED"
+        stopped = self.store.stop(
+            self._stop_request(mode),
+            self._stop_capability(mode),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run_cursor, retained_cursor = connection.execute(
+                "SELECT run.continuation_cursor, stop.retained_continuation_cursor "
+                "FROM runs AS run JOIN stop_actions AS stop ON "
+                "stop.run_id = run.run_id WHERE run.run_id = 'run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run_cursor, expected_cursor)
+        self.assertEqual(retained_cursor, expected_cursor)
+
+        second_grant = SyntheticGrant(
+            "grant-2", "repo-1", "effect-2", "attempt-2", "scope-2"
+        )
+        self.authority.register(second_grant)
+        second_capability = self.authority.claim(
+            *second_grant.__dict__.values()
+        )
+        second_plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                "run-2", "item-2", "effect-2", "revision-2",
+                "descriptor-digest", "scope-2", "budget-policy-digest",
+                ("check-2",),
+            ),
+            expected_head=stopped.event_hash,
+            writer_epoch=40,
+        )
+        self.oracle.allowed_head = second_plan.event_hash
+        second_request = replace(
+            self.request(), run_id="run-2", item_id="item-2",
+            command_id="command-2", event_id="event-2",
+            logical_effect_id="effect-2", attempt_id="attempt-2",
+            permission_use_id="permission-use-2",
+            reservation_id="reservation-2",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+            self.store.commit_intent(
+                second_request, second_capability, self.authority,
+                expected_head=second_plan.event_hash, writer_epoch=41,
+            )
+
+        settled = self.store.settle_terminal_validation(
+            self._terminal_application_request(disposition)
+        )
+        self.assertEqual(settled.resulting_state, LifecycleState.STOPPED)
+        self.assertTrue(settled.slot_released)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+        self.oracle.allowed_head = settled.event_hash
+        self.store.load_verified("repo-1")
+        committed = self.store.commit_intent(
+            second_request, second_capability, self.authority,
+            expected_head=settled.event_hash, writer_epoch=42,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        replay = self.store.commit_intent(
+            second_request, second_capability, self.authority,
+            expected_head=committed.event_hash, writer_epoch=43,
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, committed.event_hash)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_r_stop_01_t18_closes_applied_pass(self) -> None:
+        self._assert_r_stop_01_application_closure(
+            verdict="PASS", mode=StopMode.GRACEFUL
+        )
+
+    def test_r_stop_01_t19_closes_applied_pass(self) -> None:
+        self._assert_r_stop_01_application_closure(
+            verdict="PASS", mode=StopMode.IMMEDIATE
+        )
+
+    def test_r_stop_01_t18_closes_applied_recoverable_failure(self) -> None:
+        self._assert_r_stop_01_application_closure(
+            verdict="FAIL", mode=StopMode.GRACEFUL
+        )
+
+    def test_r_stop_01_t19_closes_applied_recoverable_failure(self) -> None:
+        self._assert_r_stop_01_application_closure(
+            verdict="FAIL", mode=StopMode.IMMEDIATE
+        )
+
+    def test_r_stop_01_application_closure_crash_replay_is_exactly_once(
+        self,
+    ) -> None:
+        self._record_validator_result(verdict="PASS", only_check=True)
+        application_request = ValidationApplicationRequest(
+            "application-1", "apply-command-1", "apply-event-1", "repo-1",
+            "run-1", "item-1", "effect-1", "revision-1", "check-1",
+            "validator-attempt-1", "validator-observation-1",
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store._apply_validator_observation(
+                application_request,
+                failure_hook=raise_at(
+                    "after_validation_application_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            application_hash = connection.execute(
+                "SELECT event_hash FROM validation_applications "
+                "WHERE application_id = 'application-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = application_hash
+        application_replay = self.store._apply_validator_observation(
+            application_request
+        )
+        self.assertTrue(application_replay.replayed)
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        request = self._terminal_application_request("PASSED")
+        with self.assertRaises(InjectedFailure):
+            self.store.settle_terminal_validation(
+                request,
+                failure_hook=raise_at(
+                    "after_terminal_settlement_writes_before_commit"
+                ),
+            )
+        self.assertEqual(
+            self.store.table_counts()["terminal_validation_settlements"], 0
+        )
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        with self.assertRaises(InjectedFailure):
+            self.store.settle_terminal_validation(
+                request,
+                failure_hook=raise_at(
+                    "after_terminal_settlement_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            terminal_hash = connection.execute(
+                "SELECT event_hash FROM terminal_validation_settlements "
+                "WHERE terminal_settlement_id = 'terminal-settlement-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = terminal_hash
+        reopened = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        replay = reopened.settle_terminal_validation(request)
+        self.assertTrue(replay.replayed)
+        self.assertTrue(replay.slot_released)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            terminal_events = connection.execute(
+                "SELECT COUNT(*) FROM events WHERE "
+                "event_kind = 'TERMINAL_VALIDATION_SETTLED'"
+            ).fetchone()[0]
+            terminal_rows = connection.execute(
+                "SELECT COUNT(*) FROM terminal_validation_settlements"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual((terminal_events, terminal_rows), (1, 1))
+        self.assertEqual(reopened.table_counts()["outstanding_slot"], 0)
+        reopened.load_verified("repo-1")
+
+    def test_r_stop_01_application_closure_rejects_misbound_sources(
+        self,
+    ) -> None:
+        self._prepare_finalization()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        request = self._terminal_application_request("PASSED")
+        cases = {
+            "application": {"source_id": "application-missing"},
+            "hash": {"source_event_hash": "forged-application-hash"},
+            "mapping": {"disposition": "FAILED"},
+            "attempt": {"validator_attempt_id": "validator-attempt-old"},
+            "check": {"check_id": "check-missing"},
+        }
+        before = self.store.table_counts()
+        for name, changes in cases.items():
+            with self.subTest(name=name), self.assertRaises(DispatchDenied):
+                self.store.settle_terminal_validation(
+                    replace(
+                        request,
+                        terminal_settlement_id=f"terminal-{name}",
+                        command_id=f"terminal-command-{name}",
+                        event_id=f"terminal-event-{name}",
+                        **changes,
+                    )
+                )
+            self.assertEqual(self.store.table_counts(), before)
+
+    def test_r_stop_01_application_closure_requires_complete_accounting(
+        self,
+    ) -> None:
+        self._prepare_finalization()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE budget_reservations SET disposition = 'RELEASED' "
+                "WHERE reservation_id = 'validator-reservation-1'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with patch.object(self.store, "_verify_projections", return_value=None):
+            with self.assertRaisesRegex(
+                DispatchDenied, "accounting is not authoritative"
+            ):
+                self.store.settle_terminal_validation(
+                    self._terminal_application_request("PASSED")
+                )
+        self.assertEqual(
+            self.store.table_counts()["terminal_validation_settlements"], 0
+        )
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_r_stop_01_application_closure_rejects_superseded_attempt(
+        self,
+    ) -> None:
+        observation, failed = self._prepare_recoverable_application()
+        recovery_request, attestation, parent_event_hash = (
+            self._validation_recovery_pair(failed)
+        )
+        recovered = self.store.resolve_validation_blocker(
+            recovery_request, attestation, self.authority
+        )
+        self.oracle.allowed_head = recovered.event_hash
+        successor_request, successor_capability = self._validator_intent(
+            replace(observation, event_hash=parent_event_hash),
+            suffix="2", check_id="check-1", recovery_id="recovery-1",
+        )
+        successor = self.store.commit_validator_intent(
+            successor_request, successor_capability, self.authority
+        )
+        self.oracle.allowed_head = successor.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+
+        with self.assertRaisesRegex(DispatchDenied, "current attempt"):
+            self.store.settle_terminal_validation(
+                self._terminal_application_request("FAILED")
+            )
+        self.assertEqual(
+            self.store.table_counts()["terminal_validation_settlements"], 0
+        )
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_r_stop_01_recovery_rejects_self_consistent_application_tampering(
+        self,
+    ) -> None:
+        self._prepare_finalization()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        settled = self.store.settle_terminal_validation(
+            self._terminal_application_request("PASSED")
+        )
+        mutations = {
+            "application": ("source_id", "application-missing"),
+            "hash": ("source_event_hash", "forged-application-hash"),
+            "mapping": ("disposition", "FAILED"),
+            "attempt": ("validator_attempt_id", "validator-attempt-old"),
+            "check": ("check_id", "check-missing"),
+        }
+        for name, (field, value) in mutations.items():
+            with self.subTest(name=name):
+                case_path = (
+                    Path(self.temporary_directory.name)
+                    / f"terminal-tamper-{name}.sqlite3"
+                )
+                shutil.copy2(self.database_path, case_path)
+                connection = sqlite3.connect(case_path)
+                try:
+                    body = json.loads(
+                        connection.execute(
+                            "SELECT body_json FROM events WHERE event_id = ?",
+                            (settled.event_id,),
+                        ).fetchone()[0]
+                    )
+                    body[field] = value
+                    request_body = {
+                        key: body[key]
+                        for key in TerminalValidationSettlementRequest.__dataclass_fields__
+                    }
+                    payload_digest = self.store._event_hash(request_body)
+                    obligation_proof_key = self.store._event_hash(
+                        {
+                            key: value
+                            for key, value in request_body.items()
+                            if key not in {
+                                "terminal_settlement_id", "command_id",
+                                "event_id",
+                            }
+                        }
+                    )
+                    body["obligation_proof_key"] = obligation_proof_key
+                    event_hash = self.store._event_hash(body)
+                    body_json = json.dumps(
+                        body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "UPDATE events SET event_hash = ?, body_json = ? "
+                        "WHERE event_id = ?",
+                        (event_hash, body_json, settled.event_id),
+                    )
+                    connection.execute(
+                        f"UPDATE terminal_validation_settlements SET {field} = ?, "
+                        "obligation_proof_key = ?, payload_digest = ?, "
+                        "event_hash = ?, body_json = ? WHERE "
+                        "terminal_settlement_id = ?",
+                        (
+                            value, obligation_proof_key, payload_digest,
+                            event_hash, body_json,
+                            settled.terminal_settlement_id,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE command_outcomes SET payload_digest = ?, "
+                        "event_hash = ? WHERE command_id = ?",
+                        (payload_digest, event_hash, settled.command_id),
+                    )
+                    connection.execute(
+                        "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                        (event_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE repositories SET catalog_head = ? "
+                        "WHERE repository_id = 'repo-1'",
+                        (event_hash,),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                self.oracle.allowed_head = event_hash
+                with self.assertRaisesRegex(
+                    StorageIntegrityError, "terminal validation history"
+                ):
+                    SQLiteStateStore(
+                        case_path, self.oracle, "repo-1"
+                    ).load_verified("repo-1")
+
     def test_t16_finalization_is_atomic_replay_safe_and_releases_slot(self) -> None:
         request, attestation = self._prepare_finalization()
         with self.assertRaises(InjectedFailure):
@@ -5356,6 +5751,135 @@ class SQLiteStateStoreTests(unittest.TestCase):
             StorageIntegrityError, "recovery schema is incompatible"
         ):
             SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+
+    def test_r_stop_01_migrates_populated_terminal_validation_schema(
+        self,
+    ) -> None:
+        observation = self._record_validator_result(verdict="FAIL")
+        applied = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+                "validator-observation-1",
+            ),
+            classification=self._classification(observation, "FINAL"),
+        )
+        self.oracle.allowed_head = applied.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            plan_hash = connection.execute(
+                "SELECT event_hash FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        settled = self.store.settle_terminal_validation(
+            TerminalValidationSettlementRequest(
+                "terminal-settlement-1", "terminal-command-1",
+                "terminal-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", "plan-1", "revision-1", "check-2", "PLAN",
+                "plan-1", plan_hash, "CANCELLED_WITHOUT_START",
+            )
+        )
+        self.oracle.allowed_head = settled.event_hash
+
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute("PRAGMA foreign_keys = OFF")
+            target_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'terminal_validation_settlements'"
+            ).fetchone()[0]
+            legacy_sql = target_sql.replace(
+                "'VALIDATION_APPLICATION', ", ""
+            )
+            self.assertNotEqual(legacy_sql, target_sql)
+            before_rows = connection.execute(
+                "SELECT * FROM terminal_validation_settlements"
+            ).fetchall()
+            before_event_bodies = connection.execute(
+                "SELECT event_id, body_json FROM events ORDER BY event_id"
+            ).fetchall()
+            connection.execute(
+                "ALTER TABLE terminal_validation_settlements RENAME TO "
+                "terminal_validation_settlements_snapshot"
+            )
+            connection.execute(legacy_sql)
+            columns = ", ".join(
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(terminal_validation_settlements)"
+                )
+            )
+            connection.execute(
+                f"INSERT INTO terminal_validation_settlements ({columns}) "
+                f"SELECT {columns} FROM terminal_validation_settlements_snapshot"
+            )
+            connection.execute(
+                "DROP TABLE terminal_validation_settlements_snapshot"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        migrated = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        migrated._bind_classification_authority(self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after_rows = connection.execute(
+                "SELECT * FROM terminal_validation_settlements"
+            ).fetchall()
+            after_event_bodies = connection.execute(
+                "SELECT event_id, body_json FROM events ORDER BY event_id"
+            ).fetchall()
+            migrated_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'terminal_validation_settlements'"
+            ).fetchone()[0]
+            foreign_key_errors = connection.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(after_rows, before_rows)
+        self.assertEqual(after_event_bodies, before_event_bodies)
+        self.assertIn("VALIDATION_APPLICATION", migrated_sql)
+        self.assertEqual(foreign_key_errors, [])
+        migrated.load_verified("repo-1")
+
+    def test_r_stop_01_rejects_incompatible_terminal_schema_without_mutation(
+        self,
+    ) -> None:
+        connection = sqlite3.connect(self.database_path)
+        try:
+            target_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'terminal_validation_settlements'"
+            ).fetchone()[0]
+            weakened_sql = target_sql.replace(
+                "slot_generation INTEGER NOT NULL CHECK (slot_generation = 1)",
+                "slot_generation INTEGER NOT NULL",
+            )
+            self.assertNotEqual(weakened_sql, target_sql)
+            connection.execute("DROP TABLE terminal_validation_settlements")
+            connection.execute(weakened_sql)
+            connection.commit()
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "terminal validation schema is incompatible"
+        ):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
 
     def test_c05_recoverable_failure_rolls_back_and_replays_after_lost_ack(self) -> None:
         observation = self._record_validator_result(

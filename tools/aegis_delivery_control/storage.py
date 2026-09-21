@@ -971,7 +971,7 @@ class SQLiteStateStore:
                 check_id TEXT NOT NULL,
                 source_kind TEXT NOT NULL CHECK (source_kind IN (
                     'VALIDATOR_OBSERVATION', 'VALIDATOR_CESSATION',
-                    'NONDISPATCH_PROVEN', 'PLAN'
+                    'VALIDATION_APPLICATION', 'NONDISPATCH_PROVEN', 'PLAN'
                 )),
                 source_id TEXT NOT NULL,
                 source_event_hash TEXT NOT NULL,
@@ -1127,6 +1127,7 @@ class SQLiteStateStore:
         if "continuation_cursor" not in run_columns:
             connection.execute("ALTER TABLE runs ADD COLUMN continuation_cursor TEXT")
         SQLiteStateStore._migrate_validation_recovery_schema(connection)
+        SQLiteStateStore._migrate_terminal_validation_schema(connection)
 
     @staticmethod
     def _migrate_validation_recovery_schema(
@@ -1356,6 +1357,174 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "validation recovery migration violates foreign keys"
                     )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+
+    @staticmethod
+    def _terminal_validation_table_sql(
+        table_name: str, *, application_source: bool
+    ) -> str:
+        source_kinds = (
+            "'VALIDATOR_OBSERVATION', 'VALIDATOR_CESSATION', "
+            + (
+                "'VALIDATION_APPLICATION', "
+                if application_source
+                else ""
+            )
+            + "'NONDISPATCH_PROVEN', 'PLAN'"
+        )
+        return f"""
+            CREATE TABLE {table_name} (
+                terminal_settlement_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                source_kind TEXT NOT NULL CHECK (source_kind IN (
+                    {source_kinds}
+                )),
+                source_id TEXT NOT NULL,
+                source_event_hash TEXT NOT NULL,
+                disposition TEXT NOT NULL CHECK (disposition IN (
+                    'PASSED', 'FAILED', 'CANCELLED_AFTER_START',
+                    'CANCELLED_WITHOUT_START'
+                )),
+                validator_intent_id TEXT REFERENCES validator_intents(validator_intent_id),
+                validator_attempt_id TEXT,
+                cessation_id TEXT REFERENCES validator_cessations(cessation_id),
+                cessation_event_hash TEXT,
+                obligation_proof_key TEXT NOT NULL UNIQUE,
+                slot_attempt_id TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation = 1),
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state IN (
+                    'STOPPED', 'FAILED_FINAL'
+                )),
+                slot_released INTEGER NOT NULL CHECK (slot_released IN (0, 1)),
+                body_json TEXT NOT NULL,
+                UNIQUE (plan_id, check_id)
+            )
+        """
+
+    @staticmethod
+    def _migrate_terminal_validation_schema(
+        connection: sqlite3.Connection,
+    ) -> None:
+        def canonical_schema(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        table_name = "terminal_validation_settlements"
+        target_sql = SQLiteStateStore._terminal_validation_table_sql(
+            table_name, application_source=True
+        )
+        legacy_sql = SQLiteStateStore._terminal_validation_table_sql(
+            table_name, application_source=False
+        )
+        columns = tuple(
+            str(row["name"])
+            for row in connection.execute(f"PRAGMA table_info({table_name})")
+        )
+        column_list = ", ".join(columns)
+        expected_columns = (
+            "terminal_settlement_id", "command_id", "event_id",
+            "repository_id", "run_id", "item_id", "logical_effect_id",
+            "plan_id", "revision_digest", "check_id", "source_kind",
+            "source_id", "source_event_hash", "disposition",
+            "validator_intent_id", "validator_attempt_id", "cessation_id",
+            "cessation_event_hash", "obligation_proof_key",
+            "slot_attempt_id", "slot_generation", "payload_digest",
+            "event_hash", "resulting_state", "slot_released", "body_json",
+        )
+        actual_row = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+            (table_name,),
+        ).fetchone()
+        if actual_row is None or columns != expected_columns:
+            raise StorageIntegrityError(
+                "terminal validation schema is incompatible"
+            )
+        actual_sql = str(actual_row["sql"])
+        actual_canonical = canonical_schema(actual_sql)
+        target_canonical = canonical_schema(target_sql)
+        legacy_canonical = canonical_schema(legacy_sql)
+        if actual_canonical not in {target_canonical, legacy_canonical}:
+            raise StorageIntegrityError(
+                "terminal validation schema is incompatible"
+            )
+
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            if actual_canonical == legacy_canonical:
+                legacy_name = f"{table_name}_legacy"
+                before_rows = [
+                    tuple(row)
+                    for row in connection.execute(
+                        f"SELECT {column_list} FROM {table_name} "
+                        "ORDER BY terminal_settlement_id"
+                    )
+                ]
+                connection.execute(
+                    f"ALTER TABLE {table_name} RENAME TO {legacy_name}"
+                )
+                connection.execute(target_sql)
+                connection.execute(
+                    f"INSERT INTO {table_name} ({column_list}) "
+                    f"SELECT {column_list} FROM {legacy_name}"
+                )
+                after_rows = [
+                    tuple(row)
+                    for row in connection.execute(
+                        f"SELECT {column_list} FROM {table_name} "
+                        "ORDER BY terminal_settlement_id"
+                    )
+                ]
+                if after_rows != before_rows:
+                    raise StorageIntegrityError(
+                        "terminal validation migration changed rows"
+                    )
+                connection.execute(f"DROP TABLE {legacy_name}")
+
+            migrated_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                (table_name,),
+            ).fetchone()[0]
+            migrated_foreign_keys = {
+                (str(row["from"]), str(row["table"]), str(row["to"]))
+                for row in connection.execute(
+                    f"PRAGMA foreign_key_list({table_name})"
+                )
+            }
+            expected_foreign_keys = {
+                ("event_id", "events", "event_id"),
+                ("repository_id", "repositories", "repository_id"),
+                ("run_id", "runs", "run_id"),
+                ("plan_id", "validation_plans", "plan_id"),
+                (
+                    "validator_intent_id", "validator_intents",
+                    "validator_intent_id",
+                ),
+                ("cessation_id", "validator_cessations", "cessation_id"),
+            }
+            if (
+                canonical_schema(str(migrated_sql)) != target_canonical
+                or migrated_foreign_keys != expected_foreign_keys
+                or connection.execute(
+                    "PRAGMA foreign_key_check(terminal_validation_settlements)"
+                ).fetchall()
+            ):
+                raise StorageIntegrityError(
+                    "terminal validation schema is incompatible"
+                )
             connection.commit()
         except BaseException:
             connection.rollback()
@@ -3045,6 +3214,48 @@ class SQLiteStateStore:
             != request.validator_intent_id
         ):
             return "terminal settlement does not use the current attempt"
+        if request.source_kind == "VALIDATION_APPLICATION":
+            application = connection.execute(
+                "SELECT application.*, event.sequence AS event_sequence, "
+                "observation.validator_intent_id AS "
+                "observation_validator_intent_id FROM "
+                "validation_applications AS application JOIN events AS event "
+                "ON event.event_id = application.event_id JOIN "
+                "validator_observations AS observation ON "
+                "observation.observation_id = application.observation_id "
+                "WHERE application.application_id = ?",
+                (request.source_id,),
+            ).fetchone()
+            expected_disposition = (
+                None
+                if application is None
+                else (
+                    "PASSED"
+                    if application["verdict"] == "PASS"
+                    else "FAILED"
+                )
+            )
+            if application is None or int(application["event_sequence"]) >= sequence:
+                return "terminal settlement applied validation is unavailable"
+            if (
+                application["event_hash"] != request.source_event_hash
+                or application["repository_id"] != request.repository_id
+                or application["run_id"] != request.run_id
+                or application["item_id"] != request.item_id
+                or application["logical_effect_id"]
+                != request.logical_effect_id
+                or application["plan_id"] != request.plan_id
+                or application["revision_digest"] != request.revision_digest
+                or application["check_id"] != request.check_id
+                or application["validator_attempt_id"]
+                != request.validator_attempt_id
+                or application["observation_validator_intent_id"]
+                != request.validator_intent_id
+                or expected_disposition != request.disposition
+                or intent["status"] != "SETTLED"
+            ):
+                return "terminal settlement applied validation binding is invalid"
+            return None
         prior_disposition = connection.execute(
             "SELECT 1 FROM events AS event WHERE event.run_id = ? AND "
             "event.sequence < ? AND ((event.event_kind IN "
@@ -8381,11 +8592,56 @@ class SQLiteStateStore:
                         ),
                     ).fetchone()
                     if (
-                        intent["status"] != "ACTIVE"
-                        or latest_intent is None
+                        latest_intent is None
                         or latest_intent["validator_intent_id"]
                         != request.validator_intent_id
                     ):
+                        raise DispatchDenied(
+                            "terminal validation evidence is not the current attempt"
+                        )
+                    if request.source_kind == "VALIDATION_APPLICATION":
+                        application = connection.execute(
+                            "SELECT application.*, observation.validator_intent_id "
+                            "AS observation_validator_intent_id FROM "
+                            "validation_applications AS application JOIN "
+                            "validator_observations AS observation ON "
+                            "observation.observation_id = application.observation_id "
+                            "WHERE application.application_id = ?",
+                            (request.source_id,),
+                        ).fetchone()
+                        expected_disposition = (
+                            None
+                            if application is None
+                            else (
+                                "PASSED"
+                                if application["verdict"] == "PASS"
+                                else "FAILED"
+                            )
+                        )
+                        if application is None or (
+                            application["event_hash"]
+                            != request.source_event_hash
+                            or application["repository_id"]
+                            != request.repository_id
+                            or application["run_id"] != request.run_id
+                            or application["item_id"] != request.item_id
+                            or application["logical_effect_id"]
+                            != request.logical_effect_id
+                            or application["plan_id"] != request.plan_id
+                            or application["revision_digest"]
+                            != request.revision_digest
+                            or application["check_id"] != request.check_id
+                            or application["validator_attempt_id"]
+                            != request.validator_attempt_id
+                            or application["observation_validator_intent_id"]
+                            != request.validator_intent_id
+                            or expected_disposition != request.disposition
+                            or intent["status"] != "SETTLED"
+                        ):
+                            raise DispatchDenied(
+                                "terminal settlement does not bind the applied validation"
+                            )
+                    elif intent["status"] != "ACTIVE":
                         raise DispatchDenied(
                             "terminal validation evidence is not the current attempt"
                         )
@@ -8449,6 +8705,8 @@ class SQLiteStateStore:
                             raise DispatchDenied(
                                 "started cancellation does not bind cessation"
                             )
+                    elif request.source_kind == "VALIDATION_APPLICATION":
+                        pass
                     else:
                         nonexecution = connection.execute(
                             "SELECT e.event_hash, e.body_json FROM events AS e "
@@ -8499,7 +8757,8 @@ class SQLiteStateStore:
                         reservation["settlement_body_json"]
                     )
                     if request.source_kind in {
-                        "VALIDATOR_OBSERVATION", "VALIDATOR_CESSATION"
+                        "VALIDATOR_OBSERVATION", "VALIDATOR_CESSATION",
+                        "VALIDATION_APPLICATION",
                     } and (
                         reservation["disposition"]
                         not in {
@@ -8537,7 +8796,9 @@ class SQLiteStateStore:
                         connection, request.repository_id, request.run_id,
                         str(slot["logical_effect_id"]), str(slot["attempt_id"]),
                         settling_validator_intent_id=(
-                            None if intent is None
+                            None
+                            if intent is None
+                            or request.source_kind == "VALIDATION_APPLICATION"
                             else str(intent["validator_intent_id"])
                         ),
                         settling_validator_observation_id=(
@@ -8551,6 +8812,8 @@ class SQLiteStateStore:
                     )
                     if closure_error is None:
                         slot_released = True
+                    elif request.source_kind == "VALIDATION_APPLICATION":
+                        raise DispatchDenied(closure_error)
 
                 TransitionEngine().authorize(
                     "T26", current_state, current_state,

@@ -536,6 +536,7 @@ class TerminalValidationSettlementRequest:
             )
         allowed = {
             "VALIDATOR_OBSERVATION": {"PASSED", "FAILED"},
+            "VALIDATION_APPLICATION": {"PASSED", "FAILED"},
             "VALIDATOR_CESSATION": {"CANCELLED_AFTER_START"},
             "NONDISPATCH_PROVEN": {"CANCELLED_WITHOUT_START"},
             "PLAN": {"CANCELLED_WITHOUT_START"},
@@ -576,11 +577,13 @@ class TerminalValidationSettlementRequest:
             raise ValueError(
                 "terminal validator result or cancellation requires cessation"
             )
-        if self.source_kind == "NONDISPATCH_PROVEN" and any(
+        if self.source_kind in {
+            "NONDISPATCH_PROVEN", "VALIDATION_APPLICATION"
+        } and any(
             value is not None for value in cessation_fields
         ):
             raise ValueError(
-                "validator nonexecution cannot also claim started cessation"
+                "terminal source cannot also claim started cessation"
             )
 
 

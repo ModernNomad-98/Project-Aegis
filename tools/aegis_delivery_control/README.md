@@ -39,8 +39,11 @@ fixture. It is not a delivery integration.
 - The current worktree includes typed T18 graceful and T19 immediate stop requests.
   Stop commits `STOPPED`, a permanent scoped dispatch fence, the retained cursor,
   and synthetic grant redemption atomically while preserving existing slot and
-  accounting obligations. This stop slice is not independently accepted; the
-  checkpoint limitations below are release blockers.
+  accounting obligations. T26 now accepts an exact already-applied T11/T12
+  application as terminal closure evidence, without reapplying validation or
+  reopening lifecycle, and releases the slot only after every check and accounting
+  obligation is closed. This R-STOP-01 slice is independently accepted; the two
+  remaining stop findings below are release blockers.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -91,20 +94,23 @@ JSON object containing exactly `repository_id`, `catalog_head`, and `run_heads`
 obtained independently of the database; any identity, inventory, or head
 difference fails closed.
 
-## Paused checkpoint
+## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 198 tests successfully, and
-`git diff --check` passed. An independent stop-subsystem review nevertheless
-returned `REVISE`:
+controller. The complete local package suite ran 209 tests successfully, and
+`git diff --check` passed. R-STOP-01 received independent implementation
+`APPROVE` after focused route, migration, crash/replay and tamper validation:
 
 1. stopping from `BLOCKED/FINALIZING` or a recoverable validation-failure state
-  can strand the repository-wide slot because no terminal closure can consume
-  the already-applied validation evidence;
-2. T20 graceful-to-immediate escalation is declared in the transition registry
+  can now use T26 to bind the already-applied validation evidence and release the
+  repository-wide slot atomically after every obligation closes.
+
+The stop gate remains `REVISE` because two major findings are unresolved:
+
+1. T20 graceful-to-immediate escalation is declared in the transition registry
   but lacks a typed request, coordinator/storage transaction, event/recovery
   handling, and tests; and
-3. immediate stop after adapter contact but before receipt does not atomically
+2. immediate stop after adapter contact but before receipt does not atomically
   classify the uncertainty as `UNKNOWN_WORST_CASE_CHARGED`.
 
 These findings must be corrected and independently approved before merge. They
@@ -132,7 +138,9 @@ C05 PASS/recoverable/final application, signed full-binding classification,
 scoped terminal fencing, crash/restart replay, rebound denial, conditional slot
 release, active-validator slot retention, cross-process writer exclusion, and
 T18/T19 stop request, persistence, recovery, replay, late-evidence and fencing
-behavior. Passing tests do not cover the three unresolved checkpoint findings.
+behavior, plus T26 closure by exact already-applied PASS/recoverable-failure
+evidence across T18/T19, crash/replay, migration and tamper boundaries. Passing
+tests do not cover the two unresolved checkpoint findings.
 The backlog remains the source of truth for acceptance cases not yet implemented,
 including complete transition application, the unresolved stop cases above, and
 filesystem ownership/reparse/path-swap enforcement.

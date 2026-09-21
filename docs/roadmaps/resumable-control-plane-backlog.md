@@ -309,6 +309,40 @@ CP-WP-004 and CP-FUT-001 remain blocked. The exact continuation rules, current
 file inventory, approval boundaries and ordered backlog are recorded in the
 [Codex handoff](../evidence/control-plane/cp-wp-002-codex-handoff.md).
 
+### 5.4 R-STOP-01 terminal slot closure checkpoint
+
+R-STOP-01 is corrected and independently accepted. T26 now has a typed
+`VALIDATION_APPLICATION` source that binds the exact prior T11/T12 application,
+its observation, current validator attempt and complete plan/run/item/effect/check
+identity. `PASS` maps only to `PASSED`; `FAIL` maps only to `FAILED`. The terminal
+transaction never reapplies validation, changes classification or reopens the
+run. It releases the repository-wide slot atomically only when
+`_validation_checks_settled` and `_accounting_closure_error` establish closure of
+every check, effect, validator and budget obligation.
+
+The SQLite table constraint is upgraded by an atomic, exact-schema migration.
+Historical rows, event bodies and hashes are preserved. Incompatible schema,
+foreign-key divergence, source/application tampering and superseded attempts fail
+closed. Focused coverage exercises both T18 and T19 from applied PASS
+`BLOCKED/FINALIZING` and applied recoverable FAIL `BLOCKED/VALIDATING`, denial of
+unrelated dispatch before closure, dispatch after closure, C05/C09 rollback and
+lost-acknowledgement replay, populated legacy migration and self-consistent tamper
+attempts.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: typed mapping, four-route matrix, exact migration and crash assertions needed clarification |
+| Corrected plan re-audit | `APPROVE`; no findings |
+| Focused first falsification | Failed on unsupported `VALIDATION_APPLICATION`, then passed after the narrow implementation |
+| `python -m unittest tools.aegis_delivery_control.tests.test_storage` | Exit 0; 168 tests ran in 14.231 seconds; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -v` | Exit 0; 209 tests ran in 16.666 seconds; `OK` |
+| Independent implementation review | `APPROVE`; no blocker, major, minor or nit findings; reviewer independently ran 9 focused tests |
+
+This checkpoint establishes only the R-STOP-01 slices of T18/T19/T26, C05/C09
+and F06/F09/F14/F18. Full-row and full-family traceability remain `UNVERIFIED`.
+R-STOP-02 and R-STOP-03 remain major blockers; the aggregate stop gate remains
+`REVISE`, PR #99 remains draft, and no merge, release or deployment is ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

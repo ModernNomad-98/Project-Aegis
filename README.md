@@ -621,9 +621,10 @@ The experimental offline delivery-control kernel is under active development;
 use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
-The paused CP-WP-002 checkpoint has broad synthetic coverage but is not accepted:
-its full 198-test package suite passes locally while an independent stop review
-remains `REVISE` with one blocker and two major findings. Read the
+The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
+its full 209-test package suite passes locally and R-STOP-01 terminal slot
+closure has independent `APPROVE`, while R-STOP-02 and R-STOP-03 remain major
+blocking findings. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
 continuing. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:
