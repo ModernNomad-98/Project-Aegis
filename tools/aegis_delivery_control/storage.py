@@ -56,6 +56,7 @@ from .contracts import (
     OperationLaunchReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    PauseLocalExecutionRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
     ResumeRequest,
@@ -236,6 +237,7 @@ _LIFECYCLE_ROUTES: Mapping[
         {
             (LifecycleState.PLANNED, LifecycleState.PLANNED),
             (LifecycleState.BLOCKED, LifecycleState.BLOCKED),
+            (LifecycleState.RUNNING, LifecycleState.PAUSING),
         }
     ),
     "PAUSE_SETTLED": frozenset(
@@ -1149,6 +1151,33 @@ class SQLiteStateStore:
                     OR preserved_lifecycle IS NULL
                 ),
                 preserved_continuation_cursor TEXT
+            );
+            CREATE TABLE IF NOT EXISTS local_pause_actions (
+                pause_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                intent_event_id TEXT NOT NULL,
+                intent_event_hash TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                reason_code TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_repository_id TEXT NOT NULL,
+                capability_run_id TEXT NOT NULL,
+                capability_action TEXT NOT NULL CHECK (capability_action = 'PAUSE'),
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSING'),
+                body_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS resume_actions (
                 resume_id TEXT PRIMARY KEY,
@@ -2168,6 +2197,83 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "synthetic operator capability issuer does not match "
                 "recorded action"
+            )
+
+    @staticmethod
+    def _verify_local_pause_replay(
+        row: sqlite3.Row,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+    ) -> None:
+        authority.verify_operator_issued(capability)
+        recorded = (
+            row["capability_claim_id"], row["capability_grant_id"],
+            row["capability_repository_id"], row["capability_run_id"],
+            row["capability_action"], row["capability_scope_digest"],
+            row["capability_issuer_mac"],
+            row["capability_issuer_fingerprint"],
+        )
+        expected = (*capability.__dict__.values(), authority.issuer_fingerprint)
+        if recorded != expected:
+            raise DispatchDenied(
+                "synthetic operator capability does not match recorded local pause"
+            )
+
+    @staticmethod
+    def _validate_local_pause_event_body(body: Mapping[str, object]) -> None:
+        expected_fields = set(PauseLocalExecutionRequest.__dataclass_fields__) | {
+            "capability_evidence", "capability_issuer_fingerprint",
+            "event_kind", "lifecycle_from", "lifecycle_to",
+            "pause_binding_version", "pause_kind", "payload_digest",
+            "previous_event_hash", "retained_continuation_cursor",
+            "schema_version", "sequence", "writer_epoch",
+        }
+        capability_fields = set(SyntheticOperatorCapability.__dataclass_fields__)
+        capability = body.get("capability_evidence")
+        optional_strings = {"retained_continuation_cursor"}
+        integer_fields = {
+            "expected_slot_generation", "pause_binding_version",
+            "schema_version", "sequence", "writer_epoch",
+        }
+        if (
+            set(body) != expected_fields
+            or body.get("pause_kind") != "LOCAL_EXECUTION"
+            or body.get("event_kind") != "PAUSE_REQUESTED"
+            or body.get("lifecycle_from") != LifecycleState.RUNNING.value
+            or body.get("lifecycle_to") != LifecycleState.PAUSING.value
+            or type(body.get("pause_binding_version")) is not int
+            or body.get("pause_binding_version") != 1
+            or type(body.get("schema_version")) is not int
+            or body.get("schema_version") != 1
+            or any(
+                type(body.get(field)) is not int
+                or int(cast(int, body.get(field))) <= 0
+                for field in integer_fields
+            )
+            or not isinstance(capability, Mapping)
+            or set(capability) != capability_fields
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], capability).values()
+            )
+            or any(
+                body.get(field) is not None
+                and (
+                    not isinstance(body.get(field), str)
+                    or not cast(str, body.get(field)).strip()
+                )
+                for field in optional_strings
+            )
+            or any(
+                not isinstance(body.get(field), str)
+                or not cast(str, body.get(field)).strip()
+                for field in expected_fields.difference(
+                    integer_fields | optional_strings | {"capability_evidence"}
+                )
+            )
+        ):
+            raise StorageIntegrityError(
+                "unsupported local PAUSE_REQUESTED event schema"
             )
 
     @staticmethod
@@ -4771,7 +4877,15 @@ class SQLiteStateStore:
             try:
                 body = json.loads(row["body_json"])
                 event_kind = str(row["event_kind"])
-                if event_kind == "PAUSE_SETTLED":
+                if (
+                    event_kind == "PAUSE_REQUESTED"
+                    and body.get("pause_kind") == "LOCAL_EXECUTION"
+                ):
+                    active_fences[str(body["fence_id"])] = (
+                        str(body["item_id"]),
+                        str(body["logical_effect_id"]),
+                    )
+                elif event_kind == "PAUSE_SETTLED":
                     active_fences[str(body["fence_id"])] = (None, None)
                 elif event_kind == "RESUME_ACCEPTED":
                     if active_fences.pop(str(body["pause_fence_id"]), None) is None:
@@ -5381,6 +5495,306 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.readiness_id, request.command_id, request.event_id,
             sequence, event_hash, resulting_state, False,
+        )
+
+    def pause_local_execution(
+        self,
+        request: PauseLocalExecutionRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("local pause command targets another repository")
+        if (
+            self._classification_authority is None
+            or self._classification_authority.issuer_fingerprint
+            != authority.issuer_fingerprint
+        ):
+            raise DispatchDenied("local pause authority is not the bound issuer")
+        if (
+            capability.repository_id,
+            capability.run_id,
+            capability.action,
+        ) != (request.repository_id, request.run_id, "PAUSE"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this local pause"
+            )
+        capability_evidence = dict(capability.__dict__)
+        payload = {
+            **request.__dict__,
+            "pause_kind": "LOCAL_EXECUTION",
+            "pause_binding_version": 1,
+            "capability_evidence": capability_evidence,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    prior = connection.execute(
+                        "SELECT * FROM local_pause_actions WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "local pause outcome lost its projection"
+                        )
+                    self._verify_local_pause_replay(prior, capability, authority)
+                    connection.rollback()
+                    return self._local_pause_receipt(prior, replayed=True)
+                prior = connection.execute(
+                    "SELECT * FROM local_pause_actions WHERE pause_id = ? OR "
+                    "event_id = ? OR fence_id = ?",
+                    (request.pause_id, request.event_id, request.fence_id),
+                ).fetchone()
+                if prior is not None:
+                    authority.verify_operator_issued(capability)
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "local pause identity was reused with a different payload"
+                        )
+                    self._verify_local_pause_replay(prior, capability, authority)
+                    connection.rollback()
+                    return self._local_pause_receipt(prior, replayed=True)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                authority.verify_operator_for_action(capability)
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied("local pause does not bind the recorded run")
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state is not LifecycleState.RUNNING:
+                    raise DispatchDenied("T05 requires durable RUNNING state")
+                plan = connection.execute(
+                    "SELECT item_id, logical_effect_id FROM validation_plans "
+                    "WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"]
+                ) != (request.item_id, request.logical_effect_id):
+                    raise DispatchDenied("local pause does not bind the accepted plan")
+                intent = connection.execute(
+                    "SELECT * FROM events WHERE repository_id = ? AND run_id = ? "
+                    "AND event_id = ? AND event_hash = ? AND "
+                    "event_kind = 'INTENT_COMMITTED'",
+                    (
+                        request.repository_id, request.run_id,
+                        request.intent_event_id, request.intent_event_hash,
+                    ),
+                ).fetchone()
+                if intent is None:
+                    raise DispatchDenied("local pause does not bind the durable intent")
+                intent_body = json.loads(intent["body_json"])
+                if (
+                    intent_body.get("item_id"),
+                    intent_body.get("logical_effect_id"),
+                    intent_body.get("attempt_id"),
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id,
+                ):
+                    raise DispatchDenied("local pause changed the durable attempt")
+                effect_redemption = connection.execute(
+                    "SELECT * FROM capability_redemptions WHERE repository_id = ? "
+                    "AND command_id = ?",
+                    (request.repository_id, intent["command_id"]),
+                ).fetchone()
+                if effect_redemption is None or (
+                    effect_redemption["logical_effect_id"],
+                    effect_redemption["attempt_id"],
+                ) != (request.logical_effect_id, request.attempt_id):
+                    raise DispatchDenied(
+                        "local pause attempt has no exact capability redemption"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("local pause does not own the exact slot")
+                launches = connection.execute(
+                    "SELECT * FROM operation_launches WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchall()
+                if len(launches) > 1 or any(
+                    (
+                        launch["item_id"], launch["intent_event_id"],
+                        launch["intent_event_hash"],
+                    ) != (
+                        request.item_id, request.intent_event_id,
+                        request.intent_event_hash,
+                    )
+                    for launch in launches
+                ):
+                    raise StorageIntegrityError(
+                        "local pause launch diverges from its durable intent"
+                    )
+                if launches and connection.execute(
+                    "SELECT 1 FROM adapter_contacts WHERE repository_id = ? "
+                    "AND contact_kind = 'EFFECT' AND source_id = ?",
+                    (
+                        request.repository_id,
+                        f"EFFECT:{launches[0]['launch_id']}",
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "contacted external mutation requires the T06 pause route"
+                    )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T05", current_state, LifecycleState.PAUSING,
+                        TRANSITIONS["T05"].required_guards,
+                    )
+                else:
+                    authorize_transition(current_state, LifecycleState.PAUSING)
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                body = {
+                    **payload,
+                    "event_kind": "PAUSE_REQUESTED",
+                    "lifecycle_from": LifecycleState.RUNNING.value,
+                    "lifecycle_to": LifecycleState.PAUSING.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "retained_continuation_cursor": run["continuation_cursor"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'PAUSE_REQUESTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, previous_hash, event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        request.fence_id, request.repository_id,
+                        request.item_id, request.logical_effect_id,
+                        request.reason_code, request.event_id,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO local_pause_actions VALUES ("
+                    + ", ".join("?" for _ in range(25)) + ")",
+                    (
+                        request.pause_id, request.command_id, request.event_id,
+                        request.fence_id, request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.attempt_id, request.intent_event_id,
+                        request.intent_event_hash,
+                        request.expected_slot_generation, request.reason_code,
+                        capability.claim_id, capability.grant_id,
+                        capability.repository_id, capability.run_id,
+                        capability.action, capability.scope_digest,
+                        capability.issuer_mac, authority.issuer_fingerprint,
+                        payload_digest, event_hash,
+                        LifecycleState.PAUSING.value, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'PAUSE', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest, authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSING', "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? "
+                    "WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_local_pause_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_local_pause_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.pause_id, request.command_id, request.event_id, sequence,
+            event_hash, LifecycleState.PAUSING, False,
         )
 
     def pause_before_dispatch(
@@ -12584,6 +12998,18 @@ class SQLiteStateStore:
         )
 
     @staticmethod
+    def _local_pause_receipt(
+        row: sqlite3.Row, *, replayed: bool
+    ) -> ControlReceipt:
+        return ControlReceipt(
+            str(row["pause_id"]), str(row["command_id"]),
+            str(row["event_id"]),
+            int(json.loads(row["body_json"])["sequence"]),
+            str(row["event_hash"]),
+            LifecycleState(str(row["resulting_state"])), replayed,
+        )
+
+    @staticmethod
     def _stop_receipt(
         row: sqlite3.Row, *, replayed: bool
     ) -> ControlReceipt:
@@ -12723,6 +13149,18 @@ class SQLiteStateStore:
                 }
                 if any(body.get(key) != value for key, value in bindings.items()):
                     raise StorageIntegrityError("event body binding mismatch")
+                if row["event_kind"] == "PAUSE_REQUESTED":
+                    is_local_route = (
+                        body.get("lifecycle_from") == LifecycleState.RUNNING.value
+                        and body.get("lifecycle_to")
+                        == LifecycleState.PAUSING.value
+                    )
+                    if is_local_route:
+                        self._validate_local_pause_event_body(body)
+                    elif body.get("pause_kind") == "LOCAL_EXECUTION":
+                        raise StorageIntegrityError(
+                            "local pause discriminator has an invalid route"
+                        )
                 previous_hash = str(row["event_hash"])
                 previous_writer_epoch = int(row["writer_epoch"])
                 expected_sequence += 1
@@ -13289,6 +13727,98 @@ class SQLiteStateStore:
             (repository_id,),
         ).fetchall()
         pauses = [json.loads(row["body_json"]) for row in pause_settled_rows]
+        local_pause_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'PAUSE_REQUESTED' AND "
+            "json_extract(body_json, '$.pause_kind') = 'LOCAL_EXECUTION'",
+            (repository_id,),
+        ).fetchall()
+        local_pauses = [
+            json.loads(row["body_json"]) for row in local_pause_rows
+        ]
+        for body in local_pauses:
+            self._validate_local_pause_event_body(body)
+            try:
+                request = PauseLocalExecutionRequest(
+                    **{
+                        key: body[key]
+                        for key in PauseLocalExecutionRequest.__dataclass_fields__
+                    }
+                )
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied("local pause authority is not bound")
+                self._classification_authority.verify_operator_issued(capability)
+                expected_payload = {
+                    **request.__dict__,
+                    "pause_kind": "LOCAL_EXECUTION",
+                    "pause_binding_version": 1,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                }
+                if (
+                    body["capability_issuer_fingerprint"]
+                    != self._classification_authority.issuer_fingerprint
+                    or body["payload_digest"] != self._event_hash(expected_payload)
+                    or (
+                        capability.repository_id, capability.run_id,
+                        capability.action,
+                    ) != (request.repository_id, request.run_id, "PAUSE")
+                ):
+                    raise DispatchDenied("local pause authority binding mismatch")
+                intent = connection.execute(
+                    "SELECT body_json, event_hash, writer_epoch FROM events "
+                    "WHERE event_id = ? AND repository_id = ? AND run_id = ? "
+                    "AND event_kind = 'INTENT_COMMITTED'",
+                    (
+                        request.intent_event_id, request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if intent is None or intent["event_hash"] != request.intent_event_hash:
+                    raise DispatchDenied("local pause durable intent is unavailable")
+                intent_body = json.loads(intent["body_json"])
+                if (
+                    intent_body["item_id"], intent_body["logical_effect_id"],
+                    intent_body["attempt_id"],
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id,
+                ) or int(intent["writer_epoch"]) >= int(body["writer_epoch"]):
+                    raise DispatchDenied("local pause attempt binding mismatch")
+                _, historical_slot, _ = self._historical_repository_activity(
+                    connection, repository_id, int(body["writer_epoch"])
+                )
+                if historical_slot != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("local pause historical slot mismatch")
+                contact = connection.execute(
+                    "SELECT 1 FROM adapter_contacts AS contact JOIN events AS "
+                    "event ON event.event_id = contact.event_id JOIN "
+                    "operation_launches AS launch ON contact.source_id = "
+                    "'EFFECT:' || launch.launch_id WHERE contact.repository_id = ? "
+                    "AND contact.contact_kind = 'EFFECT' AND launch.run_id = ? "
+                    "AND launch.logical_effect_id = ? AND launch.attempt_id = ? "
+                    "AND event.writer_epoch < ? LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.attempt_id,
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchone()
+                if contact is not None:
+                    raise DispatchDenied("local pause followed adapter contact")
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "local pause proof or schema is invalid"
+                ) from error
         resume_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'RESUME_ACCEPTED'",
@@ -13571,6 +14101,15 @@ class SQLiteStateStore:
                     body["event_id"], body["sequence"], self._event_hash(body),
                 )
                 for body in pauses
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in local_pauses
             }
         )
         expected_outcomes.update(
@@ -14037,6 +14576,47 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "control-action projection diverges from event history"
             )
+        expected_local_pauses = {
+            body["pause_id"]: (
+                body["command_id"], body["event_id"], body["fence_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["intent_event_id"],
+                body["intent_event_hash"], body["expected_slot_generation"],
+                body["reason_code"], body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["repository_id"],
+                body["capability_evidence"]["run_id"],
+                body["capability_evidence"]["action"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_evidence"]["issuer_mac"],
+                body["capability_issuer_fingerprint"], body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"], body,
+            )
+            for body in local_pauses
+        }
+        actual_local_pauses = {
+            row["pause_id"]: (
+                row["command_id"], row["event_id"], row["fence_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["attempt_id"], row["intent_event_id"],
+                row["intent_event_hash"], int(row["slot_generation"]),
+                row["reason_code"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_repository_id"],
+                row["capability_run_id"], row["capability_action"],
+                row["capability_scope_digest"], row["capability_issuer_mac"],
+                row["capability_issuer_fingerprint"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"],
+                json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM local_pause_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_local_pauses != expected_local_pauses:
+            raise StorageIntegrityError(
+                "local-pause projection diverges from event history"
+            )
         expected_resumes = {
             body["resume_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -14250,6 +14830,17 @@ class SQLiteStateStore:
             )
             for body in pauses
         }
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "PAUSE",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in local_pauses
+            }
+        )
         expected_operator_redemptions.update(
             {
                 body["capability_evidence"]["claim_id"]: (
@@ -14717,6 +15308,15 @@ class SQLiteStateStore:
                     None, None, body["reason_code"], body["request_event_id"]
                 )
                 for body in pauses
+            }
+        )
+        expected_fences.update(
+            {
+                body["fence_id"]: (
+                    body["item_id"], body["logical_effect_id"],
+                    body["reason_code"], body["event_id"],
+                )
+                for body in local_pauses
             }
         )
         expected_fences.update(
@@ -15488,6 +16088,18 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "T25 lifecycle semantics are invalid"
                     ) from error
+            if (
+                row["event_kind"] == "PAUSE_REQUESTED"
+                and body.get("pause_kind") == "LOCAL_EXECUTION"
+                and (
+                    body["lifecycle_from"] != expected_lifecycle.get(run_id)
+                    or body["retained_continuation_cursor"]
+                    != expected_cursors.get(run_id)
+                )
+            ):
+                raise StorageIntegrityError(
+                    "local pause predecessor state or continuation cursor diverges"
+                )
             if row["event_kind"] == "STOP_RECORDED" and (
                 body["lifecycle_from"] != expected_lifecycle.get(run_id)
                 or body["retained_continuation_cursor"]
@@ -15688,6 +16300,7 @@ class SQLiteStateStore:
             "operation_finalizations",
             "operation_launches",
             "control_actions",
+            "local_pause_actions",
             "resume_actions",
             "stop_actions",
             "stop_escalations",

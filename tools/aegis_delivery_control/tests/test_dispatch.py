@@ -40,6 +40,7 @@ from tools.aegis_delivery_control.contracts import (
     InjectedFailure,
     IntentRequest,
     LifecycleState,
+    PauseLocalExecutionRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     StopMode,
     StopEscalationRequest,
@@ -122,6 +123,61 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t05_coordinator_exposes_local_execution_pause_route(self) -> None:
+        self.assertTrue(
+            hasattr(SyntheticDispatchCoordinator, "pause_local_execution"),
+            "T05 requires a coordinator-owned local execution pause route",
+        )
+
+    def test_t05_coordinator_commits_prelaunch_pause_without_adapter_contact(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = SQLiteStateStore(
+                root / "state.sqlite3", AlwaysFreshOracle(), "repo-1"
+            )
+            store._is_canonical = True
+            authority = SyntheticAuthority()
+            adapter = SyntheticExecutionAdapter(root / "target.sqlite3")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            effect_grant = SyntheticGrant(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "command-1", "event-1",
+                "effect-1", "descriptor-1", "attempt-1", "permission-1",
+                "reservation-1", "budget-1", 1, 2, 5,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            committed = store.commit_intent(
+                intent, effect_capability, authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-1", "repo-1", "run-1", "PAUSE",
+                "pause-scope-1",
+            )
+            authority.register_operator(pause_grant)
+            receipt = coordinator.pause_local_execution(
+                PauseLocalExecutionRequest(
+                    "pause-1", "pause-command-1", "pause-event-1",
+                    "pause-fence-1", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", committed.event_id,
+                    committed.event_hash, 1, "OPERATOR_PAUSE_LOCAL_EXECUTION",
+                ),
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(receipt.resulting_state, LifecycleState.PAUSING)
+            self.assertIsNone(
+                adapter.reconcile(effect_capability.claim_id),
+                "T05 pause must not contact the synthetic target",
+            )
+
     def test_t14_coordinator_exposes_resume_route(self) -> None:
         self.assertTrue(
             hasattr(SyntheticDispatchCoordinator, "resume"),

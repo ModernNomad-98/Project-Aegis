@@ -43,6 +43,7 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     GovernedOrder,
     PauseBeforeDispatchRequest,
+    PauseLocalExecutionRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
     ResumeRequest,
@@ -132,6 +133,31 @@ def _settle_until_terminated(
 
 
 class SQLiteStateStoreTests(unittest.TestCase):
+    def test_t05_exposes_typed_local_execution_pause_contract(self) -> None:
+        self.assertTrue(
+            hasattr(contract_types, "PauseLocalExecutionRequest"),
+            "T05 requires a typed PauseLocalExecutionRequest contract",
+        )
+        request_type = contract_types.PauseLocalExecutionRequest
+        request = request_type(
+            pause_id="local-pause-1",
+            command_id="local-pause-command-1",
+            event_id="local-pause-event-1",
+            fence_id="local-pause-fence-1",
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            attempt_id="attempt-1",
+            intent_event_id="event-1",
+            intent_event_hash="intent-hash-1",
+            expected_slot_generation=1,
+            reason_code="OPERATOR_PAUSE",
+        )
+        request.validate()
+        with self.assertRaisesRegex(ValueError, "local pause"):
+            replace(request, expected_slot_generation=0).validate()
+
     def test_t14_exposes_typed_resume_request_contract(self) -> None:
         self.assertTrue(
             hasattr(contract_types, "ResumeRequest"),
@@ -369,6 +395,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_finalizations": 0,
                 "operation_launches": 0,
                 "control_actions": 0,
+                "local_pause_actions": 0,
                 "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
@@ -1298,6 +1325,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_finalizations": 0,
                 "operation_launches": 0,
                 "control_actions": 0,
+                "local_pause_actions": 0,
                 "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
@@ -3749,6 +3777,533 @@ class SQLiteStateStoreTests(unittest.TestCase):
             grant.grant_id, grant.repository_id, grant.run_id, grant.action,
             grant.scope_digest,
         )
+
+    @staticmethod
+    def _local_pause_request(
+        committed,
+        *,
+        suffix: str = "1",
+        expected_slot_generation: int = 1,
+    ) -> PauseLocalExecutionRequest:
+        return PauseLocalExecutionRequest(
+            f"local-pause-{suffix}", f"local-pause-command-{suffix}",
+            f"local-pause-event-{suffix}", f"local-pause-fence-{suffix}",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            committed.event_id, committed.event_hash,
+            expected_slot_generation, "OPERATOR_PAUSE_LOCAL_EXECUTION",
+        )
+
+    def _running_operation(self):
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        return committed
+
+    def test_t05_pauses_owned_prelaunch_attempt_and_retains_obligations(self) -> None:
+        committed = self._running_operation()
+        receipt = self.store.pause_local_execution(
+            self._local_pause_request(committed), self._pause_capability(),
+            self.authority,
+        )
+        self.assertEqual(receipt.resulting_state, LifecycleState.PAUSING)
+        self.assertFalse(receipt.replayed)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+            slot = connection.execute(
+                "SELECT run_id, logical_effect_id, attempt_id, generation "
+                "FROM outstanding_slot"
+            ).fetchone()
+            reservation = connection.execute(
+                "SELECT disposition, held_units, charged_units FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            fence = connection.execute(
+                "SELECT item_id, logical_effect_id FROM dispatch_fences "
+                "WHERE fence_id = 'local-pause-fence-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(state, "PAUSING")
+        self.assertEqual(slot, ("run-1", "effect-1", "attempt-1", 1))
+        self.assertEqual(reservation, ("RESERVED", 3, 0))
+        self.assertEqual(fence, ("item-1", "effect-1"))
+
+    def test_t05_pauses_launched_uncontacted_attempt(self) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        receipt = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="launched"),
+            self._pause_capability("launched"), self.authority,
+        )
+        self.assertEqual(receipt.resulting_state, LifecycleState.PAUSING)
+        self.oracle.allowed_head = receipt.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t05_pause_fence_denies_later_adapter_contact(self) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="race"),
+            self._pause_capability("race"), self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "RUNNING|dispatch fence"):
+            self.store._contact_claimed_operation(
+                self.request(), self.capability, committed, launched,
+                "synthetic-target-digest",
+            )
+
+    def test_t05_rejects_non_owned_attempt_bindings_without_mutation(self) -> None:
+        committed = self._running_operation()
+        capability = self._pause_capability("bindings")
+        base = self._local_pause_request(committed, suffix="bindings")
+        variants = (
+            replace(base, repository_id="other-repo"),
+            replace(base, run_id="other-run"),
+            replace(base, item_id="other-item"),
+            replace(base, logical_effect_id="other-effect"),
+            replace(base, attempt_id="other-attempt"),
+            replace(base, intent_event_id="other-event"),
+            replace(base, intent_event_hash="other-hash"),
+            replace(base, expected_slot_generation=2),
+        )
+        for request in variants:
+            with self.subTest(request=request):
+                with self.assertRaises(DispatchDenied):
+                    self.store.pause_local_execution(
+                        request, capability, self.authority
+                    )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()[0],
+                "RUNNING",
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM local_pause_actions"
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+
+    def test_t05_rejects_nonrunning_state_and_redeemed_operator(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        planned_capability = self._pause_capability("planned")
+        with self.assertRaisesRegex(DispatchDenied, "RUNNING"):
+            self.store.pause_local_execution(
+                PauseLocalExecutionRequest(
+                    "local-pause-planned", "local-pause-command-planned",
+                    "local-pause-event-planned", "local-pause-fence-planned",
+                    "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                    "event-1", "intent-hash", 1, "OPERATOR_PAUSE",
+                ),
+                planned_capability, self.authority,
+            )
+        committed = self.store.commit_intent(
+            self.request(), self.capability, self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        redeemed = self._pause_capability("redeemed")
+        self.authority.mark_operator_action_committed(redeemed)
+        with self.assertRaisesRegex(DispatchDenied, "already committed"):
+            self.store.pause_local_execution(
+                self._local_pause_request(committed, suffix="redeemed"),
+                redeemed, self.authority,
+            )
+
+    def test_t05_rejects_contacted_attempt_for_t06_route(self) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            self.request(), self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(DispatchDenied, "T06"):
+            self.store.pause_local_execution(
+                self._local_pause_request(committed, suffix="contacted"),
+                self._pause_capability("contacted"), self.authority,
+            )
+
+    def test_t05_local_pause_replays_exactly_and_rejects_conflict(self) -> None:
+        committed = self._running_operation()
+        request = self._local_pause_request(committed, suffix="replay")
+        capability = self._pause_capability("replay")
+        original = self.store.pause_local_execution(
+            request, capability, self.authority
+        )
+        self.oracle.allowed_head = original.event_hash
+        replay = self.store.pause_local_execution(
+            request, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, original.event_hash)
+        with self.assertRaisesRegex(StorageIntegrityError, "different payload"):
+            self.store.pause_local_execution(
+                replace(request, reason_code="DIFFERENT_REASON"),
+                capability, self.authority,
+            )
+
+    def test_t05_local_pause_precommit_rolls_back_and_postcommit_replays(self) -> None:
+        committed = self._running_operation()
+        request = self._local_pause_request(committed, suffix="crash")
+        capability = self._pause_capability("crash")
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_local_execution(
+                request, capability, self.authority,
+                failure_hook=raise_at("after_local_pause_writes_before_commit"),
+            )
+        self.assertEqual(self.store.table_counts()["local_pause_actions"], 0)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_local_execution(
+                request, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_local_pause_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            committed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = committed_head
+        replay = self.store.pause_local_execution(
+            request, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, committed_head)
+        self.assertEqual(self.store.table_counts()["local_pause_actions"], 1)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 1)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_t05_recovery_rejects_self_consistent_capability_rewrite(self) -> None:
+        committed = self._running_operation()
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="tamper"),
+            self._pause_capability("tamper"), self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM local_pause_actions WHERE pause_id = "
+                "'local-pause-tamper'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            with self.assertRaises(sqlite3.IntegrityError):
+                connection.execute(
+                    "UPDATE local_pause_actions SET capability_action = "
+                    "'STOP_IMMEDIATE' WHERE pause_id = 'local-pause-tamper'"
+                )
+            connection.rollback()
+            body["capability_evidence"].update(
+                {
+                    "grant_id": "forged-grant",
+                    "scope_digest": "forged-scope",
+                    "issuer_mac": "forged-mac",
+                }
+            )
+            request_payload = {
+                key: body[key]
+                for key in PauseLocalExecutionRequest.__dataclass_fields__
+            }
+            payload = {
+                **request_payload,
+                "pause_kind": body["pause_kind"],
+                "pause_binding_version": body["pause_binding_version"],
+                "capability_evidence": body["capability_evidence"],
+                "capability_issuer_fingerprint": body[
+                    "capability_issuer_fingerprint"
+                ],
+            }
+            body["payload_digest"] = self.store._event_hash(payload)
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE local_pause_actions SET capability_grant_id = ?, "
+                "capability_scope_digest = ?, capability_issuer_mac = ?, "
+                "payload_digest = ?, event_hash = ?, body_json = ? "
+                "WHERE pause_id = ?",
+                (
+                    "forged-grant", "forged-scope", "forged-mac",
+                    body["payload_digest"], event_hash,
+                    body_json, body["pause_id"],
+                ),
+            )
+            connection.execute(
+                "UPDATE operator_redemptions SET grant_id = 'forged-grant', "
+                "scope_digest = 'forged-scope' "
+                "WHERE command_id = ?",
+                (body["command_id"],),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, event_hash = ? "
+                "WHERE command_id = ?",
+                (body["payload_digest"], event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = ?",
+                (event_hash, body["run_id"]),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                (event_hash, body["repository_id"]),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "local pause"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t05_recovery_rejects_surplus_event_schema(self) -> None:
+        committed = self._running_operation()
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="surplus"),
+            self._pause_capability("surplus"), self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM local_pause_actions WHERE pause_id = "
+                "'local-pause-surplus'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["surplus"] = "forbidden"
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE local_pause_actions SET event_hash = ?, body_json = ? "
+                "WHERE pause_id = ?",
+                (event_hash, body_json, body["pause_id"]),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = ?",
+                (event_hash, body["run_id"]),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                (event_hash, body["repository_id"]),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "PAUSE_REQUESTED"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t05_recovery_rejects_self_consistent_cursor_rewrite(self) -> None:
+        committed = self._running_operation()
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="cursor"),
+            self._pause_capability("cursor"), self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM local_pause_actions WHERE pause_id = "
+                "'local-pause-cursor'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["retained_continuation_cursor"] = "forged:cursor"
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE local_pause_actions SET event_hash = ?, body_json = ? "
+                "WHERE pause_id = ?",
+                (event_hash, body_json, body["pause_id"]),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ?, continuation_cursor = ? "
+                "WHERE run_id = ?",
+                (event_hash, "forged:cursor", body["run_id"]),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                (event_hash, body["repository_id"]),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "local pause predecessor"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t05_rejects_forged_or_foreign_operator_capability(self) -> None:
+        committed = self._running_operation()
+        request = self._local_pause_request(committed, suffix="authority")
+        capability = self._pause_capability("authority")
+        with self.assertRaises(DispatchDenied):
+            self.store.pause_local_execution(
+                request, replace(capability, issuer_mac="forged"), self.authority
+            )
+        foreign = SyntheticAuthority(b"foreign-t05-issuer-key-0000000000")
+        foreign_grant = SyntheticOperatorGrant(
+            "foreign-pause-grant", "repo-1", "run-1", "PAUSE",
+            "foreign-pause-scope",
+        )
+        foreign.register_operator(foreign_grant)
+        with self.assertRaises(DispatchDenied):
+            self.store.pause_local_execution(
+                replace(request, pause_id="foreign-pause"),
+                foreign.claim_operator(*foreign_grant.__dict__.values()),
+                foreign,
+            )
+        self.assertEqual(self.store.table_counts()["local_pause_actions"], 0)
+
+    def test_t05_recovery_rejects_projection_and_fence_tampering(self) -> None:
+        committed = self._running_operation()
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="projection"),
+            self._pause_capability("projection"), self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE local_pause_actions SET attempt_id = 'other-attempt' "
+                "WHERE pause_id = 'local-pause-projection'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "local-pause projection"):
+            self.store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE local_pause_actions SET attempt_id = 'attempt-1' "
+                "WHERE pause_id = 'local-pause-projection'"
+            )
+            connection.execute(
+                "UPDATE dispatch_fences SET item_id = 'other-item' "
+                "WHERE fence_id = 'local-pause-fence-projection'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "dispatch-fence"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t05_contact_and_pause_serialize_at_the_fence(self) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.store._freshness_oracle = type(
+            "AlwaysFresh", (), {"verify": lambda self, *args: True}
+        )()
+        request = self._local_pause_request(committed, suffix="concurrent")
+        capability = self._pause_capability("concurrent")
+        barrier = threading.Barrier(2)
+        outcomes: list[str] = []
+        errors: list[BaseException] = []
+
+        def contact() -> None:
+            try:
+                barrier.wait()
+                self.store._contact_claimed_operation(
+                    self.request(), self.capability, committed, launched,
+                    self.store._adapter_target_digest("repo-1", "EFFECT"),
+                )
+                outcomes.append("contact")
+            except BaseException as error:
+                errors.append(error)
+
+        def pause() -> None:
+            try:
+                barrier.wait()
+                self.store.pause_local_execution(
+                    request, capability, self.authority
+                )
+                outcomes.append("pause")
+            except BaseException as error:
+                errors.append(error)
+
+        threads = (threading.Thread(target=contact), threading.Thread(target=pause))
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=5)
+        self.assertTrue(all(not thread.is_alive() for thread in threads))
+        self.assertEqual(len(outcomes), 1)
+        self.assertEqual(len(errors), 1)
+        self.assertIsInstance(errors[0], DispatchDenied)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            contact_count = connection.execute(
+                "SELECT COUNT(*) FROM adapter_contacts"
+            ).fetchone()[0]
+            fence_count = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                "'local-pause-fence-concurrent'"
+            ).fetchone()[0]
+            state = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        if outcomes == ["contact"]:
+            self.assertEqual((contact_count, fence_count, state), (1, 0, "RUNNING"))
+        else:
+            self.assertEqual((contact_count, fence_count, state), (0, 1, "PAUSING"))
 
     def _resume_capability(self, suffix: str = "1"):
         grant = SyntheticOperatorGrant(

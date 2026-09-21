@@ -38,6 +38,7 @@ from .contracts import (
     ObservationReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    PauseLocalExecutionRequest,
     ResumeRequest,
     StopMode,
     StopEscalationRequest,
@@ -126,6 +127,31 @@ class SyntheticDispatchCoordinator:
             )
 
         return self._store.stop(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def pause_local_execution(
+        self,
+        request: PauseLocalExecutionRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T05",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T05"].required_guards,
+            )
+
+        return self._store.pause_local_execution(
             request,
             capability,
             self._authority,

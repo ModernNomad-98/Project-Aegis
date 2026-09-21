@@ -870,6 +870,49 @@ class ResumeRequest:
 
 
 @dataclass(frozen=True)
+class PauseLocalExecutionRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    expected_slot_generation: int
+    reason_code: str
+
+    def validate(self) -> None:
+        identifiers = (
+            self.pause_id,
+            self.command_id,
+            self.event_id,
+            self.fence_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.intent_event_id,
+            self.intent_event_hash,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in identifiers
+        ):
+            raise ValueError("local pause command fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("local pause slot generation must be positive")
+
+
+@dataclass(frozen=True)
 class PauseBeforeDispatchRequest:
     pause_id: str
     command_id: str
