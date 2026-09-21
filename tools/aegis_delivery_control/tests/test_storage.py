@@ -15,6 +15,7 @@ from typing import Mapping
 
 from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
+    SyntheticAuthorityLifecycleEvidence,
     SyntheticGrant,
     SyntheticOperatorGrant,
     SyntheticSettlementProof,
@@ -25,6 +26,8 @@ from tools.aegis_delivery_control.adapters import (
     SyntheticValidatorRequest,
 )
 from tools.aegis_delivery_control.contracts import (
+    AuthorityFactKind,
+    AuthorityLifecycleFactRequest,
     BudgetDisposition,
     BudgetSettlementRequest as BudgetSettlementContract,
     DispatchDenied,
@@ -33,6 +36,7 @@ from tools.aegis_delivery_control.contracts import (
     InjectedFailure,
     IntentRequest,
     LifecycleState,
+    GovernedOrder,
     PauseBeforeDispatchRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
@@ -2869,6 +2873,843 @@ class SQLiteStateStoreTests(unittest.TestCase):
             grant.grant_id, grant.repository_id, grant.run_id, grant.action,
             grant.scope_digest,
         )
+
+    def test_t13_pre_action_revocation_blocks_matching_effect_grant(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-t13", "plan-command-t13", "plan-event-t13",
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, "revision-1",
+                request.effect_descriptor_digest, self.capability.scope_digest,
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="",
+            writer_epoch=1,
+        )
+        fact = AuthorityLifecycleFactRequest(
+            "fact-t13", "fact-command-t13", "fact-event-t13",
+            request.repository_id, request.run_id, request.item_id,
+            request.logical_effect_id, "EFFECT", self.capability.grant_id,
+            "EXECUTE_EFFECT", self.capability.scope_digest,
+            AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None,
+        )
+        evidence: SyntheticAuthorityLifecycleEvidence = (
+            self.authority.issue_authority_lifecycle_evidence("proof-t13", fact)
+        )
+        self.oracle.allowed_head = plan.event_hash
+
+        recorded = self.store.record_authority_fact(
+            fact,
+            evidence,
+            self.authority,
+            expected_head=plan.event_hash,
+            writer_epoch=2,
+        )
+
+        self.assertEqual(recorded.resulting_state, LifecycleState.BLOCKED)
+        self.oracle.allowed_head = recorded.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "authority"):
+            self.store.commit_intent(
+                request,
+                self.capability,
+                self.authority,
+                expected_head=recorded.event_hash,
+                writer_epoch=3,
+            )
+
+    def test_t13_after_action_expiry_is_future_only(self) -> None:
+        intent = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-after", "fact-command-after", "fact-event-after",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.EXPIRED, GovernedOrder.AFTER, "INTENT",
+            intent.event_id, intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-after", fact
+            ),
+            self.authority,
+            expected_head=intent.event_hash,
+            writer_epoch=3,
+        )
+        self.assertEqual(recorded.resulting_state, LifecycleState.RUNNING)
+        connection = self.store._connect()
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM effective_authority"
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = recorded.event_hash
+        self.store.load_verified("repo-1")
+
+    def test_t13_unknown_claim_status_retains_slot_and_disputes_history(self) -> None:
+        intent = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-unknown", "fact-command-unknown", "fact-event-unknown",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.CLAIM_STATUS_UNKNOWN, GovernedOrder.UNKNOWN,
+            "INTENT", intent.event_id, intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-unknown", fact
+            ),
+            self.authority,
+            expected_head=intent.event_hash,
+            writer_epoch=3,
+        )
+        self.assertEqual(
+            recorded.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT status FROM effective_authority"
+                ).fetchone()[0],
+                "UNKNOWN",
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM outstanding_slot"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+
+    def test_t13_own_consumption_is_nonbreaching_and_mismatch_rejects(self) -> None:
+        intent = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-own", "fact-command-own", "fact-event-own", "repo-1",
+            "run-1", "item-1", "effect-1", "EFFECT", "grant-1",
+            "EXECUTE_EFFECT", "scope-1", AuthorityFactKind.OWN_CONSUMED,
+            GovernedOrder.DURING, "INTENT", intent.event_id, intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence("proof-own", fact),
+            self.authority,
+            expected_head=intent.event_hash,
+            writer_epoch=3,
+        )
+        self.assertEqual(recorded.resulting_state, LifecycleState.RUNNING)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM effective_authority"
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = recorded.event_hash
+        launch = self.store.claim_operation_launch(self.request(), intent)
+        self.oracle.allowed_head = launch.event_hash
+        self.store._contact_claimed_operation(
+            self.request(), self.capability, intent, launch,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = self.store._connect()
+        try:
+            contact_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+            with self.assertRaisesRegex(DispatchDenied, "authority"):
+                self.store._require_effective_authority(
+                    connection, self.authority.issuer_fingerprint, "EFFECT",
+                    "grant-1", "EXECUTE_EFFECT", "scope-1",
+                    continuing_event_id="different-intent",
+                    continuing_event_hash="different-hash",
+                )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = contact_head
+        self.store.load_verified("repo-1")
+        mismatched = replace(
+            fact,
+            fact_id="fact-own-bad",
+            command_id="fact-command-own-bad",
+            event_id="fact-event-own-bad",
+            governed_event_hash="0" * 64,
+        )
+        self.oracle.allowed_head = contact_head
+        with self.assertRaisesRegex(DispatchDenied, "boundary"):
+            self.store.record_authority_fact(
+                mismatched,
+                self.authority.issue_authority_lifecycle_evidence(
+                    "proof-own-bad", mismatched
+                ),
+                self.authority,
+                expected_head=contact_head,
+                writer_epoch=6,
+            )
+
+    def test_t13_exact_correction_clears_only_its_effective_generation(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-correct", "plan-command-correct", "plan-event-correct",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                request.effect_descriptor_digest, "scope-1",
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        denied = AuthorityLifecycleFactRequest(
+            "fact-denied", "fact-command-denied", "fact-event-denied",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None,
+        )
+        denial = self.store.record_authority_fact(
+            denied,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-denied", denied
+            ),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = denial.event_hash
+        correction = AuthorityLifecycleFactRequest(
+            "fact-correct", "fact-command-correct", "fact-event-correct",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.CORRECTION, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None, corrected_fact_id=denied.fact_id,
+            corrected_event_hash=denial.event_hash,
+        )
+        corrected = self.store.record_authority_fact(
+            correction,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-correct", correction
+            ),
+            self.authority,
+            expected_head=denial.event_hash, writer_epoch=3,
+        )
+        self.assertEqual(corrected.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM effective_authority"
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = corrected.event_hash
+        self.store.load_verified("repo-1")
+
+    def test_t13_correction_restores_older_uncorrected_denial(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-stack", "plan-command-stack", "plan-event-stack",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                request.effect_descriptor_digest, "scope-1",
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        first = AuthorityLifecycleFactRequest(
+            "fact-stack-1", "fact-command-stack-1", "fact-event-stack-1",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None,
+        )
+        first_receipt = self.store.record_authority_fact(
+            first,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-stack-1", first
+            ),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = first_receipt.event_hash
+        second = replace(
+            first,
+            fact_id="fact-stack-2", command_id="fact-command-stack-2",
+            event_id="fact-event-stack-2",
+            fact_kind=AuthorityFactKind.SOURCE_UNAVAILABLE,
+            governed_order=GovernedOrder.UNKNOWN,
+        )
+        second_receipt = self.store.record_authority_fact(
+            second,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-stack-2", second
+            ),
+            self.authority,
+            expected_head=first_receipt.event_hash, writer_epoch=3,
+        )
+        self.oracle.allowed_head = second_receipt.event_hash
+        correction = replace(
+            first,
+            fact_id="fact-stack-correction",
+            command_id="fact-command-stack-correction",
+            event_id="fact-event-stack-correction",
+            fact_kind=AuthorityFactKind.CORRECTION,
+            corrected_fact_id=second.fact_id,
+            corrected_event_hash=second_receipt.event_hash,
+        )
+        corrected = self.store.record_authority_fact(
+            correction,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-stack-correction", correction
+            ),
+            self.authority,
+            expected_head=second_receipt.event_hash, writer_epoch=4,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            effective = connection.execute(
+                "SELECT originating_fact_id FROM effective_authority"
+            ).fetchone()[0]
+            fences = {
+                row[0] for row in connection.execute(
+                    "SELECT fence_id FROM dispatch_fences"
+                )
+            }
+        finally:
+            connection.close()
+        self.assertEqual(effective, first.fact_id)
+        self.assertEqual(fences, {f"authority:{first.fact_id}"})
+        self.oracle.allowed_head = corrected.event_hash
+        self.store.load_verified("repo-1")
+        with self.assertRaisesRegex(DispatchDenied, "authority"):
+            self.store.commit_intent(
+                request, self.capability, self.authority,
+                expected_head=corrected.event_hash, writer_epoch=5,
+            )
+
+    def test_t13_fact_write_is_atomic_replay_safe_and_tamper_evident(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-atomic", "plan-command-atomic", "plan-event-atomic",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                request.effect_descriptor_digest, "scope-1",
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-atomic", "fact-command-atomic", "fact-event-atomic",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.SOURCE_UNAVAILABLE, GovernedOrder.UNKNOWN,
+            "NO_ACTION", None, None,
+        )
+        evidence = self.authority.issue_authority_lifecycle_evidence(
+            "proof-atomic", fact
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.record_authority_fact(
+                fact, evidence, self.authority,
+                expected_head=plan.event_hash, writer_epoch=2,
+                failure_hook=raise_at("after_authority_fact_writes_before_commit"),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM authority_facts"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        recorded = self.store.record_authority_fact(
+            fact, evidence, self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        replay = self.store.record_authority_fact(
+            fact, evidence, self.authority,
+            expected_head=recorded.event_hash, writer_epoch=3,
+        )
+        self.assertTrue(replay.replayed)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE effective_authority SET generation = 99"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "effective-authority"):
+            self.store.load_verified("repo-1")
+
+    def test_t13_lifecycle_decision_table(self) -> None:
+        terminal = {
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+        }
+        for state in LifecycleState:
+            with self.subTest(state=state):
+                expected = (
+                    state
+                    if state in terminal
+                    or state in {
+                        LifecycleState.PAUSED,
+                        LifecycleState.PAUSING,
+                        LifecycleState.RECONCILIATION_REQUIRED,
+                    }
+                    else LifecycleState.RECONCILIATION_REQUIRED
+                    if state in {LifecycleState.RUNNING, LifecycleState.VALIDATING}
+                    else LifecycleState.BLOCKED
+                )
+                self.assertEqual(
+                    self.store._authority_fact_route(
+                        state, AuthorityFactKind.REVOKED, GovernedOrder.BEFORE
+                    ),
+                    expected,
+                )
+                self.assertEqual(
+                    self.store._authority_fact_route(
+                        state, AuthorityFactKind.EXPIRED, GovernedOrder.AFTER
+                    ),
+                    state,
+                )
+
+    def test_t13_future_denial_is_rechecked_before_adapter_contact(self) -> None:
+        request = self.request()
+        intent = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-contact", "fact-command-contact", "fact-event-contact",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.REVOKED, GovernedOrder.AFTER, "INTENT",
+            intent.event_id, intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-contact", fact
+            ),
+            self.authority,
+            expected_head=intent.event_hash, writer_epoch=3,
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "authority"):
+            self.store.claim_operation_launch(request, intent)
+
+    def test_t13_operator_consumer_uses_grant_wide_effective_index(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-operator", "plan-command-operator",
+                "plan-event-operator", "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", request.effect_descriptor_digest,
+                "scope-1", request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        capability = self._pause_capability("t13")
+        self.oracle.allowed_head = plan.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-operator", "fact-command-operator", "fact-event-operator",
+            "repo-1", "run-1", "item-1", "effect-1", "OPERATOR",
+            capability.grant_id, "PAUSE", capability.scope_digest,
+            AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-operator", fact
+            ),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "authority"):
+            self.store.pause_before_dispatch(
+                self._pause_request("t13"), capability, self.authority
+            )
+
+    def test_t13_unknown_operator_claim_binds_exact_operator_redemption(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-operator-unknown", "plan-command-operator-unknown",
+                "plan-event-operator-unknown", "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", request.effect_descriptor_digest,
+                "scope-1", request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        capability = self._pause_capability("unknown")
+        paused = self.store.pause_before_dispatch(
+            self._pause_request("unknown"), capability, self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-operator-unknown", "fact-command-operator-unknown",
+            "fact-event-operator-unknown", "repo-1", "run-1", "item-1",
+            "effect-1", "OPERATOR", capability.grant_id, "PAUSE",
+            capability.scope_digest, AuthorityFactKind.CLAIM_STATUS_UNKNOWN,
+            GovernedOrder.UNKNOWN, "REDEMPTION", paused.event_id,
+            paused.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-operator-unknown", fact
+            ),
+            self.authority,
+            expected_head=paused.event_hash, writer_epoch=4,
+        )
+        self.assertEqual(recorded.resulting_state, LifecycleState.PAUSED)
+
+    def test_t13_unknown_claim_rejects_cross_kind_grant_id_collision(self) -> None:
+        request = self.request()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-collision", "plan-command-collision",
+                "plan-event-collision", "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", request.effect_descriptor_digest,
+                "scope-1", request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        operator_grant = SyntheticOperatorGrant(
+            "grant-1", "repo-1", "run-1", "PAUSE", "scope-1"
+        )
+        self.authority.register_operator(operator_grant)
+        operator_capability = self.authority.claim_operator(
+            *operator_grant.__dict__.values()
+        )
+        paused = self.store.pause_before_dispatch(
+            self._pause_request("collision"), operator_capability, self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-collision", "fact-command-collision", "fact-event-collision",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT", "grant-1",
+            "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.CLAIM_STATUS_UNKNOWN, GovernedOrder.UNKNOWN,
+            "REDEMPTION", paused.event_id, paused.event_hash,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "local use"):
+            self.store.record_authority_fact(
+                fact,
+                self.authority.issue_authority_lifecycle_evidence(
+                    "proof-collision", fact
+                ),
+                self.authority,
+                expected_head=paused.event_hash, writer_epoch=4,
+            )
+
+    def test_t13_unknown_validator_claim_binds_exact_validator_redemption(self) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        validator_request, capability = self._validator_intent(observation)
+        intent = self.store.commit_validator_intent(
+            validator_request, capability, self.authority
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-validator-unknown", "fact-command-validator-unknown",
+            "fact-event-validator-unknown", "repo-1", "run-1", "item-1",
+            "effect-1", "VALIDATOR", capability.grant_id, "RUN_VALIDATOR",
+            capability.scope_digest, AuthorityFactKind.CLAIM_STATUS_UNKNOWN,
+            GovernedOrder.UNKNOWN, "INTENT", intent.event_id,
+            intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-validator-unknown", fact
+            ),
+            self.authority,
+            expected_head=intent.event_hash, writer_epoch=6,
+        )
+        self.assertEqual(
+            recorded.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+
+    def test_t13_own_validator_consumption_allows_exact_contact(self) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        validator_request, capability = self._validator_intent(observation)
+        intent = self.store.commit_validator_intent(
+            validator_request, capability, self.authority
+        )
+        self.oracle.allowed_head = intent.event_hash
+        fact = AuthorityLifecycleFactRequest(
+            "fact-validator-own", "fact-command-validator-own",
+            "fact-event-validator-own", "repo-1", "run-1", "item-1",
+            "effect-1", "VALIDATOR", capability.grant_id, "RUN_VALIDATOR",
+            capability.scope_digest, AuthorityFactKind.OWN_CONSUMED,
+            GovernedOrder.DURING, "INTENT", intent.event_id,
+            intent.event_hash,
+        )
+        recorded = self.store.record_authority_fact(
+            fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-validator-own", fact
+            ),
+            self.authority,
+            expected_head=intent.event_hash, writer_epoch=6,
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        self.store._contact_committed_validator(
+            validator_request, capability, intent,
+            self.store._adapter_target_digest("repo-1", "VALIDATOR"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            contact_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = contact_head
+        self.store.load_verified("repo-1")
+
+    def test_t13_supersession_rejects_cycles_and_never_revives_predecessor(
+        self,
+    ) -> None:
+        request = self.request()
+        successor = SyntheticGrant(
+            "grant-successor", "repo-1", "effect-1", "attempt-1", "scope-1"
+        )
+        self.authority.register(successor)
+        final_successor = SyntheticGrant(
+            "grant-final", "repo-1", "effect-1", "attempt-1", "scope-1"
+        )
+        self.authority.register(final_successor)
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-super", "plan-command-super", "plan-event-super",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                request.effect_descriptor_digest, "scope-1",
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        superseded = AuthorityLifecycleFactRequest(
+            "fact-super", "fact-command-super", "fact-event-super",
+            "repo-1", "run-1", "item-1", "effect-1", "EFFECT",
+            "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.SUPERSEDED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None, successor_grant_id="grant-successor",
+        )
+        recorded = self.store.record_authority_fact(
+            superseded,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-super", superseded
+            ),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        chain = replace(
+            superseded,
+            fact_id="fact-chain", command_id="fact-command-chain",
+            event_id="fact-event-chain", grant_id="grant-successor",
+            successor_grant_id="grant-final",
+        )
+        chained = self.store.record_authority_fact(
+            chain,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-chain", chain
+            ),
+            self.authority,
+            expected_head=recorded.event_hash, writer_epoch=3,
+        )
+        self.oracle.allowed_head = chained.event_hash
+        conflict = replace(
+            superseded,
+            fact_id="fact-conflict", command_id="fact-command-conflict",
+            event_id="fact-event-conflict", successor_grant_id="grant-final",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "conflicts"):
+            self.store.record_authority_fact(
+                conflict,
+                self.authority.issue_authority_lifecycle_evidence(
+                    "proof-conflict", conflict
+                ),
+                self.authority,
+                expected_head=chained.event_hash, writer_epoch=4,
+            )
+        cycle = replace(
+            superseded,
+            fact_id="fact-cycle", command_id="fact-command-cycle",
+            event_id="fact-event-cycle", grant_id="grant-final",
+            successor_grant_id="grant-1",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "cyclic"):
+            self.store.record_authority_fact(
+                cycle,
+                self.authority.issue_authority_lifecycle_evidence(
+                    "proof-cycle", cycle
+                ),
+                self.authority,
+                expected_head=chained.event_hash, writer_epoch=4,
+            )
+        correction = replace(
+            chain,
+            fact_id="fact-chain-correction",
+            command_id="fact-command-chain-correction",
+            event_id="fact-event-chain-correction",
+            fact_kind=AuthorityFactKind.CORRECTION,
+            successor_grant_id=None,
+            corrected_fact_id=chain.fact_id,
+            corrected_event_hash=chained.event_hash,
+        )
+        corrected = self.store.record_authority_fact(
+            correction,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-chain-correction", correction
+            ),
+            self.authority,
+            expected_head=chained.event_hash, writer_epoch=4,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT status FROM effective_authority WHERE grant_id = 'grant-1'"
+                ).fetchone()[0],
+                "DENIED",
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM authority_supersessions"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = corrected.event_hash
+        self.store.load_verified("repo-1")
+
+    def test_t13_supersession_graph_is_namespaced_by_full_typed_binding(self) -> None:
+        request = self.request()
+        self.authority.register(
+            SyntheticGrant(
+                "grant-successor", "repo-1", "effect-1", "attempt-1",
+                "scope-1",
+            )
+        )
+        for grant_id in ("grant-1", "grant-successor"):
+            self.authority.register_validator(
+                SyntheticValidatorGrant(
+                    grant_id, "repo-1", "effect-1", "revision-1", "check-1",
+                    "input-1", "validator-attempt-1", "validator-scope-1",
+                )
+            )
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-typed", "plan-command-typed", "plan-event-typed",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                request.effect_descriptor_digest, "scope-1",
+                request.budget_policy_digest, ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        effect_fact = AuthorityLifecycleFactRequest(
+            "fact-effect-typed", "fact-command-effect-typed",
+            "fact-event-effect-typed", "repo-1", "run-1", "item-1",
+            "effect-1", "EFFECT", "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.SUPERSEDED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None, successor_grant_id="grant-successor",
+        )
+        effect_recorded = self.store.record_authority_fact(
+            effect_fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-effect-typed", effect_fact
+            ),
+            self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = effect_recorded.event_hash
+        validator_fact = replace(
+            effect_fact,
+            fact_id="fact-validator-typed",
+            command_id="fact-command-validator-typed",
+            event_id="fact-event-validator-typed",
+            grant_kind="VALIDATOR",
+            action="RUN_VALIDATOR",
+            scope_digest="validator-scope-1",
+        )
+        validator_recorded = self.store.record_authority_fact(
+            validator_fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "proof-validator-typed", validator_fact
+            ),
+            self.authority,
+            expected_head=effect_recorded.event_hash, writer_epoch=3,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM authority_supersessions"
+                ).fetchone()[0],
+                2,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = validator_recorded.event_hash
+        self.store.load_verified("repo-1")
 
     def _stop_escalation_capability(self, suffix: str = "1"):
         grant = SyntheticOperatorGrant(

@@ -352,8 +352,39 @@ review returned `APPROVE` with no blocker or major finding.
 
 All three stop findings and the aggregate stop gate are now `APPROVE`. This does
 not make the PR merge-ready: exact-head T/C/F backlog work and final independent
-architecture/security/QA gates remain. Stage 6 commit/push evidence is pending
-until this reviewed stage is committed.
+architecture/security/QA gates remain. Stage 6 was committed and pushed as
+`5cd844bb65813efd798e41ab52ff9003ff23366f`; its three hosted checks passed.
+
+### Stage 7 - T13 authority lifecycle intake
+
+The T13 plan required three audit corrections before `APPROVE`: an exact
+fact-kind/order table, grant-wide durable authority state, retained unknown
+claims, typed supersession, generation-exact correction and deterministic
+lifecycle routing. The first focused test failed because the store had no
+`record_authority_fact`; the completed route now uses issuer-authenticated
+synthetic evidence and one atomic `AUTHORITY_EVALUATED` transition.
+
+Changed files: `contracts.py` adds typed fact/order/request contracts;
+`authority.py` signs and verifies bound synthetic lifecycle evidence;
+`dispatch.py` exposes the engine-authorized T13 coordinator route; `storage.py`
+persists facts, typed supersession graphs, effective generations, fences and
+recovery proofs while rechecking every grant consumer/contact; `test_storage.py`
+adds 16 focused decision, consumer, crash/replay, recovery and tamper tests.
+Canonical design, approvals, BER, CI, dependencies, artifacts/caches and real
+authority/adapters were intentionally untouched.
+
+Implementation review initially returned `REVISE` for stacked correction loss,
+cross-kind unknown-claim binding and non-graph supersession checks. Subsequent
+re-reviews found typed-graph namespacing and exact own-consumption continuation
+gaps. Each was corrected and regression-tested. Final review returned `APPROVE`
+with no remaining blocker or major and independently passed all 16 focused tests.
+The complete package passed 242 tests; skill validation reported 184 valid and
+zero warnings; validator self-tests passed 91 assertions; diff-check was clean
+apart from line-ending notices.
+
+T13 is `YES/YES/YES`. Only its C08/F03 slices are accepted; complete cross-family
+C08/F03 traceability remains `UNVERIFIED`. Commit/push and exact-head hosted
+evidence remain pending until this reviewed stage is committed.
 
 ## 8. Proven invocations
 
@@ -388,6 +419,10 @@ until this reviewed stage is committed.
 | `python -m unittest tools.aegis_delivery_control.tests.test_storage` after R-STOP-02 | `Ran 177 tests in 14.474s`; `OK` |
 | `python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py'` after R-STOP-02 | `Ran 219 tests in 19.387s`; `OK` |
 | R-STOP-02 initial / corrected implementation reviews | `REVISE` for item-retarget recovery gap, then `APPROVE`; reviewer independently passed 10 focused tests and the former probe failed closed |
+| T13 focused first falsification | Failed because `record_authority_fact` was absent; passed after the typed durable route |
+| T13 complete delivery-control package | `Ran 242 tests in 21.120s`; `OK` |
+| T13 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed |
+| Independent T13 implementation review | Initial and intermediate `REVISE` findings corrected; final `APPROVE`, no remaining blocker/major; 16 focused tests passed independently |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -478,7 +513,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 226 passing tests, a registry entry or an earlier milestone
+complete from the 242 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -506,7 +541,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
-| T13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
 | T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
@@ -536,7 +571,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
 | C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
 | C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
 
 ### F01-F21 acceptance-family matrix
@@ -547,7 +582,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | --- | --- | --- | --- | --- |
 | F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T28 |
 | F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
-| F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
+| F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
@@ -578,7 +613,7 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T13/T15/T14.
+1. T15, then T14 (T13 complete and independently accepted).
 2. T05-T09.
 3. T17 with F02/F11/F12/F21.
 4. T22.
@@ -686,6 +721,6 @@ owner before interpreting it more broadly.
 
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
-stop findings are complete. The next code change follows the documented order at
-T13/T15/T14, not dashboard work. Keep PR #99 draft until every remaining backlog
+stop findings and T13 are complete. The next code change follows the documented
+order at T15, then T14, not dashboard work. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

@@ -18,6 +18,7 @@ from .authority import (
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
     SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
     SyntheticAuthority,
+    SyntheticAuthorityLifecycleEvidence,
     SyntheticCapability,
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
@@ -30,6 +31,8 @@ from .authority import (
 )
 from .contracts import (
     ApplicationReceipt,
+    AuthorityFactKind,
+    AuthorityLifecycleFactRequest,
     BudgetDisposition,
     BudgetSettlementRequest,
     CommitReceipt,
@@ -39,6 +42,7 @@ from .contracts import (
     FailureClassification,
     FinalizeOperationRequest,
     FreshnessOracle,
+    GovernedOrder,
     InjectedFailure,
     IntentRequest,
     LifecycleState,
@@ -106,6 +110,7 @@ _SETTLEMENT_TRANSITIONS = {
 _EVENT_KINDS = frozenset(
     {
         "ADAPTER_CONTACT_CLAIMED",
+        "AUTHORITY_EVALUATED",
         "BLOCKER_RESOLVED",
         "BUDGET_SETTLED",
         "INTENT_COMMITTED",
@@ -132,6 +137,7 @@ _EVENT_KINDS = frozenset(
 _LIFECYCLE_EVENT_KINDS = frozenset(
     {
         "ADAPTER_CONTACT_CLAIMED",
+        "AUTHORITY_EVALUATED",
         "BLOCKER_RESOLVED",
         "INTENT_COMMITTED",
         "LATE_RECEIPT_RECORDED",
@@ -177,6 +183,7 @@ _LIFECYCLE_ROUTES: Mapping[
     str, frozenset[tuple[LifecycleState | None, LifecycleState]]
 ] = {
     "ADAPTER_CONTACT_CLAIMED": _PRESERVE_LIFECYCLE_ROUTES,
+    "AUTHORITY_EVALUATED": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BLOCKER_RESOLVED": frozenset(
         {(LifecycleState.BLOCKED, LifecycleState.VALIDATING)}
     ),
@@ -770,6 +777,72 @@ class SQLiteStateStore:
                 target_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS authority_facts (
+                fact_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                issuer_fingerprint TEXT NOT NULL,
+                grant_kind TEXT NOT NULL,
+                grant_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                scope_digest TEXT NOT NULL,
+                fact_kind TEXT NOT NULL,
+                governed_order TEXT NOT NULL,
+                governed_boundary_kind TEXT NOT NULL,
+                governed_event_id TEXT,
+                governed_event_hash TEXT,
+                successor_grant_id TEXT,
+                corrected_fact_id TEXT,
+                corrected_event_hash TEXT,
+                proof_id TEXT NOT NULL,
+                proof_digest TEXT NOT NULL,
+                proof_mac TEXT NOT NULL,
+                generation INTEGER NOT NULL CHECK (generation > 0),
+                fence_id TEXT,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL,
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS effective_authority (
+                issuer_fingerprint TEXT NOT NULL,
+                grant_kind TEXT NOT NULL,
+                grant_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                scope_digest TEXT NOT NULL,
+                status TEXT NOT NULL CHECK (status IN ('DENIED', 'UNKNOWN')),
+                generation INTEGER NOT NULL CHECK (generation > 0),
+                originating_fact_id TEXT NOT NULL UNIQUE
+                    REFERENCES authority_facts(fact_id),
+                originating_event_id TEXT NOT NULL UNIQUE
+                    REFERENCES events(event_id),
+                fence_id TEXT,
+                PRIMARY KEY (
+                    issuer_fingerprint, grant_kind, grant_id, action, scope_digest
+                )
+            );
+            CREATE TABLE IF NOT EXISTS authority_supersessions (
+                issuer_fingerprint TEXT NOT NULL,
+                predecessor_grant_id TEXT NOT NULL,
+                successor_grant_id TEXT NOT NULL,
+                grant_kind TEXT NOT NULL,
+                action TEXT NOT NULL,
+                scope_digest TEXT NOT NULL,
+                originating_fact_id TEXT NOT NULL UNIQUE
+                    REFERENCES authority_facts(fact_id),
+                PRIMARY KEY (
+                    issuer_fingerprint, grant_kind, predecessor_grant_id,
+                    action, scope_digest
+                ),
+                UNIQUE (
+                    issuer_fingerprint, grant_kind, successor_grant_id,
+                    action, scope_digest
+                )
             );
             CREATE TABLE IF NOT EXISTS command_outcomes (
                 command_id TEXT PRIMARY KEY,
@@ -4821,6 +4894,11 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return self._control_receipt(prior, replayed=True)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
                 authority.verify_operator_for_action(capability)
                 if connection.execute(
                     "SELECT 1 FROM operator_redemptions WHERE "
@@ -5043,6 +5121,11 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return self._stop_receipt(prior, replayed=True)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
                 authority.verify_operator_for_action(capability)
                 if connection.execute(
                     "SELECT 1 FROM operator_redemptions WHERE "
@@ -5422,6 +5505,11 @@ class SQLiteStateStore:
                         LifecycleState.STOPPED,
                         True,
                     )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
                 authority.verify_operator_for_action(capability)
                 if connection.execute(
                     "SELECT 1 FROM operator_redemptions WHERE "
@@ -5969,6 +6057,12 @@ class SQLiteStateStore:
                         replayed=True,
                     )
 
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "EFFECT",
+                    capability.grant_id, "EXECUTE_EFFECT",
+                    capability.scope_digest,
+                )
+
                 plans = connection.execute(
                     "SELECT plan_id, item_id, logical_effect_id, revision_digest, "
                     "effect_descriptor_digest, permission_scope_digest, "
@@ -6281,7 +6375,7 @@ class SQLiteStateStore:
                     )
                 intent = connection.execute(
                     "SELECT e.event_hash, e.event_id, r.lifecycle_state, "
-                    "e.body_json, c.claim_id FROM events e "
+                    "e.body_json, c.claim_id, c.grant_id, c.scope_digest FROM events e "
                     "JOIN runs r ON r.run_id = e.run_id "
                     "JOIN capability_redemptions c ON c.command_id = e.command_id "
                     "WHERE e.command_id = ? AND e.event_kind = 'INTENT_COMMITTED'",
@@ -6299,6 +6393,20 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "operation launch changed the durable intent"
                     )
+                issuer = connection.execute(
+                    "SELECT classification_issuer_fingerprint FROM "
+                    "validation_plans WHERE run_id = ?",
+                    (request.run_id,),
+                ).fetchone()
+                if issuer is None or issuer["classification_issuer_fingerprint"] is None:
+                    raise DispatchDenied("accepted-plan authority is not pinned")
+                self._require_effective_authority(
+                    connection, str(issuer["classification_issuer_fingerprint"]),
+                    "EFFECT", str(intent["grant_id"]), "EXECUTE_EFFECT",
+                    str(intent["scope_digest"]),
+                    continuing_event_id=commit.event_id,
+                    continuing_event_hash=commit.event_hash,
+                )
                 if intent["lifecycle_state"] != LifecycleState.RUNNING.value:
                     raise DispatchDenied("operation launch requires RUNNING state")
                 slot = connection.execute(
@@ -6460,6 +6568,20 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "adapter contact changed the durable operation intent"
                     )
+                issuer = connection.execute(
+                    "SELECT classification_issuer_fingerprint FROM "
+                    "validation_plans WHERE run_id = ?",
+                    (request.run_id,),
+                ).fetchone()
+                if issuer is None or issuer["classification_issuer_fingerprint"] is None:
+                    raise DispatchDenied("accepted-plan authority is not pinned")
+                self._require_effective_authority(
+                    connection, str(issuer["classification_issuer_fingerprint"]),
+                    "EFFECT", capability.grant_id, "EXECUTE_EFFECT",
+                    capability.scope_digest,
+                    continuing_event_id=commit.event_id,
+                    continuing_event_hash=commit.event_hash,
+                )
                 run = connection.execute(
                     "SELECT lifecycle_state FROM runs WHERE run_id = ? AND "
                     "repository_id = ? AND item_id = ?",
@@ -6550,6 +6672,13 @@ class SQLiteStateStore:
                     connection, request.repository_id, request.run_id, authority
                 )
                 authority.verify_validator_issued(capability)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "VALIDATOR",
+                    capability.grant_id, "RUN_VALIDATOR",
+                    capability.scope_digest,
+                    continuing_event_id=commit.event_id,
+                    continuing_event_hash=commit.event_hash,
+                )
                 validator = connection.execute(
                     "SELECT * FROM validator_intents WHERE "
                     "validator_intent_id = ?",
@@ -8509,6 +8638,11 @@ class SQLiteStateStore:
                         True,
                     )
 
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "VALIDATOR",
+                    capability.grant_id, "RUN_VALIDATOR",
+                    capability.scope_digest,
+                )
                 authority.verify_validator_for_intent(capability)
                 if connection.execute(
                     "SELECT 1 FROM capability_redemptions WHERE claim_id = ?",
@@ -10332,6 +10466,494 @@ class SQLiteStateStore:
                 raise DispatchDenied("run is unavailable")
             return LifecycleState(str(row["lifecycle_state"]))
 
+    @staticmethod
+    def _require_effective_authority(
+        connection: sqlite3.Connection,
+        issuer_fingerprint: str,
+        grant_kind: str,
+        grant_id: str,
+        action: str,
+        scope_digest: str,
+        *,
+        continuing_event_id: str | None = None,
+        continuing_event_hash: str | None = None,
+    ) -> None:
+        row = connection.execute(
+            "SELECT effective.status, fact.fact_kind, "
+            "fact.governed_event_id, fact.governed_event_hash FROM "
+            "effective_authority AS effective JOIN authority_facts AS fact ON "
+            "fact.fact_id = effective.originating_fact_id WHERE "
+            "effective.issuer_fingerprint = ? AND effective.grant_kind = ? "
+            "AND effective.grant_id = ? AND effective.action = ? AND "
+            "effective.scope_digest = ?",
+            (issuer_fingerprint, grant_kind, grant_id, action, scope_digest),
+        ).fetchone()
+        if row is not None:
+            if (
+                row["fact_kind"] == AuthorityFactKind.OWN_CONSUMED.value
+                and continuing_event_id is not None
+                and continuing_event_hash is not None
+                and (
+                    row["governed_event_id"], row["governed_event_hash"]
+                ) == (continuing_event_id, continuing_event_hash)
+            ):
+                return
+            raise DispatchDenied(
+                f"authority is not effective ({str(row['status']).lower()})"
+            )
+
+    @staticmethod
+    def _authority_fact_route(
+        current_state: LifecycleState,
+        fact_kind: AuthorityFactKind,
+        governed_order: GovernedOrder,
+    ) -> LifecycleState:
+        if fact_kind in {AuthorityFactKind.OWN_CONSUMED, AuthorityFactKind.CORRECTION}:
+            return current_state
+        if governed_order is GovernedOrder.AFTER:
+            return current_state
+        if current_state in {
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+            LifecycleState.PAUSED,
+            LifecycleState.PAUSING,
+            LifecycleState.RECONCILIATION_REQUIRED,
+        }:
+            return current_state
+        if current_state in {LifecycleState.RUNNING, LifecycleState.VALIDATING}:
+            return LifecycleState.RECONCILIATION_REQUIRED
+        return LifecycleState.BLOCKED
+
+    @staticmethod
+    def _verify_authority_boundary(
+        connection: sqlite3.Connection,
+        request: AuthorityLifecycleFactRequest,
+    ) -> sqlite3.Row | None:
+        if request.governed_boundary_kind == "NO_ACTION":
+            return None
+        row = connection.execute(
+            "SELECT event_kind, event_hash, repository_id, run_id, item_id, sequence, "
+            "body_json FROM events WHERE event_id = ?",
+            (request.governed_event_id,),
+        ).fetchone()
+        if row is None or row["event_hash"] != request.governed_event_hash:
+            raise DispatchDenied("authority fact governed boundary is unavailable")
+        if (row["repository_id"], row["run_id"], row["item_id"]) != (
+            request.repository_id, request.run_id, request.item_id,
+        ):
+            raise DispatchDenied("authority fact governed boundary changed binding")
+        permitted = {
+            "INTENT": {"INTENT_COMMITTED", "VALIDATOR_INTENT_COMMITTED"},
+            "CLAIM": {"OPERATION_LAUNCH_CLAIMED"},
+            "CONTACT": {"ADAPTER_CONTACT_CLAIMED"},
+            "REDEMPTION": {
+                "INTENT_COMMITTED", "VALIDATOR_INTENT_COMMITTED",
+                "PAUSE_SETTLED", "STOP_RECORDED", "STOP_ESCALATED",
+            },
+        }
+        if row["event_kind"] not in permitted[request.governed_boundary_kind]:
+            raise DispatchDenied("authority fact governed boundary kind is incorrect")
+        return row
+
+    @staticmethod
+    def _authority_redemption_binding(
+        connection: sqlite3.Connection,
+        grant_kind: str,
+        governed_event_id: str,
+    ) -> tuple[str, str, str] | None:
+        if grant_kind == "OPERATOR":
+            row = connection.execute(
+                "SELECT redemption.grant_id, redemption.scope_digest, "
+                "redemption.action FROM operator_redemptions AS redemption "
+                "JOIN command_outcomes AS outcome ON outcome.command_id = "
+                "redemption.command_id WHERE outcome.event_id = ?",
+                (governed_event_id,),
+            ).fetchone()
+            return None if row is None else (
+                str(row["grant_id"]), str(row["scope_digest"]),
+                str(row["action"]),
+            )
+        expected_kind = (
+            "INTENT_COMMITTED"
+            if grant_kind == "EFFECT"
+            else "VALIDATOR_INTENT_COMMITTED"
+        )
+        expected_action = (
+            "EXECUTE_EFFECT" if grant_kind == "EFFECT" else "RUN_VALIDATOR"
+        )
+        row = connection.execute(
+            "SELECT redemption.grant_id, redemption.scope_digest, "
+            "event.event_kind FROM capability_redemptions AS redemption JOIN "
+            "command_outcomes AS outcome ON outcome.command_id = "
+            "redemption.command_id JOIN events AS event ON event.event_id = "
+            "outcome.event_id WHERE outcome.event_id = ?",
+            (governed_event_id,),
+        ).fetchone()
+        if row is None or row["event_kind"] != expected_kind:
+            return None
+        return (
+            str(row["grant_id"]), str(row["scope_digest"]), expected_action,
+        )
+
+    def record_authority_fact(
+        self,
+        request: AuthorityLifecycleFactRequest,
+        evidence: SyntheticAuthorityLifecycleEvidence,
+        authority: SyntheticAuthority,
+        *,
+        expected_head: str,
+        writer_epoch: int,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("authority fact targets another repository")
+        if writer_epoch <= 0:
+            raise ValueError("writer_epoch must be positive")
+        self._bind_classification_authority(authority)
+        authority.verify_authority_lifecycle_evidence(evidence, request)
+        authority.verify_authority_fact_binding(request)
+        request_payload = {
+            **request.__dict__,
+            "fact_kind": request.fact_kind.value,
+            "governed_order": request.governed_order.value,
+        }
+        payload_digest = self._event_hash(
+            request_payload | {
+                "proof_id": evidence.proof_id,
+                "proof_digest": evidence.request_digest,
+                "proof_mac": evidence.issuer_mac,
+                "issuer_fingerprint": evidence.issuer_fingerprint,
+            }
+        )
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(connection, request.repository_id)
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    prior = connection.execute(
+                        "SELECT * FROM authority_facts WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None or prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "authority fact command ID was rebound"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["fact_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM authority_facts WHERE fact_id = ? OR event_id = ?",
+                    (request.fact_id, request.event_id),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError("authority fact identity was rebound")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied("authority fact does not bind the run")
+                plan = connection.execute(
+                    "SELECT logical_effect_id FROM validation_plans WHERE run_id = ?",
+                    (request.run_id,),
+                ).fetchone()
+                if plan is None or plan["logical_effect_id"] != request.logical_effect_id:
+                    raise DispatchDenied("authority fact does not bind the accepted plan")
+                boundary = self._verify_authority_boundary(connection, request)
+                key = (
+                    authority.issuer_fingerprint, request.grant_kind,
+                    request.grant_id, request.action, request.scope_digest,
+                )
+                existing = connection.execute(
+                    "SELECT * FROM effective_authority WHERE "
+                    "issuer_fingerprint = ? AND grant_kind = ? AND grant_id = ? "
+                    "AND action = ? AND scope_digest = ?",
+                    key,
+                ).fetchone()
+                last_generation = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(generation), 0) FROM authority_facts "
+                        "WHERE issuer_fingerprint = ? AND grant_kind = ? AND "
+                        "grant_id = ? AND action = ? AND scope_digest = ?",
+                        key,
+                    ).fetchone()[0]
+                )
+                generation = last_generation + 1
+                fence_id: str | None = None
+                effective_status: str | None = None
+                corrected: sqlite3.Row | None = None
+
+                if request.fact_kind is AuthorityFactKind.OWN_CONSUMED:
+                    if boundary is None:
+                        raise DispatchDenied("own consumption requires its durable use")
+                    use = self._authority_redemption_binding(
+                        connection, request.grant_kind,
+                        str(request.governed_event_id),
+                    )
+                    if use != (
+                        request.grant_id, request.scope_digest, request.action
+                    ):
+                        raise DispatchDenied("own consumption does not bind the durable use")
+                    effective_status = "DENIED"
+                elif request.fact_kind is AuthorityFactKind.CORRECTION:
+                    corrected = connection.execute(
+                        "SELECT * FROM authority_facts WHERE fact_id = ? AND "
+                        "event_hash = ?",
+                        (request.corrected_fact_id, request.corrected_event_hash),
+                    ).fetchone()
+                    if corrected is None or (
+                        corrected["issuer_fingerprint"], corrected["grant_kind"],
+                        corrected["grant_id"], corrected["action"],
+                        corrected["scope_digest"], corrected["repository_id"],
+                    ) != key + (request.repository_id,):
+                        raise DispatchDenied("correction does not bind the exact prior fact")
+                    generation = int(corrected["generation"])
+                else:
+                    effective_status = (
+                        "UNKNOWN"
+                        if request.fact_kind is AuthorityFactKind.CLAIM_STATUS_UNKNOWN
+                        or request.governed_order is GovernedOrder.UNKNOWN
+                        else "DENIED"
+                    )
+                    if request.fact_kind is AuthorityFactKind.CLAIM_STATUS_UNKNOWN:
+                        if boundary is None:
+                            raise DispatchDenied(
+                                "unknown claim status requires the exact local use"
+                            )
+                        use = self._authority_redemption_binding(
+                            connection, request.grant_kind,
+                            str(request.governed_event_id),
+                        )
+                        if use != (
+                            request.grant_id, request.scope_digest,
+                            request.action,
+                        ):
+                            raise DispatchDenied(
+                                "unknown claim status does not bind a local use"
+                            )
+                    if request.fact_kind is AuthorityFactKind.SUPERSEDED:
+                        conflict = connection.execute(
+                            "SELECT predecessor_grant_id, successor_grant_id "
+                            "FROM authority_supersessions WHERE "
+                            "issuer_fingerprint = ? AND grant_kind = ? AND "
+                            "action = ? AND scope_digest = ? AND "
+                            "(predecessor_grant_id = ? OR successor_grant_id = ?)",
+                            (authority.issuer_fingerprint, request.grant_kind,
+                             request.action, request.scope_digest,
+                             request.grant_id, request.successor_grant_id),
+                        ).fetchone()
+                        if conflict is not None:
+                            raise DispatchDenied(
+                                "authority supersession conflicts with an active edge"
+                            )
+                        cursor = request.successor_grant_id
+                        visited: set[str] = set()
+                        while cursor is not None:
+                            if cursor == request.grant_id:
+                                raise DispatchDenied(
+                                    "authority supersession is cyclic"
+                                )
+                            if cursor in visited:
+                                raise StorageIntegrityError(
+                                    "stored authority supersession graph is cyclic"
+                                )
+                            visited.add(cursor)
+                            edge = connection.execute(
+                                "SELECT successor_grant_id FROM "
+                                "authority_supersessions WHERE "
+                                "issuer_fingerprint = ? AND grant_kind = ? AND "
+                                "action = ? AND scope_digest = ? AND "
+                                "predecessor_grant_id = ?",
+                                (authority.issuer_fingerprint,
+                                 request.grant_kind, request.action,
+                                 request.scope_digest, cursor),
+                            ).fetchone()
+                            cursor = (
+                                None if edge is None
+                                else str(edge["successor_grant_id"])
+                            )
+                    if request.governed_order is not GovernedOrder.AFTER:
+                        fence_id = f"authority:{request.fact_id}"
+                    if fence_id is not None:
+                        connection.execute(
+                            "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                            (fence_id, request.repository_id, request.item_id,
+                             request.logical_effect_id,
+                             "AUTHORITY_CURRENT_DENIAL", request.event_id),
+                        )
+
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                resulting_state = self._authority_fact_route(
+                    current_state, request.fact_kind, request.governed_order
+                )
+                if authorize_transition is not None:
+                    authorize_transition(current_state, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                self._require_new_writer_epoch(
+                    connection, request.repository_id, writer_epoch
+                )
+                body = request_payload | {
+                    "event_kind": "AUTHORITY_EVALUATED",
+                    "issuer_fingerprint": authority.issuer_fingerprint,
+                    "proof_id": evidence.proof_id,
+                    "proof_digest": evidence.request_digest,
+                    "proof_mac": evidence.issuer_mac,
+                    "payload_digest": payload_digest,
+                    "generation": generation,
+                    "fence_id": fence_id,
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": resulting_state.value,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'AUTHORITY_EVALUATED', ?, ?, ?)",
+                    (request.event_id, request.repository_id, request.run_id,
+                     request.item_id, sequence, request.command_id, writer_epoch,
+                     previous_hash, event_hash, body_json),
+                )
+                connection.execute(
+                    "INSERT INTO authority_facts VALUES ("
+                    + ", ".join("?" for _ in range(29)) + ")",
+                    (
+                        request.fact_id, request.command_id, request.event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, authority.issuer_fingerprint,
+                        request.grant_kind, request.grant_id, request.action,
+                        request.scope_digest, request.fact_kind.value,
+                        request.governed_order.value,
+                        request.governed_boundary_kind,
+                        request.governed_event_id, request.governed_event_hash,
+                        request.successor_grant_id, request.corrected_fact_id,
+                        request.corrected_event_hash, evidence.proof_id,
+                        evidence.request_digest, evidence.issuer_mac,
+                        generation, fence_id,
+                        payload_digest, event_hash, resulting_state.value,
+                        body_json,
+                    ),
+                )
+                if effective_status is not None:
+                    connection.execute(
+                        "INSERT OR REPLACE INTO effective_authority VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        key + (effective_status, generation, request.fact_id,
+                               request.event_id, fence_id),
+                    )
+                elif request.fact_kind is AuthorityFactKind.CORRECTION:
+                    assert corrected is not None
+                    if corrected["fence_id"] is not None:
+                        connection.execute(
+                            "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                            (corrected["fence_id"],),
+                        )
+                    connection.execute(
+                        "DELETE FROM authority_supersessions WHERE "
+                        "originating_fact_id = ?",
+                        (request.corrected_fact_id,),
+                    )
+                    replacement = connection.execute(
+                        "SELECT fact.* FROM authority_facts AS fact JOIN events "
+                        "AS event ON event.event_id = fact.event_id WHERE "
+                        "fact.issuer_fingerprint = ? AND fact.grant_kind = ? "
+                        "AND fact.grant_id = ? AND fact.action = ? AND "
+                        "fact.scope_digest = ? AND fact.fact_kind <> "
+                        "'CORRECTION' AND NOT EXISTS ("
+                        "SELECT 1 FROM authority_facts AS correction WHERE "
+                        "correction.fact_kind = 'CORRECTION' AND "
+                        "correction.corrected_fact_id = fact.fact_id AND "
+                        "correction.corrected_event_hash = fact.event_hash) "
+                        "ORDER BY event.writer_epoch DESC, event.sequence DESC LIMIT 1",
+                        key,
+                    ).fetchone()
+                    if replacement is None:
+                        connection.execute(
+                            "DELETE FROM effective_authority WHERE "
+                            "issuer_fingerprint = ? AND grant_kind = ? AND "
+                            "grant_id = ? AND action = ? AND scope_digest = ?",
+                            key,
+                        )
+                    else:
+                        replacement_status = (
+                            "UNKNOWN"
+                            if replacement["fact_kind"]
+                            == AuthorityFactKind.CLAIM_STATUS_UNKNOWN.value
+                            or replacement["governed_order"]
+                            == GovernedOrder.UNKNOWN.value
+                            else "DENIED"
+                        )
+                        connection.execute(
+                            "INSERT OR REPLACE INTO effective_authority VALUES "
+                            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            key + (
+                                replacement_status,
+                                int(replacement["generation"]),
+                                replacement["fact_id"],
+                                replacement["event_id"],
+                                replacement["fence_id"],
+                            ),
+                        )
+                if request.fact_kind is AuthorityFactKind.SUPERSEDED:
+                    connection.execute(
+                        "INSERT INTO authority_supersessions VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?)",
+                        (authority.issuer_fingerprint, request.grant_id,
+                         request.successor_grant_id, request.grant_kind,
+                         request.action, request.scope_digest, request.fact_id),
+                    )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (request.command_id, payload_digest, request.event_id,
+                     sequence, event_hash),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (resulting_state.value, sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_authority_fact_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_authority_fact_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.fact_id, request.command_id, request.event_id, sequence,
+            event_hash, resulting_state, False,
+        )
+
     def _finalize_operation(
         self,
         request: FinalizeOperationRequest,
@@ -10988,6 +11610,98 @@ class SQLiteStateStore:
         readiness_evaluations = [
             json.loads(row["body_json"]) for row in readiness_event_rows
         ]
+        authority_event_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'AUTHORITY_EVALUATED' ORDER BY writer_epoch, sequence",
+            (repository_id,),
+        ).fetchall()
+        authority_facts = [
+            json.loads(row["body_json"]) for row in authority_event_rows
+        ]
+        for body in authority_facts:
+            try:
+                values = {
+                    key: body[key]
+                    for key in AuthorityLifecycleFactRequest.__dataclass_fields__
+                }
+                values["fact_kind"] = AuthorityFactKind(body["fact_kind"])
+                values["governed_order"] = GovernedOrder(body["governed_order"])
+                fact_request = AuthorityLifecycleFactRequest(**values)
+                fact_request.validate()
+                if self._classification_authority is None:
+                    raise StorageIntegrityError(
+                        "authority fact recovery requires the recorded issuer"
+                    )
+                self._require_plan_issuer(
+                    connection, repository_id, str(body["run_id"]),
+                    self._classification_authority,
+                )
+                self._classification_authority.verify_authority_lifecycle_evidence(
+                    SyntheticAuthorityLifecycleEvidence(
+                        str(body["proof_id"]), str(body["proof_digest"]),
+                        str(body["issuer_fingerprint"]), str(body["proof_mac"]),
+                    ),
+                    fact_request,
+                )
+                expected_payload_digest = self._event_hash(
+                    {
+                        **fact_request.__dict__,
+                        "fact_kind": fact_request.fact_kind.value,
+                        "governed_order": fact_request.governed_order.value,
+                    }
+                    | {
+                        "proof_id": body["proof_id"],
+                        "proof_digest": body["proof_digest"],
+                        "proof_mac": body["proof_mac"],
+                        "issuer_fingerprint": body["issuer_fingerprint"],
+                    }
+                )
+                if body["payload_digest"] != expected_payload_digest:
+                    raise ValueError("authority fact payload digest is invalid")
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "authority fact proof or schema is invalid"
+                ) from error
+        expected_authority_facts = {
+            body["fact_id"]: (
+                body["command_id"], body["event_id"], body["repository_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["issuer_fingerprint"], body["grant_kind"], body["grant_id"],
+                body["action"], body["scope_digest"], body["fact_kind"],
+                body["governed_order"], body["governed_boundary_kind"],
+                body["governed_event_id"], body["governed_event_hash"],
+                body["successor_grant_id"], body["corrected_fact_id"],
+                body["corrected_event_hash"], body["proof_id"],
+                body["proof_digest"], body["proof_mac"], int(body["generation"]),
+                body["fence_id"], body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in authority_facts
+        }
+        actual_authority_facts = {
+            row["fact_id"]: (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["issuer_fingerprint"], row["grant_kind"], row["grant_id"],
+                row["action"], row["scope_digest"], row["fact_kind"],
+                row["governed_order"], row["governed_boundary_kind"],
+                row["governed_event_id"], row["governed_event_hash"],
+                row["successor_grant_id"], row["corrected_fact_id"],
+                row["corrected_event_hash"], row["proof_id"],
+                row["proof_digest"], row["proof_mac"], int(row["generation"]),
+                row["fence_id"], row["payload_digest"], row["event_hash"],
+                row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM authority_facts WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_authority_facts != expected_authority_facts:
+            raise StorageIntegrityError(
+                "authority-fact projection diverges from event history"
+            )
         expected_outcomes = {
             body["command_id"]: (
                 self._payload_digest(
@@ -11036,6 +11750,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in readiness_evaluations
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in authority_facts
             }
         )
         observation_event_rows = connection.execute(
@@ -12121,6 +12844,132 @@ class SQLiteStateStore:
                 (repository_id,),
             )
         }
+        authority_active: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
+        authority_by_fact = {body["fact_id"]: body for body in authority_facts}
+        corrected_fact_ids: set[str] = set()
+        generations: dict[tuple[str, str, str, str, str], int] = {}
+        for body in authority_facts:
+            key = (
+                str(body["issuer_fingerprint"]), str(body["grant_kind"]),
+                str(body["grant_id"]), str(body["action"]),
+                str(body["scope_digest"]),
+            )
+            kind = AuthorityFactKind(str(body["fact_kind"]))
+            if kind is AuthorityFactKind.CORRECTION:
+                corrected = authority_by_fact.get(str(body["corrected_fact_id"]))
+                if corrected is None or (
+                    self._event_hash(corrected) != body.get("corrected_event_hash")
+                    or (
+                        corrected["issuer_fingerprint"], corrected["grant_kind"],
+                        corrected["grant_id"], corrected["action"],
+                        corrected["scope_digest"],
+                    ) != key
+                    or int(body["generation"]) != int(corrected["generation"])
+                ):
+                    raise StorageIntegrityError(
+                        "authority correction lost its exact prior fact"
+                    )
+                corrected_fact_ids.add(str(body["corrected_fact_id"]))
+            else:
+                expected_generation = generations.get(key, 0) + 1
+                if int(body["generation"]) != expected_generation:
+                    raise StorageIntegrityError(
+                        "authority fact generation diverges from history"
+                    )
+                generations[key] = expected_generation
+
+        expected_supersessions: dict[
+            tuple[str, str, str, str, str], tuple[str, str]
+        ] = {}
+        for body in authority_facts:
+            key = (
+                str(body["issuer_fingerprint"]), str(body["grant_kind"]),
+                str(body["grant_id"]), str(body["action"]),
+                str(body["scope_digest"]),
+            )
+            kind = AuthorityFactKind(str(body["fact_kind"]))
+            if (
+                kind is not AuthorityFactKind.CORRECTION
+                and str(body["fact_id"]) not in corrected_fact_ids
+            ):
+                authority_active[key] = body
+            if (
+                kind is AuthorityFactKind.SUPERSEDED
+                and str(body["fact_id"]) not in corrected_fact_ids
+            ):
+                supersession_key = (key[0], key[1], key[2], key[3], key[4])
+                successor = str(body["successor_grant_id"])
+                if supersession_key in expected_supersessions or any(
+                    existing_key[0] == key[0]
+                    and existing_key[1] == key[1]
+                    and existing_key[3:] == key[3:]
+                    and existing[0] == successor
+                    for existing_key, existing in expected_supersessions.items()
+                ):
+                    raise StorageIntegrityError(
+                        "authority supersession graph has a conflicting edge"
+                    )
+                expected_supersessions[supersession_key] = (
+                    successor, str(body["fact_id"]),
+                )
+
+        for graph_key, edge in expected_supersessions.items():
+            issuer, grant_kind, predecessor, action, scope_digest = graph_key
+            cursor = edge[0]
+            visited: set[str] = set()
+            while cursor is not None:
+                if cursor == predecessor or cursor in visited:
+                    raise StorageIntegrityError(
+                        "authority supersession graph is cyclic"
+                    )
+                visited.add(cursor)
+                successor_edge = expected_supersessions.get(
+                    (issuer, grant_kind, cursor, action, scope_digest)
+                )
+                cursor = None if successor_edge is None else successor_edge[0]
+
+        expected_effective = {
+            key: (
+                (
+                    "UNKNOWN"
+                    if body["fact_kind"] == AuthorityFactKind.CLAIM_STATUS_UNKNOWN.value
+                    or body["governed_order"] == GovernedOrder.UNKNOWN.value
+                    else "DENIED"
+                ),
+                int(body["generation"]), str(body["fact_id"]),
+                str(body["event_id"]), body["fence_id"],
+            )
+            for key, body in authority_active.items()
+        }
+        actual_effective = {
+            (
+                row["issuer_fingerprint"], row["grant_kind"], row["grant_id"],
+                row["action"], row["scope_digest"],
+            ): (
+                row["status"], int(row["generation"]),
+                row["originating_fact_id"], row["originating_event_id"],
+                row["fence_id"],
+            )
+            for row in connection.execute("SELECT * FROM effective_authority")
+        }
+        if actual_effective != expected_effective:
+            raise StorageIntegrityError(
+                "effective-authority projection diverges from history"
+            )
+        actual_supersessions = {
+            (
+                row["issuer_fingerprint"], row["grant_kind"],
+                row["predecessor_grant_id"], row["action"],
+                row["scope_digest"],
+            ): (
+                row["successor_grant_id"], row["originating_fact_id"],
+            )
+            for row in connection.execute("SELECT * FROM authority_supersessions")
+        }
+        if actual_supersessions != expected_supersessions:
+            raise StorageIntegrityError(
+                "authority-supersession projection diverges from history"
+            )
         expected_fences: dict[str, tuple[str | None, str | None, str, str]] = {}
         expected_fences.update(
             {
@@ -12128,6 +12977,18 @@ class SQLiteStateStore:
                     None, None, body["reason_code"], body["request_event_id"]
                 )
                 for body in pauses
+            }
+        )
+        expected_fences.update(
+            {
+                str(body["fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    "AUTHORITY_CURRENT_DENIAL", str(body["event_id"]),
+                )
+                for body in authority_facts
+                if body["fact_kind"] != AuthorityFactKind.CORRECTION.value
+                and str(body["fact_id"]) not in corrected_fact_ids
+                and body["fence_id"] is not None
             }
         )
         expected_fences.update(
@@ -12698,6 +13559,42 @@ class SQLiteStateStore:
                     connection, body, predecessor_state,
                     expected_cursors.get(run_id),
                 )
+            if row["event_kind"] == "AUTHORITY_EVALUATED":
+                try:
+                    predecessor_state = LifecycleState(
+                        expected_lifecycle[run_id]
+                    )
+                    fact_kind = AuthorityFactKind(str(body["fact_kind"]))
+                    governed_order = GovernedOrder(str(body["governed_order"]))
+                    expected_state = self._authority_fact_route(
+                        predecessor_state, fact_kind, governed_order
+                    )
+                    boundary = self._verify_authority_boundary(
+                        connection,
+                        AuthorityLifecycleFactRequest(
+                            **{
+                                key: body[key]
+                                for key in AuthorityLifecycleFactRequest.__dataclass_fields__
+                            }
+                            | {
+                                "fact_kind": fact_kind,
+                                "governed_order": governed_order,
+                            }
+                        ),
+                    )
+                    if boundary is not None and int(boundary["sequence"]) >= int(
+                        body["sequence"]
+                    ):
+                        raise ValueError("authority boundary is not historical")
+                    if (
+                        body["lifecycle_from"] != predecessor_state.value
+                        or body["lifecycle_to"] != expected_state.value
+                    ):
+                        raise ValueError("authority lifecycle route diverges")
+                except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "authority lifecycle semantics are invalid"
+                    ) from error
             if row["event_kind"] == "OPERATION_FINALIZED":
                 try:
                     predecessor_state = LifecycleState(

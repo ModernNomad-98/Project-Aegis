@@ -408,6 +408,36 @@ stop findings are independently accepted and the aggregate stop gate is
 `APPROVE`. Full-row/family traceability remains unclaimed where the matrix says
 `UNVERIFIED`; PR #99 remains draft and not merge-ready for the remaining backlog.
 
+### 5.7 T13 authority lifecycle checkpoint
+
+T13 is implemented and independently accepted. Typed, issuer-authenticated
+synthetic lifecycle facts cover expiry, revocation, supersession, foreign and
+own consumption, source unavailability, unknown local claim status and exact
+correction. One atomic event records the governed boundary/order, durable
+grant-wide effective-authority generation, scoped provenance fence and
+deterministic lifecycle result. Effect, validator and operator consumers consult
+the index, with a second exact check before adapter contact.
+
+Corrections rematerialize the newest remaining uncorrected prohibition rather
+than erasing stacked facts. Typed supersession graphs admit independent acyclic
+chains by issuer/kind/action/scope, reject conflicts and reachability cycles, and
+remove only an exactly corrected edge. Lawful own consumption remains a durable
+future-use denial while allowing only its exact already-committed intent to
+continue through launch/contact. Terminal lifecycle never reopens.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` rounds clarified the fact/order table, claim-status retention, typed graph, exact correction and lifecycle routes; corrected plan `APPROVE` |
+| Focused first falsification | Failed because `record_authority_fact` was absent; passed after the typed durable route |
+| Complete delivery-control package | Exit 0; 242 tests; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | `REVISE` findings for stacked correction, claim-kind binding, graph reachability/namespacing and own-use continuation were corrected; final `APPROVE`, no remaining blocker/major; reviewer passed 16 focused tests |
+
+This promotes T13 itself to `YES/YES/YES`. It establishes the T13 slices of C08
+and F03 only; full cross-family C08/F03 traceability remains `UNVERIFIED`. T15 is
+the next ordered item, followed by T14. PR #99 remains draft and not merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

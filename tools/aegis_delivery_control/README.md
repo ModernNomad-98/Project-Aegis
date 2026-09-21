@@ -50,6 +50,14 @@ fixture. It is not a delivery integration.
   and R-STOP-02 are independently accepted. Immediate T19 stop now also charges
   exact contacted, unresolved effect or validator liability at worst case in the
   same transaction. All three stop findings are independently accepted.
+- T13 now ingests issuer-authenticated synthetic expiry, revocation,
+  supersession, consumption, availability, unknown-claim and exact correction
+  facts. A durable grant-wide effective-authority index is checked by effect,
+  validator and operator consumers and again before adapter contact. Ordered
+  historical disputes fence the affected provenance without changing terminal
+  lifecycle; lawful own consumption permits only its exact in-flight action to
+  continue while denying later reuse. Recovery reconstructs typed supersession
+  graphs, stacked prohibitions and exact correction generations.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -103,7 +111,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 226 tests successfully, and
+controller. The complete local package suite ran 242 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -118,6 +126,9 @@ crash/replay, recovery and tamper validation:
 R-STOP-03 now atomically classifies post-contact/pre-receipt uncertainty as
 `UNKNOWN_WORST_CASE_CHARGED`, with exact historical recovery, crash/replay,
 late-adjustment and alias/tamper coverage. The aggregate stop gate is `APPROVE`.
+T13 authority lifecycle intake also received independent implementation
+`APPROVE` after stacked-correction, typed supersession, cross-kind redemption,
+own-consumption continuation, crash/replay, recovery and tamper review.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

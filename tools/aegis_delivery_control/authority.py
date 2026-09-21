@@ -9,7 +9,12 @@ import secrets
 import threading
 from dataclasses import dataclass
 
-from .contracts import BudgetSettlementRequest, DispatchDenied, FailureClassification
+from .contracts import (
+    AuthorityLifecycleFactRequest,
+    BudgetSettlementRequest,
+    DispatchDenied,
+    FailureClassification,
+)
 
 SYNTHETIC_FAILURE_POLICY_ID = "failure-policy"
 SYNTHETIC_FAILURE_POLICY_VERSION = "1"
@@ -211,6 +216,14 @@ class SyntheticValidatorCessationAttestation:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticAuthorityLifecycleEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -241,6 +254,127 @@ class SyntheticAuthority:
     @property
     def issuer_fingerprint(self) -> str:
         return hashlib.sha256(self._issuer_key).hexdigest()
+
+    @staticmethod
+    def _authority_fact_digest(request: AuthorityLifecycleFactRequest) -> str:
+        payload = {
+            **request.__dict__,
+            "fact_kind": request.fact_kind.value,
+            "governed_order": request.governed_order.value,
+        }
+        return hashlib.sha256(
+            json.dumps(
+                payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_authority_lifecycle_evidence(
+        self, proof_id: str, request: AuthorityLifecycleFactRequest
+    ) -> SyntheticAuthorityLifecycleEvidence:
+        request.validate()
+        self.verify_authority_fact_binding(request)
+        if not proof_id.strip():
+            raise ValueError("authority lifecycle proof ID must be non-empty")
+        digest = self._authority_fact_digest(request)
+        return SyntheticAuthorityLifecycleEvidence(
+            proof_id,
+            digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "AUTHORITY_LIFECYCLE_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_authority_fact_binding(
+        self, request: AuthorityLifecycleFactRequest
+    ) -> None:
+        request.validate()
+        with self._lock:
+            if request.grant_kind == "EFFECT":
+                grant = self._grants.get(request.grant_id)
+                binding = (
+                    grant.repository_id, grant.logical_effect_id,
+                    "EXECUTE_EFFECT", grant.scope_digest,
+                ) if grant is not None else None
+                requested = (
+                    request.repository_id, request.logical_effect_id,
+                    request.action, request.scope_digest,
+                )
+                grants: dict[str, object] = self._grants
+            elif request.grant_kind == "VALIDATOR":
+                grant = self._validator_grants.get(request.grant_id)
+                binding = (
+                    grant.repository_id, grant.logical_effect_id,
+                    "RUN_VALIDATOR", grant.scope_digest,
+                ) if grant is not None else None
+                requested = (
+                    request.repository_id, request.logical_effect_id,
+                    request.action, request.scope_digest,
+                )
+                grants = self._validator_grants
+            else:
+                grant = self._operator_grants.get(request.grant_id)
+                binding = (
+                    grant.repository_id, grant.run_id, grant.action,
+                    grant.scope_digest,
+                ) if grant is not None else None
+                requested = (
+                    request.repository_id, request.run_id, request.action,
+                    request.scope_digest,
+                )
+                grants = self._operator_grants
+            if binding != requested:
+                raise DispatchDenied(
+                    "authority lifecycle fact grant binding mismatch"
+                )
+            if request.successor_grant_id is not None:
+                successor = grants.get(request.successor_grant_id)
+                if successor is None:
+                    raise DispatchDenied(
+                        "authority supersession successor is unavailable"
+                    )
+                if request.grant_kind == "EFFECT":
+                    successor_binding = (
+                        successor.repository_id, successor.logical_effect_id,
+                        "EXECUTE_EFFECT", successor.scope_digest,
+                    )
+                elif request.grant_kind == "VALIDATOR":
+                    successor_binding = (
+                        successor.repository_id, successor.logical_effect_id,
+                        "RUN_VALIDATOR", successor.scope_digest,
+                    )
+                else:
+                    successor_binding = (
+                        successor.repository_id, successor.run_id,
+                        successor.action, successor.scope_digest,
+                    )
+                if successor_binding != requested:
+                    raise DispatchDenied(
+                        "authority supersession successor binding mismatch"
+                    )
+
+    def verify_authority_lifecycle_evidence(
+        self,
+        evidence: SyntheticAuthorityLifecycleEvidence,
+        request: AuthorityLifecycleFactRequest,
+    ) -> None:
+        request.validate()
+        digest = self._authority_fact_digest(request)
+        expected = self._mac(
+            "AUTHORITY_LIFECYCLE_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected)
+        ):
+            raise DispatchDenied("authority lifecycle evidence was not issued here")
 
     @property
     def finalization_issuer_fingerprint(self) -> str:

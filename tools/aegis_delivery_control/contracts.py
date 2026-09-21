@@ -41,6 +41,111 @@ class StopMode(str, Enum):
     IMMEDIATE = "IMMEDIATE"
 
 
+class AuthorityFactKind(str, Enum):
+    EXPIRED = "EXPIRED"
+    REVOKED = "REVOKED"
+    SUPERSEDED = "SUPERSEDED"
+    FOREIGN_CONSUMED = "FOREIGN_CONSUMED"
+    OWN_CONSUMED = "OWN_CONSUMED"
+    SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
+    CLAIM_STATUS_UNKNOWN = "CLAIM_STATUS_UNKNOWN"
+    CORRECTION = "CORRECTION"
+
+
+class GovernedOrder(str, Enum):
+    BEFORE = "BEFORE"
+    DURING = "DURING"
+    AFTER = "AFTER"
+    UNKNOWN = "UNKNOWN"
+
+
+@dataclass(frozen=True)
+class AuthorityLifecycleFactRequest:
+    fact_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    grant_kind: str
+    grant_id: str
+    action: str
+    scope_digest: str
+    fact_kind: AuthorityFactKind
+    governed_order: GovernedOrder
+    governed_boundary_kind: str
+    governed_event_id: str | None
+    governed_event_hash: str | None
+    successor_grant_id: str | None = None
+    corrected_fact_id: str | None = None
+    corrected_event_hash: str | None = None
+
+    def validate(self) -> None:
+        required = (
+            self.fact_id, self.command_id, self.event_id, self.repository_id,
+            self.run_id, self.item_id, self.logical_effect_id,
+            self.grant_kind, self.grant_id, self.action, self.scope_digest,
+            self.governed_boundary_kind,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("authority fact identifiers must be non-empty")
+        if self.grant_kind not in {"EFFECT", "VALIDATOR", "OPERATOR"}:
+            raise ValueError("authority fact grant kind is unsupported")
+        if self.governed_boundary_kind not in {
+            "NO_ACTION", "INTENT", "CLAIM", "CONTACT", "REDEMPTION",
+        }:
+            raise ValueError("authority fact boundary kind is unsupported")
+        boundary = (self.governed_event_id, self.governed_event_hash)
+        if self.governed_boundary_kind == "NO_ACTION":
+            if boundary != (None, None):
+                raise ValueError("NO_ACTION boundary cannot carry an event")
+        elif any(
+            value is None or not isinstance(value, str) or not value.strip()
+            for value in boundary
+        ):
+            raise ValueError("authority fact boundary event is required")
+        if self.fact_kind is AuthorityFactKind.SUPERSEDED:
+            if (
+                not self.successor_grant_id
+                or self.successor_grant_id == self.grant_id
+            ):
+                raise ValueError("supersession requires a distinct successor")
+        elif self.successor_grant_id is not None:
+            raise ValueError("successor is valid only for supersession")
+        correction_fields = (
+            self.corrected_fact_id, self.corrected_event_hash,
+        )
+        if self.fact_kind is AuthorityFactKind.CORRECTION:
+            if any(
+                value is None or not isinstance(value, str) or not value.strip()
+                for value in correction_fields
+            ):
+                raise ValueError("correction requires exact prior fact binding")
+        elif correction_fields != (None, None):
+            raise ValueError("correction binding is valid only for correction")
+        if (
+            self.governed_order in {GovernedOrder.DURING, GovernedOrder.AFTER}
+            and self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("ordered authority fact requires a governed event")
+        if self.fact_kind is AuthorityFactKind.OWN_CONSUMED and (
+            self.governed_order is not GovernedOrder.DURING
+            or self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("own consumption requires its exact governed use")
+        if self.fact_kind is AuthorityFactKind.CLAIM_STATUS_UNKNOWN and (
+            self.governed_order is not GovernedOrder.UNKNOWN
+            or self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("unknown claim status requires its exact local use")
+        if (
+            self.fact_kind is AuthorityFactKind.SOURCE_UNAVAILABLE
+            and self.governed_order is not GovernedOrder.UNKNOWN
+        ):
+            raise ValueError("source unavailability has unknown governed ordering")
+
+
 @dataclass(frozen=True)
 class IntentRequest:
     repository_id: str
