@@ -122,6 +122,12 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t14_coordinator_exposes_resume_route(self) -> None:
+        self.assertTrue(
+            hasattr(SyntheticDispatchCoordinator, "resume"),
+            "T14 requires a coordinator-owned resume route",
+        )
+
     @staticmethod
     def state_environment(root: Path) -> dict[str, str]:
         if sys.platform == "win32":

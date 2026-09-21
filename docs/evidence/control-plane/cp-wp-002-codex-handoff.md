@@ -7,7 +7,7 @@ Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13 AND T15 `APPROVE`**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15 AND T14 CORE SLICE `APPROVE`**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -429,6 +429,48 @@ was committed with DCO sign-off and pushed as
 `windows-offline-checks` passed on that exact head. PR #99 remained open, draft
 and blocked as intended.
 
+### Stage 9 - T14 pause-source resume slice
+
+The T14 plan required two `REVISE` audits before `APPROVE`. The corrected plan
+bound resume to the exact durable pause source and complete current run-head
+vector, required full signed capability/request evidence, derived routing from
+the historical prefix, cleared only the source pause fence and preserved every
+other blocker, slot and accounting fact. It also selected a compatibility-safe
+legacy projection migration and explicitly deferred the public clean-VALIDATING
+integration to the ordered T08 work rather than fabricating T08 history.
+
+Changed production files: `contracts.py` adds the typed `ResumeRequest` and
+history-derived optional pause cursor; `authority.py` signs/verifies exact
+synthetic resume evidence and supports the RESUME operator action; `dispatch.py`
+adds the engine-authorized coordinator route; `storage.py` adds exact schema and
+legacy migration, atomic persistence/fence clearance, blocker routing, replay,
+full-prefix recovery and projection verification. `test_storage.py` and
+`test_dispatch.py` provide 21 focused contract, evidence, routing, migration,
+crash/replay, recovery and self-consistent-tamper tests. The status READMEs,
+durable backlog and this handoff are the only documentation changes. Canonical
+design, approval register, BER, dependencies, CI, CLI, artifacts/caches and real
+authority/adapters were intentionally untouched.
+
+The first implementation review returned `REVISE` with four MAJOR findings and
+no blocker: recovery accepted surplus resume fields, reconstructed a non-null
+cursor from the wrong field, disagreed with true pre-T14 cursor migration and
+treated an unrelated run's active validator as owned activity. Exact resume
+schema/type/nested-shape validation, resume-specific cursor replay, shared legacy
+prefix derivation with transactional rollback and run-scoped validator history
+closed those findings. Corrected review returned `APPROVE` with no remaining
+blocker or major and independently passed all 21 focused tests.
+
+The focused T14 slice passed 21 tests in 0.957 seconds; the affected storage and
+dispatch modules passed 255 tests in 21.039 seconds; the complete package passed
+277 tests in 22.194 seconds. Reviewer-focused validation passed 21 tests in
+0.982 seconds; skill validation reported 184 valid with zero warnings; validator
+self-tests passed 91 assertions; and diff-check was clean apart from line-ending notices. T14
+remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition because the
+exact public-path clean VALIDATING route depends on T08. C06/C07 and
+F03/F05/F06/F12/F14/F21 also remain `UNVERIFIED`; only their narrow interactions
+with this reviewed slice were exercised. Commit, push and hosted-check evidence
+will be appended after the reviewed working tree is delivered.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -475,6 +517,12 @@ and blocked as intended.
 | `git push origin feat/cp-wp-002-offline-kernel` after T15 | Remote branch advanced `7114bc7..2de3626` |
 | Live PR #99 read on T15 implementation head | OPEN; DRAFT; BLOCKED; head `2de362612f43c125829ff8c73e22bcdcfa6147c0` |
 | Hosted checks on exact T15 implementation head | `gate-guard` passed in 5s; `validate-skills` passed in 1m24s; `windows-offline-checks` passed in 2m59s |
+| T14 plan audits | Two `REVISE` rounds, then `APPROVE`; exact source/current bindings, compatibility migration, prefix route, MAC evidence and deferred T08 integration were explicit |
+| T14 focused suite after corrections | `Ran 21 tests in 0.957s`; `OK` |
+| T14 affected storage/dispatch modules | `Ran 255 tests in 21.039s`; `OK` |
+| T14 complete delivery-control package | `Ran 277 tests in 22.194s`; `OK` |
+| T14 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent T14 implementation review | Initial `REVISE` with four MAJOR recovery findings; corrected `APPROVE`, no remaining blocker/major; reviewer independently ran 21 tests in 0.982s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -565,7 +613,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 256 passing tests, a registry entry or an earlier milestone
+complete from the 277 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -594,7 +642,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
-| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED resume slice independently accepted; clean VALIDATING public path awaits T08 |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
 | T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
@@ -665,8 +713,8 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T15 complete and independently accepted; T14 next.
-2. T05-T09.
+1. T15 complete and independently accepted; T14 core slice accepted with full transition still UNVERIFIED pending T08.
+2. T05-T09 next.
 3. T17 with F02/F11/F12/F21.
 4. T22.
 5. T28 with F01.
@@ -759,8 +807,9 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13 and T15 are independently accepted as
-  recorded in Stages 4-8; later exact-head backlog and final review gates remain.
+- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15 and the T14 PLANNED/BLOCKED core
+  slice are independently accepted as recorded in Stages 4-9; full T14 remains
+  UNVERIFIED pending T08 and later exact-head/final review gates remain.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -773,6 +822,7 @@ owner before interpreting it more broadly.
 
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
-stop findings, T13 and T15 are complete. The next code change follows the
-documented order at T14, then T05-T09, not dashboard work. Keep PR #99 draft until every remaining backlog
+stop findings, T13, T15 and the reviewed T14 core slice are accepted. The next
+code change follows the documented order at T05-T09; T08 must close the public
+VALIDATING resume gap before full T14 promotion. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

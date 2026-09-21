@@ -20,6 +20,7 @@ from .authority import (
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
+    SyntheticResumeEvidence,
     SyntheticValidatorCapability,
 )
 from .contracts import (
@@ -37,6 +38,7 @@ from .contracts import (
     ObservationReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    ResumeRequest,
     StopMode,
     StopEscalationRequest,
     StopRequest,
@@ -126,6 +128,33 @@ class SyntheticDispatchCoordinator:
         return self._store.stop(
             request,
             capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def resume(
+        self,
+        request: ResumeRequest,
+        capability: SyntheticOperatorCapability,
+        resume_evidence: SyntheticResumeEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T14",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T14"].required_guards,
+            )
+
+        return self._store.resume(
+            request,
+            capability,
+            resume_evidence,
             self._authority,
             authorize_transition=authorize,
             failure_hook=failure_hook,

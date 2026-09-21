@@ -622,9 +622,9 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 256-test package suite passes locally; all three stop findings, T13
-authority lifecycle intake and T15 binding-mismatch handling have independent
-`APPROVE`. The PR remains draft and
+its full 277-test package suite passes locally; all three stop findings, T13
+authority lifecycle intake, T15 binding-mismatch handling and the T14
+PLANNED/BLOCKED resume slice have independent `APPROVE`. The PR remains draft and
 not merge-ready while the exact
 T/C/F backlog and final review gates remain. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before

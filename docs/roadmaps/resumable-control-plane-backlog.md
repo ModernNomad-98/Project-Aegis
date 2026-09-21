@@ -474,6 +474,41 @@ show that T15 does not change an existing effect key/descriptor, accepted plan,
 slot or accounting state, but full F01 remains `UNVERIFIED` for the later T28
 work. T14 is the next ordered item. PR #99 remains draft and not merge-ready.
 
+### 5.9 T14 pause-source resume checkpoint
+
+The reviewed T14 slice adds a typed resume request, issuer-authenticated exact
+request evidence and a coordinator-owned route from durable PAUSED history. The
+state owner verifies the current catalog and complete run-head vector, accepted
+plan/revision, exact pause settlement and active pause fence. One transaction
+appends `RESUME_ACCEPTED`, clears only the source pause fence, redeems the
+operator grant and updates the run/catalog heads. Other fences, readiness
+blockers, the repository-wide slot, accounting and intervening facts survive.
+Unresolved activity owned by the resumed run still requires T17; unrelated-run
+activity yields BLOCKED without making the committed resume unrecoverable.
+
+Recovery verifies the exact event and nested evidence schemas, issuer MACs,
+full historical prefix, route, cursor and projections. A compatibility-safe
+migration adds preserved lifecycle/cursor columns to the legacy pause projection,
+derives their values from verified pre-pause history and does not rewrite legacy
+event bodies. Partial schemas and malformed prefixes fail transactionally.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Two `REVISE` rounds closed source-pause/current-vector, legacy migration, route, capability-MAC and public VALIDATING-path scope gaps; corrected plan `APPROVE` |
+| Focused first falsifications | Typed request, coordinator route, signed evidence, authority action, durable route and recovery tests failed before their narrow implementations; the later review probes reproduced four additional recovery gaps before correction |
+| Focused T14 suite | Exit 0; 21 tests in 0.957 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 255 tests in 21.039 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 277 tests in 22.194 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found surplus-schema acceptance, non-null cursor replay, true-legacy projection and cross-run validator divergences; corrected final `APPROVE`, no remaining blocker/major; reviewer passed 21 focused tests in 0.982 seconds |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+T14 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. The
+reviewed PLANNED/BLOCKED resume slice and narrow C06/C07 and F03/F05/F06/F12/F14/F21
+interactions do not establish those complete families. Exact public-path clean
+VALIDATING resume is intentionally deferred to the ordered T08 work. T05-T09 is
+next; PR #99 remains draft and not merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

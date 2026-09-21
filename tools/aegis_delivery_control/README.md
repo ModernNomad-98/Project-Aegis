@@ -66,6 +66,15 @@ fixture. It is not a delivery integration.
   stays paused, and active or uncertain work enters reconciliation without
   changing the accepted effect identity, plan, slot or accounting projections.
   Legacy unpinned plan events remain readable but cannot accept a new T15 fact.
+- T14 now accepts an issuer-authenticated, exact-head resume request only from a
+  durable pause source. The atomic `RESUME_ACCEPTED` transaction clears exactly
+  that pause fence, retains every other fence, slot and accounting obligation,
+  and routes clean PLANNED work back to PLANNED while retaining readiness,
+  recovery and FINALIZING blockers in BLOCKED. Recovery verifies the complete
+  run-head vector, signed request/capability evidence, exact event schema and
+  historical route. Pre-T14 pause projections migrate transactionally without
+  rewriting immutable event bodies. A public-path clean VALIDATING resume still
+  depends on the ordered T08 pause-validation work and remains unverified.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -119,7 +128,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 256 tests successfully, and
+controller. The complete local package suite ran 277 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -140,6 +149,11 @@ own-consumption continuation, crash/replay, recovery and tamper review.
 T15 binding-mismatch handling received independent implementation `APPROVE`
 after its initial active-`BLOCKED` routing finding was corrected and re-tested
 against idle, paused, active, uncertain and terminal cases.
+The T14 PLANNED/BLOCKED resume slice received independent implementation
+`APPROVE` after four recovery findings were corrected: exact event-schema
+validation, non-null cursor reconstruction, true legacy cursor migration and
+run-scoped active-validator recovery. T14 remains `UNVERIFIED` as a complete
+transition until T08 supplies the public clean-VALIDATING pause/resume path.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

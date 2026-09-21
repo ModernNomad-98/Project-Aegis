@@ -812,6 +812,64 @@ class OperationFinalizationReceipt:
 
 
 @dataclass(frozen=True)
+class ResumeRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_settled_event_id: str
+    source_pause_settled_event_hash: str
+    pause_fence_id: str
+    expected_preserved_lifecycle: LifecycleState
+    expected_preserved_continuation_cursor: str | None
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        required = (
+            self.resume_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.source_pause_id,
+            self.source_pause_settled_event_id,
+            self.source_pause_settled_event_hash,
+            self.pause_fence_id,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_run_heads_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("resume identifiers and evidence must be non-empty")
+        if self.expected_preserved_lifecycle not in {
+            LifecycleState.PLANNED,
+            LifecycleState.BLOCKED,
+            LifecycleState.VALIDATING,
+        }:
+            raise ValueError("resume preserved lifecycle must be typed")
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError("resume preserved cursor must be non-empty or absent")
+
+
+@dataclass(frozen=True)
 class PauseBeforeDispatchRequest:
     pause_id: str
     command_id: str
@@ -822,11 +880,20 @@ class PauseBeforeDispatchRequest:
     run_id: str
     item_id: str
     reason_code: str
-    continuation_cursor: str
+    continuation_cursor: str | None
 
     def validate(self) -> None:
-        if any(not value or not value.strip() for value in self.__dict__.values()):
+        required = tuple(self.__dict__.values())[:-1]
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
             raise ValueError("pause command fields must be non-empty")
+        if self.continuation_cursor is not None and (
+            not isinstance(self.continuation_cursor, str)
+            or not self.continuation_cursor.strip()
+        ):
+            raise ValueError("pause expected preserved cursor must be non-empty or absent")
         if self.request_event_id == self.settled_event_id:
             raise ValueError("pause request and settlement event IDs must differ")
 

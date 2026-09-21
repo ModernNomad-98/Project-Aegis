@@ -15,6 +15,7 @@ from .contracts import (
     BudgetSettlementRequest,
     DispatchDenied,
     FailureClassification,
+    ResumeRequest,
 )
 
 SYNTHETIC_FAILURE_POLICY_ID = "failure-policy"
@@ -233,6 +234,14 @@ class SyntheticBindingObservation:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticResumeEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -290,6 +299,66 @@ class SyntheticAuthority:
                 sort_keys=True,
             ).encode("utf-8")
         ).hexdigest()
+
+    @staticmethod
+    def _resume_request_digest(request: ResumeRequest) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **request.__dict__,
+                    "expected_preserved_lifecycle": (
+                        request.expected_preserved_lifecycle.value
+                    ),
+                },
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_resume_evidence(
+        self, proof_id: str, request: ResumeRequest
+    ) -> SyntheticResumeEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError("resume evidence proof ID must be non-empty")
+        request_digest = self._resume_request_digest(request)
+        return SyntheticResumeEvidence(
+            proof_id,
+            request_digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "RESUME_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_resume_evidence(
+        self,
+        evidence: SyntheticResumeEvidence,
+        request: ResumeRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied("resume evidence is malformed")
+        request_digest = self._resume_request_digest(request)
+        expected_mac = self._mac(
+            "RESUME_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied("resume evidence was not issued here")
 
     def issue_binding_observation(
         self, request: BindingMismatchRequest
@@ -639,7 +708,8 @@ class SyntheticAuthority:
         if any(not value for value in grant.__dict__.values()):
             raise ValueError("synthetic operator grant fields must be non-empty")
         if grant.action not in {
-            "PAUSE", "STOP_GRACEFUL", "STOP_IMMEDIATE", "STOP_ESCALATE",
+            "PAUSE", "RESUME", "STOP_GRACEFUL", "STOP_IMMEDIATE",
+            "STOP_ESCALATE",
         }:
             raise ValueError("unsupported synthetic operator action")
         with self._lock:

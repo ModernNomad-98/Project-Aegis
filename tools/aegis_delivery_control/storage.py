@@ -27,6 +27,7 @@ from .authority import (
     SyntheticFinalizationAttestation,
     SyntheticNonexecutionAttestation,
     SyntheticOperatorCapability,
+    SyntheticResumeEvidence,
     SyntheticSettlementProof,
     SyntheticValidationRecoveryAttestation,
     SyntheticValidatorCessationAttestation,
@@ -57,6 +58,7 @@ from .contracts import (
     PauseBeforeDispatchRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
+    ResumeRequest,
     SettlementReceipt,
     StopMode,
     StopEscalationRequest,
@@ -112,6 +114,28 @@ _SETTLEMENT_TRANSITIONS = {
     ),
 }
 
+
+def _derive_resume_route(
+    preserved_lifecycle: LifecycleState,
+    preserved_cursor: str | None,
+    blocker_codes: tuple[str, ...],
+) -> LifecycleState:
+    if blocker_codes:
+        return LifecycleState.BLOCKED
+    if preserved_lifecycle is LifecycleState.PLANNED and preserved_cursor is None:
+        return LifecycleState.PLANNED
+    if preserved_lifecycle is LifecycleState.VALIDATING and preserved_cursor in {
+        None,
+        LifecycleState.VALIDATING.value,
+    }:
+        return LifecycleState.VALIDATING
+    if preserved_lifecycle is LifecycleState.BLOCKED:
+        if preserved_cursor is None:
+            return LifecycleState.PLANNED
+        if preserved_cursor == LifecycleState.VALIDATING.value:
+            return LifecycleState.VALIDATING
+    raise DispatchDenied("resume preserved cursor is not a typed continuation")
+
 _EVENT_KINDS = frozenset(
     {
         "ADAPTER_CONTACT_CLAIMED",
@@ -129,6 +153,7 @@ _EVENT_KINDS = frozenset(
         "PLAN_ACCEPTED",
         "READINESS_EVALUATED",
         "RECEIPT_RECORDED",
+        "RESUME_ACCEPTED",
         "STOP_RECORDED",
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
@@ -156,6 +181,7 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "PLAN_ACCEPTED",
         "READINESS_EVALUATED",
         "RECEIPT_RECORDED",
+        "RESUME_ACCEPTED",
         "STOP_RECORDED",
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
@@ -228,6 +254,13 @@ _LIFECYCLE_ROUTES: Mapping[
         }
     ),
     "RECEIPT_RECORDED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "RESUME_ACCEPTED": frozenset(
+        {
+            (LifecycleState.PAUSED, LifecycleState.PLANNED),
+            (LifecycleState.PAUSED, LifecycleState.VALIDATING),
+            (LifecycleState.PAUSED, LifecycleState.BLOCKED),
+        }
+    ),
     "STOP_RECORDED": frozenset(
         {
             (source, LifecycleState.STOPPED)
@@ -1110,6 +1143,47 @@ class SQLiteStateStore:
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL,
+                body_json TEXT NOT NULL,
+                preserved_lifecycle TEXT CHECK (
+                    preserved_lifecycle IN ('PLANNED', 'BLOCKED', 'VALIDATING')
+                    OR preserved_lifecycle IS NULL
+                ),
+                preserved_continuation_cursor TEXT
+            );
+            CREATE TABLE IF NOT EXISTS resume_actions (
+                resume_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                source_pause_id TEXT NOT NULL,
+                source_pause_settled_event_id TEXT NOT NULL,
+                source_pause_settled_event_hash TEXT NOT NULL,
+                pause_fence_id TEXT NOT NULL,
+                preserved_lifecycle TEXT NOT NULL,
+                preserved_continuation_cursor TEXT,
+                expected_catalog_head TEXT NOT NULL,
+                expected_run_head TEXT NOT NULL,
+                expected_run_heads_digest TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                evidence_proof_id TEXT NOT NULL UNIQUE,
+                evidence_request_digest TEXT NOT NULL,
+                evidence_issuer_fingerprint TEXT NOT NULL,
+                evidence_issuer_mac TEXT NOT NULL,
+                blocker_codes_json TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (
+                    resulting_state IN ('PLANNED', 'VALIDATING', 'BLOCKED')
+                ),
                 body_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS stop_actions (
@@ -1218,6 +1292,7 @@ class SQLiteStateStore:
             connection.execute(
                 "ALTER TABLE dispatch_fences ADD COLUMN logical_effect_id TEXT"
             )
+        SQLiteStateStore._migrate_control_action_schema(connection)
         operator_redemption_columns = {
             str(row["name"])
             for row in connection.execute(
@@ -1274,6 +1349,188 @@ class SQLiteStateStore:
             connection.execute("ALTER TABLE runs ADD COLUMN continuation_cursor TEXT")
         SQLiteStateStore._migrate_validation_recovery_schema(connection)
         SQLiteStateStore._migrate_terminal_validation_schema(connection)
+
+    @staticmethod
+    def _pause_preserved_state_from_history(
+        connection: sqlite3.Connection,
+        request_event: sqlite3.Row,
+        settled_event: sqlite3.Row,
+    ) -> tuple[str, str | None]:
+        request_body = json.loads(request_event["body_json"])
+        settled_body = json.loads(settled_event["body_json"])
+        preservation_fields = {
+            "pause_binding_version", "preserved_lifecycle",
+            "preserved_continuation_cursor",
+        }
+        request_preservation = preservation_fields.intersection(request_body)
+        settled_preservation = preservation_fields.intersection(settled_body)
+        if (
+            request_event["event_kind"] != "PAUSE_REQUESTED"
+            or settled_event["event_kind"] != "PAUSE_SETTLED"
+            or int(settled_event["sequence"])
+            != int(request_event["sequence"]) + 1
+            or int(settled_event["writer_epoch"])
+            != int(request_event["writer_epoch"])
+            or settled_event["previous_event_hash"]
+            != request_event["event_hash"]
+            or request_body.get("lifecycle_from")
+            not in {LifecycleState.PLANNED.value, LifecycleState.BLOCKED.value}
+            or settled_body.get("lifecycle_from")
+            != request_body.get("lifecycle_from")
+            or settled_body.get("lifecycle_to")
+            != LifecycleState.PAUSED.value
+        ):
+            raise StorageIntegrityError(
+                "legacy pause source prefix is incompatible"
+            )
+        if not request_preservation and not settled_preservation:
+            preserved_cursor: str | None = None
+            for prior in connection.execute(
+                "SELECT event_kind, body_json FROM events WHERE run_id = ? "
+                "AND sequence < ? ORDER BY sequence",
+                (request_event["run_id"], int(request_event["sequence"])),
+            ):
+                prior_body = json.loads(prior["body_json"])
+                if prior["event_kind"] in {
+                    "VALIDATION_PASSED", "VALIDATION_FAILED",
+                    "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
+                    "BLOCKER_RESOLVED", "READINESS_EVALUATED",
+                    "VALIDATOR_INTENT_COMMITTED",
+                }:
+                    preserved_cursor = prior_body.get("continuation_cursor")
+            return str(request_body["lifecycle_from"]), preserved_cursor
+        if (
+            request_preservation != preservation_fields
+            or settled_preservation != preservation_fields
+            or request_body["pause_binding_version"] != 2
+            or settled_body["pause_binding_version"] != 2
+            or request_body["preserved_lifecycle"]
+            != request_body["lifecycle_from"]
+            or settled_body["preserved_lifecycle"]
+            != request_body["preserved_lifecycle"]
+            or settled_body["preserved_continuation_cursor"]
+            != request_body["preserved_continuation_cursor"]
+        ):
+            raise StorageIntegrityError(
+                "pause preserved-state history is incompatible"
+            )
+        preserved_cursor = request_body["preserved_continuation_cursor"]
+        if preserved_cursor is not None and (
+            not isinstance(preserved_cursor, str) or not preserved_cursor.strip()
+        ):
+            raise StorageIntegrityError(
+                "pause preserved-state cursor is incompatible"
+            )
+        return str(request_body["preserved_lifecycle"]), preserved_cursor
+
+    @staticmethod
+    def _migrate_control_action_schema(connection: sqlite3.Connection) -> None:
+        base_columns = (
+            "control_id", "command_id", "request_event_id", "settled_event_id",
+            "repository_id", "run_id", "item_id", "action", "reason_code",
+            "continuation_cursor", "capability_claim_id", "capability_grant_id",
+            "capability_scope_digest", "payload_digest", "event_hash",
+            "resulting_state", "body_json",
+        )
+        added_columns = (
+            "preserved_lifecycle", "preserved_continuation_cursor",
+        )
+        info = connection.execute("PRAGMA table_info(control_actions)").fetchall()
+        names = tuple(str(row["name"]) for row in info)
+        expected_shape = {
+            name: (
+                "TEXT",
+                0 if name in {"control_id", *added_columns} else 1,
+                1 if name == "control_id" else 0,
+            )
+            for name in base_columns + added_columns
+        }
+        actual_shape = {
+            str(row["name"]): (
+                str(row["type"]).upper(), int(row["notnull"]), int(row["pk"])
+            )
+            for row in info
+        }
+        if names == base_columns + added_columns:
+            if actual_shape != expected_shape:
+                raise StorageIntegrityError(
+                    "control action preserved-state schema has incompatible constraints"
+                )
+            return
+        if set(added_columns).intersection(names):
+            raise StorageIntegrityError(
+                "control action preserved-state schema is partially migrated"
+            )
+        if names != base_columns:
+            raise StorageIntegrityError(
+                "control action preserved-state schema is incompatible"
+            )
+        legacy_shape = {
+            name: expected_shape[name] for name in base_columns
+        }
+        if actual_shape != legacy_shape:
+            raise StorageIntegrityError(
+                "control action preserved-state schema has incompatible constraints"
+            )
+        rows_before = [
+            tuple(row[column] for column in base_columns)
+            for row in connection.execute("SELECT * FROM control_actions")
+        ]
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            connection.execute(
+                "ALTER TABLE control_actions ADD COLUMN preserved_lifecycle TEXT "
+                "CHECK (preserved_lifecycle IN ('PLANNED', 'BLOCKED', "
+                "'VALIDATING') OR "
+                "preserved_lifecycle IS NULL)"
+            )
+            connection.execute(
+                "ALTER TABLE control_actions ADD COLUMN "
+                "preserved_continuation_cursor TEXT"
+            )
+            for row in connection.execute("SELECT * FROM control_actions"):
+                request_event = connection.execute(
+                    "SELECT * FROM events WHERE event_id = ? AND run_id = ?",
+                    (row["request_event_id"], row["run_id"]),
+                ).fetchone()
+                settled_event = connection.execute(
+                    "SELECT * FROM events WHERE event_id = ? AND run_id = ?",
+                    (row["settled_event_id"], row["run_id"]),
+                ).fetchone()
+                if request_event is None or settled_event is None:
+                    raise StorageIntegrityError(
+                        "legacy pause source is absent from immutable history"
+                    )
+                preserved_lifecycle, preserved_cursor = (
+                    SQLiteStateStore._pause_preserved_state_from_history(
+                        connection, request_event, settled_event
+                    )
+                )
+                connection.execute(
+                    "UPDATE control_actions SET preserved_lifecycle = ?, "
+                    "preserved_continuation_cursor = ? WHERE control_id = ?",
+                    (
+                        preserved_lifecycle, preserved_cursor,
+                        row["control_id"],
+                    ),
+                )
+            migrated = connection.execute("SELECT * FROM control_actions").fetchall()
+            if [
+                tuple(row[column] for column in base_columns) for row in migrated
+            ] != rows_before or any(
+                row["preserved_lifecycle"] is None for row in migrated
+            ):
+                raise StorageIntegrityError(
+                    "control action preserved-state migration changed history"
+                )
+            if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                raise StorageIntegrityError(
+                    "control action preserved-state migration violates foreign keys"
+                )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
 
     @staticmethod
     def _migrate_plan_binding_schema(connection: sqlite3.Connection) -> None:
@@ -1813,6 +2070,16 @@ class SQLiteStateStore:
         encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
 
+    @staticmethod
+    def _run_heads_digest(run_heads: Mapping[str, str]) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                sorted(run_heads.items()),
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+
     @classmethod
     def _accepted_plan_semantic_digest(
         cls, request: PlanAcceptanceRequest
@@ -1901,6 +2168,75 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "synthetic operator capability issuer does not match "
                 "recorded action"
+            )
+
+    @staticmethod
+    def _validate_resume_event_body(body: Mapping[str, object]) -> None:
+        expected_fields = set(ResumeRequest.__dataclass_fields__) | {
+            "action", "blocker_codes", "capability_evidence",
+            "capability_issuer_fingerprint", "event_kind",
+            "indexes_complete", "lifecycle_from", "lifecycle_to",
+            "payload_digest", "preserved_continuation_cursor",
+            "preserved_lifecycle", "previous_event_hash", "request_digest",
+            "resume_evidence", "schema_version", "sequence",
+            "verified_run_heads_digest", "writer_epoch",
+        }
+        capability_fields = set(SyntheticOperatorCapability.__dataclass_fields__)
+        evidence_fields = set(SyntheticResumeEvidence.__dataclass_fields__)
+        capability = body.get("capability_evidence")
+        evidence = body.get("resume_evidence")
+        blockers = body.get("blocker_codes")
+        optional_strings = (
+            "expected_preserved_continuation_cursor",
+            "preserved_continuation_cursor",
+        )
+        non_string_fields = {
+            "blocker_codes", "capability_evidence", "indexes_complete",
+            "resume_evidence", "schema_version", "sequence", "writer_epoch",
+            *optional_strings,
+        }
+        if (
+            set(body) != expected_fields
+            or type(body.get("schema_version")) is not int
+            or body.get("schema_version") != 1
+            or type(body.get("sequence")) is not int
+            or int(cast(int, body.get("sequence"))) <= 0
+            or type(body.get("writer_epoch")) is not int
+            or int(cast(int, body.get("writer_epoch"))) <= 0
+            or type(body.get("indexes_complete")) is not bool
+            or body.get("indexes_complete") is not True
+            or not isinstance(capability, Mapping)
+            or set(capability) != capability_fields
+            or not isinstance(evidence, Mapping)
+            or set(evidence) != evidence_fields
+            or not isinstance(blockers, list)
+            or any(
+                not isinstance(code, str) or not code.strip()
+                for code in cast(list[object], blockers)
+            )
+            or cast(list[object], blockers)
+            != sorted(set(cast(list[str], blockers)))
+            or any(
+                value is not None
+                and (not isinstance(value, str) or not value.strip())
+                for value in (body.get(field) for field in optional_strings)
+            )
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], capability).values()
+            )
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], evidence).values()
+            )
+            or any(
+                not isinstance(body[field], str)
+                or not cast(str, body[field]).strip()
+                for field in expected_fields.difference(non_string_fields)
+            )
+        ):
+            raise StorageIntegrityError(
+                "unsupported RESUME_ACCEPTED event schema"
             )
 
     @classmethod
@@ -4417,7 +4753,7 @@ class SQLiteStateStore:
     ) -> tuple[
         dict[str, tuple[str | None, str | None]],
         tuple[str, str, str, int] | None,
-        frozenset[str],
+        frozenset[tuple[str, str]],
     ]:
         rows = connection.execute(
             "SELECT event_kind, body_json FROM events WHERE repository_id = ? "
@@ -4426,7 +4762,7 @@ class SQLiteStateStore:
         ).fetchall()
         active_fences: dict[str, tuple[str | None, str | None]] = {}
         active_slot: tuple[str, str, str, int] | None = None
-        active_validators: dict[str, tuple[str, str]] = {}
+        active_validators: dict[str, tuple[str, str, str]] = {}
         settlement_heads: dict[str, str] = {}
         settlement_dispositions: dict[str, BudgetDisposition] = {}
         settlement_ids: dict[str, str] = {}
@@ -4437,6 +4773,26 @@ class SQLiteStateStore:
                 event_kind = str(row["event_kind"])
                 if event_kind == "PAUSE_SETTLED":
                     active_fences[str(body["fence_id"])] = (None, None)
+                elif event_kind == "RESUME_ACCEPTED":
+                    if active_fences.pop(str(body["pause_fence_id"]), None) is None:
+                        raise ValueError("resume cleared an inactive pause fence")
+                elif event_kind == "AUTHORITY_EVALUATED":
+                    if body["fact_kind"] == AuthorityFactKind.CORRECTION.value:
+                        corrected = connection.execute(
+                            "SELECT body_json FROM authority_facts WHERE fact_id = ?",
+                            (body["corrected_fact_id"],),
+                        ).fetchone()
+                        if corrected is not None:
+                            corrected_body = json.loads(corrected["body_json"])
+                            if corrected_body.get("fence_id") is not None:
+                                active_fences.pop(
+                                    str(corrected_body["fence_id"]), None
+                                )
+                    elif body.get("fence_id") is not None:
+                        active_fences[str(body["fence_id"])] = (
+                            str(body["item_id"]),
+                            str(body["logical_effect_id"]),
+                        )
                 elif event_kind == "BINDING_MISMATCH":
                     active_fences[str(body["fence_id"])] = (
                         str(body["item_id"]),
@@ -4548,6 +4904,7 @@ class SQLiteStateStore:
                     active_validators[str(body["validator_intent_id"])] = (
                         str(body["reservation_id"]),
                         str(body["validator_attempt_id"]),
+                        str(body["run_id"]),
                     )
                 elif event_kind in {"VALIDATION_PASSED", "VALIDATION_FAILED"}:
                     validator_attempt_id = str(body["validator_attempt_id"])
@@ -4608,7 +4965,10 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "repository activity history is invalid"
                 ) from error
-        return active_fences, active_slot, frozenset(active_validators)
+        return active_fences, active_slot, frozenset(
+            (intent_id, binding[2])
+            for intent_id, binding in active_validators.items()
+        )
 
     def _readiness_blockers(
         self,
@@ -5129,6 +5489,12 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "T04 requires durable PLANNED or BLOCKED state"
                     )
+                if request.continuation_cursor != run["continuation_cursor"]:
+                    raise DispatchDenied(
+                        "pause expected preserved cursor does not match verified history"
+                    )
+                preserved_lifecycle = current_state.value
+                preserved_cursor = run["continuation_cursor"]
                 if authorize_transition is not None:
                     authorize_transition(current_state, LifecycleState.PAUSED)
                 sequence = int(run["head_sequence"]) + 1
@@ -5145,6 +5511,9 @@ class SQLiteStateStore:
                     "event_kind": "PAUSE_REQUESTED",
                     "lifecycle_from": current_state.value,
                     "lifecycle_to": current_state.value,
+                    "pause_binding_version": 2,
+                    "preserved_continuation_cursor": preserved_cursor,
+                    "preserved_lifecycle": preserved_lifecycle,
                     "previous_event_hash": previous_hash,
                     "schema_version": 1,
                     "sequence": sequence,
@@ -5178,6 +5547,9 @@ class SQLiteStateStore:
                     "event_kind": "PAUSE_SETTLED",
                     "lifecycle_from": current_state.value,
                     "lifecycle_to": LifecycleState.PAUSED.value,
+                    "pause_binding_version": 2,
+                    "preserved_continuation_cursor": preserved_cursor,
+                    "preserved_lifecycle": preserved_lifecycle,
                     "previous_event_hash": requested_hash,
                     "request_event_hash": requested_hash,
                     "schema_version": 1,
@@ -5198,15 +5570,23 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "INSERT INTO control_actions VALUES (?, ?, ?, ?, ?, ?, ?, 'PAUSE', ?, ?, ?, ?, ?, ?, ?, 'PAUSED', ?)",
+                    "INSERT INTO control_actions (control_id, command_id, "
+                    "request_event_id, settled_event_id, repository_id, run_id, "
+                    "item_id, action, reason_code, continuation_cursor, "
+                    "capability_claim_id, capability_grant_id, "
+                    "capability_scope_digest, payload_digest, event_hash, "
+                    "resulting_state, body_json, preserved_lifecycle, "
+                    "preserved_continuation_cursor) VALUES (?, ?, ?, ?, ?, ?, "
+                    "?, 'PAUSE', ?, ?, ?, ?, ?, ?, ?, 'PAUSED', ?, ?, ?)",
                     (
                         request.pause_id, request.command_id,
                         request.request_event_id, request.settled_event_id,
                         request.repository_id, request.run_id, request.item_id,
-                        request.reason_code, request.continuation_cursor,
+                        request.reason_code,
+                        request.continuation_cursor or "PLANNED",
                         capability.claim_id, capability.grant_id,
                         capability.scope_digest, payload_digest, settled_hash,
-                        settled_json,
+                        settled_json, preserved_lifecycle, preserved_cursor,
                     ),
                 )
                 connection.execute(
@@ -5245,6 +5625,344 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.pause_id, request.command_id, request.settled_event_id,
             sequence + 1, settled_hash, LifecycleState.PAUSED, False,
+        )
+
+    def resume(
+        self,
+        request: ResumeRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticResumeEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("resume command targets another repository")
+        if (
+            capability.repository_id,
+            capability.run_id,
+            capability.action,
+        ) != (request.repository_id, request.run_id, "RESUME"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this resume"
+            )
+        capability_evidence = dict(capability.__dict__)
+        resume_evidence = dict(evidence.__dict__)
+        request_payload = {
+            **request.__dict__,
+            "expected_preserved_lifecycle": (
+                request.expected_preserved_lifecycle.value
+            ),
+        }
+        payload = {
+            **request_payload,
+            "action": "RESUME",
+            "capability_evidence": capability_evidence,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "resume_evidence": resume_evidence,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_resume_evidence(evidence, request)
+                    prior = connection.execute(
+                        "SELECT * FROM resume_actions WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "resume command outcome lost its projection"
+                        )
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    connection.rollback()
+                    return self._control_receipt_for_resume(prior, replayed=True)
+                actual_vector_digest = self._run_heads_digest(run_heads)
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or run_heads.get(request.run_id) != request.expected_run_head
+                    or request.expected_run_heads_digest != actual_vector_digest
+                ):
+                    raise DispatchDenied(
+                        "resume current head vector does not match verified history"
+                    )
+                authority.verify_operator_for_action(capability)
+                authority.verify_resume_evidence(evidence, request)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "resume does not bind the accepted run and plan"
+                    )
+                if LifecycleState(str(run["lifecycle_state"])) is not LifecycleState.PAUSED:
+                    raise DispatchDenied("T14 requires durable PAUSED state")
+                source = connection.execute(
+                    "SELECT * FROM control_actions WHERE control_id = ? AND "
+                    "settled_event_id = ? AND repository_id = ? AND run_id = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_settled_event_id,
+                        request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if source is None or (
+                    source["event_hash"], source["preserved_lifecycle"],
+                    source["preserved_continuation_cursor"],
+                ) != (
+                    request.source_pause_settled_event_hash,
+                    request.expected_preserved_lifecycle.value,
+                    request.expected_preserved_continuation_cursor,
+                ):
+                    raise DispatchDenied(
+                        "resume does not bind the exact active pause source"
+                    )
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        source["request_event_id"],
+                    ),
+                ).fetchone()
+                if fence is None:
+                    raise DispatchDenied("resume pause fence is not active")
+                owned_active_validator = connection.execute(
+                    "SELECT 1 FROM validator_intents WHERE repository_id = ? "
+                    "AND run_id = ? AND status = 'ACTIVE' LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if owned_active_validator is not None or (
+                    self._unresolved_contact_reservations(
+                        connection, request.repository_id, request.run_id
+                    )
+                ):
+                    raise DispatchDenied(
+                        "resume requires T17 for unresolved owned activity"
+                    )
+                blocker_codes: set[str] = set()
+                latest_readiness = connection.execute(
+                    "SELECT evaluation.body_json FROM readiness_evaluations AS "
+                    "evaluation JOIN events AS event ON event.event_id = "
+                    "evaluation.event_id WHERE evaluation.repository_id = ? AND "
+                    "evaluation.run_id = ? ORDER BY event.writer_epoch DESC LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if latest_readiness is not None:
+                    readiness_body = json.loads(latest_readiness["body_json"])
+                    blocker_codes.update(
+                        str(code)
+                        for code in readiness_body.get("blocker_codes", ())
+                        if code != "DISPATCH_FENCE_PRESENT"
+                    )
+                other_fence = connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "fence_id <> ? AND (item_id IS NULL OR item_id = ?) AND "
+                    "(logical_effect_id IS NULL OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.pause_fence_id,
+                        request.item_id, request.logical_effect_id,
+                    ),
+                ).fetchone()
+                if other_fence is not None:
+                    blocker_codes.add("NON_PAUSE_FENCE_PRESENT")
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is not None and slot["run_id"] != request.run_id:
+                    blocker_codes.add("OTHER_OPERATION_SLOT_OCCUPIED")
+                preserved_cursor = source["preserved_continuation_cursor"]
+                preserved_lifecycle = LifecycleState(
+                    str(source["preserved_lifecycle"])
+                )
+                if preserved_cursor == LifecycleState.VALIDATING.value and (
+                    connection.execute(
+                        "SELECT 1 FROM validation_applications WHERE "
+                        "repository_id = ? AND run_id = ? AND "
+                        "classification = 'RECOVERABLE' ORDER BY rowid DESC LIMIT 1",
+                        (request.repository_id, request.run_id),
+                    ).fetchone()
+                    is not None
+                ):
+                    blocker_codes.add("T16_OBLIGATION_PENDING")
+                if preserved_cursor == "FINALIZING" or (
+                    isinstance(preserved_cursor, str)
+                    and preserved_cursor.startswith("validation-recovery:")
+                ):
+                    blocker_codes.add("T16_OBLIGATION_PENDING")
+                resulting_state = _derive_resume_route(
+                    preserved_lifecycle,
+                    preserved_cursor,
+                    tuple(sorted(blocker_codes)),
+                )
+                if authorize_transition is not None:
+                    authorize_transition(LifecycleState.PAUSED, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                body = {
+                    **payload,
+                    "blocker_codes": sorted(blocker_codes),
+                    "event_kind": "RESUME_ACCEPTED",
+                    "indexes_complete": True,
+                    "lifecycle_from": LifecycleState.PAUSED.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "preserved_continuation_cursor": preserved_cursor,
+                    "preserved_lifecycle": preserved_lifecycle.value,
+                    "request_digest": evidence.request_digest,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "verified_run_heads_digest": actual_vector_digest,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RESUME_ACCEPTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, request.expected_run_head, event_hash,
+                        body_json,
+                    ),
+                )
+                deleted = connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        source["request_event_id"],
+                    ),
+                ).rowcount
+                if deleted != 1:
+                    raise StorageIntegrityError(
+                        "resume did not clear exactly one pause fence"
+                    )
+                connection.execute(
+                    "INSERT INTO resume_actions VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    "?, ?, ?, ?, ?)",
+                    (
+                        request.resume_id, request.command_id, request.event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.plan_id,
+                        request.revision_digest, request.source_pause_id,
+                        request.source_pause_settled_event_id,
+                        request.source_pause_settled_event_hash,
+                        request.pause_fence_id, preserved_lifecycle.value,
+                        preserved_cursor, request.expected_catalog_head,
+                        request.expected_run_head,
+                        request.expected_run_heads_digest, capability.claim_id,
+                        capability.grant_id, capability.scope_digest,
+                        authority.issuer_fingerprint, capability.issuer_mac,
+                        evidence.proof_id, evidence.request_digest,
+                        evidence.issuer_fingerprint, evidence.issuer_mac,
+                        json.dumps(sorted(blocker_codes), separators=(",", ":")),
+                        payload_digest, event_hash, resulting_state.value,
+                        body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RESUME', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest, authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, preserved_cursor, sequence,
+                        event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_resume_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_resume_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.resume_id, request.command_id, request.event_id, sequence,
+            event_hash, resulting_state, False,
         )
 
     def stop(
@@ -11854,6 +12572,18 @@ class SQLiteStateStore:
         )
 
     @staticmethod
+    def _control_receipt_for_resume(
+        row: sqlite3.Row, *, replayed: bool
+    ) -> ControlReceipt:
+        return ControlReceipt(
+            str(row["resume_id"]), str(row["command_id"]),
+            str(row["event_id"]),
+            int(json.loads(row["body_json"])["sequence"]),
+            str(row["event_hash"]),
+            LifecycleState(str(row["resulting_state"])), replayed,
+        )
+
+    @staticmethod
     def _stop_receipt(
         row: sqlite3.Row, *, replayed: bool
     ) -> ControlReceipt:
@@ -12559,6 +13289,190 @@ class SQLiteStateStore:
             (repository_id,),
         ).fetchall()
         pauses = [json.loads(row["body_json"]) for row in pause_settled_rows]
+        resume_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'RESUME_ACCEPTED'",
+            (repository_id,),
+        ).fetchall()
+        resumes = [json.loads(row["body_json"]) for row in resume_rows]
+        for body in resumes:
+            self._validate_resume_event_body(body)
+            try:
+                if self._classification_authority is None:
+                    raise DispatchDenied("resume authority is not bound")
+                request = ResumeRequest(
+                    **{
+                        key: body[key]
+                        for key in ResumeRequest.__dataclass_fields__
+                        if key != "expected_preserved_lifecycle"
+                    },
+                    expected_preserved_lifecycle=LifecycleState(
+                        str(body["expected_preserved_lifecycle"])
+                    ),
+                )
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                resume_evidence = SyntheticResumeEvidence(
+                    **body["resume_evidence"]
+                )
+                self._classification_authority.verify_operator_issued(capability)
+                self._classification_authority.verify_resume_evidence(
+                    resume_evidence, request
+                )
+                expected_payload = {
+                    **{
+                        **request.__dict__,
+                        "expected_preserved_lifecycle": (
+                            request.expected_preserved_lifecycle.value
+                        ),
+                    },
+                    "action": "RESUME",
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                    "resume_evidence": dict(resume_evidence.__dict__),
+                }
+                if (
+                    body["action"] != "RESUME"
+                    or body["capability_issuer_fingerprint"]
+                    != self._classification_authority.issuer_fingerprint
+                    or body["payload_digest"] != self._event_hash(expected_payload)
+                    or body["request_digest"] != resume_evidence.request_digest
+                ):
+                    raise DispatchDenied("resume evidence binding mismatch")
+                prefix_rows = connection.execute(
+                    "SELECT run_id, event_hash FROM events WHERE repository_id = ? "
+                    "AND writer_epoch < ? ORDER BY writer_epoch, rowid",
+                    (repository_id, int(body["writer_epoch"])),
+                ).fetchall()
+                prefix_heads: dict[str, str] = {}
+                prefix_catalog_head = ""
+                for prefix_row in prefix_rows:
+                    prefix_heads[str(prefix_row["run_id"])] = str(
+                        prefix_row["event_hash"]
+                    )
+                    prefix_catalog_head = str(prefix_row["event_hash"])
+                source = connection.execute(
+                    "SELECT * FROM control_actions WHERE control_id = ? AND "
+                    "settled_event_id = ? AND event_hash = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_settled_event_id,
+                        request.source_pause_settled_event_hash,
+                    ),
+                ).fetchone()
+                if source is None or (
+                    source["repository_id"], source["run_id"], source["item_id"],
+                    source["preserved_lifecycle"],
+                    source["preserved_continuation_cursor"],
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.expected_preserved_lifecycle.value,
+                    request.expected_preserved_continuation_cursor,
+                ):
+                    raise DispatchDenied("resume source pause binding mismatch")
+                if (
+                    request.expected_catalog_head != prefix_catalog_head
+                    or request.expected_run_head
+                    != prefix_heads.get(request.run_id)
+                    or request.expected_run_heads_digest
+                    != self._run_heads_digest(prefix_heads)
+                    or body["previous_event_hash"] != request.expected_run_head
+                    or body["verified_run_heads_digest"]
+                    != request.expected_run_heads_digest
+                    or body.get("indexes_complete") is not True
+                ):
+                    raise DispatchDenied("resume historical head vector mismatch")
+                historical_fences, historical_slot, active_validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
+                )
+                if request.pause_fence_id not in historical_fences:
+                    raise DispatchDenied("resume source pause fence was inactive")
+                blockers: set[str] = set()
+                for fence_id, scope in historical_fences.items():
+                    if fence_id == request.pause_fence_id:
+                        continue
+                    if (
+                        scope[0] is None or scope[0] == request.item_id
+                    ) and (
+                        scope[1] is None or scope[1] == request.logical_effect_id
+                    ):
+                        blockers.add("NON_PAUSE_FENCE_PRESENT")
+                latest_readiness = connection.execute(
+                    "SELECT evaluation.body_json FROM readiness_evaluations AS "
+                    "evaluation JOIN events AS event ON event.event_id = "
+                    "evaluation.event_id WHERE evaluation.repository_id = ? AND "
+                    "evaluation.run_id = ? AND event.writer_epoch < ? "
+                    "ORDER BY event.writer_epoch DESC LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchone()
+                if latest_readiness is not None:
+                    readiness_body = json.loads(latest_readiness["body_json"])
+                    blockers.update(
+                        str(code)
+                        for code in readiness_body.get("blocker_codes", ())
+                        if code != "DISPATCH_FENCE_PRESENT"
+                    )
+                if historical_slot is not None and historical_slot[0] != request.run_id:
+                    blockers.add("OTHER_OPERATION_SLOT_OCCUPIED")
+                cursor = source["preserved_continuation_cursor"]
+                if cursor == LifecycleState.VALIDATING.value and (
+                    connection.execute(
+                        "SELECT 1 FROM validation_applications AS application "
+                        "JOIN events AS event ON event.event_id = application.event_id "
+                        "WHERE application.repository_id = ? AND application.run_id = ? "
+                        "AND application.classification = 'RECOVERABLE' AND "
+                        "event.writer_epoch < ? ORDER BY event.writer_epoch DESC LIMIT 1",
+                        (
+                            request.repository_id, request.run_id,
+                            int(body["writer_epoch"]),
+                        ),
+                    ).fetchone()
+                    is not None
+                ):
+                    blockers.add("T16_OBLIGATION_PENDING")
+                if cursor == "FINALIZING" or (
+                    isinstance(cursor, str)
+                    and cursor.startswith("validation-recovery:")
+                ):
+                    blockers.add("T16_OBLIGATION_PENDING")
+                owned_active_validator = any(
+                    validator_run_id == request.run_id
+                    for _, validator_run_id in active_validators
+                )
+                if owned_active_validator or self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id,
+                    before_sequence=int(body["sequence"]),
+                ):
+                    raise DispatchDenied(
+                        "resume history bypassed unresolved owned activity"
+                    )
+                expected_state = _derive_resume_route(
+                    LifecycleState(str(source["preserved_lifecycle"])),
+                    cursor,
+                    tuple(sorted(blockers)),
+                )
+                if (
+                    body["blocker_codes"] != sorted(blockers)
+                    or body["lifecycle_to"] != expected_state.value
+                    or body["preserved_lifecycle"]
+                    != source["preserved_lifecycle"]
+                    or body["preserved_continuation_cursor"] != cursor
+                ):
+                    raise DispatchDenied("resume historical route mismatch")
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "resume capability, evidence, or historical route is invalid"
+                ) from error
         stop_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? "
             "AND event_kind = 'STOP_RECORDED'",
@@ -12657,6 +13571,15 @@ class SQLiteStateStore:
                     body["event_id"], body["sequence"], self._event_hash(body),
                 )
                 for body in pauses
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in resumes
             }
         )
         expected_outcomes.update(
@@ -13050,11 +13973,29 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "validation-recovery projection diverges from event history"
             )
-        expected_controls = {
-            body["pause_id"]: (
+        expected_controls: dict[str, tuple[object, ...]] = {}
+        for body in pauses:
+            request_event = connection.execute(
+                "SELECT * FROM events WHERE event_id = ? AND run_id = ?",
+                (body["request_event_id"], body["run_id"]),
+            ).fetchone()
+            settled_event = connection.execute(
+                "SELECT * FROM events WHERE event_id = ? AND run_id = ?",
+                (body["event_id"], body["run_id"]),
+            ).fetchone()
+            if request_event is None or settled_event is None:
+                raise StorageIntegrityError(
+                    "pause source is absent from immutable history"
+                )
+            preserved_lifecycle, preserved_cursor = (
+                self._pause_preserved_state_from_history(
+                    connection, request_event, settled_event
+                )
+            )
+            expected_controls[str(body["pause_id"])] = (
                 body["command_id"], body["request_event_id"], body["event_id"],
                 body["run_id"], body["item_id"], body["action"],
-                body["reason_code"], body["continuation_cursor"],
+                body["reason_code"], body["continuation_cursor"] or "PLANNED",
                 body["capability_claim_id"], body["capability_grant_id"],
                 body["capability_scope_digest"],
                 self._event_hash(
@@ -13073,9 +14014,8 @@ class SQLiteStateStore:
                     }
                 ),
                 self._event_hash(body), body["lifecycle_to"], body,
+                preserved_lifecycle, preserved_cursor,
             )
-            for body in pauses
-        }
         actual_controls = {
             row["control_id"]: (
                 row["command_id"], row["request_event_id"],
@@ -13085,6 +14025,8 @@ class SQLiteStateStore:
                 row["capability_scope_digest"], row["payload_digest"],
                 row["event_hash"], row["resulting_state"],
                 json.loads(row["body_json"]),
+                row["preserved_lifecycle"],
+                row["preserved_continuation_cursor"],
             )
             for row in connection.execute(
                 "SELECT * FROM control_actions WHERE repository_id = ?",
@@ -13094,6 +14036,61 @@ class SQLiteStateStore:
         if actual_controls != expected_controls:
             raise StorageIntegrityError(
                 "control-action projection diverges from event history"
+            )
+        expected_resumes = {
+            body["resume_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"], body["plan_id"],
+                body["revision_digest"], body["source_pause_id"],
+                body["source_pause_settled_event_id"],
+                body["source_pause_settled_event_hash"],
+                body["pause_fence_id"], body["preserved_lifecycle"],
+                body["preserved_continuation_cursor"],
+                body["expected_catalog_head"], body["expected_run_head"],
+                body["expected_run_heads_digest"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["resume_evidence"]["proof_id"],
+                body["resume_evidence"]["request_digest"],
+                body["resume_evidence"]["issuer_fingerprint"],
+                body["resume_evidence"]["issuer_mac"],
+                json.dumps(body["blocker_codes"], separators=(",", ":")),
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in resumes
+        }
+        actual_resumes = {
+            row["resume_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["plan_id"],
+                row["revision_digest"], row["source_pause_id"],
+                row["source_pause_settled_event_id"],
+                row["source_pause_settled_event_hash"], row["pause_fence_id"],
+                row["preserved_lifecycle"],
+                row["preserved_continuation_cursor"],
+                row["expected_catalog_head"], row["expected_run_head"],
+                row["expected_run_heads_digest"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["evidence_proof_id"],
+                row["evidence_request_digest"],
+                row["evidence_issuer_fingerprint"], row["evidence_issuer_mac"],
+                row["blocker_codes_json"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM resume_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_resumes != expected_resumes:
+            raise StorageIntegrityError(
+                "resume-action projection diverges from event history"
             )
         expected_stops = {
             body["stop_id"]: (
@@ -13253,6 +14250,17 @@ class SQLiteStateStore:
             )
             for body in pauses
         }
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "RESUME",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in resumes
+            }
+        )
         expected_operator_redemptions.update(
             {
                 body["capability_claim_id"]: (
@@ -14148,6 +15156,20 @@ class SQLiteStateStore:
             ):
                 slot_obligations.append(reservation)
 
+        for body in resumes:
+            source_fence = expected_fences.get(body["pause_fence_id"])
+            if source_fence is None or source_fence[3] != (
+                connection.execute(
+                    "SELECT request_event_id FROM control_actions WHERE "
+                    "control_id = ?",
+                    (body["source_pause_id"],),
+                ).fetchone() or {"request_event_id": None}
+            )["request_event_id"]:
+                raise StorageIntegrityError(
+                    "resume source pause fence diverges from history"
+                )
+            del expected_fences[body["pause_fence_id"]]
+
         actual_fences = {
             row["fence_id"]: (
                 row["item_id"], row["logical_effect_id"], row["reason_code"],
@@ -14476,7 +15498,11 @@ class SQLiteStateStore:
                 )
             if "lifecycle_to" in body:
                 expected_lifecycle[run_id] = str(body["lifecycle_to"])
-                if row["event_kind"] in {
+                if row["event_kind"] == "RESUME_ACCEPTED":
+                    expected_cursors[run_id] = body[
+                        "preserved_continuation_cursor"
+                    ]
+                elif row["event_kind"] in {
                     "VALIDATION_PASSED", "VALIDATION_FAILED",
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
@@ -14662,6 +15688,7 @@ class SQLiteStateStore:
             "operation_finalizations",
             "operation_launches",
             "control_actions",
+            "resume_actions",
             "stop_actions",
             "stop_escalations",
             "operator_redemptions",

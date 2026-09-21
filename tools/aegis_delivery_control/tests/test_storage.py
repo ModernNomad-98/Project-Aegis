@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
+import hashlib
 import json
 import multiprocessing
 import sqlite3
@@ -13,6 +14,8 @@ from unittest.mock import patch
 from pathlib import Path
 from typing import Mapping
 
+import tools.aegis_delivery_control.contracts as contract_types
+import tools.aegis_delivery_control.storage as storage_module
 from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
     SyntheticAuthorityLifecycleEvidence,
@@ -42,6 +45,7 @@ from tools.aegis_delivery_control.contracts import (
     PauseBeforeDispatchRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
+    ResumeRequest,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -128,6 +132,37 @@ def _settle_until_terminated(
 
 
 class SQLiteStateStoreTests(unittest.TestCase):
+    def test_t14_exposes_typed_resume_request_contract(self) -> None:
+        self.assertTrue(
+            hasattr(contract_types, "ResumeRequest"),
+            "T14 requires a typed ResumeRequest contract",
+        )
+        request_type = contract_types.ResumeRequest
+        request = request_type(
+            resume_id="resume-1",
+            command_id="resume-command-1",
+            event_id="resume-event-1",
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            plan_id="plan-1",
+            revision_digest="revision-1",
+            source_pause_id="pause-1",
+            source_pause_settled_event_id="pause-settled-event-1",
+            source_pause_settled_event_hash="pause-settled-hash-1",
+            pause_fence_id="pause-fence-1",
+            expected_preserved_lifecycle=LifecycleState.PLANNED,
+            expected_preserved_continuation_cursor=None,
+            expected_catalog_head="catalog-head-1",
+            expected_run_head="run-head-1",
+            expected_run_heads_digest="run-heads-digest-1",
+        )
+        request.validate()
+        self.assertEqual(request.expected_preserved_lifecycle, LifecycleState.PLANNED)
+        with self.assertRaisesRegex(ValueError, "resume"):
+            replace(request, expected_run_heads_digest="").validate()
+
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary_directory.cleanup)
@@ -334,6 +369,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_finalizations": 0,
                 "operation_launches": 0,
                 "control_actions": 0,
+                "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
                 "operator_redemptions": 0,
@@ -1262,6 +1298,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_finalizations": 0,
                 "operation_launches": 0,
                 "control_actions": 0,
+                "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
                 "operator_redemptions": 0,
@@ -3661,8 +3698,41 @@ class SQLiteStateStoreTests(unittest.TestCase):
             f"pause-{suffix}", f"pause-command-{suffix}",
             f"pause-request-event-{suffix}", f"pause-settled-event-{suffix}",
             f"pause-fence-{suffix}", "repo-1", "run-1", "item-1",
-            "OPERATOR_PAUSE", f"cursor-{suffix}",
+            "OPERATOR_PAUSE", None,
         )
+
+    @staticmethod
+    def _resume_request(
+        *,
+        catalog_head: str,
+        run_heads_digest: str,
+        suffix: str = "1",
+    ) -> ResumeRequest:
+        return ResumeRequest(
+            f"resume-{suffix}", f"resume-command-{suffix}",
+            f"resume-event-{suffix}", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", f"pause-{suffix}",
+            f"pause-settled-event-{suffix}", catalog_head,
+            f"pause-fence-{suffix}", LifecycleState.PLANNED, None,
+            catalog_head, catalog_head, run_heads_digest,
+        )
+
+    def test_t14_resume_request_has_exact_signed_evidence(self) -> None:
+        request = self._resume_request(
+            catalog_head="pause-settled-hash-1",
+            run_heads_digest="run-heads-digest-1",
+        )
+        self.assertTrue(
+            hasattr(self.authority, "issue_resume_evidence"),
+            "T14 requires exact signed resume evidence",
+        )
+        evidence = self.authority.issue_resume_evidence("resume-proof-1", request)
+        self.authority.verify_resume_evidence(evidence, request)
+        with self.assertRaisesRegex(DispatchDenied, "resume evidence"):
+            self.authority.verify_resume_evidence(
+                evidence,
+                replace(request, expected_run_head="other-head"),
+            )
 
     def _stop_capability(self, mode: StopMode, suffix: str = "1"):
         action = (
@@ -3679,6 +3749,901 @@ class SQLiteStateStoreTests(unittest.TestCase):
             grant.grant_id, grant.repository_id, grant.run_id, grant.action,
             grant.scope_digest,
         )
+
+    def _resume_capability(self, suffix: str = "1"):
+        grant = SyntheticOperatorGrant(
+            f"resume-grant-{suffix}", "repo-1", "run-1", "RESUME",
+            f"resume-scope-{suffix}",
+        )
+        self.authority.register_operator(grant)
+        return self.authority.claim_operator(*grant.__dict__.values())
+
+    def test_t14_authority_issues_only_bound_resume_capability(self) -> None:
+        capability = self._resume_capability()
+        self.assertEqual(capability.action, "RESUME")
+        self.authority.verify_operator_for_action(capability)
+
+    @staticmethod
+    def _run_heads_digest(run_heads: Mapping[str, str]) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                sorted(run_heads.items()),
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+
+    @staticmethod
+    def _rebuild_legacy_control_actions(database_path: Path) -> None:
+        connection = sqlite3.connect(database_path)
+        try:
+            connection.executescript(
+                """
+                ALTER TABLE control_actions RENAME TO control_actions_upgraded;
+                CREATE TABLE control_actions (
+                    control_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    request_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    settled_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    action TEXT NOT NULL CHECK (action IN ('PAUSE')),
+                    reason_code TEXT NOT NULL,
+                    continuation_cursor TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_scope_digest TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL,
+                    body_json TEXT NOT NULL
+                );
+                INSERT INTO control_actions SELECT
+                    control_id, command_id, request_event_id, settled_event_id,
+                    repository_id, run_id, item_id, action, reason_code,
+                    continuation_cursor, capability_claim_id,
+                    capability_grant_id, capability_scope_digest,
+                    payload_digest, event_hash, resulting_state, body_json
+                FROM control_actions_upgraded;
+                DROP TABLE control_actions_upgraded;
+                """
+            )
+        finally:
+            connection.close()
+
+    def test_t14_planned_resume_clears_only_pause_fence_atomically(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        evidence = self.authority.issue_resume_evidence("resume-proof-1", request)
+        resumed = self.store.resume(
+            request, self._resume_capability(), evidence, self.authority
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.PLANNED)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 0)
+        self.assertEqual(self.store.table_counts()["resume_actions"], 1)
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_legacy_pause_projection_migrates_without_rewriting_history(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = connection.execute(
+                "SELECT body_json, continuation_cursor FROM control_actions"
+            ).fetchone()
+        finally:
+            connection.close()
+        self._rebuild_legacy_control_actions(self.database_path)
+        migrated = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            columns = tuple(
+                row["name"]
+                for row in connection.execute(
+                    "PRAGMA table_info(control_actions)"
+                )
+            )
+            after = connection.execute(
+                "SELECT * FROM control_actions"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(after["body_json"], before[0])
+        self.assertEqual(after["continuation_cursor"], before[1])
+        self.assertEqual(after["preserved_lifecycle"], "PLANNED")
+        self.assertIsNone(after["preserved_continuation_cursor"])
+        self.assertEqual(
+            columns[-2:],
+            ("preserved_lifecycle", "preserved_continuation_cursor"),
+        )
+        self.oracle.allowed_head = paused.event_hash
+        migrated.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_true_legacy_blocked_pause_migrates_and_recovers_cursor(self) -> None:
+        self._prepare_finalization()
+        paused = self.store.pause_before_dispatch(
+            replace(
+                self._pause_request(), continuation_cursor="FINALIZING"
+            ),
+            self._pause_capability(),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            request_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    ("pause-request-event-1",),
+                ).fetchone()[0]
+            )
+            settled_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    ("pause-settled-event-1",),
+                ).fetchone()[0]
+            )
+            for body in (request_body, settled_body):
+                body.pop("pause_binding_version")
+                body.pop("preserved_lifecycle")
+                body.pop("preserved_continuation_cursor")
+            request_hash = self.store._event_hash(request_body)
+            settled_body["previous_event_hash"] = request_hash
+            settled_body["request_event_hash"] = request_hash
+            settled_hash = self.store._event_hash(settled_body)
+            request_json = json.dumps(
+                request_body, sort_keys=True, separators=(",", ":")
+            )
+            settled_json = json.dumps(
+                settled_body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? "
+                "WHERE event_id = 'pause-request-event-1'",
+                (request_hash, request_json),
+            )
+            connection.execute(
+                "UPDATE events SET previous_event_hash = ?, event_hash = ?, "
+                "body_json = ? WHERE event_id = 'pause-settled-event-1'",
+                (request_hash, settled_hash, settled_json),
+            )
+            connection.execute(
+                "UPDATE control_actions SET event_hash = ?, body_json = ?",
+                (settled_hash, settled_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? "
+                "WHERE command_id = 'pause-command-1'",
+                (settled_hash,),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (settled_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? "
+                "WHERE repository_id = 'repo-1'",
+                (settled_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        self._rebuild_legacy_control_actions(self.database_path)
+        migrated = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            row = connection.execute(
+                "SELECT body_json, preserved_lifecycle, "
+                "preserved_continuation_cursor FROM control_actions"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(row, (settled_json, "BLOCKED", "FINALIZING"))
+        self.oracle.allowed_head = settled_hash
+        migrated.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_partial_pause_projection_migration_fails_closed(self) -> None:
+        self._rebuild_legacy_control_actions(self.database_path)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "ALTER TABLE control_actions ADD COLUMN preserved_lifecycle TEXT"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "partially migrated"):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            columns = {
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(control_actions)"
+                )
+            }
+        finally:
+            connection.close()
+        self.assertIn("preserved_lifecycle", columns)
+        self.assertNotIn("preserved_continuation_cursor", columns)
+
+    def test_t14_legacy_pause_migration_rolls_back_on_bad_prefix(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self._rebuild_legacy_control_actions(self.database_path)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE events SET event_kind = 'STOP_RECORDED' "
+                "WHERE event_id = 'pause-request-event-1'"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(StorageIntegrityError, "prefix"):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            columns = tuple(
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(control_actions)"
+                )
+            )
+        finally:
+            connection.close()
+        self.assertNotIn("preserved_lifecycle", columns)
+        self.assertNotIn("preserved_continuation_cursor", columns)
+
+    def test_t14_route_restores_clean_validation_but_retains_t16_blockers(self) -> None:
+        self.assertTrue(
+            hasattr(storage_module, "_derive_resume_route"),
+            "T14 requires a deterministic route decision",
+        )
+        derive = storage_module._derive_resume_route
+        self.assertEqual(
+            derive(LifecycleState.VALIDATING, LifecycleState.VALIDATING.value, ()),
+            LifecycleState.VALIDATING,
+        )
+        for cursor in (
+            LifecycleState.VALIDATING.value,
+            "validation-recovery:recovery-1",
+            "FINALIZING",
+        ):
+            with self.subTest(cursor=cursor):
+                self.assertEqual(
+                    derive(
+                        LifecycleState.BLOCKED,
+                        cursor,
+                        ("T16_OBLIGATION_PENDING",),
+                    ),
+                    LifecycleState.BLOCKED,
+                )
+
+    def test_t14_resume_retains_readiness_blocker_and_cursor(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        blocked = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-1", "readiness-command-1", "readiness-event-1",
+                "repo-1", "run-1", "item-1", "plan-1", "revision-1",
+                plan.event_hash, None, "inputs-evidence-1", False,
+            )
+        )
+        self.oracle.allowed_head = blocked.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        request = replace(
+            request, expected_preserved_lifecycle=LifecycleState.BLOCKED
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            blocker_codes = json.loads(
+                connection.execute(
+                    "SELECT blocker_codes_json FROM resume_actions"
+                ).fetchone()[0]
+            )
+        finally:
+            connection.close()
+        self.assertIn("INPUTS_NOT_READY", blocker_codes)
+
+    def test_t14_resume_cannot_bypass_recoverable_validation_blocker(self) -> None:
+        _, failed = self._prepare_recoverable_application()
+        paused = self.store.pause_before_dispatch(
+            replace(
+                self._pause_request(),
+                continuation_cursor=LifecycleState.VALIDATING.value,
+            ),
+            self._pause_capability(),
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = replace(
+            self._resume_request(
+                catalog_head=paused.event_hash,
+                run_heads_digest=self._run_heads_digest(
+                    {"run-1": paused.event_hash}
+                ),
+            ),
+            expected_preserved_lifecycle=LifecycleState.BLOCKED,
+            expected_preserved_continuation_cursor=LifecycleState.VALIDATING.value,
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        self.assertEqual(failed.resulting_state, LifecycleState.BLOCKED)
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs "
+                "WHERE run_id = 'run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(state, ("BLOCKED", LifecycleState.VALIDATING.value))
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_finalizing_cursor_remains_blocked_after_restart(self) -> None:
+        self._prepare_finalization()
+        paused = self.store.pause_before_dispatch(
+            replace(
+                self._pause_request(), continuation_cursor="FINALIZING"
+            ),
+            self._pause_capability(),
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = replace(
+            self._resume_request(
+                catalog_head=paused.event_hash,
+                run_heads_digest=self._run_heads_digest(
+                    {"run-1": paused.event_hash}
+                ),
+            ),
+            expected_preserved_lifecycle=LifecycleState.BLOCKED,
+            expected_preserved_continuation_cursor="FINALIZING",
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs "
+                "WHERE run_id = 'run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(state, ("BLOCKED", "FINALIZING"))
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_unrelated_active_validator_blocks_but_survives_recovery(self) -> None:
+        observation = self._record_effect_observation(("check-1",))
+        validator_request, validator_capability = self._validator_intent(
+            observation
+        )
+        validator_intent = self.store.commit_validator_intent(
+            validator_request, validator_capability, self.authority
+        )
+        self.oracle.allowed_head = validator_intent.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            writer_epoch = connection.execute(
+                "SELECT MAX(writer_epoch) + 1 FROM events"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                "run-2", "item-2", "effect-2", "revision-2",
+                "descriptor-2", "scope-2", "budget-policy-2", ("check-2",),
+            ),
+            expected_head=validator_intent.event_hash,
+            writer_epoch=writer_epoch,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        blocked = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-2", "readiness-command-2", "readiness-event-2",
+                "repo-1", "run-2", "item-2", "plan-2", "revision-2",
+                plan.event_hash, None, "inputs-evidence-2", True,
+            )
+        )
+        self.oracle.allowed_head = blocked.event_hash
+        pause_grant = SyntheticOperatorGrant(
+            "operator-grant-2", "repo-1", "run-2", "PAUSE",
+            "operator-scope-2",
+        )
+        self.authority.register_operator(pause_grant)
+        pause_capability = self.authority.claim_operator(
+            *pause_grant.__dict__.values()
+        )
+        paused = self.store.pause_before_dispatch(
+            PauseBeforeDispatchRequest(
+                "pause-2", "pause-command-2", "pause-request-event-2",
+                "pause-settled-event-2", "pause-fence-2", "repo-1",
+                "run-2", "item-2", "OPERATOR_PAUSE", None,
+            ),
+            pause_capability,
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run_heads = dict(
+                connection.execute("SELECT run_id, head_hash FROM runs")
+            )
+        finally:
+            connection.close()
+        request = ResumeRequest(
+            "resume-2", "resume-command-2", "resume-event-2", "repo-1",
+            "run-2", "item-2", "effect-2", "plan-2", "revision-2",
+            "pause-2", "pause-settled-event-2", paused.event_hash,
+            "pause-fence-2", LifecycleState.BLOCKED, None,
+            paused.event_hash, paused.event_hash,
+            self._run_heads_digest(run_heads),
+        )
+        resume_grant = SyntheticOperatorGrant(
+            "resume-grant-2", "repo-1", "run-2", "RESUME",
+            "resume-scope-2",
+        )
+        self.authority.register_operator(resume_grant)
+        resumed = self.store.resume(
+            request,
+            self.authority.claim_operator(*resume_grant.__dict__.values()),
+            self.authority.issue_resume_evidence("resume-proof-2", request),
+            self.authority,
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_intervening_binding_fact_survives_exact_pause_resume(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        mismatch_request = BindingMismatchRequest(
+            "mismatch-t14", "observation-t14", "mismatch-command-t14",
+            "mismatch-event-t14", "repo-1", "run-1", "item-1", "effect-1",
+            BindingMismatchKind.SOURCE, "source-tree-1", "source-tree-later",
+            paused.event_hash, "BINDING_MISMATCH_SOURCE",
+        )
+        mismatch = self.store.record_binding_mismatch(
+            mismatch_request,
+            self.authority.issue_binding_observation(mismatch_request),
+            self.authority,
+            expected_head=paused.event_hash,
+            writer_epoch=3,
+        )
+        self.assertEqual(mismatch.resulting_state, LifecycleState.PAUSED)
+        self.oracle.allowed_head = mismatch.event_hash
+        request = replace(
+            self._resume_request(
+                catalog_head=mismatch.event_hash,
+                run_heads_digest=self._run_heads_digest(
+                    {"run-1": mismatch.event_hash}
+                ),
+            ),
+            source_pause_settled_event_hash=paused.event_hash,
+            expected_run_head=mismatch.event_hash,
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            fences = connection.execute(
+                "SELECT reason_code FROM dispatch_fences"
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(fences, [("BINDING_MISMATCH_SOURCE",)])
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_resume_vector_mismatch_denies_without_clearing_pause(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest({}),
+        )
+        with self.assertRaisesRegex(DispatchDenied, "head vector"):
+            self.store.resume(
+                request,
+                self._resume_capability(),
+                self.authority.issue_resume_evidence("resume-proof-1", request),
+                self.authority,
+            )
+        self.assertEqual(self.store.load_run_lifecycle("run-1"), LifecycleState.PAUSED)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 1)
+        self.assertEqual(self.store.table_counts()["resume_actions"], 0)
+
+    def test_t14_resume_precommit_rollback_and_postcommit_replay(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        capability = self._resume_capability()
+        evidence = self.authority.issue_resume_evidence("resume-proof-1", request)
+        with self.assertRaises(InjectedFailure):
+            self.store.resume(
+                request, capability, evidence, self.authority,
+                failure_hook=raise_at("after_resume_writes_before_commit"),
+            )
+        self.assertEqual(self.store.load_run_lifecycle("run-1"), LifecycleState.PAUSED)
+        self.assertEqual(self.store.table_counts()["resume_actions"], 0)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 1)
+
+        with self.assertRaises(InjectedFailure):
+            self.store.resume(
+                request, capability, evidence, self.authority,
+                failure_hook=raise_at(
+                    "after_resume_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            committed_hash = connection.execute(
+                "SELECT event_hash FROM resume_actions"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = committed_hash
+        replay = self.store.resume(
+            request, capability, evidence, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, committed_hash)
+        self.assertEqual(self.store.table_counts()["resume_actions"], 1)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 0)
+
+    def test_t14_recovery_rejects_self_consistent_capability_mac_rewrite(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT body_json FROM resume_actions"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["capability_evidence"]["issuer_mac"] = "0" * 64
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? "
+                "WHERE event_id = ?",
+                (event_hash, body_json, resumed.event_id),
+            )
+            connection.execute(
+                "UPDATE resume_actions SET capability_issuer_mac = ?, "
+                "event_hash = ?, body_json = ?",
+                ("0" * 64, event_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, resumed.command_id),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(
+            (DispatchDenied, StorageIntegrityError), "resume|operator|capability"
+        ):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_recovery_rejects_self_consistent_route_rewrite(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM resume_actions"
+                ).fetchone()["body_json"]
+            )
+            body["blocker_codes"] = ["FABRICATED_BLOCKER"]
+            body["lifecycle_to"] = LifecycleState.BLOCKED.value
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? "
+                "WHERE event_id = ?",
+                (event_hash, body_json, resumed.event_id),
+            )
+            connection.execute(
+                "UPDATE resume_actions SET blocker_codes_json = ?, "
+                "resulting_state = 'BLOCKED', event_hash = ?, body_json = ?",
+                ('["FABRICATED_BLOCKER"]', event_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, resumed.command_id),
+            )
+            connection.execute(
+                "UPDATE runs SET lifecycle_state = 'BLOCKED', head_hash = ? "
+                "WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "resume.*route|route.*resume"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t14_recovery_rejects_unknown_resume_schema_fields_and_version(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        paused = self.store.pause_before_dispatch(
+            self._pause_request(), self._pause_capability(), self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = self._resume_request(
+            catalog_head=paused.event_hash,
+            run_heads_digest=self._run_heads_digest(
+                {"run-1": paused.event_hash}
+            ),
+        )
+        resumed = self.store.resume(
+            request,
+            self._resume_capability(),
+            self.authority.issue_resume_evidence("resume-proof-1", request),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            original_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM resume_actions"
+                ).fetchone()[0]
+            )
+        finally:
+            connection.close()
+
+        for mutation in ("extra-field", "unknown-version"):
+            with self.subTest(mutation=mutation):
+                body = dict(original_body)
+                if mutation == "extra-field":
+                    body["unexpected_resume_field"] = "must-deny"
+                else:
+                    body["schema_version"] = 2
+                event_hash = self.store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection = sqlite3.connect(self.database_path)
+                try:
+                    connection.execute(
+                        "UPDATE events SET event_hash = ?, body_json = ? "
+                        "WHERE event_id = ?",
+                        (event_hash, body_json, resumed.event_id),
+                    )
+                    connection.execute(
+                        "UPDATE resume_actions SET event_hash = ?, body_json = ?",
+                        (event_hash, body_json),
+                    )
+                    connection.execute(
+                        "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                        (event_hash, resumed.command_id),
+                    )
+                    connection.execute(
+                        "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                        (event_hash,),
+                    )
+                    connection.execute(
+                        "UPDATE repositories SET catalog_head = ? "
+                        "WHERE repository_id = 'repo-1'",
+                        (event_hash,),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                self.oracle.allowed_head = event_hash
+                if mutation == "extra-field":
+                    with self.assertRaisesRegex(
+                        StorageIntegrityError, "RESUME.*schema|schema.*RESUME"
+                    ):
+                        self.store.load_verified(
+                            "repo-1", authority=self.authority
+                        )
+                else:
+                    with self.assertRaises(StorageIntegrityError):
+                        self.store.load_verified(
+                            "repo-1", authority=self.authority
+                        )
 
     def test_t13_pre_action_revocation_blocks_matching_effect_grant(self) -> None:
         request = self.request()
@@ -5900,6 +6865,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
         self.oracle.allowed_head = settled.event_hash
         self.store.load_verified("repo-1")
+
         committed = self.store.commit_intent(
             second_request, second_capability, self.authority,
             expected_head=settled.event_hash, writer_epoch=42,
@@ -5912,6 +6878,29 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertTrue(replay.replayed)
         self.assertEqual(replay.event_hash, committed.event_hash)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_t14_pause_rejects_caller_fabricated_preserved_cursor(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "preserved cursor"):
+            self.store.pause_before_dispatch(
+                replace(
+                    self._pause_request(),
+                    continuation_cursor="fabricated-validation-cursor",
+                ),
+                self._pause_capability(),
+                self.authority,
+            )
+        self.assertEqual(self.store.load_run_lifecycle("run-1"), LifecycleState.PLANNED)
+        self.assertEqual(self.store.table_counts()["dispatch_fences"], 0)
 
     def test_r_stop_03_immediate_stop_charges_contacted_unknown(self) -> None:
         request = self.request()
