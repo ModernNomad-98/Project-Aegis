@@ -693,9 +693,12 @@ Corrected independent review returned `APPROVE` with no findings and passed all
 Local evidence is 8 focused tests in 1.580 seconds, 48 dispatch tests in 6.715
 seconds, 339 complete package tests in 30.792 seconds, 184 valid skills with zero
 warnings, 8 script tests with 4 expected skips, 91 gate self-test assertions,
-compileall and clean diff checks apart from line-ending notices. Commit, push and
-exact-head hosted-check evidence remain pending until this reviewed stage is
-committed. Canonical design, approval register, BER, dependencies, CI, CLI,
+compileall and clean diff checks apart from line-ending notices. Reviewed code
+was committed with DCO sign-off and pushed as
+`9599bcb748f2290f328561704c860f5cb3b9c4c3`. On that exact head, `gate-guard`
+passed in 7 seconds, `validate-skills` in 1m18s and `windows-offline-checks` in
+2m47s. Live PR #99 remained open, draft and blocked at that exact head.
+Canonical design, approval register, BER, dependencies, CI, CLI,
 adapters, preserved artifact/cache paths, real authority/adapters and external
 systems were intentionally untouched.
 
@@ -795,6 +798,16 @@ draft and blocked.
 | `git commit -s -m "feat(control-plane): checkpoint validation pause"` | Commit `a0d27bbdd64d7d86bf080355ca933d28760244ab`; signed-off; 10 files changed |
 | `git push origin feat/cp-wp-002-offline-kernel` after T08 | Remote branch advanced `511f590..a0d27bb` |
 | Hosted checks on exact T08 implementation head | `gate-guard` passed in 5s; `validate-skills` passed in 1m19s; `windows-offline-checks` passed in 2m58s |
+| T09 plan audit | `APPROVE` before editing; exact source/head/cursor, typed one-use PAUSE capability, stacked fences and deferred T17/T14 clearance were explicit |
+| T09 focused suite after review correction | `Ran 8 tests in 1.580s`; `OK` |
+| T09 dispatch module | `Ran 48 tests in 6.715s`; `OK` |
+| T09 complete delivery-control package | `Ran 339 tests in 30.792s`; `OK` |
+| T09 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent T09 implementation review | Initial `REVISE` for one MAJOR future-clearance foreign-key defect; corrected `APPROVE`, no findings; reviewer independently ran 8 focused tests in 1.453s |
+| `git commit -s -m "feat(control-plane): fence reconciliation pauses"` | Commit `9599bcb748f2290f328561704c860f5cb3b9c4c3`; signed-off; 10 files changed |
+| `git push origin feat/cp-wp-002-offline-kernel` after T09 | Remote branch advanced `9b4cc6f..9599bcb` |
+| Hosted checks on exact T09 implementation head | `gate-guard` passed in 7s; `validate-skills` passed in 1m18s; `windows-offline-checks` passed in 2m47s |
+| Live PR #99 on exact T09 implementation head | OPEN; DRAFT; BLOCKED; head `9599bcb748f2290f328561704c860f5cb3b9c4c3` |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3

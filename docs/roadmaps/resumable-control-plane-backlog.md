@@ -708,7 +708,7 @@ schema or self-consistent source retarget tamper.
 | Complete delivery-control package | 339 tests passed in 30.792 seconds |
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent implementation review | Initial `REVISE` found one MAJOR future-clearance foreign-key defect; removing only the T09 action-to-live-fence dependency and adding its regression produced final `APPROVE`, no findings; reviewer independently passed 8 focused tests in 1.453 seconds |
-| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Commit/push and hosted checks | Signed-off commit `9599bcb748f2290f328561704c860f5cb3b9c4c3` pushed to the existing branch; `gate-guard` passed in 7s, `validate-skills` in 1m18s and `windows-offline-checks` in 2m47s on that exact head; PR #99 remained open, draft and blocked |
 | Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
 
