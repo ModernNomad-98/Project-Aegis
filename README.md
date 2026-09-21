@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 373-test package suite passes locally; all three stop findings, T13
+its full 384-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -638,8 +638,11 @@ clearance, typed routing, crash/replay and recovery—also has independent
 `APPROVE`. The remaining T17 authoritative-nonexecution and authenticated
 safe-retry slice also has independent `APPROVE`: exact all-path seals, typed
 operation recovery, one-use generation-bound retry, crash/replay and strict
-prefix migration preserve later uncertainty and stacked pauses. T22 is next in
-the documented order. The PR remains draft and not
+prefix migration preserve later uncertainty and stacked pauses. T22 read-only
+terminal restart reporting also has independent `APPROVE`; it reports verified
+terminal denial without authorizing advancement or reconciliation and preserves
+the database byte-for-byte. T28/F01 is next in the documented order. The PR
+remains draft and not
 merge-ready while the exact
 T/C/F backlog and final review gates remain. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before

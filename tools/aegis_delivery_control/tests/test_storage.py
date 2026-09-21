@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import datetime, timezone
 import hashlib
@@ -62,6 +63,10 @@ from tools.aegis_delivery_control.contracts import (
     StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
+    DispatchPosture,
+    TerminalRestartDisposition,
+    TerminalRestartRequest,
+    TerminalRestartVerification,
     TerminalValidationSettlementRequest,
     ValidationApplicationRequest,
     ValidationRecoveryRequest,
@@ -70,7 +75,12 @@ from tools.aegis_delivery_control.contracts import (
     ValidatorObservationRequest,
 )
 from tools.aegis_delivery_control.engine import TRANSITIONS, TransitionEngine
-from tools.aegis_delivery_control.storage import SQLiteStateStore, raise_at
+from tools.aegis_delivery_control.dispatch import SyntheticReadCoordinator
+from tools.aegis_delivery_control.storage import (
+    SQLiteStateReader,
+    SQLiteStateStore,
+    raise_at,
+)
 
 
 def BudgetSettlementRequest(*args, **kwargs):
@@ -113,6 +123,24 @@ class MutableFreshnessOracle:
         run_heads: Mapping[str, str],
     ) -> bool:
         return repository_id == "repo-1" and catalog_head == self.allowed_head
+
+
+class CompleteFreshnessOracle:
+    def __init__(self, catalog_head: str, run_heads: Mapping[str, str]) -> None:
+        self.catalog_head = catalog_head
+        self.run_heads = dict(run_heads)
+
+    def verify(
+        self,
+        repository_id: str,
+        catalog_head: str,
+        run_heads: Mapping[str, str],
+    ) -> bool:
+        return (
+            repository_id == "repo-1"
+            and catalog_head == self.catalog_head
+            and dict(run_heads) == self.run_heads
+        )
 
 
 def _settle_until_terminated(
@@ -15618,6 +15646,567 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertEqual(after_denial, before_denial)
+
+    def _t22_report(
+        self,
+        expected_state: LifecycleState,
+        *,
+        database_path: Path | None = None,
+        oracle=None,
+        **request_changes,
+    ):
+        database_path = database_path or self.database_path
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        reader = SQLiteStateReader(
+            database_path,
+            oracle or CompleteFreshnessOracle(catalog_head, run_heads),
+            "repo-1",
+            self.authority,
+        )
+        request = TerminalRestartRequest(
+            "terminal-restart-1", "repo-1", "run-1", expected_state,
+            **request_changes,
+        )
+        return SyntheticReadCoordinator(
+            reader, TransitionEngine()
+        ).report_terminal_restart(request)
+
+    def test_t22_stopped_report_is_verified_and_strictly_read_only(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(),
+            self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        read_root = Path(self.temporary_directory.name) / "read-only-copy"
+        read_root.mkdir()
+        read_database = read_root / "state.sqlite3"
+        shutil.copy2(self.database_path, read_database)
+        before = {
+            path.name: path.read_bytes()
+            for path in read_root.iterdir()
+            if path.is_file()
+        }
+
+        report = self._t22_report(
+            LifecycleState.STOPPED,
+            database_path=read_database,
+            expected_terminal_event_id=stopped.event_id,
+            expected_terminal_event_hash=stopped.event_hash,
+            expected_catalog_head=stopped.event_hash,
+            expected_run_head=stopped.event_hash,
+            expected_run_heads_digest=self.store._run_heads_digest(
+                {"run-1": stopped.event_hash}
+            ),
+        )
+
+        after = {
+            path.name: path.read_bytes()
+            for path in read_root.iterdir()
+            if path.is_file()
+        }
+        self.assertEqual(report.verification, TerminalRestartVerification.VERIFIED_CURRENT)
+        self.assertEqual(
+            report.disposition,
+            TerminalRestartDisposition.TERMINAL_RESTART_DENIED,
+        )
+        self.assertEqual(report.observed_state, LifecycleState.STOPPED)
+        self.assertFalse(report.restart_advancement_authorized)
+        self.assertEqual(report.dispatch_posture, DispatchPosture.CLOSED)
+        self.assertFalse(report.reconciliation_authorized)
+        self.assertEqual(report.terminal_event_id, stopped.event_id)
+        self.assertEqual(before, after)
+        self.assertNotIn("writer.lock", after)
+        reader = SQLiteStateReader(
+            read_database,
+            CompleteFreshnessOracle(stopped.event_hash, {"run-1": stopped.event_hash}),
+            "repo-1", self.authority,
+        )
+        self.assertFalse(hasattr(reader, "table_counts"))
+        self.assertFalse(hasattr(reader, "accept_plan"))
+
+    def test_t22_denies_restart_for_completed_and_failed_final(self) -> None:
+        request, attestation = self._prepare_finalization()
+        completed = self.store._finalize_operation(
+            request, attestation, self.authority
+        )
+        self.oracle.allowed_head = completed.event_hash
+
+        report = self._t22_report(LifecycleState.COMPLETED)
+
+        self.assertEqual(report.observed_state, LifecycleState.COMPLETED)
+        self.assertEqual(
+            report.disposition,
+            TerminalRestartDisposition.TERMINAL_RESTART_DENIED,
+        )
+        self.assertEqual(report.terminal_event_id, completed.event_id)
+
+        failed_root = Path(self.temporary_directory.name) / "failed-terminal"
+        failed_root.mkdir()
+        failed_path = failed_root / "state.sqlite3"
+        failed_oracle = MutableFreshnessOracle()
+        failed_store = SQLiteStateStore(failed_path, failed_oracle, "repo-1")
+        failed_authority = SyntheticAuthority()
+        failed_authority.register(
+            SyntheticGrant(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+        )
+        failed_capability = failed_authority.claim(
+            "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+        )
+        failed_store._bind_classification_authority(failed_authority)
+        original_store, original_path, original_oracle, original_authority, original_capability = (
+            self.store, self.database_path, self.oracle, self.authority,
+            self.capability,
+        )
+        self.store, self.database_path, self.oracle, self.authority, self.capability = (
+            failed_store, failed_path, failed_oracle, failed_authority,
+            failed_capability,
+        )
+        try:
+            observation = self._record_validator_result(
+                verdict="FAIL", only_check=True
+            )
+            failed = self.store._apply_validator_observation(
+                ValidationApplicationRequest(
+                    "application-1", "apply-command-1", "apply-event-1",
+                    "repo-1", "run-1", "item-1", "effect-1",
+                    "revision-1", "check-1", "validator-attempt-1",
+                    "validator-observation-1",
+                ),
+                classification=self._classification(observation, "FINAL"),
+            )
+            self.oracle.allowed_head = failed.event_hash
+
+            failed_report = self._t22_report(LifecycleState.FAILED_FINAL)
+        finally:
+            self.store, self.database_path, self.oracle, self.authority, self.capability = (
+                original_store, original_path, original_oracle,
+                original_authority, original_capability,
+            )
+
+        self.assertEqual(
+            failed_report.observed_state, LifecycleState.FAILED_FINAL
+        )
+        self.assertEqual(
+            failed_report.disposition,
+            TerminalRestartDisposition.TERMINAL_RESTART_DENIED,
+        )
+        self.assertEqual(failed_report.terminal_event_id, failed.event_id)
+
+    def test_t22_reports_nonterminal_without_evaluating_dispatch(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+
+        report = self._t22_report(LifecycleState.STOPPED)
+
+        self.assertEqual(report.verification, TerminalRestartVerification.VERIFIED_CURRENT)
+        self.assertEqual(report.disposition, TerminalRestartDisposition.NONTERMINAL)
+        self.assertEqual(report.observed_state, LifecycleState.PLANNED)
+        self.assertEqual(report.dispatch_posture, DispatchPosture.NOT_EVALUATED)
+        self.assertFalse(report.restart_advancement_authorized)
+
+    def test_t22_separates_freshness_and_caller_anchor_mismatches(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+
+        stale = self._t22_report(
+            LifecycleState.STOPPED,
+            oracle=CompleteFreshnessOracle("stale", {}),
+        )
+        wrong_state = self._t22_report(LifecycleState.COMPLETED)
+        wrong_anchor = self._t22_report(
+            LifecycleState.STOPPED,
+            expected_terminal_event_id="wrong-event",
+            expected_terminal_event_hash="wrong-hash",
+        )
+
+        self.assertEqual(
+            stale.verification,
+            TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED,
+        )
+        self.assertEqual(stale.observed_state, LifecycleState.STOPPED)
+        self.assertTrue(stale.observed_state_trusted)
+        self.assertEqual(stale.dispatch_posture, DispatchPosture.CLOSED)
+        self.assertEqual(
+            wrong_state.verification,
+            TerminalRestartVerification.VERIFIED_CURRENT,
+        )
+        self.assertEqual(
+            wrong_state.disposition,
+            TerminalRestartDisposition.EXPECTED_STATE_MISMATCH,
+        )
+        self.assertEqual(
+            wrong_anchor.disposition,
+            TerminalRestartDisposition.ANCHOR_MISMATCH,
+        )
+
+    def test_t22_corrupt_or_unsupported_state_is_unverified_without_repair(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        for name, mutation in (
+            (
+                "corrupt",
+                "UPDATE runs SET lifecycle_state = 'COMPLETED' "
+                "WHERE run_id = 'run-1'",
+            ),
+            ("legacy", "PRAGMA user_version = 2"),
+        ):
+            with self.subTest(name=name):
+                case_root = Path(self.temporary_directory.name) / name
+                case_root.mkdir()
+                case_path = case_root / "state.sqlite3"
+                shutil.copy2(self.database_path, case_path)
+                connection = sqlite3.connect(case_path)
+                try:
+                    connection.execute(mutation)
+                    connection.commit()
+                finally:
+                    connection.close()
+                before = case_path.read_bytes()
+
+                report = self._t22_report(
+                    LifecycleState.STOPPED, database_path=case_path
+                )
+
+                self.assertEqual(
+                    report.verification,
+                    TerminalRestartVerification.UNVERIFIED_INTEGRITY_OR_SCHEMA,
+                )
+                self.assertEqual(
+                    report.disposition, TerminalRestartDisposition.UNVERIFIED
+                )
+                self.assertFalse(report.observed_state_trusted)
+                self.assertIsNone(report.terminal_event_id)
+                self.assertEqual(case_path.read_bytes(), before)
+                self.assertFalse((case_root / "writer.lock").exists())
+
+    def test_t22_non_object_event_body_returns_typed_unverified_report(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        case_root = Path(self.temporary_directory.name) / "non-object"
+        case_root.mkdir()
+        case_path = case_root / "state.sqlite3"
+        shutil.copy2(self.database_path, case_path)
+        malformed_hash = self.store._event_hash([])
+        connection = sqlite3.connect(case_path)
+        try:
+            connection.execute(
+                "UPDATE events SET body_json = '[]', event_hash = ? "
+                "WHERE event_id = ?",
+                (malformed_hash, stopped.event_id),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (malformed_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (malformed_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        before = case_path.read_bytes()
+
+        report = self._t22_report(
+            LifecycleState.STOPPED, database_path=case_path
+        )
+
+        self.assertEqual(
+            report.verification,
+            TerminalRestartVerification.UNVERIFIED_INTEGRITY_OR_SCHEMA,
+        )
+        self.assertEqual(report.dispatch_posture, DispatchPosture.CLOSED)
+        self.assertFalse(report.observed_state_trusted)
+        self.assertEqual(case_path.read_bytes(), before)
+        self.assertFalse((case_root / "writer.lock").exists())
+
+    def test_t22_proven_nonexecution_verifies_auxiliary_ledger_read_only(self) -> None:
+        self._prepare_t07_activity_settlement()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        tracked_paths = tuple(
+            path
+            for path in self.database_path.parent.iterdir()
+            if path.name.startswith("state.sqlite3")
+            or path.name.startswith("synthetic-target.sqlite3")
+        )
+        before = {path.name: path.read_bytes() for path in tracked_paths}
+
+        report = self._t22_report(LifecycleState.STOPPED)
+
+        after_paths = tuple(
+            path
+            for path in self.database_path.parent.iterdir()
+            if path.name.startswith("state.sqlite3")
+            or path.name.startswith("synthetic-target.sqlite3")
+        )
+        after = {path.name: path.read_bytes() for path in after_paths}
+        self.assertEqual(
+            report.disposition,
+            TerminalRestartDisposition.TERMINAL_RESTART_DENIED,
+        )
+        self.assertEqual(after, before)
+
+    def test_t22_missing_database_and_wrong_authority_fail_closed_without_creation(self) -> None:
+        missing_root = Path(self.temporary_directory.name) / "missing"
+        missing_path = missing_root / "state.sqlite3"
+        missing_reader = SQLiteStateReader(
+            missing_path, CompleteFreshnessOracle("", {}), "repo-1",
+            self.authority,
+        )
+        missing_report = SyntheticReadCoordinator(
+            missing_reader, TransitionEngine()
+        ).report_terminal_restart(
+            TerminalRestartRequest(
+                "missing-request", "repo-1", "run-1",
+                LifecycleState.STOPPED,
+            )
+        )
+        self.assertEqual(
+            missing_report.verification,
+            TerminalRestartVerification.UNVERIFIED_INTEGRITY_OR_SCHEMA,
+        )
+        self.assertFalse(missing_root.exists())
+
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        _, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        wrong_reader = SQLiteStateReader(
+            self.database_path,
+            CompleteFreshnessOracle(stopped.event_hash, run_heads),
+            "repo-1", SyntheticAuthority(b"z" * 32),
+        )
+        wrong_report = SyntheticReadCoordinator(
+            wrong_reader, TransitionEngine()
+        ).report_terminal_restart(
+            TerminalRestartRequest(
+                "wrong-authority", "repo-1", "run-1",
+                LifecycleState.STOPPED,
+            )
+        )
+        self.assertEqual(
+            wrong_report.verification,
+            TerminalRestartVerification.UNVERIFIED_INTEGRITY_OR_SCHEMA,
+        )
+        self.assertFalse(wrong_report.reconciliation_authorized)
+
+    def test_t22_repeated_restart_read_cannot_reset_budget_or_release_slot(self) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+
+        first = self._t22_report(LifecycleState.STOPPED)
+        second = self._t22_report(LifecycleState.STOPPED)
+
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+            reservation = connection.execute(
+                "SELECT disposition, held_units, charged_units FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT run_id, attempt_id, generation FROM outstanding_slot"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(first, second)
+        self.assertEqual(first.terminal_event_id, stopped.event_id)
+        self.assertEqual(after, before)
+        self.assertEqual(reservation, (BudgetDisposition.RESERVED.value, 3, 0))
+        self.assertEqual(slot, ("run-1", "attempt-1", 1))
+
+    def test_t22_freshness_oracle_failure_returns_local_non_authorizing_report(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+
+        class RaisingFreshnessOracle:
+            def verify(self, repository_id, catalog_head, run_heads):
+                raise RuntimeError("synthetic oracle unavailable")
+
+        report = self._t22_report(
+            LifecycleState.STOPPED, oracle=RaisingFreshnessOracle()
+        )
+
+        self.assertEqual(
+            report.verification,
+            TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED,
+        )
+        self.assertEqual(report.observed_state, LifecycleState.STOPPED)
+        self.assertEqual(report.dispatch_posture, DispatchPosture.CLOSED)
+        self.assertFalse(report.restart_advancement_authorized)
+
+    def test_t22_read_transaction_observes_one_snapshot_during_writer_commit(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        _, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        reader = SQLiteStateReader(
+            self.database_path,
+            CompleteFreshnessOracle(plan.event_hash, run_heads),
+            "repo-1", self.authority,
+        )
+        original_verify = reader._verifier._verify_projections
+        start_writer = threading.Event()
+        writes_staged = threading.Event()
+
+        def stop_writer():
+            start_writer.wait(timeout=5)
+
+            def observe_stage(stage):
+                if stage == "after_stop_writes_before_commit":
+                    writes_staged.set()
+
+            return self.store.stop(
+                self._stop_request(),
+                self._stop_capability(StopMode.IMMEDIATE),
+                self.authority,
+                failure_hook=observe_stage,
+            )
+
+        def verify_during_write(connection, repository_id):
+            start_writer.set()
+            if not writes_staged.wait(timeout=5):
+                raise TimeoutError("writer did not stage the terminal transition")
+            return original_verify(connection, repository_id)
+
+        reader._verifier._verify_projections = verify_during_write
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            writer = executor.submit(stop_writer)
+            report = SyntheticReadCoordinator(
+                reader, TransitionEngine()
+            ).report_terminal_restart(
+                TerminalRestartRequest(
+                    "terminal-race-1", "repo-1", "run-1",
+                    LifecycleState.STOPPED,
+                )
+            )
+            stopped = writer.result(timeout=5)
+        self.oracle.allowed_head = stopped.event_hash
+
+        self.assertEqual(
+            report.verification, TerminalRestartVerification.VERIFIED_CURRENT
+        )
+        self.assertEqual(report.disposition, TerminalRestartDisposition.NONTERMINAL)
+        self.assertEqual(report.observed_state, LifecycleState.PLANNED)
+        self.assertEqual(
+            self.store.load_run_lifecycle("run-1"), LifecycleState.STOPPED
+        )
 
 
 if __name__ == "__main__":

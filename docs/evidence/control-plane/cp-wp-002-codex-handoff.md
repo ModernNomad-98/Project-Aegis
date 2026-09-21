@@ -6,9 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed implementation checkpoint: `a6b2d8624400d7af3be2cb309db01864d6e8e472`
+Latest pushed checkpoint before T22: `3406e3e22f80f461e35f529900c289c7b93c46ac`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE AND REVIEWED T05-T09/T13-T15 PLUS ORDERED T17 SLICES `APPROVE`; T22 AND LATER BACKLOG OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, REVIEWED T05-T09/T13-T15, ORDERED T17 SLICES AND T22 `APPROVE`; T28 AND LATER BACKLOG OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -935,8 +935,64 @@ remained open, draft and blocked.
 This stage adds accepted slice evidence to T14/T16/T17/T25 and generation-aware
 T10/T11/T12/T23/T26/T27 behavior, plus C03/C04/C06 and
 F02/F04a/F06/F07/F11/F12/F19/F21. Complete T/C/F families remain conservatively
-`UNVERIFIED` pending an accumulated exact-head audit. T22 is next. PR #99 remains
-open, draft and blocked.
+`UNVERIFIED` pending an accumulated exact-head audit. The succeeding T22
+checkpoint is recorded below. PR #99 remains open, draft and blocked.
+
+### 7.19 T22 terminal restart reporting
+
+T22 now exposes a typed, non-authorizing restart/resume report for terminal
+`COMPLETED`, `FAILED_FINAL` and `STOPPED` runs. A dedicated read facade opens
+only existing main and auxiliary SQLite ledgers with URI `mode=ro` and
+`query_only`. It creates no state directory or writer lock and performs no
+initialization, migration, backfill, repair or hot-journal recovery. Trusted
+synthetic authority is injected independently of stored fingerprints. The
+reader verifies the complete local history/projections, derives the unique
+terminal-entry event server-side and invokes the T22 same-state engine guard
+only when independent complete-vector freshness and optional caller anchors
+also match.
+
+Verification and request disposition are separate. Current nonterminal state is
+reported as `NONTERMINAL` without evaluating ordinary dispatch guards. Locally
+intact but stale/unavailable freshness is explicitly non-authorizing with
+dispatch closed. Integrity, schema or trusted-verifier failure returns an
+unverified, dispatch-closed report and no authoritative terminal-event claim.
+Caller anchors are assertions, not freshness proof. T22 never appends an event,
+consumes authority, clears a fence, changes lifecycle, resets budget/caps or
+releases a slot. T23/T26 remain separate guarded routes and are not authorized
+by the report.
+
+The plan required three correction rounds before independent `APPROVE`: local
+integrity had to remain reportable without freshness; the path had to be truly
+read-only rather than using state-owner initialization; and verification,
+caller matching, restart denial and global dispatch posture had to be orthogonal.
+The first implementation review returned `REVISE` for two MAJOR findings. A
+proven-nonexecution recovery audit still opened its auxiliary target ledger with
+a write-capable handle, and valid JSON with a non-object shape could escape the
+typed failure result. Shared read-only auxiliary connections, a non-inheriting
+read facade and verifier-boundary structural exception normalization closed both.
+Corrected independent review returned `APPROVE`, no remaining blocker or major,
+and independently passed all 11 focused tests.
+
+Changed production files are `contracts.py`, `dispatch.py` and `storage.py`;
+`test_storage.py` covers all terminal states, verified nonterminal status,
+stale/raising freshness, mismatched anchors/authority, missing/corrupt/legacy
+state, retained accounting/slot, repeated reads, concurrent writer snapshots,
+non-object event bodies and byte-preserving main/auxiliary proof reads. Status
+READMEs, the durable backlog and this handoff record the evidence. Canonical
+design, approval register, BER, dependencies, CI, CLI, adapters, preserved
+artifact/cache contents, real authority/adapters and external systems remain
+intentionally untouched.
+
+The complete delivery-control package passed 384 tests in 53.243 seconds after
+review corrections. Repository validation found 184 valid skills with zero
+warnings, 8 script tests passed with 4 expected skips, all 91 gate self-test
+assertions passed, compileall passed and `git diff --check` exited 0 with Windows
+line-ending notices only. This commit cannot name its own final SHA or hosted
+check results; those belong in a succeeding evidence update after push.
+
+T22 is implemented, tested and independently accepted. C07 and F04b receive
+narrow accepted evidence but remain conservatively `UNVERIFIED` as complete
+families. T28 with F01 is next. PR #99 remains open, draft and blocked.
 
 ## 8. Proven invocations
 
@@ -1063,6 +1119,13 @@ open, draft and blocked.
 | T17 nonexecution/safe-retry repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Independent T17 nonexecution/safe-retry implementation review | Initial `REVISE` closed three generation/action/pause-replay findings; two later migration BLOCKERs corrected exact-HEAD terminal schema and proof-prefix T25 backfill. Final `APPROVE`, no remaining blocker or major; reviewer independently passed both migration probes |
 | T17 nonexecution/safe-retry delivery | Signed-off commit `a6b2d8624400d7af3be2cb309db01864d6e8e472` pushed; exact-head `gate-guard` passed in 5s, `validate-skills` in 1m7s and `windows-offline-checks` in 3m1s; PR #99 remained OPEN/DRAFT/BLOCKED |
+| T22 cold-start preflight | Local and remote head `3406e3e22f80f461e35f529900c289c7b93c46ac`; `ba13394` ancestor; source landmarks present; tracked state clean; preserved untracked inventory matched; PR #99 OPEN/DRAFT/BLOCKED with all three checks successful; approvals active |
+| T22 plan audit | Three `REVISE` rounds corrected freshness/reporting, true read-only access, trusted verifier injection, request/verification axes and nonterminal dispatch posture; final `APPROVE` before editing |
+| T22 focused regression after implementation corrections | `Ran 11 tests in 1.106s`; `OK`; independent rerun passed 11 tests in 1.038s |
+| T22 complete delivery-control package | `Ran 384 tests in 53.243s`; `OK` |
+| T22 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Independent T22 implementation review | Initial `REVISE` found two MAJOR read-only auxiliary-ledger and structural-JSON failure gaps; corrected `APPROVE`, no remaining blocker or major |
+| `git diff --check` after T22 corrections | Exit 0; Windows line-ending notices only |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -1153,7 +1216,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 373 passing tests, a registry entry or an earlier milestone
+complete from the 384 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -1190,7 +1253,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T19 | YES | YES | YES | Terminal closure and post-contact uncertainty slices independently accepted |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
 | T21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| T22 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |
 | T23 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction plus generation-2 late-receipt/retry-invalidation slice independently accepted; full trace remains |
 | T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
 | T25 | UNVERIFIED | UNVERIFIED | UNVERIFIED | INTENT_ONLY/LAUNCHED/CONTACTED canonical-seal, exact proof-prefix clearance and operation-recovery slices independently accepted; full all-state/contradiction trace remains |
@@ -1210,7 +1273,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier receipt slice plus generation-2 receipt/replay evidence accepted; accumulated exact head not re-audited |
 | C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
 | C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06/T07/T09 and T17/T25/T14/T16 recovery pre/post-commit rollback/replay, atomic settlement and durable-fence slices accepted; full crash family remains unverified |
-| C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T22 read-only local status versus independent-current freshness and closed stale/unverified reporting accepted; broader restore/export family remains |
 | C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
 | C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
 
@@ -1224,7 +1287,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 proof-free denial, exact nonexecution proof and generation-bound same-effect retry slices accepted; complete family trace remains |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 verified-receipt ancestry, conditional billing and canonical nonexecution zero-liability release slices accepted; complete family trace remains |
-| F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
+| F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting plus T22 repeated terminal-read no-reset/no-release evidence accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus pause/settlement/slot-retention and generation-bound same-effect retry slices accepted; full family trace remains |
 | F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention plus T17 typed source/control settlement and verified-receipt clearance accepted; complete family remains |
@@ -1255,7 +1318,7 @@ Current durable order after the accepted T17 work is:
 
 1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
 2. The ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and authenticated safe-retry slices are complete and independently accepted; the accumulated matrix row remains UNVERIFIED pending exact-head trace.
-3. T22.
+3. T22 complete and independently accepted.
 4. T28 with F01.
 5. Cross-family F05/F06/F13/F20.
 6. Documentation refresh.
@@ -1377,6 +1440,7 @@ stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accept
 T09 and the narrow T17 validator-result/T14 T09-source slice are also
 independently accepted, as are the T17 operation-uncertainty foundation and
 verified-receipt route and the authoritative-nonexecution/safe-retry slice. The
-next code change begins T22 only after its narrow plan independently passes
-review. Keep PR #99 draft until every remaining backlog
+T22 terminal-restart report is also independently accepted. The next code change
+begins T28 with F01 only after its narrow plan independently passes review. Keep
+PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

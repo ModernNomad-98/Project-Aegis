@@ -142,6 +142,14 @@ fixture. It is not a delivery integration.
   clean prefix routes to `VALIDATING`; replay precedes mutable freshness and
   state guards. Semantic version 2, recovery and reopen validate the exact
   route-specific projection without rewriting legacy validator history.
+- T22 exposes a separate read-only terminal-restart report. It opens existing
+  main and auxiliary SQLite ledgers with `mode=ro` plus `query_only`, performs
+  no initialization, migration, repair or lock-file creation, and separates
+  local integrity from independent freshness and caller-anchor matching. Only
+  a current, fully verified terminal entry invokes the T22 same-state guard;
+  stale status remains non-authorizing and integrity/schema failure is reported
+  unverified with dispatch closed. The route never resets budget/caps, releases
+  a slot or authorizes T23/T26 reconciliation.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -195,7 +203,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 373 tests successfully, and
+controller. The complete local package suite ran 384 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -270,6 +278,11 @@ T11/T12/T16/T26 recovery. Its corrected migrations preserve proof-time
 uncertainty prefixes, newer fences, existing rows and foreign keys. T17 and full
 T14 remain `UNVERIFIED` pending the final accumulated exact-head trace rather
 than being promoted from slice evidence alone.
+T22 terminal-restart reporting received independent implementation `APPROVE`
+after a write-capable auxiliary proof-ledger handle and an escaping structural
+JSON error were corrected. Its 11 focused tests cover terminal/nonterminal,
+freshness, corruption, trust, retained accounting/slot, concurrent snapshots
+and byte-preserving main/auxiliary reads. T28 with F01 is the next ordered item.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

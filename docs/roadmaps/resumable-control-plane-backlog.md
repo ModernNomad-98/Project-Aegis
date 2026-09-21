@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15 and all ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and safe-retry work. The complete local delivery-control suite passes 373 tests, but slice evidence does not promote unaudited T/C/F rows. T22, T28/F01, cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work and T22 terminal-restart reporting. The complete local delivery-control suite passes 384 tests, but slice evidence does not promote unaudited T/C/F rows. T28/F01, cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -892,7 +892,43 @@ resolution ownership instead of committing a partially recoverable database.
 
 The ordered T17 implementation slice is complete and independently accepted,
 but the T17 matrix row remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the
-accumulated exact-head transition trace is performed. T22 is next. PR #99
+accumulated exact-head transition trace is performed. The succeeding T22
+checkpoint is recorded below. PR #99 remains draft and not merge-ready.
+
+### 5.19 T22 terminal restart reporting checkpoint
+
+T22 now has a typed, non-authorizing restart/resume report for `COMPLETED`,
+`FAILED_FINAL` and `STOPPED`. A dedicated read facade opens only an existing
+SQLite database with URI `mode=ro` and `query_only`, verifies the complete local
+history/projections with injected trusted synthetic authority, derives the
+unique terminal-entry event server-side and invokes the T22 engine guard only
+when independent complete-vector freshness also passes. A stale or unavailable
+freshness proof returns locally verified status with dispatch closed. Integrity,
+schema or trust failure returns explicitly unverified status with dispatch
+closed. Verified nonterminal state is reported separately without claiming that
+ordinary dispatch guards were evaluated.
+
+The report never appends an event, consumes authority, clears a fence, releases
+the repository slot or changes budget/cap state. Caller-provided terminal/head
+anchors are comparisons rather than freshness proof. T23 and T26 remain separate
+guarded mutation routes; T22 reports that separation but authorizes neither.
+Main and auxiliary synthetic proof ledgers are opened read-only, so reporting
+does not initialize, migrate, backfill, repair, create `writer.lock` or recover a
+hot journal.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Three `REVISE` rounds separated local integrity, independent freshness, caller assertion matching, request disposition and global dispatch posture; corrected plan received `APPROVE` before editing |
+| Focused falsification and regressions | 11 T22 tests passed, covering all terminal states, nonterminal status, stale/raising freshness, wrong anchors/authority, missing/corrupt/legacy state, repeated reads, retained budget/slot, concurrent snapshots, non-object event bodies and read-only main/auxiliary ledgers |
+| Complete delivery-control package | 384 tests passed in 53.243 seconds after review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: a write-capable auxiliary proof-ledger handle and an escaping structural JSON exception. Shared read-only auxiliary connections and verifier-boundary normalization closed both; corrected review returned `APPROVE`, no remaining blocker or major, and independently passed all 11 focused tests |
+| T/C/F traceability | T22 is implemented, tested and independently accepted. Adds narrow evidence to CP-D06/CP-D10, C07 and F04b without promoting those broader families |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T22 is complete and independently accepted. T28 with F01 is next. PR #99
 remains draft and not merge-ready.
 
 ## 6. Handoff contract

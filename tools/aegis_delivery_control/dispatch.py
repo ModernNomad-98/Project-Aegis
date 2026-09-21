@@ -60,6 +60,8 @@ from .contracts import (
     StopMode,
     StopEscalationRequest,
     StopRequest,
+    TerminalRestartReport,
+    TerminalRestartRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
@@ -67,7 +69,7 @@ from .contracts import (
     ProvenNonexecutionIntentRequest,
 )
 from .engine import TRANSITIONS, TransitionEngine
-from .storage import FailureHook, SQLiteStateStore
+from .storage import FailureHook, SQLiteStateReader, SQLiteStateStore
 
 
 @dataclass(frozen=True)
@@ -80,6 +82,33 @@ class SyntheticDispatchReceipt:
 class SyntheticValidationReceipt:
     intent: CommitReceipt
     result: SyntheticValidatorResult | None
+
+
+class SyntheticReadCoordinator:
+    """Expose non-authorizing verified reads without adapter access."""
+
+    def __init__(
+        self, reader: SQLiteStateReader, engine: TransitionEngine
+    ) -> None:
+        self._reader = reader
+        self._engine = engine
+
+    def report_terminal_restart(
+        self, request: TerminalRestartRequest
+    ) -> TerminalRestartReport:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T22",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T22"].required_guards,
+            )
+
+        return self._reader.report_terminal_restart(
+            request, authorize_transition=authorize
+        )
 
 
 class SyntheticDispatchCoordinator:

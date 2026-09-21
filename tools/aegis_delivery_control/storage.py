@@ -48,6 +48,7 @@ from .contracts import (
     BudgetSettlementRequest,
     CommitReceipt,
     ControlReceipt,
+    DispatchPosture,
     DispatchDenied,
     EffectObservationRequest,
     FailureClassification,
@@ -86,6 +87,10 @@ from .contracts import (
     StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
+    TerminalRestartDisposition,
+    TerminalRestartReport,
+    TerminalRestartRequest,
+    TerminalRestartVerification,
     TerminalValidationSettlementReceipt,
     TerminalValidationSettlementRequest,
     ValidationApplicationRequest,
@@ -801,6 +806,17 @@ class SQLiteStateStore:
         if connection.execute("PRAGMA synchronous").fetchone()[0] != 2:
             connection.close()
             raise StorageIntegrityError("SQLite FULL synchronization is unavailable")
+        return connection
+
+    @staticmethod
+    def _connect_read_only_database(database_path: Path) -> sqlite3.Connection:
+        uri = f"{database_path.resolve(strict=False).as_uri()}?mode=ro"
+        connection = sqlite3.connect(uri, uri=True, isolation_level=None)
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA query_only = ON")
+        if connection.execute("PRAGMA query_only").fetchone()[0] != 1:
+            connection.close()
+            raise StorageIntegrityError("SQLite query-only mode is unavailable")
         return connection
 
     @staticmethod
@@ -2544,8 +2560,9 @@ class SQLiteStateStore:
                             ensure_ascii=True, separators=(",", ":"),
                         ).encode("ascii")
                     ).hexdigest()
-                    with closing(sqlite3.connect(target_path)) as target:
-                        target.row_factory = sqlite3.Row
+                    with closing(
+                        SQLiteStateStore._connect_read_only_database(target_path)
+                    ) as target:
                         seal = target.execute(
                             "SELECT * FROM synthetic_nonexecution_seals WHERE "
                             "seal_id = ?", (body["nonexecution_seal_id"],),
@@ -17849,8 +17866,9 @@ class SQLiteStateStore:
         if not target_path.is_file():
             raise DispatchDenied("canonical nonexecution target is unavailable")
         try:
-            with closing(sqlite3.connect(target_path)) as target:
-                target.row_factory = sqlite3.Row
+            with closing(
+                self._connect_read_only_database(target_path)
+            ) as target:
                 seal = target.execute(
                     "SELECT * FROM synthetic_nonexecution_seals WHERE seal_id = ?",
                     (request.nonexecution_seal_id,),
@@ -20942,8 +20960,9 @@ class SQLiteStateStore:
                 if not target_path.is_file():
                     raise DispatchDenied("canonical validator cessation is unavailable")
                 try:
-                    with closing(sqlite3.connect(target_path)) as target:
-                        target.row_factory = sqlite3.Row
+                    with closing(
+                        self._connect_read_only_database(target_path)
+                    ) as target:
                         cessation = target.execute(
                             "SELECT * FROM synthetic_validator_cessations WHERE "
                             "cessation_id = ?",
@@ -27487,8 +27506,9 @@ class SQLiteStateStore:
             target_path = self._database_path.parent / "synthetic-target.sqlite3"
             seal = None
             if target_path.is_file():
-                with closing(sqlite3.connect(target_path)) as target:
-                    target.row_factory = sqlite3.Row
+                with closing(
+                    self._connect_read_only_database(target_path)
+                ) as target:
                     seal = target.execute(
                         "SELECT * FROM synthetic_nonexecution_seals WHERE "
                         "seal_id = ?", (action["seal_id"],),
@@ -29216,6 +29236,258 @@ class SQLiteStateStore:
                 table: int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
                 for table in tables
             }
+
+
+class SQLiteStateReader:
+    """Read an existing state database without initializing or mutating it."""
+
+    def __init__(
+        self,
+        database_path: Path,
+        freshness_oracle: FreshnessOracle,
+        repository_id: str,
+        authority: SyntheticAuthority,
+    ) -> None:
+        if not repository_id.strip():
+            raise ValueError("repository_id must be non-empty")
+        self._database_path = database_path
+        self._freshness_oracle = freshness_oracle
+        self._repository_id = repository_id
+        self._authority = authority
+        verifier = object.__new__(SQLiteStateStore)
+        verifier._database_path = database_path
+        verifier._freshness_oracle = freshness_oracle
+        verifier._repository_id = repository_id
+        verifier._classification_authority = authority
+        verifier._utc_now = lambda: datetime.now(timezone.utc)
+        self._verifier = verifier
+
+    def _connect_read_only(self) -> sqlite3.Connection:
+        return SQLiteStateStore._connect_read_only_database(
+            self._database_path
+        )
+
+    @staticmethod
+    def _untrusted_observed_state(
+        connection: sqlite3.Connection | None,
+        repository_id: str,
+        run_id: str,
+    ) -> LifecycleState | None:
+        if connection is None:
+            return None
+        try:
+            row = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE repository_id = ? "
+                "AND run_id = ?",
+                (repository_id, run_id),
+            ).fetchone()
+            return None if row is None else LifecycleState(str(row[0]))
+        except (sqlite3.Error, ValueError):
+            return None
+
+    @staticmethod
+    def _terminal_entry(
+        connection: sqlite3.Connection,
+        repository_id: str,
+        run_id: str,
+        terminal_state: LifecycleState,
+    ) -> tuple[str, str]:
+        terminal_values = {
+            LifecycleState.COMPLETED.value,
+            LifecycleState.FAILED_FINAL.value,
+            LifecycleState.STOPPED.value,
+        }
+        entries: list[tuple[str, str]] = []
+        for row in connection.execute(
+            "SELECT event_id, event_hash, body_json FROM events WHERE "
+            "repository_id = ? AND run_id = ? ORDER BY sequence",
+            (repository_id, run_id),
+        ):
+            body = json.loads(str(row["body_json"]))
+            if (
+                body.get("lifecycle_to") == terminal_state.value
+                and body.get("lifecycle_from") not in terminal_values
+            ):
+                entries.append((str(row["event_id"]), str(row["event_hash"])))
+        if len(entries) != 1:
+            raise StorageIntegrityError(
+                "terminal lifecycle does not have one verified entry event"
+            )
+        return entries[0]
+
+    def report_terminal_restart(
+        self,
+        request: TerminalRestartRequest,
+        *,
+        authorize_transition: Callable[
+            [LifecycleState, LifecycleState], None
+        ],
+    ) -> TerminalRestartReport:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise ValueError("terminal restart request targets another repository")
+
+        connection: sqlite3.Connection | None = None
+        try:
+            connection = self._connect_read_only()
+            connection.execute("BEGIN")
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version != 3:
+                raise StorageIntegrityError(
+                    "state database semantic version is unsupported for read-only T22"
+                )
+            metadata = connection.execute(
+                "SELECT repository_id FROM store_metadata WHERE singleton = 1"
+            ).fetchone()
+            if metadata is None or metadata["repository_id"] != self._repository_id:
+                raise StorageIntegrityError(
+                    "state database belongs to another repository"
+                )
+            issuer_rows = connection.execute(
+                "SELECT DISTINCT classification_issuer_fingerprint FROM "
+                "validation_plans WHERE repository_id = ?",
+                (self._repository_id,),
+            ).fetchall()
+            if (
+                len(issuer_rows) != 1
+                or issuer_rows[0]["classification_issuer_fingerprint"]
+                != self._authority.issuer_fingerprint
+            ):
+                raise StorageIntegrityError(
+                    "trusted synthetic authority cannot verify accepted plans"
+                )
+            catalog_head, run_heads = self._verifier._heads(
+                connection, self._repository_id
+            )
+            self._verifier._verify_projections(
+                connection, self._repository_id
+            )
+            run = connection.execute(
+                "SELECT lifecycle_state, head_hash FROM runs WHERE "
+                "repository_id = ? AND run_id = ?",
+                (self._repository_id, request.run_id),
+            ).fetchone()
+            if run is None:
+                return TerminalRestartReport(
+                    request.request_id, request.repository_id, request.run_id,
+                    TerminalRestartVerification.VERIFIED_CURRENT,
+                    TerminalRestartDisposition.UNVERIFIED,
+                    None, True, None, None, catalog_head, None,
+                    SQLiteStateStore._run_heads_digest(run_heads), False,
+                    DispatchPosture.CLOSED, False, False, "RUN_UNAVAILABLE",
+                )
+            observed_state = LifecycleState(str(run["lifecycle_state"]))
+            terminal = observed_state in {
+                LifecycleState.COMPLETED,
+                LifecycleState.FAILED_FINAL,
+                LifecycleState.STOPPED,
+            }
+            terminal_event_id: str | None = None
+            terminal_event_hash: str | None = None
+            if terminal:
+                terminal_event_id, terminal_event_hash = self._terminal_entry(
+                    connection, self._repository_id, request.run_id,
+                    observed_state,
+                )
+            run_head = str(run["head_hash"])
+            run_heads_digest = SQLiteStateStore._run_heads_digest(run_heads)
+            try:
+                fresh = bool(
+                    self._freshness_oracle.verify(
+                        self._repository_id, catalog_head, run_heads
+                    )
+                )
+            except Exception:
+                fresh = False
+            if not fresh:
+                return TerminalRestartReport(
+                    request.request_id, request.repository_id, request.run_id,
+                    TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED,
+                    TerminalRestartDisposition.UNVERIFIED,
+                    observed_state, True, terminal_event_id,
+                    terminal_event_hash, catalog_head, run_head,
+                    run_heads_digest, False, DispatchPosture.CLOSED,
+                    terminal, False, "INDEPENDENT_FRESHNESS_UNVERIFIED",
+                )
+            if not terminal:
+                return TerminalRestartReport(
+                    request.request_id, request.repository_id, request.run_id,
+                    TerminalRestartVerification.VERIFIED_CURRENT,
+                    TerminalRestartDisposition.NONTERMINAL,
+                    observed_state, True, None, None, catalog_head, run_head,
+                    run_heads_digest, False, DispatchPosture.NOT_EVALUATED,
+                    False, False, "RUN_IS_NONTERMINAL",
+                )
+            if observed_state is not request.expected_terminal_state:
+                return TerminalRestartReport(
+                    request.request_id, request.repository_id, request.run_id,
+                    TerminalRestartVerification.VERIFIED_CURRENT,
+                    TerminalRestartDisposition.EXPECTED_STATE_MISMATCH,
+                    observed_state, True, terminal_event_id,
+                    terminal_event_hash, catalog_head, run_head,
+                    run_heads_digest, False, DispatchPosture.CLOSED,
+                    True, False, "EXPECTED_TERMINAL_STATE_MISMATCH",
+                )
+            event_anchor = (
+                request.expected_terminal_event_id,
+                request.expected_terminal_event_hash,
+            )
+            head_anchor = (
+                request.expected_catalog_head,
+                request.expected_run_head,
+                request.expected_run_heads_digest,
+            )
+            event_mismatch = event_anchor[0] is not None and event_anchor != (
+                terminal_event_id, terminal_event_hash,
+            )
+            head_mismatch = head_anchor[0] is not None and head_anchor != (
+                catalog_head, run_head, run_heads_digest,
+            )
+            if event_mismatch or head_mismatch:
+                return TerminalRestartReport(
+                    request.request_id, request.repository_id, request.run_id,
+                    TerminalRestartVerification.VERIFIED_CURRENT,
+                    TerminalRestartDisposition.ANCHOR_MISMATCH,
+                    observed_state, True, terminal_event_id,
+                    terminal_event_hash, catalog_head, run_head,
+                    run_heads_digest, False, DispatchPosture.CLOSED,
+                    True, False, "TERMINAL_RESTART_ANCHOR_MISMATCH",
+                )
+            authorize_transition(observed_state, observed_state)
+            return TerminalRestartReport(
+                request.request_id, request.repository_id, request.run_id,
+                TerminalRestartVerification.VERIFIED_CURRENT,
+                TerminalRestartDisposition.TERMINAL_RESTART_DENIED,
+                observed_state, True, terminal_event_id,
+                terminal_event_hash, catalog_head, run_head,
+                run_heads_digest, False, DispatchPosture.CLOSED,
+                True, False, "TERMINAL_LIFECYCLE_CANNOT_REOPEN",
+            )
+        except (
+            AttributeError,
+            DispatchDenied,
+            IndexError,
+            KeyError,
+            StorageIntegrityError,
+            TypeError,
+            ValueError,
+            sqlite3.Error,
+        ):
+            observed_state = self._untrusted_observed_state(
+                connection, self._repository_id, request.run_id
+            )
+            return TerminalRestartReport(
+                request.request_id, request.repository_id, request.run_id,
+                TerminalRestartVerification.UNVERIFIED_INTEGRITY_OR_SCHEMA,
+                TerminalRestartDisposition.UNVERIFIED,
+                observed_state, False, None, None, None, None, None, False,
+                DispatchPosture.CLOSED, False, False,
+                "LOCAL_INTEGRITY_OR_SCHEMA_UNVERIFIED",
+            )
+        finally:
+            if connection is not None:
+                connection.rollback()
+                connection.close()
 
 
 def raise_at(expected_point: str) -> FailureHook:

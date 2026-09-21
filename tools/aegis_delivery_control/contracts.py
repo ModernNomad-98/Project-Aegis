@@ -41,6 +41,25 @@ class StopMode(str, Enum):
     IMMEDIATE = "IMMEDIATE"
 
 
+class TerminalRestartVerification(str, Enum):
+    VERIFIED_CURRENT = "VERIFIED_CURRENT"
+    LOCAL_FRESHNESS_UNVERIFIED = "LOCAL_FRESHNESS_UNVERIFIED"
+    UNVERIFIED_INTEGRITY_OR_SCHEMA = "UNVERIFIED_INTEGRITY_OR_SCHEMA"
+
+
+class TerminalRestartDisposition(str, Enum):
+    TERMINAL_RESTART_DENIED = "TERMINAL_RESTART_DENIED"
+    NONTERMINAL = "NONTERMINAL"
+    EXPECTED_STATE_MISMATCH = "EXPECTED_STATE_MISMATCH"
+    ANCHOR_MISMATCH = "ANCHOR_MISMATCH"
+    UNVERIFIED = "UNVERIFIED"
+
+
+class DispatchPosture(str, Enum):
+    CLOSED = "CLOSED"
+    NOT_EVALUATED = "NOT_EVALUATED"
+
+
 class SourceControlClassification(str, Enum):
     """Closed synthetic classification for receipt/source authority."""
 
@@ -2008,6 +2027,72 @@ class StopEscalationRequest:
             raise ValueError("stop escalation repeats a settlement event")
         if self.event_id in event_ids:
             raise ValueError("stop escalation and settlement event IDs must differ")
+
+
+@dataclass(frozen=True)
+class TerminalRestartRequest:
+    request_id: str
+    repository_id: str
+    run_id: str
+    expected_terminal_state: LifecycleState
+    expected_terminal_event_id: str | None = None
+    expected_terminal_event_hash: str | None = None
+    expected_catalog_head: str | None = None
+    expected_run_head: str | None = None
+    expected_run_heads_digest: str | None = None
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.request_id, self.repository_id, self.run_id)
+        ):
+            raise ValueError("terminal restart request identifiers must be non-empty")
+        if self.expected_terminal_state not in {
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+        }:
+            raise ValueError("terminal restart request requires a terminal state")
+        event_anchor = (
+            self.expected_terminal_event_id,
+            self.expected_terminal_event_hash,
+        )
+        if any(value is not None for value in event_anchor) and any(
+            not isinstance(value, str) or not value.strip()
+            for value in event_anchor
+        ):
+            raise ValueError("terminal event anchor must be complete or absent")
+        head_anchor = (
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_run_heads_digest,
+        )
+        if any(value is not None for value in head_anchor) and any(
+            not isinstance(value, str) or not value.strip()
+            for value in head_anchor
+        ):
+            raise ValueError("terminal head anchor must be complete or absent")
+
+
+@dataclass(frozen=True)
+class TerminalRestartReport:
+    request_id: str
+    repository_id: str
+    run_id: str
+    verification: TerminalRestartVerification
+    disposition: TerminalRestartDisposition
+    observed_state: LifecycleState | None
+    observed_state_trusted: bool
+    terminal_event_id: str | None
+    terminal_event_hash: str | None
+    catalog_head: str | None
+    run_head: str | None
+    run_heads_digest: str | None
+    restart_advancement_authorized: bool
+    dispatch_posture: DispatchPosture
+    separate_reconciliation_route_required: bool
+    reconciliation_authorized: bool
+    reason_code: str
 
 
 @dataclass(frozen=True)
