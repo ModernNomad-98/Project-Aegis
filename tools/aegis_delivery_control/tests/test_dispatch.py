@@ -40,6 +40,7 @@ from tools.aegis_delivery_control.contracts import (
     InjectedFailure,
     IntentRequest,
     LifecycleState,
+    PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     StopMode,
@@ -178,11 +179,283 @@ class MediatedDispatchTests(unittest.TestCase):
                 "T05 pause must not contact the synthetic target",
             )
 
+    def test_t06_contact_without_intaken_receipt_is_fenced_and_worst_case_charged(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            authority = SyntheticAuthority()
+            effect_grant = SyntheticGrant(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "command-1", "event-1",
+                "effect-1", "payload-1", "attempt-1", "permission-1",
+                "reservation-1", "budget-1", 1, 2, 5,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            dispatched = coordinator.dispatch(
+                intent,
+                effect_capability,
+                SyntheticEffectRequest(
+                    "repo-1", "effect-1", "attempt-1", "scope-1", "payload-1"
+                ),
+                expected_head=plan.event_hash,
+                writer_epoch=2,
+                usage_units=1,
+                lose_receipt=True,
+            )
+            self.assertIsNone(dispatched.effect)
+            canonical_before_pause = adapter.reconcile(effect_capability.claim_id)
+            self.assertIsNotNone(canonical_before_pause)
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                launch = connection.execute(
+                    "SELECT * FROM operation_launches WHERE run_id = 'run-1'"
+                ).fetchone()
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE run_id = 'run-1'"
+                ).fetchone()
+            finally:
+                connection.close()
+            pause_grant = SyntheticOperatorGrant(
+                "pause-grant-t06", "repo-1", "run-1", "PAUSE", "pause-scope-t06"
+            )
+            authority.register_operator(pause_grant)
+            receipt = coordinator.pause_external_mutation(
+                PauseExternalMutationRequest(
+                    "external-pause-1", "external-pause-command-1",
+                    "external-pause-event-1", "external-pause-fence-1",
+                    "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                    dispatched.intent.event_id, dispatched.intent.event_hash,
+                    launch["launch_id"], launch["event_id"], launch["event_hash"],
+                    contact["contact_id"], contact["event_id"],
+                    contact["event_hash"], contact["target_digest"], 1,
+                    "OPERATOR_PAUSE_EXTERNAL_MUTATION",
+                ),
+                authority.claim_operator(*pause_grant.__dict__.values()),
+            )
+            self.assertEqual(
+                receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                reservation = connection.execute(
+                    "SELECT disposition, held_units, charged_units, uncertainty "
+                    "FROM budget_reservations WHERE reservation_id = 'reservation-1'"
+                ).fetchone()
+                slot_count = connection.execute(
+                    "SELECT COUNT(*) FROM outstanding_slot"
+                ).fetchone()[0]
+                fence_count = connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                    "'external-pause-fence-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(
+                reservation, ("UNKNOWN_WORST_CASE_CHARGED", 0, 2, 1)
+            )
+            self.assertEqual(slot_count, 1)
+            self.assertEqual(fence_count, 1)
+            self.assertEqual(
+                adapter.reconcile(effect_capability.claim_id),
+                canonical_before_pause,
+                "T06 must not contact, cancel, or mutate the target ledger",
+            )
+            late = coordinator.intake_effect_receipt(
+                EffectObservationCommand(
+                    "late-observation-1", "late-observation-command-1",
+                    "late-observation-event-1", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", effect_capability.claim_id,
+                    "late-settlement-1", "",
+                )
+            )
+            self.assertEqual(
+                late.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                adjusted = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = 'reservation-1'"
+                ).fetchone()
+                event_kind = connection.execute(
+                    "SELECT event_kind FROM events WHERE event_id = "
+                    "'late-observation-event-1'"
+                ).fetchone()[0]
+                retained = connection.execute(
+                    "SELECT (SELECT COUNT(*) FROM outstanding_slot), "
+                    "(SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                    "'external-pause-fence-1')"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(adjusted, ("ADJUSTED", 1, 0))
+            self.assertEqual(event_kind, "LATE_RECEIPT_RECORDED")
+            self.assertEqual(retained, (1, 1))
+
     def test_t14_coordinator_exposes_resume_route(self) -> None:
         self.assertTrue(
             hasattr(SyntheticDispatchCoordinator, "resume"),
             "T14 requires a coordinator-owned resume route",
         )
+
+    def test_t06_receipt_and_pause_race_serializes_without_reopening_dispatch(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            authority = SyntheticAuthority()
+            effect_grant = SyntheticGrant(
+                "race-grant", "repo-1", "race-effect", "race-attempt",
+                "scope-1",
+            )
+            authority.register(effect_grant)
+            effect_capability = authority.claim(*effect_grant.__dict__.values())
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            intent = IntentRequest(
+                "repo-1", "race-run", "race-item", "race-command",
+                "race-event", "race-effect", "race-payload", "race-attempt",
+                "race-permission", "race-reservation", "race-budget", 1, 3, 5,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            dispatched = coordinator.dispatch(
+                intent,
+                effect_capability,
+                SyntheticEffectRequest(
+                    "repo-1", "race-effect", "race-attempt", "scope-1",
+                    "race-payload",
+                ),
+                expected_head=plan.event_hash,
+                writer_epoch=2,
+                usage_units=2,
+                lose_receipt=True,
+            )
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                launch = connection.execute(
+                    "SELECT * FROM operation_launches WHERE run_id = 'race-run'"
+                ).fetchone()
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE run_id = 'race-run'"
+                ).fetchone()
+            finally:
+                connection.close()
+            pause_grant = SyntheticOperatorGrant(
+                "race-pause-grant", "repo-1", "race-run", "PAUSE",
+                "race-pause-scope",
+            )
+            authority.register_operator(pause_grant)
+            pause_request = PauseExternalMutationRequest(
+                "race-pause", "race-pause-command", "race-pause-event",
+                "race-pause-fence", "repo-1", "race-run", "race-item",
+                "race-effect", "race-attempt", dispatched.intent.event_id,
+                dispatched.intent.event_hash, launch["launch_id"],
+                launch["event_id"], launch["event_hash"], contact["contact_id"],
+                contact["event_id"], contact["event_hash"],
+                contact["target_digest"], 1, "OPERATOR_PAUSE_EXTERNAL_MUTATION",
+            )
+            observation = EffectObservationCommand(
+                "race-observation", "race-observation-command",
+                "race-observation-event", "repo-1", "race-run", "race-item",
+                "race-effect", "race-attempt", effect_capability.claim_id,
+                "race-observation-settlement", "",
+            )
+            barrier = threading.Barrier(2)
+
+            def pause():
+                barrier.wait()
+                return coordinator.pause_external_mutation(
+                    pause_request,
+                    authority.claim_operator(*pause_grant.__dict__.values()),
+                )
+
+            def observe():
+                barrier.wait()
+                return coordinator.intake_effect_receipt(observation)
+
+            results = []
+            errors = []
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = (executor.submit(pause), executor.submit(observe))
+                for future in futures:
+                    try:
+                        results.append(future.result())
+                    except BaseException as error:
+                        errors.append(error)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                state = connection.execute(
+                    "SELECT lifecycle_state FROM runs WHERE run_id = 'race-run'"
+                ).fetchone()[0]
+                counts = connection.execute(
+                    "SELECT (SELECT COUNT(*) FROM external_pause_actions), "
+                    "(SELECT COUNT(*) FROM effect_observations), "
+                    "(SELECT COUNT(*) FROM outstanding_slot)"
+                ).fetchone()
+                accounting = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = 'race-reservation'"
+                ).fetchone()
+            finally:
+                connection.close()
+            if counts[:2] == (1, 0):
+                results.append(coordinator.intake_effect_receipt(observation))
+                errors.clear()
+            elif counts[:2] == (0, 1):
+                with self.assertRaises(DispatchDenied):
+                    coordinator.pause_external_mutation(
+                        pause_request,
+                        authority.claim_operator(*pause_grant.__dict__.values()),
+                    )
+                errors.clear()
+            connection = sqlite3.connect(store._database_path)
+            try:
+                state = connection.execute(
+                    "SELECT lifecycle_state FROM runs WHERE run_id = 'race-run'"
+                ).fetchone()[0]
+                counts = connection.execute(
+                    "SELECT (SELECT COUNT(*) FROM external_pause_actions), "
+                    "(SELECT COUNT(*) FROM effect_observations), "
+                    "(SELECT COUNT(*) FROM outstanding_slot)"
+                ).fetchone()
+                accounting = connection.execute(
+                    "SELECT disposition, charged_units, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = 'race-reservation'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(counts[1:], (1, 1), repr(errors))
+            self.assertNotEqual(state, LifecycleState.PAUSING.value)
+            if counts[0] == 1:
+                self.assertEqual(state, LifecycleState.RECONCILIATION_REQUIRED.value)
+                self.assertEqual(accounting, ("ADJUSTED", 2, 0))
+                self.assertEqual(len(errors), 0)
+                self.assertEqual(len(results), 2)
+            else:
+                self.assertEqual(state, LifecycleState.VALIDATING.value)
+                self.assertEqual(accounting, ("CONSUMED", 2, 0))
+                self.assertEqual(len(errors), 0)
 
     @staticmethod
     def state_environment(root: Path) -> dict[str, str]:

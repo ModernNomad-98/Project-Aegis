@@ -913,6 +913,43 @@ class PauseLocalExecutionRequest:
 
 
 @dataclass(frozen=True)
+class PauseExternalMutationRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    launch_id: str
+    launch_event_id: str
+    launch_event_hash: str
+    contact_id: str
+    contact_event_id: str
+    contact_event_hash: str
+    target_digest: str
+    expected_slot_generation: int
+    reason_code: str
+
+    def validate(self) -> None:
+        identifiers = tuple(self.__dict__.values())[:-2] + (self.reason_code,)
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in identifiers
+        ):
+            raise ValueError("external pause command fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("external pause slot generation must be positive")
+
+
+@dataclass(frozen=True)
 class PauseBeforeDispatchRequest:
     pause_id: str
     command_id: str

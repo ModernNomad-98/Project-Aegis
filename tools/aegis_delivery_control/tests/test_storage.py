@@ -43,6 +43,7 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     GovernedOrder,
     PauseBeforeDispatchRequest,
+    PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
@@ -396,6 +397,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_launches": 0,
                 "control_actions": 0,
                 "local_pause_actions": 0,
+                "external_pause_actions": 0,
                 "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
@@ -1326,6 +1328,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_launches": 0,
                 "control_actions": 0,
                 "local_pause_actions": 0,
+                "external_pause_actions": 0,
                 "resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
@@ -3801,6 +3804,38 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.oracle.allowed_head = committed.event_hash
         return committed
 
+    def _contacted_operation(self, suffix: str = "1"):
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            self.request(), self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            contact = connection.execute(
+                "SELECT * FROM adapter_contacts WHERE run_id = 'run-1'"
+            ).fetchone()
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        request = PauseExternalMutationRequest(
+            f"external-pause-{suffix}", f"external-pause-command-{suffix}",
+            f"external-pause-event-{suffix}",
+            f"external-pause-fence-{suffix}", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-1", committed.event_id,
+            committed.event_hash, launched.launch_id, launched.event_id,
+            launched.event_hash, contact["contact_id"], contact["event_id"],
+            contact["event_hash"], contact["target_digest"], 1,
+            "OPERATOR_PAUSE_EXTERNAL_MUTATION",
+        )
+        return committed, launched, contact, request
+
     def test_t05_pauses_owned_prelaunch_attempt_and_retains_obligations(self) -> None:
         committed = self._running_operation()
         receipt = self.store.pause_local_execution(
@@ -3832,6 +3867,543 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(slot, ("run-1", "effect-1", "attempt-1", 1))
         self.assertEqual(reservation, ("RESERVED", 3, 0))
         self.assertEqual(fence, ("item-1", "effect-1"))
+
+    def test_t06_exact_contact_history_survives_verified_recovery(self) -> None:
+        _, _, _, request = self._contacted_operation("recovery")
+        receipt = self.store.pause_external_mutation(
+            request, self._pause_capability("external-recovery"), self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+        self.assertEqual(
+            receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+
+    def test_t06_rejects_wrong_contact_chain_and_slot_without_mutation(self) -> None:
+        _, _, _, request = self._contacted_operation("bindings")
+        capability = self._pause_capability("external-bindings")
+        variants = (
+            replace(request, item_id="other-item"),
+            replace(request, logical_effect_id="other-effect"),
+            replace(request, attempt_id="other-attempt"),
+            replace(request, intent_event_hash="other-intent-hash"),
+            replace(request, launch_id="other-launch"),
+            replace(request, launch_event_hash="other-launch-hash"),
+            replace(request, contact_id="other-contact"),
+            replace(request, contact_event_hash="other-contact-hash"),
+            replace(request, target_digest="other-target"),
+            replace(request, expected_slot_generation=2),
+        )
+        for variant in variants:
+            with self.subTest(variant=variant), self.assertRaises(DispatchDenied):
+                self.store.pause_external_mutation(
+                    variant, capability, self.authority
+                )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(state, "RUNNING")
+        self.assertEqual(self.store.table_counts()["external_pause_actions"], 0)
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 0)
+
+    def test_t06_requires_contact_and_denies_already_recorded_receipt(self) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        fabricated = PauseExternalMutationRequest(
+            "external-pause-precontact", "external-command-precontact",
+            "external-event-precontact", "external-fence-precontact",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            committed.event_id, committed.event_hash, launched.launch_id,
+            launched.event_id, launched.event_hash, "missing-contact",
+            "missing-contact-event", "missing-contact-hash",
+            self.store._adapter_target_digest("repo-1", "EFFECT"), 1,
+            "OPERATOR_PAUSE_EXTERNAL_MUTATION",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "adapter contact"):
+            self.store.pause_external_mutation(
+                fabricated, self._pause_capability("external-precontact"),
+                self.authority,
+            )
+
+    def test_t06_exact_replay_conflict_and_crash_boundaries(self) -> None:
+        _, _, _, request = self._contacted_operation("crash")
+        capability = self._pause_capability("external-crash")
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_external_mutation(
+                request, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_external_pause_settlement_before_pause"
+                ),
+            )
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 0)
+        self.assertEqual(self.store.table_counts()["external_pause_actions"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_external_mutation(
+                request, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_external_pause_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        replay = self.store.pause_external_mutation(
+            request, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, self.oracle.allowed_head)
+        with self.assertRaisesRegex(StorageIntegrityError, "different payload"):
+            self.store.pause_external_mutation(
+                replace(request, reason_code="DIFFERENT"),
+                capability, self.authority,
+            )
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
+        self.assertEqual(self.store.table_counts()["external_pause_actions"], 1)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+    def test_t06_retains_existing_unknown_settlement_without_double_charge(
+        self,
+    ) -> None:
+        _, _, _, request = self._contacted_operation("existing-unknown")
+        settlement = BudgetSettlementRequest(
+            "existing-unknown-settlement", "reservation-1", "",
+            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+            "existing-missing-telemetry", "USAGE_UNKNOWN",
+        )
+        settled = self.store._settle_budget(
+            settlement,
+            self.authority.issue_settlement_proof(
+                "existing-unknown-proof", settlement
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-existing-unknown"),
+            self.authority,
+        )
+        self.assertEqual(
+            paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            row = connection.execute(
+                "SELECT settlement_event_id, settlement_hash FROM "
+                "external_pause_actions"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(
+            row, ("existing-unknown-settlement", settled.settlement_hash)
+        )
+
+    def test_t06_unknown_late_receipt_retains_worst_case_and_fence(self) -> None:
+        _, _, _, request = self._contacted_operation("unknown-late")
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-unknown-late"),
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        observed = self.store._record_effect_observation(
+            EffectObservationRequest(
+                "unknown-late-observation", "unknown-late-command",
+                "unknown-late-event", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "unknown-late-receipt",
+                self.capability.claim_id, self.request().effect_descriptor_digest,
+                None, "unknown-late-settlement", "",
+            )
+        )
+        self.assertEqual(
+            observed.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT disposition, charged_units, uncertainty FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            retained = connection.execute(
+                "SELECT (SELECT COUNT(*) FROM outstanding_slot), "
+                "(SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                "'external-pause-fence-unknown-late')"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(accounting, ("UNKNOWN_WORST_CASE_CHARGED", 5, 1))
+        self.assertEqual(retained, (1, 1))
+
+    def test_t06_recovery_rejects_external_pause_projection_loss(self) -> None:
+        _, _, _, request = self._contacted_operation("projection-tamper")
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-projection-tamper"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute("DELETE FROM external_pause_actions")
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = paused.event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "external-pause"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t06_recovery_rejects_surplus_event_schema(self) -> None:
+        _, _, _, request = self._contacted_operation("schema-tamper")
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-schema-tamper"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM external_pause_actions"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["surplus"] = "forbidden"
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE external_pause_actions SET event_hash = ?, body_json = ?",
+                (event_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = "
+                "'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "external PAUSE_REQUESTED"
+        ):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t06_recovery_rejects_self_consistent_contact_snapshot_rewrite(
+        self,
+    ) -> None:
+        _, _, _, request = self._contacted_operation("snapshot-tamper")
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-snapshot-tamper"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM external_pause_actions"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["uncertainty_snapshot"]["contact_event_hash"] = "forged-contact"
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE external_pause_actions SET event_hash = ?, body_json = ?",
+                (event_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = "
+                "'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "external pause proof"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t06_recovery_rejects_retained_settlement_head_retarget(self) -> None:
+        _, _, _, request = self._contacted_operation("head-retarget")
+        unknown_request = BudgetSettlementRequest(
+            "head-retarget-unknown", "reservation-1", "",
+            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+            "head-retarget-missing", "USAGE_UNKNOWN",
+        )
+        unknown = self.store._settle_budget(
+            unknown_request,
+            self.authority.issue_settlement_proof(
+                "head-retarget-unknown-proof", unknown_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = unknown.settlement_hash
+        adjusted_request = BudgetSettlementRequest(
+            "head-retarget-adjusted", "reservation-1",
+            unknown.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            "head-retarget-known", "USAGE_REPORTED",
+        )
+        adjusted = self.store._settle_budget(
+            adjusted_request,
+            self.authority.issue_settlement_proof(
+                "head-retarget-adjusted-proof", adjusted_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = adjusted.settlement_hash
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-head-retarget"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM external_pause_actions"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["uncertainty_snapshot"].update(
+                {
+                    "historical_disposition": (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                    ),
+                    "resulting_disposition": (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                    ),
+                    "settlement_event_id": unknown.settlement_event_id,
+                    "settlement_hash": unknown.settlement_hash,
+                }
+            )
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, body["event_id"]),
+            )
+            connection.execute(
+                "UPDATE external_pause_actions SET settlement_event_id = ?, "
+                "settlement_hash = ?, event_hash = ?, body_json = ?",
+                (
+                    unknown.settlement_event_id, unknown.settlement_hash,
+                    event_hash, body_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, body["command_id"]),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = "
+                "'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "external pause proof"):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t06_recovery_rejects_self_consistent_contact_effect_retarget(
+        self,
+    ) -> None:
+        _, _, _, request = self._contacted_operation("contact-retarget")
+        paused = self.store.pause_external_mutation(
+            request, self._pause_capability("external-contact-retarget"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            contact = connection.execute(
+                "SELECT * FROM adapter_contacts"
+            ).fetchone()
+            pause = connection.execute(
+                "SELECT * FROM external_pause_actions"
+            ).fetchone()
+            settlement = connection.execute(
+                "SELECT * FROM budget_settlements WHERE settlement_event_id = ?",
+                (pause["settlement_event_id"],),
+            ).fetchone()
+
+            contact_body = json.loads(contact["body_json"])
+            contact_body["logical_effect_id"] = "forged-effect"
+            contact_hash = self.store._event_hash(contact_body)
+            contact_json = json.dumps(
+                contact_body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (contact_hash, contact_json, contact["event_id"]),
+            )
+            connection.execute(
+                "UPDATE adapter_contacts SET event_hash = ?, body_json = ? "
+                "WHERE contact_id = ?",
+                (contact_hash, contact_json, contact["contact_id"]),
+            )
+
+            pause_body = json.loads(pause["body_json"])
+            settlement_body = json.loads(settlement["body_json"])
+            settlement_binding = {
+                "pause_id": pause_body["pause_id"],
+                "pause_event_id": pause_body["event_id"],
+                "reservation_id": settlement["reservation_id"],
+                "expected_previous_hash": settlement["previous_hash"],
+                "intent_event_hash": pause_body["intent_event_hash"],
+                "launch_event_hash": pause_body["launch_event_hash"],
+                "contact_event_hash": contact_hash,
+            }
+            evidence_digest = self.store._event_hash(settlement_binding)
+            settlement_event_id = "external-pause-unknown:" + evidence_digest
+            settlement_body.update(
+                {
+                    "settlement_event_id": settlement_event_id,
+                    "evidence_digest": evidence_digest,
+                    "event_id": settlement_event_id,
+                    "command_id": f"settlement:{settlement_event_id}",
+                    "previous_event_hash": contact_hash,
+                }
+            )
+            payload_keys = {
+                "actual_units", "additional_liability",
+                "all_obligations_settled", "disposition", "evidence_digest",
+                "expected_previous_hash", "non_dispatch_proven",
+                "reason_code", "release_slot", "reservation_id",
+                "settlement_event_id", "zero_liability_proven",
+                "repository_id", "run_id", "item_id", "logical_effect_id",
+                "attempt_id", "settlement_binding_version",
+            }
+            settlement_payload_digest = self.store._event_hash(
+                {key: settlement_body[key] for key in payload_keys}
+            )
+            settlement_hash = self.store._event_hash(settlement_body)
+            settlement_json = json.dumps(
+                settlement_body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET event_id = ?, command_id = ?, "
+                "previous_event_hash = ?, event_hash = ?, body_json = ? "
+                "WHERE event_id = ?",
+                (
+                    settlement_event_id, settlement_body["command_id"],
+                    contact_hash, settlement_hash, settlement_json,
+                    settlement["settlement_event_id"],
+                ),
+            )
+            connection.execute(
+                "UPDATE budget_settlements SET settlement_event_id = ?, "
+                "settlement_hash = ?, evidence_digest = ?, payload_digest = ?, "
+                "body_json = ? WHERE settlement_event_id = ?",
+                (
+                    settlement_event_id, settlement_hash, evidence_digest,
+                    settlement_payload_digest, settlement_json,
+                    settlement["settlement_event_id"],
+                ),
+            )
+            connection.execute(
+                "UPDATE budget_reservations SET settlement_head_hash = ? "
+                "WHERE reservation_id = ?",
+                (settlement_hash, settlement["reservation_id"]),
+            )
+
+            pause_body["contact_event_hash"] = contact_hash
+            pause_body["previous_event_hash"] = settlement_hash
+            pause_body["uncertainty_snapshot"].update(
+                {
+                    "contact_event_hash": contact_hash,
+                    "settlement_event_id": settlement_event_id,
+                    "settlement_hash": settlement_hash,
+                }
+            )
+            pause_payload = {
+                **{
+                    key: pause_body[key]
+                    for key in PauseExternalMutationRequest.__dataclass_fields__
+                },
+                "pause_kind": pause_body["pause_kind"],
+                "pause_binding_version": pause_body["pause_binding_version"],
+                "capability_evidence": pause_body["capability_evidence"],
+                "capability_issuer_fingerprint": pause_body[
+                    "capability_issuer_fingerprint"
+                ],
+            }
+            pause_body["payload_digest"] = self.store._event_hash(pause_payload)
+            pause_hash = self.store._event_hash(pause_body)
+            pause_json = json.dumps(
+                pause_body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "UPDATE events SET previous_event_hash = ?, event_hash = ?, "
+                "body_json = ? WHERE event_id = ?",
+                (
+                    settlement_hash, pause_hash, pause_json,
+                    pause_body["event_id"],
+                ),
+            )
+            connection.execute(
+                "UPDATE external_pause_actions SET contact_event_hash = ?, "
+                "settlement_event_id = ?, settlement_hash = ?, "
+                "payload_digest = ?, event_hash = ?, body_json = ?",
+                (
+                    contact_hash, settlement_event_id, settlement_hash,
+                    pause_body["payload_digest"], pause_hash, pause_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, event_hash = ? "
+                "WHERE command_id = ?",
+                (
+                    pause_body["payload_digest"], pause_hash,
+                    pause_body["command_id"],
+                ),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (pause_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = "
+                "'repo-1'",
+                (pause_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = pause_hash
+        with self.assertRaisesRegex(StorageIntegrityError, "external pause proof"):
+            self.store.load_verified("repo-1", authority=self.authority)
 
     def test_t05_pauses_launched_uncontacted_attempt(self) -> None:
         committed = self._running_operation()

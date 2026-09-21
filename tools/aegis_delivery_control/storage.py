@@ -56,6 +56,7 @@ from .contracts import (
     OperationLaunchReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
@@ -238,6 +239,10 @@ _LIFECYCLE_ROUTES: Mapping[
             (LifecycleState.PLANNED, LifecycleState.PLANNED),
             (LifecycleState.BLOCKED, LifecycleState.BLOCKED),
             (LifecycleState.RUNNING, LifecycleState.PAUSING),
+            (
+                LifecycleState.RUNNING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
         }
     ),
     "PAUSE_SETTLED": frozenset(
@@ -1177,6 +1182,44 @@ class SQLiteStateStore:
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSING'),
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS external_pause_actions (
+                pause_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                intent_event_id TEXT NOT NULL,
+                intent_event_hash TEXT NOT NULL,
+                launch_id TEXT NOT NULL,
+                launch_event_id TEXT NOT NULL,
+                launch_event_hash TEXT NOT NULL,
+                contact_id TEXT NOT NULL,
+                contact_event_id TEXT NOT NULL,
+                contact_event_hash TEXT NOT NULL,
+                target_digest TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                reason_code TEXT NOT NULL,
+                settlement_event_id TEXT NOT NULL,
+                settlement_hash TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_repository_id TEXT NOT NULL,
+                capability_run_id TEXT NOT NULL,
+                capability_action TEXT NOT NULL CHECK (capability_action = 'PAUSE'),
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (
+                    resulting_state = 'RECONCILIATION_REQUIRED'
+                ),
                 body_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS resume_actions (
@@ -2274,6 +2317,88 @@ class SQLiteStateStore:
         ):
             raise StorageIntegrityError(
                 "unsupported local PAUSE_REQUESTED event schema"
+            )
+
+    @staticmethod
+    def _validate_external_pause_event_body(body: Mapping[str, object]) -> None:
+        expected_fields = set(
+            PauseExternalMutationRequest.__dataclass_fields__
+        ) | {
+            "capability_evidence", "capability_issuer_fingerprint",
+            "event_kind", "lifecycle_from", "lifecycle_to",
+            "pause_binding_version", "pause_kind", "payload_digest",
+            "previous_event_hash", "retained_continuation_cursor",
+            "schema_version", "sequence", "uncertainty_snapshot",
+            "uncertainty_snapshot_version", "writer_epoch",
+        }
+        snapshot_fields = {
+            "reservation_id", "historical_disposition",
+            "resulting_disposition", "worst_case_units",
+            "settlement_event_id", "settlement_hash", "intent_event_hash",
+            "launch_event_hash", "contact_event_hash",
+            "source_receipt_classification", "control_state_classification",
+        }
+        capability = body.get("capability_evidence")
+        snapshot = body.get("uncertainty_snapshot")
+        integer_fields = {
+            "expected_slot_generation", "pause_binding_version",
+            "schema_version", "sequence", "uncertainty_snapshot_version",
+            "writer_epoch",
+        }
+        optional_strings = {"retained_continuation_cursor"}
+        if (
+            set(body) != expected_fields
+            or body.get("pause_kind") != "EXTERNAL_MUTATION"
+            or body.get("event_kind") != "PAUSE_REQUESTED"
+            or body.get("lifecycle_from") != LifecycleState.RUNNING.value
+            or body.get("lifecycle_to")
+            != LifecycleState.RECONCILIATION_REQUIRED.value
+            or body.get("pause_binding_version") != 1
+            or body.get("schema_version") != 1
+            or body.get("uncertainty_snapshot_version") != 1
+            or any(
+                type(body.get(field)) is not int
+                or int(cast(int, body.get(field))) <= 0
+                for field in integer_fields
+            )
+            or not isinstance(capability, Mapping)
+            or set(capability)
+            != set(SyntheticOperatorCapability.__dataclass_fields__)
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in cast(Mapping[str, object], capability).values()
+            )
+            or not isinstance(snapshot, Mapping)
+            or set(snapshot) != snapshot_fields
+            or type(snapshot.get("worst_case_units")) is not int
+            or int(cast(int, snapshot.get("worst_case_units"))) < 0
+            or any(
+                not isinstance(snapshot.get(field), str)
+                or not cast(str, snapshot.get(field)).strip()
+                for field in snapshot_fields.difference({"worst_case_units"})
+            )
+            or snapshot.get("source_receipt_classification") != "UNKNOWN"
+            or snapshot.get("control_state_classification") != "UNKNOWN"
+            or any(
+                body.get(field) is not None
+                and (
+                    not isinstance(body.get(field), str)
+                    or not cast(str, body.get(field)).strip()
+                )
+                for field in optional_strings
+            )
+            or any(
+                not isinstance(body.get(field), str)
+                or not cast(str, body.get(field)).strip()
+                for field in expected_fields.difference(
+                    integer_fields
+                    | optional_strings
+                    | {"capability_evidence", "uncertainty_snapshot"}
+                )
+            )
+        ):
+            raise StorageIntegrityError(
+                "unsupported external PAUSE_REQUESTED event schema"
             )
 
     @staticmethod
@@ -4879,7 +5004,8 @@ class SQLiteStateStore:
                 event_kind = str(row["event_kind"])
                 if (
                     event_kind == "PAUSE_REQUESTED"
-                    and body.get("pause_kind") == "LOCAL_EXECUTION"
+                    and body.get("pause_kind")
+                    in {"LOCAL_EXECUTION", "EXTERNAL_MUTATION"}
                 ):
                     active_fences[str(body["fence_id"])] = (
                         str(body["item_id"]),
@@ -5795,6 +5921,534 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.pause_id, request.command_id, request.event_id, sequence,
             event_hash, LifecycleState.PAUSING, False,
+        )
+
+    def pause_external_mutation(
+        self,
+        request: PauseExternalMutationRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("external pause command targets another repository")
+        if (
+            self._classification_authority is None
+            or self._classification_authority.issuer_fingerprint
+            != authority.issuer_fingerprint
+        ):
+            raise DispatchDenied("external pause authority is not the bound issuer")
+        if (
+            capability.repository_id,
+            capability.run_id,
+            capability.action,
+        ) != (request.repository_id, request.run_id, "PAUSE"):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this external pause"
+            )
+        capability_evidence = dict(capability.__dict__)
+        payload = {
+            **request.__dict__,
+            "pause_kind": "EXTERNAL_MUTATION",
+            "pause_binding_version": 1,
+            "capability_evidence": capability_evidence,
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    prior = connection.execute(
+                        "SELECT * FROM external_pause_actions WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "external pause outcome lost its projection"
+                        )
+                    recorded_capability = (
+                        prior["capability_claim_id"],
+                        prior["capability_grant_id"],
+                        prior["capability_repository_id"],
+                        prior["capability_run_id"],
+                        prior["capability_action"],
+                        prior["capability_scope_digest"],
+                        prior["capability_issuer_mac"],
+                        prior["capability_issuer_fingerprint"],
+                    )
+                    if recorded_capability != (
+                        *capability.__dict__.values(),
+                        authority.issuer_fingerprint,
+                    ):
+                        raise DispatchDenied(
+                            "operator capability does not match recorded external pause"
+                        )
+                    connection.rollback()
+                    body = json.loads(prior["body_json"])
+                    return ControlReceipt(
+                        str(prior["pause_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState.RECONCILIATION_REQUIRED, True,
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM external_pause_actions WHERE pause_id = ? OR "
+                    "event_id = ? OR fence_id = ?",
+                    (request.pause_id, request.event_id, request.fence_id),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "external pause identity was reused with a different payload"
+                        )
+                    raise StorageIntegrityError(
+                        "external pause identity lost its command outcome"
+                    )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                authority.verify_operator_for_action(capability)
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied(
+                        "external pause does not bind the recorded run"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state is not LifecycleState.RUNNING:
+                    raise DispatchDenied("T06 requires durable RUNNING state")
+                plan = connection.execute(
+                    "SELECT item_id, logical_effect_id FROM validation_plans "
+                    "WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"]
+                ) != (request.item_id, request.logical_effect_id):
+                    raise DispatchDenied(
+                        "external pause does not bind the accepted plan"
+                    )
+                intent = connection.execute(
+                    "SELECT * FROM events WHERE repository_id = ? AND run_id = ? "
+                    "AND event_id = ? AND event_hash = ? AND "
+                    "event_kind = 'INTENT_COMMITTED'",
+                    (
+                        request.repository_id, request.run_id,
+                        request.intent_event_id, request.intent_event_hash,
+                    ),
+                ).fetchone()
+                if intent is None:
+                    raise DispatchDenied(
+                        "external pause does not bind the durable intent"
+                    )
+                intent_body = json.loads(intent["body_json"])
+                if (
+                    intent_body.get("item_id"),
+                    intent_body.get("logical_effect_id"),
+                    intent_body.get("attempt_id"),
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id,
+                ):
+                    raise DispatchDenied("external pause changed the durable attempt")
+                redemption = connection.execute(
+                    "SELECT * FROM capability_redemptions WHERE repository_id = ? "
+                    "AND command_id = ?",
+                    (request.repository_id, intent["command_id"]),
+                ).fetchone()
+                if redemption is None or (
+                    redemption["logical_effect_id"], redemption["attempt_id"]
+                ) != (request.logical_effect_id, request.attempt_id):
+                    raise DispatchDenied(
+                        "external pause attempt has no exact capability redemption"
+                    )
+                launch = connection.execute(
+                    "SELECT * FROM operation_launches WHERE launch_id = ? AND "
+                    "event_id = ? AND event_hash = ? AND repository_id = ? AND "
+                    "run_id = ? AND item_id = ? AND logical_effect_id = ? AND "
+                    "attempt_id = ?",
+                    (
+                        request.launch_id, request.launch_event_id,
+                        request.launch_event_hash, request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                if launch is None or (
+                    launch["intent_event_id"], launch["intent_event_hash"],
+                    launch["capability_claim_id"],
+                ) != (
+                    request.intent_event_id, request.intent_event_hash,
+                    redemption["claim_id"],
+                ):
+                    raise DispatchDenied(
+                        "external pause does not bind the exact operation launch"
+                    )
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE contact_id = ? AND "
+                    "event_id = ? AND event_hash = ? AND repository_id = ? AND "
+                    "run_id = ? AND item_id = ? AND contact_kind = 'EFFECT' AND "
+                    "source_id = ? AND target_digest = ?",
+                    (
+                        request.contact_id, request.contact_event_id,
+                        request.contact_event_hash, request.repository_id,
+                        request.run_id, request.item_id,
+                        f"EFFECT:{request.launch_id}", request.target_digest,
+                    ),
+                ).fetchone()
+                if contact is None or request.target_digest != (
+                    self._adapter_target_digest(request.repository_id, "EFFECT")
+                ):
+                    raise DispatchDenied(
+                        "external pause does not bind the exact adapter contact"
+                    )
+                contact_body = json.loads(contact["body_json"])
+                if (
+                    contact_body.get("logical_effect_id"),
+                    contact_body.get("attempt_id"),
+                ) != (request.logical_effect_id, request.attempt_id):
+                    raise DispatchDenied("external pause changed the contact attempt")
+                if connection.execute(
+                    "SELECT 1 FROM effect_observations WHERE repository_id = ? "
+                    "AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.logical_effect_id,
+                        request.attempt_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "T06 cannot replace an already recorded effect receipt"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("external pause does not own the exact slot")
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                    "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                    "AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                if reservation is None:
+                    raise DispatchDenied(
+                        "external pause lost the exact budget reservation"
+                    )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T06", current_state,
+                        LifecycleState.RECONCILIATION_REQUIRED,
+                        TRANSITIONS["T06"].required_guards,
+                    )
+                else:
+                    authorize_transition(
+                        current_state, LifecycleState.RECONCILIATION_REQUIRED
+                    )
+                sequence = int(run["head_sequence"])
+                previous_hash = str(run["head_hash"])
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                current_disposition = BudgetDisposition(
+                    str(reservation["disposition"])
+                )
+                settlement_event_id = ""
+                settlement_hash = str(reservation["settlement_head_hash"])
+                if current_disposition is BudgetDisposition.RESERVED:
+                    settlement_binding = {
+                        "pause_id": request.pause_id,
+                        "pause_event_id": request.event_id,
+                        "reservation_id": reservation["reservation_id"],
+                        "expected_previous_hash": settlement_hash,
+                        "intent_event_hash": request.intent_event_hash,
+                        "launch_event_hash": request.launch_event_hash,
+                        "contact_event_hash": request.contact_event_hash,
+                    }
+                    binding_digest = self._event_hash(settlement_binding)
+                    settlement_event_id = (
+                        "external-pause-unknown:" + binding_digest
+                    )
+                    settlement_request = BudgetSettlementRequest(
+                        settlement_event_id=settlement_event_id,
+                        reservation_id=str(reservation["reservation_id"]),
+                        expected_previous_hash=settlement_hash,
+                        disposition=(
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        ),
+                        actual_units=None,
+                        evidence_digest=binding_digest,
+                        reason_code="PAUSE_CONTACT_RECEIPT_UNKNOWN",
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        attempt_id=request.attempt_id,
+                    )
+                    settlement_request.validate()
+                    settlement_payload = {
+                        **{
+                            key: value
+                            for key, value in settlement_request.__dict__.items()
+                            if key != "nonexecution_seal_id"
+                        },
+                        "disposition": settlement_request.disposition.value,
+                        "settlement_binding_version": 2,
+                    }
+                    settlement_payload_digest = self._event_hash(
+                        settlement_payload
+                    )
+                    sequence += 1
+                    settlement_body = {
+                        **settlement_payload,
+                        "charged_units": int(reservation["worst_case_units"]),
+                        "command_id": f"settlement:{settlement_event_id}",
+                        "contradiction": False,
+                        "event_id": settlement_event_id,
+                        "event_kind": "BUDGET_SETTLED",
+                        "held_units": 0,
+                        "previous_event_hash": previous_hash,
+                        "schema_version": 1,
+                        "sequence": sequence,
+                        "uncertainty": True,
+                        "writer_epoch": writer_epoch,
+                    }
+                    settlement_hash = self._event_hash(settlement_body)
+                    settlement_json = json.dumps(
+                        settlement_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                        "'BUDGET_SETTLED', ?, ?, ?)",
+                        (
+                            settlement_event_id, request.repository_id,
+                            request.run_id, request.item_id, sequence,
+                            settlement_body["command_id"], writer_epoch,
+                            previous_hash, settlement_hash, settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO budget_settlements VALUES "
+                        "(?, ?, ?, ?, ?, 0, ?, 1, ?, ?, ?, ?)",
+                        (
+                            settlement_event_id, reservation["reservation_id"],
+                            settlement_request.expected_previous_hash,
+                            settlement_hash,
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            reservation["worst_case_units"], binding_digest,
+                            settlement_request.reason_code,
+                            settlement_payload_digest, settlement_json,
+                        ),
+                    )
+                    connection.execute(
+                        "UPDATE budget_reservations SET held_units = 0, "
+                        "charged_units = worst_case_units, uncertainty = 1, "
+                        "disposition = ?, settlement_head_hash = ? WHERE "
+                        "reservation_id = ?",
+                        (
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                            settlement_hash, reservation["reservation_id"],
+                        ),
+                    )
+                    previous_hash = settlement_hash
+                    if failure_hook is not None:
+                        failure_hook(
+                            "after_external_pause_settlement_before_pause"
+                        )
+                else:
+                    existing = connection.execute(
+                        "SELECT settlement_event_id, settlement_hash FROM "
+                        "budget_settlements WHERE reservation_id = ? AND "
+                        "settlement_hash = ?",
+                        (
+                            reservation["reservation_id"],
+                            reservation["settlement_head_hash"],
+                        ),
+                    ).fetchone()
+                    if existing is None:
+                        raise StorageIntegrityError(
+                            "external pause accounting head is unavailable"
+                        )
+                    settlement_event_id = str(existing["settlement_event_id"])
+                    settlement_hash = str(existing["settlement_hash"])
+                uncertainty_snapshot = {
+                    "reservation_id": reservation["reservation_id"],
+                    "historical_disposition": current_disposition.value,
+                    "resulting_disposition": (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                        if current_disposition is BudgetDisposition.RESERVED
+                        else current_disposition.value
+                    ),
+                    "worst_case_units": int(reservation["worst_case_units"]),
+                    "settlement_event_id": settlement_event_id,
+                    "settlement_hash": settlement_hash,
+                    "intent_event_hash": request.intent_event_hash,
+                    "launch_event_hash": request.launch_event_hash,
+                    "contact_event_hash": request.contact_event_hash,
+                    "source_receipt_classification": "UNKNOWN",
+                    "control_state_classification": "UNKNOWN",
+                }
+                sequence += 1
+                body = {
+                    **payload,
+                    "event_kind": "PAUSE_REQUESTED",
+                    "lifecycle_from": LifecycleState.RUNNING.value,
+                    "lifecycle_to": (
+                        LifecycleState.RECONCILIATION_REQUIRED.value
+                    ),
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "retained_continuation_cursor": run["continuation_cursor"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "uncertainty_snapshot": uncertainty_snapshot,
+                    "uncertainty_snapshot_version": 1,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'PAUSE_REQUESTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, previous_hash, event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        request.fence_id, request.repository_id,
+                        request.item_id, request.logical_effect_id,
+                        request.reason_code, request.event_id,
+                    ),
+                )
+                values = (
+                    request.pause_id, request.command_id, request.event_id,
+                    request.fence_id, request.repository_id, request.run_id,
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id, request.intent_event_id,
+                    request.intent_event_hash, request.launch_id,
+                    request.launch_event_id, request.launch_event_hash,
+                    request.contact_id, request.contact_event_id,
+                    request.contact_event_hash, request.target_digest,
+                    request.expected_slot_generation, request.reason_code,
+                    settlement_event_id, settlement_hash,
+                    capability.claim_id, capability.grant_id,
+                    capability.repository_id, capability.run_id,
+                    capability.action, capability.scope_digest,
+                    capability.issuer_mac, authority.issuer_fingerprint,
+                    payload_digest, event_hash,
+                    LifecycleState.RECONCILIATION_REQUIRED.value, body_json,
+                )
+                connection.execute(
+                    "INSERT INTO external_pause_actions VALUES ("
+                    + ", ".join("?" for _ in values) + ")",
+                    values,
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'PAUSE', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id,
+                        request.run_id, capability.scope_digest,
+                        authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (
+                        LifecycleState.RECONCILIATION_REQUIRED.value,
+                        sequence, event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? "
+                    "WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_external_pause_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_external_pause_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as exc:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "external pause durable identity conflicts with recorded state"
+                ) from exc
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.pause_id, request.command_id, request.event_id, sequence,
+            event_hash, LifecycleState.RECONCILIATION_REQUIRED, False,
         )
 
     def pause_before_dispatch(
@@ -13103,7 +13757,34 @@ class SQLiteStateStore:
                     )
                 except (KeyError, TypeError, json.JSONDecodeError):
                     immediate_stop_epoch = False
-            if not pause_epoch and not escalation_epoch and not immediate_stop_epoch:
+            external_pause_epoch = False
+            if (
+                len(rows) == 2
+                and tuple(row["event_kind"] for row in rows)
+                == ("BUDGET_SETTLED", "PAUSE_REQUESTED")
+                and rows[0]["run_id"] == rows[1]["run_id"]
+                and int(rows[0]["sequence"]) + 1 == int(rows[1]["sequence"])
+            ):
+                try:
+                    external_pause_body = json.loads(rows[1]["body_json"])
+                    external_pause_epoch = (
+                        external_pause_body["pause_kind"]
+                        == "EXTERNAL_MUTATION"
+                        and external_pause_body["uncertainty_snapshot_version"]
+                        == 1
+                        and external_pause_body["uncertainty_snapshot"][
+                            "settlement_event_id"
+                        ]
+                        == rows[0]["event_id"]
+                    )
+                except (KeyError, TypeError, json.JSONDecodeError):
+                    external_pause_epoch = False
+            if not (
+                pause_epoch
+                or escalation_epoch
+                or immediate_stop_epoch
+                or external_pause_epoch
+            ):
                 raise StorageIntegrityError(
                     "writer epoch is reused outside one atomic control action: "
                     f"{[(row['event_kind'], row['event_id'], row['sequence']) for row in rows]}"
@@ -13245,16 +13926,21 @@ class SQLiteStateStore:
         expected_contacts = {
             body["contact_id"]: (
                 body["event_id"], body["repository_id"], body["run_id"],
-                body["item_id"], body["contact_kind"], body["source_id"],
-                body["target_digest"], self._event_hash(body),
+                body["item_id"], body["logical_effect_id"], body["attempt_id"],
+                body["contact_kind"], body["source_id"],
+                body["target_digest"], self._event_hash(body), body,
             )
             for body in contact_events
         }
         actual_contacts = {
             row["contact_id"]: (
                 row["event_id"], row["repository_id"], row["run_id"],
-                row["item_id"], row["contact_kind"], row["source_id"],
+                row["item_id"],
+                json.loads(row["body_json"])["logical_effect_id"],
+                json.loads(row["body_json"])["attempt_id"],
+                row["contact_kind"], row["source_id"],
                 row["target_digest"], row["event_hash"],
+                json.loads(row["body_json"]),
             )
             for row in connection.execute(
                 "SELECT * FROM adapter_contacts WHERE repository_id = ?",
@@ -13819,6 +14505,263 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "local pause proof or schema is invalid"
                 ) from error
+        external_pause_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'PAUSE_REQUESTED' AND "
+            "json_extract(body_json, '$.pause_kind') = 'EXTERNAL_MUTATION'",
+            (repository_id,),
+        ).fetchall()
+        external_pauses = [
+            json.loads(row["body_json"]) for row in external_pause_rows
+        ]
+        for body in external_pauses:
+            self._validate_external_pause_event_body(body)
+            try:
+                request = PauseExternalMutationRequest(
+                    **{
+                        key: body[key]
+                        for key in (
+                            PauseExternalMutationRequest.__dataclass_fields__
+                        )
+                    }
+                )
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied("external pause authority is not bound")
+                self._classification_authority.verify_operator_issued(capability)
+                expected_payload = {
+                    **request.__dict__,
+                    "pause_kind": "EXTERNAL_MUTATION",
+                    "pause_binding_version": 1,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                }
+                if (
+                    body["capability_issuer_fingerprint"]
+                    != self._classification_authority.issuer_fingerprint
+                    or body["payload_digest"] != self._event_hash(expected_payload)
+                    or (
+                        capability.repository_id, capability.run_id,
+                        capability.action,
+                    ) != (request.repository_id, request.run_id, "PAUSE")
+                ):
+                    raise DispatchDenied("external pause authority binding mismatch")
+                intent = connection.execute(
+                    "SELECT body_json, event_hash, writer_epoch FROM events "
+                    "WHERE event_id = ? AND repository_id = ? AND run_id = ? "
+                    "AND event_kind = 'INTENT_COMMITTED'",
+                    (
+                        request.intent_event_id, request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                launch = connection.execute(
+                    "SELECT * FROM operation_launches WHERE launch_id = ? AND "
+                    "event_id = ? AND event_hash = ?",
+                    (
+                        request.launch_id, request.launch_event_id,
+                        request.launch_event_hash,
+                    ),
+                ).fetchone()
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE contact_id = ? AND "
+                    "event_id = ? AND event_hash = ?",
+                    (
+                        request.contact_id, request.contact_event_id,
+                        request.contact_event_hash,
+                    ),
+                ).fetchone()
+                if (
+                    intent is None
+                    or intent["event_hash"] != request.intent_event_hash
+                    or launch is None
+                    or contact is None
+                    or request.target_digest
+                    != self._adapter_target_digest(repository_id, "EFFECT")
+                    or contact["target_digest"] != request.target_digest
+                    or contact["contact_kind"] != "EFFECT"
+                    or contact["source_id"] != f"EFFECT:{request.launch_id}"
+                ):
+                    raise DispatchDenied(
+                        "external pause durable contact chain is unavailable"
+                    )
+                intent_body = json.loads(intent["body_json"])
+                contact_body = json.loads(contact["body_json"])
+                if (
+                    intent_body["item_id"], intent_body["logical_effect_id"],
+                    intent_body["attempt_id"], launch["repository_id"],
+                    launch["run_id"], launch["item_id"],
+                    launch["logical_effect_id"], launch["attempt_id"],
+                    launch["intent_event_id"], launch["intent_event_hash"],
+                    contact["repository_id"], contact["run_id"],
+                    contact["item_id"], contact_body["repository_id"],
+                    contact_body["run_id"], contact_body["item_id"],
+                    contact_body["logical_effect_id"],
+                    contact_body["attempt_id"], contact_body["contact_kind"],
+                    contact_body["source_id"], contact_body["target_digest"],
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.attempt_id, request.repository_id,
+                    request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.intent_event_id, request.intent_event_hash,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id, "EFFECT",
+                    f"EFFECT:{request.launch_id}", request.target_digest,
+                ):
+                    raise DispatchDenied("external pause attempt binding mismatch")
+                if (
+                    self._event_hash(contact_body) != request.contact_event_hash
+                    or int(contact_body["sequence"]) >= int(body["sequence"])
+                    or int(contact_body["writer_epoch"])
+                    >= int(body["writer_epoch"])
+                ):
+                    raise DispatchDenied(
+                        "external pause contact does not precede the pause"
+                    )
+                _, historical_slot, _ = self._historical_repository_activity(
+                    connection, repository_id, int(body["writer_epoch"])
+                )
+                if historical_slot != (
+                    request.run_id, request.logical_effect_id,
+                    request.attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("external pause historical slot mismatch")
+                snapshot = body["uncertainty_snapshot"]
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id = ? "
+                    "AND repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        snapshot["reservation_id"], request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                settlement = connection.execute(
+                    "SELECT * FROM budget_settlements WHERE "
+                    "settlement_event_id = ? AND settlement_hash = ? AND "
+                    "reservation_id = ?",
+                    (
+                        snapshot["settlement_event_id"],
+                        snapshot["settlement_hash"],
+                        snapshot["reservation_id"],
+                    ),
+                ).fetchone()
+                if reservation is None or settlement is None or (
+                    snapshot["intent_event_hash"],
+                    snapshot["launch_event_hash"],
+                    snapshot["contact_event_hash"],
+                    int(snapshot["worst_case_units"]),
+                ) != (
+                    request.intent_event_hash, request.launch_event_hash,
+                    request.contact_event_hash,
+                    int(reservation["worst_case_units"]),
+                ):
+                    raise DispatchDenied("external pause uncertainty binding mismatch")
+                historical = BudgetDisposition(
+                    str(snapshot["historical_disposition"])
+                )
+                resulting = BudgetDisposition(
+                    str(snapshot["resulting_disposition"])
+                )
+                prefix_settlements = connection.execute(
+                    "SELECT settlement.*, event.sequence, event.writer_epoch "
+                    "FROM budget_settlements AS settlement JOIN events AS event "
+                    "ON event.event_id = settlement.settlement_event_id WHERE "
+                    "settlement.reservation_id = ? AND event.writer_epoch < ? "
+                    "ORDER BY event.sequence",
+                    (
+                        reservation["reservation_id"],
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchall()
+                prefix_head = (
+                    None if not prefix_settlements else prefix_settlements[-1]
+                )
+                prefix_disposition = (
+                    BudgetDisposition.RESERVED
+                    if prefix_head is None
+                    else BudgetDisposition(str(prefix_head["disposition"]))
+                )
+                prefix_hash = (
+                    "" if prefix_head is None else str(prefix_head["settlement_hash"])
+                )
+                if historical is not prefix_disposition:
+                    raise DispatchDenied(
+                        "external pause historical accounting is not prefix-derived"
+                    )
+                if historical is BudgetDisposition.RESERVED:
+                    settlement_body = json.loads(settlement["body_json"])
+                    settlement_binding = {
+                        "pause_id": request.pause_id,
+                        "pause_event_id": request.event_id,
+                        "reservation_id": reservation["reservation_id"],
+                        "expected_previous_hash": settlement["previous_hash"],
+                        "intent_event_hash": request.intent_event_hash,
+                        "launch_event_hash": request.launch_event_hash,
+                        "contact_event_hash": request.contact_event_hash,
+                    }
+                    binding_digest = self._event_hash(settlement_binding)
+                    if (
+                        resulting
+                        is not BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        or settlement["settlement_event_id"]
+                        != "external-pause-unknown:" + binding_digest
+                        or settlement["previous_hash"] != prefix_hash
+                        or settlement["disposition"] != resulting.value
+                        or int(settlement["charged_units"])
+                        != int(reservation["worst_case_units"])
+                        or not bool(settlement["uncertainty"])
+                        or settlement["evidence_digest"] != binding_digest
+                        or settlement_body["reason_code"]
+                        != "PAUSE_CONTACT_RECEIPT_UNKNOWN"
+                        or int(settlement_body["sequence"]) + 1
+                        != int(body["sequence"])
+                        or int(settlement_body["writer_epoch"])
+                        != int(body["writer_epoch"])
+                        or body["previous_event_hash"]
+                        != settlement["settlement_hash"]
+                    ):
+                        raise DispatchDenied(
+                            "external pause worst-case settlement mismatch"
+                        )
+                elif (
+                    resulting is not historical
+                    or prefix_head is None
+                    or settlement["settlement_event_id"]
+                    != prefix_head["settlement_event_id"]
+                    or settlement["settlement_hash"]
+                    != prefix_head["settlement_hash"]
+                ):
+                    raise DispatchDenied(
+                        "external pause changed or retargeted prefix accounting"
+                    )
+                observed = connection.execute(
+                    "SELECT 1 FROM effect_observations AS observation JOIN "
+                    "events AS event ON event.event_id = observation.event_id "
+                    "WHERE observation.repository_id = ? AND "
+                    "observation.logical_effect_id = ? AND "
+                    "observation.attempt_id = ? AND event.sequence < ?",
+                    (
+                        request.repository_id, request.logical_effect_id,
+                        request.attempt_id, int(body["sequence"]),
+                    ),
+                ).fetchone()
+                if observed is not None:
+                    raise DispatchDenied(
+                        "external pause followed an already-recorded receipt"
+                    )
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "external pause proof or schema is invalid"
+                ) from error
         resume_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'RESUME_ACCEPTED'",
@@ -14110,6 +15053,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in local_pauses
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in external_pauses
             }
         )
         expected_outcomes.update(
@@ -14617,6 +15569,58 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "local-pause projection diverges from event history"
             )
+        expected_external_pauses = {
+            body["pause_id"]: (
+                body["command_id"], body["event_id"], body["fence_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["intent_event_id"],
+                body["intent_event_hash"], body["launch_id"],
+                body["launch_event_id"], body["launch_event_hash"],
+                body["contact_id"], body["contact_event_id"],
+                body["contact_event_hash"], body["target_digest"],
+                body["expected_slot_generation"], body["reason_code"],
+                body["uncertainty_snapshot"]["settlement_event_id"],
+                body["uncertainty_snapshot"]["settlement_hash"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["repository_id"],
+                body["capability_evidence"]["run_id"],
+                body["capability_evidence"]["action"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_evidence"]["issuer_mac"],
+                body["capability_issuer_fingerprint"], body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"], body,
+            )
+            for body in external_pauses
+        }
+        actual_external_pauses = {
+            row["pause_id"]: (
+                row["command_id"], row["event_id"], row["fence_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["attempt_id"], row["intent_event_id"],
+                row["intent_event_hash"], row["launch_id"],
+                row["launch_event_id"], row["launch_event_hash"],
+                row["contact_id"], row["contact_event_id"],
+                row["contact_event_hash"], row["target_digest"],
+                int(row["slot_generation"]), row["reason_code"],
+                row["settlement_event_id"], row["settlement_hash"],
+                row["capability_claim_id"], row["capability_grant_id"],
+                row["capability_repository_id"], row["capability_run_id"],
+                row["capability_action"], row["capability_scope_digest"],
+                row["capability_issuer_mac"],
+                row["capability_issuer_fingerprint"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"],
+                json.loads(row["body_json"]),
+            )
+            for row in connection.execute(
+                "SELECT * FROM external_pause_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_external_pauses != expected_external_pauses:
+            raise StorageIntegrityError(
+                "external-pause projection diverges from event history"
+            )
         expected_resumes = {
             body["resume_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -14839,6 +15843,17 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in local_pauses
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "PAUSE",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in external_pauses
             }
         )
         expected_operator_redemptions.update(
@@ -15317,6 +16332,15 @@ class SQLiteStateStore:
                     body["reason_code"], body["event_id"],
                 )
                 for body in local_pauses
+            }
+        )
+        expected_fences.update(
+            {
+                body["fence_id"]: (
+                    body["item_id"], body["logical_effect_id"],
+                    body["reason_code"], body["event_id"],
+                )
+                for body in external_pauses
             }
         )
         expected_fences.update(
@@ -16100,6 +17124,18 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "local pause predecessor state or continuation cursor diverges"
                 )
+            if (
+                row["event_kind"] == "PAUSE_REQUESTED"
+                and body.get("pause_kind") == "EXTERNAL_MUTATION"
+                and (
+                    body["lifecycle_from"] != expected_lifecycle.get(run_id)
+                    or body["retained_continuation_cursor"]
+                    != expected_cursors.get(run_id)
+                )
+            ):
+                raise StorageIntegrityError(
+                    "external pause predecessor state or continuation cursor diverges"
+                )
             if row["event_kind"] == "STOP_RECORDED" and (
                 body["lifecycle_from"] != expected_lifecycle.get(run_id)
                 or body["retained_continuation_cursor"]
@@ -16301,6 +17337,7 @@ class SQLiteStateStore:
             "operation_launches",
             "control_actions",
             "local_pause_actions",
+            "external_pause_actions",
             "resume_actions",
             "stop_actions",
             "stop_escalations",
