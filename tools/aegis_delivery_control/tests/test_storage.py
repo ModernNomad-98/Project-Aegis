@@ -47,9 +47,13 @@ from tools.aegis_delivery_control.contracts import (
     PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
+    PauseReconciliationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ReadinessEvaluationRequest,
+    RecoverProvenNonexecutionRequest,
+    ProvenNonexecutionIntentRequest,
     ResumeActivitySettlementRequest,
+    ResumeOperationNonexecutionRequest,
     ResumeRequest,
     SourceControlClassification,
     SourceControlEvidenceRequest,
@@ -139,6 +143,17 @@ def _settle_until_terminated(
 
 
 class SQLiteStateStoreTests(unittest.TestCase):
+    def test_proven_nonexecution_exposes_typed_recovery_contracts(self) -> None:
+        for name in (
+            "ResumeOperationNonexecutionRequest",
+            "RecoverProvenNonexecutionRequest",
+            "ProvenNonexecutionIntentRequest",
+        ):
+            self.assertTrue(
+                hasattr(contract_types, name),
+                f"proven nonexecution requires typed {name}",
+            )
+
     def test_t07_exposes_typed_activity_pause_settlement_contract(self) -> None:
         self.assertTrue(
             hasattr(contract_types, "PauseActivitySettlementRequest"),
@@ -380,12 +395,26 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = pause.event_hash
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = target_path.resolve()
+        attestation = self.authority.issue_nonexecution_attestation(
+            "intent-nonexecution-attestation-1",
+            "intent-nonexecution-seal-1", "EFFECT",
+            adapter._target_digest("repo-1"), self.capability.claim_id,
+            f"EFFECT-INTENT:{committed.command_id}", committed.event_hash,
+            "reservation-1", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1",
+        )
+        seal = adapter.seal_nonexecution(attestation, self.authority)
         nonexecution_request = BudgetSettlementRequest(
             "nonexecution-1", "reservation-1", "",
             BudgetDisposition.RELEASED, None,
             "nonexecution-evidence-1", "NONDISPATCH_PROVEN",
             non_dispatch_proven=True, zero_liability_proven=True,
             release_slot=False, all_obligations_settled=True,
+            nonexecution_seal_id=seal.seal_id,
         )
         nonexecution = self.store._settle_budget(
             nonexecution_request,
@@ -432,6 +461,11 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "SELECT originating_event_id FROM dispatch_fences WHERE "
                 "fence_id = 'pause-fence-1'"
             ).fetchone()
+            action = connection.execute(
+                "SELECT path_class, resolved_uncertainty_ids_json FROM "
+                "proven_nonexecution_actions WHERE settlement_event_id = "
+                "'nonexecution-1'"
+            ).fetchone()
         finally:
             connection.close()
         self.assertEqual(run, ("PAUSED", "operation-recovery:attempt-1"))
@@ -442,6 +476,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.assertEqual(slot, ("attempt-1", 1))
         self.assertEqual(fence, ("pause-event-1",))
+        self.assertEqual(action, ("INTENT_ONLY", "[]"))
         self.store.load_verified("repo-1")
 
     def test_t07_recovery_accepts_intervening_nonaccounting_fact(self) -> None:
@@ -539,6 +574,247 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(slot, ("attempt-1", 1))
         self.assertIsNone(pause_fence)
         self.store.load_verified("repo-1")
+
+        recovery_grant = SyntheticOperatorGrant(
+            "activity-recovery-grant-1", "repo-1", "run-1",
+            "RECOVER_OPERATION", "activity-recovery-scope-1",
+        )
+        self.authority.register_operator(recovery_grant)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            source_hash = connection.execute(
+                "SELECT event_hash FROM proven_nonexecution_actions WHERE "
+                "settlement_event_id = 'nonexecution-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        recovered = self.store.recover_proven_nonexecution(
+            RecoverProvenNonexecutionRequest(
+                "activity-operation-recovery-1",
+                "activity-retry-authorization-1",
+                "activity-operation-recovery-command-1",
+                "activity-operation-recovery-event-1", "repo-1", "run-1",
+                "item-1", "effect-1", "attempt-1", "attempt-2",
+                "plan:run-1", "revision-1", "descriptor-digest",
+                "nonexecution-1", source_hash, (),
+                "operation-recovery:attempt-1", 1, 2,
+                receipt.event_hash, receipt.event_hash,
+            ),
+            self.authority.claim_operator(*recovery_grant.__dict__.values()),
+            self.authority,
+        )
+        self.oracle.allowed_head = recovered.event_hash
+        self.assertEqual(recovered.resulting_state, LifecycleState.PLANNED)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        retry_grant = SyntheticGrant(
+            "activity-retry-grant-1", "repo-1", "effect-1", "attempt-2",
+            "scope-1",
+        )
+        self.authority.register(retry_grant)
+        retry_capability = self.authority.claim(*retry_grant.__dict__.values())
+        retry_request = ProvenNonexecutionIntentRequest(
+            "repo-1", "run-1", "item-1", "activity-retry-command-1",
+            "activity-retry-event-1", "effect-1", "descriptor-digest",
+            "attempt-2", "activity-retry-permission-1",
+            "activity-retry-reservation-1", "budget-policy-digest",
+            3, 5, 10, "activity-retry-authorization-1", "attempt-1", 1, 2,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            writer_epoch = connection.execute(
+                "SELECT MAX(writer_epoch) + 1 FROM events"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        retry_intent = self.store.commit_intent(
+            retry_request, retry_capability, self.authority,
+            expected_head=recovered.event_hash, writer_epoch=writer_epoch,
+        )
+        self.oracle.allowed_head = retry_intent.event_hash
+        retry_launch = self.store.claim_operation_launch(
+            retry_request, retry_intent
+        )
+        self.oracle.allowed_head = retry_launch.event_hash
+        self.store._contact_claimed_operation(
+            retry_request, retry_capability, retry_intent, retry_launch,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            retry_contact = connection.execute(
+                "SELECT * FROM adapter_contacts WHERE source_id = ?",
+                (f"EFFECT:{retry_launch.launch_id}",),
+            ).fetchone()
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        external_grant = SyntheticOperatorGrant(
+            "activity-external-pause-grant-1", "repo-1", "run-1", "PAUSE",
+            "activity-external-pause-scope-1",
+        )
+        self.authority.register_operator(external_grant)
+        external_request = PauseExternalMutationRequest(
+            "activity-external-pause-1", "activity-external-pause-command-1",
+            "activity-external-pause-event-1",
+            "activity-external-pause-fence-1", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-2", retry_intent.event_id,
+            retry_intent.event_hash, retry_launch.launch_id,
+            retry_launch.event_id, retry_launch.event_hash,
+            retry_contact["contact_id"], retry_contact["event_id"],
+            retry_contact["event_hash"], retry_contact["target_digest"], 2,
+            "OPERATOR_PAUSE_EXTERNAL_MUTATION",
+        )
+        external_pause = self.store.pause_external_mutation(
+            external_request,
+            self.authority.claim_operator(*external_grant.__dict__.values()),
+            self.authority,
+        )
+        self.oracle.allowed_head = external_pause.event_hash
+
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = target_path.resolve()
+        retry_attestation = self.authority.issue_nonexecution_attestation(
+            "activity-retry-nonexecution-attestation-1",
+            "activity-retry-nonexecution-seal-1", "EFFECT",
+            adapter._target_digest("repo-1"), retry_capability.claim_id,
+            f"EFFECT:{retry_launch.launch_id}", retry_launch.event_hash,
+            "activity-retry-reservation-1", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-2",
+        )
+        retry_seal = adapter.seal_nonexecution(
+            retry_attestation, self.authority
+        )
+        retry_settlement_request = BudgetSettlementRequest(
+            "activity-retry-nonexecution-1",
+            "activity-retry-reservation-1", "",
+            BudgetDisposition.RELEASED, None,
+            "activity-retry-nonexecution-evidence-1", "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True, zero_liability_proven=True,
+            release_slot=False, all_obligations_settled=True,
+            nonexecution_seal_id=retry_seal.seal_id,
+            attempt_id="attempt-2",
+        )
+
+        def settle_and_resume_external(
+            target_store, target_oracle, *, suffix: str,
+        ):
+            connection = sqlite3.connect(target_store._database_path)
+            try:
+                current_settlement_head = connection.execute(
+                    "SELECT settlement_head_hash FROM budget_reservations "
+                    "WHERE reservation_id = 'activity-retry-reservation-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            target_settlement_request = replace(
+                retry_settlement_request,
+                expected_previous_hash=current_settlement_head,
+            )
+            settled_retry = target_store._settle_budget(
+                target_settlement_request,
+                self.authority.issue_settlement_proof(
+                    f"activity-retry-nonexecution-proof-{suffix}",
+                    target_settlement_request,
+                ),
+                self.authority,
+            )
+            target_oracle.allowed_head = settled_retry.settlement_hash
+            connection = sqlite3.connect(target_store._database_path)
+            try:
+                catalog_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+                resolved_ids = tuple(
+                    row[0] for row in connection.execute(
+                        "SELECT uncertainty_id FROM uncertainty_resolutions "
+                        "WHERE reconciliation_id = ? ORDER BY uncertainty_id",
+                        (
+                            "proven-nonexecution:"
+                            "activity-retry-nonexecution-1",
+                        ),
+                    )
+                )
+            finally:
+                connection.close()
+            resume_grant = SyntheticOperatorGrant(
+                f"activity-external-resume-grant-{suffix}", "repo-1",
+                "run-1", "RESUME",
+                f"activity-external-resume-scope-{suffix}",
+            )
+            self.authority.register_operator(resume_grant)
+            resume_request = ResumeOperationNonexecutionRequest(
+                f"activity-external-resume-{suffix}",
+                f"activity-external-resume-command-{suffix}",
+                f"activity-external-resume-event-{suffix}", "repo-1",
+                "run-1", "item-1", "effect-1", "attempt-2",
+                "plan:run-1", "revision-1", "descriptor-digest",
+                external_request.pause_id, external_pause.event_id,
+                external_pause.event_hash, external_request.fence_id,
+                target_settlement_request.settlement_event_id,
+                settled_retry.settlement_hash,
+                "activity-retry-reservation-1",
+                settled_retry.settlement_hash, resolved_ids,
+                "operation-recovery:attempt-2", "attempt-2", 2,
+                catalog_head, catalog_head,
+                target_store._run_heads_digest({"run-1": catalog_head}),
+            )
+            resume_receipt = target_store.resume_operation_nonexecution(
+                resume_request,
+                self.authority.claim_operator(*resume_grant.__dict__.values()),
+                self.authority.issue_operation_nonexecution_resume_evidence(
+                    f"activity-external-resume-proof-{suffix}",
+                    resume_request,
+                ),
+                self.authority,
+            )
+            target_oracle.allowed_head = resume_receipt.event_hash
+            target_store.load_verified("repo-1", authority=self.authority)
+            return resume_receipt
+
+        stacked_path = self.database_path.parent / "stacked-t14.sqlite3"
+        shutil.copy2(self.database_path, stacked_path)
+        stacked_oracle = MutableFreshnessOracle()
+        stacked_oracle.allowed_head = external_pause.event_hash
+        stacked_store = SQLiteStateStore(
+            stacked_path, stacked_oracle, "repo-1"
+        )
+        stacked_store._bind_classification_authority(self.authority)
+        stacked_grant = SyntheticOperatorGrant(
+            "activity-stacked-pause-grant-1", "repo-1", "run-1", "PAUSE",
+            "activity-stacked-pause-scope-1",
+        )
+        self.authority.register_operator(stacked_grant)
+        stacked_pause = stacked_store.pause_reconciliation(
+            PauseReconciliationRequest(
+                "activity-stacked-pause-1",
+                "activity-stacked-pause-command-1",
+                "activity-stacked-pause-event-1",
+                "activity-stacked-pause-fence-1", "repo-1", "run-1",
+                "item-1", "effect-1", "plan:run-1", "revision-1",
+                "OPERATOR_PAUSE_RECONCILIATION", external_pause.event_id,
+                external_pause.event_hash, None,
+            ),
+            self.authority.claim_operator(*stacked_grant.__dict__.values()),
+            self.authority,
+        )
+        stacked_oracle.allowed_head = stacked_pause.event_hash
+        stacked_resume = settle_and_resume_external(
+            stacked_store, stacked_oracle, suffix="stacked"
+        )
+        self.assertEqual(stacked_resume.resulting_state, LifecycleState.PAUSED)
+
+        cleared_resume = settle_and_resume_external(
+            self.store, self.oracle, suffix="cleared-prior"
+        )
+        self.assertEqual(cleared_resume.resulting_state, LifecycleState.BLOCKED)
 
     def test_t14_slot_generation_is_derived_from_exact_t07_source(self) -> None:
         settlement_request, _, _ = self._prepare_t07_activity_settlement()
@@ -846,7 +1122,72 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.oracle.allowed_head = settled.event_hash
 
         self.assertEqual(settled.resulting_state, LifecycleState.PAUSED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            path_class = connection.execute(
+                "SELECT path_class FROM proven_nonexecution_actions WHERE "
+                "settlement_event_id = 'launched-nonexecution-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(path_class, "LAUNCHED")
         self.store.load_verified("repo-1")
+
+    def test_t25_intent_only_recovery_denies_missing_or_rebound_seal(self) -> None:
+        committed = self._running_operation()
+        paused = self.store.pause_local_execution(
+            self._local_pause_request(committed, suffix="intent-proof"),
+            self._pause_capability("intent-proof"), self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        request = BudgetSettlementRequest(
+            "intent-proof-settlement", "reservation-1", "",
+            BudgetDisposition.RELEASED, None, "intent-proof-evidence",
+            "NONDISPATCH_PROVEN", non_dispatch_proven=True,
+            zero_liability_proven=True, release_slot=False,
+            all_obligations_settled=True,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "canonical nonexecution seal"):
+            self.store._settle_budget(
+                request,
+                self.authority.issue_settlement_proof(
+                    "intent-proof-missing", request
+                ),
+                self.authority,
+            )
+        self.assertEqual(
+            self.store.table_counts()["proven_nonexecution_actions"], 0
+        )
+
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = target_path.resolve()
+        rebound = self.authority.issue_nonexecution_attestation(
+            "intent-proof-rebound-attestation", "intent-proof-rebound-seal",
+            "EFFECT", adapter._target_digest("repo-1"),
+            self.capability.claim_id, "EFFECT-INTENT:other-command",
+            committed.event_hash, "reservation-1", "repo-1", "run-1",
+            "item-1", "effect-1", "attempt-1",
+        )
+        rebound_seal = adapter.seal_nonexecution(rebound, self.authority)
+        rebound_request = replace(
+            request,
+            settlement_event_id="intent-proof-rebound-settlement",
+            nonexecution_seal_id=rebound_seal.seal_id,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "does not bind"):
+            self.store._settle_budget(
+                rebound_request,
+                self.authority.issue_settlement_proof(
+                    "intent-proof-rebound", rebound_request
+                ),
+                self.authority,
+            )
+        self.assertEqual(
+            self.store.table_counts()["proven_nonexecution_actions"], 0
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def _rewrite_application_tail(self, body: dict[str, object]) -> str:
         event_hash = self.store._event_hash(body)
@@ -970,6 +1311,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
                 "verified_receipt_reconciliation_actions": 0,
+                "proven_nonexecution_actions": 0,
+                "operation_nonexecution_resume_actions": 0,
+                "operation_recovery_actions": 0,
+                "operation_retry_authorizations": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
@@ -1908,6 +2253,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
                 "verified_receipt_reconciliation_actions": 0,
+                "proven_nonexecution_actions": 0,
+                "operation_nonexecution_resume_actions": 0,
+                "operation_recovery_actions": 0,
+                "operation_retry_authorizations": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
@@ -3621,6 +3970,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.execute(
                 "DROP TABLE verified_receipt_reconciliation_actions"
             )
+            connection.execute("DROP TABLE operation_retry_authorizations")
+            connection.execute("DROP TABLE operation_recovery_actions")
+            connection.execute(
+                "DROP TABLE operation_nonexecution_resume_actions"
+            )
+            connection.execute("DROP TABLE proven_nonexecution_actions")
             connection.execute("PRAGMA user_version = 0")
             connection.commit()
         finally:
@@ -3673,8 +4028,18 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 2)
+        self.assertEqual(semantic_version, 3)
         migrated.load_verified("repo-1", authority=self.authority)
+
+    def test_proven_nonexecution_schema_version_is_three(self) -> None:
+        connection = sqlite3.connect(self.database_path)
+        try:
+            semantic_version = connection.execute(
+                "PRAGMA user_version"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(semantic_version, 3)
 
     def test_c04_conflicting_durable_identities_fail_closed(self) -> None:
         committed = self._commit_planned_intent(
@@ -4788,6 +5153,995 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(
             receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
         )
+
+    def test_t25_contacted_nonexecution_clears_exact_uncertainty_and_pauses(
+        self,
+    ) -> None:
+        _, launched, _, pause_request = self._contacted_operation(
+            "proven-nonexecution"
+        )
+        pause = self.store.pause_external_mutation(
+            pause_request,
+            self._pause_capability("proven-nonexecution"),
+            self.authority,
+        )
+        self.oracle.allowed_head = pause.event_hash
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = target_path.resolve()
+        attestation = self.authority.issue_nonexecution_attestation(
+            "contacted-nonexecution-attestation",
+            "contacted-nonexecution-seal", "EFFECT",
+            adapter._target_digest("repo-1"), self.capability.claim_id,
+            f"EFFECT:{launched.launch_id}", launched.event_hash,
+            "reservation-1", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1",
+        )
+        seal = adapter.seal_nonexecution(attestation, self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            settlement_head = connection.execute(
+                "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        request = BudgetSettlementRequest(
+            "contacted-nonexecution", "reservation-1", settlement_head,
+            BudgetDisposition.RELEASED, None,
+            "contacted-nonexecution-evidence", "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True, zero_liability_proven=True,
+            release_slot=False, all_obligations_settled=True,
+            nonexecution_seal_id=seal.seal_id,
+        )
+        settled = self.store._settle_budget(
+            request,
+            self.authority.issue_settlement_proof(
+                "contacted-nonexecution-proof", request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs WHERE "
+                "run_id = 'run-1'"
+            ).fetchone()
+            operation_fences = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code IN ("
+                "'OPERATION_OUTCOME_UNKNOWN', 'OPERATION_ACTIVITY_UNKNOWN', "
+                "'EFFECT_BILLING_UNKNOWN', 'EFFECT_SOURCE_CONTROL_UNKNOWN')"
+            ).fetchone()[0]
+            pause_fence = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?",
+                (pause_request.fence_id,),
+            ).fetchone()[0]
+            resolutions = connection.execute(
+                "SELECT COUNT(*) FROM uncertainty_resolutions WHERE "
+                "reconciliation_id = ?",
+                ("proven-nonexecution:contacted-nonexecution",),
+            ).fetchone()[0]
+            action = connection.execute(
+                "SELECT path_class, resulting_state FROM "
+                "proven_nonexecution_actions WHERE settlement_event_id = ?",
+                ("contacted-nonexecution",),
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run, ("PAUSED", "operation-recovery:attempt-1"))
+        self.assertEqual(operation_fences, 0)
+        self.assertEqual(pause_fence, 1)
+        self.assertEqual(resolutions, 4)
+        self.assertEqual(action, ("CONTACTED", "PAUSED"))
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        backfill_path = self.database_path.parent / "v2-t25-backfill.sqlite3"
+        shutil.copy2(self.database_path, backfill_path)
+
+        def downgrade_t25_fixture(path: Path) -> None:
+            connection = sqlite3.connect(path)
+            connection.row_factory = sqlite3.Row
+            try:
+                uncertainty_rows = connection.execute(
+                    "SELECT instance.* FROM uncertainty_instances AS instance "
+                    "JOIN uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id "
+                    "WHERE resolution.reconciliation_id = "
+                    "'proven-nonexecution:contacted-nonexecution'"
+                ).fetchall()
+                reason_codes = {
+                    "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+                    "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+                    "BILLING": "EFFECT_BILLING_UNKNOWN",
+                    "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+                }
+                connection.execute(
+                    "DELETE FROM uncertainty_resolutions WHERE "
+                    "reconciliation_id = "
+                    "'proven-nonexecution:contacted-nonexecution'"
+                )
+                for row in uncertainty_rows:
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, 'repo-1', "
+                        "'item-1', 'effect-1', ?, ?)",
+                        (
+                            row["fence_id"],
+                            reason_codes[row["uncertainty_kind"]],
+                            row["origin_event_id"],
+                        ),
+                    )
+                connection.execute(
+                    "DROP TABLE operation_retry_authorizations"
+                )
+                connection.execute("DROP TABLE operation_recovery_actions")
+                connection.execute(
+                    "DROP TABLE operation_nonexecution_resume_actions"
+                )
+                connection.execute("DROP TABLE proven_nonexecution_actions")
+                connection.execute("PRAGMA user_version = 2")
+                connection.commit()
+            finally:
+                connection.close()
+
+        downgrade_t25_fixture(backfill_path)
+        backfill_oracle = MutableFreshnessOracle()
+        backfill_oracle.allowed_head = settled.settlement_hash
+        migrated = SQLiteStateStore(backfill_path, backfill_oracle, "repo-1")
+        migrated._bind_classification_authority(self.authority)
+        migrated.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(backfill_path)
+        try:
+            migrated_state = (
+                connection.execute("PRAGMA user_version").fetchone()[0],
+                connection.execute(
+                    "SELECT COUNT(*) FROM proven_nonexecution_actions"
+                ).fetchone()[0],
+                connection.execute(
+                    "SELECT COUNT(*) FROM uncertainty_resolutions WHERE "
+                    "reconciliation_id = "
+                    "'proven-nonexecution:contacted-nonexecution'"
+                ).fetchone()[0],
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code IN "
+                    "('OPERATION_OUTCOME_UNKNOWN', "
+                    "'OPERATION_ACTIVITY_UNKNOWN', 'EFFECT_BILLING_UNKNOWN', "
+                    "'EFFECT_SOURCE_CONTROL_UNKNOWN')"
+                ).fetchone()[0],
+            )
+        finally:
+            connection.close()
+        self.assertEqual(migrated_state, (3, 1, 4, 0))
+
+        late_observation = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "backfill-late-observation", "backfill-late-command",
+                "backfill-late-event", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "backfill-late-receipt",
+                self.capability.claim_id, "descriptor-digest", 0,
+                "backfill-late-settlement", "",
+            ),
+            classification=SourceControlClassification.UNKNOWN,
+            store=migrated,
+        )
+        backfill_oracle.allowed_head = late_observation.event_hash
+        migrated.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(backfill_path)
+        try:
+            later_uncertainty_ids = tuple(
+                row[0]
+                for row in connection.execute(
+                    "SELECT uncertainty_id FROM uncertainty_instances WHERE "
+                    "origin_event_id = ? ORDER BY uncertainty_id",
+                    (late_observation.event_id,),
+                )
+            )
+        finally:
+            connection.close()
+        self.assertTrue(later_uncertainty_ids)
+
+        downgrade_t25_fixture(backfill_path)
+        later_resolution_path = (
+            self.database_path.parent / "v2-t25-later-resolution.sqlite3"
+        )
+        shutil.copy2(backfill_path, later_resolution_path)
+        connection = sqlite3.connect(later_resolution_path)
+        try:
+            uncertainty_id, fence_id = connection.execute(
+                "SELECT uncertainty_id, fence_id FROM uncertainty_instances "
+                "WHERE origin_event_id = ? ORDER BY uncertainty_id LIMIT 1",
+                (pause_request.event_id,),
+            ).fetchone()
+            connection.execute(
+                "DELETE FROM dispatch_fences WHERE fence_id = ?", (fence_id,)
+            )
+            later_resolution_body = json.dumps(
+                {
+                    "event_id": late_observation.event_id,
+                    "proof_event_hash": late_observation.event_hash,
+                    "proof_event_id": late_observation.event_id,
+                    "proof_kind": "LATER_OWNER",
+                    "reconciliation_id": "later-owner",
+                    "schema_version": 1,
+                    "uncertainty_id": uncertainty_id,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            connection.execute(
+                "INSERT INTO uncertainty_resolutions VALUES (?, ?, ?, ?, ?, "
+                "?, ?)",
+                (
+                    uncertainty_id, "later-owner", late_observation.event_id,
+                    "LATER_OWNER", late_observation.event_id,
+                    late_observation.event_hash, later_resolution_body,
+                ),
+            )
+            connection.commit()
+            before_failed_migration = tuple(connection.iterdump())
+            connection.row_factory = sqlite3.Row
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "later resolution ownership"
+            ):
+                SQLiteStateStore._migrate_proven_nonexecution_version(
+                    connection
+                )
+            after_failed_migration = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after_failed_migration, before_failed_migration)
+
+        remigrated = SQLiteStateStore(
+            backfill_path, backfill_oracle, "repo-1"
+        )
+        remigrated._bind_classification_authority(self.authority)
+        remigrated.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(backfill_path)
+        try:
+            resolved_by_t25 = tuple(json.loads(connection.execute(
+                "SELECT resolved_uncertainty_ids_json FROM "
+                "proven_nonexecution_actions WHERE settlement_event_id = "
+                "'contacted-nonexecution'"
+            ).fetchone()[0]))
+            surviving_later_fences = connection.execute(
+                "SELECT COUNT(*) FROM uncertainty_instances AS instance JOIN "
+                "dispatch_fences AS fence ON fence.fence_id = "
+                "instance.fence_id WHERE instance.uncertainty_id IN ("
+                + ",".join("?" for _ in later_uncertainty_ids)
+                + ")",
+                later_uncertainty_ids,
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertTrue(set(resolved_by_t25).isdisjoint(later_uncertainty_ids))
+        self.assertEqual(surviving_later_fences, len(later_uncertainty_ids))
+
+        grant = SyntheticOperatorGrant(
+            "resume-nonexecution-grant", "repo-1", "run-1", "RESUME",
+            "resume-nonexecution-scope",
+        )
+        self.authority.register_operator(grant)
+        capability = self.authority.claim_operator(*grant.__dict__.values())
+        connection = sqlite3.connect(self.database_path)
+        try:
+            catalog_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            run_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+            resolved_ids = tuple(
+                row[0] for row in connection.execute(
+                    "SELECT uncertainty_id FROM uncertainty_resolutions WHERE "
+                    "reconciliation_id = ? ORDER BY uncertainty_id",
+                    ("proven-nonexecution:contacted-nonexecution",),
+                )
+            )
+        finally:
+            connection.close()
+        resume_request = ResumeOperationNonexecutionRequest(
+            "resume-nonexecution", "resume-nonexecution-command",
+            "resume-nonexecution-event", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-1", "plan:run-1", "revision-1",
+            "descriptor-digest", pause_request.pause_id,
+            pause_request.event_id, pause.event_hash, pause_request.fence_id,
+            "contacted-nonexecution", settled.settlement_hash,
+            "reservation-1", settled.settlement_hash, resolved_ids,
+            "operation-recovery:attempt-1", "attempt-1", 1,
+            catalog_head, run_head,
+            self.store._run_heads_digest({"run-1": run_head}),
+        )
+        resume_evidence = (
+            self.authority.issue_operation_nonexecution_resume_evidence(
+                "resume-nonexecution-proof", resume_request
+            )
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.resume_operation_nonexecution(
+                resume_request, capability, resume_evidence, self.authority,
+                failure_hook=raise_at(
+                    "after_operation_nonexecution_resume_commit_before_acknowledgement"
+                ),
+            )
+        resume = self.store.resume_operation_nonexecution(
+            resume_request, capability,
+            resume_evidence, self.authority,
+        )
+        self.assertTrue(resume.replayed)
+        self.oracle.allowed_head = resume.event_hash
+        self.assertEqual(resume.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs WHERE "
+                "run_id = 'run-1'"
+            ).fetchone()
+            pause_fence = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?",
+                (pause_request.fence_id,),
+            ).fetchone()[0]
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot WHERE "
+                "repository_id = 'repo-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run, ("BLOCKED", "operation-recovery:attempt-1"))
+        self.assertEqual(pause_fence, 0)
+        self.assertEqual(slot, ("attempt-1", 1))
+        self.store.load_verified("repo-1", authority=self.authority)
+        pre_recovery_path = (
+            self.database_path.parent / "pre-recovery.sqlite3"
+        )
+        shutil.copy2(self.database_path, pre_recovery_path)
+        recovery_grant = SyntheticOperatorGrant(
+            "recover-nonexecution-grant", "repo-1", "run-1",
+            "RECOVER_OPERATION", "recover-nonexecution-scope",
+        )
+        self.authority.register_operator(recovery_grant)
+        recovery_capability = self.authority.claim_operator(
+            *recovery_grant.__dict__.values()
+        )
+        recovery_request = RecoverProvenNonexecutionRequest(
+            "recover-nonexecution", "retry-authorization-1",
+            "recover-nonexecution-command", "recover-nonexecution-event",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            "attempt-2", "plan:run-1", "revision-1", "descriptor-digest",
+            "contacted-nonexecution", settled.settlement_hash, resolved_ids,
+            "operation-recovery:attempt-1", 1, 2,
+            resume.event_hash, resume.event_hash,
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.recover_proven_nonexecution(
+                recovery_request, recovery_capability, self.authority,
+                failure_hook=raise_at(
+                    "after_operation_recovery_commit_before_acknowledgement"
+                ),
+            )
+        recovered = self.store.recover_proven_nonexecution(
+            recovery_request, recovery_capability, self.authority
+        )
+        self.assertTrue(recovered.replayed)
+        self.oracle.allowed_head = recovered.event_hash
+        self.assertEqual(recovered.resulting_state, LifecycleState.PLANNED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor FROM runs WHERE "
+                "run_id = 'run-1'"
+            ).fetchone()
+            authorization = connection.execute(
+                "SELECT status, prior_attempt_id, successor_attempt_id, "
+                "source_generation, target_generation FROM "
+                "operation_retry_authorizations WHERE authorization_id = "
+                "'retry-authorization-1'"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot WHERE "
+                "repository_id = 'repo-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(run, ("PLANNED", None))
+        self.assertEqual(
+            authorization, ("AVAILABLE", "attempt-1", "attempt-2", 1, 2)
+        )
+        self.assertEqual(slot, ("attempt-1", 1))
+        self.store.load_verified("repo-1", authority=self.authority)
+        available_recovery_path = (
+            self.database_path.parent / "available-recovery.sqlite3"
+        )
+        shutil.copy2(self.database_path, available_recovery_path)
+
+        retry_grant = SyntheticGrant(
+            "grant-retry", "repo-1", "effect-1", "attempt-2", "scope-1"
+        )
+        self.authority.register(retry_grant)
+        retry_capability = self.authority.claim(*retry_grant.__dict__.values())
+        retry_request = ProvenNonexecutionIntentRequest(
+            "repo-1", "run-1", "item-1", "command-2", "event-2",
+            "effect-1", "descriptor-digest", "attempt-2",
+            "permission-use-2", "reservation-2", "budget-policy-digest",
+            3, 5, 10, "retry-authorization-1", "attempt-1", 1, 2,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            writer_epoch = connection.execute(
+                "SELECT MAX(writer_epoch) + 1 FROM events WHERE "
+                "repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.commit_intent(
+                retry_request, retry_capability, self.authority,
+                expected_head=recovered.event_hash, writer_epoch=writer_epoch,
+                failure_hook=raise_at("after_intent_writes_before_commit"),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            rolled_back = connection.execute(
+                "SELECT status FROM operation_retry_authorizations WHERE "
+                "authorization_id = 'retry-authorization-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(rolled_back, "AVAILABLE")
+        retried = self.store.commit_intent(
+            retry_request, retry_capability, self.authority,
+            expected_head=recovered.event_hash, writer_epoch=writer_epoch,
+        )
+        self.oracle.allowed_head = retried.event_hash
+        retry_replay = self.store.commit_intent(
+            retry_request, retry_capability, self.authority,
+            expected_head=retried.event_hash, writer_epoch=writer_epoch + 1,
+        )
+        self.assertTrue(retry_replay.replayed)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot WHERE "
+                "repository_id = 'repo-1'"
+            ).fetchone()
+            authorization = connection.execute(
+                "SELECT status, consuming_event_id FROM "
+                "operation_retry_authorizations WHERE authorization_id = "
+                "'retry-authorization-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(slot, ("attempt-2", 2))
+        self.assertEqual(authorization, ("CONSUMED", "event-2"))
+        self.store.load_verified("repo-1", authority=self.authority)
+        consumed_recovery_path = (
+            self.database_path.parent / "consumed-recovery.sqlite3"
+        )
+        shutil.copy2(self.database_path, consumed_recovery_path)
+        retry_launch = self.store.claim_operation_launch(
+            retry_request, retried
+        )
+        self.oracle.allowed_head = retry_launch.event_hash
+        self.store._contact_claimed_operation(
+            retry_request, retry_capability, retried, retry_launch,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            launch_body, contact_body = (
+                json.loads(row[0]) for row in connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ? OR "
+                    "event_id = (SELECT event_id FROM adapter_contacts WHERE "
+                    "source_id = ?) ORDER BY sequence",
+                    (retry_launch.event_id, f"EFFECT:{retry_launch.launch_id}"),
+                )
+            )
+        finally:
+            connection.close()
+        recovered_bodies = (launch_body, contact_body)
+        self.assertEqual(
+            {body["slot_generation"] for body in recovered_bodies}, {2}
+        )
+        self.assertEqual(
+            {
+                body["recovery_authorization_id"]
+                for body in recovered_bodies
+            },
+            {"retry-authorization-1"},
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        retry_contact_path = (
+            self.database_path.parent / "retry-contact.sqlite3"
+        )
+        shutil.copy2(self.database_path, retry_contact_path)
+
+        terminal_oracle = MutableFreshnessOracle()
+        terminal_oracle.allowed_head = self.oracle.allowed_head
+        terminal_store = SQLiteStateStore(
+            retry_contact_path, terminal_oracle, "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        terminal_store._bind_classification_authority(self.authority)
+        terminal_stop = terminal_store.stop(
+            self._stop_request(suffix="retry-terminal"),
+            self._stop_capability(
+                StopMode.IMMEDIATE, suffix="retry-terminal"
+            ),
+            self.authority,
+        )
+        terminal_oracle.allowed_head = terminal_stop.event_hash
+        connection = sqlite3.connect(retry_contact_path)
+        try:
+            retry_plan_hash = connection.execute(
+                "SELECT event_hash FROM validation_plans WHERE plan_id = "
+                "'plan:run-1'"
+            ).fetchone()[0]
+            retry_stop_accounting = connection.execute(
+                "SELECT held_units, charged_units, uncertainty, disposition "
+                "FROM budget_reservations WHERE reservation_id = "
+                "'reservation-2'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(
+            retry_stop_accounting,
+            (
+                0, 5, 1,
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+            ),
+        )
+        terminal_request = TerminalValidationSettlementRequest(
+            "terminal-settlement-retry", "terminal-command-retry",
+            "terminal-event-retry", "repo-1", "run-1", "item-1",
+            "effect-1", "plan:run-1", "revision-1", "check-1", "PLAN",
+            "plan:run-1", retry_plan_hash, "CANCELLED_WITHOUT_START",
+        )
+        with self.assertRaises(InjectedFailure):
+            terminal_store.settle_terminal_validation(
+                terminal_request,
+                failure_hook=raise_at(
+                    "after_terminal_settlement_writes_before_commit"
+                ),
+            )
+        self.assertEqual(
+            terminal_store.table_counts()["terminal_validation_settlements"],
+            0,
+        )
+        with self.assertRaises(InjectedFailure):
+            terminal_store.settle_terminal_validation(
+                terminal_request,
+                failure_hook=raise_at(
+                    "after_terminal_settlement_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(retry_contact_path)
+        try:
+            terminal_hash = connection.execute(
+                "SELECT event_hash FROM terminal_validation_settlements "
+                "WHERE terminal_settlement_id = 'terminal-settlement-retry'"
+            ).fetchone()[0]
+            terminal_generation = json.loads(connection.execute(
+                "SELECT body_json FROM terminal_validation_settlements "
+                "WHERE terminal_settlement_id = 'terminal-settlement-retry'"
+            ).fetchone()[0])["slot_generation"]
+        finally:
+            connection.close()
+        terminal_oracle.allowed_head = terminal_hash
+        reopened_terminal_store = SQLiteStateStore(
+            retry_contact_path, terminal_oracle, "repo-1"
+        )
+        reopened_terminal_store._bind_classification_authority(self.authority)
+        terminal_replay = reopened_terminal_store.settle_terminal_validation(
+            terminal_request
+        )
+        self.assertTrue(terminal_replay.replayed)
+        self.assertEqual(terminal_generation, 2)
+        self.assertFalse(terminal_replay.slot_released)
+        self.assertEqual(
+            reopened_terminal_store.table_counts()["outstanding_slot"], 1
+        )
+        reopened_terminal_store.load_verified(
+            "repo-1", authority=self.authority
+        )
+
+        retry_observation_request = EffectObservationRequest(
+            "retry-observation", "retry-observe-command",
+            "retry-observation-event", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-2", "retry-receipt",
+            retry_capability.claim_id, "descriptor-digest", 2,
+            "retry-settlement", "",
+        )
+        with self.assertRaises(InjectedFailure):
+            self._record_signed_effect_observation(
+                retry_observation_request,
+                failure_hook=raise_at(
+                    "after_observation_settlement_before_observation"
+                ),
+            )
+        self.assertEqual(
+            self.store.table_counts()["effect_observations"], 0
+        )
+        with self.assertRaises(InjectedFailure):
+            self._record_signed_effect_observation(
+                retry_observation_request,
+                failure_hook=raise_at(
+                    "after_observation_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            retry_observation_hash = connection.execute(
+                "SELECT event_hash FROM effect_observations WHERE "
+                "observation_id = 'retry-observation'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = retry_observation_hash
+        retry_observation = self._record_signed_effect_observation(
+            retry_observation_request
+        )
+        self.assertTrue(retry_observation.replayed)
+        self.assertEqual(
+            retry_observation.resulting_state, LifecycleState.VALIDATING
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        validator_grant = SyntheticValidatorGrant(
+            "validator-grant-retry", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-retry",
+            "read-only-scope-retry",
+        )
+        self.authority.register_validator(validator_grant)
+        validator_capability = self.authority.claim_validator(
+            *validator_grant.__dict__.values()
+        )
+        validator_request = ValidatorIntentRequest(
+            "validator-intent-retry", "validator-command-retry",
+            "validator-event-retry", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-2", "retry-observation",
+            retry_observation.event_hash, "revision-1", "check-1",
+            "input-1", "validator-attempt-retry",
+            "validator-permission-retry", "validator-reservation-retry",
+            "validator-budget-policy-1", 1, 2, 10,
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.commit_validator_intent(
+                validator_request, validator_capability, self.authority,
+                failure_hook=raise_at(
+                    "after_validator_intent_writes_before_commit"
+                ),
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store.commit_validator_intent(
+                validator_request, validator_capability, self.authority,
+                failure_hook=raise_at(
+                    "after_validator_intent_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            validator_intent_hash = connection.execute(
+                "SELECT event_hash FROM validator_intents WHERE "
+                "validator_intent_id = 'validator-intent-retry'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = validator_intent_hash
+        validator_intent = self.store.commit_validator_intent(
+            validator_request, validator_capability, self.authority
+        )
+        self.assertTrue(validator_intent.replayed)
+        self.store.load_verified("repo-1", authority=self.authority)
+        validator_target = self.store._adapter_target_digest(
+            "repo-1", "VALIDATOR"
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store._contact_committed_validator(
+                validator_request, validator_capability, validator_intent,
+                validator_target, self.authority,
+                failure_hook=raise_at(
+                    "after_validator_contact_writes_before_commit"
+                ),
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store._contact_committed_validator(
+                validator_request, validator_capability, validator_intent,
+                validator_target, self.authority,
+                failure_hook=raise_at(
+                    "after_validator_contact_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.store._contact_committed_validator(
+            validator_request, validator_capability, validator_intent,
+            validator_target, self.authority,
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        for tampered_field, tampered_value in (
+            ("slot_generation", 1),
+            ("recovery_authorization_id", "forged-retry-authorization"),
+        ):
+            tamper_path = self.database_path.parent / (
+                f"retry-validator-contact-{tampered_field}.sqlite3"
+            )
+            shutil.copy2(self.database_path, tamper_path)
+            connection = sqlite3.connect(tamper_path)
+            try:
+                contact_event_id, contact_body_json = connection.execute(
+                    "SELECT event_id, body_json FROM adapter_contacts WHERE "
+                    "source_id = 'VALIDATOR:validator-intent-retry'"
+                ).fetchone()
+                contact_body = json.loads(contact_body_json)
+                contact_body[tampered_field] = tampered_value
+                forged_hash = self.store._event_hash(contact_body)
+                forged_json = json.dumps(
+                    contact_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?",
+                    (forged_hash, forged_json, contact_event_id),
+                )
+                connection.execute(
+                    "UPDATE adapter_contacts SET event_hash = ?, "
+                    "body_json = ? WHERE event_id = ?",
+                    (forged_hash, forged_json, contact_event_id),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                    (forged_hash,),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'",
+                    (forged_hash,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            tamper_oracle = MutableFreshnessOracle()
+            tamper_oracle.allowed_head = forged_hash
+            tampered_store = SQLiteStateStore(
+                tamper_path, tamper_oracle, "repo-1"
+            )
+            tampered_store._bind_classification_authority(self.authority)
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "recovered validator contact"
+            ):
+                tampered_store.load_verified(
+                    "repo-1", authority=self.authority
+                )
+
+        validator_settlement_request = BudgetSettlementRequest(
+            "validator-settlement-retry", "validator-reservation-retry", "",
+            BudgetDisposition.CONSUMED, 1, "validator-result-retry",
+            "VALIDATOR_USAGE_REPORTED",
+        )
+        validator_settlement = self.store._settle_budget(
+            validator_settlement_request,
+            self.authority.issue_settlement_proof(
+                "validator-proof-retry", validator_settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = validator_settlement.settlement_hash
+        self._record_validator_cessation_for(
+            suffix="retry", result_available=True, check_id="check-1"
+        )
+        validator_observation = self.store._record_validator_observation(
+            ValidatorObservationRequest(
+                "validator-observation-retry",
+                "validator-observe-command-retry",
+                "validator-observation-event-retry", "repo-1", "run-1",
+                "item-1", "effect-1", "validator-intent-retry",
+                "validator-attempt-retry", "validator-result-retry",
+                validator_capability.claim_id, "revision-1", "check-1",
+                "input-1", "result-digest-retry", "PASS", 1,
+                "validator-settlement-retry",
+                validator_settlement.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = validator_observation.event_hash
+        application_request = ValidationApplicationRequest(
+            "application-retry", "apply-command-retry", "apply-event-retry",
+            "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+            "check-1", "validator-attempt-retry",
+            "validator-observation-retry",
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store._apply_validator_observation(
+                application_request,
+                failure_hook=raise_at(
+                    "after_validation_application_writes_before_commit"
+                ),
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store._apply_validator_observation(
+                application_request,
+                failure_hook=raise_at(
+                    "after_validation_application_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            application_hash = connection.execute(
+                "SELECT event_hash FROM validation_applications WHERE "
+                "application_id = 'application-retry'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = application_hash
+        application = self.store._apply_validator_observation(
+            application_request
+        )
+        self.assertTrue(application.replayed)
+        self.assertEqual(application.resulting_state, LifecycleState.BLOCKED)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        finalization_request = FinalizeOperationRequest(
+            "finalization-retry", "finalize-command-retry",
+            "finalize-event-retry", "repo-1", "run-1", "item-1",
+            "effect-1", "plan:run-1", "revision-1", "attempt-2", 2,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            plan_event_hash, gate_set_digest = connection.execute(
+                "SELECT event_hash, gate_set_digest FROM validation_plans "
+                "WHERE plan_id = 'plan:run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        finalization_key = self.store.finalization_key(
+            "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+            "revision-1",
+        )
+        finalization_attestation = (
+            self.authority.issue_finalization_attestation(
+                "attestation-retry", "repo-1", "run-1", "item-1",
+                "effect-1", "plan:run-1", plan_event_hash, "revision-1",
+                application.event_hash, finalization_key, gate_set_digest,
+                "attempt-2", 2,
+            )
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store._finalize_operation(
+                finalization_request, finalization_attestation,
+                self.authority,
+                failure_hook=raise_at("after_finalization_writes_before_commit"),
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store._finalize_operation(
+                finalization_request, finalization_attestation,
+                self.authority,
+                failure_hook=raise_at(
+                    "after_finalization_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            finalization_hash = connection.execute(
+                "SELECT event_hash FROM operation_finalizations WHERE "
+                "finalization_id = 'finalization-retry'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = finalization_hash
+        finalization = self.store._finalize_operation(
+            finalization_request, finalization_attestation, self.authority
+        )
+        self.assertTrue(finalization.replayed)
+        self.assertEqual(finalization.resulting_state, LifecycleState.COMPLETED)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        def record_original_receipt(suffix: str):
+            receipt = self._record_signed_effect_observation(
+                EffectObservationRequest(
+                    f"late-original-{suffix}",
+                    f"late-original-command-{suffix}",
+                    f"late-original-event-{suffix}",
+                    "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                    f"late-original-receipt-{suffix}",
+                    self.capability.claim_id, "descriptor-digest", 0,
+                    f"late-original-settlement-{suffix}", "",
+                )
+            )
+            self.oracle.allowed_head = receipt.event_hash
+            return receipt
+
+        shutil.copy2(consumed_recovery_path, self.database_path)
+        self.oracle.allowed_head = retried.event_hash
+        consumed_receipt = record_original_receipt("consumed")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            invalidation = connection.execute(
+                "SELECT status, consuming_event_id, disabling_event_id FROM "
+                "operation_retry_authorizations WHERE authorization_id = "
+                "'retry-authorization-1'"
+            ).fetchone()
+            initiation_fence = connection.execute(
+                "SELECT reason_code, originating_event_id FROM "
+                "dispatch_fences WHERE fence_id = "
+                "'retry-initiation-disabled:retry-authorization-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(
+            invalidation,
+            ("DISABLED", "event-2", consumed_receipt.event_id),
+        )
+        self.assertEqual(
+            initiation_fence,
+            ("RECOVERY_INITIATION_DISABLED", consumed_receipt.event_id),
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
+        with self.assertRaises(DispatchDenied):
+            self.store.claim_operation_launch(retry_request, retried)
+
+        shutil.copy2(available_recovery_path, self.database_path)
+        self.oracle.allowed_head = recovered.event_hash
+        available_receipt = record_original_receipt("available")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            invalidation = connection.execute(
+                "SELECT status, consuming_event_id, disabling_event_id FROM "
+                "operation_retry_authorizations WHERE authorization_id = "
+                "'retry-authorization-1'"
+            ).fetchone()
+            initiation_fences = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code = "
+                "'RECOVERY_INITIATION_DISABLED'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(
+            invalidation, ("DISABLED", None, available_receipt.event_id)
+        )
+        self.assertEqual(initiation_fences, 0)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+        shutil.copy2(pre_recovery_path, self.database_path)
+        self.oracle.allowed_head = resume.event_hash
+        pre_recovery_receipt = record_original_receipt("pre-recovery")
+        denied_grant = SyntheticOperatorGrant(
+            "recover-after-receipt-grant", "repo-1", "run-1",
+            "RECOVER_OPERATION", "recover-after-receipt-scope",
+        )
+        self.authority.register_operator(denied_grant)
+        denied_capability = self.authority.claim_operator(
+            *denied_grant.__dict__.values()
+        )
+        denied_request = replace(
+            recovery_request,
+            recovery_id="recover-after-receipt",
+            authorization_id="retry-after-receipt",
+            command_id="recover-after-receipt-command",
+            event_id="recover-after-receipt-event",
+            expected_catalog_head=pre_recovery_receipt.event_hash,
+            expected_run_head=pre_recovery_receipt.event_hash,
+        )
+        with self.assertRaises(DispatchDenied):
+            self.store.recover_proven_nonexecution(
+                denied_request, denied_capability, self.authority
+            )
+        self.assertEqual(
+            self.store.table_counts()["operation_recovery_actions"], 0
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def test_t06_rejects_wrong_contact_chain_and_slot_without_mutation(self) -> None:
         _, _, _, request = self._contacted_operation("bindings")
@@ -11691,6 +13045,92 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(foreign_key_errors, [])
         migrated.load_verified("repo-1")
 
+    def test_terminal_validation_migrates_exact_head_generation_schema(
+        self,
+    ) -> None:
+        self._prepare_finalization()
+        stopped = self.store.stop(
+            self._stop_request(),
+            self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        settled = self.store.settle_terminal_validation(
+            self._terminal_application_request("PASSED")
+        )
+        self.oracle.allowed_head = settled.event_hash
+
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute("PRAGMA foreign_keys = OFF")
+            target_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'terminal_validation_settlements'"
+            ).fetchone()[0]
+            head_sql = target_sql.replace(
+                "slot_generation INTEGER NOT NULL CHECK (slot_generation > 0)",
+                "slot_generation INTEGER NOT NULL CHECK (slot_generation = 1)",
+            )
+            self.assertNotEqual(head_sql, target_sql)
+            self.assertIn("VALIDATION_APPLICATION", head_sql)
+            before_rows = connection.execute(
+                "SELECT * FROM terminal_validation_settlements"
+            ).fetchall()
+            before_event_bodies = connection.execute(
+                "SELECT event_id, body_json FROM events ORDER BY event_id"
+            ).fetchall()
+            connection.execute(
+                "ALTER TABLE terminal_validation_settlements RENAME TO "
+                "terminal_validation_settlements_snapshot"
+            )
+            connection.execute(head_sql)
+            columns = ", ".join(
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(terminal_validation_settlements)"
+                )
+            )
+            connection.execute(
+                f"INSERT INTO terminal_validation_settlements ({columns}) "
+                f"SELECT {columns} FROM "
+                "terminal_validation_settlements_snapshot"
+            )
+            connection.execute(
+                "DROP TABLE terminal_validation_settlements_snapshot"
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        migrated = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        migrated._bind_classification_authority(self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after_rows = connection.execute(
+                "SELECT * FROM terminal_validation_settlements"
+            ).fetchall()
+            after_event_bodies = connection.execute(
+                "SELECT event_id, body_json FROM events ORDER BY event_id"
+            ).fetchall()
+            migrated_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'terminal_validation_settlements'"
+            ).fetchone()[0]
+            foreign_key_errors = connection.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(after_rows, before_rows)
+        self.assertEqual(after_event_bodies, before_event_bodies)
+        self.assertIn(
+            "slot_generation > 0", "".join(migrated_sql.splitlines())
+        )
+        self.assertEqual(foreign_key_errors, [])
+        migrated.load_verified("repo-1", authority=self.authority)
+
     def test_r_stop_01_rejects_incompatible_terminal_schema_without_mutation(
         self,
     ) -> None:
@@ -11701,7 +13141,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "name = 'terminal_validation_settlements'"
             ).fetchone()[0]
             weakened_sql = target_sql.replace(
-                "slot_generation INTEGER NOT NULL CHECK (slot_generation = 1)",
+                "slot_generation INTEGER NOT NULL CHECK (slot_generation > 0)",
                 "slot_generation INTEGER NOT NULL",
             )
             self.assertNotEqual(weakened_sql, target_sql)
@@ -13589,12 +15029,29 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         connection = sqlite3.connect(self.database_path)
         try:
-            contact_hash = connection.execute(
-                "SELECT event_hash FROM adapter_contacts WHERE "
+            contact_hash, contact_body_json = connection.execute(
+                "SELECT event_hash, body_json FROM adapter_contacts WHERE "
                 "contact_kind = 'VALIDATOR'"
-            ).fetchone()[0]
+            ).fetchone()
+            intent_body = json.loads(connection.execute(
+                "SELECT body_json FROM validator_intents WHERE "
+                "validator_intent_id = 'validator-intent-1'"
+            ).fetchone()[0])
         finally:
             connection.close()
+        recovery_intent_fields = {
+            "validator_intent_binding_version",
+            "parent_slot_generation",
+            "parent_recovery_authorization_id",
+        }
+        recovery_contact_fields = {
+            "contact_binding_version", "slot_generation",
+            "recovery_authorization_id",
+        }
+        self.assertTrue(recovery_intent_fields.isdisjoint(intent_body))
+        self.assertTrue(
+            recovery_contact_fields.isdisjoint(json.loads(contact_body_json))
+        )
         self.oracle.allowed_head = contact_hash
         release = BudgetSettlementRequest(
             "validator-release-1", "validator-reservation-1", "",

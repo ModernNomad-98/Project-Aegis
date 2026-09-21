@@ -195,7 +195,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 368 tests successfully, and
+controller. The complete local package suite ran 373 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -263,9 +263,13 @@ The reviewed operation-uncertainty foundation now adds typed source/control
 evidence, conditional operation uncertainty, an atomic semantic migration and
 exact-set recovery without promoting T17. The reviewed verified-receipt slice
 adds proof-bound operation clearance, full accounting ancestry, typed routing
-and exact replay/recovery. Authoritative nonexecution and safe-retry
-reconciliation remain ordered T17 work, so T17 and full T14 remain
-`UNVERIFIED`.
+and exact replay/recovery. The remaining authoritative-nonexecution and
+safe-retry slice now adds exact all-path seals, a typed T14/T16 recovery chain,
+one-use generation-bound operation retry and generation-aware T10/T23/T27/
+T11/T12/T16/T26 recovery. Its corrected migrations preserve proof-time
+uncertainty prefixes, newer fences, existing rows and foreign keys. T17 and full
+T14 remain `UNVERIFIED` pending the final accumulated exact-head trace rather
+than being promoted from slice evidence alone.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Current kernel demonstrates atomic intent rollback/replay, coordinator-owned T03 dispatch with durable PLANNED→RUNNING state, canonical supported controller/target roots, durable claim redemption, C04 canonical full-provenance receipt intake, and C05 exactly-once PASS/recoverable/final validation application. C05 uses store-bound issuer verification, full observation binding, item/effect-scoped permanent failure fences, crash/restart replay, and conditional slot release. It also proves event-anchored settlement/fence/slot facts, worst-case unknown charging, proof-bound release and OS writer exclusion. Filesystem ownership/reparse/path-swap protection and complete T01–T28/C06–C09/F01–F21 application remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15 and all ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and safe-retry work. The complete local delivery-control suite passes 373 tests, but slice evidence does not promote unaudited T/C/F rows. T22, T28/F01, cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -844,6 +844,55 @@ T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED`. Authoritative
 `SAFE_SAME_EFFECT_RETRY`. The existing validator-only T09-after-T17 resume
 projection is intentionally unchanged; operation-sourced T14 clearance remains
 deferred. PR #99 remains draft and not merge-ready.
+
+### 5.18 T17 authoritative nonexecution and safe-retry checkpoint
+
+The reviewed slice closes the remaining ordered T17 implementation work for
+synthetic operation nonexecution. T25 requires an issuer-authenticated,
+canonical target-ledger seal for every `INTENT_ONLY`, `LAUNCHED` or `CONTACTED`
+operation routed to recovery. It persists the exact proof/action, clears only
+uncertainties that existed at the proof prefix and retains every newer or
+independent fence. T14 clears only the exact operator pause and remains PAUSED
+when another prefix-active pause survives. T16 creates one typed, one-use retry
+authorization; the exact successor T03 intent atomically consumes it and
+transfers the repository slot from generation 1 to generation 2 without
+authorizing another effect.
+
+Recovered generation and authorization identity are carried through operation
+launch/contact, T10/T23 effect intake, T27 validator intent/contact, T11/T12
+application, T16 finalization and T26 terminal settlement. Exact replay covers
+pre-commit rollback and post-commit acknowledgement loss. Ordinary generation-1
+event shapes remain unchanged. Recovery rejects rebound generation or
+authorization fields, while a stopped contacted retry retains its slot until
+the missing authoritative effect outcome is settled.
+
+The initial implementation review returned `REVISE` because generation-2
+recovery stopped at operation contact, INTENT_ONLY T25 recovery lacked its
+canonical action/seal, and T14 replay counted cleared historical pauses as
+active. After those corrections, two migration-only blockers were corrected.
+Terminal-settlement migration
+now recognizes both committed generation-1 schemas and migrates populated rows
+losslessly to positive generations with foreign keys intact. The v2-to-v3 T25
+backfill now derives its resolution set from the exact proof-event prefix,
+preserves later uncertainties/fences and atomically rejects incompatible later
+resolution ownership instead of committing a partially recoverable database.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T17/T25/T14/T16 plan was independently approved; a corrected remediation plan closed all-path proof and crash/replay coverage gaps before editing |
+| Focused falsification and regressions | Generation-2 observation/validation/finalization/terminal crash-replay, INTENT_ONLY/LAUNCHED/CONTACTED seal binding, stacked-pause replay, generation/authorization tamper, generation-1 compatibility and both migration boundaries passed |
+| Storage module | 279 tests passed in 32.924 seconds |
+| Complete delivery-control package | 373 tests passed in 47.700 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Independent implementation review | Initial `REVISE` closed generation propagation, missing INTENT_ONLY action/seal and cleared-pause replay findings. Two later migration blockers exposed exact-HEAD terminal-schema and historical T25-backfill defects; both were corrected and independently retested. Final `APPROVE`, no remaining blocker or major; reviewer independently passed the two migration probes |
+| T/C/F traceability | Adds accepted operation-nonexecution/safe-retry evidence to T14/T16/T17/T25 and generation-aware T10/T11/T12/T23/T26/T27, plus C03/C04/C06 and F02/F04a/F06/F07/F11/F12/F19/F21; complete families remain conservatively `UNVERIFIED` pending accumulated exact-head audit |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+The ordered T17 implementation slice is complete and independently accepted,
+but the T17 matrix row remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the
+accumulated exact-head transition trace is performed. T22 is next. PR #99
+remains draft and not merge-ready.
 
 ## 6. Handoff contract
 

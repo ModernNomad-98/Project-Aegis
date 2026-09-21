@@ -17,6 +17,7 @@ from .contracts import (
     FailureClassification,
     ReconciliationPauseResumeRequest,
     ResumeActivitySettlementRequest,
+    ResumeOperationNonexecutionRequest,
     ResumeRequest,
     SourceControlEvidenceRequest,
     SourceControlSettlementRequest,
@@ -248,6 +249,14 @@ class SyntheticResumeEvidence:
 
 @dataclass(frozen=True)
 class SyntheticActivityResumeEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticOperationNonexecutionResumeEvidence:
     proof_id: str
     request_digest: str
     issuer_fingerprint: str
@@ -594,6 +603,80 @@ class SyntheticAuthority:
         ):
             raise DispatchDenied(
                 "activity resume evidence was not issued here"
+            )
+
+    @staticmethod
+    def _operation_nonexecution_resume_digest(
+        request: ResumeOperationNonexecutionRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **{
+                        key: value
+                        for key, value in request.__dict__.items()
+                        if key != "resolved_uncertainty_ids"
+                    },
+                    "resolved_uncertainty_ids": list(
+                        request.resolved_uncertainty_ids
+                    ),
+                },
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_operation_nonexecution_resume_evidence(
+        self,
+        proof_id: str,
+        request: ResumeOperationNonexecutionRequest,
+    ) -> SyntheticOperationNonexecutionResumeEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError(
+                "operation-nonexecution resume proof ID must be non-empty"
+            )
+        request_digest = self._operation_nonexecution_resume_digest(request)
+        return SyntheticOperationNonexecutionResumeEvidence(
+            proof_id,
+            request_digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "OPERATION_NONEXECUTION_RESUME_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_operation_nonexecution_resume_evidence(
+        self,
+        evidence: SyntheticOperationNonexecutionResumeEvidence,
+        request: ResumeOperationNonexecutionRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied(
+                "operation-nonexecution resume evidence is malformed"
+            )
+        request_digest = self._operation_nonexecution_resume_digest(request)
+        expected_mac = self._mac(
+            "OPERATION_NONEXECUTION_RESUME_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied(
+                "operation-nonexecution resume evidence was not issued here"
             )
 
     @staticmethod
@@ -1002,7 +1085,7 @@ class SyntheticAuthority:
             raise ValueError("synthetic operator grant fields must be non-empty")
         if grant.action not in {
             "PAUSE", "RESUME", "STOP_GRACEFUL", "STOP_IMMEDIATE",
-            "STOP_ESCALATE",
+            "STOP_ESCALATE", "RECOVER_OPERATION",
         }:
             raise ValueError("unsupported synthetic operator action")
         with self._lock:

@@ -63,7 +63,7 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
 CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) but is
-still an unaccepted draft checkpoint. The full local package suite passed 368
+still an unaccepted draft checkpoint. The full local package suite passed 373
 tests on 2026-09-21; all three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
@@ -78,8 +78,11 @@ migration and exact-set recovery, also received independent `APPROVE`.
 The T17 verified-receipt route now also has independent `APPROVE`: it binds a
 typed query/time/source/response lookup, exact receipt/plan/slot/head facts and
 complete settlement ancestry, then clears its exact uncertainty set atomically
-with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. Authoritative
-nonexecution and safe-retry reconciliation remain ordered T17 work.
+with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. The remaining
+T17 authoritative-nonexecution and authenticated safe-retry slice also has
+independent `APPROVE`, including all-path seal binding, generation-bound retry,
+stacked-pause replay and proof-prefix-safe migration. T22 is next in the
+documented order.
 Remaining exact
 T/C/F backlog and final review gates still
 block merge, so the

@@ -241,6 +241,41 @@ class IntentRequest:
 
 
 @dataclass(frozen=True)
+class ProvenNonexecutionIntentRequest(IntentRequest):
+    recovery_authorization_id: str
+    prior_attempt_id: str
+    expected_source_generation: int
+    expected_target_generation: int
+
+    def validate(self) -> None:
+        super().validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.recovery_authorization_id,
+                self.prior_attempt_id,
+            )
+        ):
+            raise ValueError(
+                "proven-nonexecution intent recovery bindings must be non-empty"
+            )
+        if self.prior_attempt_id == self.attempt_id:
+            raise ValueError(
+                "proven-nonexecution intent requires a successor attempt"
+            )
+        if (
+            type(self.expected_source_generation) is not int
+            or type(self.expected_target_generation) is not int
+            or self.expected_source_generation <= 0
+            or self.expected_target_generation
+            != self.expected_source_generation + 1
+        ):
+            raise ValueError(
+                "proven-nonexecution intent generations must advance exactly once"
+            )
+
+
+@dataclass(frozen=True)
 class PlanAcceptanceRequest:
     plan_id: str
     command_id: str
@@ -1555,6 +1590,158 @@ class ResumeActivitySettlementRequest:
         ):
             raise ValueError(
                 "activity-settlement resume requires its operation recovery cursor"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeOperationNonexecutionRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    source_nonexecution_event_id: str
+    source_nonexecution_event_hash: str
+    reservation_id: str
+    settlement_head_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    continuation_cursor: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.resume_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.attempt_id, self.plan_id,
+            self.revision_digest, self.effect_descriptor_digest,
+            self.source_pause_id, self.source_pause_event_id,
+            self.source_pause_event_hash, self.pause_fence_id,
+            self.source_nonexecution_event_id,
+            self.source_nonexecution_event_hash, self.reservation_id,
+            self.settlement_head_hash, self.continuation_cursor,
+            self.expected_slot_attempt_id, self.expected_catalog_head,
+            self.expected_run_head, self.expected_run_heads_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "operation-nonexecution resume bindings must be non-empty"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "operation-nonexecution resume uncertainty IDs must be sorted "
+                "and distinct"
+            )
+        if self.continuation_cursor != f"operation-recovery:{self.attempt_id}":
+            raise ValueError(
+                "operation-nonexecution resume requires its recovery cursor"
+            )
+        if self.expected_slot_attempt_id != self.attempt_id:
+            raise ValueError(
+                "operation-nonexecution resume must retain the exact attempt slot"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "operation-nonexecution resume slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class RecoverProvenNonexecutionRequest:
+    recovery_id: str
+    authorization_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    prior_attempt_id: str
+    successor_attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    source_nonexecution_event_id: str
+    source_nonexecution_event_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    continuation_cursor: str
+    expected_slot_generation: int
+    target_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.recovery_id, self.authorization_id, self.command_id,
+            self.event_id, self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.prior_attempt_id,
+            self.successor_attempt_id, self.plan_id, self.revision_digest,
+            self.effect_descriptor_digest,
+            self.source_nonexecution_event_id,
+            self.source_nonexecution_event_hash, self.continuation_cursor,
+            self.expected_catalog_head, self.expected_run_head,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery bindings must be non-empty"
+            )
+        if self.prior_attempt_id == self.successor_attempt_id:
+            raise ValueError(
+                "proven-nonexecution recovery requires a successor attempt"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery uncertainty IDs must be sorted "
+                "and distinct"
+            )
+        if self.continuation_cursor != (
+            f"operation-recovery:{self.prior_attempt_id}"
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery requires its operation cursor"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or type(self.target_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+            or self.target_slot_generation != self.expected_slot_generation + 1
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery generations must advance once"
             )
 
 

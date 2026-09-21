@@ -27,6 +27,7 @@ from .authority import (
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
     SyntheticNonexecutionAttestation,
+    SyntheticOperationNonexecutionResumeEvidence,
     SyntheticOperatorCapability,
     SyntheticResumeEvidence,
     SyntheticReconciliationResumeEvidence,
@@ -68,10 +69,13 @@ from .contracts import (
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
     ReconciliationPauseResumeRequest,
+    RecoverProvenNonexecutionRequest,
     ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ResumeActivitySettlementRequest,
+    ResumeOperationNonexecutionRequest,
     ResumeRequest,
+    ProvenNonexecutionIntentRequest,
     SettlementReceipt,
     SourceControlClassification,
     SourceControlEvidenceRequest,
@@ -253,7 +257,10 @@ _LIFECYCLE_ROUTES: Mapping[
     "AUTHORITY_EVALUATED": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BINDING_MISMATCH": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BLOCKER_RESOLVED": frozenset(
-        {(LifecycleState.BLOCKED, LifecycleState.VALIDATING)}
+        {
+            (LifecycleState.BLOCKED, LifecycleState.PLANNED),
+            (LifecycleState.BLOCKED, LifecycleState.VALIDATING),
+        }
     ),
     "INTENT_COMMITTED": frozenset(
         {(LifecycleState.PLANNED, LifecycleState.RUNNING)}
@@ -327,6 +334,7 @@ _LIFECYCLE_ROUTES: Mapping[
         {
             (LifecycleState.PAUSED, LifecycleState.PLANNED),
             (LifecycleState.PAUSED, LifecycleState.VALIDATING),
+            (LifecycleState.PAUSED, LifecycleState.PAUSED),
             (LifecycleState.PAUSED, LifecycleState.BLOCKED),
         }
     ),
@@ -443,8 +451,9 @@ def _derive_effect_observation_route(
     source_control_classification: str = "",
     *,
     accounting_unknown: bool | None = None,
+    force_late: bool = False,
 ) -> tuple[str, str, LifecycleState]:
-    ordinary_receipt = current_state in {
+    ordinary_receipt = not force_late and current_state in {
         LifecycleState.RUNNING,
         LifecycleState.PAUSING,
     }
@@ -518,6 +527,7 @@ def _derive_nonexecution_route(
     current_attempt: bool,
     validator_nonexecution: bool,
     attempt_id: str,
+    external_pause_active: bool = False,
 ) -> tuple[LifecycleState, str | None]:
     resulting_state = current_state
     continuation_cursor = current_cursor
@@ -534,7 +544,10 @@ def _derive_nonexecution_route(
     if (contradiction or uncertainty) and current_state not in terminal_states:
         resulting_state = LifecycleState.RECONCILIATION_REQUIRED
         continuation_cursor = recovery_cursor
-    elif current_attempt and current_state is LifecycleState.PAUSED:
+    elif current_attempt and (
+        current_state is LifecycleState.PAUSED or external_pause_active
+    ):
+        resulting_state = LifecycleState.PAUSED
         continuation_cursor = recovery_cursor
     elif current_attempt and current_state not in {
         *terminal_states,
@@ -793,7 +806,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2}:
+        if semantic_version not in {0, 1, 2, 3}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -814,7 +827,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2} and (
+        if semantic_version in {1, 2, 3} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -1243,7 +1256,7 @@ class SQLiteStateStore:
                 cessation_event_hash TEXT,
                 obligation_proof_key TEXT NOT NULL UNIQUE,
                 slot_attempt_id TEXT NOT NULL,
-                slot_generation INTEGER NOT NULL CHECK (slot_generation = 1),
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL CHECK (resulting_state IN (
@@ -1308,7 +1321,7 @@ class SQLiteStateStore:
                 pause_id TEXT PRIMARY KEY,
                 command_id TEXT NOT NULL UNIQUE,
                 event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
-                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                fence_id TEXT NOT NULL UNIQUE,
                 repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
                 run_id TEXT NOT NULL REFERENCES runs(run_id),
                 item_id TEXT NOT NULL,
@@ -1742,6 +1755,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_verified_receipt_reconciliation_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_proven_nonexecution_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -1763,7 +1779,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2}:
+            if version not in {0, 1, 2, 3}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -1771,7 +1787,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version == 2:
+            if version in {2, 3}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -1821,6 +1837,71 @@ class SQLiteStateStore:
                             if resolution is None:
                                 raise StorageIntegrityError(
                                     "verified-receipt resolution is missing"
+                                )
+                            resolved_operation_ids.add(str(uncertainty_id))
+                if version == 3:
+                    proven_table = connection.execute(
+                        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                        "name = 'proven_nonexecution_actions'"
+                    ).fetchone()
+                    if proven_table is None:
+                        raise StorageIntegrityError(
+                            "proven-nonexecution resolution projection is missing"
+                        )
+                    for action in connection.execute(
+                        "SELECT action.*, event.body_json AS event_body, "
+                        "event.event_hash AS source_event_hash FROM "
+                        "proven_nonexecution_actions AS action JOIN events AS "
+                        "event ON event.event_id = action.settlement_event_id"
+                    ):
+                        if (
+                            action["body_json"] != action["event_body"]
+                            or action["event_hash"] != action["source_event_hash"]
+                            or SQLiteStateStore._event_hash(
+                                json.loads(str(action["event_body"]))
+                            ) != action["source_event_hash"]
+                        ):
+                            raise StorageIntegrityError(
+                                "proven-nonexecution resolution source is invalid"
+                            )
+                        try:
+                            uncertainty_ids = json.loads(
+                                str(action["resolved_uncertainty_ids_json"])
+                            )
+                        except json.JSONDecodeError as error:
+                            raise StorageIntegrityError(
+                                "proven-nonexecution resolution set is invalid"
+                            ) from error
+                        if (
+                            not isinstance(uncertainty_ids, list)
+                            or uncertainty_ids != sorted(uncertainty_ids)
+                            or len(set(uncertainty_ids)) != len(uncertainty_ids)
+                        ):
+                            raise StorageIntegrityError(
+                                "proven-nonexecution resolution set is invalid"
+                            )
+                        reconciliation_id = (
+                            "proven-nonexecution:"
+                            + str(action["settlement_event_id"])
+                        )
+                        for uncertainty_id in uncertainty_ids:
+                            if uncertainty_id not in expected:
+                                raise StorageIntegrityError(
+                                    "proven nonexecution resolved an unknown "
+                                    "operation uncertainty"
+                                )
+                            resolution = connection.execute(
+                                "SELECT * FROM uncertainty_resolutions WHERE "
+                                "uncertainty_id = ? AND reconciliation_id = ? "
+                                "AND event_id = ?",
+                                (
+                                    uncertainty_id, reconciliation_id,
+                                    action["settlement_event_id"],
+                                ),
+                            ).fetchone()
+                            if resolution is None:
+                                raise StorageIntegrityError(
+                                    "proven-nonexecution resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
             source_ids = {
@@ -1968,7 +2049,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2,
+                1, 2, 3,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -2040,7 +2121,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2}:
+            if version not in {1, 2, 3}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -2080,9 +2161,565 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "verified-receipt action schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 2:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                2, 3,
+            }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
+                )
+            if manage_transaction:
+                connection.commit()
+        except BaseException:
+            if manage_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_proven_nonexecution_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+    ) -> None:
+        external_pause_sql = """
+            CREATE TABLE external_pause_actions_v3 (
+                pause_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                fence_id TEXT NOT NULL UNIQUE,
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                intent_event_id TEXT NOT NULL,
+                intent_event_hash TEXT NOT NULL,
+                launch_id TEXT NOT NULL,
+                launch_event_id TEXT NOT NULL,
+                launch_event_hash TEXT NOT NULL,
+                contact_id TEXT NOT NULL,
+                contact_event_id TEXT NOT NULL,
+                contact_event_hash TEXT NOT NULL,
+                target_digest TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                reason_code TEXT NOT NULL,
+                settlement_event_id TEXT NOT NULL,
+                settlement_hash TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_repository_id TEXT NOT NULL,
+                capability_run_id TEXT NOT NULL,
+                capability_action TEXT NOT NULL CHECK (capability_action = 'PAUSE'),
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSED'),
+                body_json TEXT NOT NULL
+            )
+        """
+        table_sql = {
+            "proven_nonexecution_actions": """
+                CREATE TABLE proven_nonexecution_actions (
+                    settlement_event_id TEXT PRIMARY KEY REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    attempt_id TEXT NOT NULL,
+                    reservation_id TEXT NOT NULL REFERENCES budget_reservations(reservation_id),
+                    settlement_hash TEXT NOT NULL UNIQUE,
+                    plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    effect_descriptor_digest TEXT NOT NULL,
+                    path_class TEXT NOT NULL CHECK (path_class IN (
+                        'INTENT_ONLY', 'LAUNCHED', 'CONTACTED'
+                    )),
+                    intent_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    intent_event_hash TEXT NOT NULL,
+                    launch_id TEXT,
+                    launch_event_id TEXT,
+                    launch_event_hash TEXT,
+                    contact_id TEXT,
+                    contact_event_id TEXT,
+                    contact_event_hash TEXT,
+                    claim_id TEXT NOT NULL,
+                    source_id TEXT NOT NULL,
+                    target_digest TEXT NOT NULL,
+                    seal_id TEXT NOT NULL UNIQUE,
+                    seal_hash TEXT NOT NULL UNIQUE,
+                    resolved_uncertainty_ids_json TEXT NOT NULL,
+                    slot_attempt_id TEXT NOT NULL,
+                    slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (
+                        resulting_state IN ('PAUSING', 'PAUSED', 'BLOCKED')
+                    ),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "operation_nonexecution_resume_actions": """
+                CREATE TABLE operation_nonexecution_resume_actions (
+                    resume_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    attempt_id TEXT NOT NULL,
+                    plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    effect_descriptor_digest TEXT NOT NULL,
+                    source_pause_id TEXT NOT NULL REFERENCES external_pause_actions(pause_id),
+                    source_pause_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    source_pause_event_hash TEXT NOT NULL,
+                    pause_fence_id TEXT NOT NULL,
+                    source_nonexecution_event_id TEXT NOT NULL REFERENCES proven_nonexecution_actions(settlement_event_id),
+                    source_nonexecution_event_hash TEXT NOT NULL,
+                    resolved_uncertainty_ids_json TEXT NOT NULL,
+                    continuation_cursor TEXT NOT NULL,
+                    slot_attempt_id TEXT NOT NULL,
+                    slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                    expected_catalog_head TEXT NOT NULL,
+                    expected_run_head TEXT NOT NULL,
+                    expected_run_heads_digest TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_scope_digest TEXT NOT NULL,
+                    capability_issuer_fingerprint TEXT NOT NULL,
+                    capability_issuer_mac TEXT NOT NULL,
+                    evidence_proof_id TEXT NOT NULL UNIQUE,
+                    evidence_request_digest TEXT NOT NULL,
+                    evidence_issuer_fingerprint TEXT NOT NULL,
+                    evidence_issuer_mac TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (
+                        resulting_state IN ('PAUSED', 'BLOCKED')
+                    ),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "operation_recovery_actions": """
+                CREATE TABLE operation_recovery_actions (
+                    recovery_id TEXT PRIMARY KEY,
+                    authorization_id TEXT NOT NULL UNIQUE,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    prior_attempt_id TEXT NOT NULL,
+                    successor_attempt_id TEXT NOT NULL,
+                    source_generation INTEGER NOT NULL CHECK (source_generation > 0),
+                    target_generation INTEGER NOT NULL CHECK (target_generation > 1),
+                    plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    effect_descriptor_digest TEXT NOT NULL,
+                    source_nonexecution_event_id TEXT NOT NULL REFERENCES proven_nonexecution_actions(settlement_event_id),
+                    source_nonexecution_event_hash TEXT NOT NULL,
+                    continuation_cursor TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_scope_digest TEXT NOT NULL,
+                    capability_issuer_fingerprint TEXT NOT NULL,
+                    capability_issuer_mac TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state = 'PLANNED'),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "operation_retry_authorizations": """
+                CREATE TABLE operation_retry_authorizations (
+                    authorization_id TEXT PRIMARY KEY,
+                    recovery_id TEXT NOT NULL UNIQUE REFERENCES operation_recovery_actions(recovery_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    prior_attempt_id TEXT NOT NULL,
+                    successor_attempt_id TEXT NOT NULL,
+                    source_generation INTEGER NOT NULL CHECK (source_generation > 0),
+                    target_generation INTEGER NOT NULL CHECK (target_generation > 1),
+                    source_nonexecution_event_id TEXT NOT NULL REFERENCES proven_nonexecution_actions(settlement_event_id),
+                    status TEXT NOT NULL CHECK (status IN (
+                        'AVAILABLE', 'CONSUMED', 'DISABLED'
+                    )),
+                    consuming_event_id TEXT REFERENCES events(event_id),
+                    disabling_event_id TEXT REFERENCES events(event_id),
+                    body_json TEXT NOT NULL
+                )
+            """,
+        }
+
+        def canonical_schema(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {2, 3}:
+                raise StorageIntegrityError(
+                    "proven-nonexecution semantic version is unsupported"
+                )
+            external_pause_fks = tuple(
+                connection.execute(
+                    "PRAGMA foreign_key_list(external_pause_actions)"
+                )
+            )
+            if any(
+                str(row[2]) == "dispatch_fences" and str(row[3]) == "fence_id"
+                for row in external_pause_fks
+            ):
+                connection.execute("PRAGMA defer_foreign_keys = ON")
+                connection.execute(external_pause_sql)
+                connection.execute(
+                    "INSERT INTO external_pause_actions_v3 SELECT * FROM "
+                    "external_pause_actions"
+                )
+                connection.execute("DROP TABLE external_pause_actions")
+                connection.execute(
+                    "ALTER TABLE external_pause_actions_v3 RENAME TO "
+                    "external_pause_actions"
+                )
+            existing = {
+                str(row["name"]): str(row["sql"])
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+                )
+                if str(row["name"]) in table_sql
+            }
+            if version == 2:
+                if existing:
+                    raise StorageIntegrityError(
+                        "proven-nonexecution schema is partially migrated"
+                    )
+                for sql in table_sql.values():
+                    connection.execute(sql)
+                database_file = str(
+                    connection.execute("PRAGMA database_list").fetchone()[2]
+                )
+                target_path = Path(database_file).parent / (
+                    "synthetic-target.sqlite3"
+                )
+                for event in connection.execute(
+                    "SELECT * FROM events WHERE event_kind = "
+                    "'NONDISPATCH_PROVEN' ORDER BY writer_epoch, sequence"
+                ).fetchall():
+                    try:
+                        body = json.loads(str(event["body_json"]))
+                    except json.JSONDecodeError as error:
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution event is invalid"
+                        ) from error
+                    eligible = (
+                        body.get("non_dispatch_proven") is True
+                        and body.get("zero_liability_proven") is True
+                        and body.get("all_obligations_settled") is True
+                        and body.get("release_slot") is False
+                        and body.get("contradiction") is False
+                        and body.get("uncertainty") is False
+                        and isinstance(
+                            body.get("nonexecution_seal_id"), str
+                        )
+                        and bool(body.get("nonexecution_seal_id"))
+                        and body.get("lifecycle_to") in {
+                            LifecycleState.PAUSING.value,
+                            LifecycleState.PAUSED.value,
+                            LifecycleState.BLOCKED.value,
+                        }
+                    )
+                    if not eligible:
+                        continue
+                    reservation = connection.execute(
+                        "SELECT * FROM budget_reservations WHERE "
+                        "reservation_id = ?",
+                        (body.get("reservation_id"),),
+                    ).fetchone()
+                    settlement = connection.execute(
+                        "SELECT * FROM budget_settlements WHERE "
+                        "settlement_event_id = ?",
+                        (event["event_id"],),
+                    ).fetchone()
+                    validator = connection.execute(
+                        "SELECT 1 FROM validator_intents WHERE reservation_id = ?",
+                        (body.get("reservation_id"),),
+                    ).fetchone()
+                    plans = connection.execute(
+                        "SELECT * FROM validation_plans WHERE repository_id = ? "
+                        "AND run_id = ?",
+                        (event["repository_id"], event["run_id"]),
+                    ).fetchall()
+                    slot = connection.execute(
+                        "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                        (event["repository_id"],),
+                    ).fetchone()
+                    if (
+                        reservation is None or settlement is None
+                        or validator is not None or len(plans) != 1
+                        or slot is None
+                    ):
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution proof chain is incomplete"
+                        )
+                    plan = plans[0]
+                    if (
+                        reservation["repository_id"], reservation["run_id"],
+                        reservation["item_id"],
+                        reservation["logical_effect_id"],
+                        reservation["attempt_id"],
+                        settlement["reservation_id"],
+                        settlement["settlement_hash"],
+                        settlement["disposition"],
+                        bool(settlement["uncertainty"]),
+                        slot["run_id"], slot["logical_effect_id"],
+                        slot["attempt_id"], int(slot["generation"]),
+                    ) != (
+                        event["repository_id"], event["run_id"],
+                        event["item_id"], body.get("logical_effect_id"),
+                        body.get("attempt_id"), body.get("reservation_id"),
+                        event["event_hash"], BudgetDisposition.RELEASED.value,
+                        False, event["run_id"], body.get("logical_effect_id"),
+                        body.get("attempt_id"), 1,
+                    ):
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution settlement is inconsistent"
+                        )
+                    intent = connection.execute(
+                        "SELECT source.event_id, source.event_hash, "
+                        "source.command_id, redemption.claim_id FROM events AS "
+                        "source JOIN capability_redemptions AS redemption ON "
+                        "redemption.command_id = source.command_id WHERE "
+                        "source.repository_id = ? AND source.run_id = ? AND "
+                        "source.event_kind = 'INTENT_COMMITTED' AND "
+                        "redemption.logical_effect_id = ? AND "
+                        "redemption.attempt_id = ?",
+                        (
+                            event["repository_id"], event["run_id"],
+                            body.get("logical_effect_id"),
+                            body.get("attempt_id"),
+                        ),
+                    ).fetchone()
+                    launch = connection.execute(
+                        "SELECT * FROM operation_launches WHERE repository_id "
+                        "= ? AND run_id = ? AND item_id = ? AND "
+                        "logical_effect_id = ? AND attempt_id = ?",
+                        (
+                            event["repository_id"], event["run_id"],
+                            event["item_id"], body.get("logical_effect_id"),
+                            body.get("attempt_id"),
+                        ),
+                    ).fetchone()
+                    if intent is None or not target_path.is_file():
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution target proof is unavailable"
+                        )
+                    source_id = (
+                        f"EFFECT:{launch['launch_id']}"
+                        if launch is not None
+                        else f"EFFECT-INTENT:{intent['command_id']}"
+                    )
+                    contact = connection.execute(
+                        "SELECT * FROM adapter_contacts WHERE repository_id = ? "
+                        "AND run_id = ? AND item_id = ? AND contact_kind = "
+                        "'EFFECT' AND source_id = ?",
+                        (
+                            event["repository_id"], event["run_id"],
+                            event["item_id"], source_id,
+                        ),
+                    ).fetchone()
+                    target_digest = hashlib.sha256(
+                        json.dumps(
+                            [
+                                "EFFECT", event["repository_id"],
+                                str(target_path.resolve()),
+                            ],
+                            ensure_ascii=True, separators=(",", ":"),
+                        ).encode("ascii")
+                    ).hexdigest()
+                    with closing(sqlite3.connect(target_path)) as target:
+                        target.row_factory = sqlite3.Row
+                        seal = target.execute(
+                            "SELECT * FROM synthetic_nonexecution_seals WHERE "
+                            "seal_id = ?", (body["nonexecution_seal_id"],),
+                        ).fetchone()
+                    if seal is None:
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution seal is unavailable"
+                        )
+                    seal_body = json.loads(str(seal["body_json"]))
+                    source_event_hash = str(
+                        launch["event_hash"]
+                        if launch is not None else intent["event_hash"]
+                    )
+                    if (
+                        seal["contact_kind"], seal["target_digest"],
+                        seal["claim_id"], seal["source_id"],
+                        seal["source_event_hash"], seal["reservation_id"],
+                        seal["repository_id"], seal["run_id"], seal["item_id"],
+                        seal["logical_effect_id"], seal["attempt_id"],
+                        seal["seal_hash"],
+                    ) != (
+                        "EFFECT", target_digest, intent["claim_id"], source_id,
+                        source_event_hash, reservation["reservation_id"],
+                        reservation["repository_id"], reservation["run_id"],
+                        reservation["item_id"],
+                        reservation["logical_effect_id"],
+                        reservation["attempt_id"],
+                        SQLiteStateStore._event_hash(seal_body),
+                    ):
+                        raise StorageIntegrityError(
+                            "legacy proven-nonexecution seal is rebound"
+                        )
+                    prefix_uncertainties = connection.execute(
+                        "SELECT instance.*, fence.reason_code, "
+                        "resolution.event_id AS resolution_event_id, "
+                        "resolution_event.sequence AS resolution_sequence FROM "
+                        "uncertainty_instances AS instance JOIN events AS "
+                        "origin ON origin.event_id = instance.origin_event_id "
+                        "LEFT JOIN dispatch_fences AS fence ON fence.fence_id = "
+                        "instance.fence_id LEFT JOIN uncertainty_resolutions AS "
+                        "resolution ON resolution.uncertainty_id = "
+                        "instance.uncertainty_id LEFT JOIN events AS "
+                        "resolution_event ON resolution_event.event_id = "
+                        "resolution.event_id WHERE instance.repository_id = ? "
+                        "AND instance.run_id = ? AND instance.item_id = ? AND "
+                        "instance.logical_effect_id = ? AND "
+                        "instance.attempt_id = ? AND instance.check_id IS NULL "
+                        "AND origin.sequence < ? ORDER BY "
+                        "instance.uncertainty_id",
+                        (
+                            reservation["repository_id"], reservation["run_id"],
+                            reservation["item_id"],
+                            reservation["logical_effect_id"],
+                            reservation["attempt_id"],
+                            event["sequence"],
+                        ),
+                    ).fetchall()
+                    uncertainty_rows = []
+                    for uncertainty in prefix_uncertainties:
+                        if uncertainty["resolution_event_id"] is not None:
+                            resolution_sequence = uncertainty[
+                                "resolution_sequence"
+                            ]
+                            if resolution_sequence is None or int(
+                                resolution_sequence
+                            ) >= int(event["sequence"]):
+                                raise StorageIntegrityError(
+                                    "legacy proven-nonexecution uncertainty "
+                                    "has incompatible later resolution ownership"
+                                )
+                            continue
+                        if uncertainty["reason_code"] is None:
+                            raise StorageIntegrityError(
+                                "legacy proven-nonexecution uncertainty lost "
+                                "its active fence"
+                            )
+                        uncertainty_rows.append(uncertainty)
+                    reason_codes = {
+                        "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+                        "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+                        "BILLING": "EFFECT_BILLING_UNKNOWN",
+                        "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+                    }
+                    reconciliation_id = (
+                        "proven-nonexecution:" + str(event["event_id"])
+                    )
+                    for uncertainty in uncertainty_rows:
+                        kind = str(uncertainty["uncertainty_kind"])
+                        if uncertainty["reason_code"] != reason_codes.get(kind):
+                            raise StorageIntegrityError(
+                                "legacy proven-nonexecution fence is rebound"
+                            )
+                        proof_kind = (
+                            "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                            if kind == "BILLING"
+                            else "AUTHORITATIVE_NONEXECUTION_SEAL"
+                        )
+                        resolution_body = {
+                            "event_id": event["event_id"],
+                            "proof_event_hash": event["event_hash"],
+                            "proof_event_id": event["event_id"],
+                            "proof_kind": proof_kind,
+                            "reconciliation_id": reconciliation_id,
+                            "schema_version": 1,
+                            "uncertainty_id": uncertainty["uncertainty_id"],
+                        }
+                        connection.execute(
+                            "INSERT INTO uncertainty_resolutions VALUES "
+                            "(?, ?, ?, ?, ?, ?, ?)",
+                            (
+                                uncertainty["uncertainty_id"], reconciliation_id,
+                                event["event_id"], proof_kind,
+                                event["event_id"], event["event_hash"],
+                                json.dumps(
+                                    resolution_body, sort_keys=True,
+                                    separators=(",", ":"),
+                                ),
+                            ),
+                        )
+                        connection.execute(
+                            "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                            (uncertainty["fence_id"],),
+                        )
+                    path_class = (
+                        "CONTACTED" if contact is not None else
+                        "LAUNCHED" if launch is not None else "INTENT_ONLY"
+                    )
+                    values = (
+                        event["event_id"], reservation["repository_id"],
+                        reservation["run_id"], reservation["item_id"],
+                        reservation["logical_effect_id"],
+                        reservation["attempt_id"],
+                        reservation["reservation_id"], event["event_hash"],
+                        plan["plan_id"], plan["revision_digest"],
+                        plan["effect_descriptor_digest"], path_class,
+                        intent["event_id"], intent["event_hash"],
+                        None if launch is None else launch["launch_id"],
+                        None if launch is None else launch["event_id"],
+                        None if launch is None else launch["event_hash"],
+                        None if contact is None else contact["contact_id"],
+                        None if contact is None else contact["event_id"],
+                        None if contact is None else contact["event_hash"],
+                        intent["claim_id"], source_id, target_digest,
+                        seal["seal_id"], seal["seal_hash"],
+                        json.dumps([
+                            str(row["uncertainty_id"])
+                            for row in uncertainty_rows
+                        ]),
+                        slot["attempt_id"], int(slot["generation"]),
+                        settlement["payload_digest"], event["event_hash"],
+                        body["lifecycle_to"], event["body_json"],
+                    )
+                    connection.execute(
+                        "INSERT INTO proven_nonexecution_actions VALUES ("
+                        + ", ".join("?" for _ in values) + ")", values,
+                    )
+                connection.execute("PRAGMA user_version = 3")
+                existing = {
+                    str(row["name"]): str(row["sql"])
+                    for row in connection.execute(
+                        "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+                    )
+                    if str(row["name"]) in table_sql
+                }
+            if set(existing) != set(table_sql) or any(
+                canonical_schema(existing[name]) != canonical_schema(sql)
+                for name, sql in table_sql.items()
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution action schema is missing or incompatible"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 3:
+                raise StorageIntegrityError(
+                    "proven-nonexecution migration did not advance"
                 )
             if manage_transaction:
                 connection.commit()
@@ -3122,7 +3759,8 @@ class SQLiteStateStore:
 
     @staticmethod
     def _terminal_validation_table_sql(
-        table_name: str, *, application_source: bool
+        table_name: str, *, application_source: bool,
+        recovered_generations: bool = True,
     ) -> str:
         source_kinds = (
             "'VALIDATOR_OBSERVATION', 'VALIDATOR_CESSATION', "
@@ -3160,7 +3798,9 @@ class SQLiteStateStore:
                 cessation_event_hash TEXT,
                 obligation_proof_key TEXT NOT NULL UNIQUE,
                 slot_attempt_id TEXT NOT NULL,
-                slot_generation INTEGER NOT NULL CHECK (slot_generation = 1),
+                slot_generation INTEGER NOT NULL CHECK (
+                    slot_generation {"> 0" if recovered_generations else "= 1"}
+                ),
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL CHECK (resulting_state IN (
@@ -3185,8 +3825,19 @@ class SQLiteStateStore:
         target_sql = SQLiteStateStore._terminal_validation_table_sql(
             table_name, application_source=True
         )
-        legacy_sql = SQLiteStateStore._terminal_validation_table_sql(
-            table_name, application_source=False
+        legacy_sqls = (
+            SQLiteStateStore._terminal_validation_table_sql(
+                table_name, application_source=True,
+                recovered_generations=False,
+            ),
+            SQLiteStateStore._terminal_validation_table_sql(
+                table_name, application_source=False,
+                recovered_generations=False,
+            ),
+            SQLiteStateStore._terminal_validation_table_sql(
+                table_name, application_source=False,
+                recovered_generations=True,
+            ),
         )
         columns = tuple(
             str(row["name"])
@@ -3214,15 +3865,17 @@ class SQLiteStateStore:
         actual_sql = str(actual_row["sql"])
         actual_canonical = canonical_schema(actual_sql)
         target_canonical = canonical_schema(target_sql)
-        legacy_canonical = canonical_schema(legacy_sql)
-        if actual_canonical not in {target_canonical, legacy_canonical}:
+        legacy_canonicals = {
+            canonical_schema(legacy_sql) for legacy_sql in legacy_sqls
+        }
+        if actual_canonical not in {target_canonical, *legacy_canonicals}:
             raise StorageIntegrityError(
                 "terminal validation schema is incompatible"
             )
 
         connection.execute("BEGIN IMMEDIATE")
         try:
-            if actual_canonical == legacy_canonical:
+            if actual_canonical in legacy_canonicals:
                 legacy_name = f"{table_name}_legacy"
                 before_rows = [
                     tuple(row)
@@ -3299,7 +3952,7 @@ class SQLiteStateStore:
 
     @staticmethod
     def _durable_intent_fields(body: Mapping[str, object]) -> dict[str, object]:
-        return {
+        fields = {
             "repository_id": body.get("repository_id"),
             "run_id": body.get("run_id"),
             "item_id": body.get("item_id"),
@@ -3315,6 +3968,22 @@ class SQLiteStateStore:
             "worst_case_units": body.get("budget_worst_case_units"),
             "cap_units": body.get("budget_cap_units"),
         }
+        if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+            fields.update(
+                {
+                    "recovery_authorization_id": body.get(
+                        "recovery_authorization_id"
+                    ),
+                    "prior_attempt_id": body.get("prior_attempt_id"),
+                    "expected_source_generation": body.get(
+                        "expected_source_generation"
+                    ),
+                    "expected_target_generation": body.get(
+                        "expected_target_generation"
+                    ),
+                }
+            )
+        return fields
 
     @staticmethod
     def finalization_key(
@@ -5326,6 +5995,17 @@ class SQLiteStateStore:
         }
         if is_v2:
             expected_fields.add("observation_schema_version")
+        retry_invalidation = body.get("retry_invalidation_version") == 1
+        if retry_invalidation:
+            expected_fields.update(
+                {
+                    "retry_invalidation_version",
+                    "invalidated_retry_authorization_id",
+                    "invalidated_retry_prior_status",
+                    "invalidated_retry_consuming_event_id",
+                    "retry_initiation_fence_id",
+                }
+            )
         try:
             if set(body) != expected_fields or (
                 type(body["schema_version"]) is not int
@@ -5407,13 +6087,32 @@ class SQLiteStateStore:
                     evidence_request,
                 )
             intent_row = connection.execute(
-                "SELECT body_json FROM events WHERE repository_id = ? AND "
-                "run_id = ? AND event_kind = 'INTENT_COMMITTED'",
-                (request.repository_id, request.run_id),
+                "SELECT event.body_json FROM events AS event JOIN "
+                "capability_redemptions AS redemption ON "
+                "redemption.command_id = event.command_id WHERE "
+                "event.repository_id = ? AND event.run_id = ? AND "
+                "event.event_kind = 'INTENT_COMMITTED' AND "
+                "redemption.logical_effect_id = ? AND "
+                "redemption.attempt_id = ?",
+                (
+                    request.repository_id, request.run_id,
+                    request.logical_effect_id, request.attempt_id,
+                ),
             ).fetchone()
             if intent_row is None:
                 raise ValueError("effect observation lost its intent")
             intent = json.loads(intent_row["body_json"])
+            intent_generation, _intent_recovery_authorization_id = (
+                self._operation_attempt_generation(
+                    connection,
+                    request.repository_id,
+                    request.run_id,
+                    request.item_id,
+                    request.logical_effect_id,
+                    request.attempt_id,
+                    sequence_limit=int(body["sequence"]),
+                )
+            )
             if (
                 request.repository_id, request.run_id, request.item_id,
                 request.logical_effect_id, request.attempt_id,
@@ -5473,6 +6172,7 @@ class SQLiteStateStore:
                         BudgetDisposition(str(settlement["disposition"]))
                         is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
                     ),
+                    force_late=retry_invalidation,
                 )
             )
             if (
@@ -5482,10 +6182,49 @@ class SQLiteStateStore:
                 or body["slot_attempt_id"] != request.attempt_id
                 or (
                     transition_id == "T10"
-                    and body["slot_generation"] != 1
+                    and body["slot_generation"] != intent_generation
                 )
             ):
                 raise ValueError("effect observation route mismatch")
+            if retry_invalidation:
+                authorization = connection.execute(
+                    "SELECT * FROM operation_retry_authorizations WHERE "
+                    "authorization_id = ? AND repository_id = ? AND run_id = "
+                    "? AND item_id = ? AND logical_effect_id = ? AND "
+                    "prior_attempt_id = ?",
+                    (
+                        body["invalidated_retry_authorization_id"],
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                prior_status = body["invalidated_retry_prior_status"]
+                if authorization is None or prior_status not in {
+                    "AVAILABLE", "CONSUMED",
+                } or (
+                    authorization["status"],
+                    authorization["disabling_event_id"],
+                    body["invalidated_retry_consuming_event_id"],
+                    body["retry_initiation_fence_id"],
+                ) != (
+                    "DISABLED", body["event_id"],
+                    authorization["consuming_event_id"],
+                    (
+                        "retry-initiation-disabled:"
+                        + str(authorization["authorization_id"])
+                        if prior_status == "CONSUMED"
+                        else None
+                    ),
+                ) or (
+                    prior_status == "AVAILABLE"
+                    and authorization["consuming_event_id"] is not None
+                ) or (
+                    prior_status == "CONSUMED"
+                    and authorization["consuming_event_id"] is None
+                ):
+                    raise ValueError(
+                        "late receipt retry invalidation is inconsistent"
+                    )
             reservation = connection.execute(
                 "SELECT * FROM budget_reservations WHERE repository_id = ? "
                 "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
@@ -5499,7 +6238,7 @@ class SQLiteStateStore:
                 reservation is not None
                 and self._operation_slot_current_before(
                     connection, reservation, int(body["sequence"]),
-                    expected_generation=1,
+                    expected_generation=intent_generation,
                 )
                 and self._late_observation_release_error(connection, body)
                 is None
@@ -6893,6 +7632,165 @@ class SQLiteStateStore:
                 "validation recovery attestation or semantics are invalid"
             ) from error
 
+    def _validate_operation_recovery_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            RecoverProvenNonexecutionRequest.__dataclass_fields__
+        ) | {
+            "action", "capability_evidence",
+            "capability_issuer_fingerprint", "continuation_cursor",
+            "event_kind", "lifecycle_from", "lifecycle_to",
+            "payload_digest", "previous_event_hash",
+            "recovery_binding_version", "recovery_kind", "schema_version",
+            "sequence", "source_continuation_cursor", "transition_id",
+            "writer_epoch",
+        }
+        try:
+            if set(body) != expected_fields or (
+                type(body["schema_version"]) is not int
+                or body["schema_version"] != 1
+                or type(body["recovery_binding_version"]) is not int
+                or body["recovery_binding_version"] != 1
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+            ):
+                raise ValueError("operation recovery schema is invalid")
+            request = RecoverProvenNonexecutionRequest(
+                **{
+                    key: (
+                        tuple(body[key])
+                        if key == "resolved_uncertainty_ids"
+                        else body["source_continuation_cursor"]
+                        if key == "continuation_cursor"
+                        else body[key]
+                    )
+                    for key in (
+                        RecoverProvenNonexecutionRequest.__dataclass_fields__
+                    )
+                }
+            )
+            request.validate()
+            capability_value = body["capability_evidence"]
+            if not isinstance(capability_value, dict):
+                raise ValueError("operation recovery capability is malformed")
+            capability = SyntheticOperatorCapability(**capability_value)
+            if self._classification_authority is None:
+                raise ValueError("operation recovery authority is not bound")
+            self._classification_authority.verify_operator_issued(capability)
+            expected_payload = {
+                **{
+                    key: value for key, value in request.__dict__.items()
+                    if key != "resolved_uncertainty_ids"
+                },
+                "resolved_uncertainty_ids": list(
+                    request.resolved_uncertainty_ids
+                ),
+                "action": "RECOVER_OPERATION",
+                "recovery_kind": "PROVEN_NONEXECUTION",
+                "recovery_binding_version": 1,
+                "capability_evidence": dict(capability.__dict__),
+                "capability_issuer_fingerprint": (
+                    self._classification_authority.issuer_fingerprint
+                ),
+            }
+            if (
+                body["payload_digest"] != self._event_hash(expected_payload)
+                or body["previous_event_hash"] != request.expected_run_head
+                or body["action"] != "RECOVER_OPERATION"
+                or body["recovery_kind"] != "PROVEN_NONEXECUTION"
+                or capability.action != "RECOVER_OPERATION"
+                or capability.repository_id != request.repository_id
+                or capability.run_id != request.run_id
+            ):
+                raise ValueError("operation recovery binding is invalid")
+            if (
+                predecessor_state is not LifecycleState.BLOCKED
+                or predecessor_cursor != request.continuation_cursor
+                or body["source_continuation_cursor"]
+                != request.continuation_cursor
+                or body["lifecycle_from"] != LifecycleState.BLOCKED.value
+                or body["lifecycle_to"] != LifecycleState.PLANNED.value
+                or body["continuation_cursor"] is not None
+                or body["event_kind"] != "BLOCKER_RESOLVED"
+                or body["transition_id"] != "T16"
+            ):
+                raise ValueError("operation recovery route is invalid")
+            source = connection.execute(
+                "SELECT action.*, event.sequence AS source_sequence FROM "
+                "proven_nonexecution_actions AS action JOIN events AS event "
+                "ON event.event_id = action.settlement_event_id WHERE "
+                "action.settlement_event_id = ? AND action.event_hash = ?",
+                (
+                    request.source_nonexecution_event_id,
+                    request.source_nonexecution_event_hash,
+                ),
+            ).fetchone()
+            if source is None or int(source["source_sequence"]) >= int(
+                body["sequence"]
+            ) or (
+                source["repository_id"], source["run_id"], source["item_id"],
+                source["logical_effect_id"], source["attempt_id"],
+                source["plan_id"], source["revision_digest"],
+                source["effect_descriptor_digest"],
+                tuple(json.loads(source["resolved_uncertainty_ids_json"])),
+            ) != (
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, request.prior_attempt_id,
+                request.plan_id, request.revision_digest,
+                request.effect_descriptor_digest,
+                request.resolved_uncertainty_ids,
+            ):
+                raise ValueError("operation recovery source is invalid")
+            reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                "AND attempt_id = ?",
+                (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.prior_attempt_id,
+                ),
+            ).fetchone()
+            if reservation is None or not self._operation_slot_current_before(
+                connection, reservation, int(body["sequence"]),
+                expected_generation=request.expected_slot_generation,
+            ):
+                raise ValueError("operation recovery did not own the slot")
+            historical_fences, _slot, _validators = (
+                self._historical_repository_activity(
+                    connection, request.repository_id,
+                    int(body["writer_epoch"]),
+                )
+            )
+            if historical_fences:
+                raise ValueError("operation recovery bypassed an active fence")
+            if connection.execute(
+                "SELECT 1 FROM effect_observations AS observation JOIN events "
+                "AS event ON event.event_id = observation.event_id WHERE "
+                "observation.repository_id = ? AND observation.run_id = ? "
+                "AND observation.logical_effect_id = ? AND "
+                "observation.attempt_id = ? AND event.sequence < ? LIMIT 1",
+                (
+                    request.repository_id, request.run_id,
+                    request.logical_effect_id, request.prior_attempt_id,
+                    body["sequence"],
+                ),
+            ).fetchone() is not None:
+                raise ValueError("operation recovery ignored a receipt")
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "operation recovery capability or history is invalid"
+            ) from error
+
     def _validate_readiness_event(
         self,
         connection: sqlite3.Connection,
@@ -7010,7 +7908,7 @@ class SQLiteStateStore:
                 or int(body["writer_epoch"]) <= 0
                 or type(body["slot_released"]) is not bool
                 or type(body["slot_generation"]) is not int
-                or body["slot_generation"] != 1
+                or body["slot_generation"] <= 0
                 or not isinstance(body["slot_attempt_id"], str)
                 or not body["slot_attempt_id"].strip()
             ):
@@ -7178,8 +8076,20 @@ class SQLiteStateStore:
             ).fetchone()
             if operation_reservation is None:
                 raise ValueError("validation application lost its operation slot")
+            expected_slot_generation, _recovery_authorization_id = (
+                self._operation_attempt_generation(
+                    connection,
+                    request.repository_id,
+                    request.run_id,
+                    request.item_id,
+                    request.logical_effect_id,
+                    str(observation["operation_attempt_id"]),
+                    sequence_limit=int(body["sequence"]),
+                )
+            )
             operation_slot_current = self._operation_slot_current_before(
-                connection, operation_reservation, int(body["sequence"])
+                connection, operation_reservation, int(body["sequence"]),
+                expected_generation=expected_slot_generation,
             )
             accounting_closed = self._accounting_closure_error(
                 connection,
@@ -7218,6 +8128,7 @@ class SQLiteStateStore:
                 or body["lifecycle_to"] != expected_state.value
                 or body["slot_released"] is not expected_slot_released
                 or body["slot_attempt_id"] != observation["operation_attempt_id"]
+                or body["slot_generation"] != expected_slot_generation
             ):
                 raise ValueError("validation application route diverges from history")
         except (
@@ -7623,20 +8534,25 @@ class SQLiteStateStore:
                 and actual_units == charged_units
             )
             authoritative_nonexecution = (
-                reservation["reservation_id"] in validator_reservation_ids
-                and disposition == BudgetDisposition.RELEASED.value
+                disposition == BudgetDisposition.RELEASED.value
                 and charged_units == 0
                 and settlement_body.get("event_kind") == "NONDISPATCH_PROVEN"
                 and bool(settlement_body.get("non_dispatch_proven"))
                 and bool(settlement_body.get("zero_liability_proven"))
                 and bool(settlement_body.get("all_obligations_settled"))
                 and not bool(settlement_body.get("contradiction"))
+                and (
+                    reservation["reservation_id"] in validator_reservation_ids
+                    or connection.execute(
+                        "SELECT 1 FROM proven_nonexecution_actions WHERE "
+                        "reservation_id = ?",
+                        (reservation["reservation_id"],),
+                    ).fetchone() is not None
+                )
             )
             if not authoritative_usage and not authoritative_nonexecution:
                 return "operation accounting remains unsettled"
 
-        if len(reservations) != len(validator_intents) + 1:
-            return "operation accounting reservation set is incomplete"
         reservation_ids = {row["reservation_id"] for row in reservations}
         for intent in validator_intents:
             if intent["reservation_id"] not in reservation_ids:
@@ -7825,27 +8741,26 @@ class SQLiteStateStore:
             (request.plan_id, request.check_id),
         ).fetchone() is None:
             return "terminal settlement check was not declared"
-        if int(body.get("slot_generation", 0)) != 1:
-            return "terminal settlement slot generation is invalid"
-        operation_intent = connection.execute(
-            "SELECT body_json FROM events WHERE repository_id = ? AND "
-            "run_id = ? AND event_kind = 'INTENT_COMMITTED' AND sequence < ?",
-            (request.repository_id, request.run_id, sequence),
-        ).fetchone()
-        if operation_intent is None:
-            return "terminal settlement does not bind the operation slot attempt"
-        try:
-            intent_body = json.loads(operation_intent["body_json"])
-        except (TypeError, json.JSONDecodeError):
-            return "terminal settlement operation intent is invalid"
         if (
-            intent_body.get("repository_id"), intent_body.get("run_id"),
-            intent_body.get("item_id"), intent_body.get("logical_effect_id"),
-            intent_body.get("attempt_id"),
-        ) != (
-            request.repository_id, request.run_id, request.item_id,
-            request.logical_effect_id, body.get("slot_attempt_id"),
+            type(body.get("slot_generation")) is not int
+            or int(body["slot_generation"]) <= 0
         ):
+            return "terminal settlement slot generation is invalid"
+        try:
+            intent_generation, _authorization_id = (
+                self._operation_attempt_generation(
+                    connection,
+                    request.repository_id,
+                    request.run_id,
+                    request.item_id,
+                    request.logical_effect_id,
+                    str(body.get("slot_attempt_id")),
+                    sequence_limit=sequence,
+                )
+            )
+        except StorageIntegrityError:
+            return "terminal settlement does not bind the operation slot attempt"
+        if int(body["slot_generation"]) != intent_generation:
             return "terminal settlement does not bind the operation slot attempt"
         if bool(body.get("slot_released")) and connection.execute(
             "SELECT 1 FROM effect_observations AS observation JOIN events AS "
@@ -8134,7 +9049,8 @@ class SQLiteStateStore:
             return "late receipt release does not preserve releasable terminal state"
         if (
             body.get("slot_attempt_id") != body.get("attempt_id")
-            or body.get("slot_generation") != 1
+            or type(body.get("slot_generation")) is not int
+            or int(body["slot_generation"]) <= 0
         ):
             return "late receipt release does not bind the operation slot"
         sequence = int(body["sequence"])
@@ -8367,12 +9283,38 @@ class SQLiteStateStore:
                     )
                     if reservation is None or tuple(reservation) != expected_reservation:
                         raise ValueError("operation slot reservation is unavailable")
-                    if active_slot is not None:
-                        raise ValueError("multiple operation slots are active")
-                    active_slot = (
-                        str(body["run_id"]), str(body["logical_effect_id"]),
-                        str(body["attempt_id"]), 1,
-                    )
+                    if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+                        expected_prior_slot = (
+                            str(body["run_id"]),
+                            str(body["logical_effect_id"]),
+                            str(body["prior_attempt_id"]),
+                            int(body["expected_source_generation"]),
+                        )
+                        if (
+                            body.get("intent_binding_version") != 2
+                            or active_slot != expected_prior_slot
+                            or type(body.get("expected_target_generation"))
+                            is not int
+                            or body["expected_target_generation"]
+                            != body["expected_source_generation"] + 1
+                        ):
+                            raise ValueError(
+                                "operation slot retry transfer is invalid"
+                            )
+                        active_slot = (
+                            str(body["run_id"]),
+                            str(body["logical_effect_id"]),
+                            str(body["attempt_id"]),
+                            int(body["expected_target_generation"]),
+                        )
+                    else:
+                        if active_slot is not None:
+                            raise ValueError("multiple operation slots are active")
+                        active_slot = (
+                            str(body["run_id"]),
+                            str(body["logical_effect_id"]),
+                            str(body["attempt_id"]), 1,
+                        )
                 elif event_kind == "VALIDATOR_INTENT_COMMITTED":
                     reservation = connection.execute(
                         "SELECT repository_id, run_id, item_id, "
@@ -13270,6 +14212,731 @@ class SQLiteStateStore:
             event_hash, resulting_state, False,
         )
 
+    def resume_operation_nonexecution(
+        self,
+        request: ResumeOperationNonexecutionRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticOperationNonexecutionResumeEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "operation-nonexecution resume targets another repository"
+            )
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, "RESUME"):
+            raise DispatchDenied(
+                "operator capability does not bind operation-nonexecution resume"
+            )
+        payload = {
+            **{
+                key: value
+                for key, value in request.__dict__.items()
+                if key != "resolved_uncertainty_ids"
+            },
+            "resolved_uncertainty_ids": list(
+                request.resolved_uncertainty_ids
+            ),
+            "action": "RESUME",
+            "resume_kind": "OPERATION_NONEXECUTION",
+            "source_kind": "PROVEN_NONEXECUTION",
+            "resume_binding_version": 1,
+            "capability_evidence": dict(capability.__dict__),
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "resume_evidence": dict(evidence.__dict__),
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_operation_nonexecution_resume_evidence(
+                        evidence, request
+                    )
+                    prior = connection.execute(
+                        "SELECT * FROM operation_nonexecution_resume_actions "
+                        "WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if (
+                        prior is None
+                        or prior_command["payload_digest"] != payload_digest
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "operation-nonexecution resume identity was reused"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["resume_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id,
+                    authority,
+                )
+                authority.verify_operator_for_action(capability)
+                authority.verify_operation_nonexecution_resume_evidence(
+                    evidence, request
+                )
+                vector_digest = self._run_heads_digest(run_heads)
+                if (
+                    catalog_head != request.expected_catalog_head
+                    or run_heads.get(request.run_id) != request.expected_run_head
+                    or vector_digest != request.expected_run_heads_digest
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume head vector is stale"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ?",
+                    (request.repository_id, request.run_id, request.plan_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], run["lifecycle_state"],
+                    run["continuation_cursor"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                    plan["effect_descriptor_digest"],
+                ) != (
+                    request.item_id, LifecycleState.PAUSED.value,
+                    request.continuation_cursor, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                    request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume does not bind the paused run"
+                    )
+                source_pause = connection.execute(
+                    "SELECT * FROM external_pause_actions WHERE pause_id = ? "
+                    "AND event_id = ? AND event_hash = ? AND fence_id = ? "
+                    "AND repository_id = ? AND run_id = ? AND item_id = ? "
+                    "AND logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.source_pause_id, request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                        request.pause_fence_id, request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                source = connection.execute(
+                    "SELECT * FROM proven_nonexecution_actions WHERE "
+                    "settlement_event_id = ? AND event_hash = ? AND "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ? AND "
+                    "reservation_id = ? AND settlement_hash = ?",
+                    (
+                        request.source_nonexecution_event_id,
+                        request.source_nonexecution_event_hash,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                        request.reservation_id, request.settlement_head_hash,
+                    ),
+                ).fetchone()
+                if source_pause is None or source is None or (
+                    tuple(json.loads(source["resolved_uncertainty_ids_json"]))
+                    != request.resolved_uncertainty_ids
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume source chain is invalid"
+                    )
+                reservation = connection.execute(
+                    "SELECT settlement_head_hash, uncertainty FROM "
+                    "budget_reservations WHERE reservation_id = ?",
+                    (request.reservation_id,),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if reservation is None or (
+                    reservation["settlement_head_hash"],
+                    bool(reservation["uncertainty"]),
+                ) != (request.settlement_head_hash, False):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume accounting is not current"
+                    )
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume does not own the slot"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM uncertainty_instances AS instance LEFT JOIN "
+                    "uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND resolution.uncertainty_id IS NULL LIMIT 1",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "operation-nonexecution resume has unresolved uncertainty"
+                    )
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.item_id, request.logical_effect_id,
+                        request.source_pause_event_id,
+                    ),
+                ).fetchone()
+                if fence is None:
+                    raise DispatchDenied(
+                        "operation-nonexecution pause fence is not active"
+                    )
+                other_pause = connection.execute(
+                    "SELECT 1 FROM dispatch_fences AS fence WHERE "
+                    "fence.repository_id = ? AND fence.fence_id <> ? AND "
+                    "(fence.item_id IS NULL OR fence.item_id = ?) AND "
+                    "(fence.logical_effect_id IS NULL OR "
+                    "fence.logical_effect_id = ?) AND ("
+                    "EXISTS (SELECT 1 FROM local_pause_actions p WHERE "
+                    "p.fence_id = fence.fence_id AND p.run_id = ?) OR "
+                    "EXISTS (SELECT 1 FROM external_pause_actions p WHERE "
+                    "p.fence_id = fence.fence_id AND p.run_id = ?) OR "
+                    "EXISTS (SELECT 1 FROM reconciliation_pause_actions p "
+                    "WHERE p.fence_id = fence.fence_id AND p.run_id = ?) OR "
+                    "EXISTS (SELECT 1 FROM validation_pause_actions p WHERE "
+                    "p.fence_id = fence.fence_id AND p.run_id = ?)) LIMIT 1",
+                    (
+                        request.repository_id, request.pause_fence_id,
+                        request.item_id, request.logical_effect_id,
+                        request.run_id, request.run_id, request.run_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                resulting_state = (
+                    LifecycleState.PAUSED
+                    if other_pause is not None
+                    else LifecycleState.BLOCKED
+                )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T14", LifecycleState.PAUSED, resulting_state,
+                        TRANSITIONS["T14"].required_guards,
+                    )
+                else:
+                    authorize_transition(LifecycleState.PAUSED, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                body = {
+                    **payload,
+                    "continuation_cursor": request.continuation_cursor,
+                    "event_kind": "RESUME_ACCEPTED",
+                    "indexes_complete": True,
+                    "lifecycle_from": LifecycleState.PAUSED.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "request_digest": evidence.request_digest,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "verified_run_heads_digest": vector_digest,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RESUME_ACCEPTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, request.expected_run_head,
+                        event_hash, body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_nonexecution_resume_event_before_clearance"
+                    )
+                if connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.source_pause_event_id,
+                    ),
+                ).rowcount != 1:
+                    raise StorageIntegrityError(
+                        "operation-nonexecution resume did not clear its fence"
+                    )
+                values = (
+                    request.resume_id, request.command_id, request.event_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    request.plan_id, request.revision_digest,
+                    request.effect_descriptor_digest, request.source_pause_id,
+                    request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.source_nonexecution_event_id,
+                    request.source_nonexecution_event_hash,
+                    json.dumps(
+                        request.resolved_uncertainty_ids,
+                        separators=(",", ":"),
+                    ),
+                    request.continuation_cursor,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                    request.expected_catalog_head, request.expected_run_head,
+                    request.expected_run_heads_digest, capability.claim_id,
+                    capability.grant_id, capability.scope_digest,
+                    authority.issuer_fingerprint, capability.issuer_mac,
+                    evidence.proof_id, evidence.request_digest,
+                    evidence.issuer_fingerprint, evidence.issuer_mac,
+                    payload_digest, event_hash, resulting_state.value,
+                    body_json,
+                )
+                connection.execute(
+                    "INSERT INTO operation_nonexecution_resume_actions VALUES ("
+                    + ", ".join("?" for _ in values) + ")", values,
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RESUME', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest, authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, request.continuation_cursor,
+                        sequence, event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?", (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_nonexecution_resume_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_nonexecution_resume_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.resume_id, request.command_id, request.event_id, sequence,
+            event_hash, resulting_state, False,
+        )
+
+    def recover_proven_nonexecution(
+        self,
+        request: RecoverProvenNonexecutionRequest,
+        capability: SyntheticOperatorCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "proven-nonexecution recovery targets another repository"
+            )
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (
+            request.repository_id, request.run_id, "RECOVER_OPERATION",
+        ):
+            raise DispatchDenied(
+                "operator capability does not bind operation recovery"
+            )
+        payload = {
+            **{
+                key: value for key, value in request.__dict__.items()
+                if key != "resolved_uncertainty_ids"
+            },
+            "resolved_uncertainty_ids": list(
+                request.resolved_uncertainty_ids
+            ),
+            "action": "RECOVER_OPERATION",
+            "recovery_kind": "PROVEN_NONEXECUTION",
+            "recovery_binding_version": 1,
+            "capability_evidence": dict(capability.__dict__),
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    prior = connection.execute(
+                        "SELECT * FROM operation_recovery_actions WHERE "
+                        "command_id = ?", (request.command_id,),
+                    ).fetchone()
+                    if (
+                        prior is None
+                        or prior_command["payload_digest"] != payload_digest
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "operation recovery identity was reused"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["recovery_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]), LifecycleState.PLANNED, True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent operation recovery freshness proof failed"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id,
+                    authority,
+                )
+                authority.verify_operator_for_action(capability)
+                if (
+                    catalog_head != request.expected_catalog_head
+                    or run_heads.get(request.run_id)
+                    != request.expected_run_head
+                ):
+                    raise DispatchDenied("operation recovery head is stale")
+                if connection.execute(
+                    "SELECT 1 FROM operation_recovery_actions WHERE "
+                    "recovery_id = ? OR authorization_id = ? OR event_id = ?",
+                    (
+                        request.recovery_id, request.authorization_id,
+                        request.event_id,
+                    ),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "operation recovery durable identity was reused"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ?",
+                    (
+                        request.repository_id, request.run_id,
+                        request.plan_id,
+                    ),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], run["lifecycle_state"],
+                    run["continuation_cursor"], run["head_hash"],
+                    plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                    plan["effect_descriptor_digest"],
+                ) != (
+                    request.item_id, LifecycleState.BLOCKED.value,
+                    request.continuation_cursor, request.expected_run_head,
+                    request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                    request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied(
+                        "operation recovery does not bind the blocked run"
+                    )
+                source = connection.execute(
+                    "SELECT * FROM proven_nonexecution_actions WHERE "
+                    "settlement_event_id = ? AND event_hash = ? AND "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ? AND plan_id = ? "
+                    "AND revision_digest = ? AND effect_descriptor_digest = ?",
+                    (
+                        request.source_nonexecution_event_id,
+                        request.source_nonexecution_event_hash,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.prior_attempt_id,
+                        request.plan_id, request.revision_digest,
+                        request.effect_descriptor_digest,
+                    ),
+                ).fetchone()
+                if source is None or (
+                    tuple(json.loads(source["resolved_uncertainty_ids_json"]))
+                    != request.resolved_uncertainty_ids
+                ):
+                    raise DispatchDenied(
+                        "operation recovery source proof is invalid"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.prior_attempt_id,
+                    request.expected_slot_generation,
+                ) or request.target_slot_generation != (
+                    request.expected_slot_generation + 1
+                ):
+                    raise DispatchDenied(
+                        "operation recovery does not bind the retained slot"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM effect_observations WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND "
+                    "attempt_id = ? LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.prior_attempt_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "operation recovery is contradicted by a receipt"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM uncertainty_instances AS instance LEFT JOIN "
+                    "uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND resolution.uncertainty_id IS NULL LIMIT 1",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.prior_attempt_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "operation recovery has unresolved uncertainty"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "((item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.item_id,
+                        request.logical_effect_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied("operation recovery has an active fence")
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T16", LifecycleState.BLOCKED,
+                        LifecycleState.PLANNED,
+                        TRANSITIONS["T16"].required_guards,
+                    )
+                else:
+                    authorize_transition(
+                        LifecycleState.BLOCKED, LifecycleState.PLANNED
+                    )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                body = {
+                    **payload,
+                    "event_kind": "BLOCKER_RESOLVED",
+                    "transition_id": "T16",
+                    "lifecycle_from": LifecycleState.BLOCKED.value,
+                    "lifecycle_to": LifecycleState.PLANNED.value,
+                    "source_continuation_cursor": request.continuation_cursor,
+                    "continuation_cursor": None,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'BLOCKER_RESOLVED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, request.expected_run_head, event_hash,
+                        body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_recovery_event_before_authorization"
+                    )
+                action_values = (
+                    request.recovery_id, request.authorization_id,
+                    request.command_id, request.event_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.prior_attempt_id,
+                    request.successor_attempt_id,
+                    request.expected_slot_generation,
+                    request.target_slot_generation, request.plan_id,
+                    request.revision_digest, request.effect_descriptor_digest,
+                    request.source_nonexecution_event_id,
+                    request.source_nonexecution_event_hash,
+                    request.continuation_cursor, capability.claim_id,
+                    capability.grant_id, capability.scope_digest,
+                    authority.issuer_fingerprint, capability.issuer_mac,
+                    payload_digest, event_hash, LifecycleState.PLANNED.value,
+                    body_json,
+                )
+                connection.execute(
+                    "INSERT INTO operation_recovery_actions VALUES ("
+                    + ", ".join("?" for _ in action_values) + ")",
+                    action_values,
+                )
+                authorization_body = json.dumps(
+                    {
+                        "authorization_id": request.authorization_id,
+                        "recovery_id": request.recovery_id,
+                        "repository_id": request.repository_id,
+                        "run_id": request.run_id,
+                        "item_id": request.item_id,
+                        "logical_effect_id": request.logical_effect_id,
+                        "prior_attempt_id": request.prior_attempt_id,
+                        "successor_attempt_id": request.successor_attempt_id,
+                        "source_generation": request.expected_slot_generation,
+                        "target_generation": request.target_slot_generation,
+                        "source_nonexecution_event_id": (
+                            request.source_nonexecution_event_id
+                        ),
+                        "status": "AVAILABLE",
+                    },
+                    sort_keys=True, separators=(",", ":"),
+                )
+                connection.execute(
+                    "INSERT INTO operation_retry_authorizations VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'AVAILABLE', NULL, "
+                    "NULL, ?)",
+                    (
+                        request.authorization_id, request.recovery_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.prior_attempt_id,
+                        request.successor_attempt_id,
+                        request.expected_slot_generation,
+                        request.target_slot_generation,
+                        request.source_nonexecution_event_id,
+                        authorization_body,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RECOVER_OPERATION', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id,
+                        request.run_id, capability.scope_digest,
+                        authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PLANNED', "
+                    "continuation_cursor = NULL, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?", (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_recovery_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_operation_recovery_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.recovery_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.PLANNED, False,
+        )
+
     def resume_activity_settlement(
         self,
         request: ResumeActivitySettlementRequest,
@@ -14599,6 +16266,9 @@ class SQLiteStateStore:
         failure_hook: FailureHook | None = None,
     ) -> CommitReceipt:
         request.validate()
+        recovered_nonexecution = isinstance(
+            request, ProvenNonexecutionIntentRequest
+        )
         if request.repository_id != self._repository_id:
             raise DispatchDenied("intent targets a different repository")
         capability_binding = (
@@ -14745,8 +16415,79 @@ class SQLiteStateStore:
                 sequence = int(existing_run["head_sequence"]) + 1
                 previous_hash = str(existing_run["head_hash"])
 
-                if connection.execute("SELECT 1 FROM outstanding_slot").fetchone():
-                    raise DispatchDenied("another operation owns the repository slot")
+                recovery_authorization = None
+                if recovered_nonexecution:
+                    assert isinstance(request, ProvenNonexecutionIntentRequest)
+                    recovery_authorization = connection.execute(
+                        "SELECT authorization.*, recovery.plan_id, "
+                        "recovery.revision_digest, "
+                        "recovery.effect_descriptor_digest, "
+                        "recovery.event_id AS recovery_event_id FROM "
+                        "operation_retry_authorizations AS authorization JOIN "
+                        "operation_recovery_actions AS recovery ON "
+                        "recovery.recovery_id = authorization.recovery_id "
+                        "WHERE authorization.authorization_id = ?",
+                        (request.recovery_authorization_id,),
+                    ).fetchone()
+                    slot = connection.execute(
+                        "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()
+                    if recovery_authorization is None or (
+                        recovery_authorization["repository_id"],
+                        recovery_authorization["run_id"],
+                        recovery_authorization["item_id"],
+                        recovery_authorization["logical_effect_id"],
+                        recovery_authorization["prior_attempt_id"],
+                        recovery_authorization["successor_attempt_id"],
+                        int(recovery_authorization["source_generation"]),
+                        int(recovery_authorization["target_generation"]),
+                        recovery_authorization["status"],
+                        recovery_authorization["plan_id"],
+                        recovery_authorization["revision_digest"],
+                        recovery_authorization["effect_descriptor_digest"],
+                    ) != (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.prior_attempt_id,
+                        request.attempt_id,
+                        request.expected_source_generation,
+                        request.expected_target_generation, "AVAILABLE",
+                        plan["plan_id"], plan["revision_digest"],
+                        request.effect_descriptor_digest,
+                    ):
+                        raise DispatchDenied(
+                            "recovered intent lacks its exact available authorization"
+                        )
+                    if slot is None or (
+                        slot["run_id"], slot["logical_effect_id"],
+                        slot["attempt_id"], int(slot["generation"]),
+                    ) != (
+                        request.run_id, request.logical_effect_id,
+                        request.prior_attempt_id,
+                        request.expected_source_generation,
+                    ):
+                        raise DispatchDenied(
+                            "recovered intent does not own its source slot"
+                        )
+                    if connection.execute(
+                        "SELECT 1 FROM effect_observations WHERE "
+                        "repository_id = ? AND run_id = ? AND "
+                        "logical_effect_id = ? AND attempt_id = ? LIMIT 1",
+                        (
+                            request.repository_id, request.run_id,
+                            request.logical_effect_id,
+                            request.prior_attempt_id,
+                        ),
+                    ).fetchone() is not None:
+                        raise DispatchDenied(
+                            "recovered intent is contradicted by a receipt"
+                        )
+                elif connection.execute(
+                    "SELECT 1 FROM outstanding_slot"
+                ).fetchone():
+                    raise DispatchDenied(
+                        "another operation owns the repository slot"
+                    )
                 if connection.execute(
                     "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
                     "(item_id IS NULL AND logical_effect_id IS NULL) OR "
@@ -14765,7 +16506,14 @@ class SQLiteStateStore:
                 if existing_effect is not None:
                     if existing_effect["descriptor_digest"] != request.effect_descriptor_digest:
                         raise StorageIntegrityError("logical effect changed descriptor")
-                    raise DispatchDenied("logical effect already has durable history")
+                    if not recovered_nonexecution:
+                        raise DispatchDenied(
+                            "logical effect already has durable history"
+                        )
+                elif recovered_nonexecution:
+                    raise StorageIntegrityError(
+                        "recovered logical effect lost its durable history"
+                    )
 
                 aggregate = connection.execute(
                     "SELECT COALESCE(SUM(held_units + charged_units), 0) FROM budget_reservations WHERE repository_id = ?",
@@ -14805,17 +16553,40 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if recovered_nonexecution:
+                    assert isinstance(request, ProvenNonexecutionIntentRequest)
+                    assert recovery_authorization is not None
+                    body.update(
+                        {
+                            "intent_binding_version": 2,
+                            "intent_kind": "PROVEN_NONEXECUTION_RETRY",
+                            "recovery_authorization_id": (
+                                request.recovery_authorization_id
+                            ),
+                            "recovery_event_id": recovery_authorization[
+                                "recovery_event_id"
+                            ],
+                            "prior_attempt_id": request.prior_attempt_id,
+                            "expected_source_generation": (
+                                request.expected_source_generation
+                            ),
+                            "expected_target_generation": (
+                                request.expected_target_generation
+                            ),
+                        }
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
-                connection.execute(
-                    "INSERT INTO effects VALUES (?, ?, ?, ?)",
-                    (
-                        request.repository_id,
-                        request.logical_effect_id,
-                        effect_key,
-                        request.effect_descriptor_digest,
-                    ),
-                )
+                if not recovered_nonexecution:
+                    connection.execute(
+                        "INSERT INTO effects VALUES (?, ?, ?, ?)",
+                        (
+                            request.repository_id,
+                            request.logical_effect_id,
+                            effect_key,
+                            request.effect_descriptor_digest,
+                        ),
+                    )
                 connection.execute(
                     "INSERT INTO permission_uses VALUES (?, ?, ?, ?)",
                     (
@@ -14861,15 +16632,56 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
-                connection.execute(
-                    "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
-                    (
-                        request.repository_id,
-                        request.run_id,
-                        request.logical_effect_id,
-                        request.attempt_id,
-                    ),
-                )
+                if recovered_nonexecution:
+                    assert isinstance(request, ProvenNonexecutionIntentRequest)
+                    assert recovery_authorization is not None
+                    if connection.execute(
+                        "UPDATE outstanding_slot SET attempt_id = ?, "
+                        "generation = ? WHERE repository_id = ? AND run_id = ? "
+                        "AND logical_effect_id = ? AND attempt_id = ? AND "
+                        "generation = ?",
+                        (
+                            request.attempt_id,
+                            request.expected_target_generation,
+                            request.repository_id, request.run_id,
+                            request.logical_effect_id,
+                            request.prior_attempt_id,
+                            request.expected_source_generation,
+                        ),
+                    ).rowcount != 1:
+                        raise StorageIntegrityError(
+                            "recovered intent slot transfer was not atomic"
+                        )
+                    consumed_authorization_body = json.dumps(
+                        {
+                            **json.loads(recovery_authorization["body_json"]),
+                            "status": "CONSUMED",
+                            "consuming_event_id": request.event_id,
+                        },
+                        sort_keys=True, separators=(",", ":"),
+                    )
+                    if connection.execute(
+                        "UPDATE operation_retry_authorizations SET status = "
+                        "'CONSUMED', consuming_event_id = ?, body_json = ? "
+                        "WHERE authorization_id = ? AND status = 'AVAILABLE'",
+                        (
+                            request.event_id, consumed_authorization_body,
+                            request.recovery_authorization_id,
+                        ),
+                    ).rowcount != 1:
+                        raise StorageIntegrityError(
+                            "recovered intent authorization was not consumed"
+                        )
+                else:
+                    connection.execute(
+                        "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
+                        (
+                            request.repository_id,
+                            request.run_id,
+                            request.logical_effect_id,
+                            request.attempt_id,
+                        ),
+                    )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -14923,6 +16735,11 @@ class SQLiteStateStore:
         commit: CommitReceipt,
     ) -> OperationLaunchReceipt:
         request.validate()
+        expected_slot_generation = (
+            request.expected_target_generation
+            if isinstance(request, ProvenNonexecutionIntentRequest)
+            else 1
+        )
         if request.repository_id != self._repository_id:
             raise DispatchDenied("operation launch targets another repository")
         launch_id = f"launch:{request.command_id}"
@@ -15017,7 +16834,7 @@ class SQLiteStateStore:
                     slot["attempt_id"], int(slot["generation"]),
                 ) != (
                     request.run_id, request.logical_effect_id,
-                    request.attempt_id, 1,
+                    request.attempt_id, expected_slot_generation,
                 ):
                     raise DispatchDenied("operation launch does not own the slot")
                 reservation = connection.execute(
@@ -15035,6 +16852,18 @@ class SQLiteStateStore:
                 ):
                     raise DispatchDenied(
                         "operation launch requires an unsettled reservation"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? "
+                    "AND ((item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.item_id,
+                        request.logical_effect_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "operation launch has an active dispatch fence"
                     )
                 run = connection.execute(
                     "SELECT head_sequence, head_hash FROM runs WHERE run_id = ?",
@@ -15068,6 +16897,16 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if isinstance(request, ProvenNonexecutionIntentRequest):
+                    body.update(
+                        {
+                            "launch_binding_version": 2,
+                            "recovery_authorization_id": (
+                                request.recovery_authorization_id
+                            ),
+                            "slot_generation": expected_slot_generation,
+                        }
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
@@ -15117,6 +16956,11 @@ class SQLiteStateStore:
         launch: OperationLaunchReceipt,
         target_digest: str,
     ) -> None:
+        expected_slot_generation = (
+            request.expected_target_generation
+            if isinstance(request, ProvenNonexecutionIntentRequest)
+            else 1
+        )
         with RepositoryWriterLock(self._database_path.parent), closing(
             self._connect()
         ) as connection:
@@ -15197,7 +17041,7 @@ class SQLiteStateStore:
                     slot["attempt_id"], int(slot["generation"]),
                 ) != (
                     request.run_id, request.logical_effect_id,
-                    request.attempt_id, 1,
+                    request.attempt_id, expected_slot_generation,
                 ):
                     raise DispatchDenied("adapter contact does not own the slot")
                 reservation = connection.execute(
@@ -15238,6 +17082,16 @@ class SQLiteStateStore:
                     logical_effect_id=request.logical_effect_id,
                     attempt_id=request.attempt_id,
                     target_digest=target_digest,
+                    slot_generation=(
+                        expected_slot_generation
+                        if isinstance(request, ProvenNonexecutionIntentRequest)
+                        else None
+                    ),
+                    recovery_authorization_id=(
+                        request.recovery_authorization_id
+                        if isinstance(request, ProvenNonexecutionIntentRequest)
+                        else None
+                    ),
                 )
                 connection.commit()
             except BaseException:
@@ -15251,6 +17105,8 @@ class SQLiteStateStore:
         commit: CommitReceipt,
         target_digest: str,
         authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
     ) -> None:
         with RepositoryWriterLock(self._database_path.parent), closing(
             self._connect()
@@ -15320,6 +17176,38 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "validator contact changed the durable validator intent"
                     )
+                parent_slot_generation, parent_recovery_authorization_id = (
+                    self._operation_attempt_generation(
+                        connection,
+                        request.repository_id,
+                        request.run_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        request.parent_attempt_id,
+                    )
+                )
+                if parent_slot_generation == 1:
+                    if any(
+                        field in validator_body
+                        for field in (
+                            "validator_intent_binding_version",
+                            "parent_slot_generation",
+                            "parent_recovery_authorization_id",
+                        )
+                    ):
+                        raise DispatchDenied(
+                            "ordinary validator intent carries recovery bindings"
+                        )
+                elif (
+                    validator_body.get("validator_intent_binding_version") != 2
+                    or validator_body.get("parent_slot_generation")
+                    != parent_slot_generation
+                    or validator_body.get("parent_recovery_authorization_id")
+                    != parent_recovery_authorization_id
+                ):
+                    raise DispatchDenied(
+                        "recovered validator intent lost its parent slot binding"
+                    )
                 if request.recovery_id is not None:
                     consumed_recovery = connection.execute(
                         "SELECT 1 FROM validation_recoveries AS recovery JOIN "
@@ -15364,7 +17252,7 @@ class SQLiteStateStore:
                     slot["attempt_id"], int(slot["generation"]),
                 ) != (
                     request.run_id, request.logical_effect_id,
-                    request.parent_attempt_id, 1,
+                    request.parent_attempt_id, parent_slot_generation,
                 ):
                     raise DispatchDenied("validator contact does not bind the slot")
                 if connection.execute(
@@ -15377,6 +17265,55 @@ class SQLiteStateStore:
                     ),
                 ).fetchone() is not None:
                     raise DispatchDenied("validator contact has an active dispatch fence")
+                existing_contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE source_id = ?",
+                    (f"VALIDATOR:{request.validator_intent_id}",),
+                ).fetchone()
+                if existing_contact is not None:
+                    existing_body = json.loads(existing_contact["body_json"])
+                    expected_recovery_fields = (
+                        {
+                            "contact_binding_version": 2,
+                            "recovery_authorization_id": (
+                                parent_recovery_authorization_id
+                            ),
+                            "slot_generation": parent_slot_generation,
+                        }
+                        if parent_slot_generation > 1
+                        else {}
+                    )
+                    if (
+                        existing_contact["repository_id"],
+                        existing_contact["run_id"],
+                        existing_contact["item_id"],
+                        existing_contact["contact_kind"],
+                        existing_contact["target_digest"],
+                        existing_body.get("logical_effect_id"),
+                        existing_body.get("attempt_id"),
+                    ) != (
+                        request.repository_id, request.run_id, request.item_id,
+                        "VALIDATOR", target_digest,
+                        request.logical_effect_id,
+                        request.validator_attempt_id,
+                    ) or any(
+                        existing_body.get(key) != value
+                        for key, value in expected_recovery_fields.items()
+                    ) or (
+                        parent_slot_generation == 1
+                        and any(
+                            key in existing_body
+                            for key in (
+                                "contact_binding_version",
+                                "recovery_authorization_id",
+                                "slot_generation",
+                            )
+                        )
+                    ):
+                        raise StorageIntegrityError(
+                            "validator contact replay binding is inconsistent"
+                        )
+                    connection.rollback()
+                    return
                 self._claim_adapter_contact(
                     connection,
                     contact_kind="VALIDATOR",
@@ -15387,8 +17324,24 @@ class SQLiteStateStore:
                     logical_effect_id=request.logical_effect_id,
                     attempt_id=request.validator_attempt_id,
                     target_digest=target_digest,
+                    slot_generation=(
+                        parent_slot_generation
+                        if parent_slot_generation > 1 else None
+                    ),
+                    recovery_authorization_id=(
+                        parent_recovery_authorization_id
+                        if parent_slot_generation > 1 else None
+                    ),
                 )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validator_contact_writes_before_commit"
+                    )
                 connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validator_contact_commit_before_acknowledgement"
+                    )
             except BaseException:
                 connection.rollback()
                 raise
@@ -15405,6 +17358,8 @@ class SQLiteStateStore:
         logical_effect_id: str,
         attempt_id: str,
         target_digest: str,
+        slot_generation: int | None = None,
+        recovery_authorization_id: str | None = None,
     ) -> None:
         if target_digest != self._adapter_target_digest(
             repository_id, contact_kind
@@ -15454,6 +17409,23 @@ class SQLiteStateStore:
             "target_digest": target_digest,
             "writer_epoch": writer_epoch,
         }
+        if slot_generation is not None or recovery_authorization_id is not None:
+            if (
+                type(slot_generation) is not int
+                or slot_generation <= 1
+                or not isinstance(recovery_authorization_id, str)
+                or not recovery_authorization_id
+            ):
+                raise DispatchDenied(
+                    "recovered adapter contact binding is incomplete"
+                )
+            body.update(
+                {
+                    "contact_binding_version": 2,
+                    "recovery_authorization_id": recovery_authorization_id,
+                    "slot_generation": slot_generation,
+                }
+            )
         event_hash = self._event_hash(body)
         body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
         connection.execute(
@@ -15542,6 +17514,7 @@ class SQLiteStateStore:
         reservation: sqlite3.Row,
         *,
         sequence_limit: int | None = None,
+        current_operation_recovery: bool = False,
     ) -> bool:
         sequence_clause = (
             "" if sequence_limit is None else " AND event.sequence < ?"
@@ -15570,7 +17543,11 @@ class SQLiteStateStore:
             "WHERE intent.reservation_id = ?" + sequence_clause + " LIMIT 1",
             validator_parameters,
         ).fetchone()
-        return operation_launch is not None or validator_contact is not None
+        return (
+            current_operation_recovery
+            or operation_launch is not None
+            or validator_contact is not None
+        )
 
     @staticmethod
     def _operation_slot_current_before(
@@ -15580,7 +17557,7 @@ class SQLiteStateStore:
         *,
         expected_generation: int = 1,
     ) -> bool:
-        if type(expected_generation) is not int or expected_generation != 1:
+        if type(expected_generation) is not int or expected_generation <= 0:
             return False
         prior_events = connection.execute(
             "SELECT sequence, event_kind, body_json FROM events WHERE repository_id = ? "
@@ -15588,6 +17565,7 @@ class SQLiteStateStore:
             (reservation["repository_id"], reservation["run_id"], sequence),
         ).fetchall()
         acquisition_sequence = None
+        acquisition_generation = None
         decoded_events: list[tuple[sqlite3.Row, dict[str, object]]] = []
         for row in prior_events:
             body = json.loads(row["body_json"])
@@ -15602,7 +17580,13 @@ class SQLiteStateStore:
                 reservation["item_id"],
             ):
                 acquisition_sequence = int(row["sequence"])
-        if acquisition_sequence is None:
+                acquisition_generation = int(
+                    body.get("expected_target_generation", 1)
+                )
+        if (
+            acquisition_sequence is None
+            or acquisition_generation != expected_generation
+        ):
             return False
 
         for row, body in decoded_events:
@@ -15631,9 +17615,119 @@ class SQLiteStateStore:
                 body.get("logical_effect_id"), body.get("slot_attempt_id")
             ) == (
                 reservation["logical_effect_id"], reservation["attempt_id"]
-            ) and body.get("slot_generation") == 1:
+            ) and body.get("slot_generation") == expected_generation:
                 return False
         return True
+
+    @classmethod
+    def _operation_attempt_generation(
+        cls,
+        connection: sqlite3.Connection,
+        repository_id: str,
+        run_id: str,
+        item_id: str,
+        logical_effect_id: str,
+        attempt_id: str,
+        *,
+        sequence_limit: int | None = None,
+    ) -> tuple[int, str | None]:
+        """Return the immutable slot generation bound by one exact intent."""
+        sequence_clause = (
+            "" if sequence_limit is None else " AND event.sequence < ?"
+        )
+        parameters: tuple[object, ...] = (
+            repository_id, run_id, item_id, logical_effect_id, attempt_id,
+        )
+        if sequence_limit is not None:
+            parameters += (sequence_limit,)
+        rows = connection.execute(
+            "SELECT event.event_id, event.body_json FROM events AS event JOIN "
+            "capability_redemptions AS redemption ON redemption.command_id = "
+            "event.command_id WHERE event.repository_id = ? AND "
+            "event.run_id = ? AND event.item_id = ? AND event.event_kind = "
+            "'INTENT_COMMITTED' AND redemption.logical_effect_id = ? AND "
+            "redemption.attempt_id = ?" + sequence_clause,
+            parameters,
+        ).fetchall()
+        if len(rows) != 1:
+            raise StorageIntegrityError(
+                "operation attempt does not have one exact durable intent"
+            )
+        try:
+            body = json.loads(rows[0]["body_json"])
+            if (
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["attempt_id"],
+                body["event_id"],
+            ) != (
+                repository_id, run_id, item_id, logical_effect_id,
+                attempt_id, rows[0]["event_id"],
+            ):
+                raise ValueError("operation intent binding is inconsistent")
+            if body.get("intent_kind") is None:
+                forbidden = {
+                    "intent_binding_version", "recovery_authorization_id",
+                    "recovery_event_id", "prior_attempt_id",
+                    "expected_source_generation",
+                    "expected_target_generation",
+                }
+                if forbidden.intersection(body):
+                    raise ValueError(
+                        "ordinary operation intent carries recovery fields"
+                    )
+                return 1, None
+            if (
+                body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY"
+                or body.get("intent_binding_version") != 2
+                or type(body.get("expected_source_generation")) is not int
+                or type(body.get("expected_target_generation")) is not int
+                or body["expected_source_generation"] <= 0
+                or body["expected_target_generation"]
+                != body["expected_source_generation"] + 1
+                or not isinstance(body.get("recovery_authorization_id"), str)
+                or not body["recovery_authorization_id"]
+                or not isinstance(body.get("recovery_event_id"), str)
+                or not body["recovery_event_id"]
+                or not isinstance(body.get("prior_attempt_id"), str)
+                or not body["prior_attempt_id"]
+            ):
+                raise ValueError("recovered operation intent is malformed")
+            authorization = connection.execute(
+                "SELECT authorization.*, recovery.event_id AS "
+                "recovery_event_id FROM operation_retry_authorizations AS "
+                "authorization JOIN operation_recovery_actions AS recovery "
+                "ON recovery.recovery_id = authorization.recovery_id WHERE "
+                "authorization.authorization_id = ?",
+                (body["recovery_authorization_id"],),
+            ).fetchone()
+            if authorization is None or (
+                authorization["repository_id"], authorization["run_id"],
+                authorization["item_id"],
+                authorization["logical_effect_id"],
+                authorization["prior_attempt_id"],
+                authorization["successor_attempt_id"],
+                int(authorization["source_generation"]),
+                int(authorization["target_generation"]),
+                authorization["consuming_event_id"],
+                authorization["recovery_event_id"],
+            ) != (
+                repository_id, run_id, item_id, logical_effect_id,
+                body["prior_attempt_id"], attempt_id,
+                body["expected_source_generation"],
+                body["expected_target_generation"], body["event_id"],
+                body["recovery_event_id"],
+            ):
+                raise ValueError(
+                    "recovered operation intent authorization is inconsistent"
+                )
+            return (
+                int(body["expected_target_generation"]),
+                str(body["recovery_authorization_id"]),
+            )
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+            raise StorageIntegrityError(
+                "operation intent generation binding is invalid"
+            ) from error
 
     @staticmethod
     def _validator_intent_active_before(
@@ -15685,7 +17779,7 @@ class SQLiteStateStore:
         request: BudgetSettlementRequest,
         reservation: sqlite3.Row,
         authority: SyntheticAuthority,
-    ) -> bool:
+    ) -> tuple[bool, dict[str, object]]:
         if request.nonexecution_seal_id is None:
             raise DispatchDenied(
                 "durable handoff requires a canonical nonexecution seal"
@@ -15697,6 +17791,7 @@ class SQLiteStateStore:
             "reservation_id = ?",
             (request.reservation_id,),
         ).fetchone()
+        launch = None
         if validator is not None:
             contact_kind = "VALIDATOR"
             source_id = f"VALIDATOR:{validator['validator_intent_id']}"
@@ -15716,7 +17811,7 @@ class SQLiteStateStore:
                 ),
             ).fetchone()
             intent = connection.execute(
-                "SELECT e.command_id, e.event_hash, c.claim_id FROM events e "
+                "SELECT e.event_id, e.command_id, e.event_hash, c.claim_id FROM events e "
                 "JOIN capability_redemptions c ON c.command_id = e.command_id "
                 "WHERE e.repository_id = ? AND e.run_id = ? AND "
                 "e.event_kind = 'INTENT_COMMITTED' AND "
@@ -15820,7 +17915,52 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "canonical nonexecution seal integrity check failed"
             )
-        return executed is not None
+        launch_id = None if validator is not None or launch is None else str(
+            launch["launch_id"]
+        )
+        launch_event_id = None if validator is not None or launch is None else str(
+            launch["event_id"]
+        )
+        launch_event_hash = None if validator is not None or launch is None else str(
+            launch["event_hash"]
+        )
+        contact = None
+        if validator is None and launch is not None:
+            contact = connection.execute(
+                "SELECT * FROM adapter_contacts WHERE repository_id = ? AND "
+                "run_id = ? AND item_id = ? AND contact_kind = 'EFFECT' AND "
+                "source_id = ?",
+                (
+                    reservation["repository_id"], reservation["run_id"],
+                    reservation["item_id"], source_id,
+                ),
+            ).fetchone()
+        path_class = (
+            "CONTACTED" if contact is not None else
+            "LAUNCHED" if launch is not None else "INTENT_ONLY"
+        )
+        return executed is not None, {
+            "path_class": path_class,
+            "intent_event_id": None if validator is not None else str(
+                intent["event_id"]
+            ),
+            "intent_event_hash": None if validator is not None else str(
+                intent["event_hash"]
+            ),
+            "launch_id": launch_id,
+            "launch_event_id": launch_event_id,
+            "launch_event_hash": launch_event_hash,
+            "contact_id": None if contact is None else str(contact["contact_id"]),
+            "contact_event_id": None if contact is None else str(contact["event_id"]),
+            "contact_event_hash": None if contact is None else str(
+                contact["event_hash"]
+            ),
+            "claim_id": claim_id,
+            "source_id": source_id,
+            "target_digest": target_digest,
+            "seal_id": str(seal["seal_id"]),
+            "seal_hash": str(seal["seal_hash"]),
+        }
 
     def _settle_budget(
         self,
@@ -15956,6 +18096,7 @@ class SQLiteStateStore:
                     raise DispatchDenied(str(error)) from error
                 additional_unknown_liability = request.additional_liability
                 nonexecution_contradiction = False
+                nonexecution_path: dict[str, object] | None = None
                 if request.non_dispatch_proven:
                     nonexecution_contradiction = (
                         self._local_nonexecution_contradiction(
@@ -15964,15 +18105,33 @@ class SQLiteStateStore:
                     )
                     if (
                         self._nonexecution_requires_seal(
-                            connection, reservation
+                            connection,
+                            reservation,
+                            current_operation_recovery=(
+                                request.all_obligations_settled
+                                and not request.release_slot
+                                and connection.execute(
+                                    "SELECT 1 FROM outstanding_slot WHERE "
+                                    "repository_id = ? AND run_id = ? AND "
+                                    "logical_effect_id = ? AND attempt_id = ?",
+                                    (
+                                        reservation["repository_id"],
+                                        reservation["run_id"],
+                                        reservation["logical_effect_id"],
+                                        reservation["attempt_id"],
+                                    ),
+                                ).fetchone() is not None
+                            ),
                         )
                         or request.nonexecution_seal_id is not None
                     ):
-                        nonexecution_contradiction = (
+                        seal_contradiction, nonexecution_path = (
                             self._verify_nonexecution_seal(
                                 connection, request, reservation, authority
                             )
-                            or nonexecution_contradiction
+                        )
+                        nonexecution_contradiction = (
+                            seal_contradiction or nonexecution_contradiction
                         )
                     if nonexecution_contradiction and (
                         request.disposition is BudgetDisposition.RELEASED
@@ -16069,15 +18228,29 @@ class SQLiteStateStore:
                 }
                 if request.non_dispatch_proven:
                     current_state = LifecycleState(str(run["lifecycle_state"]))
-                    operation_is_current = connection.execute(
-                        "SELECT 1 FROM outstanding_slot WHERE repository_id = ? "
+                    operation_slot = connection.execute(
+                        "SELECT * FROM outstanding_slot WHERE repository_id = ? "
                         "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
                         (
                             reservation["repository_id"], reservation["run_id"],
                             reservation["logical_effect_id"],
                             reservation["attempt_id"],
                         ),
-                    ).fetchone() is not None
+                    ).fetchone()
+                    operation_is_current = operation_slot is not None
+                    external_pause = connection.execute(
+                        "SELECT pause.* FROM external_pause_actions AS pause "
+                        "JOIN dispatch_fences AS fence ON fence.fence_id = "
+                        "pause.fence_id WHERE pause.repository_id = ? AND "
+                        "pause.run_id = ? AND pause.item_id = ? AND "
+                        "pause.logical_effect_id = ? AND pause.attempt_id = ?",
+                        (
+                            reservation["repository_id"], reservation["run_id"],
+                            reservation["item_id"],
+                            reservation["logical_effect_id"],
+                            reservation["attempt_id"],
+                        ),
+                    ).fetchone()
                     current_attempt = (
                         validator_nonexecution is not None
                         and validator_nonexecution["status"] == "ACTIVE"
@@ -16093,6 +18266,7 @@ class SQLiteStateStore:
                                 validator_nonexecution is not None
                             ),
                             attempt_id=str(reservation["attempt_id"]),
+                            external_pause_active=(external_pause is not None),
                         )
                     )
                     settlement_body.update(
@@ -16167,6 +18341,173 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                proven_nonexecution_rows: list[sqlite3.Row] = []
+                if (
+                    request.non_dispatch_proven
+                    and validator_nonexecution is None
+                    and operation_is_current
+                    and nonexecution_path is not None
+                    and not nonexecution_contradiction
+                    and not uncertainty
+                    and request.all_obligations_settled
+                    and not request.release_slot
+                    and current_state not in {
+                        LifecycleState.COMPLETED,
+                        LifecycleState.FAILED_FINAL,
+                        LifecycleState.STOPPED,
+                    }
+                ):
+                    plans = connection.execute(
+                        "SELECT * FROM validation_plans WHERE repository_id = ? "
+                        "AND run_id = ?",
+                        (reservation["repository_id"], reservation["run_id"]),
+                    ).fetchall()
+                    if len(plans) != 1:
+                        raise StorageIntegrityError(
+                            "proven nonexecution lost its accepted plan"
+                        )
+                    plan = plans[0]
+                    proven_nonexecution_rows = connection.execute(
+                        "SELECT instance.*, fence.reason_code FROM "
+                        "uncertainty_instances AS instance JOIN "
+                        "dispatch_fences AS fence ON fence.fence_id = "
+                        "instance.fence_id LEFT JOIN uncertainty_resolutions AS "
+                        "resolution ON resolution.uncertainty_id = "
+                        "instance.uncertainty_id WHERE instance.repository_id = ? "
+                        "AND instance.run_id = ? AND instance.item_id = ? AND "
+                        "instance.logical_effect_id = ? AND instance.attempt_id = ? "
+                        "AND instance.check_id IS NULL AND "
+                        "resolution.uncertainty_id IS NULL ORDER BY "
+                        "instance.uncertainty_id",
+                        (
+                            reservation["repository_id"], reservation["run_id"],
+                            reservation["item_id"],
+                            reservation["logical_effect_id"],
+                            reservation["attempt_id"],
+                        ),
+                    ).fetchall()
+                    reason_codes = {
+                        "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+                        "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+                        "BILLING": "EFFECT_BILLING_UNKNOWN",
+                        "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+                    }
+                    for uncertainty_row in proven_nonexecution_rows:
+                        kind = str(uncertainty_row["uncertainty_kind"])
+                        if uncertainty_row["reason_code"] != reason_codes.get(kind):
+                            raise StorageIntegrityError(
+                                "proven-nonexecution uncertainty fence is rebound"
+                            )
+                        if kind == "BILLING" and not (
+                            str(uncertainty_row["settlement_head_hash"])
+                            == request.expected_previous_hash
+                            or self._settlement_descends_from(
+                                connection,
+                                reservation_id=request.reservation_id,
+                                current_hash=request.expected_previous_hash,
+                                ancestor_hash=str(
+                                    uncertainty_row["settlement_head_hash"]
+                                ),
+                            )
+                        ):
+                            raise DispatchDenied(
+                                "proven nonexecution accounting does not descend "
+                                "from every uncertainty"
+                            )
+                    reconciliation_id = (
+                        "proven-nonexecution:" + request.settlement_event_id
+                    )
+                    for uncertainty_row in proven_nonexecution_rows:
+                        proof_kind = (
+                            "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                            if uncertainty_row["uncertainty_kind"] == "BILLING"
+                            else "AUTHORITATIVE_NONEXECUTION_SEAL"
+                        )
+                        resolution_body = {
+                            "event_id": request.settlement_event_id,
+                            "proof_event_hash": settlement_hash,
+                            "proof_event_id": request.settlement_event_id,
+                            "proof_kind": proof_kind,
+                            "reconciliation_id": reconciliation_id,
+                            "schema_version": 1,
+                            "uncertainty_id": uncertainty_row["uncertainty_id"],
+                        }
+                        connection.execute(
+                            "INSERT INTO uncertainty_resolutions VALUES "
+                            "(?, ?, ?, ?, ?, ?, ?)",
+                            (
+                                uncertainty_row["uncertainty_id"],
+                                reconciliation_id,
+                                request.settlement_event_id,
+                                proof_kind,
+                                request.settlement_event_id,
+                                settlement_hash,
+                                json.dumps(
+                                    resolution_body, sort_keys=True,
+                                    separators=(",", ":"),
+                                ),
+                            ),
+                        )
+                        if connection.execute(
+                            "DELETE FROM dispatch_fences WHERE fence_id = ? "
+                            "AND repository_id = ? AND reason_code = ?",
+                            (
+                                uncertainty_row["fence_id"],
+                                reservation["repository_id"],
+                                reason_codes[str(
+                                    uncertainty_row["uncertainty_kind"]
+                                )],
+                            ),
+                        ).rowcount != 1:
+                            raise StorageIntegrityError(
+                                "resolved proven-nonexecution fence is absent or "
+                                "rebound"
+                            )
+                    connection.execute(
+                        "INSERT INTO proven_nonexecution_actions ("
+                        "settlement_event_id, repository_id, run_id, item_id, "
+                        "logical_effect_id, attempt_id, reservation_id, "
+                        "settlement_hash, plan_id, revision_digest, "
+                        "effect_descriptor_digest, path_class, intent_event_id, "
+                        "intent_event_hash, launch_id, launch_event_id, "
+                        "launch_event_hash, contact_id, contact_event_id, "
+                        "contact_event_hash, claim_id, source_id, target_digest, "
+                        "seal_id, seal_hash, resolved_uncertainty_ids_json, "
+                        "slot_attempt_id, slot_generation, payload_digest, "
+                        "event_hash, resulting_state, body_json) VALUES ("
+                        + ", ".join("?" for _ in range(32)) + ")",
+                        (
+                            request.settlement_event_id,
+                            reservation["repository_id"], reservation["run_id"],
+                            reservation["item_id"],
+                            reservation["logical_effect_id"],
+                            reservation["attempt_id"], request.reservation_id,
+                            settlement_hash, plan["plan_id"],
+                            plan["revision_digest"],
+                            plan["effect_descriptor_digest"],
+                            nonexecution_path["path_class"],
+                            nonexecution_path["intent_event_id"],
+                            nonexecution_path["intent_event_hash"],
+                            nonexecution_path["launch_id"],
+                            nonexecution_path["launch_event_id"],
+                            nonexecution_path["launch_event_hash"],
+                            nonexecution_path["contact_id"],
+                            nonexecution_path["contact_event_id"],
+                            nonexecution_path["contact_event_hash"],
+                            nonexecution_path["claim_id"],
+                            nonexecution_path["source_id"],
+                            nonexecution_path["target_digest"],
+                            nonexecution_path["seal_id"],
+                            nonexecution_path["seal_hash"],
+                            json.dumps([
+                                str(row["uncertainty_id"])
+                                for row in proven_nonexecution_rows
+                            ]),
+                            operation_slot["attempt_id"],
+                            int(operation_slot["generation"]), payload_digest,
+                            settlement_hash, resulting_state.value, body_json,
+                        ),
+                    )
                 if charged_units > int(reservation["cap_units"]):
                     connection.execute(
                         "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
@@ -16247,12 +18588,13 @@ class SQLiteStateStore:
                     deleted = connection.execute(
                         "DELETE FROM outstanding_slot WHERE repository_id = ? "
                         "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ? "
-                        "AND generation = 1",
+                        "AND generation = ?",
                         (
                             reservation["repository_id"],
                             reservation["run_id"],
                             reservation["logical_effect_id"],
                             reservation["attempt_id"],
+                            int(operation_slot["generation"]),
                         ),
                     ).rowcount
                     if deleted != 1:
@@ -16414,9 +18756,19 @@ class SQLiteStateStore:
                 if run is None or run["item_id"] != request.item_id:
                     raise DispatchDenied("observation does not bind the recorded run")
                 current_state = LifecycleState(str(run["lifecycle_state"]))
+                retry_authorization = connection.execute(
+                    "SELECT * FROM operation_retry_authorizations WHERE "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND prior_attempt_id = ? AND "
+                    "status IN ('AVAILABLE', 'CONSUMED')",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
                 ordinary_receipt = current_state in {
                     LifecycleState.RUNNING, LifecycleState.PAUSING,
-                }
+                } and retry_authorization is None
                 self._require_plan_issuer(
                     connection,
                     request.repository_id,
@@ -16425,8 +18777,16 @@ class SQLiteStateStore:
                 )
 
                 intent_row = connection.execute(
-                    "SELECT body_json FROM events WHERE run_id = ? AND event_kind = 'INTENT_COMMITTED'",
-                    (request.run_id,),
+                    "SELECT event.body_json FROM events AS event JOIN "
+                    "capability_redemptions AS redemption ON "
+                    "redemption.command_id = event.command_id WHERE "
+                    "event.run_id = ? AND event.event_kind = "
+                    "'INTENT_COMMITTED' AND redemption.logical_effect_id = ? "
+                    "AND redemption.attempt_id = ?",
+                    (
+                        request.run_id, request.logical_effect_id,
+                        request.attempt_id,
+                    ),
                 ).fetchone()
                 if intent_row is None:
                     raise StorageIntegrityError("observation run has no durable intent")
@@ -16730,6 +19090,7 @@ class SQLiteStateStore:
                             BudgetDisposition(str(settlement["disposition"]))
                             is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
                         ),
+                        force_late=retry_authorization is not None,
                     )
                 )
                 slot = connection.execute(
@@ -16813,6 +19174,27 @@ class SQLiteStateStore:
                     "slot_released": slot_released,
                     "writer_epoch": writer_epoch,
                 }
+                if retry_authorization is not None:
+                    body.update(
+                        {
+                            "retry_invalidation_version": 1,
+                            "invalidated_retry_authorization_id": (
+                                retry_authorization["authorization_id"]
+                            ),
+                            "invalidated_retry_prior_status": (
+                                retry_authorization["status"]
+                            ),
+                            "invalidated_retry_consuming_event_id": (
+                                retry_authorization["consuming_event_id"]
+                            ),
+                            "retry_initiation_fence_id": (
+                                "retry-initiation-disabled:"
+                                + str(retry_authorization["authorization_id"])
+                                if retry_authorization["status"] == "CONSUMED"
+                                else None
+                            ),
+                        }
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
@@ -16856,6 +19238,38 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                if retry_authorization is not None:
+                    disabled_authorization_body = json.dumps(
+                        {
+                            **json.loads(retry_authorization["body_json"]),
+                            "status": "DISABLED",
+                            "disabling_event_id": request.event_id,
+                        },
+                        sort_keys=True, separators=(",", ":"),
+                    )
+                    if connection.execute(
+                        "UPDATE operation_retry_authorizations SET status = "
+                        "'DISABLED', disabling_event_id = ?, body_json = ? "
+                        "WHERE authorization_id = ? AND status = ?",
+                        (
+                            request.event_id, disabled_authorization_body,
+                            retry_authorization["authorization_id"],
+                            retry_authorization["status"],
+                        ),
+                    ).rowcount != 1:
+                        raise StorageIntegrityError(
+                            "late receipt did not disable its retry authorization"
+                        )
+                    if retry_authorization["status"] == "CONSUMED":
+                        connection.execute(
+                            "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, "
+                            "'RECOVERY_INITIATION_DISABLED', ?)",
+                            (
+                                body["retry_initiation_fence_id"],
+                                request.repository_id, request.item_id,
+                                request.logical_effect_id, request.event_id,
+                            ),
+                        )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -17419,6 +19833,33 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "validator intent does not bind the parent observation"
                     )
+                parent_slot_generation, parent_recovery_authorization_id = (
+                    self._operation_attempt_generation(
+                        connection,
+                        request.repository_id,
+                        request.run_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        request.parent_attempt_id,
+                    )
+                )
+                try:
+                    parent_observation_body = json.loads(
+                        observation["body_json"]
+                    )
+                except (TypeError, json.JSONDecodeError) as error:
+                    raise StorageIntegrityError(
+                        "validator parent observation body is invalid"
+                    ) from error
+                if (
+                    parent_observation_body.get("slot_attempt_id")
+                    != request.parent_attempt_id
+                    or parent_observation_body.get("slot_generation")
+                    != parent_slot_generation
+                ):
+                    raise DispatchDenied(
+                        "validator intent parent observation lost its slot binding"
+                    )
                 latest_observation = connection.execute(
                     "SELECT event_hash FROM effect_observations WHERE run_id = ? ORDER BY rowid DESC LIMIT 1",
                     (request.run_id,),
@@ -17438,10 +19879,12 @@ class SQLiteStateStore:
                     slot["run_id"],
                     slot["logical_effect_id"],
                     slot["attempt_id"],
+                    int(slot["generation"]),
                 ) != (
                     request.run_id,
                     request.logical_effect_id,
                     request.parent_attempt_id,
+                    parent_slot_generation,
                 ):
                     raise DispatchDenied(
                         "validator intent does not own the operation slot"
@@ -17488,6 +19931,20 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if parent_slot_generation > 1:
+                    if parent_recovery_authorization_id is None:
+                        raise StorageIntegrityError(
+                            "recovered validator intent lost retry authorization"
+                        )
+                    body.update(
+                        {
+                            "validator_intent_binding_version": 2,
+                            "parent_slot_generation": parent_slot_generation,
+                            "parent_recovery_authorization_id": (
+                                parent_recovery_authorization_id
+                            ),
+                        }
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
@@ -18071,6 +20528,16 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "validation application does not bind the recorded RESULT"
                     )
+                operation_slot_generation, _recovery_authorization_id = (
+                    self._operation_attempt_generation(
+                        connection,
+                        request.repository_id,
+                        request.run_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        str(observation["operation_attempt_id"]),
+                    )
+                )
                 if bool(observation["applied"]) or observation["status"] != "ACTIVE":
                     raise StorageIntegrityError(
                         "unapplied observation and active intent projections disagree"
@@ -18208,7 +20675,7 @@ class SQLiteStateStore:
                 ) == (
                     request.logical_effect_id,
                     observation["operation_attempt_id"],
-                    1,
+                    operation_slot_generation,
                 )
                 classification_value = (
                     None
@@ -18286,7 +20753,7 @@ class SQLiteStateStore:
                     "schema_version": 1,
                     "sequence": sequence,
                     "slot_attempt_id": observation["operation_attempt_id"],
-                    "slot_generation": 1,
+                    "slot_generation": operation_slot_generation,
                     "writer_epoch": writer_epoch,
                     "slot_released": slot_released,
                 }
@@ -18350,12 +20817,13 @@ class SQLiteStateStore:
                         deleted = connection.execute(
                             "DELETE FROM outstanding_slot WHERE repository_id = ? "
                             "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ? "
-                            "AND generation = 1",
+                            "AND generation = ?",
                             (
                                 request.repository_id,
                                 request.run_id,
                                 slot_row["logical_effect_id"],
                                 slot_row["attempt_id"],
+                                operation_slot_generation,
                             ),
                         ).rowcount
                         if deleted != 1:
@@ -19054,11 +21522,26 @@ class SQLiteStateStore:
                     "SELECT * FROM outstanding_slot WHERE repository_id = ?",
                     (request.repository_id,),
                 ).fetchone()
-                if slot is None or (
+                if slot is None:
+                    raise StorageIntegrityError(
+                        "terminal validation settlement lost its operation slot"
+                    )
+                terminal_slot_generation, _recovery_authorization_id = (
+                    self._operation_attempt_generation(
+                        connection,
+                        request.repository_id,
+                        request.run_id,
+                        request.item_id,
+                        request.logical_effect_id,
+                        str(slot["attempt_id"]),
+                    )
+                )
+                if (
                     slot["run_id"], slot["logical_effect_id"],
                     int(slot["generation"]),
                 ) != (
-                    request.run_id, request.logical_effect_id, 1,
+                    request.run_id, request.logical_effect_id,
+                    terminal_slot_generation,
                 ):
                     raise StorageIntegrityError(
                         "terminal validation settlement lost its operation slot"
@@ -19154,10 +21637,11 @@ class SQLiteStateStore:
                     deleted = connection.execute(
                         "DELETE FROM outstanding_slot WHERE repository_id = ? "
                         "AND run_id = ? AND logical_effect_id = ? AND "
-                        "attempt_id = ? AND generation = 1",
+                        "attempt_id = ? AND generation = ?",
                         (
                             request.repository_id, request.run_id,
                             slot["logical_effect_id"], slot["attempt_id"],
+                            terminal_slot_generation,
                         ),
                     ).rowcount
                     if deleted != 1:
@@ -20701,6 +23185,111 @@ class SQLiteStateStore:
         ).fetchall()
         launches = [json.loads(row["body_json"]) for row in launch_event_rows]
         intents_by_event = {body["event_id"]: body for body in intents}
+        recovered_intent_fields = {
+            "capability_claim_id", "capability_grant_id",
+            "capability_scope_digest", "command_id", "attempt_id",
+            "budget_policy_digest", "budget_cap_units",
+            "budget_reserved_units", "budget_worst_case_units",
+            "effect_descriptor_digest", "event_id", "event_kind", "item_id",
+            "logical_effect_id", "lifecycle_from", "lifecycle_to",
+            "permission_use_id", "plan_id", "previous_event_hash",
+            "repository_id", "revision_digest", "run_id", "reservation_id",
+            "schema_version", "sequence", "writer_epoch",
+            "intent_binding_version", "intent_kind",
+            "recovery_authorization_id", "recovery_event_id",
+            "prior_attempt_id", "expected_source_generation",
+            "expected_target_generation",
+        }
+        for intent_body in intents:
+            if intent_body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY":
+                continue
+            if set(intent_body) != recovered_intent_fields or (
+                intent_body.get("intent_binding_version") != 2
+                or intent_body.get("event_kind") != "INTENT_COMMITTED"
+            ):
+                raise StorageIntegrityError(
+                    "recovered intent schema is invalid"
+                )
+            authorization = connection.execute(
+                "SELECT authorization.*, recovery.event_id AS "
+                "recovery_event_id, recovery.plan_id, "
+                "recovery.revision_digest, "
+                "recovery.effect_descriptor_digest, event.sequence AS "
+                "recovery_sequence FROM operation_retry_authorizations AS "
+                "authorization JOIN operation_recovery_actions AS recovery "
+                "ON recovery.recovery_id = authorization.recovery_id JOIN "
+                "events AS event ON event.event_id = recovery.event_id WHERE "
+                "authorization.authorization_id = ?",
+                (intent_body["recovery_authorization_id"],),
+            ).fetchone()
+            prior_reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                "AND attempt_id = ?",
+                (
+                    intent_body["repository_id"], intent_body["run_id"],
+                    intent_body["item_id"],
+                    intent_body["logical_effect_id"],
+                    intent_body["prior_attempt_id"],
+                ),
+            ).fetchone()
+            if authorization is None or prior_reservation is None or (
+                authorization["repository_id"], authorization["run_id"],
+                authorization["item_id"],
+                authorization["logical_effect_id"],
+                authorization["prior_attempt_id"],
+                authorization["successor_attempt_id"],
+                int(authorization["source_generation"]),
+                int(authorization["target_generation"]),
+                authorization["consuming_event_id"],
+                authorization["recovery_event_id"],
+                authorization["plan_id"], authorization["revision_digest"],
+                authorization["effect_descriptor_digest"],
+            ) != (
+                intent_body["repository_id"], intent_body["run_id"],
+                intent_body["item_id"], intent_body["logical_effect_id"],
+                intent_body["prior_attempt_id"], intent_body["attempt_id"],
+                intent_body["expected_source_generation"],
+                intent_body["expected_target_generation"],
+                intent_body["event_id"], intent_body["recovery_event_id"],
+                intent_body["plan_id"], intent_body["revision_digest"],
+                intent_body["effect_descriptor_digest"],
+            ) or int(authorization["recovery_sequence"]) >= int(
+                intent_body["sequence"]
+            ) or not self._operation_slot_current_before(
+                connection, prior_reservation, int(intent_body["sequence"]),
+                expected_generation=int(
+                    intent_body["expected_source_generation"]
+                ),
+            ):
+                raise StorageIntegrityError(
+                    "recovered intent authorization binding is invalid"
+                )
+            historical_fences, historical_slot, _validators = (
+                self._historical_repository_activity(
+                    connection, repository_id,
+                    int(intent_body["writer_epoch"]),
+                )
+            )
+            if historical_fences or historical_slot != (
+                intent_body["run_id"], intent_body["logical_effect_id"],
+                intent_body["prior_attempt_id"],
+                intent_body["expected_source_generation"],
+            ) or connection.execute(
+                "SELECT 1 FROM effect_observations AS observation JOIN events "
+                "AS event ON event.event_id = observation.event_id WHERE "
+                "observation.repository_id = ? AND observation.run_id = ? "
+                "AND observation.logical_effect_id = ? AND "
+                "observation.attempt_id = ? AND event.sequence < ? LIMIT 1",
+                (
+                    intent_body["repository_id"], intent_body["run_id"],
+                    intent_body["logical_effect_id"],
+                    intent_body["prior_attempt_id"], intent_body["sequence"],
+                ),
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "recovered intent bypassed a historical prohibition"
+                )
         for launch_body in launches:
             intent_body = intents_by_event.get(launch_body["intent_event_id"])
             if intent_body is None or (
@@ -20718,6 +23307,17 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "operation launch diverges from its durable intent"
                 )
+            if intent_body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+                if (
+                    launch_body.get("launch_binding_version") != 2
+                    or launch_body.get("recovery_authorization_id")
+                    != intent_body["recovery_authorization_id"]
+                    or launch_body.get("slot_generation")
+                    != intent_body["expected_target_generation"]
+                ):
+                    raise StorageIntegrityError(
+                        "recovered launch lost its generation binding"
+                    )
         contact_event_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'ADAPTER_CONTACT_CLAIMED'",
@@ -20726,6 +23326,82 @@ class SQLiteStateStore:
         contact_events = [
             json.loads(row["body_json"]) for row in contact_event_rows
         ]
+        launches_by_source = {
+            f"EFFECT:{body['launch_id']}": body for body in launches
+        }
+        for contact_body in contact_events:
+            if contact_body.get("contact_kind") == "VALIDATOR":
+                source_id = str(contact_body.get("source_id", ""))
+                validator_id = (
+                    source_id.removeprefix("VALIDATOR:")
+                    if source_id.startswith("VALIDATOR:") else ""
+                )
+                validator_row = connection.execute(
+                    "SELECT body_json FROM validator_intents WHERE "
+                    "validator_intent_id = ?",
+                    (validator_id,),
+                ).fetchone()
+                if validator_row is None:
+                    raise StorageIntegrityError(
+                        "validator contact lost its durable intent"
+                    )
+                validator_body = json.loads(validator_row["body_json"])
+                generation, authorization_id = (
+                    self._operation_attempt_generation(
+                        connection,
+                        str(validator_body["repository_id"]),
+                        str(validator_body["run_id"]),
+                        str(validator_body["item_id"]),
+                        str(validator_body["logical_effect_id"]),
+                        str(validator_body["parent_attempt_id"]),
+                        sequence_limit=int(contact_body["sequence"]),
+                    )
+                )
+                if (
+                    contact_body.get("attempt_id")
+                    != validator_body["validator_attempt_id"]
+                ):
+                    raise StorageIntegrityError(
+                        "validator contact attempt binding is invalid"
+                    )
+                recovery_fields = {
+                    "contact_binding_version",
+                    "recovery_authorization_id",
+                    "slot_generation",
+                }
+                if generation == 1:
+                    if recovery_fields.intersection(contact_body):
+                        raise StorageIntegrityError(
+                            "ordinary validator contact carries recovery bindings"
+                        )
+                elif (
+                    contact_body.get("contact_binding_version") != 2
+                    or contact_body.get("recovery_authorization_id")
+                    != authorization_id
+                    or contact_body.get("slot_generation") != generation
+                ):
+                    raise StorageIntegrityError(
+                        "recovered validator contact lost its generation binding"
+                    )
+                continue
+            if contact_body.get("contact_kind") != "EFFECT":
+                continue
+            launch_body = launches_by_source.get(contact_body.get("source_id"))
+            if launch_body is None:
+                continue
+            intent_body = intents_by_event.get(launch_body["intent_event_id"])
+            if intent_body is not None and intent_body.get("intent_kind") == (
+                "PROVEN_NONEXECUTION_RETRY"
+            ) and (
+                contact_body.get("contact_binding_version") != 2
+                or contact_body.get("recovery_authorization_id")
+                != intent_body["recovery_authorization_id"]
+                or contact_body.get("slot_generation")
+                != intent_body["expected_target_generation"]
+            ):
+                raise StorageIntegrityError(
+                    "recovered adapter contact lost its generation binding"
+                )
         expected_contacts = {
             body["contact_id"]: (
                 body["event_id"], body["repository_id"], body["run_id"],
@@ -21003,26 +23679,23 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "binding-mismatch projection diverges from event history"
             )
+        def intent_request_from_body(
+            body: Mapping[str, object],
+        ) -> IntentRequest:
+            request_type = (
+                ProvenNonexecutionIntentRequest
+                if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
+                else IntentRequest
+            )
+            reconstructed = request_type(
+                **self._durable_intent_fields(body)
+            )
+            reconstructed.validate()
+            return reconstructed
+
         expected_outcomes = {
             body["command_id"]: (
-                self._payload_digest(
-                    IntentRequest(
-                        repository_id=body["repository_id"],
-                        run_id=body["run_id"],
-                        item_id=body["item_id"],
-                        command_id=body["command_id"],
-                        event_id=body["event_id"],
-                        logical_effect_id=body["logical_effect_id"],
-                        effect_descriptor_digest=body["effect_descriptor_digest"],
-                        attempt_id=body["attempt_id"],
-                        permission_use_id=body["permission_use_id"],
-                        reservation_id=body["reservation_id"],
-                        budget_policy_digest=body["budget_policy_digest"],
-                        reserved_units=body["budget_reserved_units"],
-                        worst_case_units=body["budget_worst_case_units"],
-                        cap_units=body["budget_cap_units"],
-                    )
-                ),
+                self._payload_digest(intent_request_from_body(body)),
                 body["event_id"],
                 body["sequence"],
                 self._event_hash(body),
@@ -21093,6 +23766,62 @@ class SQLiteStateStore:
             (repository_id,),
         ).fetchall()
         validator_intents = [json.loads(row["body_json"]) for row in validator_event_rows]
+        for validator_body in validator_intents:
+            parent_generation, parent_authorization_id = (
+                self._operation_attempt_generation(
+                    connection,
+                    str(validator_body["repository_id"]),
+                    str(validator_body["run_id"]),
+                    str(validator_body["item_id"]),
+                    str(validator_body["logical_effect_id"]),
+                    str(validator_body["parent_attempt_id"]),
+                    sequence_limit=int(validator_body["sequence"]),
+                )
+            )
+            parent_observation = connection.execute(
+                "SELECT body_json FROM effect_observations WHERE "
+                "observation_id = ? AND event_hash = ?",
+                (
+                    validator_body["parent_observation_id"],
+                    validator_body["parent_event_hash"],
+                ),
+            ).fetchone()
+            if parent_observation is None:
+                raise StorageIntegrityError(
+                    "validator intent lost its parent observation"
+                )
+            parent_observation_body = json.loads(
+                parent_observation["body_json"]
+            )
+            if (
+                parent_observation_body.get("slot_attempt_id")
+                != validator_body["parent_attempt_id"]
+                or parent_observation_body.get("slot_generation")
+                != parent_generation
+            ):
+                raise StorageIntegrityError(
+                    "validator intent parent slot binding is invalid"
+                )
+            recovery_fields = {
+                "validator_intent_binding_version",
+                "parent_slot_generation",
+                "parent_recovery_authorization_id",
+            }
+            if parent_generation == 1:
+                if recovery_fields.intersection(validator_body):
+                    raise StorageIntegrityError(
+                        "ordinary validator intent carries recovery bindings"
+                    )
+            elif (
+                validator_body.get("validator_intent_binding_version") != 2
+                or validator_body.get("parent_slot_generation")
+                != parent_generation
+                or validator_body.get("parent_recovery_authorization_id")
+                != parent_authorization_id
+            ):
+                raise StorageIntegrityError(
+                    "recovered validator intent lost its generation binding"
+                )
         expected_outcomes.update(
             {
                 body["command_id"]: (
@@ -21115,9 +23844,23 @@ class SQLiteStateStore:
             "event_kind = 'BLOCKER_RESOLVED'",
             (repository_id,),
         ).fetchall()
-        validation_recoveries = [
+        all_recoveries = [
             json.loads(row["body_json"]) for row in recovery_event_rows
         ]
+        validation_recoveries = [
+            body for body in all_recoveries
+            if body.get("recovery_kind") is None
+        ]
+        operation_recoveries = [
+            body for body in all_recoveries
+            if body.get("recovery_kind") == "PROVEN_NONEXECUTION"
+        ]
+        if len(validation_recoveries) + len(operation_recoveries) != len(
+            all_recoveries
+        ):
+            raise StorageIntegrityError(
+                "blocker-recovery history contains an unknown discriminator"
+            )
         expected_outcomes.update(
             {
                 body["command_id"]: (
@@ -21125,6 +23868,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in validation_recoveries
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in operation_recoveries
             }
         )
         validator_observation_rows = connection.execute(
@@ -22129,7 +24881,15 @@ class SQLiteStateStore:
             body for body in all_resumes
             if body.get("resume_kind") == "ACTIVITY_SETTLEMENT"
         ]
-        if len(resumes) + len(activity_resumes) != len(all_resumes):
+        operation_nonexecution_resumes = [
+            body for body in all_resumes
+            if body.get("resume_kind") == "OPERATION_NONEXECUTION"
+        ]
+        if (
+            len(resumes) + len(activity_resumes)
+            + len(operation_nonexecution_resumes)
+            != len(all_resumes)
+        ):
             raise StorageIntegrityError(
                 "unsupported RESUME_ACCEPTED event discriminator"
             )
@@ -22526,6 +25286,177 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "activity resume proof or historical route is invalid"
                 ) from error
+        for body in operation_nonexecution_resumes:
+            try:
+                if self._classification_authority is None:
+                    raise DispatchDenied(
+                        "operation-nonexecution resume authority is not bound"
+                    )
+                request = ResumeOperationNonexecutionRequest(
+                    **{
+                        key: (
+                            tuple(body[key])
+                            if key == "resolved_uncertainty_ids"
+                            else body[key]
+                        )
+                        for key in (
+                            ResumeOperationNonexecutionRequest.__dataclass_fields__
+                        )
+                    }
+                )
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                evidence = SyntheticOperationNonexecutionResumeEvidence(
+                    **body["resume_evidence"]
+                )
+                self._classification_authority.verify_operator_issued(
+                    capability
+                )
+                self._classification_authority.verify_operation_nonexecution_resume_evidence(
+                    evidence, request
+                )
+                expected_payload = {
+                    **{
+                        key: value
+                        for key, value in request.__dict__.items()
+                        if key != "resolved_uncertainty_ids"
+                    },
+                    "resolved_uncertainty_ids": list(
+                        request.resolved_uncertainty_ids
+                    ),
+                    "action": "RESUME",
+                    "resume_kind": "OPERATION_NONEXECUTION",
+                    "source_kind": "PROVEN_NONEXECUTION",
+                    "resume_binding_version": 1,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                    "resume_evidence": dict(evidence.__dict__),
+                }
+                if (
+                    body["payload_digest"] != self._event_hash(expected_payload)
+                    or body["request_digest"] != evidence.request_digest
+                    or capability.action != "RESUME"
+                    or capability.repository_id != request.repository_id
+                    or capability.run_id != request.run_id
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume evidence binding mismatch"
+                    )
+                prefix_rows = connection.execute(
+                    "SELECT run_id, event_hash FROM events WHERE repository_id "
+                    "= ? AND writer_epoch < ? ORDER BY writer_epoch, rowid",
+                    (repository_id, int(body["writer_epoch"])),
+                ).fetchall()
+                prefix_heads: dict[str, str] = {}
+                prefix_catalog_head = ""
+                for prefix_row in prefix_rows:
+                    prefix_heads[str(prefix_row["run_id"])] = str(
+                        prefix_row["event_hash"]
+                    )
+                    prefix_catalog_head = str(prefix_row["event_hash"])
+                if (
+                    request.expected_catalog_head != prefix_catalog_head
+                    or request.expected_run_head
+                    != prefix_heads.get(request.run_id)
+                    or request.expected_run_heads_digest
+                    != self._run_heads_digest(prefix_heads)
+                    or body["previous_event_hash"]
+                    != request.expected_run_head
+                    or body["verified_run_heads_digest"]
+                    != request.expected_run_heads_digest
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume historical head mismatch"
+                    )
+                source_pause = connection.execute(
+                    "SELECT pause.*, event.writer_epoch FROM "
+                    "external_pause_actions AS pause JOIN events AS event ON "
+                    "event.event_id = pause.event_id WHERE pause.pause_id = ? "
+                    "AND pause.event_id = ? AND pause.event_hash = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                    ),
+                ).fetchone()
+                source = connection.execute(
+                    "SELECT action.*, event.writer_epoch FROM "
+                    "proven_nonexecution_actions AS action JOIN events AS "
+                    "event ON event.event_id = action.settlement_event_id "
+                    "WHERE action.settlement_event_id = ? AND "
+                    "action.event_hash = ?",
+                    (
+                        request.source_nonexecution_event_id,
+                        request.source_nonexecution_event_hash,
+                    ),
+                ).fetchone()
+                if (
+                    source_pause is None or source is None
+                    or int(source_pause["writer_epoch"])
+                    >= int(body["writer_epoch"])
+                    or int(source["writer_epoch"]) >= int(body["writer_epoch"])
+                    or tuple(json.loads(source["resolved_uncertainty_ids_json"]))
+                    != request.resolved_uncertainty_ids
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume historical source mismatch"
+                    )
+                historical_fences, historical_slot, _active_validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
+                )
+                if request.pause_fence_id not in historical_fences or (
+                    historical_slot != (
+                        request.run_id, request.logical_effect_id,
+                        request.attempt_id, request.expected_slot_generation,
+                    )
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume historical activity mismatch"
+                    )
+                prior_pause_fences = connection.execute(
+                    "SELECT fence_id FROM (SELECT fence_id, run_id, event_id FROM "
+                    "local_pause_actions UNION ALL SELECT fence_id, run_id, "
+                    "event_id FROM external_pause_actions UNION ALL SELECT "
+                    "fence_id, run_id, event_id FROM reconciliation_pause_actions "
+                    "UNION ALL SELECT fence_id, run_id, request_event_id AS "
+                    "event_id FROM validation_pause_actions) AS pause JOIN "
+                    "events AS event ON event.event_id = pause.event_id WHERE "
+                    "pause.run_id = ? AND pause.fence_id <> ? AND "
+                    "event.writer_epoch < ?",
+                    (
+                        request.run_id, request.pause_fence_id,
+                        int(body["writer_epoch"]),
+                    ),
+                ).fetchall()
+                other_pause = any(
+                    str(row["fence_id"]) in historical_fences
+                    for row in prior_pause_fences
+                )
+                expected_state = (
+                    LifecycleState.PAUSED
+                    if other_pause
+                    else LifecycleState.BLOCKED
+                )
+                if (
+                    body["continuation_cursor"] != request.continuation_cursor
+                    or body["lifecycle_to"] != expected_state.value
+                ):
+                    raise DispatchDenied(
+                        "operation-nonexecution resume historical route mismatch"
+                    )
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+                json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "operation-nonexecution resume proof or history is invalid"
+                ) from error
         stop_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? "
             "AND event_kind = 'STOP_RECORDED'",
@@ -22669,6 +25600,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in activity_resumes
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in operation_nonexecution_resumes
             }
         )
         expected_outcomes.update(
@@ -23061,6 +26001,141 @@ class SQLiteStateStore:
         if actual_recoveries != expected_recoveries:
             raise StorageIntegrityError(
                 "validation-recovery projection diverges from event history"
+            )
+        expected_operation_recoveries = {
+            body["recovery_id"]: (
+                body["authorization_id"], body["command_id"],
+                body["event_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["prior_attempt_id"],
+                body["successor_attempt_id"],
+                body["expected_slot_generation"],
+                body["target_slot_generation"], body["plan_id"],
+                body["revision_digest"], body["effect_descriptor_digest"],
+                body["source_nonexecution_event_id"],
+                body["source_nonexecution_event_hash"],
+                body["source_continuation_cursor"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in operation_recoveries
+        }
+        actual_operation_recoveries = {
+            row["recovery_id"]: (
+                row["authorization_id"], row["command_id"], row["event_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["prior_attempt_id"], row["successor_attempt_id"],
+                int(row["source_generation"]), int(row["target_generation"]),
+                row["plan_id"], row["revision_digest"],
+                row["effect_descriptor_digest"],
+                row["source_nonexecution_event_id"],
+                row["source_nonexecution_event_hash"],
+                row["continuation_cursor"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM operation_recovery_actions WHERE "
+                "repository_id = ?", (repository_id,)
+            )
+        }
+        if actual_operation_recoveries != expected_operation_recoveries:
+            raise StorageIntegrityError(
+                "operation-recovery projection diverges from event history"
+            )
+        recovered_intents_by_authorization = {
+            body["recovery_authorization_id"]: body
+            for body in intents
+            if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
+        }
+        retry_invalidations_by_authorization = {
+            body["invalidated_retry_authorization_id"]: body
+            for body in observation_events
+            if body.get("retry_invalidation_version") == 1
+        }
+        expected_retry_authorizations = {}
+        for body in operation_recoveries:
+            authorization_body = {
+                "authorization_id": body["authorization_id"],
+                "recovery_id": body["recovery_id"],
+                "repository_id": body["repository_id"],
+                "run_id": body["run_id"],
+                "item_id": body["item_id"],
+                "logical_effect_id": body["logical_effect_id"],
+                "prior_attempt_id": body["prior_attempt_id"],
+                "successor_attempt_id": body["successor_attempt_id"],
+                "source_generation": body["expected_slot_generation"],
+                "target_generation": body["target_slot_generation"],
+                "source_nonexecution_event_id": body[
+                    "source_nonexecution_event_id"
+                ],
+                "status": "AVAILABLE",
+            }
+            consuming_intent = recovered_intents_by_authorization.get(
+                body["authorization_id"]
+            )
+            status = "AVAILABLE"
+            consuming_event_id = None
+            if consuming_intent is not None:
+                status = "CONSUMED"
+                consuming_event_id = consuming_intent["event_id"]
+                authorization_body.update(
+                    {
+                        "status": status,
+                        "consuming_event_id": consuming_event_id,
+                    }
+                )
+            disabling_observation = retry_invalidations_by_authorization.get(
+                body["authorization_id"]
+            )
+            disabling_event_id = None
+            if disabling_observation is not None:
+                status = "DISABLED"
+                disabling_event_id = disabling_observation["event_id"]
+                authorization_body.update(
+                    {
+                        "status": status,
+                        "disabling_event_id": disabling_event_id,
+                    }
+                )
+            expected_retry_authorizations[body["authorization_id"]] = (
+                body["recovery_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["prior_attempt_id"],
+                body["successor_attempt_id"],
+                body["expected_slot_generation"],
+                body["target_slot_generation"],
+                body["source_nonexecution_event_id"], status,
+                consuming_event_id, disabling_event_id,
+                json.dumps(
+                    authorization_body,
+                    sort_keys=True, separators=(",", ":"),
+                ),
+            )
+        actual_retry_authorizations = {
+            row["authorization_id"]: (
+                row["recovery_id"], row["run_id"], row["item_id"],
+                row["logical_effect_id"], row["prior_attempt_id"],
+                row["successor_attempt_id"], int(row["source_generation"]),
+                int(row["target_generation"]),
+                row["source_nonexecution_event_id"], row["status"],
+                row["consuming_event_id"], row["disabling_event_id"],
+                row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM operation_retry_authorizations WHERE "
+                "repository_id = ?", (repository_id,)
+            )
+        }
+        if actual_retry_authorizations != expected_retry_authorizations:
+            raise StorageIntegrityError(
+                "operation retry authorization projection diverges from history"
             )
         expected_controls: dict[str, tuple[object, ...]] = {}
         for body in pauses:
@@ -23498,6 +26573,73 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "activity-resume projection diverges from event history"
             )
+        expected_operation_nonexecution_resumes = {
+            body["resume_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["plan_id"],
+                body["revision_digest"], body["effect_descriptor_digest"],
+                body["source_pause_id"], body["source_pause_event_id"],
+                body["source_pause_event_hash"], body["pause_fence_id"],
+                body["source_nonexecution_event_id"],
+                body["source_nonexecution_event_hash"],
+                json.dumps(
+                    body["resolved_uncertainty_ids"], separators=(",", ":")
+                ),
+                body["continuation_cursor"], body["expected_slot_attempt_id"],
+                body["expected_slot_generation"],
+                body["expected_catalog_head"], body["expected_run_head"],
+                body["expected_run_heads_digest"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["resume_evidence"]["proof_id"],
+                body["resume_evidence"]["request_digest"],
+                body["resume_evidence"]["issuer_fingerprint"],
+                body["resume_evidence"]["issuer_mac"],
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in operation_nonexecution_resumes
+        }
+        actual_operation_nonexecution_resumes = {
+            row["resume_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["attempt_id"],
+                row["plan_id"], row["revision_digest"],
+                row["effect_descriptor_digest"], row["source_pause_id"],
+                row["source_pause_event_id"],
+                row["source_pause_event_hash"], row["pause_fence_id"],
+                row["source_nonexecution_event_id"],
+                row["source_nonexecution_event_hash"],
+                row["resolved_uncertainty_ids_json"],
+                row["continuation_cursor"], row["slot_attempt_id"],
+                int(row["slot_generation"]), row["expected_catalog_head"],
+                row["expected_run_head"], row["expected_run_heads_digest"],
+                row["capability_claim_id"], row["capability_grant_id"],
+                row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["evidence_proof_id"],
+                row["evidence_request_digest"],
+                row["evidence_issuer_fingerprint"],
+                row["evidence_issuer_mac"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM operation_nonexecution_resume_actions WHERE "
+                "repository_id = ?", (repository_id,)
+            )
+        }
+        if (
+            actual_operation_nonexecution_resumes
+            != expected_operation_nonexecution_resumes
+        ):
+            raise StorageIntegrityError(
+                "operation-nonexecution resume projection diverges from history"
+            )
         expected_reconciliation_resumes = {
             body["resume_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -23782,6 +26924,29 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in activity_resumes
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "RESUME",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in operation_nonexecution_resumes
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"],
+                    "RECOVER_OPERATION",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in operation_recoveries
             }
         )
         expected_operator_redemptions.update(
@@ -24244,6 +27409,257 @@ class SQLiteStateStore:
                 self._event_hash(body), body["lifecycle_to"],
                 json.dumps(body, sort_keys=True, separators=(",", ":")),
             )
+        for action in connection.execute(
+            "SELECT action.*, event.body_json AS event_body, "
+            "event.event_hash AS source_event_hash, "
+            "event.sequence AS event_sequence FROM "
+            "proven_nonexecution_actions AS action JOIN events AS event ON "
+            "event.event_id = action.settlement_event_id WHERE "
+            "action.repository_id = ?",
+            (repository_id,),
+        ):
+            if (
+                action["body_json"] != action["event_body"]
+                or action["event_hash"] != action["source_event_hash"]
+                or self._event_hash(json.loads(str(action["event_body"])))
+                != action["source_event_hash"]
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution action diverges from its event"
+                )
+            event_body = json.loads(str(action["event_body"]))
+            settlement = connection.execute(
+                "SELECT settlement.*, reservation.repository_id, "
+                "reservation.run_id, reservation.item_id, "
+                "reservation.logical_effect_id, reservation.attempt_id FROM "
+                "budget_settlements AS settlement JOIN budget_reservations AS "
+                "reservation ON reservation.reservation_id = "
+                "settlement.reservation_id WHERE "
+                "settlement.settlement_event_id = ?",
+                (action["settlement_event_id"],),
+            ).fetchone()
+            plan_rows = connection.execute(
+                "SELECT * FROM validation_plans WHERE repository_id = ? AND "
+                "run_id = ?",
+                (action["repository_id"], action["run_id"]),
+            ).fetchall()
+            intent = connection.execute(
+                "SELECT event.event_id, event.event_hash, event.command_id, "
+                "redemption.claim_id FROM events AS event JOIN "
+                "capability_redemptions AS redemption ON "
+                "redemption.command_id = event.command_id WHERE "
+                "event.repository_id = ? AND event.run_id = ? AND "
+                "event.event_kind = 'INTENT_COMMITTED' AND "
+                "redemption.logical_effect_id = ? AND "
+                "redemption.attempt_id = ?",
+                (
+                    action["repository_id"], action["run_id"],
+                    action["logical_effect_id"], action["attempt_id"],
+                ),
+            ).fetchone()
+            launch = connection.execute(
+                "SELECT * FROM operation_launches WHERE repository_id = ? "
+                "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                "AND attempt_id = ?",
+                (
+                    action["repository_id"], action["run_id"],
+                    action["item_id"], action["logical_effect_id"],
+                    action["attempt_id"],
+                ),
+            ).fetchone()
+            source_id = (
+                f"EFFECT:{launch['launch_id']}"
+                if launch is not None
+                else (
+                    f"EFFECT-INTENT:{intent['command_id']}"
+                    if intent is not None else ""
+                )
+            )
+            contact = connection.execute(
+                "SELECT * FROM adapter_contacts WHERE repository_id = ? AND "
+                "run_id = ? AND item_id = ? AND contact_kind = 'EFFECT' AND "
+                "source_id = ?",
+                (
+                    action["repository_id"], action["run_id"],
+                    action["item_id"], source_id,
+                ),
+            ).fetchone()
+            target_path = self._database_path.parent / "synthetic-target.sqlite3"
+            seal = None
+            if target_path.is_file():
+                with closing(sqlite3.connect(target_path)) as target:
+                    target.row_factory = sqlite3.Row
+                    seal = target.execute(
+                        "SELECT * FROM synthetic_nonexecution_seals WHERE "
+                        "seal_id = ?", (action["seal_id"],),
+                    ).fetchone()
+            if (
+                settlement is None or len(plan_rows) != 1 or intent is None
+                or seal is None
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution action lost its proof chain"
+                )
+            plan = plan_rows[0]
+            try:
+                seal_body = json.loads(str(seal["body_json"]))
+            except json.JSONDecodeError as error:
+                raise StorageIntegrityError(
+                    "proven-nonexecution seal body is invalid"
+                ) from error
+            path_class = (
+                "CONTACTED" if contact is not None else
+                "LAUNCHED" if launch is not None else "INTENT_ONLY"
+            )
+            expected_source_event_hash = str(
+                launch["event_hash"]
+                if launch is not None else intent["event_hash"]
+            )
+            expected_target_digest = self._adapter_target_digest(
+                str(action["repository_id"]), "EFFECT"
+            )
+            action_binding = (
+                action["repository_id"], action["run_id"], action["item_id"],
+                action["logical_effect_id"], action["attempt_id"],
+                action["reservation_id"], action["settlement_hash"],
+                action["plan_id"], action["revision_digest"],
+                action["effect_descriptor_digest"], action["path_class"],
+                action["intent_event_id"], action["intent_event_hash"],
+                action["launch_id"], action["launch_event_id"],
+                action["launch_event_hash"], action["contact_id"],
+                action["contact_event_id"], action["contact_event_hash"],
+                action["claim_id"], action["source_id"],
+                action["target_digest"], action["seal_id"],
+                action["seal_hash"], action["slot_attempt_id"],
+                int(action["slot_generation"]), action["payload_digest"],
+                action["resulting_state"],
+            )
+            expected_binding = (
+                settlement["repository_id"], settlement["run_id"],
+                settlement["item_id"], settlement["logical_effect_id"],
+                settlement["attempt_id"], settlement["reservation_id"],
+                settlement["settlement_hash"], plan["plan_id"],
+                plan["revision_digest"], plan["effect_descriptor_digest"],
+                path_class, intent["event_id"], intent["event_hash"],
+                None if launch is None else launch["launch_id"],
+                None if launch is None else launch["event_id"],
+                None if launch is None else launch["event_hash"],
+                None if contact is None else contact["contact_id"],
+                None if contact is None else contact["event_id"],
+                None if contact is None else contact["event_hash"],
+                intent["claim_id"], source_id, expected_target_digest,
+                event_body.get("nonexecution_seal_id"), seal["seal_hash"],
+                settlement["attempt_id"], int(action["slot_generation"]),
+                settlement["payload_digest"], event_body["lifecycle_to"],
+            )
+            if action_binding != expected_binding or (
+                seal["seal_id"], seal["contact_kind"], seal["target_digest"],
+                seal["claim_id"], seal["source_id"],
+                seal["source_event_hash"], seal["reservation_id"],
+                seal["repository_id"], seal["run_id"], seal["item_id"],
+                seal["logical_effect_id"], seal["attempt_id"],
+                seal["seal_hash"], seal["body_json"],
+            ) != (
+                action["seal_id"], "EFFECT", expected_target_digest,
+                intent["claim_id"], source_id, expected_source_event_hash,
+                action["reservation_id"], action["repository_id"],
+                action["run_id"], action["item_id"],
+                action["logical_effect_id"], action["attempt_id"],
+                self._event_hash(seal_body),
+                json.dumps(seal_body, sort_keys=True, separators=(",", ":")),
+            ) or not self._operation_slot_current_before(
+                connection, settlement, int(action["event_sequence"]),
+                expected_generation=int(action["slot_generation"]),
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution action proof binding is invalid"
+                )
+            try:
+                uncertainty_ids = json.loads(
+                    str(action["resolved_uncertainty_ids_json"])
+                )
+            except json.JSONDecodeError as error:
+                raise StorageIntegrityError(
+                    "proven-nonexecution resolution set is invalid"
+                ) from error
+            if (
+                not isinstance(uncertainty_ids, list)
+                or uncertainty_ids != sorted(uncertainty_ids)
+                or len(set(uncertainty_ids)) != len(uncertainty_ids)
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution resolution set is invalid"
+                )
+            expected_uncertainty_ids = [
+                str(row["uncertainty_id"])
+                for row in connection.execute(
+                    "SELECT instance.uncertainty_id FROM "
+                    "uncertainty_instances AS instance JOIN events AS origin "
+                    "ON origin.event_id = instance.origin_event_id LEFT JOIN "
+                    "uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id LEFT "
+                    "JOIN events AS resolution_event ON "
+                    "resolution_event.event_id = resolution.event_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND origin.sequence < ? AND (resolution.event_id IS NULL "
+                    "OR resolution_event.sequence >= ?) ORDER BY "
+                    "instance.uncertainty_id",
+                    (
+                        action["repository_id"], action["run_id"],
+                        action["item_id"], action["logical_effect_id"],
+                        action["attempt_id"], action["event_sequence"],
+                        action["event_sequence"],
+                    ),
+                )
+            ]
+            if uncertainty_ids != expected_uncertainty_ids or (
+                event_body.get("non_dispatch_proven") is not True
+                or event_body.get("zero_liability_proven") is not True
+                or event_body.get("all_obligations_settled") is not True
+                or event_body.get("release_slot") is not False
+                or event_body.get("contradiction") is not False
+                or event_body.get("uncertainty") is not False
+            ):
+                raise StorageIntegrityError(
+                    "proven-nonexecution action is not an exact safe-retry proof"
+                )
+            reconciliation_id = (
+                "proven-nonexecution:" + str(action["settlement_event_id"])
+            )
+            for uncertainty_id in uncertainty_ids:
+                if uncertainty_id not in expected_uncertainties:
+                    raise StorageIntegrityError(
+                        "proven nonexecution resolves an unknown uncertainty"
+                    )
+                if uncertainty_id in expected_resolutions:
+                    raise StorageIntegrityError(
+                        "uncertainty instance is resolved more than once"
+                    )
+                kind = str(expected_uncertainties[uncertainty_id][1])
+                proof_kind = (
+                    "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                    if kind == "BILLING"
+                    else "AUTHORITATIVE_NONEXECUTION_SEAL"
+                )
+                resolution_body = {
+                    "event_id": action["settlement_event_id"],
+                    "proof_event_hash": action["event_hash"],
+                    "proof_event_id": action["settlement_event_id"],
+                    "proof_kind": proof_kind,
+                    "reconciliation_id": reconciliation_id,
+                    "schema_version": 1,
+                    "uncertainty_id": uncertainty_id,
+                }
+                expected_resolutions[uncertainty_id] = (
+                    reconciliation_id, action["settlement_event_id"],
+                    proof_kind, action["settlement_event_id"],
+                    action["event_hash"], json.dumps(
+                        resolution_body, sort_keys=True,
+                        separators=(",", ":"),
+                    ),
+                )
         actual_resolutions = {
             row["uncertainty_id"]: (
                 row["reconciliation_id"], row["event_id"],
@@ -24613,6 +28029,16 @@ class SQLiteStateStore:
         )
         expected_fences.update(
             {
+                str(body["retry_initiation_fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    "RECOVERY_INITIATION_DISABLED", str(body["event_id"]),
+                )
+                for body in observation_events
+                if body.get("retry_initiation_fence_id") is not None
+            }
+        )
+        expected_fences.update(
+            {
                 f"failed-final:{body['application_id']}": (
                     body["item_id"], body["logical_effect_id"],
                     "FAILED_FINAL_APPLICATION", body["event_id"]
@@ -24621,11 +28047,7 @@ class SQLiteStateStore:
                 if body["lifecycle_to"] == LifecycleState.FAILED_FINAL.value
             }
         )
-        resolved_uncertainty_ids = {
-            uncertainty_id
-            for body in reconciliations
-            for uncertainty_id in body["resolved_uncertainty_ids"]
-        }
+        resolved_uncertainty_ids = set(expected_resolutions)
         for uncertainty_id, uncertainty in expected_uncertainties.items():
             if uncertainty_id not in resolved_uncertainty_ids:
                 expected_fences[uncertainty_id] = (
@@ -24657,6 +28079,14 @@ class SQLiteStateStore:
         )
         visited_settlements: set[str] = set()
         operation_reservation_ids = {body["reservation_id"] for body in intents}
+        transferred_prior_attempts = {
+            (
+                body["repository_id"], body["run_id"],
+                body["logical_effect_id"], body["prior_attempt_id"],
+            )
+            for body in intents
+            if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
+        }
         validation_released_effects = {
             body["logical_effect_id"]
             for body in applications
@@ -24920,14 +28350,16 @@ class SQLiteStateStore:
                             self._classification_authority,
                         )
                         try:
-                            derived_contradiction = (
+                            seal_contradiction, _path = (
                                 self._verify_nonexecution_seal(
                                     connection,
                                     settlement_request,
                                     reservation,
                                     self._classification_authority,
                                 )
-                                or derived_contradiction
+                            )
+                            derived_contradiction = (
+                                seal_contradiction or derived_contradiction
                             )
                         except DispatchDenied as error:
                             raise StorageIntegrityError(
@@ -25049,6 +28481,11 @@ class SQLiteStateStore:
                 and reservation["reservation_id"] in operation_reservation_ids
                 and reservation["logical_effect_id"]
                 not in validation_released_effects
+                and (
+                    reservation["repository_id"], reservation["run_id"],
+                    reservation["logical_effect_id"],
+                    reservation["attempt_id"],
+                ) not in transferred_prior_attempts
             ):
                 slot_obligations.append(reservation)
 
@@ -25094,6 +28531,17 @@ class SQLiteStateStore:
             ):
                 raise StorageIntegrityError(
                     "activity resume source pause fence diverges from history"
+                )
+            del expected_fences[body["pause_fence_id"]]
+
+        for body in operation_nonexecution_resumes:
+            source_fence = expected_fences.get(body["pause_fence_id"])
+            if (
+                source_fence is None
+                or source_fence[3] != body["source_pause_event_id"]
+            ):
+                raise StorageIntegrityError(
+                    "operation-nonexecution resume source fence diverges from history"
                 )
             del expected_fences[body["pause_fence_id"]]
 
@@ -25266,12 +28714,22 @@ class SQLiteStateStore:
                     )
                 except (KeyError, ValueError) as error:
                     raise StorageIntegrityError(
-                        "validation recovery has no valid predecessor state"
+                        "blocker recovery has no valid predecessor state"
                     ) from error
-                self._validate_validation_recovery_event(
-                    connection, body, predecessor_state,
-                    expected_cursors.get(run_id),
-                )
+                if body.get("recovery_kind") == "PROVEN_NONEXECUTION":
+                    self._validate_operation_recovery_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
+                elif body.get("recovery_kind") is None:
+                    self._validate_validation_recovery_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
+                else:
+                    raise StorageIntegrityError(
+                        "blocker recovery has an unknown discriminator"
+                    )
             if row["event_kind"] == "READINESS_EVALUATED":
                 try:
                     predecessor_state = LifecycleState(
@@ -25405,6 +28863,19 @@ class SQLiteStateStore:
                         (body["reservation_id"],),
                     ).fetchone()
                     validator_nonexecution = validator is not None
+                    operation_generation = 1
+                    if not validator_nonexecution:
+                        operation_generation, _authorization_id = (
+                            self._operation_attempt_generation(
+                                connection,
+                                str(body["repository_id"]),
+                                str(body["run_id"]),
+                                str(body["item_id"]),
+                                str(body["logical_effect_id"]),
+                                str(body["attempt_id"]),
+                                sequence_limit=int(body["sequence"]),
+                            )
+                        )
                     current_attempt = (
                         self._validator_intent_active_before(
                             connection,
@@ -25413,9 +28884,22 @@ class SQLiteStateStore:
                         )
                         if validator_nonexecution
                         else self._operation_slot_current_before(
-                            connection, reservation, int(body["sequence"])
+                            connection, reservation, int(body["sequence"]),
+                            expected_generation=operation_generation,
                         )
                     )
+                    external_pause_active = connection.execute(
+                        "SELECT 1 FROM external_pause_actions AS pause JOIN "
+                        "events AS event ON event.event_id = pause.event_id "
+                        "WHERE pause.repository_id = ? AND pause.run_id = ? "
+                        "AND pause.item_id = ? AND pause.logical_effect_id = ? "
+                        "AND pause.attempt_id = ? AND event.sequence < ? LIMIT 1",
+                        (
+                            body["repository_id"], body["run_id"],
+                            body["item_id"], body["logical_effect_id"],
+                            body["attempt_id"], body["sequence"],
+                        ),
+                    ).fetchone() is not None
                     expected_state, expected_cursor = (
                         _derive_nonexecution_route(
                             predecessor_state,
@@ -25425,6 +28909,7 @@ class SQLiteStateStore:
                             current_attempt=current_attempt,
                             validator_nonexecution=validator_nonexecution,
                             attempt_id=str(body["attempt_id"]),
+                            external_pause_active=external_pause_active,
                         )
                     )
                     if (
@@ -25659,12 +29144,25 @@ class SQLiteStateStore:
             raise StorageIntegrityError("slot exists without an unresolved operation")
         if slot_obligations:
             reservation = slot_obligations[0]
+            expected_generation = 1
+            for body in intents:
+                if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY" and (
+                    body["repository_id"], body["run_id"],
+                    body["logical_effect_id"], body["attempt_id"],
+                ) == (
+                    reservation["repository_id"], reservation["run_id"],
+                    reservation["logical_effect_id"],
+                    reservation["attempt_id"],
+                ):
+                    expected_generation = int(
+                        body["expected_target_generation"]
+                    )
             if slot is None or (
                 slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
                 int(slot["generation"]),
             ) != (
                 reservation["run_id"], reservation["logical_effect_id"],
-                reservation["attempt_id"], 1,
+                reservation["attempt_id"], expected_generation,
             ):
                 raise StorageIntegrityError("slot projection diverges from event history")
 
@@ -25699,6 +29197,10 @@ class SQLiteStateStore:
             "uncertainty_resolutions",
             "reconciliation_actions",
             "verified_receipt_reconciliation_actions",
+            "proven_nonexecution_actions",
+            "operation_nonexecution_resume_actions",
+            "operation_recovery_actions",
+            "operation_retry_authorizations",
             "validation_pause_actions",
             "resume_actions",
             "reconciliation_resume_actions",

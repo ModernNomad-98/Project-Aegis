@@ -21,6 +21,7 @@ from .authority import (
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
+    SyntheticOperationNonexecutionResumeEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
     SyntheticSourceControlEvidence,
@@ -50,8 +51,10 @@ from .contracts import (
     ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ReconciliationPauseResumeRequest,
+    RecoverProvenNonexecutionRequest,
     ResumeRequest,
     ResumeActivitySettlementRequest,
+    ResumeOperationNonexecutionRequest,
     SourceControlClassification,
     SourceControlEvidenceRequest,
     StopMode,
@@ -61,6 +64,7 @@ from .contracts import (
     ValidatorIntentRequest,
     ValidatorObservationCommand,
     ValidatorObservationRequest,
+    ProvenNonexecutionIntentRequest,
 )
 from .engine import TRANSITIONS, TransitionEngine
 from .storage import FailureHook, SQLiteStateStore
@@ -297,6 +301,54 @@ class SyntheticDispatchCoordinator:
             failure_hook=failure_hook,
         )
 
+    def resume_operation_nonexecution(
+        self,
+        request: ResumeOperationNonexecutionRequest,
+        capability: SyntheticOperatorCapability,
+        resume_evidence: SyntheticOperationNonexecutionResumeEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T14", current_state, resulting_state,
+                TRANSITIONS["T14"].required_guards,
+            )
+
+        return self._store.resume_operation_nonexecution(
+            request,
+            capability,
+            resume_evidence,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def recover_proven_nonexecution(
+        self,
+        request: RecoverProvenNonexecutionRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T16", current_state, resulting_state,
+                TRANSITIONS["T16"].required_guards,
+            )
+
+        return self._store.recover_proven_nonexecution(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
     def resume(
         self,
         request: ResumeRequest,
@@ -473,6 +525,27 @@ class SyntheticDispatchCoordinator:
             lose_receipt=lose_receipt,
         )
         return SyntheticDispatchReceipt(commit, receipt)
+
+    def dispatch_proven_nonexecution_retry(
+        self,
+        intent: ProvenNonexecutionIntentRequest,
+        capability: SyntheticCapability,
+        effect: SyntheticEffectRequest,
+        *,
+        expected_head: str,
+        writer_epoch: int,
+        usage_units: int | None = 0,
+        lose_receipt: bool = False,
+    ) -> SyntheticDispatchReceipt:
+        return self.dispatch(
+            intent,
+            capability,
+            effect,
+            expected_head=expected_head,
+            writer_epoch=writer_epoch,
+            usage_units=usage_units,
+            lose_receipt=lose_receipt,
+        )
 
     def intake_effect_receipt(
         self,

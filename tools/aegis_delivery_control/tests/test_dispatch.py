@@ -773,6 +773,12 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute(
                     "DROP TABLE verified_receipt_reconciliation_actions"
                 )
+                connection.execute("DROP TABLE operation_retry_authorizations")
+                connection.execute("DROP TABLE operation_recovery_actions")
+                connection.execute(
+                    "DROP TABLE operation_nonexecution_resume_actions"
+                )
+                connection.execute("DROP TABLE proven_nonexecution_actions")
                 connection.execute("PRAGMA user_version = 0")
                 connection.commit()
             finally:
@@ -835,6 +841,12 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute(
                     "DROP TABLE verified_receipt_reconciliation_actions"
                 )
+                connection.execute("DROP TABLE operation_retry_authorizations")
+                connection.execute("DROP TABLE operation_recovery_actions")
+                connection.execute(
+                    "DROP TABLE operation_nonexecution_resume_actions"
+                )
+                connection.execute("DROP TABLE proven_nonexecution_actions")
                 connection.execute("PRAGMA user_version = 1")
                 connection.commit()
             finally:
@@ -858,7 +870,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 2)
+            self.assertEqual(version, 3)
             self.assertEqual(action_count, 0)
             migrated.load_verified("repo-1", authority=authority)
 
@@ -902,7 +914,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 2
+                    connection.execute("PRAGMA user_version").fetchone()[0], 3
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -929,7 +941,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 3")
+                connection.execute("PRAGMA user_version = 4")
             finally:
                 connection.close()
             with self.assertRaisesRegex(
