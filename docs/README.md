@@ -63,14 +63,15 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
 CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) but is
-still an unaccepted draft checkpoint. The full local package suite passed 331
+still an unaccepted draft checkpoint. The full local package suite passed 339
 tests on 2026-09-21; all three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause received independent `APPROVE`. The narrow
 T07 local-nonexecution settlement and its BLOCKED-only T14 recovery route, plus
 the narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
-route, also received independent `APPROVE`. Remaining exact
+route, and T09's exact-head reconciliation pause fence also received independent
+`APPROVE`. Remaining exact
 T/C/F backlog and final review gates still
 block merge, so the
 passing suite is not a completion or merge claim.

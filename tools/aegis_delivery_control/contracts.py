@@ -812,6 +812,45 @@ class OperationFinalizationReceipt:
 
 
 @dataclass(frozen=True)
+class PauseReconciliationRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    reason_code: str
+    source_event_id: str
+    source_event_hash: str
+    expected_preserved_continuation_cursor: str | None
+
+    def validate(self) -> None:
+        required = tuple(self.__dict__.values())[:-1]
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError(
+                "reconciliation pause identifiers and source event must be non-empty"
+            )
+        if self.event_id == self.source_event_id:
+            raise ValueError(
+                "reconciliation pause event must differ from its source event"
+            )
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "reconciliation pause preserved cursor must be non-empty or absent"
+            )
+
+
+@dataclass(frozen=True)
 class PauseValidationRequest:
     pause_id: str
     command_id: str

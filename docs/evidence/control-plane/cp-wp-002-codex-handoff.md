@@ -658,6 +658,52 @@ The clean VALIDATING T14 slice is independently accepted, but complete T14 and
 the implicated C/F families remain `UNVERIFIED`. T09 is next and PR #99 remains
 open, draft and blocked.
 
+### Stage 14 - T09 reconciliation-required pause fence
+
+The T09 plan bound one typed, signed, one-use PAUSE request to the exact current
+`RECONCILIATION_REQUIRED` source event, accepted plan and preserved cursor. It
+received independent `APPROVE` before editing. The plan deliberately kept T14
+fence clearance with later T17 and allowed T09 itself to become
+`YES/YES/YES` without promoting the complete C06, F06 or F21 families.
+
+Changed production files: `contracts.py` adds `PauseReconciliationRequest`;
+`dispatch.py` adds the engine-authorized coordinator route; `storage.py` adds the
+closed event/projection schema, atomic writer-serialized transition, historical
+activity reconstruction and strict recovery. `test_dispatch.py` adds 8 typed
+contract, exact-head, stacked-fence, no-adapter, crash/replay, tamper, recovery,
+race and future-clearance tests; `test_storage.py` updates the closed table
+inventory. Status READMEs, the durable backlog and this handoff are the only
+documentation changes.
+
+The transaction authenticates and redeems the PAUSE capability, appends
+`PAUSE_FENCE_RECORDED`, inserts its fence and immutable action projection and
+advances the run and catalog heads. It does not change lifecycle, cursor,
+accounting, outstanding-slot ownership, prior evidence or prior fences and does
+not call an adapter. Replay is idempotent, stale-source commands fail closed and
+a command deliberately rebound to the new exact head may stack another fence.
+
+Initial implementation review returned `REVISE` with one MAJOR finding: the new
+immutable action projection foreign-keyed its live fence and would prevent later
+T17/T14 exact fence clearance from preserving history. The correction removed
+only that T09 dependency, restored the pre-existing external-pause constraint
+unchanged and added a foreign-key-enabled deletion/retention regression.
+Corrected independent review returned `APPROVE` with no findings and passed all
+8 focused tests in 1.453 seconds.
+
+Local evidence is 8 focused tests in 1.580 seconds, 48 dispatch tests in 6.715
+seconds, 339 complete package tests in 30.792 seconds, 184 valid skills with zero
+warnings, 8 script tests with 4 expected skips, 91 gate self-test assertions,
+compileall and clean diff checks apart from line-ending notices. Commit, push and
+exact-head hosted-check evidence remain pending until this reviewed stage is
+committed. Canonical design, approval register, BER, dependencies, CI, CLI,
+adapters, preserved artifact/cache paths, real authority/adapters and external
+systems were intentionally untouched.
+
+T09 is `YES/YES/YES`. Its narrow C06 crash/replay, F06 slot-retention and F21
+uncertainty/fence-persistence evidence does not promote those complete families,
+which remain `UNVERIFIED`. T17 with F02/F11/F12/F21 is next; PR #99 remains open,
+draft and blocked.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -839,7 +885,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 331 passing tests, a registry entry or an earlier milestone
+complete from the 339 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -863,7 +909,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
 | T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05-local/T25-authoritative nonexecution settlement and BLOCKED-only T14 recovery slice independently accepted; T08/T24/other source families remain |
 | T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle/exact-settled-result pause, unresolved reconciliation, contacted worst-case accounting and clean VALIDATING T14 slice independently accepted; active drain/cancel and broader cessation sources remain |
-| T09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T09 | YES | YES | YES | Exact current-head reconciliation fence, one-use authority, idempotent replay, stacked fence, no-adapter invariants and strict recovery independently accepted |
 | T10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
@@ -895,7 +941,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | C03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 preserves original effect key/slot and worst-case accounting through missing-receipt reconciliation; complete family trace remains |
 | C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
 | C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
-| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06/T07 pre/post-commit rollback/replay, atomic settlement and durable-fence slices accepted; full crash family remains unverified |
+| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06/T07/T09 pre/post-commit rollback/replay, atomic settlement and durable-fence slices accepted; full crash family remains unverified |
 | C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
 | C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
@@ -912,7 +958,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
 | F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05/T06/T07 pause, settlement, slot-retention and serialized contact/receipt slices accepted; full family trace remains |
+| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 plus T05/T06/T07/T09 pause, settlement, slot-retention and serialized contact/receipt slices accepted; full family trace remains |
 | F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention/worst-case reconciliation slice accepted; full family trace remains |
 | F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 and T06 post-contact/late-adjustment slices accepted; full family trace remains |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
@@ -927,7 +973,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal closure slice accepted; full family trace remains |
 | F19 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | F20 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 uncertainty and fence persistence slice accepted; complete clearance/recovery family remains ordered with T17 |
 
 Immediate order:
 
@@ -939,16 +985,15 @@ Immediate order:
 
 Prior-session routing context for work after stop approval was:
 
-1. T15, T05 and T06 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
-2. T09 next.
-3. T17 with F02/F11/F12/F21.
-4. T22.
-5. T28 with F01.
-6. Cross-family F05/F06/F13/F20.
-7. Documentation refresh.
-8. Full repository validation.
-9. Independent architecture, security and QA reviews.
-10. Commit, push, PR update and administrator merge only after all gates pass.
+1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
+2. T17 with F02/F11/F12/F21.
+3. T22.
+4. T28 with F01.
+5. Cross-family F05/F06/F13/F20.
+6. Documentation refresh.
+7. Full repository validation.
+8. Independent architecture, security and QA reviews.
+9. Commit, push, PR update and administrator merge only after all gates pass.
 
 This later order is recovered session context, not a superseding design record.
 Before each item, compare it with the current backlog, design and actual diff.
@@ -1033,16 +1078,17 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, the narrow T07
+- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, the narrow T07
   local-nonexecution slice, T08 validation-pause slice and T14 core slices are
-  independently accepted as recorded in Stages 4-13; complete T07/T08/T14
+  independently accepted as recorded in Stages 4-14; complete T07/T08/T14
   remain UNVERIFIED pending T17/T24 and other source families, and later exact-head/final
   review gates remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
-  pause request. T08 adds no adapter cancellation or drain side effect. T09 is
-  the next ordered work.
+  pause request. T08 adds no adapter cancellation or drain side effect. T09
+  retains reconciliation uncertainty and performs no adapter call. T17 is the
+  next ordered work.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
   document unless PR #99 later records it.
@@ -1056,5 +1102,7 @@ owner before interpreting it more broadly.
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
 stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accepted.
-The next code change follows the documented order at T09. Keep PR #99 draft until every remaining backlog
+T09 is also independently accepted.
+The next code change follows the documented order at T17 with
+F02/F11/F12/F21. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

@@ -167,7 +167,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 331 tests successfully, and
+controller. The complete local package suite ran 339 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -218,6 +218,14 @@ verified reads and the two race regressions closed both; corrected independent
 review returned `APPROVE`. T08 remains `UNVERIFIED` as a complete transition
 because authenticated active/drain/cancel and broader cessation source families
 are still ordered work.
+T09 reconciliation pause received independent implementation `APPROVE` after
+its first review identified one future-clearance schema defect. The corrected
+route binds a typed one-use PAUSE capability to the exact current
+`RECONCILIATION_REQUIRED` head, records a durable stacked fence without changing
+the continuation cursor, accounting, outstanding slot or prior evidence, and
+supports idempotent replay plus strict recovery. Its immutable action history
+does not foreign-key the live fence, so later exact fence clearance can preserve
+that history. T09 performs no adapter call and does not clear uncertainty.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

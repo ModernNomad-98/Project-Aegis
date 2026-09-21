@@ -668,7 +668,7 @@ projection/event snapshot while contact or result intake commits.
 | Complete delivery-control package | 331 tests passed in 28.693 seconds |
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent implementation review | Initial `REVISE` found two MAJOR gaps: zero cessation was accepted as eligible and pause/contact plus pause/result races lacked deterministic coverage. Both were corrected; final `APPROVE`, no remaining blocker/major; reviewer independently passed 13 focused tests in 2.479 seconds |
-| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Commit/push and hosted checks | Reviewed implementation commit `a0d27bbdd64d7d86bf080355ca933d28760244ab` and evidence commit `9b4cc6ff0d656409b071e16ed6a81ec06a692e5a` were pushed; all three hosted checks passed on both exact heads; PR #99 remained open, draft and blocked |
 | Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
 
@@ -676,8 +676,46 @@ T08 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. This
 slice proves the synthetic idle, exact settled-result, uncontacted uncertainty
 and contacted worst-case branches plus the clean VALIDATING T14 route; it does
 not claim authenticated active drain/cancel or every T17/T24 cessation source.
-T14 and the implicated C/F families likewise remain `UNVERIFIED`. T09 is next;
+T14 and the implicated C/F families likewise remain `UNVERIFIED`. T09 follows;
 PR #99 remains draft and not merge-ready.
+
+### 5.14 T09 reconciliation-required pause checkpoint
+
+T09 now has a distinct typed operator request and coordinator/state-owner route
+for an already durable `RECONCILIATION_REQUIRED` run. The request binds the
+repository, run, item, logical effect, accepted plan and revision, exact current
+source event ID/hash, preserved continuation cursor, new event and fence IDs,
+reason and signed one-use PAUSE capability. Under the repository writer lock and
+one `BEGIN IMMEDIATE` transaction, the route verifies the current head, cursor,
+plan and authority, appends `PAUSE_FENCE_RECORDED`, inserts the fence and immutable
+action projection, redeems the capability and advances both durable heads.
+
+The lifecycle remains `RECONCILIATION_REQUIRED`. The route leaves accounting,
+the repository-wide outstanding slot, continuation cursor, prior evidence and
+prior fences unchanged, performs no adapter call and does not hide or clear
+uncertainty. Same-command replay is idempotent; a distinct stale-source command
+is denied, while a deliberate new command bound to the new exact head can stack
+another fence. Recovery reconstructs and authenticates the complete event,
+source, plan, projection, redemption and fence history and fails closed on
+schema or self-consistent source retarget tamper.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | The narrow plan received independent `APPROVE` before editing; T14 clearance remained deferred to T17 |
+| Focused first falsification | Typed contract import failed before implementation; the narrow route made the contract/coordinator test pass |
+| Focused T09 suite | 8 tests passed in 1.580 seconds |
+| Affected dispatch module | 48 tests passed in 6.715 seconds |
+| Complete delivery-control package | 339 tests passed in 30.792 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found one MAJOR future-clearance foreign-key defect; removing only the T09 action-to-live-fence dependency and adding its regression produced final `APPROVE`, no findings; reviewer independently passed 8 focused tests in 1.453 seconds |
+| Commit/push and hosted checks | Pending this reviewed checkpoint commit; do not infer exact-head hosted evidence before push |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T09 is `YES/YES/YES`. Its crash/replay, slot-retention and uncertainty/fence
+persistence tests are narrow evidence for C06, F06 and F21; those complete
+families remain `UNVERIFIED`. T17 with F02/F11/F12/F21 is next. PR #99 remains
+draft and not merge-ready.
 
 ## 6. Handoff contract
 

@@ -42,6 +42,7 @@ from .contracts import (
     PauseActivitySettlementRequest,
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
+    PauseReconciliationRequest,
     PauseValidationRequest,
     ResumeRequest,
     ResumeActivitySettlementRequest,
@@ -207,6 +208,31 @@ class SyntheticDispatchCoordinator:
             )
 
         return self._store.pause_validation(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def pause_reconciliation(
+        self,
+        request: PauseReconciliationRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T09",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T09"].required_guards,
+            )
+
+        return self._store.pause_reconciliation(
             request,
             capability,
             self._authority,
