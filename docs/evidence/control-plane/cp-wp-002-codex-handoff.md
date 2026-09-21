@@ -423,9 +423,11 @@ zero warnings; validator self-tests passed 91 assertions; diff-check was clean
 apart from line-ending notices. T15 is `YES/YES/YES`. Its narrow F01 controls
 prove that mismatch handling does not change the effect identity/descriptor,
 accepted plan/revision, outstanding slot or accounting projections and cannot
-re-enable readiness. Full F01 remains `UNVERIFIED` for T28. Commit/push and
-exact-head hosted evidence for Stage 8 remain pending until this reviewed stage
-is committed.
+re-enable readiness. Full F01 remains `UNVERIFIED` for T28. The reviewed stage
+was committed with DCO sign-off and pushed as
+`2de362612f43c125829ff8c73e22bcdcfa6147c0`; `gate-guard`, `validate-skills` and
+`windows-offline-checks` passed on that exact head. PR #99 remained open, draft
+and blocked as intended.
 
 ## 8. Proven invocations
 
@@ -469,6 +471,10 @@ is committed.
 | T15 complete delivery-control package | `Ran 256 tests in 19.733s`; `OK` |
 | T15 repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
 | Independent T15 implementation review | Initial `REVISE` for active BLOCKED routing; corrected final `APPROVE`, no remaining blocker/major; 14 focused tests passed independently |
+| `git commit -s -m "feat(control-plane): fence immutable binding mismatches"` | Commit `2de362612f43c125829ff8c73e22bcdcfa6147c0`; signed-off; 12 files changed |
+| `git push origin feat/cp-wp-002-offline-kernel` after T15 | Remote branch advanced `7114bc7..2de3626` |
+| Live PR #99 read on T15 implementation head | OPEN; DRAFT; BLOCKED; head `2de362612f43c125829ff8c73e22bcdcfa6147c0` |
+| Hosted checks on exact T15 implementation head | `gate-guard` passed in 5s; `validate-skills` passed in 1m24s; `windows-offline-checks` passed in 2m59s |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3

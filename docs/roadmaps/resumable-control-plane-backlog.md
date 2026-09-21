@@ -467,6 +467,7 @@ route, fence and full projection/fence union.
 | `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
 | `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
 | Independent implementation review | Initial `REVISE` found active BLOCKED work incorrectly treated as idle; historical-prefix activity routing and regression coverage corrected it; final `APPROVE`, no remaining blocker/major; reviewer passed 14 focused tests |
+| Commit/push and hosted checks | Signed-off commit `2de362612f43c125829ff8c73e22bcdcfa6147c0` pushed to the existing branch; `gate-guard`, `validate-skills` and `windows-offline-checks` passed on that exact head; PR #99 remained open, draft and blocked |
 
 This promotes T15 itself to `YES/YES/YES`. The narrow F01 non-mutation controls
 show that T15 does not change an existing effect key/descriptor, accepted plan,
