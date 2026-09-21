@@ -5,6 +5,7 @@ Repository: `ModernNomad-98/Project-Aegis` (Role A source library)
 Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
+First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
 Status: **PAUSED - NOT MERGE-READY - INDEPENDENT REVIEW VERDICT `REVISE`**
 
@@ -53,20 +54,26 @@ tools/behavioral_eval_runner/judge/__pycache__/
 
 Do not stage, delete, broadly inspect or add ignore rules for the artifact
 directories. The cache directories are generated local state and were not added
-to the checkpoint; do not stage them.
+to the checkpoint. No further cleanup or deletion, including cache removal, is
+authorized by this handoff; do not stage or delete them.
 
 ## 2. Source precedence
 
-Use this order when sources disagree:
+Apply precedence by domain:
 
-1. the user's current direct instruction;
-2. the effective lifecycle in the approval register;
-3. this handoff for the exact paused checkpoint and deviations;
-4. the canonical design for required CP-D/T/C/F behavior;
-5. the durable backlog for work-package status and completion gates;
-6. current code and tests for what is implemented now;
-7. merged history;
-8. old chat, summaries and memory only as labeled context.
+- **Authority:** the user's current direct instruction, then the effective
+  lifecycle in the approval register. This handoff, design and backlog create no
+  authority.
+- **Requirements and scope:** current direct scope, the canonical design, then
+  the durable backlog. A checkpoint record cannot weaken a canonical acceptance
+  requirement.
+- **Observed state:** live Git/GitHub state and current code/tests, then this
+  handoff's dated evidence, then merged history. Old chat, summaries and memory
+  are context only where labeled.
+
+Any contradiction across these domains stops work for explicit source
+reconciliation. Do not resolve it merely by selecting whichever source is higher
+in a single global list.
 
 Code and passing tests establish current behavior, not acceptance. The design
 establishes required behavior, not implementation. A transition registry row is
@@ -89,13 +96,21 @@ below existed in the approval register when this handoff was prepared.
 Delivery state at handoff preparation:
 
 - checkpoint commit `ba13394` is pushed to the branch above;
-- PR #99 is open, draft and blocked;
+- first handoff commit `8456a36` is pushed to the same branch;
+- PR #99 was updated with both commit identifiers, the linked handoff, local
+  validation receipts and all three blocking stop findings;
+- a public PR-page read after that update confirmed PR #99 was open and draft,
+  listed both commits, and identified `8456a36` as the latest head at that time;
 - no CP-WP-002 commit is on `main`;
-- the GitHub deployments API returned `[]`;
-- `gh release list` returned `no releases found`;
+- on 2026-09-21 the GitHub deployments API returned `[]`;
+- on 2026-09-21 `gh release list` returned `no releases found`;
 - no software deployment or release occurred; and
 - administrator-merge pre-approval is carried forward but must not be exercised
   while the independent gate is `REVISE` or required checks are unresolved.
+
+The commit containing the final audit corrections to this handoff necessarily
+cannot self-record its own SHA. Treat PR #99's latest head and check rollup as
+the live delivery record and re-query them during cold-start preflight.
 
 ## 4. Binding decision register
 
@@ -175,7 +190,59 @@ This inventory is descriptive, not an independent acceptance verdict.
 - Production data, providers, credentials, external integrations, real authority,
   real execution adapters, releases and deployments: absent and unauthorized.
 
-## 6. Proven invocations
+## 6. Stage 2 - first handoff checkpoint
+
+### Changed files in `8456a36`
+
+- `docs/evidence/control-plane/cp-wp-002-codex-handoff.md`: created the Codex
+  continuation record.
+
+### Intentionally not touched
+
+- All kernel source and tests: the user requested pause, not another stop fix.
+- Canonical design and approval register: no decision or authority changed.
+- Artifact/cache paths and every prohibited AEGIS-APR-004 surface.
+
+### Proven delivery
+
+- `git push` advanced the remote branch from `ba13394` to `8456a36`.
+- `gh pr edit 99 ...` returned PR #99's URL after replacing the provisional body
+  with the actual handoff link, commit identities, validation and blockers.
+- A public PR read confirmed two commits, draft state and head `8456a36` at that
+  time. Its latest-head checks were not all terminal yet.
+
+### Open item
+
+Independent review of this first handoff returned `REVISE`; Stage 3 corrects the
+specific findings below without resuming kernel implementation.
+
+## 7. Stage 3 - handoff audit corrections
+
+### Changed files
+
+- `docs/evidence/control-plane/cp-wp-002-codex-handoff.md`: corrected precedence,
+  remote evidence, stage inventory, cleanup boundaries and T/C/F status mapping.
+- `docs/README.md`: changed the incomplete two-grant approval summary to require
+  reading the complete grant/lifecycle register.
+
+### Intentionally not touched
+
+- All kernel source/tests and the three unresolved stop findings.
+- Canonical design, approval register, BER, CI/dependencies and artifact/cache
+  paths.
+- PR draft state, merge state, releases and deployments.
+
+### Commit identity
+
+This stage is the commit containing this revised handoff. Its SHA is deliberately
+not embedded in itself. The final PR #99 head and a post-push PR record identify
+it without a self-referential commit claim.
+
+Independent read-only re-review verdict: `APPROVE`, with no blocker, major,
+minor or nit findings. The reviewer confirmed all six first-review findings were
+closed and that the three implementation stop defects remain correctly blocking.
+
+## 8. Proven invocations
 
 | Command | Tell-tale result |
 | --- | --- |
@@ -187,17 +254,26 @@ This inventory is descriptive, not an independent acceptance verdict.
 | `git commit -s -m "feat(control-plane): checkpoint offline kernel"` | Commit `ba13394`; signed-off; 15 files, 19,000 insertions, 2,811 deletions |
 | `git push -u origin feat/cp-wp-002-offline-kernel` | New remote branch created and upstream configured |
 | `gh pr create --draft ...` | Draft PR `https://github.com/ModernNomad-98/Project-Aegis/pull/99` |
+| `git push` after `8456a36` | Remote branch advanced `ba13394..8456a36` |
+| `gh pr edit 99 ...` | PR #99 URL returned after body synchronization |
+| Public read of PR #99 after update | Draft; two commits; latest head `8456a36`; implementation commit showed 3/3 checks, handoff head checks still running |
 | `gh api "repos/ModernNomad-98/Project-Aegis/deployments?per_page=100"` | `[]` |
 | `gh release list --repo ModernNomad-98/Project-Aegis --limit 20` | `no releases found` |
 | Dashboard cleanup verification | `Test-Path tools/aegis_delivery_control/dashboard` returned `False`; dashboard absent from `git status` |
-| Local-link audit over the five updated Markdown files | 100 local Markdown links checked; all targets exist |
+| Local-link audit over the five updated Markdown files | 103 local Markdown links checked; all targets exist |
+| T/C/F matrix row-count check | T=28, C=9, F=22 (F04a and F04b are separate canonical rows) |
 | `python -B scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
 | `python -B scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed.` |
+| Independent corrected-handoff re-review | `APPROVE`; no blocker, major, minor or nit findings |
+
+The first handoff audit returned `REVISE`: one precedence blocker, three major
+evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
+addresses those findings and requires re-review before closeout.
 
 The independent stop reviewer was read-only and did not execute tests. Its
 findings are code-review evidence, not an executable test receipt.
 
-## 7. Independent stop gate - `REVISE`
+## 9. Independent stop gate - `REVISE`
 
 The stop gate must be corrected before any later backlog slice or merge.
 
@@ -263,12 +339,98 @@ Required correction: atomically preserve the obligation and worst-case charge
 when stop observes post-contact/pre-receipt uncertainty. Add late authoritative
 usage correction, replay, tamper and crash-boundary tests.
 
-## 8. Backlog state
+## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
 complete from the 198 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
+
+Status legend: `YES` means directly established at this checkpoint;
+`NO` means a verified absence or failed gate; `UNVERIFIED` means the exact-head
+implementation-to-test-to-requirement trace has not been audited. `UNVERIFIED`
+is not a failure and must never be upgraded from filenames, test counts or a
+transition registry entry.
+
+### T01-T28 transition matrix
+
+Canonical rows: [design transition table](../../design/resumable-control-plane-v1.md#L420-L455).
+
+| ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
+| --- | --- | --- | --- | --- |
+| T01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Code/test names exist; exact-head trace required |
+| T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical readiness work exists; exact-head trace required |
+| T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
+| T04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
+| T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
+| T13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T16 | UNVERIFIED | UNVERIFIED | NO | Terminal closure interaction blocked by R-STOP-01 |
+| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T18 | YES | YES | NO | Stop review `REVISE`; R-STOP-01 applies |
+| T19 | YES | YES | NO | Stop review `REVISE`; R-STOP-01 and R-STOP-03 apply |
+| T20 | NO | NO | NO | Declaration only; R-STOP-02 |
+| T21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T22 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T23 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
+| T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
+| T25 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
+| T26 | UNVERIFIED | UNVERIFIED | NO | Existing path cannot close R-STOP-01 case |
+| T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T28 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog with F01 |
+
+### C01-C09 crash-boundary matrix
+
+Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v1.md#L599-L607).
+
+| ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
+| --- | --- | --- | --- | --- |
+| C01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
+| C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
+| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
+
+### F01-F21 acceptance-family matrix
+
+Canonical rows: [design acceptance families](../../design/resumable-control-plane-v1.md#L939-L960).
+
+| ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
+| --- | --- | --- | --- | --- |
+| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T28 |
+| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
+| F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
+| F04b | UNVERIFIED | UNVERIFIED | NO | R-STOP-02 and R-STOP-03 affect stop accounting |
+| F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
+| F06 | UNVERIFIED | UNVERIFIED | NO | R-STOP-01 can strand the global slot |
+| F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
+| F08 | UNVERIFIED | UNVERIFIED | NO | R-STOP-03 requires post-contact unknown charging |
+| F09 | UNVERIFIED | UNVERIFIED | NO | R-STOP-01 requires terminal validation closure |
+| F10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
+| F14 | UNVERIFIED | UNVERIFIED | NO | Recoverable failure stop path affected by R-STOP-01 |
+| F15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| F16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| F17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| F18 | UNVERIFIED | UNVERIFIED | NO | Terminal closure affected by R-STOP-01 |
+| F19 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| F20 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
+| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
 
 Immediate order:
 
@@ -305,7 +467,7 @@ transition/acceptance mapping remain open until proven otherwise.
 CP-WP-003, CP-WP-004 and CP-FUT-001 remain blocked. Do not begin them under
 AEGIS-APR-004.
 
-## 9. Continuation protocol
+## 11. Continuation protocol
 
 For every remaining item:
 
@@ -329,7 +491,7 @@ Do not merge merely because administrator merge is pre-approved. Merge is the
 last step after scope, tests, independent reviews, documentation and GitHub
 checks all pass. Merge does not authorize a release or deployment.
 
-## 10. Cleanup and removal contract
+## 12. Cleanup and removal contract
 
 The accidental dashboard was an unauthorized scope deviation. It was mocked,
 untracked and disconnected from the kernel. These files were deleted before the
@@ -343,11 +505,13 @@ tools/aegis_delivery_control/dashboard/
 ```
 
 The phrase "cleanup and removal of the project" has no broader verified target
-in the conversation. Do not delete Project Aegis, `tools/aegis_delivery_control/`,
-tracked implementation files, the preserved artifact directories or any remote
-branch/PR. Ask the owner before interpreting it more broadly.
+in the conversation. Dashboard removal is complete. No further deletion or
+cleanup is authorized, including deletion of cache directories. Do not delete
+Project Aegis, `tools/aegis_delivery_control/`, tracked implementation files,
+the preserved artifact directories, caches or any remote branch/PR. Ask the
+owner before interpreting it more broadly.
 
-## 11. Deviations
+## 13. Deviations
 
 - **Unauthorized frontend deviation:** a dashboard was created after accidental
   frontend exploration was mistaken for an active request. This violated the
@@ -362,12 +526,12 @@ branch/PR. Ask the owner before interpreting it more broadly.
 - **Validation-command correction:** the first custom Markdown link audit used
   an empty parent path for root-level files and emitted PowerShell `Join-Path`/
   `Test-Path` errors. No pass was claimed from it; the corrected command checked
-  100 local links successfully.
+  103 local links successfully after the final audit corrections.
 - **Large accumulated diff:** `ba13394` is a 15-file checkpoint of work developed
   across prior stages. It is intentionally a draft recovery point, not an ideal
   review-sized completion commit.
 
-## 12. Intentionally not done / omitted
+## 14. Intentionally not done / omitted
 
 - The three stop findings were not fixed after the user requested pause.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
@@ -378,7 +542,7 @@ branch/PR. Ask the owner before interpreting it more broadly.
 - No merge, release, deployment, provider call, production-data operation,
   external integration or real authority/adapter work was performed.
 
-## 13. Next entry criterion
+## 15. Next entry criterion
 
 Codex may resume implementation only after the cold-start preflight matches this
 handoff and the first stop-fix plan has been independently audited. The next code

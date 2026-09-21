@@ -14,8 +14,9 @@ their original context; use the active registers below to determine current work
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
 - [Offline CI](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
-- [Owner approval register](approvals/APPROVAL_REGISTER.md): recurring read-only-agent
-  and administrator-merge authority for `ModernNomad-98/Project-Aegis` only.
+- [Owner approval register](approvals/APPROVAL_REGISTER.md): all current
+  Project Aegis grants, limits and lifecycle events; read the complete register
+  before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
