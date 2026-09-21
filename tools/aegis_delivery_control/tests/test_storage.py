@@ -4266,6 +4266,421 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(replay.event_hash, committed.event_hash)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
 
+    def test_r_stop_03_immediate_stop_charges_contacted_unknown(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            request, self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            contact_hash = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE "
+                "contact_kind = 'EFFECT'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = contact_hash
+
+        stopped = self.store.stop(
+            self._stop_request(),
+            self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT held_units, charged_units, uncertainty, disposition "
+                "FROM budget_reservations WHERE reservation_id = ?",
+                ("reservation-1",),
+            ).fetchone()
+            stop_body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0])
+            epoch_rows = connection.execute(
+                "SELECT event_kind, event_id, sequence FROM events WHERE "
+                "writer_epoch = ? ORDER BY rowid",
+                (stop_body["writer_epoch"],),
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(
+            accounting,
+            (0, 5, 1, BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value),
+        )
+        self.assertEqual(
+            epoch_rows,
+            [
+                (
+                    "BUDGET_SETTLED",
+                    stop_body["uncertainty_snapshot"][0]["settlement_event_id"],
+                    stop_body["sequence"] - 1,
+                ),
+                ("STOP_RECORDED", "stop-event-1", stop_body["sequence"]),
+            ],
+        )
+        self.store.load_verified("repo-1")
+
+    def test_r_stop_03_precontact_stop_retains_reserve(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT held_units, charged_units, disposition FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0])
+        finally:
+            connection.close()
+        self.assertEqual(accounting, (3, 0, BudgetDisposition.RESERVED.value))
+        self.assertEqual(body["uncertainty_snapshot"], [])
+        self.store.load_verified("repo-1")
+
+    def test_r_stop_03_crash_boundaries_replay_exactly_once(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            request, self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE "
+                "contact_kind = 'EFFECT'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        stop_request = self._stop_request()
+        capability = self._stop_capability(StopMode.IMMEDIATE)
+        for point in (
+            "after_stop_unknown_settlement_before_stop_recorded",
+            "after_stop_writes_before_commit",
+        ):
+            with self.assertRaises(InjectedFailure):
+                self.store.stop(
+                    stop_request, capability, self.authority,
+                    failure_hook=raise_at(point),
+                )
+            self.assertEqual(self.store.table_counts()["stop_actions"], 0)
+            self.assertEqual(self.store.table_counts()["budget_settlements"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.stop(
+                stop_request, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_stop_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            stop_hash = connection.execute(
+                "SELECT event_hash FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = stop_hash
+        replay = self.store.stop(stop_request, capability, self.authority)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(self.store.table_counts()["stop_actions"], 1)
+        self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
+        self.store.load_verified("repo-1")
+
+    def test_r_stop_03_recovery_rejects_snapshot_retarget(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            request, self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE "
+                "contact_kind = 'EFFECT'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0])
+            body["uncertainty_snapshot"][0]["contact_id"] = "forged-contact"
+            forged_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                "event_id = 'stop-event-1'", (forged_hash, body_json)
+            )
+            connection.execute(
+                "UPDATE stop_actions SET event_hash = ?, body_json = ? WHERE "
+                "stop_id = 'stop-1'", (forged_hash, body_json)
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE "
+                "command_id = 'stop-command-1'", (forged_hash,)
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (forged_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'", (forged_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = forged_hash
+        with self.assertRaises(StorageIntegrityError):
+            self.store.load_verified("repo-1")
+
+    def test_r_stop_03_validator_contact_is_unknown_but_known_effect_retained(
+        self,
+    ) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        request, capability = self._validator_intent(observation)
+        committed = self.store.commit_validator_intent(
+            request, capability, self.authority
+        )
+        self.oracle.allowed_head = committed.event_hash
+        self.store._contact_committed_validator(
+            request, capability, committed,
+            self.store._adapter_target_digest("repo-1", "VALIDATOR"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE "
+                "contact_kind = 'VALIDATOR'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT reservation_id, disposition, charged_units FROM "
+                "budget_reservations ORDER BY reservation_id"
+            ).fetchall()
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0])
+        finally:
+            connection.close()
+        self.assertEqual(accounting[0][1], BudgetDisposition.CONSUMED.value)
+        self.assertEqual(
+            accounting[1],
+            (
+                "validator-reservation-1",
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                2,
+            ),
+        )
+        self.assertEqual(
+            body["uncertainty_snapshot"][0]["contact_kind"], "VALIDATOR"
+        )
+        self.store.load_verified("repo-1")
+
+    def test_r_stop_03_late_authoritative_usage_adjusts_without_reopen(self) -> None:
+        request = self.request()
+        committed = self._commit_planned_intent(
+            request, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        launched = self.store.claim_operation_launch(request, committed)
+        self.oracle.allowed_head = launched.event_hash
+        self.store._contact_claimed_operation(
+            request, self.capability, committed, launched,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE "
+                "contact_kind = 'EFFECT'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        stopped = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            unknown_hash = connection.execute(
+                "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        adjustment = BudgetSettlementRequest(
+            "late-stop-adjustment-1", "reservation-1", unknown_hash,
+            BudgetDisposition.ADJUSTED, 2, "late-authoritative-bill-1",
+            "AUTHORITATIVE_LATE_USAGE",
+        )
+        adjusted = self.store._settle_budget(
+            adjustment,
+            self.authority.issue_settlement_proof(
+                "late-stop-adjustment-proof-1", adjustment
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = adjusted.settlement_hash
+        self.assertEqual(
+            self.store.load_run_lifecycle("run-1"), LifecycleState.STOPPED
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT charged_units, uncertainty, disposition FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(accounting, (2, 0, BudgetDisposition.ADJUSTED.value))
+        reopened = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        reopened.load_verified("repo-1")
+
+    def test_r_stop_03_reused_attempt_on_other_run_cannot_hide_contact(
+        self,
+    ) -> None:
+        self._prepare_finalization()
+        stopped_1 = self.store.stop(
+            self._stop_request(), self._stop_capability(StopMode.IMMEDIATE),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped_1.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            first_stop_body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = 'stop-1'"
+            ).fetchone()[0])
+            first_disposition = connection.execute(
+                "SELECT disposition FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(first_stop_body["uncertainty_snapshot"], [])
+        self.assertEqual(first_disposition, BudgetDisposition.CONSUMED.value)
+        closed = self.store.settle_terminal_validation(
+            self._terminal_application_request("PASSED")
+        )
+        self.oracle.allowed_head = closed.event_hash
+        plan_2 = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                "run-2", "item-2", "effect-2", "revision-2",
+                "descriptor-2", "scope-2", "budget-policy-2", ("check-2",),
+            ),
+            expected_head=closed.event_hash, writer_epoch=90,
+        )
+        self.oracle.allowed_head = plan_2.event_hash
+        grant_2 = SyntheticGrant(
+            "grant-2", "repo-1", "effect-2", "attempt-1", "scope-2"
+        )
+        self.authority.register(grant_2)
+        capability_2 = self.authority.claim(*grant_2.__dict__.values())
+        request_2 = replace(
+            self.request(), run_id="run-2", item_id="item-2",
+            command_id="command-2", event_id="event-2",
+            logical_effect_id="effect-2", permission_use_id="permission-use-2",
+            reservation_id="reservation-2", effect_descriptor_digest="descriptor-2",
+            budget_policy_digest="budget-policy-2",
+        )
+        committed_2 = self.store.commit_intent(
+            request_2, capability_2, self.authority,
+            expected_head=plan_2.event_hash, writer_epoch=91,
+        )
+        self.oracle.allowed_head = committed_2.event_hash
+        launched_2 = self.store.claim_operation_launch(request_2, committed_2)
+        self.oracle.allowed_head = launched_2.event_hash
+        self.store._contact_claimed_operation(
+            request_2, capability_2, committed_2, launched_2,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT event_hash FROM adapter_contacts WHERE run_id = 'run-2'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        stop_2 = replace(
+            self._stop_request(StopMode.IMMEDIATE, "2"), run_id="run-2"
+        )
+        stop_grant_2 = SyntheticOperatorGrant(
+            "stop-grant-2", "repo-1", "run-2", "STOP_IMMEDIATE",
+            "stop-scope-2",
+        )
+        self.authority.register_operator(stop_grant_2)
+        stopped_2 = self.store.stop(
+            stop_2,
+            self.authority.claim_operator(*stop_grant_2.__dict__.values()),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped_2.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            disposition = connection.execute(
+                "SELECT disposition FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-2'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(
+            disposition, BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+        )
+        self.store.load_verified("repo-1")
+
     def test_t20_escalation_atomically_charges_unknown_and_replays(self) -> None:
         request = self.request()
         committed = self._commit_planned_intent(

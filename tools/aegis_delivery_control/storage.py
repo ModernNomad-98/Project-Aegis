@@ -1646,7 +1646,7 @@ class SQLiteStateStore:
 
     @classmethod
     def _validate_stop_event_body(cls, body: Mapping[str, object]) -> None:
-        expected_fields = {
+        legacy_fields = {
             "action", "capability_claim_id", "capability_grant_id",
             "capability_issuer_fingerprint", "capability_scope_digest",
             "command_id", "drain_deadline_utc", "event_id", "event_kind",
@@ -1656,10 +1656,14 @@ class SQLiteStateStore:
             "retained_continuation_cursor", "run_id", "schema_version",
             "sequence", "stop_id", "writer_epoch",
         }
+        extended_fields = legacy_fields | {
+            "uncertainty_snapshot", "uncertainty_snapshot_version",
+        }
+        is_extended = set(body) == extended_fields
         if (
             type(body.get("schema_version")) is not int
             or body.get("schema_version") != 1
-            or set(body) != expected_fields
+            or set(body) not in (legacy_fields, extended_fields)
         ):
             raise StorageIntegrityError(
                 "unsupported STOP_RECORDED event schema"
@@ -1683,7 +1687,7 @@ class SQLiteStateStore:
                 for field in nullable_string_fields
             ):
                 raise ValueError("stop event optional strings are invalid")
-            string_fields = expected_fields.difference(
+            string_fields = legacy_fields.difference(
                 {"schema_version", *integer_fields, *nullable_string_fields}
             )
             if any(
@@ -1693,6 +1697,47 @@ class SQLiteStateStore:
             ):
                 raise ValueError("stop event strings are invalid")
             mode = StopMode(cast(str, body["mode"]))
+            if is_extended:
+                if (
+                    mode is not StopMode.IMMEDIATE
+                    or body["uncertainty_snapshot_version"] != 1
+                    or not isinstance(body["uncertainty_snapshot"], list)
+                ):
+                    raise ValueError("stop uncertainty snapshot is invalid")
+                snapshot_fields = {
+                    "attempt_id", "contact_event_hash", "contact_event_id",
+                    "contact_id", "contact_kind", "contact_sequence",
+                    "expected_previous_hash", "item_id", "logical_effect_id",
+                    "reservation_id", "resulting_disposition", "run_id",
+                    "settlement_event_id", "settlement_hash", "source_id",
+                    "worst_case_units",
+                }
+                for item in cast(list[object], body["uncertainty_snapshot"]):
+                    if not isinstance(item, dict) or set(item) != snapshot_fields:
+                        raise ValueError("stop uncertainty entry is invalid")
+                    if (
+                        any(
+                            not isinstance(item[field], str)
+                            or not item[field].strip()
+                            for field in snapshot_fields.difference(
+                                {
+                                    "contact_sequence",
+                                    "expected_previous_hash",
+                                    "worst_case_units",
+                                }
+                            )
+                        )
+                        or not isinstance(item["expected_previous_hash"], str)
+                        or type(item["contact_sequence"]) is not int
+                        or int(item["contact_sequence"]) <= 0
+                        or type(item["worst_case_units"]) is not int
+                        or int(item["worst_case_units"]) < 0
+                        or item["resulting_disposition"]
+                        != BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                    ):
+                        raise ValueError("stop uncertainty entry binding is invalid")
+            elif "uncertainty_snapshot" in body:
+                raise ValueError("legacy stop carries uncertainty fields")
             request = StopRequest(
                 stop_id=cast(str, body["stop_id"]),
                 command_id=cast(str, body["command_id"]),
@@ -1744,6 +1789,253 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "STOP_RECORDED event semantics are invalid"
             ) from error
+
+    @classmethod
+    def _stop_unknown_settlement_id(
+        cls,
+        *,
+        stop_id: str,
+        stop_event_id: str,
+        reservation_id: str,
+        contact_id: str,
+        contact_event_hash: str,
+        expected_previous_hash: str,
+    ) -> str:
+        digest = cls._event_hash(
+            {
+                "domain": "aegis-stop-immediate-unknown-v1",
+                "stop_id": stop_id,
+                "stop_event_id": stop_event_id,
+                "reservation_id": reservation_id,
+                "contacts": [
+                    {"contact_id": contact_id, "event_hash": contact_event_hash}
+                ],
+                "expected_previous_hash": expected_previous_hash,
+            }
+        )
+        return f"stop-immediate-unknown:{digest}"
+
+    def _unresolved_contact_reservations(
+        self,
+        connection: sqlite3.Connection,
+        repository_id: str,
+        run_id: str,
+        *,
+        before_sequence: int | None = None,
+    ) -> list[dict[str, object]]:
+        contacts = connection.execute(
+            "SELECT contact.*, event.sequence AS contact_sequence FROM "
+            "adapter_contacts AS contact JOIN events AS event ON "
+            "event.event_id = contact.event_id WHERE contact.repository_id = ? "
+            "AND contact.run_id = ? ORDER BY event.sequence, contact.contact_id",
+            (repository_id, run_id),
+        ).fetchall()
+        result: list[dict[str, object]] = []
+        for contact in contacts:
+            if before_sequence is not None and int(contact["contact_sequence"]) >= before_sequence:
+                continue
+            kind = str(contact["contact_kind"])
+            source_id = str(contact["source_id"])
+            if kind == "EFFECT" and source_id.startswith("EFFECT:"):
+                source = connection.execute(
+                    "SELECT launch.*, reservation.reservation_id FROM "
+                    "operation_launches AS launch JOIN budget_reservations AS "
+                    "reservation ON reservation.repository_id = launch.repository_id "
+                    "AND reservation.run_id = launch.run_id AND "
+                    "reservation.logical_effect_id = launch.logical_effect_id AND "
+                    "reservation.attempt_id = launch.attempt_id WHERE "
+                    "launch.launch_id = ?",
+                    (source_id.removeprefix("EFFECT:"),),
+                ).fetchone()
+            elif kind == "VALIDATOR" and source_id.startswith("VALIDATOR:"):
+                source = connection.execute(
+                    "SELECT intent.*, intent.validator_attempt_id AS attempt_id "
+                    "FROM validator_intents AS intent WHERE "
+                    "intent.validator_intent_id = ?",
+                    (source_id.removeprefix("VALIDATOR:"),),
+                ).fetchone()
+            else:
+                raise StorageIntegrityError("adapter contact source binding is invalid")
+            if source is None:
+                raise StorageIntegrityError("adapter contact lost its durable source")
+            if (
+                contact["repository_id"], contact["run_id"], contact["item_id"],
+            ) != (
+                source["repository_id"], source["run_id"], source["item_id"],
+            ):
+                raise StorageIntegrityError(
+                    "adapter contact diverges from its durable source"
+                )
+            cutoff_clause = "" if before_sequence is None else " AND event.sequence < ?"
+            if kind == "EFFECT":
+                resolution_query = (
+                    "SELECT 1 FROM effect_observations AS resolved JOIN events "
+                    "AS event ON event.event_id = resolved.event_id WHERE "
+                    "resolved.repository_id = ? AND resolved.run_id = ? AND "
+                    "resolved.item_id = ? AND resolved.logical_effect_id = ? "
+                    "AND resolved.attempt_id = ?"
+                )
+                params: tuple[object, ...] = (
+                    source["repository_id"], source["run_id"], source["item_id"],
+                    source["logical_effect_id"], source["attempt_id"],
+                )
+            else:
+                resolution_query = (
+                    "SELECT 1 FROM validator_observations AS resolved JOIN "
+                    "events AS event ON event.event_id = resolved.event_id WHERE "
+                    "resolved.validator_intent_id = ?"
+                )
+                params = (source["validator_intent_id"],)
+            if before_sequence is not None:
+                params += (before_sequence,)
+            resolved = connection.execute(
+                f"{resolution_query}{cutoff_clause} LIMIT 1",
+                params,
+            ).fetchone() is not None
+            if kind == "VALIDATOR" and not resolved:
+                validator_params: tuple[object, ...] = (
+                    source["validator_intent_id"],
+                )
+                if before_sequence is not None:
+                    validator_params += (before_sequence,)
+                for table in ("validator_cessations", "terminal_validation_settlements"):
+                    column = "validator_intent_id"
+                    resolved = connection.execute(
+                        f"SELECT 1 FROM {table} AS resolved JOIN events AS event "
+                        "ON event.event_id = resolved.event_id WHERE "
+                        f"resolved.{column} = ?{cutoff_clause} LIMIT 1",
+                        validator_params,
+                    ).fetchone() is not None
+                    if resolved:
+                        break
+            if resolved:
+                continue
+            reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+                (source["reservation_id"],),
+            ).fetchone()
+            if reservation is None:
+                raise StorageIntegrityError("contacted obligation lost its reservation")
+            historical = None
+            if before_sequence is not None:
+                historical = connection.execute(
+                    "SELECT settlement.disposition, settlement.settlement_hash "
+                    "FROM budget_settlements AS settlement JOIN events AS event "
+                    "ON event.event_id = settlement.settlement_event_id WHERE "
+                    "settlement.reservation_id = ? AND event.sequence < ? ORDER "
+                    "BY event.sequence DESC LIMIT 1",
+                    (reservation["reservation_id"], before_sequence),
+                ).fetchone()
+            disposition = (
+                str(reservation["disposition"])
+                if before_sequence is None
+                else (
+                    BudgetDisposition.RESERVED.value
+                    if historical is None else str(historical["disposition"])
+                )
+            )
+            previous = (
+                str(reservation["settlement_head_hash"])
+                if before_sequence is None
+                else ("" if historical is None else str(historical["settlement_hash"]))
+            )
+            if disposition == BudgetDisposition.RELEASED.value:
+                continue
+            result.append(
+                {
+                    "attempt_id": str(source["attempt_id"]),
+                    "contact_event_hash": str(contact["event_hash"]),
+                    "contact_event_id": str(contact["event_id"]),
+                    "contact_id": str(contact["contact_id"]),
+                    "contact_kind": kind,
+                    "contact_sequence": int(contact["contact_sequence"]),
+                    "expected_previous_hash": previous,
+                    "item_id": str(reservation["item_id"]),
+                    "logical_effect_id": str(reservation["logical_effect_id"]),
+                    "reservation_id": str(reservation["reservation_id"]),
+                    "run_id": str(reservation["run_id"]),
+                    "source_id": source_id,
+                    "worst_case_units": int(reservation["worst_case_units"]),
+                    "historical_disposition": disposition,
+                }
+            )
+        return result
+
+    def _validate_immediate_stop_uncertainty_history(
+        self, connection: sqlite3.Connection, body: Mapping[str, object]
+    ) -> None:
+        if "uncertainty_snapshot_version" not in body:
+            return
+        sequence = int(body["sequence"])
+        first_settlement_sequence = connection.execute(
+            "SELECT MIN(sequence) FROM events WHERE repository_id = ? AND "
+            "run_id = ? AND writer_epoch = ? AND event_kind = 'BUDGET_SETTLED'",
+            (body["repository_id"], body["run_id"], body["writer_epoch"]),
+        ).fetchone()[0]
+        prefix_sequence = (
+            sequence if first_settlement_sequence is None
+            else int(first_settlement_sequence)
+        )
+        expected: list[dict[str, object]] = []
+        obligations = self._unresolved_contact_reservations(
+            connection,
+            cast(str, body["repository_id"]),
+            cast(str, body["run_id"]),
+            before_sequence=prefix_sequence,
+        )
+        for obligation in obligations:
+            if obligation["historical_disposition"] != (
+                BudgetDisposition.RESERVED.value
+            ):
+                continue
+            settlement_event_id = self._stop_unknown_settlement_id(
+                stop_id=cast(str, body["stop_id"]),
+                stop_event_id=cast(str, body["event_id"]),
+                reservation_id=str(obligation["reservation_id"]),
+                contact_id=str(obligation["contact_id"]),
+                contact_event_hash=str(obligation["contact_event_hash"]),
+                expected_previous_hash=str(obligation["expected_previous_hash"]),
+            )
+            settlement = connection.execute(
+                "SELECT settlement.*, event.sequence, event.writer_epoch FROM "
+                "budget_settlements AS settlement JOIN events AS event ON "
+                "event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.settlement_event_id = ? AND "
+                "settlement.reservation_id = ?",
+                (settlement_event_id, obligation["reservation_id"]),
+            ).fetchone()
+            if settlement is None or (
+                settlement["previous_hash"], settlement["disposition"],
+                settlement["held_units"], settlement["charged_units"],
+                bool(settlement["uncertainty"]), settlement["evidence_digest"],
+                settlement["reason_code"], int(settlement["writer_epoch"]),
+            ) != (
+                obligation["expected_previous_hash"],
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                0, obligation["worst_case_units"], True,
+                f"immediate-stop:{body['stop_id']}",
+                "IMMEDIATE_STOP_CONTACT_UNKNOWN", int(body["writer_epoch"]),
+            ) or int(settlement["sequence"]) >= sequence:
+                raise StorageIntegrityError(
+                    "immediate stop uncertainty settlement diverges from history"
+                )
+            expected.append(
+                {
+                    key: value for key, value in obligation.items()
+                    if key != "historical_disposition"
+                }
+                | {
+                    "resulting_disposition": (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                    ),
+                    "settlement_event_id": settlement_event_id,
+                    "settlement_hash": str(settlement["settlement_hash"]),
+                }
+            )
+        if body["uncertainty_snapshot"] != expected:
+            raise StorageIntegrityError(
+                "immediate stop uncertainty snapshot diverges from history"
+            )
 
     @classmethod
     def _validate_stop_escalation_event_body(
@@ -4788,7 +5080,7 @@ class SQLiteStateStore:
                     )
                 else:
                     authorize_transition(current_state, LifecycleState.STOPPED)
-                sequence = int(run["head_sequence"]) + 1
+                sequence = int(run["head_sequence"])
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
                     connection.execute(
@@ -4798,6 +5090,127 @@ class SQLiteStateStore:
                     ).fetchone()[0]
                 )
                 fence_id = f"stop-fence:{request.event_id}"
+                uncertainty_snapshot: list[dict[str, object]] = []
+                if request.mode is StopMode.IMMEDIATE:
+                    obligations = self._unresolved_contact_reservations(
+                        connection, request.repository_id, request.run_id
+                    )
+                    for obligation in obligations:
+                        if obligation["historical_disposition"] != (
+                            BudgetDisposition.RESERVED.value
+                        ):
+                            continue
+                        settlement_event_id = self._stop_unknown_settlement_id(
+                            stop_id=request.stop_id,
+                            stop_event_id=request.event_id,
+                            reservation_id=str(obligation["reservation_id"]),
+                            contact_id=str(obligation["contact_id"]),
+                            contact_event_hash=str(obligation["contact_event_hash"]),
+                            expected_previous_hash=str(
+                                obligation["expected_previous_hash"]
+                            ),
+                        )
+                        settlement_request = BudgetSettlementRequest(
+                            settlement_event_id=settlement_event_id,
+                            reservation_id=str(obligation["reservation_id"]),
+                            expected_previous_hash=str(
+                                obligation["expected_previous_hash"]
+                            ),
+                            disposition=(
+                                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                            ),
+                            actual_units=None,
+                            evidence_digest=f"immediate-stop:{request.stop_id}",
+                            reason_code="IMMEDIATE_STOP_CONTACT_UNKNOWN",
+                            repository_id=request.repository_id,
+                            run_id=request.run_id,
+                            item_id=str(obligation["item_id"]),
+                            logical_effect_id=str(
+                                obligation["logical_effect_id"]
+                            ),
+                            attempt_id=str(obligation["attempt_id"]),
+                        )
+                        settlement_request.validate()
+                        settlement_payload = {
+                            **settlement_request.__dict__,
+                            "disposition": settlement_request.disposition.value,
+                            "settlement_binding_version": 3,
+                        }
+                        settlement_payload_digest = self._event_hash(
+                            settlement_payload
+                        )
+                        sequence += 1
+                        settlement_body = {
+                            **settlement_payload,
+                            "charged_units": int(obligation["worst_case_units"]),
+                            "command_id": f"settlement:{settlement_event_id}",
+                            "contradiction": False,
+                            "event_id": settlement_event_id,
+                            "event_kind": "BUDGET_SETTLED",
+                            "held_units": 0,
+                            "previous_event_hash": previous_hash,
+                            "schema_version": 1,
+                            "sequence": sequence,
+                            "uncertainty": True,
+                            "writer_epoch": writer_epoch,
+                        }
+                        settlement_hash = self._event_hash(settlement_body)
+                        settlement_json = json.dumps(
+                            settlement_body, sort_keys=True, separators=(",", ":")
+                        )
+                        connection.execute(
+                            "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                            "'BUDGET_SETTLED', ?, ?, ?)",
+                            (
+                                settlement_event_id, request.repository_id,
+                                request.run_id, obligation["item_id"], sequence,
+                                settlement_body["command_id"], writer_epoch,
+                                previous_hash, settlement_hash, settlement_json,
+                            ),
+                        )
+                        connection.execute(
+                            "INSERT INTO budget_settlements VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            (
+                                settlement_event_id,
+                                obligation["reservation_id"],
+                                obligation["expected_previous_hash"],
+                                settlement_hash,
+                                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                                0, obligation["worst_case_units"], 1,
+                                settlement_request.evidence_digest,
+                                settlement_request.reason_code,
+                                settlement_payload_digest, settlement_json,
+                            ),
+                        )
+                        connection.execute(
+                            "UPDATE budget_reservations SET held_units = 0, "
+                            "charged_units = worst_case_units, uncertainty = 1, "
+                            "disposition = ?, settlement_head_hash = ? WHERE "
+                            "reservation_id = ?",
+                            (
+                                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                                settlement_hash, obligation["reservation_id"],
+                            ),
+                        )
+                        uncertainty_snapshot.append(
+                            {
+                                key: value for key, value in obligation.items()
+                                if key != "historical_disposition"
+                            }
+                            | {
+                                "resulting_disposition": (
+                                    BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value
+                                ),
+                                "settlement_event_id": settlement_event_id,
+                                "settlement_hash": settlement_hash,
+                            }
+                        )
+                        previous_hash = settlement_hash
+                        if failure_hook is not None:
+                            failure_hook(
+                                "after_stop_unknown_settlement_before_stop_recorded"
+                            )
+                sequence += 1
                 body = {
                     **payload,
                     "event_kind": "STOP_RECORDED",
@@ -4813,6 +5226,13 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if request.mode is StopMode.IMMEDIATE:
+                    body.update(
+                        {
+                            "uncertainty_snapshot": uncertainty_snapshot,
+                            "uncertainty_snapshot_version": 1,
+                        }
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(
                     body, sort_keys=True, separators=(",", ":")
@@ -10375,9 +10795,33 @@ class SQLiteStateStore:
                     )
                 except (KeyError, TypeError, json.JSONDecodeError):
                     escalation_epoch = False
-            if not pause_epoch and not escalation_epoch:
+            immediate_stop_epoch = False
+            if rows[-1]["event_kind"] == "STOP_RECORDED" and all(
+                row["event_kind"] == "BUDGET_SETTLED" for row in rows[:-1]
+            ):
+                try:
+                    stop_body = json.loads(rows[-1]["body_json"])
+                    immediate_stop_epoch = (
+                        stop_body["mode"] == StopMode.IMMEDIATE.value
+                        and stop_body["uncertainty_snapshot_version"] == 1
+                        and len({row["run_id"] for row in rows}) == 1
+                        and all(
+                            int(rows[index]["sequence"]) + 1
+                            == int(rows[index + 1]["sequence"])
+                            for index in range(len(rows) - 1)
+                        )
+                        and {row["event_id"] for row in rows[:-1]}
+                        == {
+                            item["settlement_event_id"]
+                            for item in stop_body["uncertainty_snapshot"]
+                        }
+                    )
+                except (KeyError, TypeError, json.JSONDecodeError):
+                    immediate_stop_epoch = False
+            if not pause_epoch and not escalation_epoch and not immediate_stop_epoch:
                 raise StorageIntegrityError(
-                    "writer epoch is reused outside one atomic control action"
+                    "writer epoch is reused outside one atomic control action: "
+                    f"{[(row['event_kind'], row['event_id'], row['sequence']) for row in rows]}"
                 )
         for run_id, expected_head in run_heads.items():
             previous_hash = ""
@@ -10765,6 +11209,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "stop plan binding diverges from accepted target"
                 )
+            self._validate_immediate_stop_uncertainty_history(
+                connection, body
+            )
         escalation_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? "
             "AND event_kind = 'STOP_ESCALATED'",

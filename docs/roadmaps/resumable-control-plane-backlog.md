@@ -378,6 +378,36 @@ It does not claim an approved deadline-rule scheduler. R-STOP-03 remains a major
 blocker, so the aggregate stop gate remains `REVISE`, PR #99 remains draft, and
 no merge, release or deployment is ready.
 
+### 5.6 R-STOP-03 post-contact immediate-stop checkpoint
+
+R-STOP-03 is corrected and independently accepted. Every new immediate T19 stop
+records an exact nested uncertainty snapshot while preserving the legacy event
+envelope and historical stop bodies. A contacted effect or validator reservation
+with no exact receipt/observation/cessation/nonexecution resolution is atomically
+settled from `RESERVED` to `UNKNOWN_WORST_CASE_CHARGED` before `STOP_RECORDED` in
+the same writer epoch. Pre-contact reservations remain reserved and known
+accounting is never downgraded.
+
+Settlement identities are domain-separated hashes of the stop, exact reservation,
+contact identity/hash and predecessor head. Recovery reconstructs the historical
+prefix and rejects omitted, added, retargeted or aliased contact classifications
+while allowing later authoritative adjustment without reopening the terminal run.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: exact legacy compatibility, durable identity, per-contact historical predicates and exact-set/crash coverage required |
+| Corrected plan re-audits | `REVISE` for infeasible event-envelope v2, then `APPROVE` after retaining envelope schema 1 with exact nested snapshot version 1 |
+| Focused first falsification | Failed with contacted reservation still `RESERVED`; passed after atomic T19 settlement |
+| Focused R-STOP-03 suite | Exit 0; 7 tests; `OK` |
+| Storage module | Exit 0; 184 tests; `OK` |
+| Complete delivery-control package | Exit 0; 226 tests; `OK` |
+| Independent implementation review | Initial `REVISE` for cross-run/effect attempt-ID alias; corrected re-review `APPROVE`, no remaining blocker/major; reviewer independently passed 7 focused tests and reproduced the corrected probe |
+
+This establishes the R-STOP-03 slices of T19, C09, F04b and F08. All three
+stop findings are independently accepted and the aggregate stop gate is
+`APPROVE`. Full-row/family traceability remains unclaimed where the matrix says
+`UNVERIFIED`; PR #99 remains draft and not merge-ready for the remaining backlog.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

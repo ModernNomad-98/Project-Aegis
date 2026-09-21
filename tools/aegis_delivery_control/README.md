@@ -47,8 +47,9 @@ fixture. It is not a delivery integration.
   obligation as `UNKNOWN_WORST_CASE_CHARGED`, records `STOP_ESCALATED`, and
   retains terminal lifecycle, fence, cursor and slot. Recovery binds the exact
   stop, plan, item, effect, slot and historical accounting snapshot. R-STOP-01
-  and R-STOP-02 are independently accepted; the remaining stop finding below is
-  a release blocker.
+  and R-STOP-02 are independently accepted. Immediate T19 stop now also charges
+  exact contacted, unresolved effect or validator liability at worst case in the
+  same transaction. All three stop findings are independently accepted.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -102,7 +103,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 219 tests successfully, and
+controller. The complete local package suite ran 226 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -114,14 +115,12 @@ crash/replay, recovery and tamper validation:
   ambiguous reservations at worst case and durably record an idempotent
   escalation without releasing the outstanding slot.
 
-The stop gate remains `REVISE` because one major finding is unresolved:
-
-1. immediate stop after adapter contact but before receipt does not atomically
-  classify the uncertainty as `UNKNOWN_WORST_CASE_CHARGED`.
-
-These findings must be corrected and independently approved before merge. They
-do not authorize real authority, external calls, provider integration, release,
-or deployment.
+R-STOP-03 now atomically classifies post-contact/pre-receipt uncertainty as
+`UNKNOWN_WORST_CASE_CHARGED`, with exact historical recovery, crash/replay,
+late-adjustment and alias/tamper coverage. The aggregate stop gate is `APPROVE`.
+The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
+not merge-ready and does not authorize real authority, external calls, provider
+integration, release, or deployment.
 
 ## Validation
 
