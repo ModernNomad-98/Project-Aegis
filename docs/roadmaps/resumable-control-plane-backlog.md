@@ -554,6 +554,53 @@ remain `UNVERIFIED`. No cancel/drain adapter or T07 settlement is claimed. T06
 through T09 are next in their documented order; PR #99 remains draft and not
 merge-ready.
 
+### 5.11 T06 contacted external-mutation pause checkpoint
+
+T06 is implemented and independently accepted for the synthetic contacted,
+no-control-plane-receipt boundary. `PauseExternalMutationRequest` binds the exact
+committed intent, operation launch, durable `EFFECT` adapter contact, canonical
+target digest, repository slot owner and generation. Bare contact is not treated
+as proof that the mutation remains active or drainable. The only implemented T06
+outcome is therefore `RUNNING -> RECONCILIATION_REQUIRED`; no unauthenticated
+`PAUSING` branch is claimed.
+
+One writer transaction converts a still-`RESERVED` reservation to a normal,
+versioned `UNKNOWN_WORST_CASE_CHARGED` settlement at W, appends the closed-schema
+`EXTERNAL_MUTATION` `PAUSE_REQUESTED`, installs the item/effect fence and redeems
+the signed operator grant. Existing known or unknown accounting is retained by
+exact prefix-head reference without downgrade or duplicate charge. The slot,
+effect identity, intent/launch/contact evidence and continuation cursor remain.
+The route performs no adapter observe, cancel, rollback, retry or new mutation
+and never infers cessation. A later receipt enters through T23: known use adjusts
+the prior worst-case charge while unknown use retains it; both remain in
+reconciliation with the fence and slot intact.
+
+Recovery round-trips the complete contact event body and independently verifies
+its repository/run/item/effect/attempt/kind/source/target/hash and strict
+pre-pause order. It derives the reservation disposition and settlement head from
+the pre-transaction writer-epoch prefix rather than trusting the pause snapshot.
+Self-consistent contact retarget, settlement-head retarget, snapshot, projection,
+schema and cursor/history tampering fail closed.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` found one BLOCKER and two MAJOR gaps: bare contact was incorrectly treated as ordinary PAUSING, worst-case accounting was omitted and later receipt routing incorrectly used T10; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused first falsification | The coordinator test failed at import because `PauseExternalMutationRequest` was absent; the narrow typed route then made the contacted/no-receipt worst-case behavior pass |
+| Focused T06 suite | Exit 0; 14 tests in 0.923 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 285 tests in 23.229 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 307 tests in 23.939 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR recovery gaps in exact contact-body/order verification and prefix-derived retained accounting; both were corrected with self-consistent tamper regressions; final `APPROVE`, no remaining blocker/major; reviewer independently passed 14 focused tests in 0.824 seconds |
+| Commit/push and hosted checks | Signed-off commit `39b3268adc984e3d0b10e55a42fe37a172229e60` pushed to the existing branch; `gate-guard` passed in 7s, `validate-skills` in 1m20s and `windows-offline-checks` in 2m49s; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+This promotes T06 itself to `YES/YES/YES`. Its accepted contact uncertainty,
+crash/replay, late-receipt and slot-retention slices inform C03, C06, F06, F07
+and F08, but those complete families remain `UNVERIFIED`. No authenticated
+active/drainable PAUSING route or T07 settlement is claimed. T07 through T09 are
+next in their documented order; PR #99 remains draft and not merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

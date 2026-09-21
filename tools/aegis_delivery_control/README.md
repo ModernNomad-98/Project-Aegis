@@ -83,6 +83,15 @@ fixture. It is not a delivery integration.
   contacted attempt is denied to T06. This synthetic path performs no
   cancel/drain side effect and never treats parent exit or a pause request as
   cessation evidence.
+- T06 now accepts an authenticated pause command only for the exact contacted
+  external-mutation attempt. A durable contact without an intaken receipt is
+  treated as bounded uncertainty: one transaction worst-case-charges a still
+  reserved budget, records an `EXTERNAL_MUTATION` pause fence and enters
+  `RECONCILIATION_REQUIRED` while retaining the slot and cursor. Existing
+  accounting is retained by exact historical-prefix reference. The route makes
+  no observe/cancel/retry call; later known or unknown receipts use T23 and do
+  not reopen dispatch. Recovery verifies the full contact body/order and
+  prefix-derived settlement head.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -136,7 +145,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 294 tests successfully, and
+controller. The complete local package suite ran 307 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -166,6 +175,11 @@ T05 local-execution pause received independent implementation `APPROVE` after
 the initial plan was corrected for the pre-launch window, durable capability
 authenticity and T04/T05 schema separation, and the implementation was corrected
 to bind its retained cursor to the recovered historical predecessor.
+T06 contacted external-mutation pause received independent implementation
+`APPROVE` after the plan was corrected to route bare contact through
+worst-case reconciliation and the implementation was corrected to verify the
+complete historical contact body/order and prefix-derived accounting head.
+It performs no adapter observe/cancel/retry and does not claim T07 settlement.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
