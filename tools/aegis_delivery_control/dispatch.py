@@ -23,6 +23,7 @@ from .authority import (
     SyntheticOperatorCapability,
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
+    SyntheticSourceControlEvidence,
     SyntheticValidatorCapability,
 )
 from .contracts import (
@@ -49,6 +50,8 @@ from .contracts import (
     ReconciliationPauseResumeRequest,
     ResumeRequest,
     ResumeActivitySettlementRequest,
+    SourceControlClassification,
+    SourceControlEvidenceRequest,
     StopMode,
     StopEscalationRequest,
     StopRequest,
@@ -473,6 +476,10 @@ class SyntheticDispatchCoordinator:
         self,
         command: EffectObservationCommand,
         *,
+        source_control_classification: SourceControlClassification = (
+            SourceControlClassification.KNOWN
+        ),
+        source_control_evidence: SyntheticSourceControlEvidence | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ObservationReceipt:
         command.validate()
@@ -505,9 +512,38 @@ class SyntheticDispatchCoordinator:
         )
         if receipt_binding != command_binding:
             raise DispatchDenied("canonical receipt does not bind this observation")
+        evidence_request = SourceControlEvidenceRequest(
+            repository_id=receipt.repository_id,
+            run_id=receipt.run_id,
+            item_id=receipt.item_id,
+            logical_effect_id=receipt.logical_effect_id,
+            attempt_id=receipt.attempt_id,
+            source_claim_id=receipt.claim_id,
+            source_receipt_id=receipt.receipt_id,
+            payload_digest=receipt.payload_digest,
+            usage_units=receipt.usage_units,
+            accepted=receipt.accepted,
+            classification=source_control_classification,
+        )
+        evidence_request.validate()
+        if source_control_evidence is None:
+            if source_control_classification is not SourceControlClassification.KNOWN:
+                raise DispatchDenied(
+                    "unknown source/control classification requires explicit evidence"
+                )
+            source_control_evidence = self._authority.issue_source_control_evidence(
+                f"source-control:{receipt.receipt_id}", evidence_request
+            )
+        self._authority.verify_source_control_evidence(
+            source_control_evidence, evidence_request
+        )
         resulting_state = (
             LifecycleState.RECONCILIATION_REQUIRED
-            if receipt.usage_units is None
+            if (
+                receipt.usage_units is None
+                or source_control_classification
+                is SourceControlClassification.UNKNOWN
+            )
             else LifecycleState.VALIDATING
         )
         self._engine.authorize(
@@ -532,7 +568,19 @@ class SyntheticDispatchCoordinator:
                 usage_units=receipt.usage_units,
                 settlement_event_id=command.settlement_event_id,
                 settlement_hash="",
+                source_control_classification=(
+                    source_control_classification.value
+                ),
+                source_control_evidence_id=source_control_evidence.evidence_id,
+                source_control_evidence_digest=(
+                    source_control_evidence.request_digest
+                ),
+                source_control_issuer_fingerprint=(
+                    source_control_evidence.issuer_fingerprint
+                ),
+                source_control_issuer_mac=source_control_evidence.issuer_mac,
             ),
+            authority=self._authority,
             failure_hook=failure_hook,
         )
 

@@ -31,6 +31,7 @@ from .authority import (
     SyntheticResumeEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticSettlementProof,
+    SyntheticSourceControlEvidence,
     SyntheticValidationRecoveryAttestation,
     SyntheticValidatorCessationAttestation,
     SyntheticValidatorCapability,
@@ -70,6 +71,8 @@ from .contracts import (
     ResumeActivitySettlementRequest,
     ResumeRequest,
     SettlementReceipt,
+    SourceControlClassification,
+    SourceControlEvidenceRequest,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -431,19 +434,31 @@ def _derive_settlement_accounting(
 
 
 def _derive_effect_observation_route(
-    current_state: LifecycleState, usage_units: int | None
+    current_state: LifecycleState,
+    usage_units: int | None,
+    source_control_classification: str = "",
+    *,
+    accounting_unknown: bool | None = None,
 ) -> tuple[str, str, LifecycleState]:
     ordinary_receipt = current_state in {
         LifecycleState.RUNNING,
         LifecycleState.PAUSING,
     }
+    unresolved_billing = (
+        usage_units is None
+        if accounting_unknown is None
+        else accounting_unknown
+    )
     if current_state in {
         LifecycleState.COMPLETED,
         LifecycleState.FAILED_FINAL,
         LifecycleState.STOPPED,
     }:
         resulting_state = current_state
-    elif usage_units is None:
+    elif (
+        unresolved_billing
+        or source_control_classification == SourceControlClassification.UNKNOWN.value
+    ):
         resulting_state = LifecycleState.RECONCILIATION_REQUIRED
     elif current_state is LifecycleState.RUNNING:
         resulting_state = LifecycleState.VALIDATING
@@ -472,11 +487,14 @@ def _effect_observation_accounting_error(
     uncertainty: bool,
 ) -> str | None:
     if usage_units is None:
-        if (
-            disposition is not BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
-            or not uncertainty
-        ):
-            return "unknown receipt usage requires uncertain accounting"
+        if disposition is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED:
+            if not uncertainty:
+                return "unknown receipt accounting lost uncertainty"
+        elif disposition not in {
+            BudgetDisposition.CONSUMED,
+            BudgetDisposition.ADJUSTED,
+        } or uncertainty:
+            return "missing receipt usage has invalid accounting history"
     elif (
         disposition
         not in {BudgetDisposition.CONSUMED, BudgetDisposition.ADJUSTED}
@@ -770,6 +788,11 @@ class SQLiteStateStore:
 
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
+        semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+        if semantic_version not in {0, 1}:
+            raise StorageIntegrityError(
+                "state database semantic version is unsupported"
+            )
         reconciliation_tables = {
             "uncertainty_instances", "uncertainty_resolutions",
             "reconciliation_actions",
@@ -786,6 +809,12 @@ class SQLiteStateStore:
         ):
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
+            )
+        if semantic_version == 1 and (
+            existing_reconciliation_tables != reconciliation_tables
+        ):
+            raise StorageIntegrityError(
+                "operation-uncertainty schema is missing after migration"
             )
         reconciliation_schema_existed = bool(
             existing_reconciliation_tables
@@ -1696,13 +1725,204 @@ class SQLiteStateStore:
             connection.execute("ALTER TABLE runs ADD COLUMN continuation_cursor TEXT")
         SQLiteStateStore._migrate_validation_recovery_schema(connection)
         SQLiteStateStore._migrate_terminal_validation_schema(connection)
-        SQLiteStateStore._migrate_reconciliation_schema(
-            connection, backfill=not reconciliation_schema_existed
-        )
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            SQLiteStateStore._migrate_reconciliation_schema(
+                connection,
+                backfill=not reconciliation_schema_existed,
+                manage_transaction=False,
+            )
+            SQLiteStateStore._migrate_operation_uncertainty_version(
+                connection, manage_transaction=False
+            )
+            if semantic_version == 0 and connection.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "operation-uncertainty migration violates foreign keys"
+                )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_operation_uncertainty_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+    ) -> None:
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {0, 1}:
+                raise StorageIntegrityError(
+                    "state database semantic version is unsupported"
+                )
+            expected = SQLiteStateStore._expected_operation_uncertainties(
+                connection
+            )
+            source_ids = {
+                str(row["event_id"])
+                for row in connection.execute(
+                    "SELECT event_id FROM external_pause_actions UNION "
+                    "SELECT event_id FROM effect_observations"
+                )
+            }
+            actual_rows = {
+                str(row["uncertainty_id"]): tuple(row)
+                for row in connection.execute(
+                    "SELECT * FROM uncertainty_instances"
+                )
+                if str(row["origin_event_id"]) in source_ids
+            }
+            expected_rows = {
+                uncertainty_id: instance
+                for uncertainty_id, (instance, _fence) in expected.items()
+            }
+            if version == 0:
+                if actual_rows:
+                    for uncertainty_id, actual in actual_rows.items():
+                        expected_spec = expected.get(uncertainty_id)
+                        if expected_spec is None:
+                            raise StorageIntegrityError(
+                                "legacy operation uncertainty is unrecognized"
+                            )
+                        expected_instance, expected_fence = expected_spec
+                        origin = connection.execute(
+                            "SELECT body_json FROM events WHERE event_id = ? "
+                            "AND event_kind IN ('RECEIPT_RECORDED', "
+                            "'LATE_RECEIPT_RECORDED')",
+                            (actual[9],),
+                        ).fetchone()
+                        if (
+                            actual[2] != "BILLING"
+                            or actual[:-1] != expected_instance[:-1]
+                            or origin is None
+                        ):
+                            raise StorageIntegrityError(
+                                "legacy operation uncertainty is malformed"
+                            )
+                        origin_body = json.loads(str(origin["body_json"]))
+                        legacy_body = {
+                            "attempt_id": origin_body["attempt_id"],
+                            "check_id": None,
+                            "fence_id": uncertainty_id,
+                            "item_id": origin_body["item_id"],
+                            "logical_effect_id": origin_body[
+                                "logical_effect_id"
+                            ],
+                            "origin_event_hash": actual[10],
+                            "origin_event_id": actual[9],
+                            "repository_id": origin_body["repository_id"],
+                            "reservation_id": actual[11],
+                            "run_id": origin_body["run_id"],
+                            "schema_version": 1,
+                            "settlement_head_hash": actual[12],
+                            "uncertainty_id": uncertainty_id,
+                            "uncertainty_kind": "BILLING",
+                        }
+                        legacy_fence = connection.execute(
+                            "SELECT * FROM dispatch_fences WHERE fence_id = ?",
+                            (uncertainty_id,),
+                        ).fetchone()
+                        if (
+                            actual[-1]
+                            != json.dumps(
+                                legacy_body,
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            )
+                            or legacy_fence is None
+                            or tuple(legacy_fence) != expected_fence
+                        ):
+                            raise StorageIntegrityError(
+                                "legacy operation uncertainty was tampered"
+                            )
+                    placeholders = ", ".join("?" for _ in actual_rows)
+                    if connection.execute(
+                        "SELECT 1 FROM uncertainty_resolutions WHERE "
+                        f"uncertainty_id IN ({placeholders}) LIMIT 1",
+                        tuple(actual_rows),
+                    ).fetchone() is not None:
+                        raise StorageIntegrityError(
+                            "legacy operation uncertainty is already resolved"
+                        )
+                    connection.execute(
+                        f"DELETE FROM dispatch_fences WHERE fence_id IN ({placeholders})",
+                        tuple(actual_rows),
+                    )
+                    connection.execute(
+                        "DELETE FROM uncertainty_instances WHERE "
+                        f"uncertainty_id IN ({placeholders})",
+                        tuple(actual_rows),
+                    )
+                SQLiteStateStore._insert_operation_uncertainties(
+                    connection, expected
+                )
+                connection.execute("PRAGMA user_version = 1")
+            actual_rows = {
+                str(row["uncertainty_id"]): tuple(row)
+                for row in connection.execute(
+                    "SELECT * FROM uncertainty_instances"
+                )
+                if str(row["origin_event_id"]) in source_ids
+            }
+            actual_fences = {
+                str(row["fence_id"]): tuple(row)
+                for row in connection.execute("SELECT * FROM dispatch_fences")
+                if str(row["fence_id"]) in expected
+            }
+            expected_fences = {
+                uncertainty_id: fence
+                for uncertainty_id, (_instance, fence) in expected.items()
+            }
+            operation_reason_codes = {
+                "OPERATION_OUTCOME_UNKNOWN",
+                "OPERATION_ACTIVITY_UNKNOWN",
+                "EFFECT_BILLING_UNKNOWN",
+                "EFFECT_SOURCE_CONTROL_UNKNOWN",
+            }
+            surplus_fences = connection.execute(
+                "SELECT 1 FROM dispatch_fences WHERE reason_code IN "
+                "('OPERATION_OUTCOME_UNKNOWN', 'OPERATION_ACTIVITY_UNKNOWN', "
+                "'EFFECT_BILLING_UNKNOWN', 'EFFECT_SOURCE_CONTROL_UNKNOWN') "
+                "AND fence_id NOT IN (SELECT uncertainty_id FROM "
+                "uncertainty_instances) LIMIT 1"
+            ).fetchone()
+            if (
+                actual_rows != expected_rows
+                or actual_fences != expected_fences
+                or surplus_fences is not None
+                or any(
+                    str(row["reason_code"]) in operation_reason_codes
+                    and str(row["fence_id"]) not in expected
+                    for row in connection.execute(
+                        "SELECT * FROM dispatch_fences"
+                    )
+                )
+            ):
+                raise StorageIntegrityError(
+                    "operation-uncertainty projection diverges from history"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 1:
+                raise StorageIntegrityError(
+                    "operation-uncertainty migration did not advance"
+                )
+            if manage_transaction:
+                connection.commit()
+        except BaseException:
+            if manage_transaction:
+                connection.rollback()
+            raise
 
     @staticmethod
     def _migrate_reconciliation_schema(
-        connection: sqlite3.Connection, *, backfill: bool
+        connection: sqlite3.Connection,
+        *,
+        backfill: bool,
+        manage_transaction: bool = True,
     ) -> None:
         table_sql = {
             "uncertainty_instances": """
@@ -1792,7 +2012,8 @@ class SQLiteStateStore:
                 "resulting_state", "body_json",
             ),
         }
-        connection.execute("BEGIN IMMEDIATE")
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
         try:
             if backfill:
                 for sql in table_sql.values():
@@ -1886,7 +2107,8 @@ class SQLiteStateStore:
                         f"{table_name} schema is incompatible"
                     )
             if not backfill:
-                connection.commit()
+                if manage_transaction:
+                    connection.commit()
                 return
             if connection.execute(
                 "SELECT 1 FROM events WHERE event_kind = "
@@ -2132,9 +2354,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T17 reconciliation backfill violates foreign keys"
                 )
-            connection.commit()
+            if manage_transaction:
+                connection.commit()
         except BaseException:
-            connection.rollback()
+            if manage_transaction:
+                connection.rollback()
             raise
 
     @staticmethod
@@ -2982,6 +3206,558 @@ class SQLiteStateStore:
             "reservation_id": reservation_id,
         }
         return "uncertainty:" + cls._event_hash(binding)
+
+    @classmethod
+    def _derive_operation_uncertainty_specs(
+        cls,
+        *,
+        origin_body: Mapping[str, object],
+        origin_event_hash: str,
+        reservation_id: str,
+        settlement_head_hash: str,
+        categories: tuple[str, ...],
+    ) -> dict[str, tuple[tuple[object, ...], tuple[object, ...]]]:
+        """Purely derive closed T17 operation uncertainty rows and fences."""
+        reasons = {
+            "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+            "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+            "BILLING": "EFFECT_BILLING_UNKNOWN",
+            "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+        }
+        if not categories or any(kind not in reasons for kind in categories):
+            raise StorageIntegrityError(
+                "operation uncertainty categories are empty or unsupported"
+            )
+        specs: dict[str, tuple[tuple[object, ...], tuple[object, ...]]] = {}
+        for kind in categories:
+            uncertainty_id = cls._uncertainty_id(
+                uncertainty_kind=kind,
+                repository_id=str(origin_body["repository_id"]),
+                run_id=str(origin_body["run_id"]),
+                item_id=str(origin_body["item_id"]),
+                logical_effect_id=str(origin_body["logical_effect_id"]),
+                attempt_id=str(origin_body["attempt_id"]),
+                check_id=None,
+                origin_event_id=str(origin_body["event_id"]),
+                origin_event_hash=origin_event_hash,
+                reservation_id=reservation_id,
+            )
+            uncertainty_body = {
+                "attempt_id": origin_body["attempt_id"],
+                "check_id": None,
+                "fence_id": uncertainty_id,
+                "item_id": origin_body["item_id"],
+                "logical_effect_id": origin_body["logical_effect_id"],
+                "origin_event_hash": origin_event_hash,
+                "origin_event_id": origin_body["event_id"],
+                "origin_sequence": origin_body["sequence"],
+                "origin_writer_epoch": origin_body["writer_epoch"],
+                "repository_id": origin_body["repository_id"],
+                "reservation_id": reservation_id,
+                "run_id": origin_body["run_id"],
+                "schema_version": 2,
+                "settlement_head_hash": (
+                    settlement_head_hash if kind == "BILLING" else None
+                ),
+                "slot_attempt_id": origin_body.get("slot_attempt_id"),
+                "slot_generation": origin_body.get(
+                    "slot_generation",
+                    origin_body.get("expected_slot_generation"),
+                ),
+                "source_control_classification": origin_body.get(
+                    "source_control_classification",
+                    origin_body.get("uncertainty_snapshot", {}).get(
+                        "control_state_classification"
+                    )
+                    if isinstance(origin_body.get("uncertainty_snapshot"), dict)
+                    else None,
+                ),
+                "uncertainty_id": uncertainty_id,
+                "uncertainty_kind": kind,
+            }
+            instance = (
+                uncertainty_id,
+                uncertainty_id,
+                kind,
+                origin_body["repository_id"],
+                origin_body["run_id"],
+                origin_body["item_id"],
+                origin_body["logical_effect_id"],
+                origin_body["attempt_id"],
+                None,
+                origin_body["event_id"],
+                origin_event_hash,
+                reservation_id,
+                settlement_head_hash if kind == "BILLING" else None,
+                json.dumps(
+                    uncertainty_body, sort_keys=True, separators=(",", ":")
+                ),
+            )
+            fence = (
+                uncertainty_id,
+                origin_body["repository_id"],
+                origin_body["item_id"],
+                origin_body["logical_effect_id"],
+                reasons[kind],
+                origin_body["event_id"],
+            )
+            specs[uncertainty_id] = (instance, fence)
+        return specs
+
+    @classmethod
+    def _validated_operation_settlement(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        settlement_event_id: str,
+        settlement_hash: str,
+        reservation_id: str,
+    ) -> sqlite3.Row:
+        settlement = connection.execute(
+            "SELECT settlement.*, reservation.repository_id AS "
+            "reservation_repository_id, reservation.run_id AS "
+            "reservation_run_id, reservation.item_id AS reservation_item_id, "
+            "reservation.logical_effect_id AS reservation_effect_id, "
+            "reservation.attempt_id AS reservation_attempt_id FROM "
+            "budget_settlements AS settlement JOIN budget_reservations AS "
+            "reservation ON reservation.reservation_id = "
+            "settlement.reservation_id WHERE settlement.settlement_event_id = ? "
+            "AND settlement.settlement_hash = ? AND "
+            "settlement.reservation_id = ?",
+            (settlement_event_id, settlement_hash, reservation_id),
+        ).fetchone()
+        event = connection.execute(
+            "SELECT * FROM events WHERE event_id = ?",
+            (settlement_event_id,),
+        ).fetchone()
+        if settlement is None or event is None:
+            raise StorageIntegrityError(
+                "operation uncertainty settlement head is unavailable"
+            )
+        try:
+            body = json.loads(str(settlement["body_json"]))
+            event_body = json.loads(str(event["body_json"]))
+        except (TypeError, json.JSONDecodeError) as error:
+            raise StorageIntegrityError(
+                "operation uncertainty settlement body is invalid"
+            ) from error
+        projection_binding = (
+            settlement["settlement_event_id"], settlement["reservation_id"],
+            settlement["previous_hash"], settlement["disposition"],
+            int(settlement["held_units"]), int(settlement["charged_units"]),
+            bool(settlement["uncertainty"]), settlement["evidence_digest"],
+            settlement["reason_code"],
+        )
+        body_binding = (
+            body.get("settlement_event_id"), body.get("reservation_id"),
+            body.get("expected_previous_hash"), body.get("disposition"),
+            body.get("held_units"), body.get("charged_units"),
+            body.get("uncertainty"), body.get("evidence_digest"),
+            body.get("reason_code"),
+        )
+        reservation_scope = (
+            settlement["reservation_repository_id"],
+            settlement["reservation_run_id"],
+            settlement["reservation_item_id"],
+            settlement["reservation_effect_id"],
+            settlement["reservation_attempt_id"],
+        )
+        body_scope = (
+            body.get("repository_id"), body.get("run_id"),
+            body.get("item_id"), body.get("logical_effect_id"),
+            body.get("attempt_id"),
+        )
+        event_scope = (
+            event["repository_id"], event["run_id"], event["item_id"],
+        )
+        if (
+            str(settlement["body_json"]) != str(event["body_json"])
+            or body != event_body
+            or cls._event_hash(body) != settlement_hash
+            or event["event_hash"] != settlement_hash
+            or event["event_kind"] not in {
+                "BUDGET_SETTLED", "NONDISPATCH_PROVEN",
+            }
+            or body.get("event_id") != settlement_event_id
+            or body.get("event_kind") != event["event_kind"]
+            or projection_binding != body_binding
+            or reservation_scope != body_scope
+            or event_scope != reservation_scope[:3]
+        ):
+            raise StorageIntegrityError(
+                "operation uncertainty settlement projection diverges from history"
+            )
+        return settlement
+
+    @classmethod
+    def _expected_operation_uncertainties(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        repository_id: str | None = None,
+        origin_event_id: str | None = None,
+    ) -> dict[str, tuple[tuple[object, ...], tuple[object, ...]]]:
+        where = []
+        values: list[object] = []
+        if repository_id is not None:
+            where.append("event.repository_id = ?")
+            values.append(repository_id)
+        if origin_event_id is not None:
+            where.append("event.event_id = ?")
+            values.append(origin_event_id)
+        suffix = " WHERE " + " AND ".join(where) if where else ""
+        specs: dict[str, tuple[tuple[object, ...], tuple[object, ...]]] = {}
+
+        def source_event(
+            event_id: object, event_hash: object, event_kind: str,
+        ) -> tuple[sqlite3.Row, dict[str, object]]:
+            event = connection.execute(
+                "SELECT * FROM events WHERE event_id = ? AND event_hash = ? "
+                "AND event_kind = ?",
+                (event_id, event_hash, event_kind),
+            ).fetchone()
+            if event is None:
+                raise StorageIntegrityError(
+                    "operation uncertainty source prefix is incomplete"
+                )
+            source_body = json.loads(str(event["body_json"]))
+            if cls._event_hash(source_body) != event["event_hash"]:
+                raise StorageIntegrityError(
+                    "operation uncertainty source prefix is corrupt"
+                )
+            return event, source_body
+
+        def precedes(left: sqlite3.Row, right_body: Mapping[str, object]) -> bool:
+            return (int(left["writer_epoch"]), int(left["sequence"])) < (
+                int(right_body["writer_epoch"]), int(right_body["sequence"])
+            )
+
+        pause_rows = connection.execute(
+            "SELECT action.*, event.body_json AS event_body, "
+            "event.event_hash AS immutable_event_hash FROM "
+            "external_pause_actions AS action JOIN events AS event ON "
+            "event.event_id = action.event_id" + suffix,
+            tuple(values),
+        ).fetchall()
+        for row in pause_rows:
+            body = json.loads(str(row["event_body"]))
+            if (
+                cls._event_hash(body) != row["immutable_event_hash"]
+                or str(row["body_json"]) != str(row["event_body"])
+                or body.get("event_kind") != "PAUSE_REQUESTED"
+                or body.get("event_id") != row["event_id"]
+                or body.get("attempt_id") != row["attempt_id"]
+                or body.get("expected_slot_generation")
+                != row["slot_generation"]
+                or body.get("launch_event_hash") != row["launch_event_hash"]
+                or body.get("contact_event_hash") != row["contact_event_hash"]
+            ):
+                raise StorageIntegrityError(
+                    "T06 uncertainty source diverges from immutable history"
+                )
+            intent_event, intent_body = source_event(
+                row["intent_event_id"], row["intent_event_hash"],
+                "INTENT_COMMITTED",
+            )
+            launch_event, launch_body = source_event(
+                row["launch_event_id"], row["launch_event_hash"],
+                "OPERATION_LAUNCH_CLAIMED",
+            )
+            contact_event, contact_body = source_event(
+                row["contact_event_id"], row["contact_event_hash"],
+                "ADAPTER_CONTACT_CLAIMED",
+            )
+            binding = (
+                row["repository_id"], row["run_id"], row["item_id"],
+                row["logical_effect_id"], row["attempt_id"],
+            )
+            if (
+                tuple(
+                    intent_body[key] for key in (
+                        "repository_id", "run_id", "item_id",
+                        "logical_effect_id", "attempt_id",
+                    )
+                ) != binding
+                or tuple(
+                    launch_body[key] for key in (
+                        "repository_id", "run_id", "item_id",
+                        "logical_effect_id", "attempt_id",
+                    )
+                ) != binding
+                or tuple(
+                    contact_body[key] for key in (
+                        "repository_id", "run_id", "item_id",
+                        "logical_effect_id", "attempt_id",
+                    )
+                ) != binding
+                or launch_body.get("intent_event_hash")
+                != row["intent_event_hash"]
+                or contact_body.get("target_digest") != row["target_digest"]
+                or not precedes(intent_event, launch_body)
+                or not precedes(launch_event, contact_body)
+                or not precedes(contact_event, body)
+            ):
+                raise StorageIntegrityError(
+                    "T06 uncertainty chronology or binding is invalid"
+                )
+            redemption = connection.execute(
+                "SELECT * FROM capability_redemptions WHERE claim_id = ? "
+                "AND repository_id = ? AND logical_effect_id = ? AND "
+                "attempt_id = ?",
+                (
+                    intent_body["capability_claim_id"], row["repository_id"],
+                    row["logical_effect_id"], row["attempt_id"],
+                ),
+            ).fetchone()
+            command_outcome = connection.execute(
+                "SELECT * FROM command_outcomes WHERE command_id = ? AND "
+                "event_id = ?",
+                (row["command_id"], row["event_id"]),
+            ).fetchone()
+            if redemption is None or command_outcome is None or (
+                command_outcome["payload_digest"] != row["payload_digest"]
+                or command_outcome["event_hash"] != row["event_hash"]
+            ):
+                raise StorageIntegrityError(
+                    "T06 uncertainty authority or command outcome is invalid"
+                )
+            prior_observation = connection.execute(
+                "SELECT event.writer_epoch, event.sequence FROM "
+                "effect_observations AS observation JOIN events AS event ON "
+                "event.event_id = observation.event_id WHERE "
+                "observation.repository_id = ? AND observation.run_id = ? "
+                "AND observation.logical_effect_id = ? AND "
+                "observation.attempt_id = ?",
+                (
+                    row["repository_id"], row["run_id"],
+                    row["logical_effect_id"], row["attempt_id"],
+                ),
+            ).fetchall()
+            if any(
+                (int(item["writer_epoch"]), int(item["sequence"])) < (
+                    int(body["writer_epoch"]), int(body["sequence"])
+                )
+                for item in prior_observation
+            ):
+                raise StorageIntegrityError(
+                    "T06 uncertainty follows an already recorded receipt"
+                )
+            snapshot = body.get("uncertainty_snapshot")
+            if not isinstance(snapshot, dict) or (
+                snapshot.get("settlement_hash") != row["settlement_hash"]
+                or snapshot.get("reservation_id") is None
+            ):
+                raise StorageIntegrityError(
+                    "T06 uncertainty accounting snapshot is invalid"
+                )
+            settlement = cls._validated_operation_settlement(
+                connection,
+                settlement_event_id=str(row["settlement_event_id"]),
+                settlement_hash=str(row["settlement_hash"]),
+                reservation_id=str(snapshot["reservation_id"]),
+            )
+            settlement_event = connection.execute(
+                "SELECT * FROM events WHERE event_id = ?",
+                (row["settlement_event_id"],),
+            ).fetchone()
+            if settlement_event is None or not precedes(settlement_event, body):
+                raise StorageIntegrityError(
+                    "T06 uncertainty settlement chronology is invalid"
+                )
+            disposition = BudgetDisposition(str(settlement["disposition"]))
+            categories = ["OUTCOME", "ACTIVITY", "SOURCE_CONTROL"]
+            if disposition is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED:
+                if not bool(settlement["uncertainty"]):
+                    raise StorageIntegrityError(
+                        "T06 unknown settlement lost its uncertainty marker"
+                    )
+                categories.append("BILLING")
+            elif disposition not in {
+                BudgetDisposition.CONSUMED, BudgetDisposition.ADJUSTED,
+            } or bool(settlement["uncertainty"]):
+                raise StorageIntegrityError(
+                    "T06 retained an invalid accounting disposition"
+                )
+            derived = cls._derive_operation_uncertainty_specs(
+                origin_body=body,
+                origin_event_hash=str(row["immutable_event_hash"]),
+                reservation_id=str(snapshot["reservation_id"]),
+                settlement_head_hash=str(row["settlement_hash"]),
+                categories=tuple(categories),
+            )
+            if specs.keys() & derived.keys():
+                raise StorageIntegrityError(
+                    "operation uncertainty identity is aliased"
+                )
+            specs.update(derived)
+
+        observation_rows = connection.execute(
+            "SELECT observation.*, event.body_json AS event_body, "
+            "event.event_hash AS immutable_event_hash FROM "
+            "effect_observations AS observation JOIN events AS event ON "
+            "event.event_id = observation.event_id" + suffix,
+            tuple(values),
+        ).fetchall()
+        for row in observation_rows:
+            body = json.loads(str(row["event_body"]))
+            if (
+                cls._event_hash(body) != row["immutable_event_hash"]
+                or str(row["body_json"]) != str(row["event_body"])
+                or body.get("event_id") != row["event_id"]
+                or body.get("attempt_id") != row["attempt_id"]
+                or body.get("settlement_hash") != row["settlement_hash"]
+            ):
+                raise StorageIntegrityError(
+                    "effect uncertainty source diverges from immutable history"
+                )
+            intent = connection.execute(
+                "SELECT event.*, redemption.claim_id AS redeemed_claim FROM "
+                "events AS event JOIN capability_redemptions AS redemption ON "
+                "redemption.command_id = event.command_id WHERE "
+                "event.repository_id = ? AND event.run_id = ? AND "
+                "event.event_kind = 'INTENT_COMMITTED' AND "
+                "redemption.claim_id = ? AND redemption.logical_effect_id = ? "
+                "AND redemption.attempt_id = ?",
+                (
+                    row["repository_id"], row["run_id"],
+                    row["source_claim_id"], row["logical_effect_id"],
+                    row["attempt_id"],
+                ),
+            ).fetchone()
+            command_outcome = connection.execute(
+                "SELECT * FROM command_outcomes WHERE command_id = ? AND "
+                "event_id = ? AND event_hash = ?",
+                (row["command_id"], row["event_id"], row["event_hash"]),
+            ).fetchone()
+            if intent is None or command_outcome is None or not precedes(
+                intent, body
+            ):
+                raise StorageIntegrityError(
+                    "effect-observation projection authority or chronology is invalid"
+                )
+            launch = connection.execute(
+                "SELECT launch.*, event.writer_epoch, event.sequence FROM "
+                "operation_launches AS launch JOIN events AS event ON "
+                "event.event_id = launch.event_id WHERE "
+                "launch.repository_id = ? AND launch.run_id = ? AND "
+                "launch.item_id = ? AND launch.logical_effect_id = ? AND "
+                "launch.attempt_id = ? AND launch.capability_claim_id = ?",
+                (
+                    row["repository_id"], row["run_id"], row["item_id"],
+                    row["logical_effect_id"], row["attempt_id"],
+                    row["source_claim_id"],
+                ),
+            ).fetchone()
+            contacts = connection.execute(
+                "SELECT contact.*, event.writer_epoch, event.sequence FROM "
+                "adapter_contacts AS contact JOIN events AS event ON "
+                "event.event_id = contact.event_id WHERE "
+                "contact.repository_id = ? AND contact.run_id = ? AND "
+                "contact.item_id = ? AND contact.contact_kind = 'EFFECT'",
+                (
+                    row["repository_id"], row["run_id"], row["item_id"],
+                ),
+            ).fetchall()
+            matching_contacts = []
+            for contact in contacts:
+                contact_body = json.loads(str(contact["body_json"]))
+                if (
+                    contact_body.get("logical_effect_id"),
+                    contact_body.get("attempt_id"),
+                ) == (row["logical_effect_id"], row["attempt_id"]):
+                    matching_contacts.append(contact)
+            contact_prefix_valid = not matching_contacts
+            if matching_contacts and launch is not None:
+                contact_prefix_valid = (
+                    precedes(launch, body)
+                    and len(matching_contacts) == 1
+                    and matching_contacts[0]["source_id"]
+                    == f"EFFECT:{launch['launch_id']}"
+                    and precedes(matching_contacts[0], body)
+                )
+            if not contact_prefix_valid:
+                raise StorageIntegrityError(
+                    "effect observation launch/contact prefix is invalid"
+                )
+            reservation = connection.execute(
+                "SELECT reservation_id FROM budget_reservations WHERE "
+                "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                "logical_effect_id = ? AND attempt_id = ?",
+                (
+                    row["repository_id"], row["run_id"], row["item_id"],
+                    row["logical_effect_id"], row["attempt_id"],
+                ),
+            ).fetchone()
+            if reservation is None:
+                raise StorageIntegrityError(
+                    "effect uncertainty settlement head is unavailable"
+                )
+            settlement = cls._validated_operation_settlement(
+                connection,
+                settlement_event_id=str(row["settlement_event_id"]),
+                settlement_hash=str(row["settlement_hash"]),
+                reservation_id=str(reservation["reservation_id"]),
+            )
+            settlement_event = connection.execute(
+                "SELECT * FROM events WHERE event_id = ?",
+                (row["settlement_event_id"],),
+            ).fetchone()
+            if settlement_event is None or not precedes(settlement_event, body):
+                raise StorageIntegrityError(
+                    "effect uncertainty settlement chronology is invalid"
+                )
+            categories = []
+            classification = body.get("source_control_classification")
+            if classification == SourceControlClassification.UNKNOWN.value:
+                categories.append("SOURCE_CONTROL")
+            elif classification not in {
+                None, SourceControlClassification.KNOWN.value,
+            }:
+                raise StorageIntegrityError(
+                    "effect source/control classification is invalid"
+                )
+            disposition = BudgetDisposition(str(settlement["disposition"]))
+            if disposition is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED:
+                if not bool(settlement["uncertainty"]):
+                    raise StorageIntegrityError(
+                        "effect unknown settlement lost its uncertainty marker"
+                    )
+                categories.append("BILLING")
+            elif disposition not in {
+                BudgetDisposition.CONSUMED, BudgetDisposition.ADJUSTED,
+            } or bool(settlement["uncertainty"]):
+                raise StorageIntegrityError(
+                    "effect observation retained invalid accounting"
+                )
+            if categories:
+                derived = cls._derive_operation_uncertainty_specs(
+                    origin_body=body,
+                    origin_event_hash=str(row["immutable_event_hash"]),
+                    reservation_id=str(settlement["reservation_id"]),
+                    settlement_head_hash=str(row["settlement_hash"]),
+                    categories=tuple(categories),
+                )
+                if specs.keys() & derived.keys():
+                    raise StorageIntegrityError(
+                        "operation uncertainty identity is aliased"
+                    )
+                specs.update(derived)
+        return specs
+
+    @staticmethod
+    def _insert_operation_uncertainties(
+        connection: sqlite3.Connection,
+        specs: Mapping[str, tuple[tuple[object, ...], tuple[object, ...]]],
+    ) -> None:
+        for instance, fence in specs.values():
+            connection.execute(
+                "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)", fence
+            )
+            connection.execute(
+                "INSERT INTO uncertainty_instances VALUES ("
+                + ", ".join("?" for _ in instance) + ")",
+                instance,
+            )
 
     @staticmethod
     def _run_heads_digest(run_heads: Mapping[str, str]) -> str:
@@ -4258,12 +5034,27 @@ class SQLiteStateStore:
         body: Mapping[str, object],
         predecessor_state: LifecycleState,
     ) -> None:
-        expected_fields = set(EffectObservationRequest.__dataclass_fields__) | {
+        evidence_fields = {
+            "source_control_classification",
+            "source_control_evidence_id",
+            "source_control_evidence_digest",
+            "source_control_issuer_fingerprint",
+            "source_control_issuer_mac",
+        }
+        is_v2 = body.get("observation_schema_version") == 2
+        request_field_names = set(
+            EffectObservationRequest.__dataclass_fields__
+        )
+        if not is_v2:
+            request_field_names -= evidence_fields
+        expected_fields = request_field_names | {
             "command_payload_digest", "event_kind", "lifecycle_from",
             "lifecycle_to", "observation_digest", "previous_event_hash",
             "requested_settlement_hash", "schema_version", "sequence", "slot_attempt_id",
             "slot_generation", "slot_released", "writer_epoch",
         }
+        if is_v2:
+            expected_fields.add("observation_schema_version")
         try:
             if set(body) != expected_fields or (
                 type(body["schema_version"]) is not int
@@ -4288,7 +5079,7 @@ class SQLiteStateStore:
                 raise ValueError("effect observation schema is invalid")
             request_fields = {
                 field: body[field]
-                for field in EffectObservationRequest.__dataclass_fields__
+                for field in request_field_names
             }
             request_fields["settlement_hash"] = body[
                 "requested_settlement_hash"
@@ -4297,11 +5088,53 @@ class SQLiteStateStore:
             request.validate()
             if (
                 body["command_payload_digest"]
-                != self._event_hash(request.__dict__)
+                != self._event_hash(
+                    self._effect_observation_request_payload(request)
+                )
                 or body["observation_digest"]
                 != self._observation_digest(request)
             ):
                 raise ValueError("effect observation digest mismatch")
+            if is_v2:
+                evidence_request = SourceControlEvidenceRequest(
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    attempt_id=request.attempt_id,
+                    source_claim_id=request.source_claim_id,
+                    source_receipt_id=request.source_receipt_id,
+                    payload_digest=request.payload_digest,
+                    usage_units=request.usage_units,
+                    accepted=True,
+                    classification=SourceControlClassification(
+                        request.source_control_classification
+                    ),
+                )
+                plan_issuer = connection.execute(
+                    "SELECT classification_issuer_fingerprint FROM "
+                    "validation_plans WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if plan_issuer is None or plan_issuer[
+                    "classification_issuer_fingerprint"
+                ] != request.source_control_issuer_fingerprint:
+                    raise ValueError(
+                        "effect observation evidence issuer is not plan-bound"
+                    )
+                if self._classification_authority is None:
+                    raise ValueError(
+                        "effect observation evidence authority is required"
+                    )
+                self._classification_authority.verify_source_control_evidence(
+                    SyntheticSourceControlEvidence(
+                        request.source_control_evidence_id,
+                        request.source_control_evidence_digest,
+                        request.source_control_issuer_fingerprint,
+                        request.source_control_issuer_mac,
+                    ),
+                    evidence_request,
+                )
             intent_row = connection.execute(
                 "SELECT body_json FROM events WHERE repository_id = ? AND "
                 "run_id = ? AND event_kind = 'INTENT_COMMITTED'",
@@ -4362,7 +5195,13 @@ class SQLiteStateStore:
                 raise ValueError(accounting_error)
             transition_id, event_kind, resulting_state = (
                 _derive_effect_observation_route(
-                    predecessor_state, request.usage_units
+                    predecessor_state,
+                    request.usage_units,
+                    request.source_control_classification,
+                    accounting_unknown=(
+                        BudgetDisposition(str(settlement["disposition"]))
+                        is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                    ),
                 )
             )
             if (
@@ -4401,7 +5240,7 @@ class SQLiteStateStore:
             json.JSONDecodeError,
         ) as error:
             raise StorageIntegrityError(
-                "effect observation semantics are invalid"
+                f"effect observation semantics are invalid: {error}"
             ) from error
 
     def _validate_validator_observation_event(
@@ -5968,10 +6807,28 @@ class SQLiteStateStore:
             ) from error
 
     @classmethod
+    def _effect_observation_request_payload(
+        cls, request: EffectObservationRequest
+    ) -> dict[str, object]:
+        payload = dict(request.__dict__)
+        if not request.source_control_classification:
+            for field in (
+                "source_control_classification",
+                "source_control_evidence_id",
+                "source_control_evidence_digest",
+                "source_control_issuer_fingerprint",
+                "source_control_issuer_mac",
+            ):
+                payload.pop(field)
+        return payload
+
+    @classmethod
     def _observation_digest(cls, request: EffectObservationRequest) -> str:
         payload = {
             key: value
-            for key, value in request.__dict__.items()
+            for key, value in cls._effect_observation_request_payload(
+                request
+            ).items()
             if key not in {"command_id", "event_id"}
         }
         return cls._event_hash(payload)
@@ -8520,6 +9377,14 @@ class SQLiteStateStore:
                     (
                         request.command_id, payload_digest, request.event_id,
                         sequence, event_hash,
+                    ),
+                )
+                self._insert_operation_uncertainties(
+                    connection,
+                    self._expected_operation_uncertainties(
+                        connection,
+                        repository_id=request.repository_id,
+                        origin_event_id=request.event_id,
                     ),
                 )
                 connection.execute(
@@ -14246,12 +15111,42 @@ class SQLiteStateStore:
         self,
         request: EffectObservationRequest,
         *,
+        authority: SyntheticAuthority | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ObservationReceipt:
         request.validate()
         if request.repository_id != self._repository_id:
             raise DispatchDenied("observation targets a different repository")
-        command_payload_digest = self._event_hash(request.__dict__)
+        if not request.source_control_classification or authority is None:
+            raise DispatchDenied(
+                "new observations require complete source/control evidence"
+            )
+        evidence_request = SourceControlEvidenceRequest(
+                repository_id=request.repository_id,
+                run_id=request.run_id,
+                item_id=request.item_id,
+                logical_effect_id=request.logical_effect_id,
+                attempt_id=request.attempt_id,
+                source_claim_id=request.source_claim_id,
+                source_receipt_id=request.source_receipt_id,
+                payload_digest=request.payload_digest,
+                usage_units=request.usage_units,
+                accepted=True,
+                classification=SourceControlClassification(
+                    request.source_control_classification
+                ),
+        )
+        authority.verify_source_control_evidence(
+            SyntheticSourceControlEvidence(
+                request.source_control_evidence_id,
+                request.source_control_evidence_digest,
+                request.source_control_issuer_fingerprint,
+                request.source_control_issuer_mac,
+            ),
+            evidence_request,
+        )
+        request_payload = self._effect_observation_request_payload(request)
+        command_payload_digest = self._event_hash(request_payload)
         observation_digest = self._observation_digest(request)
 
         with RepositoryWriterLock(self._database_path.parent), closing(
@@ -14325,12 +15220,9 @@ class SQLiteStateStore:
                 if run is None or run["item_id"] != request.item_id:
                     raise DispatchDenied("observation does not bind the recorded run")
                 current_state = LifecycleState(str(run["lifecycle_state"]))
-                transition_id, event_kind, resulting_state = (
-                    _derive_effect_observation_route(
-                        current_state, request.usage_units
-                    )
-                )
-                ordinary_receipt = transition_id == "T10"
+                ordinary_receipt = current_state in {
+                    LifecycleState.RUNNING, LifecycleState.PAUSING,
+                }
                 self._require_plan_issuer(
                     connection,
                     request.repository_id,
@@ -14635,6 +15527,17 @@ class SQLiteStateStore:
                 )
                 if accounting_error is not None:
                     raise DispatchDenied(accounting_error)
+                transition_id, event_kind, resulting_state = (
+                    _derive_effect_observation_route(
+                        current_state,
+                        request.usage_units,
+                        request.source_control_classification,
+                        accounting_unknown=(
+                            BudgetDisposition(str(settlement["disposition"]))
+                            is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        ),
+                    )
+                )
                 slot = connection.execute(
                     "SELECT * FROM outstanding_slot WHERE repository_id = ?",
                     (request.repository_id,),
@@ -14691,18 +15594,21 @@ class SQLiteStateStore:
                     ).fetchone()[0]
                 )
                 body = {
-                    **request.__dict__,
+                    **request_payload,
                     "settlement_hash": settlement_hash,
                     "requested_settlement_hash": request.settlement_hash,
                     "command_payload_digest": command_payload_digest,
-                    "event_kind": (
-                        event_kind
-                    ),
+                    "event_kind": event_kind,
                     "lifecycle_from": current_state.value,
                     "lifecycle_to": resulting_state.value,
                     "observation_digest": observation_digest,
                     "previous_event_hash": previous_event_hash,
                     "schema_version": 1,
+                    **(
+                        {"observation_schema_version": 2}
+                        if request.source_control_classification
+                        else {}
+                    ),
                     "sequence": sequence,
                     "slot_attempt_id": (
                         slot["attempt_id"] if owns_slot else request.attempt_id
@@ -14756,59 +15662,6 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
-                if request.usage_units is None:
-                    uncertainty_id = self._uncertainty_id(
-                        uncertainty_kind="BILLING",
-                        repository_id=request.repository_id,
-                        run_id=request.run_id,
-                        item_id=request.item_id,
-                        logical_effect_id=request.logical_effect_id,
-                        attempt_id=request.attempt_id,
-                        check_id=None,
-                        origin_event_id=request.event_id,
-                        origin_event_hash=event_hash,
-                        reservation_id=str(settlement["reservation_id"]),
-                    )
-                    uncertainty_body = {
-                        "attempt_id": request.attempt_id,
-                        "check_id": None,
-                        "fence_id": uncertainty_id,
-                        "item_id": request.item_id,
-                        "logical_effect_id": request.logical_effect_id,
-                        "origin_event_hash": event_hash,
-                        "origin_event_id": request.event_id,
-                        "repository_id": request.repository_id,
-                        "reservation_id": settlement["reservation_id"],
-                        "run_id": request.run_id,
-                        "schema_version": 1,
-                        "settlement_head_hash": settlement_hash,
-                        "uncertainty_id": uncertainty_id,
-                        "uncertainty_kind": "BILLING",
-                    }
-                    connection.execute(
-                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, "
-                        "'EFFECT_BILLING_UNKNOWN', ?)",
-                        (
-                            uncertainty_id, request.repository_id,
-                            request.item_id, request.logical_effect_id,
-                            request.event_id,
-                        ),
-                    )
-                    connection.execute(
-                        "INSERT INTO uncertainty_instances VALUES ("
-                        "?, ?, 'BILLING', ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?)",
-                        (
-                            uncertainty_id, uncertainty_id,
-                            request.repository_id, request.run_id,
-                            request.item_id, request.logical_effect_id,
-                            request.attempt_id, request.event_id, event_hash,
-                            settlement["reservation_id"], settlement_hash,
-                            json.dumps(
-                                uncertainty_body, sort_keys=True,
-                                separators=(",", ":"),
-                            ),
-                        ),
-                    )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -14817,6 +15670,14 @@ class SQLiteStateStore:
                         request.event_id,
                         sequence,
                         event_hash,
+                    ),
+                )
+                self._insert_operation_uncertainties(
+                    connection,
+                    self._expected_operation_uncertainties(
+                        connection,
+                        repository_id=request.repository_id,
+                        origin_event_id=request.event_id,
                     ),
                 )
                 if slot_released:
@@ -21944,65 +22805,14 @@ class SQLiteStateStore:
         validator_intents_by_id = {
             body["validator_intent_id"]: body for body in validator_intents
         }
-        expected_uncertainties: dict[str, tuple[object, ...]] = {}
-        operation_intents_by_binding = {
-            (
-                body["run_id"], body["logical_effect_id"], body["attempt_id"]
-            ): body
-            for body in intents
+        expected_uncertainties: dict[str, tuple[object, ...]] = {
+            uncertainty_id: instance[1:]
+            for uncertainty_id, (instance, _fence) in (
+                self._expected_operation_uncertainties(
+                    connection, repository_id=repository_id
+                ).items()
+            )
         }
-        for body in observation_events:
-            if body["usage_units"] is not None:
-                continue
-            intent = operation_intents_by_binding.get(
-                (
-                    body["run_id"], body["logical_effect_id"],
-                    body["attempt_id"],
-                )
-            )
-            if intent is None:
-                raise StorageIntegrityError(
-                    "effect uncertainty lost its durable intent"
-                )
-            observation_hash = self._event_hash(body)
-            uncertainty_id = self._uncertainty_id(
-                uncertainty_kind="BILLING",
-                repository_id=body["repository_id"],
-                run_id=body["run_id"],
-                item_id=body["item_id"],
-                logical_effect_id=body["logical_effect_id"],
-                attempt_id=body["attempt_id"],
-                check_id=None,
-                origin_event_id=body["event_id"],
-                origin_event_hash=observation_hash,
-                reservation_id=intent["reservation_id"],
-            )
-            uncertainty_body = {
-                "attempt_id": body["attempt_id"],
-                "check_id": None,
-                "fence_id": uncertainty_id,
-                "item_id": body["item_id"],
-                "logical_effect_id": body["logical_effect_id"],
-                "origin_event_hash": observation_hash,
-                "origin_event_id": body["event_id"],
-                "repository_id": body["repository_id"],
-                "reservation_id": intent["reservation_id"],
-                "run_id": body["run_id"],
-                "schema_version": 1,
-                "settlement_head_hash": body["settlement_hash"],
-                "uncertainty_id": uncertainty_id,
-                "uncertainty_kind": "BILLING",
-            }
-            expected_uncertainties[uncertainty_id] = (
-                uncertainty_id, "BILLING", body["repository_id"],
-                body["run_id"], body["item_id"],
-                body["logical_effect_id"], body["attempt_id"], None,
-                body["event_id"], observation_hash,
-                intent["reservation_id"], body["settlement_hash"],
-                json.dumps(
-                    uncertainty_body, sort_keys=True, separators=(",", ":")
-                ),
-            )
         for body in validator_observations:
             intent = validator_intents_by_id.get(body["validator_intent_id"])
             if intent is None:
@@ -22506,9 +23316,13 @@ class SQLiteStateStore:
                 expected_fences[uncertainty_id] = (
                     str(uncertainty[4]), str(uncertainty[5]),
                     (
-                        "EFFECT_BILLING_UNKNOWN"
-                        if uncertainty[1] == "BILLING"
-                        and uncertainty[7] is None
+                        {
+                            "OUTCOME": "OPERATION_OUTCOME_UNKNOWN",
+                            "ACTIVITY": "OPERATION_ACTIVITY_UNKNOWN",
+                            "BILLING": "EFFECT_BILLING_UNKNOWN",
+                            "SOURCE_CONTROL": "EFFECT_SOURCE_CONTROL_UNKNOWN",
+                        }[str(uncertainty[1])]
+                        if uncertainty[7] is None
                         else (
                             "VALIDATOR_BILLING_UNKNOWN"
                             if uncertainty[1] == "BILLING"

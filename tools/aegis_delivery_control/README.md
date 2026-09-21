@@ -123,8 +123,16 @@ fixture. It is not a delivery integration.
   immutable T09/T17 sources and the independently current run head. Sequential
   resumes clear only their named T09 fences: the first stays PAUSED while a
   second remains, and the final clean resume returns to VALIDATING. Historical
-  replay recognizes those exact clearances. Complete T17 operation uncertainty,
-  receipt/nonexecution reconciliation and safe retry remain unverified.
+  replay recognizes those exact clearances.
+- The reviewed T17 operation-uncertainty foundation uses one canonical
+  runtime/migration/recovery derivation. T06 records separate outcome, activity
+  and source/control uncertainty and adds billing only for unknown accounting.
+  Receipt intake requires typed issuer-authenticated source/control evidence;
+  known historical accounting is not downgraded by missing telemetry. The
+  version-0-to-1 semantic migration is atomic, rejects malformed or disguised
+  legacy rows and validates settlement projections against immutable history;
+  version 1 verifies exact rows/fences without healing. Verified-receipt,
+  nonexecution and safe-retry reconciliation remain unverified.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -178,7 +186,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 352 tests successfully, and
+controller. The complete local package suite ran 364 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -242,8 +250,11 @@ also received independent `APPROVE` after two correction rounds closed
 repository-prefix scope, legacy-contract separation, stacked-fence chaining,
 historical fence replay and full source rebinding. Two exact T09 fences now
 clear sequentially without losing the typed validation-application cursor.
-Complete operation uncertainty, receipt/nonexecution reconciliation and safe
-retry remain ordered T17 work, so T17 and full T14 remain `UNVERIFIED`.
+The reviewed operation-uncertainty foundation now adds typed source/control
+evidence, conditional operation uncertainty, an atomic semantic migration and
+exact-set recovery without promoting T17. Verified-receipt, nonexecution and
+safe-retry reconciliation remain ordered T17 work, so T17 and full T14 remain
+`UNVERIFIED`.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

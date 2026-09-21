@@ -51,6 +51,8 @@ from tools.aegis_delivery_control.contracts import (
     ReadinessEvaluationRequest,
     ResumeActivitySettlementRequest,
     ResumeRequest,
+    SourceControlClassification,
+    SourceControlEvidenceRequest,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -222,6 +224,46 @@ class SQLiteStateStoreTests(unittest.TestCase):
             "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
         )
 
+    def _record_signed_effect_observation(
+        self,
+        request: EffectObservationRequest,
+        *,
+        classification: SourceControlClassification = (
+            SourceControlClassification.KNOWN
+        ),
+        store: SQLiteStateStore | None = None,
+        **kwargs,
+    ):
+        evidence_request = SourceControlEvidenceRequest(
+            request.repository_id,
+            request.run_id,
+            request.item_id,
+            request.logical_effect_id,
+            request.attempt_id,
+            request.source_claim_id,
+            request.source_receipt_id,
+            request.payload_digest,
+            request.usage_units,
+            True,
+            classification,
+        )
+        evidence = self.authority.issue_source_control_evidence(
+            f"source-control:{request.source_receipt_id}:{classification.value}",
+            evidence_request,
+        )
+        signed = replace(
+            request,
+            source_control_classification=classification.value,
+            source_control_evidence_id=evidence.evidence_id,
+            source_control_evidence_digest=evidence.request_digest,
+            source_control_issuer_fingerprint=evidence.issuer_fingerprint,
+            source_control_issuer_mac=evidence.issuer_mac,
+        )
+        target_store = self.store if store is None else store
+        return SQLiteStateStore._record_effect_observation(
+            target_store, signed, authority=self.authority, **kwargs
+        )
+
     @staticmethod
     def request() -> IntentRequest:
         return IntentRequest(
@@ -240,6 +282,33 @@ class SQLiteStateStoreTests(unittest.TestCase):
             worst_case_units=5,
             cap_units=10,
         )
+
+    def _contact_committed_operation(
+        self,
+        committed,
+        request: IntentRequest | None = None,
+    ):
+        operation_request = self.request() if request is None else request
+        launch = self.store.claim_operation_launch(
+            operation_request, committed
+        )
+        self.oracle.allowed_head = launch.event_hash
+        self.store._contact_claimed_operation(
+            operation_request,
+            self.capability,
+            committed,
+            launch,
+            self.store._adapter_target_digest("repo-1", "EFFECT"),
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        return launch
 
     def _commit_planned_intent(
         self,
@@ -577,7 +646,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = late_accounting.settlement_hash
-        observation = self.store._record_effect_observation(
+        observation = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observation-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
@@ -2422,8 +2491,28 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.capability.claim_id, "descriptor-digest", 2,
             "attacker-settlement", "",
         )
+        attacker_evidence_request = SourceControlEvidenceRequest(
+            receipt.repository_id, receipt.run_id, receipt.item_id,
+            receipt.logical_effect_id, receipt.attempt_id,
+            receipt.source_claim_id, receipt.source_receipt_id,
+            receipt.payload_digest, receipt.usage_units, True,
+            SourceControlClassification.KNOWN,
+        )
+        attacker_evidence = attacker.issue_source_control_evidence(
+            "attacker-source-evidence", attacker_evidence_request
+        )
+        receipt = replace(
+            receipt,
+            source_control_classification="KNOWN",
+            source_control_evidence_id=attacker_evidence.evidence_id,
+            source_control_evidence_digest=attacker_evidence.request_digest,
+            source_control_issuer_fingerprint=(
+                attacker_evidence.issuer_fingerprint
+            ),
+            source_control_issuer_mac=attacker_evidence.issuer_mac,
+        )
         with self.assertRaisesRegex(DispatchDenied, "authority is not bound"):
-            reopened._record_effect_observation(receipt)
+            reopened._record_effect_observation(receipt, authority=attacker)
         connection = sqlite3.connect(self.database_path)
         try:
             after_receipt = tuple(connection.iterdump())
@@ -2935,14 +3024,14 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
 
         with self.assertRaises(InjectedFailure):
-            self.store._record_effect_observation(
+            self._record_signed_effect_observation(
                 observation,
                 failure_hook=raise_at("after_observation_writes_before_commit"),
             )
         self.assertEqual(self.store.table_counts()["effect_observations"], 0)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
         with self.assertRaises(InjectedFailure):
-            self.store._record_effect_observation(
+            self._record_signed_effect_observation(
                 observation,
                 failure_hook=raise_at(
                     "after_observation_commit_before_acknowledgement"
@@ -2956,7 +3045,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         self.oracle.allowed_head = observation_hash
-        replay = self.store._record_effect_observation(observation)
+        replay = self._record_signed_effect_observation(observation)
 
         self.assertTrue(replay.replayed)
         self.assertEqual(replay.event_hash, observation_hash)
@@ -3414,7 +3503,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = settlement.settlement_hash
 
-        recorded = self.store._record_effect_observation(
+        recorded = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "observation-unknown-1", "observe-unknown-command-1",
                 "observation-unknown-event-1", "repo-1", "run-1", "item-1",
@@ -3457,19 +3546,145 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(after_denial, before_denial)
 
+    def test_t17_exact_legacy_billing_projection_migrates_without_event_rewrite(
+        self,
+    ) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        self._contact_committed_operation(committed)
+        settlement_request = BudgetSettlementRequest(
+            "legacy-settlement", "reservation-1", "",
+            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+            "legacy-receipt", "USAGE_UNKNOWN",
+        )
+        settlement = self.store._settle_budget(
+            settlement_request,
+            self.authority.issue_settlement_proof(
+                "legacy-settlement-proof", settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settlement.settlement_hash
+        observed = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "legacy-observation", "legacy-observation-command",
+                "legacy-observation-event", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "legacy-receipt",
+                self.capability.claim_id, "descriptor-digest", None,
+                "legacy-settlement", settlement.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = observed.event_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            event_bytes = connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (observed.event_id,),
+            ).fetchone()[0]
+            row = connection.execute(
+                "SELECT * FROM uncertainty_instances WHERE origin_event_id = ?",
+                (observed.event_id,),
+            ).fetchone()
+            origin = json.loads(event_bytes)
+            legacy_body = {
+                "attempt_id": origin["attempt_id"],
+                "check_id": None,
+                "fence_id": row["uncertainty_id"],
+                "item_id": origin["item_id"],
+                "logical_effect_id": origin["logical_effect_id"],
+                "origin_event_hash": row["origin_event_hash"],
+                "origin_event_id": row["origin_event_id"],
+                "repository_id": origin["repository_id"],
+                "reservation_id": row["reservation_id"],
+                "run_id": origin["run_id"],
+                "schema_version": 1,
+                "settlement_head_hash": row["settlement_head_hash"],
+                "uncertainty_id": row["uncertainty_id"],
+                "uncertainty_kind": "BILLING",
+            }
+            connection.execute(
+                "UPDATE uncertainty_instances SET body_json = ? WHERE "
+                "uncertainty_id = ?",
+                (
+                    json.dumps(
+                        legacy_body, sort_keys=True, separators=(",", ":")
+                    ),
+                    row["uncertainty_id"],
+                ),
+            )
+            connection.execute("PRAGMA user_version = 0")
+            connection.commit()
+        finally:
+            connection.close()
+
+        tampered_path = self.database_path.parent / "legacy-tampered.sqlite3"
+        shutil.copy2(self.database_path, tampered_path)
+        connection = sqlite3.connect(tampered_path)
+        try:
+            tampered = dict(legacy_body)
+            tampered["retargeted"] = True
+            connection.execute(
+                "UPDATE uncertainty_instances SET body_json = ? WHERE "
+                "uncertainty_id = ?",
+                (
+                    json.dumps(
+                        tampered, sort_keys=True, separators=(",", ":")
+                    ),
+                    row["uncertainty_id"],
+                ),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "legacy operation uncertainty was tampered"
+        ):
+            SQLiteStateStore(tampered_path, self.oracle, "repo-1")
+
+        migrated = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            migrated_event_bytes = connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (observed.event_id,),
+            ).fetchone()[0]
+            migrated_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM uncertainty_instances WHERE "
+                    "origin_event_id = ?",
+                    (observed.event_id,),
+                ).fetchone()[0]
+            )
+            semantic_version = connection.execute(
+                "PRAGMA user_version"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(migrated_event_bytes, event_bytes)
+        self.assertEqual(migrated_body["schema_version"], 2)
+        self.assertEqual(semantic_version, 1)
+        migrated.load_verified("repo-1", authority=self.authority)
+
     def test_c04_conflicting_durable_identities_fail_closed(self) -> None:
         committed = self._commit_planned_intent(
             self.request(), self.capability, self.authority,
             expected_head="", writer_epoch=1,
         )
         self.oracle.allowed_head = committed.event_hash
+        self._contact_committed_operation(committed)
         base = EffectObservationRequest(
             "observation-1", "observe-command-1", "observation-event-1",
             "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
             "receipt-1", self.capability.claim_id, "descriptor-digest", 2,
             "settlement-1", "",
         )
-        recorded = self.store._record_effect_observation(base)
+        recorded = self._record_signed_effect_observation(base)
         self.assertFalse(recorded.replayed)
         self.oracle.allowed_head = recorded.event_hash
         for conflicting in (
@@ -3501,7 +3716,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             with self.subTest(conflicting=conflicting), self.assertRaises(
                 StorageIntegrityError
             ):
-                self.store._record_effect_observation(conflicting)
+                self._record_signed_effect_observation(conflicting)
             self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
             self.assertEqual(self.store.table_counts()["effect_observations"], 1)
 
@@ -3523,6 +3738,186 @@ class SQLiteStateStoreTests(unittest.TestCase):
             SQLiteStateStore(
                 self.database_path, self.oracle, "repo-1"
             ).load_verified("repo-1")
+
+    def test_t17_new_observation_requires_typed_source_evidence(self) -> None:
+        self._record_effect_observation(check_ids=("check-1",))
+        with self.assertRaisesRegex(
+            DispatchDenied, "complete source/control evidence"
+        ):
+            self.store._record_effect_observation(
+                EffectObservationRequest(
+                    "unsigned-observation", "unsigned-command",
+                    "unsigned-event", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", "unsigned-receipt",
+                    self.capability.claim_id, "descriptor-digest", 2,
+                    "settlement-1", "",
+                )
+            )
+
+    def test_t17_v2_observation_recovery_requires_and_verifies_authority(
+        self,
+    ) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        self.oracle.allowed_head = observation.event_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "evidence authority is required"
+        ):
+            SQLiteStateStore(
+                self.database_path, self.oracle, "repo-1"
+            ).load_verified("repo-1")
+        SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        ).load_verified("repo-1", authority=self.authority)
+
+        retargeted_path = (
+            self.database_path.parent / "retargeted-source-control.sqlite3"
+        )
+        shutil.copy2(self.database_path, retargeted_path)
+        connection = sqlite3.connect(retargeted_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM effect_observations WHERE observation_id = "
+                "'observation-1'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["source_control_classification"] = "UNKNOWN"
+            request_fields = {
+                field: body[field]
+                for field in EffectObservationRequest.__dataclass_fields__
+            }
+            request_fields["settlement_hash"] = body[
+                "requested_settlement_hash"
+            ]
+            request = EffectObservationRequest(**request_fields)
+            body["command_payload_digest"] = self.store._event_hash(
+                self.store._effect_observation_request_payload(request)
+            )
+            body["observation_digest"] = self.store._observation_digest(
+                request
+            )
+            retargeted_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                "event_id = 'observation-event-1'",
+                (retargeted_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE effect_observations SET observation_digest = ?, "
+                "command_payload_digest = ?, event_hash = ?, body_json = ? "
+                "WHERE observation_id = 'observation-1'",
+                (
+                    body["observation_digest"],
+                    body["command_payload_digest"],
+                    retargeted_hash,
+                    body_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, "
+                "event_hash = ? WHERE command_id = 'observe-command-1'",
+                (body["command_payload_digest"], retargeted_hash),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (retargeted_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (retargeted_hash,),
+            )
+            reservation = connection.execute(
+                "SELECT reservation_id FROM budget_reservations WHERE "
+                "repository_id = 'repo-1' AND run_id = 'run-1' AND "
+                "logical_effect_id = 'effect-1' AND attempt_id = 'attempt-1'"
+            ).fetchone()[0]
+            specs = self.store._derive_operation_uncertainty_specs(
+                origin_body=body,
+                origin_event_hash=retargeted_hash,
+                reservation_id=reservation,
+                settlement_head_hash=body["settlement_hash"],
+                categories=("SOURCE_CONTROL",),
+            )
+            self.store._insert_operation_uncertainties(connection, specs)
+            connection.commit()
+        finally:
+            connection.close()
+        retargeted_oracle = MutableFreshnessOracle()
+        retargeted_oracle.allowed_head = retargeted_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "effect observation semantics"
+        ):
+            SQLiteStateStore(
+                retargeted_path, retargeted_oracle, "repo-1"
+            ).load_verified("repo-1", authority=self.authority)
+
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM effect_observations WHERE observation_id = "
+                "'observation-1'"
+            ).fetchone()
+            body = json.loads(row["body_json"])
+            body["source_control_issuer_mac"] = "0" * 64
+            request_fields = {
+                field: body[field]
+                for field in EffectObservationRequest.__dataclass_fields__
+            }
+            request_fields["settlement_hash"] = body[
+                "requested_settlement_hash"
+            ]
+            request = EffectObservationRequest(**request_fields)
+            body["command_payload_digest"] = self.store._event_hash(
+                self.store._effect_observation_request_payload(request)
+            )
+            body["observation_digest"] = self.store._observation_digest(
+                request
+            )
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                "event_id = 'observation-event-1'",
+                (event_hash, body_json),
+            )
+            connection.execute(
+                "UPDATE effect_observations SET observation_digest = ?, "
+                "command_payload_digest = ?, event_hash = ?, body_json = ? "
+                "WHERE observation_id = 'observation-1'",
+                (
+                    body["observation_digest"],
+                    body["command_payload_digest"],
+                    event_hash,
+                    body_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, "
+                "event_hash = ? WHERE command_id = 'observe-command-1'",
+                (body["command_payload_digest"], event_hash),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "effect observation semantics"
+        ):
+            SQLiteStateStore(
+                self.database_path, self.oracle, "repo-1"
+            ).load_verified("repo-1", authority=self.authority)
 
     def _record_effect_observation(
         self,
@@ -3564,7 +3959,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             settlement_request, proof, self.authority
         )
         self.oracle.allowed_head = settlement.settlement_hash
-        receipt = self.store._record_effect_observation(
+        receipt = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "observation-1",
                 "observe-command-1",
@@ -4518,6 +4913,45 @@ class SQLiteStateStoreTests(unittest.TestCase):
             row, ("existing-unknown-settlement", settled.settlement_hash)
         )
 
+    def test_t06_known_accounting_does_not_create_billing_uncertainty(
+        self,
+    ) -> None:
+        _, _, _, request = self._contacted_operation("existing-known")
+        settlement = BudgetSettlementRequest(
+            "existing-known-settlement", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 2,
+            "existing-known-usage", "USAGE_REPORTED",
+        )
+        settled = self.store._settle_budget(
+            settlement,
+            self.authority.issue_settlement_proof(
+                "existing-known-proof", settlement
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        self.store.pause_external_mutation(
+            request, self._pause_capability("external-existing-known"),
+            self.authority,
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT disposition, charged_units, uncertainty FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            kinds = connection.execute(
+                "SELECT uncertainty_kind FROM uncertainty_instances WHERE "
+                "origin_event_id = ? ORDER BY uncertainty_kind",
+                (request.event_id,),
+            ).fetchall()
+        finally:
+            connection.close()
+        self.assertEqual(accounting, ("CONSUMED", 2, 0))
+        self.assertEqual(
+            kinds, [("ACTIVITY",), ("OUTCOME",), ("SOURCE_CONTROL",)]
+        )
+
     def test_t06_unknown_late_receipt_retains_worst_case_and_fence(self) -> None:
         _, _, _, request = self._contacted_operation("unknown-late")
         paused = self.store.pause_external_mutation(
@@ -4525,7 +4959,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = paused.event_hash
-        observed = self.store._record_effect_observation(
+        observed = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "unknown-late-observation", "unknown-late-command",
                 "unknown-late-event", "repo-1", "run-1", "item-1",
@@ -4552,6 +4986,49 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(accounting, ("UNKNOWN_WORST_CASE_CHARGED", 5, 1))
         self.assertEqual(retained, (1, 1))
+
+    def test_t17_missing_usage_preserves_known_accounting_without_billing(
+        self,
+    ) -> None:
+        self._contacted_operation("known-accounting-observation")
+        settlement = BudgetSettlementRequest(
+            "known-observation-settlement", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 2,
+            "known-observation-receipt", "USAGE_REPORTED",
+        )
+        settled = self.store._settle_budget(
+            settlement,
+            self.authority.issue_settlement_proof(
+                "known-observation-proof", settlement
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        observed = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "known-observation", "known-observation-command",
+                "known-observation-event", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "known-observation-receipt",
+                self.capability.claim_id,
+                self.request().effect_descriptor_digest, None,
+                "known-observation-settlement", settled.settlement_hash,
+            )
+        )
+        self.assertEqual(observed.resulting_state, LifecycleState.VALIDATING)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            accounting = connection.execute(
+                "SELECT disposition, charged_units, uncertainty FROM "
+                "budget_reservations WHERE reservation_id = 'reservation-1'"
+            ).fetchone()
+            uncertainty_count = connection.execute(
+                "SELECT COUNT(*) FROM uncertainty_instances WHERE "
+                "origin_event_id = 'known-observation-event'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(accounting, ("CONSUMED", 2, 0))
+        self.assertEqual(uncertainty_count, 0)
 
     def test_t06_recovery_rejects_external_pause_projection_loss(self) -> None:
         _, _, _, request = self._contacted_operation("projection-tamper")
@@ -7607,7 +8084,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(reservation_before, (3, 0, 0, "RESERVED"))
 
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
@@ -7637,7 +8114,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
 
     def test_t23_late_receipt_from_validating_preserves_evidence(self) -> None:
         self._record_effect_observation(check_ids=("check-1",))
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "observation-2", "observe-command-2", "observation-event-2",
                 "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
@@ -7674,7 +8151,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             request, attestation, self.authority
         )
         self.oracle.allowed_head = finalized.event_hash
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "observation-2", "observe-command-2", "observation-event-2",
                 "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
@@ -7703,7 +8180,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = committed.event_hash
         self._stop_run()
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
@@ -8872,7 +9349,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         reopened = SQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
-        reopened.load_verified("repo-1")
+        reopened.load_verified("repo-1", authority=self.authority)
 
     def test_r_stop_03_reused_attempt_on_other_run_cannot_hide_contact(
         self,
@@ -9290,7 +9767,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = adjusted.settlement_hash
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
@@ -9321,7 +9798,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         reopened = SQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
-        reopened.load_verified("repo-1")
+        reopened.load_verified("repo-1", authority=self.authority)
 
     def test_t20_recovery_rejects_self_consistent_snapshot_tamper(self) -> None:
         request = self.request()
@@ -9689,6 +10166,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         reopened = SQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
+        reopened._bind_classification_authority(self.authority)
         replay = reopened.settle_terminal_validation(request)
         self.assertTrue(replay.replayed)
         self.assertTrue(replay.slot_released)
@@ -9896,7 +10374,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 ):
                     SQLiteStateStore(
                         case_path, self.oracle, "repo-1"
-                    ).load_verified("repo-1")
+                    ).load_verified("repo-1", authority=self.authority)
 
     def test_t16_finalization_is_atomic_replay_safe_and_releases_slot(self) -> None:
         request, attestation = self._prepare_finalization()
@@ -11628,6 +12106,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         reopened = SQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
+        reopened._bind_classification_authority(self.authority)
         replay = reopened.settle_terminal_validation(request)
 
         self.assertTrue(replay.replayed)
@@ -11702,7 +12181,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         ):
             SQLiteStateStore(
                 misbound_path, misbound_oracle, "repo-1"
-            ).load_verified("repo-1")
+            ).load_verified("repo-1", authority=self.authority)
         tampered_path = self.database_path.parent / "tampered-t26.sqlite3"
         shutil.copy2(self.database_path, tampered_path)
         connection = sqlite3.connect(tampered_path)
@@ -11756,7 +12235,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         ):
             SQLiteStateStore(
                 tampered_path, tampered_oracle, "repo-1"
-            ).load_verified("repo-1")
+            ).load_verified("repo-1", authority=self.authority)
         connection = sqlite3.connect(self.database_path)
         try:
             plan_hash = connection.execute(
@@ -11865,14 +12344,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         reopened._bind_classification_authority(self.authority)
         reopened.load_verified("repo-1")
-        late = reopened._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
                 "effect-1", "attempt-1", "late-receipt-1",
                 self.capability.claim_id, "descriptor-digest", 2,
                 "late-settlement-1", "",
-            )
+            ),
+            store=reopened,
         )
         self.oracle.allowed_head = late.event_hash
         reopened.load_verified("repo-1")
@@ -11924,14 +12404,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         reopened._bind_classification_authority(self.authority)
         reopened.load_verified("repo-1")
-        late = reopened._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
                 "effect-1", "attempt-1", "late-receipt-1",
                 self.capability.claim_id, "descriptor-digest", 2,
                 "late-settlement-1", "",
-            )
+            ),
+            store=reopened,
         )
         self.oracle.allowed_head = late.event_hash
         connection = sqlite3.connect(self.database_path)
@@ -11978,7 +12459,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = early.event_hash
         self.assertFalse(early.slot_released)
-        late = self.store._record_effect_observation(
+        late = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-observation-1", "late-observe-command-1",
                 "late-observation-event-1", "repo-1", "run-1", "item-1",
@@ -12049,7 +12530,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             classification=self._classification(observation, "FINAL"),
         )
         self.oracle.allowed_head = applied.event_hash
-        unknown = self.store._record_effect_observation(
+        unknown = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-unknown-observation", "late-unknown-command",
                 "late-unknown-event", "repo-1", "run-1", "item-1",
@@ -12077,7 +12558,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.oracle.allowed_head = terminal.event_hash
         self.assertFalse(terminal.slot_released)
 
-        corrected = self.store._record_effect_observation(
+        corrected = self._record_signed_effect_observation(
             EffectObservationRequest(
                 "late-known-observation", "late-known-command",
                 "late-known-event", "repo-1", "run-1", "item-1",

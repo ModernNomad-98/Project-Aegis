@@ -49,6 +49,8 @@ from tools.aegis_delivery_control.contracts import (
     ReconcileValidatorResultRequest,
     ReconciliationPauseResumeRequest,
     ResumeRequest,
+    SourceControlClassification,
+    SourceControlEvidenceRequest,
     StopMode,
     StopEscalationRequest,
     StopEscalationSettlement,
@@ -727,6 +729,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute("PRAGMA user_version = 0")
                 connection.commit()
             finally:
                 connection.close()
@@ -770,6 +773,222 @@ class MediatedDispatchTests(unittest.TestCase):
                     store._database_path, store._freshness_oracle, "repo-1"
                 )
 
+    def test_t17_semantic_version_reopen_is_stable_and_surplus_fails_closed(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStateStore(
+                Path(directory) / "state.sqlite3",
+                AlwaysFreshOracle(),
+                "repo-1",
+            )
+            reopened = SQLiteStateStore(
+                store._database_path, store._freshness_oracle, "repo-1"
+            )
+            self.assertEqual(reopened.table_counts(), store.table_counts())
+            connection = sqlite3.connect(store._database_path)
+            try:
+                self.assertEqual(
+                    connection.execute("PRAGMA user_version").fetchone()[0], 1
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES ("
+                    "'surplus-operation-uncertainty', 'repo-1', NULL, NULL, "
+                    "'OPERATION_OUTCOME_UNKNOWN', 'fabricated-origin')"
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "operation-uncertainty projection diverges",
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+
+    def test_t17_unknown_semantic_version_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = SQLiteStateStore(
+                Path(directory) / "state.sqlite3",
+                AlwaysFreshOracle(),
+                "repo-1",
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.execute("PRAGMA user_version = 2")
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "semantic version is unsupported"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+
+    def test_t17_v0_surplus_operation_uncertainty_is_not_healed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            (
+                _authority, store, _validation, _request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                Path(directory), "legacy-operation-surplus"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                observation = connection.execute(
+                    "SELECT event_id, event_hash, repository_id, run_id, "
+                    "item_id, logical_effect_id, attempt_id FROM "
+                    "effect_observations LIMIT 1"
+                ).fetchone()
+                reservation_id = connection.execute(
+                    "SELECT reservation_id FROM budget_reservations WHERE "
+                    "repository_id = ? AND run_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        observation[2], observation[3], observation[5],
+                        observation[6],
+                    ),
+                ).fetchone()[0]
+                connection.execute("PRAGMA user_version = 0")
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES ("
+                    "'fabricated-operation-uncertainty', ?, ?, ?, "
+                    "'OPERATION_OUTCOME_UNKNOWN', ?)",
+                    (observation[2], observation[4], observation[5], observation[0]),
+                )
+                connection.execute(
+                    "INSERT INTO uncertainty_instances VALUES ("
+                    "'fabricated-operation-uncertainty', "
+                    "'fabricated-operation-uncertainty', 'OUTCOME', ?, ?, ?, ?, "
+                    "?, NULL, ?, ?, ?, NULL, '{}')",
+                    (
+                        observation[2], observation[3], observation[4],
+                        observation[5], observation[6], observation[0],
+                        observation[1], reservation_id,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "legacy operation uncertainty"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+
+    def test_t17_v0_disguised_operation_uncertainty_is_not_healed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            (
+                _authority, store, _validation, _request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                Path(directory), "legacy-operation-disguised-surplus"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                observation = connection.execute(
+                    "SELECT event_id, event_hash, repository_id, run_id, "
+                    "item_id, logical_effect_id, attempt_id FROM "
+                    "effect_observations LIMIT 1"
+                ).fetchone()
+                reservation_id = connection.execute(
+                    "SELECT reservation_id FROM budget_reservations WHERE "
+                    "repository_id = ? AND run_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        observation[2], observation[3], observation[5],
+                        observation[6],
+                    ),
+                ).fetchone()[0]
+                connection.execute("PRAGMA user_version = 0")
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES ("
+                    "'disguised-operation-uncertainty', ?, ?, ?, "
+                    "'VALIDATOR_BILLING_UNKNOWN', ?)",
+                    (observation[2], observation[4], observation[5], observation[0]),
+                )
+                connection.execute(
+                    "INSERT INTO uncertainty_instances VALUES ("
+                    "'disguised-operation-uncertainty', "
+                    "'disguised-operation-uncertainty', 'BILLING', ?, ?, ?, ?, "
+                    "?, 'fake-validator-check', ?, ?, ?, NULL, '{}')",
+                    (
+                        observation[2], observation[3], observation[4],
+                        observation[5], observation[6], observation[0],
+                        observation[1], reservation_id,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "legacy operation uncertainty"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                version = connection.execute("PRAGMA user_version").fetchone()[0]
+                disguised = connection.execute(
+                    "SELECT check_id FROM uncertainty_instances WHERE "
+                    "uncertainty_id = 'disguised-operation-uncertainty'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(version, 0)
+            self.assertEqual(disguised, ("fake-validator-check",))
+
+    def test_t17_v0_settlement_projection_tamper_rolls_back(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            (
+                _authority, store, _validation, _request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                Path(directory), "legacy-settlement-projection-tamper"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                settlement_event_id = connection.execute(
+                    "SELECT settlement_event_id FROM effect_observations LIMIT 1"
+                ).fetchone()[0]
+                connection.execute("PRAGMA user_version = 0")
+                connection.execute(
+                    "UPDATE budget_settlements SET disposition = ?, "
+                    "uncertainty = 1 WHERE settlement_event_id = ?",
+                    (
+                        BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                        settlement_event_id,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "settlement projection diverges from history",
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                version = connection.execute("PRAGMA user_version").fetchone()[0]
+                tampered = connection.execute(
+                    "SELECT disposition, uncertainty FROM budget_settlements "
+                    "WHERE settlement_event_id = ?",
+                    (settlement_event_id,),
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(version, 0)
+            self.assertEqual(
+                tampered,
+                (BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value, 1),
+            )
+
     def test_t17_backfill_failure_rolls_back_new_schema(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -788,6 +1007,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES (?, 'repo-1', "
                     "'item-1', 'effect-1', 'CONFLICTING_LEGACY_FENCE', "
@@ -811,9 +1031,13 @@ class MediatedDispatchTests(unittest.TestCase):
                         "'uncertainty_resolutions', 'reconciliation_actions')"
                     )
                 }
+                semantic_version = connection.execute(
+                    "PRAGMA user_version"
+                ).fetchone()[0]
             finally:
                 connection.close()
             self.assertEqual(tables, set())
+            self.assertEqual(semantic_version, 0)
 
     def test_t17_legacy_projection_tamper_rolls_back_new_schema(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -833,6 +1057,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.execute("DROP TABLE reconciliation_actions")
                 connection.execute("DROP TABLE uncertainty_resolutions")
                 connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute("PRAGMA user_version = 0")
                 connection.execute(
                     "UPDATE validator_observations SET event_hash = ? WHERE "
                     "observation_id = 'validator-observation-t08'",
@@ -860,6 +1085,58 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(tables, set())
+
+    def test_t17_operation_derivation_failure_rolls_back_validator_backfill(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                _authority, store, _validation, _request, _uncertainty_ids,
+                fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                root, "operation-phase-rollback"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.executemany(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    ((value,) for value in fence_ids),
+                )
+                connection.execute("DROP TABLE reconciliation_actions")
+                connection.execute("DROP TABLE uncertainty_resolutions")
+                connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute("PRAGMA user_version = 0")
+                connection.execute(
+                    "UPDATE effect_observations SET source_claim_id = "
+                    "'tampered-operation-claim'"
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "effect-observation projection"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                tables = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table' "
+                        "AND name IN ('uncertainty_instances', "
+                        "'uncertainty_resolutions', 'reconciliation_actions')"
+                    )
+                }
+                semantic_version = connection.execute(
+                    "PRAGMA user_version"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(tables, set())
+            self.assertEqual(semantic_version, 0)
 
     def test_t17_rejects_incomplete_activity_proof_and_rebound_slot(self) -> None:
         mutations = (
@@ -2888,6 +3165,11 @@ class MediatedDispatchTests(unittest.TestCase):
                     "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
                     "'external-pause-fence-1'"
                 ).fetchone()[0]
+                uncertainty_rows = connection.execute(
+                    "SELECT uncertainty_kind, fence_id FROM "
+                    "uncertainty_instances WHERE origin_event_id = "
+                    "'external-pause-event-1' ORDER BY uncertainty_kind"
+                ).fetchall()
             finally:
                 connection.close()
             self.assertEqual(
@@ -2895,6 +3177,13 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             self.assertEqual(slot_count, 1)
             self.assertEqual(fence_count, 1)
+            self.assertEqual(
+                [row[0] for row in uncertainty_rows],
+                ["ACTIVITY", "BILLING", "OUTCOME", "SOURCE_CONTROL"],
+            )
+            self.assertTrue(
+                all(row[1] != "external-pause-fence-1" for row in uncertainty_rows)
+            )
             self.assertEqual(
                 adapter.reconcile(effect_capability.claim_id),
                 canonical_before_pause,
@@ -4741,7 +5030,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 recovered_store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
-            recovered_store.load_verified("repo-1")
+            recovered_store.load_verified("repo-1", authority=authority)
             recovered_coordinator = SyntheticDispatchCoordinator(
                 recovered_store, TransitionEngine(), authority, adapter
             )
@@ -4765,6 +5054,104 @@ class MediatedDispatchTests(unittest.TestCase):
                     ),
                     expected_head=replay.event_hash,
                     writer_epoch=2,
+                )
+
+    def test_t17_unknown_source_with_known_usage_creates_only_source_fence(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            authority = SyntheticAuthority()
+            grant = SyntheticGrant(
+                "grant-source-unknown", "repo-1", "effect-1", "attempt-1",
+                "scope-1",
+            )
+            authority.register(grant)
+            capability = authority.claim(*grant.__dict__.values())
+            with patch.dict(os.environ, self.state_environment(root)):
+                store = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
+            coordinator = SyntheticDispatchCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            intent = IntentRequest(
+                "repo-1", "run-1", "item-1", "command-1", "event-1",
+                "effect-1", "payload-1", "attempt-1", "permission-1",
+                "reservation-1", "budget-1", 1, 1, 2,
+            )
+            plan = self._accept_operation_plan(store, intent)
+            coordinator.dispatch(
+                intent, capability,
+                SyntheticEffectRequest(
+                    "repo-1", "effect-1", "attempt-1", "scope-1",
+                    "payload-1",
+                ),
+                expected_head=plan.event_hash, writer_epoch=2,
+                usage_units=1, lose_receipt=True,
+            )
+            receipt = adapter.reconcile(capability.claim_id)
+            self.assertIsNotNone(receipt)
+            evidence_request = SourceControlEvidenceRequest(
+                receipt.repository_id, receipt.run_id, receipt.item_id,
+                receipt.logical_effect_id, receipt.attempt_id,
+                receipt.claim_id, receipt.receipt_id, receipt.payload_digest,
+                receipt.usage_units, receipt.accepted,
+                SourceControlClassification.UNKNOWN,
+            )
+            evidence = authority.issue_source_control_evidence(
+                "source-unknown-proof-1", evidence_request
+            )
+            observed = coordinator.intake_effect_receipt(
+                EffectObservationCommand(
+                    "observation-1", "observe-command-1",
+                    "observation-event-1", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", capability.claim_id,
+                    "settlement-1", "",
+                ),
+                source_control_classification=(
+                    SourceControlClassification.UNKNOWN
+                ),
+                source_control_evidence=evidence,
+            )
+            self.assertEqual(
+                observed.resulting_state,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                kinds = connection.execute(
+                    "SELECT uncertainty_kind FROM uncertainty_instances "
+                    "WHERE origin_event_id = 'observation-event-1' ORDER BY 1"
+                ).fetchall()
+            finally:
+                connection.close()
+            self.assertEqual(kinds, [("SOURCE_CONTROL",)])
+            store.load_verified("repo-1", authority=authority)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                uncertainty_id = connection.execute(
+                    "SELECT uncertainty_id FROM uncertainty_instances WHERE "
+                    "origin_event_id = 'observation-event-1'"
+                ).fetchone()[0]
+                connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    (uncertainty_id,),
+                )
+                connection.execute(
+                    "DELETE FROM uncertainty_instances WHERE uncertainty_id = ?",
+                    (uncertainty_id,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "operation-uncertainty projection diverges",
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
                 )
 
     def test_c04_canonical_receipt_cannot_be_substituted_across_attempts(self) -> None:

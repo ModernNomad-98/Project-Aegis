@@ -746,6 +746,7 @@ reducers replay both exact clearances so a removed fence is not resurrected.
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
 | Independent implementation review | First `REVISE` required repository-wide applicable scope and a distinct T14 contract. Second `REVISE` found stranded stacked fences, historical fence resurrection and incomplete recovery rebinding. Current-head signing, PAUSED preservation, both historical reducers and full source bindings closed the findings; final `APPROVE`, no remaining blocker or major |
+| Commit/push and hosted checks | Signed-off commit `2bd6112215d78937bb23d694aa933eebf8d417e2` pushed to the existing branch; `gate-guard`, `validate-skills` and `windows-offline-checks` passed on that exact head; PR #99 remained open, draft and blocked |
 | Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `engine.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
 
@@ -756,6 +757,46 @@ uncertainty categories, operation receipt/nonexecution reconciliation and safe
 retry remain ordered T17 work. F02, F11, F12 and F21 receive narrow evidence but
 remain `UNVERIFIED` as complete families. PR #99 remains draft and not
 merge-ready.
+
+### 5.16 T17 operation-uncertainty foundation checkpoint
+
+The reviewed foundation gives operation uncertainty one canonical derivation
+used by runtime, semantic migration and recovery. T06 now records distinct
+`OUTCOME`, `ACTIVITY` and `SOURCE_CONTROL` instances and records `BILLING` only
+when the complete settlement history is genuinely unknown. Effect receipts use
+typed, issuer-authenticated source/control classification: `SOURCE_CONTROL` is
+created only for authenticated `UNKNOWN`, while known `CONSUMED` or `ADJUSTED`
+accounting is never downgraded merely because the incoming receipt omits usage.
+The operator pause fence remains separate from these uncertainty fences.
+
+SQLite `PRAGMA user_version=1` is the semantic boundary. Version 0 performs the
+reconciliation backfill, exact legacy-operation audit, canonical operation-row
+derivation and version advance in one `BEGIN IMMEDIATE` transaction. Version 1
+validates the exact row/fence set and never heals deletion or surplus data.
+Migration rejects disguised validator-shaped operation rows and verifies every
+settlement projection against its immutable event body, hash and scope before
+classification. New evidence-bearing receipt history requires the bound issuer
+and MAC during recovery; immutable legacy receipt bodies retain their original
+digest semantics.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T17 foundation plan tied runtime, migration, recovery and the accounting matrix to T06/T10/T17 and F02/F04a/F07/F11/F12/F21; corrected plan received `APPROVE` before editing |
+| Cheapest falsification and regressions | Evidence omission, v2 authority/MAC recovery, conditional T06/receipt category matrices, exact legacy migration, atomic rollback, repeated reopen, deletion/surplus/tamper and crash/replay cases passed; the final disguised-row and settlement-projection rollback probes passed 2 tests independently |
+| Affected storage/dispatch modules | 342 tests passed in 43.910 seconds after the final migration corrections |
+| Complete delivery-control package | 364 tests passed in 44.034 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found four MAJOR evidence, recovery-MAC, transaction-boundary and legacy-row-healing gaps. A second `REVISE` found disguised operation rows and unverified settlement projections at migration. Both correction rounds were regression-tested; final `APPROVE`, no remaining blocker or major |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+This checkpoint adds narrow evidence to T17 and F02/F04a/F07/F11/F12/F21 but
+does not promote any complete family. T17 remains
+`UNVERIFIED/UNVERIFIED/UNVERIFIED`: verified-receipt reconciliation,
+authoritative nonexecution resolution and authenticated concurrent-safe
+same-effect retry remain next in their documented order. PR #99 remains draft
+and not merge-ready.
 
 ## 6. Handoff contract
 

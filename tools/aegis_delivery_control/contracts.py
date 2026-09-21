@@ -41,6 +41,13 @@ class StopMode(str, Enum):
     IMMEDIATE = "IMMEDIATE"
 
 
+class SourceControlClassification(str, Enum):
+    """Closed synthetic classification for receipt/source authority."""
+
+    KNOWN = "KNOWN"
+    UNKNOWN = "UNKNOWN"
+
+
 class AuthorityFactKind(str, Enum):
     EXPIRED = "EXPIRED"
     REVOKED = "REVOKED"
@@ -377,9 +384,57 @@ class EffectObservationCommand:
     settlement_hash: str
 
     def validate(self) -> None:
-        required = tuple(self.__dict__.values())[:-1]
+        required = (
+            self.observation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.source_claim_id,
+            self.settlement_event_id,
+        )
         if any(not value or not value.strip() for value in required):
             raise ValueError("observation command identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class SourceControlEvidenceRequest:
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    source_claim_id: str
+    source_receipt_id: str
+    payload_digest: str
+    usage_units: int | None
+    accepted: bool
+    classification: SourceControlClassification
+
+    def validate(self) -> None:
+        required = (
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.source_claim_id,
+            self.source_receipt_id,
+            self.payload_digest,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("source/control evidence identifiers must be non-empty")
+        if self.usage_units is not None and (
+            type(self.usage_units) is not int or self.usage_units < 0
+        ):
+            raise ValueError("source/control evidence usage must be non-negative or unknown")
+        if type(self.accepted) is not bool or self.accepted is not True:
+            raise ValueError("source/control evidence requires an accepted receipt")
+        if not isinstance(self.classification, SourceControlClassification):
+            raise ValueError("source/control classification is invalid")
 
 
 @dataclass(frozen=True)
@@ -398,6 +453,11 @@ class EffectObservationRequest:
     usage_units: int | None
     settlement_event_id: str
     settlement_hash: str
+    source_control_classification: str = ""
+    source_control_evidence_id: str = ""
+    source_control_evidence_digest: str = ""
+    source_control_issuer_fingerprint: str = ""
+    source_control_issuer_mac: str = ""
 
     def validate(self) -> None:
         required = (
@@ -420,6 +480,22 @@ class EffectObservationRequest:
             type(self.usage_units) is not int or self.usage_units < 0
         ):
             raise ValueError("observation usage must be non-negative or unknown")
+        evidence_values = (
+            self.source_control_classification,
+            self.source_control_evidence_id,
+            self.source_control_evidence_digest,
+            self.source_control_issuer_fingerprint,
+            self.source_control_issuer_mac,
+        )
+        if any(evidence_values) and not all(
+            isinstance(value, str) and value.strip() for value in evidence_values
+        ):
+            raise ValueError("source/control evidence must be complete or absent")
+        if self.source_control_classification and (
+            self.source_control_classification
+            not in {item.value for item in SourceControlClassification}
+        ):
+            raise ValueError("source/control classification is invalid")
 
 
 @dataclass(frozen=True)
