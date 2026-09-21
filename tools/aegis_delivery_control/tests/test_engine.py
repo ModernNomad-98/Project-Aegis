@@ -3,7 +3,11 @@ from __future__ import annotations
 import unittest
 
 from tools.aegis_delivery_control.contracts import DispatchDenied, LifecycleState
-from tools.aegis_delivery_control.engine import TRANSITIONS, TransitionEngine
+from tools.aegis_delivery_control.engine import (
+    NONTERMINAL_STATES,
+    TRANSITIONS,
+    TransitionEngine,
+)
 
 
 class TransitionEngineTests(unittest.TestCase):
@@ -76,6 +80,34 @@ class TransitionEngineTests(unittest.TestCase):
                 self.engine.authorize(
                     "T22", terminal, terminal, TRANSITIONS["T22"].required_guards
                 )
+
+    def test_t18_and_t19_stop_every_nonterminal_state_only(self) -> None:
+        for transition_id in ("T18", "T19"):
+            for current_state in NONTERMINAL_STATES:
+                with self.subTest(
+                    transition_id=transition_id, current_state=current_state
+                ):
+                    self.engine.authorize(
+                        transition_id,
+                        current_state,
+                        LifecycleState.STOPPED,
+                        TRANSITIONS[transition_id].required_guards,
+                    )
+            for terminal_state in (
+                LifecycleState.COMPLETED,
+                LifecycleState.FAILED_FINAL,
+                LifecycleState.STOPPED,
+            ):
+                with self.subTest(
+                    transition_id=transition_id,
+                    terminal_state=terminal_state,
+                ), self.assertRaises(DispatchDenied):
+                    self.engine.authorize(
+                        transition_id,
+                        terminal_state,
+                        LifecycleState.STOPPED,
+                        TRANSITIONS[transition_id].required_guards,
+                    )
 
 
 if __name__ == "__main__":

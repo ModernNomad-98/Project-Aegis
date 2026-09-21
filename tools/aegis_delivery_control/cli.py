@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
 from .storage import SQLiteStateStore, default_state_root
 
@@ -72,6 +73,26 @@ def _load_expected_vector(path: Path) -> tuple[str, str, dict[str, str]]:
     return repository_id, catalog_head, dict(run_heads)
 
 
+def _load_authority(path: Path) -> SyntheticAuthority:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("authority key file must be readable JSON") from error
+    if not isinstance(value, dict) or set(value) != {
+        "synthetic_issuer_key_hex"
+    }:
+        raise ValueError("authority key file has an invalid schema")
+    key_hex = value["synthetic_issuer_key_hex"]
+    if (
+        not isinstance(key_hex, str)
+        or len(key_hex) < 64
+        or len(key_hex) % 2 != 0
+        or any(character not in "0123456789abcdefABCDEF" for character in key_hex)
+    ):
+        raise ValueError("synthetic issuer key must be canonical hexadecimal")
+    return SyntheticAuthority(bytes.fromhex(key_hex))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m tools.aegis_delivery_control",
@@ -83,6 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("status")
     verify = subparsers.add_parser("verify")
     verify.add_argument("--expected-vector", required=True, type=Path)
+    verify.add_argument("--authority-key-file", required=True, type=Path)
     return parser
 
 
@@ -148,6 +170,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         expected_repository_id, expected_catalog_head, expected_run_heads = (
             _load_expected_vector(arguments.expected_vector)
         )
+        authority = _load_authority(arguments.authority_key_file)
         store = SQLiteStateStore.open_canonical(
             arguments.repository_id,
             ExpectedFreshnessOracle(
@@ -156,7 +179,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 expected_run_heads,
             ),
         )
-        catalog_head, run_heads = store.load_verified(arguments.repository_id)
+        catalog_head, run_heads = store.load_verified(
+            arguments.repository_id, authority=authority
+        )
     except (DispatchDenied, StorageIntegrityError, ValueError, sqlite3.Error) as error:
         print(f"verification failed: {error}", file=sys.stderr)
         return 3

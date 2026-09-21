@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import io
+import json
 import subprocess
 import sys
 import tempfile
@@ -50,17 +51,49 @@ class PlatformContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             output = io.StringIO()
-            with redirect_stdout(output):
+            environment = (
+                {"LOCALAPPDATA": str(root)}
+                if sys.platform == "win32"
+                else {"XDG_STATE_HOME": str(root)}
+            )
+            with patch.dict(os.environ, environment), redirect_stdout(output):
                 result = main(
-                    [
-                        "--repository-id",
-                        "repo-1",
-                        "status",
-                    ]
+                    ["--repository-id", "repo-1", "status"]
                 )
             self.assertEqual(result, 0)
             self.assertIn('"initialized": false', output.getvalue())
-            self.assertEqual(list(root.iterdir()), [])
+            self.assertEqual(list(root.rglob("*")), [])
+
+    def test_cli_capabilities_runs_as_module_in_isolated_environment(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            environment = os.environ.copy()
+            state_variable = (
+                "LOCALAPPDATA" if sys.platform == "win32" else "XDG_STATE_HOME"
+            )
+            environment[state_variable] = str(root)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "tools.aegis_delivery_control",
+                    "--repository-id",
+                    "repo-1",
+                    "capabilities",
+                ],
+                cwd=Path(__file__).parents[3],
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=5,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stderr, "")
+            capabilities = json.loads(result.stdout)
+            self.assertFalse(capabilities["external_io"])
+            self.assertFalse(capabilities["real_adapters"])
+            self.assertEqual(list(root.rglob("*")), [])
 
     def test_state_root_uses_repository_identity_not_checkout_name(self) -> None:
         if sys.platform == "win32":
@@ -90,6 +123,7 @@ class PlatformContractTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=5,
                 )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("repository writer lock is unavailable", result.stderr)

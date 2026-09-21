@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
 
 from .adapters import (
     SyntheticEffectRequest,
@@ -17,6 +16,7 @@ from .authority import (
     SyntheticAuthority,
     SyntheticCapability,
     SyntheticClassificationEvidence,
+    SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
     SyntheticValidatorCapability,
 )
@@ -27,10 +27,14 @@ from .contracts import (
     DispatchDenied,
     EffectObservationCommand,
     EffectObservationRequest,
+    FinalizeOperationRequest,
     IntentRequest,
     LifecycleState,
     ObservationReceipt,
+    OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
+    StopMode,
+    StopRequest,
     ValidationApplicationRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
@@ -64,6 +68,7 @@ class SyntheticDispatchCoordinator:
     ) -> None:
         if not store.is_canonical:
             raise DispatchDenied("dispatch store is not the canonical repository root")
+        store._bind_classification_authority(authority)
         self._store = store
         self._engine = engine
         self._authority = authority
@@ -94,6 +99,33 @@ class SyntheticDispatchCoordinator:
             failure_hook=failure_hook,
         )
 
+    def stop(
+        self,
+        request: StopRequest,
+        capability: SyntheticOperatorCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        transition_id = "T18" if request.mode is StopMode.GRACEFUL else "T19"
+
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                transition_id,
+                current_state,
+                resulting_state,
+                TRANSITIONS[transition_id].required_guards,
+            )
+
+        return self._store.stop(
+            request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
     def dispatch(
         self,
         intent: IntentRequest,
@@ -104,21 +136,25 @@ class SyntheticDispatchCoordinator:
         writer_epoch: int,
         usage_units: int | None = 0,
         lose_receipt: bool = False,
-        before_adapter_hook: Callable[[], None] | None = None,
     ) -> SyntheticDispatchReceipt:
         if not self._adapter.is_canonical_for(intent.repository_id):
             raise DispatchDenied(
                 "synthetic target is not the canonical repository root"
             )
         intent.validate()
+        effect.validate()
+        if usage_units is not None and (
+            type(usage_units) is not int or usage_units < 0
+        ):
+            raise ValueError("usage_units must be non-negative or unknown")
         self._engine.authorize(
             "T03",
             LifecycleState.PLANNED,
             LifecycleState.RUNNING,
             TRANSITIONS["T03"].required_guards,
         )
-        if effect.payload_digest != intent.effect_descriptor_digest:
-            raise DispatchDenied("effect payload does not match the committed descriptor")
+        self._authority.verify_issued(capability)
+        self._adapter._validate_request_binding(capability, effect, intent)
         commit = self._store.commit_intent(
             intent,
             capability,
@@ -128,13 +164,16 @@ class SyntheticDispatchCoordinator:
         )
         if commit.replayed:
             raise DispatchDenied("synthetic capability was already redeemed")
-        if before_adapter_hook is not None:
-            before_adapter_hook()
+        launch = self._store.claim_operation_launch(intent, commit)
+        if launch.replayed:
+            raise DispatchDenied("operation launch was already claimed")
         receipt = self._adapter._execute_committed(
             capability,
             effect,
             self._authority,
+            self._store,
             commit,
+            launch,
             intent,
             usage_units=usage_units,
             lose_receipt=lose_receipt,
@@ -240,12 +279,20 @@ class SyntheticValidationCoordinator:
             raise DispatchDenied(
                 "synthetic validator is not the canonical repository root"
             )
+        intent.validate()
+        request.validate()
+        if usage_units is not None and (
+            type(usage_units) is not int or usage_units < 0
+        ):
+            raise ValueError("usage_units must be non-negative or unknown")
         self._engine.authorize(
             "T27",
             LifecycleState.VALIDATING,
             LifecycleState.VALIDATING,
             TRANSITIONS["T27"].required_guards,
         )
+        self._authority.verify_validator_issued(capability)
+        self._adapter._validate_request_binding(capability, request, intent)
         commit = self._store.commit_validator_intent(
             intent, capability, self._authority
         )
@@ -257,7 +304,9 @@ class SyntheticValidationCoordinator:
             capability,
             request,
             self._authority,
+            self._store,
             commit,
+            intent,
             usage_units=usage_units,
             lose_result=lose_result,
         )
@@ -326,4 +375,38 @@ class SyntheticValidationCoordinator:
             request,
             classification=classification,
             failure_hook=failure_hook,
+        )
+
+
+class SyntheticFinalizationCoordinator:
+    """Complete an operation only from attested, reconstructed durable state."""
+
+    def __init__(
+        self,
+        store: SQLiteStateStore,
+        engine: TransitionEngine,
+        authority: SyntheticAuthority,
+    ) -> None:
+        if not store.is_canonical:
+            raise DispatchDenied(
+                "finalization store is not the canonical repository root"
+            )
+        self._store = store
+        self._engine = engine
+        self._authority = authority
+        self._store._bind_classification_authority(authority)
+
+    def finalize(
+        self,
+        request: FinalizeOperationRequest,
+        attestation: SyntheticFinalizationAttestation,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> OperationFinalizationReceipt:
+        self._engine.authorize(
+            "T16", LifecycleState.BLOCKED, LifecycleState.COMPLETED,
+            TRANSITIONS["T16"].required_guards,
+        )
+        return self._store._finalize_operation(
+            request, attestation, self._authority, failure_hook=failure_hook
         )

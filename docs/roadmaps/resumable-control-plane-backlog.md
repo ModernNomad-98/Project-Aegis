@@ -264,6 +264,51 @@ The delivery-control suite is not yet wired into repository CI; AEGIS-APR-004
 does not authorize workflow changes, so CI gating remains a declared follow-up
 rather than a silent scope expansion.
 
+### 5.3 Paused CP-WP-002 checkpoint — 2026-09-21
+
+The current checkpoint is based on `497a4529b84ec223245e001213271a9266514f62`
+on `main`, which matched `origin/main` before checkpoint delivery. The working
+tree contained 11 modified tracked delivery-control source/test files. The
+accidental untracked `tools/aegis_delivery_control/dashboard/` detour was outside
+AEGIS-APR-004, disconnected from the kernel and removed before checkpointing.
+Existing untracked `artifacts/recovery/`, `artifacts/reviews/` and bytecode cache
+directories were not added to the work package.
+
+Fresh local evidence at this checkpoint:
+
+| Command | Result |
+| --- | --- |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -v` | Exit 0; 198 tests ran in 16.659 seconds; `OK` |
+| `git diff --check` | Exit 0; no whitespace errors |
+| `git status --short --untracked-files=normal` | The 11 tracked delivery-control files remained modified; the dashboard no longer appeared; preserved artifact/cache directories remained untracked |
+| `gh pr list --repo ModernNomad-98/Project-Aegis --state open ...` | Only unrelated Dependabot PR #98 was open; no CP-WP-002 PR or deployment existed |
+
+Passing tests do not close the current independent gate. A read-only
+`principal-architecture-reviewer` re-audit of T18/T19 and their required
+T20/T23-T26 interactions returned `REVISE`:
+
+1. **BLOCKER — terminal slot can be stranded.** STOP from
+	`BLOCKED/FINALIZING` or recoverable validation failure can retain a slot that
+	neither T16 nor T26 can later close. Add a T26-compatible terminal closure by
+	reference to already-applied validation evidence, with crash/replay and
+	unrelated-run dispatch tests.
+2. **MAJOR — T20 is declaration-only.** Add a typed, idempotent escalation bound
+	to the original graceful stop/deadline, the coordinator/storage transaction,
+	`STOP_ESCALATED` event and recovery/projection validation, plus deadline,
+	tamper and commit-boundary tests.
+3. **MAJOR — post-contact immediate-stop uncertainty is underclassified.** When
+	adapter contact is durably claimed but no receipt exists, T19 must atomically
+	preserve the obligation and classify bounded liability as
+	`UNKNOWN_WORST_CASE_CHARGED`, with late authoritative correction and replay
+	tests.
+
+No software was deployed. No release, production data, provider call, external
+integration, real authority, credential, real adapter, BER, dependency, CI or
+artifact-directory change is authorized by this checkpoint. CP-WP-003,
+CP-WP-004 and CP-FUT-001 remain blocked. The exact continuation rules, current
+file inventory, approval boundaries and ordered backlog are recorded in the
+[Codex handoff](../evidence/control-plane/cp-wp-002-codex-handoff.md).
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete
