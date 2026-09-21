@@ -717,6 +717,46 @@ persistence tests are narrow evidence for C06, F06 and F21; those complete
 families remain `UNVERIFIED`. T17 with F02/F11/F12/F21 is next. PR #99 remains
 draft and not merge-ready.
 
+### 5.15 T17 validator-result reconciliation and T09-resume checkpoint
+
+The reviewed T17 slice reconciles one exact ceased validator RESULT from its
+immutable observation, cessation, accounting settlement and uncertainty set.
+Runtime and recovery share one repository-prefix reducer bounded by the global
+writer epoch. It rejects a superseded validator attempt, resolves only the
+named uncertainty instances and exact associated fences, and derives the
+remaining route from applicable item/effect history. A same-run pause preserves
+`PAUSED`; an applicable cross-run pause is a blocker; later history cannot
+retroactively alter the recorded route. The typed validation-application cursor
+is retained for the still-unapplied result.
+
+The associated versioned T14 route is distinct from legacy `ResumeRequest`.
+Its signed request binds the immutable T09 pause and T17 reconciliation sources,
+the independently current catalog/run-head vector and current run head. One
+transaction clears only the named T09 fence, redeems the one-use operator
+capability and advances the run chain. If another same-run T09 fence remains,
+the first resume remains `PAUSED`; a later independently signed resume chains
+from that new head and may return the eligible result to `VALIDATING`. Historical
+reducers replay both exact clearances so a removed fence is not resurrected.
+
+| Evidence | Result |
+| --- | --- |
+| Focused falsification and correction tests | T17 validator reconciliation, cross-run prefix ordering, T09/T17 stacking, two-stage exact fence clearance, rollback/replay and recovery tamper tests passed |
+| Affected dispatch/storage modules | 330 tests passed in 40.735 seconds before the final current-head binding correction; focused two-stage regression passed afterward |
+| Complete delivery-control package | 352 tests passed in 41.590 seconds after all corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | First `REVISE` required repository-wide applicable scope and a distinct T14 contract. Second `REVISE` found stranded stacked fences, historical fence resurrection and incomplete recovery rebinding. Current-head signing, PAUSED preservation, both historical reducers and full source bindings closed the findings; final `APPROVE`, no remaining blocker or major |
+| Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `engine.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+This checkpoint accepts only the validator-result T17 route and the exact T09
+pause-source T14 route. T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a
+complete transition: effect-operation uncertainty backfill, the complete T06
+uncertainty categories, operation receipt/nonexecution reconciliation and safe
+retry remain ordered T17 work. F02, F11, F12 and F21 receive narrow evidence but
+remain `UNVERIFIED` as complete families. PR #99 remains draft and not
+merge-ready.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

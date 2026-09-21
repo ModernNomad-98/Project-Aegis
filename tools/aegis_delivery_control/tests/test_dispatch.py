@@ -41,10 +41,13 @@ from tools.aegis_delivery_control.contracts import (
     IntentRequest,
     LifecycleState,
     PauseExternalMutationRequest,
+    PauseBeforeDispatchRequest,
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
     PauseValidationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
+    ReconcileValidatorResultRequest,
+    ReconciliationPauseResumeRequest,
     ResumeRequest,
     StopMode,
     StopEscalationRequest,
@@ -129,6 +132,1087 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t17_retained_validator_result_contract_and_coordinator_route(
+        self,
+    ) -> None:
+        request = ReconcileValidatorResultRequest(
+            reconciliation_id="reconciliation-validator-result-1",
+            command_id="reconciliation-validator-result-command-1",
+            event_id="reconciliation-validator-result-event-1",
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            plan_id="plan-1",
+            revision_digest="revision-1",
+            observation_id="validator-observation-1",
+            observation_event_hash="validator-observation-hash-1",
+            cessation_id="validator-cessation-1",
+            cessation_event_id="validator-cessation-event-1",
+            cessation_event_hash="validator-cessation-hash-1",
+            settlement_event_id="validator-settlement-1",
+            settlement_hash="validator-settlement-hash-1",
+            resolved_uncertainty_ids=("validator-billing-uncertainty-1",),
+            expected_slot_attempt_id="attempt-1",
+            expected_slot_generation=1,
+            expected_run_head="run-head-1",
+            expected_continuation_cursor="VALIDATING",
+        )
+        request.validate()
+        self.assertTrue(
+            hasattr(SyntheticValidationCoordinator, "reconcile_result")
+        )
+
+    def _prepare_t17_validator_reconciliation(
+        self, root: Path, suffix: str
+    ) -> tuple[
+        SyntheticAuthority,
+        SQLiteStateStore,
+        SyntheticValidationCoordinator,
+        ReconcileValidatorResultRequest,
+        tuple[str, ...],
+        tuple[str, ...],
+    ]:
+        (
+            authority, store, _dispatch, validator_adapter,
+            _validator_intent, _validator_capability, _committed,
+        ) = self._prepare_t08_active_validator(
+            root, contact=True, result=True, cessation=True,
+            result_usage_units=None,
+        )
+        connection = sqlite3.connect(store._database_path)
+        try:
+            observation = connection.execute(
+                "SELECT observation_id, event_hash FROM validator_observations "
+                "WHERE observation_id = ?", ("validator-observation-t08",),
+            ).fetchone()
+            uncertainties = connection.execute(
+                "SELECT uncertainty_id, fence_id FROM uncertainty_instances "
+                "WHERE origin_event_id = ? ORDER BY uncertainty_kind",
+                ("validator-observe-event-t08",),
+            ).fetchall()
+            cessation = connection.execute(
+                "SELECT cessation_id, event_id, event_hash FROM "
+                "validator_cessations WHERE validator_intent_id = ?",
+                ("validator-intent-t08",),
+            ).fetchone()
+            unknown_head = connection.execute(
+                "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                "reservation_id = ?", ("validator-reservation-t08",),
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        adjusted_request = BudgetSettlementRequest(
+            f"validator-adjusted-t17-{suffix}", "validator-reservation-t08",
+            unknown_head, BudgetDisposition.ADJUSTED, 1,
+            f"authoritative-validator-billing-t17-{suffix}",
+            "USAGE_REPORTED", attempt_id="validator-attempt-1",
+        )
+        adjusted = store._settle_budget(
+            adjusted_request,
+            authority.issue_settlement_proof(
+                f"validator-adjusted-proof-t17-{suffix}", adjusted_request
+            ),
+            authority,
+        )
+        validation = SyntheticValidationCoordinator(
+            store, TransitionEngine(), authority, validator_adapter
+        )
+        request = ReconcileValidatorResultRequest(
+            f"reconciliation-validator-result-t17-{suffix}",
+            f"reconciliation-validator-result-command-t17-{suffix}",
+            f"reconciliation-validator-result-event-t17-{suffix}",
+            "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+            "revision-1", observation[0], observation[1],
+            cessation[0], cessation[1], cessation[2],
+            adjusted.settlement_event_id, adjusted.settlement_hash,
+            tuple(row[0] for row in uncertainties), "attempt-1", 1,
+            adjusted.settlement_hash, None,
+        )
+        return (
+            authority, store, validation, request,
+            tuple(row[0] for row in uncertainties),
+            tuple(row[1] for row in uncertainties),
+        )
+
+    def test_t17_authoritative_validator_billing_restores_same_result(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, _dispatch, validator_adapter,
+                _validator_intent, _validator_capability, _committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=True, cessation=True,
+                result_usage_units=None,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                observation = connection.execute(
+                    "SELECT observation_id, event_hash FROM "
+                    "validator_observations WHERE observation_id = ?",
+                    ("validator-observation-t08",),
+                ).fetchone()
+                uncertainties = connection.execute(
+                    "SELECT uncertainty_id, fence_id FROM uncertainty_instances "
+                    "WHERE origin_event_id = ? ORDER BY uncertainty_kind",
+                    ("validator-observe-event-t08",),
+                ).fetchall()
+                cessation = connection.execute(
+                    "SELECT cessation_id, event_id, event_hash FROM "
+                    "validator_cessations WHERE validator_intent_id = ?",
+                    ("validator-intent-t08",),
+                ).fetchone()
+                unknown_head = connection.execute(
+                    "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                    "reservation_id = ?",
+                    ("validator-reservation-t08",),
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertIsNotNone(observation)
+            self.assertEqual(len(uncertainties), 2)
+            self.assertIsNotNone(cessation)
+            adjusted_request = BudgetSettlementRequest(
+                "validator-adjusted-t17", "validator-reservation-t08",
+                unknown_head, BudgetDisposition.ADJUSTED, 1,
+                "authoritative-validator-billing-t17", "USAGE_REPORTED",
+                attempt_id="validator-attempt-1",
+            )
+            adjusted = store._settle_budget(
+                adjusted_request,
+                authority.issue_settlement_proof(
+                    "validator-adjusted-proof-t17", adjusted_request
+                ),
+                authority,
+            )
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            request = ReconcileValidatorResultRequest(
+                "reconciliation-validator-result-t17",
+                "reconciliation-validator-result-command-t17",
+                "reconciliation-validator-result-event-t17",
+                "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+                "revision-1", observation[0], observation[1],
+                cessation[0], cessation[1], cessation[2],
+                adjusted.settlement_event_id, adjusted.settlement_hash,
+                tuple(row[0] for row in uncertainties), "attempt-1", 1,
+                adjusted.settlement_hash, None,
+            )
+            receipt = validation.reconcile_result(request)
+            self.assertEqual(receipt.resulting_state, LifecycleState.VALIDATING)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                state = connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone()
+                retained = connection.execute(
+                    "SELECT applied FROM validator_observations WHERE "
+                    "observation_id = ?", (observation[0],)
+                ).fetchone()[0]
+                fence = connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id IN "
+                    "(?, ?)",
+                    tuple(row[1] for row in uncertainties),
+                ).fetchone()[0]
+                resolutions = connection.execute(
+                    "SELECT proof_event_hash FROM uncertainty_resolutions WHERE "
+                    "uncertainty_id IN (?, ?) ORDER BY proof_kind",
+                    tuple(row[0] for row in uncertainties),
+                ).fetchall()
+            finally:
+                connection.close()
+            self.assertEqual(
+                state,
+                (
+                    "VALIDATING",
+                    "validation-application:v1:validator-observation-t08:"
+                    "check-1:validator-attempt-1",
+                ),
+            )
+            self.assertEqual((retained, fence), (0, 0))
+            self.assertEqual(
+                {row[0] for row in resolutions},
+                {cessation[2], adjusted.settlement_hash},
+            )
+            self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+            store.load_verified("repo-1", authority=authority)
+            applied = validation.apply_result(
+                ValidationApplicationRequest(
+                    "application-after-t17", "apply-command-after-t17",
+                    "apply-event-after-t17", "repo-1", "run-1", "item-1",
+                    "effect-1", "revision-1", "check-1",
+                    "validator-attempt-1", observation[0],
+                )
+            )
+            self.assertEqual(applied.resulting_state, LifecycleState.BLOCKED)
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t17_validator_reconciliation_crash_boundaries_are_atomic(
+        self,
+    ) -> None:
+        rollback_points = (
+            "after_reconciliation_event_before_uncertainty_clearance",
+            "after_reconciliation_writes_before_commit",
+        )
+        for point in rollback_points:
+            with self.subTest(point=point), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (
+                    authority, store, validation, request, uncertainty_id,
+                    fence_id,
+                ) = self._prepare_t17_validator_reconciliation(root, point)
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    before_head = connection.execute(
+                        "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+                    ).fetchone()[0]
+                finally:
+                    connection.close()
+                with self.assertRaises(InjectedFailure):
+                    validation.reconcile_result(
+                        request, failure_hook=raise_at(point)
+                    )
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    state = connection.execute(
+                        "SELECT (SELECT COUNT(*) FROM reconciliation_actions), "
+                        "(SELECT COUNT(*) FROM uncertainty_resolutions), "
+                        "(SELECT COUNT(*) FROM dispatch_fences WHERE reason_code "
+                        "IN ('VALIDATOR_ACTIVITY_UNKNOWN', "
+                        "'VALIDATOR_BILLING_UNKNOWN')), (SELECT head_hash "
+                        "FROM runs WHERE run_id = 'run-1')",
+                    ).fetchone()
+                finally:
+                    connection.close()
+                self.assertEqual(
+                    state, (0, 0, len(uncertainty_id), before_head)
+                )
+                recovered = validation.reconcile_result(request)
+                self.assertFalse(recovered.replayed)
+                store.load_verified("repo-1", authority=authority)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_id,
+                _fence_id,
+            ) = self._prepare_t17_validator_reconciliation(root, "post-commit")
+            with self.assertRaises(InjectedFailure):
+                validation.reconcile_result(
+                    request,
+                    failure_hook=raise_at(
+                        "after_reconciliation_commit_before_acknowledgement"
+                    ),
+                )
+            replay = validation.reconcile_result(request)
+            self.assertTrue(replay.replayed)
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t17_recovery_rejects_projection_and_event_schema_tamper(self) -> None:
+        projection_tampers = (
+            (
+                "uncertainty_instances", "origin_event_hash",
+                "tampered-observation-hash", "uncertainty-instance projection",
+            ),
+            (
+                "uncertainty_resolutions", "proof_event_hash",
+                "tampered-settlement-hash", "uncertainty-resolution projection",
+            ),
+            (
+                "reconciliation_actions", "source_event_hash",
+                "tampered-source-hash", "reconciliation-action projection",
+            ),
+        )
+        for table, column, value, message in projection_tampers:
+            with (
+                self.subTest(table=table, column=column),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                (
+                    authority, store, validation, request, _uncertainty_id,
+                    _fence_id,
+                ) = self._prepare_t17_validator_reconciliation(
+                    root, f"tamper-{table}-{column}"
+                )
+                validation.reconcile_result(request)
+                connection = sqlite3.connect(store._database_path)
+                try:
+                    connection.execute(
+                        f"UPDATE {table} SET {column} = ?", (value,)
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(StorageIntegrityError, message):
+                    store.load_verified("repo-1", authority=authority)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_id,
+                _fence_id,
+            ) = self._prepare_t17_validator_reconciliation(root, "event-surplus")
+            validation.reconcile_result(request)
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone()
+                body = json.loads(row["body_json"])
+                body["surplus_field"] = "forbidden"
+                event_hash = store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?", (event_hash, body_json, request.event_id)
+                )
+                connection.execute(
+                    "UPDATE reconciliation_actions SET event_hash = ?, "
+                    "body_json = ? WHERE reconciliation_id = ?",
+                    (event_hash, body_json, request.reconciliation_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "command_id = ?", (event_hash, request.command_id)
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                    (event_hash,),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'", (event_hash,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "validator reconciliation"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t17_recovery_ignores_later_same_scope_pause_in_another_run(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_id,
+                _fence_id,
+            ) = self._prepare_t17_validator_reconciliation(
+                root, "future-cross-run-pause"
+            )
+            validation.reconcile_result(request)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                catalog_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+                writer_epoch = connection.execute(
+                    "SELECT MAX(writer_epoch) + 1 FROM events WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            plan = store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan:run-2", "plan-command-run-2", "plan-event-run-2",
+                    "repo-1", "run-2", "item-1", "effect-1", "revision-2",
+                    "payload-1", "scope-2", "budget-2", ("check-1",),
+                ),
+                expected_head=catalog_head,
+                writer_epoch=writer_epoch,
+            )
+            grant = SyntheticOperatorGrant(
+                "pause-grant-run-2", "repo-1", "run-2", "PAUSE",
+                "pause-scope-run-2",
+            )
+            authority.register_operator(grant)
+            store.pause_before_dispatch(
+                PauseBeforeDispatchRequest(
+                    "pause-run-2", "pause-command-run-2",
+                    "pause-request-run-2", "pause-settled-run-2",
+                    "pause-fence-run-2", "repo-1", "run-2", "item-1",
+                    "OPERATOR_PAUSE", None,
+                ),
+                authority.claim_operator(*grant.__dict__.values()), authority,
+            )
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone()
+                body = json.loads(row["body_json"])
+                body["lifecycle_to"] = LifecycleState.PAUSED.value
+                body["continuation_cursor"] = None
+                event_hash = store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?", (event_hash, body_json, request.event_id)
+                )
+                connection.execute(
+                    "UPDATE reconciliation_actions SET event_hash = ?, "
+                    "body_json = ?, resulting_state = 'PAUSED', "
+                    "continuation_cursor = NULL WHERE reconciliation_id = ?",
+                    (event_hash, body_json, request.reconciliation_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "command_id = ?", (event_hash, request.command_id)
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ?, lifecycle_state = 'PAUSED', "
+                    "continuation_cursor = NULL WHERE run_id = 'run-1'",
+                    (event_hash,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            self.assertNotEqual(plan.event_hash, event_hash)
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "validator reconciliation"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_id,
+                _fence_id,
+            ) = self._prepare_t17_validator_reconciliation(root, "route-tamper")
+            validation.reconcile_result(request)
+            connection = sqlite3.connect(store._database_path)
+            connection.row_factory = sqlite3.Row
+            try:
+                row = connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone()
+                body = json.loads(row["body_json"])
+                body["lifecycle_to"] = LifecycleState.BLOCKED.value
+                body["continuation_cursor"] = None
+                event_hash = store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?", (event_hash, body_json, request.event_id)
+                )
+                connection.execute(
+                    "UPDATE reconciliation_actions SET event_hash = ?, "
+                    "body_json = ?, resulting_state = 'BLOCKED', "
+                    "continuation_cursor = NULL WHERE reconciliation_id = ?",
+                    (event_hash, body_json, request.reconciliation_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "command_id = ?", (event_hash, request.command_id)
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ?, lifecycle_state = 'BLOCKED', "
+                    "continuation_cursor = NULL WHERE run_id = 'run-1'",
+                    (event_hash,),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'", (event_hash,)
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "validator reconciliation"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t17_preexisting_cross_run_same_effect_pause_is_blocker(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                root, "prior-cross-run-pause"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                catalog_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+                writer_epoch = connection.execute(
+                    "SELECT MAX(writer_epoch) + 1 FROM events WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan:run-2", "plan-command-prior-run-2",
+                    "plan-event-prior-run-2", "repo-1", "run-2", "item-1",
+                    "effect-1", "revision-2", "payload-1", "scope-2",
+                    "budget-2", ("check-1",),
+                ),
+                expected_head=catalog_head,
+                writer_epoch=writer_epoch,
+            )
+            grant = SyntheticOperatorGrant(
+                "pause-grant-prior-run-2", "repo-1", "run-2", "PAUSE",
+                "pause-scope-prior-run-2",
+            )
+            authority.register_operator(grant)
+            pause = store.pause_before_dispatch(
+                PauseBeforeDispatchRequest(
+                    "pause-prior-run-2", "pause-command-prior-run-2",
+                    "pause-request-prior-run-2", "pause-settled-prior-run-2",
+                    "pause-fence-prior-run-2", "repo-1", "run-2", "item-1",
+                    "OPERATOR_PAUSE", None,
+                ),
+                authority.claim_operator(*grant.__dict__.values()), authority,
+            )
+
+            reconciled = validation.reconcile_result(request)
+
+            self.assertEqual(reconciled.resulting_state, LifecycleState.BLOCKED)
+            self.assertEqual(
+                store.load_run_lifecycle("run-2"), LifecycleState.PAUSED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                fence = connection.execute(
+                    "SELECT originating_event_id FROM dispatch_fences WHERE "
+                    "fence_id = 'pause-fence-prior-run-2'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(fence, ("pause-request-prior-run-2",))
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t17_legacy_uncertainty_projection_backfills_without_event_rewrite(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, _validation, _request, uncertainty_id,
+                fence_id,
+            ) = self._prepare_t17_validator_reconciliation(root, "legacy")
+            connection = sqlite3.connect(store._database_path)
+            try:
+                event_bytes = connection.execute(
+                    "SELECT event_id, body_json FROM events ORDER BY rowid"
+                ).fetchall()
+                connection.executemany(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    ((value,) for value in fence_id),
+                )
+                connection.execute("DROP TABLE reconciliation_actions")
+                connection.execute("DROP TABLE uncertainty_resolutions")
+                connection.execute("DROP TABLE uncertainty_instances")
+                connection.commit()
+            finally:
+                connection.close()
+            migrated = SQLiteStateStore(
+                store._database_path, store._freshness_oracle, "repo-1"
+            )
+            migrated._bind_classification_authority(authority)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                migrated_event_bytes = connection.execute(
+                    "SELECT event_id, body_json FROM events ORDER BY rowid"
+                ).fetchall()
+                restored = connection.execute(
+                    "SELECT uncertainty_id, fence_id FROM "
+                    "uncertainty_instances ORDER BY uncertainty_kind"
+                ).fetchall()
+            finally:
+                connection.close()
+            self.assertEqual(migrated_event_bytes, event_bytes)
+            self.assertEqual(
+                restored, list(zip(uncertainty_id, fence_id, strict=True))
+            )
+            migrated.load_verified("repo-1", authority=authority)
+
+    def test_t17_partial_reconciliation_schema_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = SQLiteStateStore(
+                root / "state.sqlite3", AlwaysFreshOracle(), "repo-1"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.execute("DROP TABLE reconciliation_actions")
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "partially migrated"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+
+    def test_t17_backfill_failure_rolls_back_new_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                _authority, store, _validation, _request, uncertainty_ids,
+                fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                root, "backfill-rollback"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.executemany(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    ((value,) for value in fence_ids),
+                )
+                connection.execute("DROP TABLE reconciliation_actions")
+                connection.execute("DROP TABLE uncertainty_resolutions")
+                connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, 'repo-1', "
+                    "'item-1', 'effect-1', 'CONFLICTING_LEGACY_FENCE', "
+                    "'validator-observe-event-t08')",
+                    (uncertainty_ids[0],),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaises(sqlite3.IntegrityError):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                tables = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table' "
+                        "AND name IN ('uncertainty_instances', "
+                        "'uncertainty_resolutions', 'reconciliation_actions')"
+                    )
+                }
+            finally:
+                connection.close()
+            self.assertEqual(tables, set())
+
+    def test_t17_legacy_projection_tamper_rolls_back_new_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                _authority, store, _validation, _request, _uncertainty_ids,
+                fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(
+                root, "legacy-projection-tamper"
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                connection.executemany(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    ((value,) for value in fence_ids),
+                )
+                connection.execute("DROP TABLE reconciliation_actions")
+                connection.execute("DROP TABLE uncertainty_resolutions")
+                connection.execute("DROP TABLE uncertainty_instances")
+                connection.execute(
+                    "UPDATE validator_observations SET event_hash = ? WHERE "
+                    "observation_id = 'validator-observation-t08'",
+                    ("tampered-legacy-observation-hash",),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "legacy validator-observation"
+            ):
+                SQLiteStateStore(
+                    store._database_path, store._freshness_oracle, "repo-1"
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                tables = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table' "
+                        "AND name IN ('uncertainty_instances', "
+                        "'uncertainty_resolutions', 'reconciliation_actions')"
+                    )
+                }
+            finally:
+                connection.close()
+            self.assertEqual(tables, set())
+
+    def test_t17_rejects_incomplete_activity_proof_and_rebound_slot(self) -> None:
+        mutations = (
+            ("cessation", lambda request: replace(
+                request, cessation_event_hash="wrong-cessation-hash"
+            )),
+            ("uncertainty", lambda request: replace(
+                request,
+                resolved_uncertainty_ids=request.resolved_uncertainty_ids[:1],
+            )),
+            ("slot", lambda request: replace(
+                request, expected_slot_generation=2
+            )),
+        )
+        for label, mutate in mutations:
+            with (
+                self.subTest(label=label),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                (
+                    _authority, _store, validation, request,
+                    _uncertainty_ids, _fence_ids,
+                ) = self._prepare_t17_validator_reconciliation(root, label)
+                with self.assertRaises(DispatchDenied):
+                    validation.reconcile_result(mutate(request))
+
+    def test_t17_resolved_validator_result_retains_stacked_t09_pause(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, validation, request, _uncertainty_ids,
+                _fence_ids,
+            ) = self._prepare_t17_validator_reconciliation(root, "stacked-pause")
+            connection = sqlite3.connect(store._database_path)
+            try:
+                source = connection.execute(
+                    "SELECT event_id, head_hash FROM runs JOIN events ON "
+                    "events.event_hash = runs.head_hash WHERE runs.run_id = ?",
+                    ("run-1",),
+                ).fetchone()
+            finally:
+                connection.close()
+            pause_request = PauseReconciliationRequest(
+                "t17-stacked-pause", "t17-stacked-pause-command",
+                "t17-stacked-pause-event", "t17-stacked-pause-fence",
+                "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+                "revision-1", "OPERATOR_PAUSE_RECONCILIATION", source[0],
+                source[1], None,
+            )
+            grant = SyntheticOperatorGrant(
+                "t17-stacked-pause-grant", "repo-1", "run-1", "PAUSE",
+                "t17-stacked-pause-scope",
+            )
+            authority.register_operator(grant)
+            paused = store.pause_reconciliation(
+                pause_request,
+                authority.claim_operator(*grant.__dict__.values()),
+                authority,
+            )
+            second_pause_request = PauseReconciliationRequest(
+                "t17-stacked-pause-2", "t17-stacked-pause-command-2",
+                "t17-stacked-pause-event-2", "t17-stacked-pause-fence-2",
+                "repo-1", "run-1", "item-1", "effect-1", "plan:run-1",
+                "revision-1", "OPERATOR_PAUSE_RECONCILIATION",
+                paused.event_id, paused.event_hash, None,
+            )
+            second_pause_grant = SyntheticOperatorGrant(
+                "t17-stacked-pause-grant-2", "repo-1", "run-1", "PAUSE",
+                "t17-stacked-pause-scope-2",
+            )
+            authority.register_operator(second_pause_grant)
+            second_paused = store.pause_reconciliation(
+                second_pause_request,
+                authority.claim_operator(*second_pause_grant.__dict__.values()),
+                authority,
+            )
+            reconciled = validation.reconcile_result(
+                replace(request, expected_run_head=second_paused.event_hash)
+            )
+            self.assertEqual(reconciled.resulting_state, LifecycleState.PAUSED)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                fences = connection.execute(
+                    "SELECT fence_id FROM dispatch_fences ORDER BY fence_id"
+                ).fetchall()
+            finally:
+                connection.close()
+            self.assertEqual(
+                fences,
+                [
+                    (pause_request.fence_id,),
+                    (second_pause_request.fence_id,),
+                ],
+            )
+            store.load_verified("repo-1", authority=authority)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                run_state = connection.execute(
+                    "SELECT continuation_cursor FROM runs WHERE run_id = ?",
+                    ("run-1",),
+                ).fetchone()
+                run_heads = dict(
+                    connection.execute(
+                        "SELECT run_id, head_hash FROM runs ORDER BY run_id"
+                    )
+                )
+                catalog_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertTrue(
+                run_state[0].startswith("validation-application:v1:")
+            )
+            resume_request = ReconciliationPauseResumeRequest(
+                "t17-t09-resume", "t17-t09-resume-command",
+                "t17-t09-resume-event", "repo-1", "run-1", "item-1",
+                "effect-1", "plan:run-1", "revision-1",
+                pause_request.pause_id, pause_request.event_id,
+                paused.event_hash, pause_request.fence_id,
+                request.reconciliation_id, reconciled.event_id,
+                reconciled.event_hash, run_state[0], catalog_head,
+                reconciled.event_hash,
+                store._run_heads_digest(run_heads),
+            )
+            resume_grant = SyntheticOperatorGrant(
+                "t17-t09-resume-grant", "repo-1", "run-1", "RESUME",
+                "t17-t09-resume-scope",
+            )
+            authority.register_operator(resume_grant)
+            resume_capability = authority.claim_operator(
+                *resume_grant.__dict__.values()
+            )
+            resume_evidence = authority.issue_reconciliation_resume_evidence(
+                "t17-t09-resume-proof", resume_request
+            )
+            with self.assertRaises(InjectedFailure):
+                store.resume_reconciliation_pause(
+                    resume_request, resume_capability, resume_evidence,
+                    authority,
+                    failure_hook=raise_at(
+                        "after_reconciliation_resume_writes_before_commit"
+                    ),
+                )
+            self.assertEqual(
+                store.table_counts()["reconciliation_resume_actions"], 0
+            )
+            self.assertEqual(store.table_counts()["dispatch_fences"], 2)
+            resumed = store.resume_reconciliation_pause(
+                resume_request, resume_capability, resume_evidence, authority,
+            )
+            self.assertEqual(resumed.resulting_state, LifecycleState.PAUSED)
+            self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+            store.load_verified("repo-1", authority=authority)
+            replay = store.resume_reconciliation_pause(
+                resume_request, resume_capability, resume_evidence, authority,
+            )
+            self.assertTrue(replay.replayed)
+            self.assertEqual(replay.event_hash, resumed.event_hash)
+            self.assertEqual(
+                store.table_counts()["reconciliation_resume_actions"], 1
+            )
+            self.assertEqual(store.table_counts()["dispatch_fences"], 1)
+
+            connection = sqlite3.connect(store._database_path)
+            try:
+                run_heads = dict(connection.execute(
+                    "SELECT run_id, head_hash FROM runs ORDER BY run_id"
+                ))
+                catalog_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = 'repo-1'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            second_resume_request = ReconciliationPauseResumeRequest(
+                "t17-t09-resume-2", "t17-t09-resume-command-2",
+                "t17-t09-resume-event-2", "repo-1", "run-1", "item-1",
+                "effect-1", "plan:run-1", "revision-1",
+                second_pause_request.pause_id, second_pause_request.event_id,
+                second_paused.event_hash, second_pause_request.fence_id,
+                request.reconciliation_id, reconciled.event_id,
+                reconciled.event_hash, run_state[0], catalog_head,
+                resumed.event_hash, store._run_heads_digest(run_heads),
+            )
+            second_resume_grant = SyntheticOperatorGrant(
+                "t17-t09-resume-grant-2", "repo-1", "run-1", "RESUME",
+                "t17-t09-resume-scope-2",
+            )
+            authority.register_operator(second_resume_grant)
+            second_resume_capability = authority.claim_operator(
+                *second_resume_grant.__dict__.values()
+            )
+            second_resume_evidence = (
+                authority.issue_reconciliation_resume_evidence(
+                    "t17-t09-resume-proof-2", second_resume_request
+                )
+            )
+            second_resumed = store.resume_reconciliation_pause(
+                second_resume_request, second_resume_capability,
+                second_resume_evidence, authority,
+            )
+            self.assertEqual(
+                second_resumed.resulting_state, LifecycleState.VALIDATING
+            )
+            self.assertEqual(store.table_counts()["dispatch_fences"], 0)
+            store.load_verified("repo-1", authority=authority)
+            second_replay = store.resume_reconciliation_pause(
+                second_resume_request, second_resume_capability,
+                second_resume_evidence, authority,
+            )
+            self.assertTrue(second_replay.replayed)
+            self.assertEqual(second_replay.event_hash, second_resumed.event_hash)
+            self.assertEqual(
+                store.table_counts()["reconciliation_resume_actions"], 2
+            )
+
+            connection = sqlite3.connect(store._database_path)
+            try:
+                body = json.loads(connection.execute(
+                    "SELECT body_json FROM reconciliation_resume_actions "
+                    "WHERE resume_id = ?", (second_resume_request.resume_id,)
+                ).fetchone()[0])
+                body["source_kind"] = "LEGACY_INFERRED"
+                event_hash = store._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?",
+                    (event_hash, body_json, second_resumed.event_id),
+                )
+                connection.execute(
+                    "UPDATE reconciliation_resume_actions SET event_hash = ?, "
+                    "body_json = ? WHERE resume_id = ?",
+                    (event_hash, body_json, second_resume_request.resume_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "command_id = ?", (event_hash, second_resumed.command_id),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_hash = ? WHERE run_id = ?",
+                    (event_hash, second_resume_request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, second_resume_request.repository_id),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "reconciliation.*resume"
+            ):
+                store.load_verified("repo-1", authority=authority)
+
+    def test_t17_resolved_validator_result_retains_t08_pause(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (
+                authority, store, dispatch, validator_adapter,
+                validator_intent, validator_capability, committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=True, intake_result=False
+            )
+            pause_request = self._t08_pause_request(
+                store, suffix="t17-stacked-t08"
+            )
+            grant = SyntheticOperatorGrant(
+                "t17-t08-pause-grant", "repo-1", "run-1", "PAUSE",
+                "t17-t08-pause-scope",
+            )
+            authority.register_operator(grant)
+            pause_receipt = dispatch.pause_validation(
+                pause_request,
+                authority.claim_operator(*grant.__dict__.values()),
+            )
+            self.assertEqual(
+                pause_receipt.resulting_state,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                settlement_hash = connection.execute(
+                    "SELECT settlement_head_hash FROM budget_reservations WHERE "
+                    "reservation_id = 'validator-reservation-t08'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            observation = validation.intake_result(
+                ValidatorObservationCommand(
+                    "validator-observation-t08",
+                    "validator-observe-command-t08",
+                    "validator-observe-event-t08", "repo-1", "run-1",
+                    "item-1", "validator-intent-t08",
+                    "validator-settlement-t08", settlement_hash,
+                )
+            )
+            attestation = authority.issue_validator_cessation_attestation(
+                "t17-t08-cessation-attestation", "t17-t08-cessation",
+                validator_adapter._target_digest("repo-1"),
+                validator_capability.claim_id,
+                "VALIDATOR:validator-intent-t08", committed.event_hash,
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+            )
+            cessation_seal = validator_adapter.seal_cessation(
+                attestation, authority
+            )
+            cessation = store.record_validator_cessation(
+                ValidatorCessationRequest(
+                    "t17-t08-cessation", "t17-t08-cessation-command",
+                    "t17-t08-cessation-event", "repo-1", "run-1", "item-1",
+                    "effect-1", validator_intent.validator_intent_id,
+                    "validator-attempt-1", "revision-1", "check-1",
+                    cessation_seal.cessation_hash,
+                ),
+                authority,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                uncertainty_ids = tuple(
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT uncertainty_id FROM uncertainty_instances WHERE "
+                        "origin_event_id = ?", (observation.event_id,)
+                    )
+                )
+            finally:
+                connection.close()
+            reconciled = validation.reconcile_result(
+                ReconcileValidatorResultRequest(
+                    "t17-t08-reconciliation", "t17-t08-reconcile-command",
+                    "t17-t08-reconcile-event", "repo-1", "run-1", "item-1",
+                    "effect-1", "plan:run-1", "revision-1",
+                    observation.observation_id, observation.event_hash,
+                    "t17-t08-cessation", "t17-t08-cessation-event",
+                    cessation.event_hash, "validator-settlement-t08",
+                    settlement_hash, uncertainty_ids, "attempt-1", 1,
+                    cessation.event_hash, None,
+                )
+            )
+            self.assertEqual(reconciled.resulting_state, LifecycleState.PAUSED)
+            store.load_verified("repo-1", authority=authority)
+
     def test_t09_reconciliation_pause_contract_and_coordinator_route(self) -> None:
         request = PauseReconciliationRequest(
             pause_id="reconciliation-pause-1",
@@ -963,6 +2047,40 @@ class MediatedDispatchTests(unittest.TestCase):
             ) = self._prepare_t08_active_validator(
                 root, contact=True, result=True, cessation=True
             )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                observation = connection.execute(
+                    "SELECT observation_id, event_hash, settlement_event_id, "
+                    "settlement_hash FROM validator_observations WHERE "
+                    "observation_id = 'validator-observation-t08'"
+                ).fetchone()
+                uncertainty_ids = tuple(
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT uncertainty_id FROM uncertainty_instances "
+                        "WHERE origin_event_id = 'validator-observe-event-t08'"
+                    )
+                )
+                cessation = connection.execute(
+                    "SELECT cessation_id, event_id, event_hash FROM "
+                    "validator_cessations WHERE cessation_id = 'cessation-t08'"
+                ).fetchone()
+            finally:
+                connection.close()
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            reconciled = validation.reconcile_result(
+                ReconcileValidatorResultRequest(
+                    "reconcile-settled-result", "reconcile-command-settled-result",
+                    "reconcile-event-settled-result", "repo-1", "run-1",
+                    "item-1", "effect-1", "plan:run-1", "revision-1",
+                    observation[0], observation[1], cessation[0], cessation[1],
+                    cessation[2], observation[2], observation[3],
+                    uncertainty_ids, "attempt-1", 1, cessation[2], None,
+                )
+            )
+            self.assertEqual(reconciled.resulting_state, LifecycleState.VALIDATING)
             request = self._t08_pause_request(store, suffix="settled-result")
             self.assertEqual(
                 request.expected_checkpoint_kind, "ELIGIBLE_RESULT_SETTLED"
@@ -993,7 +2111,9 @@ class MediatedDispatchTests(unittest.TestCase):
                 "resume-event-settled-result", "repo-1", "run-1", "item-1",
                 "effect-1", "plan:run-1", "revision-1", request.pause_id,
                 request.checkpoint_event_id, paused.event_hash,
-                request.fence_id, LifecycleState.VALIDATING, None,
+                request.fence_id, LifecycleState.VALIDATING,
+                "validation-application:v1:validator-observation-t08:"
+                "check-1:validator-attempt-1",
                 catalog_head, run_heads["run-1"],
                 store._run_heads_digest(run_heads),
             )
@@ -1005,9 +2125,6 @@ class MediatedDispatchTests(unittest.TestCase):
                 ),
             )
             self.assertEqual(resumed.resulting_state, LifecycleState.VALIDATING)
-            validation = SyntheticValidationCoordinator(
-                store, TransitionEngine(), authority, validator_adapter
-            )
             applied = validation.apply_result(
                 ValidationApplicationRequest(
                     "application-settled-result", "apply-command-settled-result",
@@ -1045,13 +2162,11 @@ class MediatedDispatchTests(unittest.TestCase):
                 "PAUSE", "pause-scope-result-without-cessation",
             )
             authority.register_operator(pause_grant)
-            paused = dispatch.pause_validation(
-                request,
-                authority.claim_operator(*pause_grant.__dict__.values()),
-            )
-            self.assertEqual(
-                paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
-            )
+            with self.assertRaises(DispatchDenied):
+                dispatch.pause_validation(
+                    request,
+                    authority.claim_operator(*pause_grant.__dict__.values()),
+                )
             connection = sqlite3.connect(store._database_path)
             try:
                 accounting = connection.execute(
@@ -1063,10 +2178,18 @@ class MediatedDispatchTests(unittest.TestCase):
                     "SELECT COUNT(*) FROM validator_observations WHERE "
                     "observation_id = 'validator-observation-t08'"
                 ).fetchone()[0]
+                lifecycle = connection.execute(
+                    "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()[0]
+                activity_fences = connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code = "
+                    "'VALIDATOR_ACTIVITY_UNKNOWN'"
+                ).fetchone()[0]
             finally:
                 connection.close()
             self.assertEqual(accounting, ("CONSUMED", 1, 0))
             self.assertEqual(observations, 1)
+            self.assertEqual((lifecycle, activity_fences), ("RECONCILIATION_REQUIRED", 1))
             store.load_verified("repo-1", authority=authority)
 
     def test_t08_existing_validator_accounting_is_never_downgraded_or_recharged(
@@ -1576,15 +2699,14 @@ class MediatedDispatchTests(unittest.TestCase):
                 observed = intake_future.result()
             if observed is None:
                 observed = validation.intake_result(observation_command)
-            if paused is None:
-                paused = dispatch.pause_validation(request, pause_capability)
-            self.assertEqual(
-                paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
-            )
+            if paused is not None:
+                self.assertEqual(
+                    paused.resulting_state,
+                    LifecycleState.RECONCILIATION_REQUIRED,
+                )
             self.assertIn(
                 observed.resulting_state,
                 {
-                    LifecycleState.VALIDATING,
                     LifecycleState.RECONCILIATION_REQUIRED,
                 },
                 "the observation receipt reflects its own commit order; the "
@@ -1606,9 +2728,19 @@ class MediatedDispatchTests(unittest.TestCase):
                     "budget_reservations WHERE reservation_id = "
                     "'validator-reservation-t08'"
                 ).fetchone()
+                activity_fence_count = connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code = "
+                    "'VALIDATOR_ACTIVITY_UNKNOWN'"
+                ).fetchone()[0]
             finally:
                 connection.close()
-            self.assertEqual(counts, (1, 1, 1, 1, 1))
+            self.assertEqual(
+                counts,
+                (1, 1, 1, 1, 1)
+                if paused is not None
+                else (0, 1, 1, 1, 0),
+            )
+            self.assertEqual(activity_fence_count, 1)
             self.assertEqual(accounting, ("CONSUMED", 1, 0))
             store.load_verified("repo-1", authority=authority)
 
@@ -1992,6 +3124,7 @@ class MediatedDispatchTests(unittest.TestCase):
         result: bool = False,
         cessation: bool = False,
         intake_result: bool = True,
+        result_usage_units: int | None = 1,
     ):
         authority = SyntheticAuthority()
         effect_grant = SyntheticGrant(
@@ -2058,12 +3191,17 @@ class MediatedDispatchTests(unittest.TestCase):
                     "input-1", "validator-attempt-1", "read-only-1",
                     "result-digest-t08", "PASS",
                 ),
-                usage_units=1,
+                usage_units=result_usage_units,
             )
             committed = launched.intent
             settlement_request = BudgetSettlementRequest(
                 "validator-settlement-t08", "validator-reservation-t08", "",
-                BudgetDisposition.CONSUMED, 1,
+                (
+                    BudgetDisposition.CONSUMED
+                    if result_usage_units is not None
+                    else BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                ),
+                result_usage_units,
                 launched.result.result_id, "VALIDATOR_USAGE_REPORTED",
                 attempt_id="validator-attempt-1",
             )
@@ -3887,6 +5025,57 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertTrue(replay.replayed)
             self.assertEqual(store.table_counts()["validator_observations"], 1)
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+            cessation_attestation = (
+                authority.issue_validator_cessation_attestation(
+                    "cessation-attestation-1", "cessation-1",
+                    validator_adapter._target_digest("repo-1"),
+                    validator_capability.claim_id,
+                    "VALIDATOR:launch:command-1", launched.intent.event_hash,
+                    "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                    "check-1", "validator-attempt-1",
+                )
+            )
+            cessation_seal = validator_adapter.seal_cessation(
+                cessation_attestation, authority
+            )
+            cessation = store.record_validator_cessation(
+                ValidatorCessationRequest(
+                    "cessation-1", "cessation-command-1", "cessation-event-1",
+                    "repo-1", "run-1", "item-1", "effect-1",
+                    "launch:command-1", "validator-attempt-1", "revision-1",
+                    "check-1", cessation_seal.cessation_hash,
+                ),
+                authority,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                observation = connection.execute(
+                    "SELECT event_hash FROM validator_observations WHERE "
+                    "observation_id = 'validator-observation-1'"
+                ).fetchone()
+                uncertainty_ids = tuple(
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT uncertainty_id FROM uncertainty_instances WHERE "
+                        "origin_event_id = 'validator-observation-event-1'"
+                    )
+                )
+            finally:
+                connection.close()
+            reconciliation = validation.reconcile_result(
+                ReconcileValidatorResultRequest(
+                    "reconciliation-1", "reconciliation-command-1",
+                    "reconciliation-event-1", "repo-1", "run-1", "item-1",
+                    "effect-1", "plan-1", "revision-1",
+                    "validator-observation-1", observation[0], "cessation-1",
+                    "cessation-event-1", cessation.event_hash,
+                    "validator-settlement-1", validator_settlement.settlement_hash,
+                    uncertainty_ids, "attempt-1", 1, cessation.event_hash, None,
+                )
+            )
+            self.assertEqual(
+                reconciliation.resulting_state, LifecycleState.VALIDATING
+            )
             applied = validation.apply_result(
                 ValidationApplicationRequest(
                     "application-1", "apply-command-1", "apply-event-1",

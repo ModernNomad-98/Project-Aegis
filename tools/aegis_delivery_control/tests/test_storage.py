@@ -897,8 +897,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "local_pause_actions": 0,
                 "external_pause_actions": 0,
                 "reconciliation_pause_actions": 0,
+                "uncertainty_instances": 0,
+                "uncertainty_resolutions": 0,
+                "reconciliation_actions": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
+                "reconciliation_resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
                 "operator_redemptions": 0,
@@ -1830,8 +1834,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "local_pause_actions": 0,
                 "external_pause_actions": 0,
                 "reconciliation_pause_actions": 0,
+                "uncertainty_instances": 0,
+                "uncertainty_resolutions": 0,
+                "reconciliation_actions": 0,
                 "validation_pause_actions": 0,
                 "resume_actions": 0,
+                "reconciliation_resume_actions": 0,
                 "stop_actions": 0,
                 "stop_escalations": 0,
                 "operator_redemptions": 0,
@@ -8020,6 +8028,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = settlement.settlement_hash
+        self._record_validator_cessation_for(
+            suffix=suffix, result_available=True, verdict=verdict
+        )
         recorded = self.store._record_validator_observation(
             ValidatorObservationRequest(
                 f"validator-observation-{suffix}",
@@ -8037,8 +8048,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
         return recorded
 
     def _record_validator_cessation_for(
-        self, *, suffix: str = "1", result_available: bool = False
+        self, *, suffix: str = "1", result_available: bool = False,
+        verdict: str = "PASS", check_id: str | None = None,
     ):
+        check_id = check_id or f"check-{suffix}"
         connection = sqlite3.connect(self.database_path)
         connection.row_factory = sqlite3.Row
         try:
@@ -8057,14 +8070,14 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection = sqlite3.connect(validator_path)
             try:
                 connection.execute(
-                    "INSERT INTO synthetic_validator_results VALUES "
+                    "INSERT OR IGNORE INTO synthetic_validator_results VALUES "
                     "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
                     (
                         intent["capability_claim_id"],
                         f"validator-result-{suffix}", "repo-1", "effect-1",
-                        "revision-1", f"check-{suffix}", "input-1",
+                        "revision-1", check_id, "input-1",
                         f"validator-attempt-{suffix}",
-                        f"result-digest-{suffix}", "PASS", 1,
+                        f"result-digest-{suffix}", verdict, 1,
                     ),
                 )
                 connection.commit()
@@ -8075,7 +8088,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             adapter._target_digest("repo-1"), intent["capability_claim_id"],
             f"VALIDATOR:validator-intent-{suffix}", intent["event_hash"],
             "repo-1", "run-1", "item-1", "effect-1", "revision-1",
-            f"check-{suffix}", f"validator-attempt-{suffix}",
+            check_id, f"validator-attempt-{suffix}",
         )
         seal = adapter.seal_cessation(attestation, self.authority)
         receipt = self.store.record_validator_cessation(
@@ -8084,11 +8097,17 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 f"cessation-event-{suffix}", "repo-1", "run-1", "item-1",
                 "effect-1", f"validator-intent-{suffix}",
                 f"validator-attempt-{suffix}", "revision-1",
-                f"check-{suffix}", seal.cessation_hash,
+                check_id, seal.cessation_hash,
             ),
             self.authority,
         )
-        self.oracle.allowed_head = receipt.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
         return receipt
 
     def _stop_run(self) -> str:
@@ -8226,7 +8245,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.oracle.allowed_head = event_hash
 
         with self.assertRaisesRegex(
-            StorageIntegrityError, "validator observation semantics"
+            StorageIntegrityError,
+            "uncertainty-instance projection|validator observation semantics",
         ):
             self.store.load_verified("repo-1")
 
@@ -10697,6 +10717,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = settlement.settlement_hash
+        self._record_validator_cessation_for(
+            suffix="2", result_available=True, check_id="check-1"
+        )
         passed_observation = self.store._record_validator_observation(
             ValidatorObservationRequest(
                 "validator-observation-2", "validator-observe-command-2",

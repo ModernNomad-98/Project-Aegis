@@ -29,6 +29,7 @@ from .authority import (
     SyntheticNonexecutionAttestation,
     SyntheticOperatorCapability,
     SyntheticResumeEvidence,
+    SyntheticReconciliationResumeEvidence,
     SyntheticSettlementProof,
     SyntheticValidationRecoveryAttestation,
     SyntheticValidatorCessationAttestation,
@@ -64,6 +65,8 @@ from .contracts import (
     PauseValidationRequest,
     PlanAcceptanceRequest,
     ReadinessEvaluationRequest,
+    ReconciliationPauseResumeRequest,
+    ReconcileValidatorResultRequest,
     ResumeActivitySettlementRequest,
     ResumeRequest,
     SettlementReceipt,
@@ -131,11 +134,18 @@ def _derive_resume_route(
         return LifecycleState.BLOCKED
     if preserved_lifecycle is LifecycleState.PLANNED and preserved_cursor is None:
         return LifecycleState.PLANNED
-    if preserved_lifecycle is LifecycleState.VALIDATING and preserved_cursor in {
-        None,
-        LifecycleState.VALIDATING.value,
-    }:
-        return LifecycleState.VALIDATING
+    if preserved_lifecycle is LifecycleState.VALIDATING:
+        typed_validation_cursor = (
+            preserved_cursor is not None
+            and len(parts := preserved_cursor.split(":")) == 5
+            and parts[0:2] == ["validation-application", "v1"]
+            and all(parts[2:])
+        )
+        if preserved_cursor in {
+            None,
+            LifecycleState.VALIDATING.value,
+        } or typed_validation_cursor:
+            return LifecycleState.VALIDATING
     if preserved_lifecycle is LifecycleState.BLOCKED:
         if preserved_cursor is None:
             return LifecycleState.PLANNED
@@ -160,6 +170,8 @@ _EVENT_KINDS = frozenset(
         "PAUSE_SETTLED",
         "PLAN_ACCEPTED",
         "READINESS_EVALUATED",
+        "RECONCILIATION_RECORDED",
+        "RECONCILIATION_PAUSE_RESUMED",
         "RECEIPT_RECORDED",
         "RESUME_ACCEPTED",
         "STOP_RECORDED",
@@ -191,6 +203,8 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "PAUSE_SETTLED",
         "PLAN_ACCEPTED",
         "READINESS_EVALUATED",
+        "RECONCILIATION_RECORDED",
+        "RECONCILIATION_PAUSE_RESUMED",
         "RECEIPT_RECORDED",
         "RESUME_ACCEPTED",
         "STOP_RECORDED",
@@ -281,6 +295,27 @@ _LIFECYCLE_ROUTES: Mapping[
         }
     ),
     "RECEIPT_RECORDED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "RECONCILIATION_RECORDED": frozenset(
+        {
+            (LifecycleState.RECONCILIATION_REQUIRED, target)
+            for target in {
+                LifecycleState.RECONCILIATION_REQUIRED,
+                LifecycleState.PAUSED,
+                LifecycleState.BLOCKED,
+                LifecycleState.VALIDATING,
+                LifecycleState.PLANNED,
+                LifecycleState.STOPPED,
+                LifecycleState.FAILED_FINAL,
+            }
+        }
+    ),
+    "RECONCILIATION_PAUSE_RESUMED": frozenset(
+        {
+            (LifecycleState.PAUSED, LifecycleState.VALIDATING),
+            (LifecycleState.PAUSED, LifecycleState.PAUSED),
+            (LifecycleState.PAUSED, LifecycleState.BLOCKED),
+        }
+    ),
     "RESUME_ACCEPTED": frozenset(
         {
             (LifecycleState.PAUSED, LifecycleState.PLANNED),
@@ -735,6 +770,26 @@ class SQLiteStateStore:
 
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
+        reconciliation_tables = {
+            "uncertainty_instances", "uncertainty_resolutions",
+            "reconciliation_actions",
+        }
+        existing_reconciliation_tables = {
+            str(row["name"])
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+            if str(row["name"]) in reconciliation_tables
+        }
+        if existing_reconciliation_tables and (
+            existing_reconciliation_tables != reconciliation_tables
+        ):
+            raise StorageIntegrityError(
+                "T17 reconciliation schema is partially migrated"
+            )
+        reconciliation_schema_existed = bool(
+            existing_reconciliation_tables
+        )
         connection.executescript(
             """
             BEGIN IMMEDIATE;
@@ -1439,6 +1494,44 @@ class SQLiteStateStore:
                 resulting_state TEXT NOT NULL CHECK (resulting_state = 'BLOCKED'),
                 body_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS reconciliation_resume_actions (
+                resume_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                source_pause_id TEXT NOT NULL REFERENCES reconciliation_pause_actions(pause_id),
+                source_pause_event_id TEXT NOT NULL,
+                source_pause_event_hash TEXT NOT NULL,
+                pause_fence_id TEXT NOT NULL,
+                source_reconciliation_id TEXT NOT NULL REFERENCES reconciliation_actions(reconciliation_id),
+                source_reconciliation_event_id TEXT NOT NULL,
+                source_reconciliation_event_hash TEXT NOT NULL,
+                continuation_cursor TEXT NOT NULL,
+                expected_catalog_head TEXT NOT NULL,
+                expected_run_head TEXT NOT NULL,
+                expected_run_heads_digest TEXT NOT NULL,
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL,
+                capability_scope_digest TEXT NOT NULL,
+                capability_issuer_fingerprint TEXT NOT NULL,
+                capability_issuer_mac TEXT NOT NULL,
+                evidence_proof_id TEXT NOT NULL UNIQUE,
+                evidence_request_digest TEXT NOT NULL,
+                evidence_issuer_fingerprint TEXT NOT NULL,
+                evidence_issuer_mac TEXT NOT NULL,
+                blocker_codes_json TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (
+                    resulting_state IN ('VALIDATING', 'PAUSED', 'BLOCKED')
+                ),
+                body_json TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS stop_actions (
                 stop_id TEXT PRIMARY KEY,
                 command_id TEXT NOT NULL UNIQUE,
@@ -1603,6 +1696,446 @@ class SQLiteStateStore:
             connection.execute("ALTER TABLE runs ADD COLUMN continuation_cursor TEXT")
         SQLiteStateStore._migrate_validation_recovery_schema(connection)
         SQLiteStateStore._migrate_terminal_validation_schema(connection)
+        SQLiteStateStore._migrate_reconciliation_schema(
+            connection, backfill=not reconciliation_schema_existed
+        )
+
+    @staticmethod
+    def _migrate_reconciliation_schema(
+        connection: sqlite3.Connection, *, backfill: bool
+    ) -> None:
+        table_sql = {
+            "uncertainty_instances": """
+                CREATE TABLE uncertainty_instances (
+                    uncertainty_id TEXT PRIMARY KEY,
+                    fence_id TEXT NOT NULL UNIQUE,
+                    uncertainty_kind TEXT NOT NULL CHECK (uncertainty_kind IN (
+                        'OUTCOME', 'ACTIVITY', 'BILLING', 'SOURCE_CONTROL',
+                        'AUTHORITY_ORDERING', 'INTEGRITY'
+                    )),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    attempt_id TEXT NOT NULL,
+                    check_id TEXT,
+                    origin_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    origin_event_hash TEXT NOT NULL,
+                    reservation_id TEXT REFERENCES budget_reservations(reservation_id),
+                    settlement_head_hash TEXT,
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "uncertainty_resolutions": """
+                CREATE TABLE uncertainty_resolutions (
+                    uncertainty_id TEXT PRIMARY KEY REFERENCES uncertainty_instances(uncertainty_id),
+                    reconciliation_id TEXT NOT NULL,
+                    event_id TEXT NOT NULL REFERENCES events(event_id),
+                    proof_kind TEXT NOT NULL,
+                    proof_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    proof_event_hash TEXT NOT NULL,
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "reconciliation_actions": """
+                CREATE TABLE reconciliation_actions (
+                    reconciliation_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    route TEXT NOT NULL CHECK (route IN ('VALIDATOR_RESULT')),
+                    plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    source_id TEXT NOT NULL,
+                    source_event_hash TEXT NOT NULL,
+                    cessation_id TEXT NOT NULL REFERENCES validator_cessations(cessation_id),
+                    cessation_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    cessation_event_hash TEXT NOT NULL,
+                    settlement_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    settlement_hash TEXT NOT NULL,
+                    resolved_uncertainty_ids_json TEXT NOT NULL,
+                    slot_attempt_id TEXT NOT NULL,
+                    slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                    continuation_cursor TEXT,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL,
+                    body_json TEXT NOT NULL
+                )
+            """,
+        }
+        expected_columns = {
+            "uncertainty_instances": (
+                "uncertainty_id", "fence_id", "uncertainty_kind",
+                "repository_id", "run_id", "item_id", "logical_effect_id",
+                "attempt_id", "check_id", "origin_event_id",
+                "origin_event_hash", "reservation_id",
+                "settlement_head_hash", "body_json",
+            ),
+            "uncertainty_resolutions": (
+                "uncertainty_id", "reconciliation_id", "event_id",
+                "proof_kind", "proof_event_id", "proof_event_hash",
+                "body_json",
+            ),
+            "reconciliation_actions": (
+                "reconciliation_id", "command_id", "event_id",
+                "repository_id", "run_id", "item_id", "logical_effect_id",
+                "route", "plan_id", "revision_digest", "source_id",
+                "source_event_hash", "cessation_id", "cessation_event_id",
+                "cessation_event_hash", "settlement_event_id",
+                "settlement_hash", "resolved_uncertainty_ids_json",
+                "slot_attempt_id", "slot_generation",
+                "continuation_cursor", "payload_digest", "event_hash",
+                "resulting_state", "body_json",
+            ),
+        }
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            if backfill:
+                for sql in table_sql.values():
+                    connection.execute(sql)
+
+            def canonical_schema(sql: str) -> str:
+                return "".join(sql.upper().split()).replace(
+                    "IFNOTEXISTS", ""
+                ).rstrip(";")
+
+            expected_foreign_keys = {
+                "uncertainty_instances": {
+                    ("repository_id", "repositories", "repository_id"),
+                    ("run_id", "runs", "run_id"),
+                    ("origin_event_id", "events", "event_id"),
+                    (
+                        "reservation_id", "budget_reservations",
+                        "reservation_id",
+                    ),
+                },
+                "uncertainty_resolutions": {
+                    (
+                        "uncertainty_id", "uncertainty_instances",
+                        "uncertainty_id",
+                    ),
+                    ("event_id", "events", "event_id"),
+                    ("proof_event_id", "events", "event_id"),
+                },
+                "reconciliation_actions": {
+                    ("event_id", "events", "event_id"),
+                    ("repository_id", "repositories", "repository_id"),
+                    ("run_id", "runs", "run_id"),
+                    ("plan_id", "validation_plans", "plan_id"),
+                    (
+                        "cessation_id", "validator_cessations",
+                        "cessation_id",
+                    ),
+                    ("cessation_event_id", "events", "event_id"),
+                    ("settlement_event_id", "events", "event_id"),
+                },
+            }
+            expected_unique_indexes = {
+                "uncertainty_instances": {
+                    ("uncertainty_id",), ("fence_id",),
+                },
+                "uncertainty_resolutions": {("uncertainty_id",)},
+                "reconciliation_actions": {
+                    ("reconciliation_id",), ("command_id",),
+                    ("event_id",), ("event_hash",),
+                },
+            }
+            for table_name, columns in expected_columns.items():
+                actual_columns = tuple(
+                    str(row["name"])
+                    for row in connection.execute(
+                        f"PRAGMA table_info({table_name})"
+                    )
+                )
+                schema_row = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                    "name = ?", (table_name,),
+                ).fetchone()
+                actual_foreign_keys = {
+                    (str(row["from"]), str(row["table"]), str(row["to"]))
+                    for row in connection.execute(
+                        f"PRAGMA foreign_key_list({table_name})"
+                    )
+                }
+                actual_unique_indexes = {
+                    tuple(
+                        str(column["name"])
+                        for column in connection.execute(
+                            f"PRAGMA index_info('{index['name']}')"
+                        )
+                    )
+                    for index in connection.execute(
+                        f"PRAGMA index_list({table_name})"
+                    )
+                    if bool(index["unique"])
+                }
+                if (
+                    actual_columns != columns
+                    or schema_row is None
+                    or canonical_schema(str(schema_row["sql"]))
+                    != canonical_schema(table_sql[table_name])
+                    or actual_foreign_keys != expected_foreign_keys[table_name]
+                    or actual_unique_indexes
+                    != expected_unique_indexes[table_name]
+                ):
+                    raise StorageIntegrityError(
+                        f"{table_name} schema is incompatible"
+                    )
+            if not backfill:
+                connection.commit()
+                return
+            if connection.execute(
+                "SELECT 1 FROM events WHERE event_kind = "
+                "'RECONCILIATION_RECORDED' LIMIT 1"
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "legacy T17 history has no reconstructible projection schema"
+                )
+
+            def verified_event_body(
+                event_id: str, event_kind: str, projection_json: str
+            ) -> tuple[sqlite3.Row, dict[str, object]]:
+                event = connection.execute(
+                    "SELECT * FROM events WHERE event_id = ? AND event_kind = ?",
+                    (event_id, event_kind),
+                ).fetchone()
+                if event is None:
+                    raise StorageIntegrityError(
+                        "legacy T17 source is absent from immutable history"
+                    )
+                try:
+                    body = json.loads(str(event["body_json"]))
+                except json.JSONDecodeError as error:
+                    raise StorageIntegrityError(
+                        "legacy T17 source event is not valid JSON"
+                    ) from error
+                canonical_body = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                if (
+                    canonical_body != str(event["body_json"])
+                    or canonical_body != projection_json
+                    or SQLiteStateStore._event_hash(body)
+                    != event["event_hash"]
+                ):
+                    raise StorageIntegrityError(
+                        "legacy T17 source projection diverges from history"
+                    )
+                return event, body
+
+            intent_bodies: dict[str, dict[str, object]] = {}
+            for intent in connection.execute(
+                "SELECT * FROM validator_intents ORDER BY rowid"
+            ):
+                event, body = verified_event_body(
+                    str(intent["event_id"]), "VALIDATOR_INTENT_COMMITTED",
+                    str(intent["body_json"]),
+                )
+                direct_fields = (
+                    "validator_intent_id", "command_id", "event_id",
+                    "repository_id", "run_id", "item_id",
+                    "logical_effect_id", "parent_attempt_id",
+                    "parent_observation_id", "parent_event_hash",
+                    "revision_digest", "check_id", "input_digest",
+                    "validator_attempt_id", "capability_claim_id",
+                    "capability_grant_id", "capability_scope_digest",
+                    "permission_use_id", "reservation_id", "recovery_id",
+                )
+                if any(intent[field] != body.get(field) for field in direct_fields) or (
+                    intent["event_hash"] != event["event_hash"]
+                ):
+                    raise StorageIntegrityError(
+                        "legacy validator-intent projection diverges from history"
+                    )
+                intent_bodies[str(intent["validator_intent_id"])] = body
+
+            cessation_bodies: list[tuple[sqlite3.Row, dict[str, object]]] = []
+            for cessation in connection.execute(
+                "SELECT * FROM validator_cessations ORDER BY rowid"
+            ):
+                event, body = verified_event_body(
+                    str(cessation["event_id"]),
+                    "VALIDATOR_CESSATION_RECORDED",
+                    str(cessation["body_json"]),
+                )
+                direct_fields = (
+                    "cessation_id", "command_id", "event_id",
+                    "repository_id", "run_id", "item_id",
+                    "logical_effect_id", "validator_intent_id",
+                    "validator_attempt_id", "source_claim_id",
+                    "source_event_hash", "revision_digest", "check_id",
+                    "source_cessation_hash", "result_id", "result_digest",
+                )
+                if any(
+                    cessation[field] != body.get(field)
+                    for field in direct_fields
+                ) or (
+                    bool(cessation["result_available"])
+                    is not bool(body.get("result_available"))
+                    or cessation["event_hash"] != event["event_hash"]
+                ):
+                    raise StorageIntegrityError(
+                        "legacy validator-cessation projection diverges from history"
+                    )
+                cessation_bodies.append((event, body))
+
+            rows = connection.execute(
+                "SELECT observation.*, intent.reservation_id FROM "
+                "validator_observations AS observation JOIN validator_intents "
+                "AS intent ON intent.validator_intent_id = "
+                "observation.validator_intent_id ORDER BY observation.rowid"
+            ).fetchall()
+            inserted_count = 0
+            for row in rows:
+                observation_event, observation_body = verified_event_body(
+                    str(row["event_id"]),
+                    "VALIDATOR_OBSERVATION_RECORDED", str(row["body_json"]),
+                )
+                direct_fields = (
+                    "observation_id", "source_result_id", "command_id",
+                    "event_id", "repository_id", "run_id", "item_id",
+                    "logical_effect_id", "validator_intent_id",
+                    "validator_attempt_id", "source_claim_id",
+                    "revision_digest", "check_id", "input_digest",
+                    "result_digest", "verdict", "usage_units",
+                    "settlement_event_id", "settlement_hash",
+                    "observation_digest", "command_payload_digest",
+                )
+                intent_body = intent_bodies.get(str(row["validator_intent_id"]))
+                if (
+                    intent_body is None
+                    or row["reservation_id"] != intent_body.get("reservation_id")
+                    or any(
+                        row[field] != observation_body.get(field)
+                        for field in direct_fields
+                    )
+                    or row["event_hash"] != observation_event["event_hash"]
+                    or row["resulting_state"]
+                    != observation_body.get("lifecycle_to")
+                ):
+                    raise StorageIntegrityError(
+                        "legacy validator-observation projection diverges from "
+                        "history"
+                    )
+                prior_cessation = next(
+                    (
+                        body
+                        for event, body in cessation_bodies
+                        if body.get("validator_intent_id")
+                        == row["validator_intent_id"]
+                        and body.get("validator_attempt_id")
+                        == row["validator_attempt_id"]
+                        and body.get("result_available") is True
+                        and body.get("result_id") == row["source_result_id"]
+                        and body.get("result_digest") == row["result_digest"]
+                        and (
+                            int(event["writer_epoch"]), int(event["sequence"])
+                        ) < (
+                            int(observation_event["writer_epoch"]),
+                            int(observation_event["sequence"]),
+                        )
+                    ),
+                    None,
+                )
+                uncertainty_kinds = []
+                if prior_cessation is None:
+                    uncertainty_kinds.append(
+                        ("ACTIVITY", "VALIDATOR_ACTIVITY_UNKNOWN", None)
+                    )
+                if row["usage_units"] is None:
+                    uncertainty_kinds.append(
+                        (
+                            "BILLING", "VALIDATOR_BILLING_UNKNOWN",
+                            row["settlement_hash"],
+                        )
+                    )
+                for uncertainty_kind, reason_code, settlement_head in (
+                    uncertainty_kinds
+                ):
+                    uncertainty_id = SQLiteStateStore._uncertainty_id(
+                        uncertainty_kind=uncertainty_kind,
+                        repository_id=str(row["repository_id"]),
+                        run_id=str(row["run_id"]),
+                        item_id=str(row["item_id"]),
+                        logical_effect_id=str(row["logical_effect_id"]),
+                        attempt_id=str(row["validator_attempt_id"]),
+                        check_id=str(row["check_id"]),
+                        origin_event_id=str(row["event_id"]),
+                        origin_event_hash=str(row["event_hash"]),
+                        reservation_id=str(row["reservation_id"]),
+                    )
+                    uncertainty_body = {
+                        "check_id": row["check_id"],
+                        "fence_id": uncertainty_id,
+                        "item_id": row["item_id"],
+                        "logical_effect_id": row["logical_effect_id"],
+                        "origin_event_hash": row["event_hash"],
+                        "origin_event_id": row["event_id"],
+                        "repository_id": row["repository_id"],
+                        "reservation_id": row["reservation_id"],
+                        "run_id": row["run_id"],
+                        "schema_version": 1,
+                        "settlement_head_hash": settlement_head,
+                        "uncertainty_id": uncertainty_id,
+                        "uncertainty_kind": uncertainty_kind,
+                        "validator_attempt_id": row["validator_attempt_id"],
+                    }
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            uncertainty_id, row["repository_id"],
+                            row["item_id"], row["logical_effect_id"],
+                            reason_code, row["event_id"],
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO uncertainty_instances VALUES ("
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            uncertainty_id, uncertainty_id, uncertainty_kind,
+                            row["repository_id"], row["run_id"],
+                            row["item_id"], row["logical_effect_id"],
+                            row["validator_attempt_id"], row["check_id"],
+                            row["event_id"], row["event_hash"],
+                            row["reservation_id"], settlement_head,
+                            json.dumps(
+                                uncertainty_body, sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        ),
+                    )
+                    inserted_count += 1
+            if (
+                connection.execute(
+                    "SELECT COUNT(*) FROM uncertainty_instances"
+                ).fetchone()[0]
+                != inserted_count
+                or connection.execute(
+                    "SELECT COUNT(*) FROM uncertainty_resolutions"
+                ).fetchone()[0]
+                != 0
+                or connection.execute(
+                    "SELECT COUNT(*) FROM reconciliation_actions"
+                ).fetchone()[0]
+                != 0
+            ):
+                raise StorageIntegrityError(
+                    "T17 reconciliation backfill changed projection rows"
+                )
+            if connection.execute(
+                "PRAGMA foreign_key_check"
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "T17 reconciliation backfill violates foreign keys"
+                )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
 
     @staticmethod
     def _pause_preserved_state_from_history(
@@ -1650,6 +2183,7 @@ class SQLiteStateStore:
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
                     "VALIDATOR_INTENT_COMMITTED",
+                    "RECONCILIATION_RECORDED",
                 }:
                     preserved_cursor = prior_body.get("continuation_cursor")
             return str(request_body["lifecycle_from"]), preserved_cursor
@@ -2418,6 +2952,36 @@ class SQLiteStateStore:
     def _event_hash(body: Mapping[str, object]) -> str:
         encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
+
+    @classmethod
+    def _uncertainty_id(
+        cls,
+        *,
+        uncertainty_kind: str,
+        repository_id: str,
+        run_id: str,
+        item_id: str,
+        logical_effect_id: str,
+        attempt_id: str,
+        check_id: str | None,
+        origin_event_id: str,
+        origin_event_hash: str,
+        reservation_id: str | None,
+    ) -> str:
+        binding = {
+            "domain": "aegis-t17-uncertainty-v1",
+            "uncertainty_kind": uncertainty_kind,
+            "repository_id": repository_id,
+            "run_id": run_id,
+            "item_id": item_id,
+            "logical_effect_id": logical_effect_id,
+            "attempt_id": attempt_id,
+            "check_id": check_id,
+            "origin_event_id": origin_event_id,
+            "origin_event_hash": origin_event_hash,
+            "reservation_id": reservation_id,
+        }
+        return "uncertainty:" + cls._event_hash(binding)
 
     @staticmethod
     def _run_heads_digest(run_heads: Mapping[str, str]) -> str:
@@ -3942,16 +4506,6 @@ class SQLiteStateStore:
                     raise ValueError(
                         "unknown validator usage lacks uncertain accounting"
                     )
-                resulting_state = (
-                    predecessor_state
-                    if predecessor_state
-                    in {
-                        LifecycleState.COMPLETED,
-                        LifecycleState.FAILED_FINAL,
-                        LifecycleState.STOPPED,
-                    }
-                    else LifecycleState.RECONCILIATION_REQUIRED
-                )
             else:
                 if bool(settlement["uncertainty"]) or int(
                     settlement["charged_units"]
@@ -3959,7 +4513,35 @@ class SQLiteStateStore:
                     raise ValueError(
                         "validator usage does not match settled accounting"
                     )
-                resulting_state = predecessor_state
+            matched_cessation = connection.execute(
+                "SELECT 1 FROM validator_cessations AS cessation JOIN events "
+                "AS event ON event.event_id = cessation.event_id WHERE "
+                "cessation.validator_intent_id = ? AND "
+                "cessation.validator_attempt_id = ? AND "
+                "cessation.result_available = 1 AND cessation.result_id = ? "
+                "AND cessation.result_digest = ? AND event.sequence < ? LIMIT 1",
+                (
+                    request.validator_intent_id,
+                    request.validator_attempt_id, request.source_result_id,
+                    request.result_digest, body["sequence"],
+                ),
+            ).fetchone()
+            resulting_state = (
+                predecessor_state
+                if (
+                    predecessor_state
+                    in {
+                        LifecycleState.COMPLETED,
+                        LifecycleState.FAILED_FINAL,
+                        LifecycleState.STOPPED,
+                    }
+                    or (
+                        request.usage_units is not None
+                        and matched_cessation is not None
+                    )
+                )
+                else LifecycleState.RECONCILIATION_REQUIRED
+            )
             if (
                 body["lifecycle_from"] != predecessor_state.value
                 or body["lifecycle_to"] != resulting_state.value
@@ -3971,6 +4553,710 @@ class SQLiteStateStore:
         ) as error:
             raise StorageIntegrityError(
                 "validator observation semantics are invalid"
+            ) from error
+
+    def _validate_validator_reconciliation_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            ReconcileValidatorResultRequest.__dataclass_fields__
+        ) | {
+            "continuation_cursor", "event_kind", "lifecycle_from",
+            "lifecycle_to", "payload_digest", "previous_event_hash",
+            "reconciliation_binding_version", "route", "schema_version",
+            "sequence", "writer_epoch",
+        }
+        try:
+            if set(body) != expected_fields or (
+                type(body["schema_version"]) is not int
+                or body["schema_version"] != 1
+                or type(body["reconciliation_binding_version"]) is not int
+                or body["reconciliation_binding_version"] != 1
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+                or not isinstance(body["resolved_uncertainty_ids"], list)
+            ):
+                raise ValueError("validator reconciliation schema is invalid")
+            request_values = {
+                field: body[field]
+                for field in ReconcileValidatorResultRequest.__dataclass_fields__
+            }
+            request_values["resolved_uncertainty_ids"] = tuple(
+                request_values["resolved_uncertainty_ids"]
+            )
+            request = ReconcileValidatorResultRequest(**request_values)
+            request.validate()
+            payload = {
+                **request.__dict__,
+                "reconciliation_binding_version": 1,
+                "route": "VALIDATOR_RESULT",
+            }
+            if (
+                body["payload_digest"] != self._event_hash(payload)
+                or body["event_kind"] != "RECONCILIATION_RECORDED"
+                or body["route"] != "VALIDATOR_RESULT"
+                or request.expected_run_head != body["previous_event_hash"]
+                or predecessor_state
+                is not LifecycleState.RECONCILIATION_REQUIRED
+                or body["lifecycle_from"]
+                != LifecycleState.RECONCILIATION_REQUIRED.value
+                or request.expected_continuation_cursor != predecessor_cursor
+            ):
+                raise ValueError("validator reconciliation binding is invalid")
+            observation = connection.execute(
+                "SELECT observation.*, intent.reservation_id, "
+                "intent.parent_attempt_id, "
+                "event.sequence AS observation_sequence FROM "
+                "validator_observations AS observation JOIN validator_intents "
+                "AS intent ON intent.validator_intent_id = "
+                "observation.validator_intent_id JOIN events AS event ON "
+                "event.event_id = observation.event_id WHERE "
+                "observation.observation_id = ?",
+                (request.observation_id,),
+            ).fetchone()
+            settlement = connection.execute(
+                "SELECT settlement.*, event.sequence AS settlement_sequence "
+                "FROM budget_settlements AS settlement JOIN events AS event "
+                "ON event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.settlement_event_id = ?",
+                (request.settlement_event_id,),
+            ).fetchone()
+            cessation = connection.execute(
+                "SELECT cessation.*, event.sequence AS cessation_sequence FROM "
+                "validator_cessations AS cessation JOIN events AS event ON "
+                "event.event_id = cessation.event_id WHERE "
+                "cessation.cessation_id = ? AND cessation.event_id = ?",
+                (request.cessation_id, request.cessation_event_id),
+            ).fetchone()
+            latest_prefix_settlement = connection.execute(
+                "SELECT settlement.settlement_event_id FROM "
+                "budget_settlements AS settlement JOIN events AS event ON "
+                "event.event_id = settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND event.sequence < ? "
+                "ORDER BY event.sequence DESC LIMIT 1",
+                (
+                    None if observation is None else observation["reservation_id"],
+                    body["sequence"],
+                ),
+            ).fetchone()
+            if observation is None or settlement is None or (
+                int(observation["observation_sequence"]) >= int(body["sequence"])
+                or int(settlement["settlement_sequence"]) >= int(body["sequence"])
+                or observation["event_hash"] != request.observation_event_hash
+                or observation["repository_id"] != request.repository_id
+                or observation["run_id"] != request.run_id
+                or observation["item_id"] != request.item_id
+                or observation["logical_effect_id"]
+                != request.logical_effect_id
+                or observation["revision_digest"] != request.revision_digest
+                or settlement["reservation_id"]
+                != observation["reservation_id"]
+                or settlement["settlement_hash"] != request.settlement_hash
+                or bool(settlement["uncertainty"])
+                or settlement["disposition"] not in {
+                    BudgetDisposition.CONSUMED.value,
+                    BudgetDisposition.ADJUSTED.value,
+                }
+                or latest_prefix_settlement is None
+                or latest_prefix_settlement["settlement_event_id"]
+                != request.settlement_event_id
+            ):
+                raise ValueError(
+                    "validator reconciliation source or settlement is invalid"
+                )
+            if cessation is None or (
+                int(cessation["cessation_sequence"]) >= int(body["sequence"])
+                or cessation["event_hash"] != request.cessation_event_hash
+                or cessation["validator_intent_id"]
+                != observation["validator_intent_id"]
+                or cessation["validator_attempt_id"]
+                != observation["validator_attempt_id"]
+                or not bool(cessation["result_available"])
+                or cessation["result_id"] != observation["source_result_id"]
+                or cessation["result_digest"] != observation["result_digest"]
+            ):
+                raise ValueError(
+                    "validator reconciliation cessation binding is invalid"
+                )
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                "repository_id = ? AND run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            if plan is None or (
+                plan["item_id"], plan["logical_effect_id"],
+                plan["revision_digest"],
+            ) != (
+                request.item_id, request.logical_effect_id,
+                request.revision_digest,
+            ):
+                raise ValueError("validator reconciliation plan is invalid")
+            if connection.execute(
+                "SELECT 1 FROM validation_applications AS application JOIN "
+                "events AS event ON event.event_id = application.event_id "
+                "WHERE application.observation_id = ? AND event.sequence < ?",
+                (request.observation_id, body["sequence"]),
+            ).fetchone() is not None:
+                raise ValueError("validator result was already applied")
+            operation_reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                (
+                    request.repository_id, request.run_id,
+                    request.logical_effect_id, request.expected_slot_attempt_id,
+                ),
+            ).fetchone()
+            if (
+                operation_reservation is None
+                or request.expected_slot_attempt_id
+                != observation["parent_attempt_id"]
+                or not self._operation_slot_current_before(
+                    connection, operation_reservation, int(body["sequence"]),
+                    expected_generation=request.expected_slot_generation,
+                )
+            ):
+                raise ValueError("validator reconciliation slot is invalid")
+            prior_cessation = connection.execute(
+                "SELECT 1 FROM validator_cessations AS prior JOIN events AS "
+                "event ON event.event_id = prior.event_id WHERE "
+                "prior.validator_intent_id = ? AND "
+                "prior.validator_attempt_id = ? AND prior.result_available = 1 "
+                "AND prior.result_id = ? AND prior.result_digest = ? AND "
+                "event.sequence < ? LIMIT 1",
+                (
+                    observation["validator_intent_id"],
+                    observation["validator_attempt_id"],
+                    observation["source_result_id"],
+                    observation["result_digest"],
+                    observation["observation_sequence"],
+                ),
+            ).fetchone()
+            uncertainty_kinds = []
+            if prior_cessation is None:
+                uncertainty_kinds.append("ACTIVITY")
+            if observation["usage_units"] is None:
+                uncertainty_kinds.append("BILLING")
+            expected_uncertainty_ids = {
+                self._uncertainty_id(
+                    uncertainty_kind=uncertainty_kind,
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    attempt_id=str(observation["validator_attempt_id"]),
+                    check_id=str(observation["check_id"]),
+                    origin_event_id=str(observation["event_id"]),
+                    origin_event_hash=str(observation["event_hash"]),
+                    reservation_id=str(observation["reservation_id"]),
+                )
+                for uncertainty_kind in uncertainty_kinds
+            }
+            if set(request.resolved_uncertainty_ids) != expected_uncertainty_ids:
+                raise ValueError(
+                    "validator reconciliation does not resolve the exact instance"
+                )
+            expected_cursor = (
+                "validation-application:v1:"
+                f"{observation['observation_id']}:"
+                f"{observation['check_id']}:"
+                f"{observation['validator_attempt_id']}"
+            )
+            expected_state, expected_route_cursor = (
+                self._validator_reconciliation_route_at_prefix(
+                    connection,
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    validator_observation_id=request.observation_id,
+                    validator_check_id=str(observation["check_id"]),
+                    validator_attempt_id=str(
+                        observation["validator_attempt_id"]
+                    ),
+                    resolved_uncertainty_ids=request.resolved_uncertainty_ids,
+                    boundary_sequence=int(body["sequence"]),
+                    boundary_writer_epoch=int(body["writer_epoch"]),
+                    preserved_cursor=predecessor_cursor,
+                    validation_cursor=expected_cursor,
+                )
+            )
+            if (
+                body["lifecycle_to"] != expected_state.value
+                or body["continuation_cursor"] != expected_route_cursor
+            ):
+                raise ValueError("validator reconciliation route is invalid")
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "validator reconciliation semantics are invalid"
+            ) from error
+
+    def _validator_reconciliation_route_at_prefix(
+        self,
+        connection: sqlite3.Connection,
+        *,
+        repository_id: str,
+        run_id: str,
+        item_id: str,
+        logical_effect_id: str,
+        validator_observation_id: str,
+        validator_check_id: str,
+        validator_attempt_id: str,
+        resolved_uncertainty_ids: tuple[str, ...],
+        boundary_sequence: int,
+        boundary_writer_epoch: int,
+        preserved_cursor: str | None,
+        validation_cursor: str,
+        cleared_fence_ids: tuple[str, ...] = (),
+    ) -> tuple[LifecycleState, str | None]:
+        """Derive T17 routing only from evidence preceding one event.
+
+        The same prefix replay is used while writing and while recovering.  It
+        deliberately does not consult the mutable dispatch-fence projection,
+        whose present value can include later resume or correction events.
+        """
+
+        selected = connection.execute(
+            "SELECT intent.event_id AS intent_event_id, event.writer_epoch, "
+            "event.sequence FROM validator_observations AS observation JOIN "
+            "validator_intents AS intent ON intent.validator_intent_id = "
+            "observation.validator_intent_id JOIN events AS event ON "
+            "event.event_id = intent.event_id WHERE observation.observation_id "
+            "= ? AND observation.run_id = ? AND observation.check_id = ? AND "
+            "observation.validator_attempt_id = ?",
+            (
+                validator_observation_id, run_id, validator_check_id,
+                validator_attempt_id,
+            ),
+        ).fetchone()
+        if selected is None:
+            raise DispatchDenied(
+                "validator reconciliation lost its selected attempt"
+            )
+        successor = connection.execute(
+            "SELECT 1 FROM validator_intents AS intent JOIN events AS event ON "
+            "event.event_id = intent.event_id WHERE intent.repository_id = ? "
+            "AND intent.run_id = ? AND intent.check_id = ? AND "
+            "intent.validator_attempt_id != ? AND (event.writer_epoch > ? OR "
+            "(event.writer_epoch = ? AND event.sequence > ?)) AND "
+            "(event.writer_epoch < ? OR (event.writer_epoch = ? AND "
+            "event.sequence < ?)) LIMIT 1",
+            (
+                repository_id, run_id, validator_check_id,
+                validator_attempt_id, int(selected["writer_epoch"]),
+                int(selected["writer_epoch"]), int(selected["sequence"]),
+                boundary_writer_epoch, boundary_writer_epoch,
+                boundary_sequence,
+            ),
+        ).fetchone()
+        recovery_successor = connection.execute(
+            "SELECT 1 FROM validation_recoveries AS recovery JOIN events AS "
+            "event ON event.event_id = recovery.event_id WHERE "
+            "recovery.repository_id = ? AND recovery.run_id = ? AND "
+            "recovery.check_id = ? AND recovery.failed_validator_attempt_id "
+            "= ? AND recovery.successor_validator_attempt_id != ? AND "
+            "(event.writer_epoch < ? OR (event.writer_epoch = ? AND "
+            "event.sequence < ?)) LIMIT 1",
+            (
+                repository_id, run_id, validator_check_id,
+                validator_attempt_id, validator_attempt_id,
+                boundary_writer_epoch, boundary_writer_epoch,
+                boundary_sequence,
+            ),
+        ).fetchone()
+        if successor is not None or recovery_successor is not None:
+            raise DispatchDenied(
+                "validator reconciliation cannot restore a superseded attempt"
+            )
+
+        relevant = lambda body: (
+            body.get("item_id") in {None, item_id}
+            and body.get("logical_effect_id") in {None, logical_effect_id}
+        )
+        active_fences: dict[str, tuple[str, str]] = {}
+        authority_fences: dict[str, str] = {}
+        recoverable_applications: set[str] = set()
+        settlement_dispositions: dict[str, BudgetDisposition] = {}
+        active_additional_liability: dict[str, str] = {}
+        reservation_caps = {
+            str(row["reservation_id"]): int(row["cap_units"])
+            for row in connection.execute(
+                "SELECT reservation_id, cap_units FROM budget_reservations "
+                "WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        rows = connection.execute(
+            "SELECT event_id, event_kind, body_json FROM events WHERE "
+            "repository_id = ? AND (writer_epoch < ? OR (writer_epoch = ? "
+            "AND sequence < ?)) ORDER BY writer_epoch, sequence",
+            (
+                repository_id, boundary_writer_epoch,
+                boundary_writer_epoch, boundary_sequence,
+            ),
+        ).fetchall()
+        for row in rows:
+            body = json.loads(str(row["body_json"]))
+            event_kind = str(row["event_kind"])
+            event_id = str(row["event_id"])
+            if event_kind in {
+                "PAUSE_REQUESTED", "PAUSE_FENCE_RECORDED",
+                "VALIDATION_PAUSE_REQUESTED",
+            } and body.get("fence_id") is not None and relevant(body):
+                active_fences[str(body["fence_id"])] = (
+                    (
+                        "PAUSE"
+                        if body.get("run_id") == run_id
+                        else "BLOCKER"
+                    ),
+                    str(body["reason_code"]),
+                )
+            elif event_kind == "AUTHORITY_EVALUATED":
+                if body.get("fact_kind") == AuthorityFactKind.CORRECTION.value:
+                    corrected = body.get("corrected_fact_id")
+                    fence_id = authority_fences.pop(str(corrected), None)
+                    if fence_id is not None:
+                        active_fences.pop(fence_id, None)
+                elif body.get("fence_id") is not None and relevant(body):
+                    fence_id = str(body["fence_id"])
+                    authority_fences[str(body["fact_id"])] = fence_id
+                    active_fences[fence_id] = (
+                        "BLOCKER", "AUTHORITY_CURRENT_DENIAL"
+                    )
+            elif (
+                event_kind == "BINDING_MISMATCH"
+                and body.get("fence_id") is not None
+                and relevant(body)
+            ):
+                active_fences[str(body["fence_id"])] = (
+                    "RECONCILIATION", str(body["reason_code"])
+                )
+            elif event_kind == "STOP_RECORDED" and relevant(body):
+                active_fences[str(body["fence_id"])] = (
+                    "BLOCKER", "STOPPED_RUN"
+                )
+            elif event_kind == "VALIDATION_FAILED" and relevant(body):
+                application_id = str(body["application_id"])
+                if body.get("classification") == FailureClassification.RECOVERABLE.value:
+                    recoverable_applications.add(application_id)
+                if body.get("lifecycle_to") == LifecycleState.FAILED_FINAL.value:
+                    active_fences[f"failed-final:{application_id}"] = (
+                        "BLOCKER", "FAILED_FINAL_APPLICATION"
+                    )
+            elif event_kind == "BLOCKER_RESOLVED":
+                recoverable_applications.discard(
+                    str(body["failed_application_id"])
+                )
+            elif event_kind in {
+                "RESUME_ACCEPTED", "RECONCILIATION_PAUSE_RESUMED",
+            } and relevant(body):
+                active_fences.pop(str(body["pause_fence_id"]), None)
+            elif (
+                event_kind in {"BUDGET_SETTLED", "NONDISPATCH_PROVEN"}
+                and relevant(body)
+            ):
+                reservation_id = str(body["reservation_id"])
+                previous = settlement_dispositions.get(
+                    reservation_id, BudgetDisposition.RESERVED
+                )
+                current = BudgetDisposition(str(body["disposition"]))
+                settlement_id = str(body["settlement_event_id"])
+                prior_additional = active_additional_liability.get(
+                    reservation_id
+                )
+                if (
+                    previous is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                    and current in {
+                        BudgetDisposition.ADJUSTED, BudgetDisposition.RELEASED,
+                    }
+                    and prior_additional is not None
+                ):
+                    active_fences.pop(prior_additional, None)
+                    active_additional_liability.pop(reservation_id, None)
+                if int(body["charged_units"]) > reservation_caps.get(
+                    reservation_id, int(body["charged_units"])
+                ):
+                    active_fences[f"budget-breach:{settlement_id}"] = (
+                        "BLOCKER", "BUDGET_CAP_EXCEEDED"
+                    )
+                if bool(body.get("contradiction")):
+                    active_fences[
+                        f"nonexecution-contradiction:{settlement_id}"
+                    ] = ("RECONCILIATION", "NONEXECUTION_CONTRADICTION")
+                if previous is BudgetDisposition.RELEASED:
+                    active_fences[f"late-accounting:{settlement_id}"] = (
+                        "RECONCILIATION", "LATE_ACCOUNTING_AFTER_RELEASE"
+                    )
+                if (
+                    current is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                    and previous in {
+                        BudgetDisposition.CONSUMED, BudgetDisposition.ADJUSTED,
+                    }
+                    and bool(body.get("additional_liability"))
+                ):
+                    fence_id = f"additional-liability:{settlement_id}"
+                    active_fences[fence_id] = (
+                        "RECONCILIATION", "ADDITIONAL_LIABILITY_UNRESOLVED"
+                    )
+                    active_additional_liability[reservation_id] = fence_id
+                settlement_dispositions[reservation_id] = current
+
+        for fence_id in cleared_fence_ids:
+            active_fences.pop(fence_id, None)
+
+        placeholders = ", ".join("?" for _ in resolved_uncertainty_ids)
+        excluded = (
+            f"AND instance.uncertainty_id NOT IN ({placeholders}) "
+            if resolved_uncertainty_ids else ""
+        )
+        uncertainty_rows = connection.execute(
+            "SELECT instance.uncertainty_id FROM uncertainty_instances AS "
+            "instance JOIN events AS origin ON origin.event_id = "
+            "instance.origin_event_id LEFT JOIN uncertainty_resolutions AS "
+            "resolution ON resolution.uncertainty_id = "
+            "instance.uncertainty_id LEFT JOIN events AS resolved_event ON "
+            "resolved_event.event_id = resolution.event_id WHERE "
+            "instance.repository_id = ? AND "
+            "(origin.writer_epoch < ? OR (origin.writer_epoch = ? AND "
+            "origin.sequence < ?)) AND (resolved_event.event_id IS NULL OR "
+            "resolved_event.writer_epoch > ? OR (resolved_event.writer_epoch "
+            "= ? AND resolved_event.sequence >= ?)) "
+            + excluded
+            + "AND ((instance.item_id IS NULL AND "
+            "instance.logical_effect_id IS NULL) OR instance.item_id = ? OR "
+            "instance.logical_effect_id = ?)",
+            (
+                repository_id,
+                boundary_writer_epoch, boundary_writer_epoch,
+                boundary_sequence, boundary_writer_epoch,
+                boundary_writer_epoch, boundary_sequence,
+                *resolved_uncertainty_ids, item_id, logical_effect_id,
+            ),
+        ).fetchall()
+        if uncertainty_rows or any(
+            category == "RECONCILIATION"
+            for category, _ in active_fences.values()
+        ):
+            return LifecycleState.RECONCILIATION_REQUIRED, preserved_cursor
+        if any(
+            category == "PAUSE" for category, _ in active_fences.values()
+        ):
+            return LifecycleState.PAUSED, validation_cursor
+        if recoverable_applications or any(
+            category == "BLOCKER" for category, _ in active_fences.values()
+        ):
+            return LifecycleState.BLOCKED, preserved_cursor
+        return LifecycleState.VALIDATING, validation_cursor
+
+    def _validate_reconciliation_pause_resume_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            ReconciliationPauseResumeRequest.__dataclass_fields__
+        ) | {
+            "action", "blocker_codes", "capability_evidence",
+            "capability_issuer_fingerprint", "continuation_cursor",
+            "event_kind", "indexes_complete", "lifecycle_from",
+            "lifecycle_to", "payload_digest", "previous_event_hash",
+            "request_digest", "resume_binding_version", "resume_evidence",
+            "resume_kind", "schema_version", "sequence", "source_kind",
+            "verified_run_heads_digest", "writer_epoch",
+        }
+        try:
+            if set(body) != expected_fields or (
+                body["schema_version"] != 1
+                or type(body["schema_version"]) is not int
+                or body["resume_binding_version"] != 1
+                or type(body["writer_epoch"]) is not int
+                or type(body["sequence"]) is not int
+                or not isinstance(body["blocker_codes"], list)
+            ):
+                raise ValueError(
+                    "reconciliation pause resume schema is invalid"
+                )
+            request = ReconciliationPauseResumeRequest(
+                **{
+                    field: body[field]
+                    for field in (
+                        ReconciliationPauseResumeRequest.__dataclass_fields__
+                    )
+                }
+            )
+            request.validate()
+            capability = SyntheticOperatorCapability(
+                **cast(dict[str, object], body["capability_evidence"])
+            )
+            evidence = SyntheticReconciliationResumeEvidence(
+                **cast(dict[str, object], body["resume_evidence"])
+            )
+            if self._classification_authority is None:
+                raise DispatchDenied(
+                    "reconciliation resume authority is unavailable"
+                )
+            authority = self._classification_authority
+            authority.verify_operator_issued(capability)
+            authority.verify_reconciliation_resume_evidence(evidence, request)
+            payload = {
+                **request.__dict__,
+                "action": "RESUME",
+                "resume_binding_version": 1,
+                "resume_kind": "RECONCILIATION_PAUSE",
+                "source_kind": "T09_AFTER_T17",
+                "capability_evidence": dict(capability.__dict__),
+                "capability_issuer_fingerprint": authority.issuer_fingerprint,
+                "resume_evidence": dict(evidence.__dict__),
+            }
+            if (
+                body["payload_digest"] != self._event_hash(payload)
+                or body["request_digest"] != evidence.request_digest
+                or body["action"] != "RESUME"
+                or body["resume_kind"] != "RECONCILIATION_PAUSE"
+                or body["source_kind"] != "T09_AFTER_T17"
+                or body["event_kind"] != "RECONCILIATION_PAUSE_RESUMED"
+                or body["indexes_complete"] is not True
+                or predecessor_state is not LifecycleState.PAUSED
+                or predecessor_cursor != request.expected_continuation_cursor
+                or body["lifecycle_from"] != LifecycleState.PAUSED.value
+                or body["previous_event_hash"]
+                != request.expected_run_head
+                or body["continuation_cursor"]
+                != request.expected_continuation_cursor
+            ):
+                raise ValueError(
+                    "reconciliation pause resume binding is invalid"
+                )
+            source_pause = connection.execute(
+                "SELECT pause.*, event.writer_epoch FROM "
+                "reconciliation_pause_actions AS pause JOIN events AS event "
+                "ON event.event_id = pause.event_id WHERE pause.pause_id = ? "
+                "AND pause.event_id = ? AND pause.event_hash = ? AND "
+                "pause.fence_id = ? AND pause.repository_id = ? AND "
+                "pause.run_id = ? AND pause.item_id = ? AND "
+                "pause.logical_effect_id = ? AND pause.plan_id = ? AND "
+                "pause.revision_digest = ?",
+                (
+                    request.source_pause_id, request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.plan_id,
+                    request.revision_digest,
+                ),
+            ).fetchone()
+            source_reconciliation = connection.execute(
+                "SELECT action.*, event.writer_epoch FROM "
+                "reconciliation_actions AS action JOIN events AS event ON "
+                "event.event_id = action.event_id WHERE "
+                "action.reconciliation_id = ? AND action.event_id = ? AND "
+                "action.event_hash = ? AND action.repository_id = ? AND "
+                "action.run_id = ? AND action.item_id = ? AND "
+                "action.logical_effect_id = ? AND action.plan_id = ? AND "
+                "action.revision_digest = ? AND "
+                "action.resulting_state = 'PAUSED'",
+                (
+                    request.source_reconciliation_id,
+                    request.source_reconciliation_event_id,
+                    request.source_reconciliation_event_hash,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.plan_id,
+                    request.revision_digest,
+                ),
+            ).fetchone()
+            if source_pause is None or source_reconciliation is None or (
+                int(source_pause["writer_epoch"])
+                >= int(source_reconciliation["writer_epoch"])
+                or int(source_reconciliation["writer_epoch"])
+                >= int(body["writer_epoch"])
+            ):
+                raise ValueError(
+                    "reconciliation pause resume source order is invalid"
+                )
+            prefix_rows = connection.execute(
+                "SELECT run_id, event_hash FROM events WHERE repository_id = ? "
+                "AND writer_epoch < ? ORDER BY writer_epoch, sequence",
+                (request.repository_id, body["writer_epoch"]),
+            ).fetchall()
+            heads: dict[str, str] = {}
+            catalog_head = ""
+            for row in prefix_rows:
+                heads[str(row["run_id"])] = str(row["event_hash"])
+                catalog_head = str(row["event_hash"])
+            if (
+                request.expected_catalog_head != catalog_head
+                or heads.get(request.run_id)
+                != request.expected_run_head
+                or request.expected_run_heads_digest
+                != self._run_heads_digest(heads)
+                or body["verified_run_heads_digest"]
+                != request.expected_run_heads_digest
+            ):
+                raise ValueError(
+                    "reconciliation pause resume prefix is invalid"
+                )
+            observation = connection.execute(
+                "SELECT * FROM validator_observations WHERE observation_id = ?",
+                (source_reconciliation["source_id"],),
+            ).fetchone()
+            if observation is None:
+                raise ValueError(
+                    "reconciliation pause resume observation is missing"
+                )
+            derived_state, derived_cursor = (
+                self._validator_reconciliation_route_at_prefix(
+                    connection,
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    validator_observation_id=str(observation["observation_id"]),
+                    validator_check_id=str(observation["check_id"]),
+                    validator_attempt_id=str(
+                        observation["validator_attempt_id"]
+                    ),
+                    resolved_uncertainty_ids=(),
+                    boundary_sequence=int(body["sequence"]),
+                    boundary_writer_epoch=int(body["writer_epoch"]),
+                    preserved_cursor=request.expected_continuation_cursor,
+                    validation_cursor=request.expected_continuation_cursor,
+                    cleared_fence_ids=(request.pause_fence_id,),
+                )
+            )
+            expected_state = (
+                derived_state
+                if derived_state in {
+                    LifecycleState.VALIDATING, LifecycleState.PAUSED,
+                }
+                else LifecycleState.BLOCKED
+            )
+            expected_blockers = (
+                ["OTHER_APPLICABLE_FENCE_OR_BLOCKER"]
+                if expected_state is LifecycleState.BLOCKED else []
+            )
+            if (
+                derived_cursor != request.expected_continuation_cursor
+                or body["blocker_codes"] != expected_blockers
+                or body["lifecycle_to"] != expected_state.value
+            ):
+                raise ValueError(
+                    "reconciliation pause resume route is invalid"
+                )
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "reconciliation pause resume semantics are invalid"
             ) from error
 
     def _validate_validation_recovery_event(
@@ -5516,7 +6802,9 @@ class SQLiteStateStore:
                             )
                     else:
                         active_fences[str(body["fence_id"])] = (None, None)
-                elif event_kind == "RESUME_ACCEPTED":
+                elif event_kind in {
+                    "RESUME_ACCEPTED", "RECONCILIATION_PAUSE_RESUMED",
+                }:
                     if active_fences.pop(str(body["pause_fence_id"]), None) is None:
                         raise ValueError("resume cleared an inactive pause fence")
                 elif event_kind == "AUTHORITY_EVALUATED":
@@ -5990,22 +7278,52 @@ class SQLiteStateStore:
                     int(observation["sequence"]),
                 )
             )
+            reconciliation_parameters: tuple[object, ...] = (
+                observation["observation_id"], intent["reservation_id"],
+            )
+            reconciliation_cutoff = ""
+            if before_writer_epoch is not None:
+                reconciliation_cutoff = " AND event.writer_epoch < ?"
+                reconciliation_parameters += (before_writer_epoch,)
+            reconciled_accounting = connection.execute(
+                "SELECT settlement.* FROM reconciliation_actions AS action "
+                "JOIN events AS event ON event.event_id = action.event_id "
+                "JOIN budget_settlements AS settlement ON "
+                "settlement.settlement_event_id = action.settlement_event_id "
+                "WHERE action.route = 'VALIDATOR_RESULT' AND action.source_id "
+                "= ? AND settlement.reservation_id = ?"
+                + reconciliation_cutoff
+                + " ORDER BY event.writer_epoch DESC, event.sequence DESC LIMIT 1",
+                reconciliation_parameters,
+            ).fetchone()
+            accounting_matches = (
+                observation["settlement_hash"] == settlement_head
+                and observation["usage_units"] is not None
+                and int(observation["usage_units"])
+                == settlement_charged_units
+            ) or (
+                reconciled_accounting is not None
+                and reconciled_accounting["settlement_hash"] == settlement_head
+                and not bool(reconciled_accounting["uncertainty"])
+                and reconciled_accounting["disposition"]
+                in {
+                    BudgetDisposition.CONSUMED.value,
+                    BudgetDisposition.ADJUSTED.value,
+                }
+            )
             eligible = (
                 contact is not None
                 and not observation_applied
                 and observation["validator_attempt_id"]
                 == intent["validator_attempt_id"]
                 and observation["check_id"] == intent["check_id"]
-                and observation["settlement_hash"] == settlement_head
+                and accounting_matches
                 and settlement_disposition
                 in {
                     BudgetDisposition.CONSUMED.value,
                     BudgetDisposition.ADJUSTED.value,
                 }
                 and not settlement_uncertainty
-                and observation["usage_units"] is not None
-                and int(observation["usage_units"])
-                == settlement_charged_units
                 and cessation_consistent
             )
         checkpoint_kind = (
@@ -8664,6 +9982,489 @@ class SQLiteStateStore:
             event_hash, LifecycleState.RECONCILIATION_REQUIRED, False,
         )
 
+    def reconcile_validator_result(
+        self,
+        request: ReconcileValidatorResultRequest,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "validator reconciliation targets another repository"
+            )
+        payload = {
+            **request.__dict__,
+            "reconciliation_binding_version": 1,
+            "route": "VALIDATOR_RESULT",
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    if prior_command["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    prior = connection.execute(
+                        "SELECT * FROM reconciliation_actions WHERE command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None:
+                        raise StorageIntegrityError(
+                            "reconciliation outcome lost its projection"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["reconciliation_id"]),
+                        str(prior["command_id"]), str(prior["event_id"]),
+                        int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM reconciliation_actions WHERE "
+                    "reconciliation_id = ? OR event_id = ?",
+                    (request.reconciliation_id, request.event_id),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "reconciliation identity was reused with different "
+                            "evidence"
+                        )
+                    outcome = connection.execute(
+                        "SELECT sequence FROM command_outcomes WHERE command_id = ?",
+                        (prior["command_id"],),
+                    ).fetchone()
+                    if outcome is None:
+                        raise StorageIntegrityError(
+                            "reconciliation projection lost its outcome"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["reconciliation_id"]),
+                        str(prior["command_id"]), str(prior["event_id"]),
+                        int(outcome["sequence"]), str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM events WHERE event_id = ?",
+                    (request.event_id,),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "reconciliation event ID was already used"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied(
+                        "validator reconciliation does not bind the run"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state is not LifecycleState.RECONCILIATION_REQUIRED:
+                    raise DispatchDenied(
+                        "T17 requires durable RECONCILIATION_REQUIRED state"
+                    )
+                if (
+                    run["head_hash"] != request.expected_run_head
+                    or run["continuation_cursor"]
+                    != request.expected_continuation_cursor
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation head or cursor is stale"
+                    )
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if plan is None or (
+                    plan["plan_id"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                ) != (
+                    request.plan_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation does not bind the accepted plan"
+                    )
+                observation = connection.execute(
+                    "SELECT observation.*, intent.reservation_id, "
+                    "intent.parent_attempt_id FROM "
+                    "validator_observations AS observation JOIN validator_intents "
+                    "AS intent ON intent.validator_intent_id = "
+                    "observation.validator_intent_id WHERE "
+                    "observation.observation_id = ? AND "
+                    "observation.repository_id = ? AND observation.run_id = ?",
+                    (
+                        request.observation_id, request.repository_id,
+                        request.run_id,
+                    ),
+                ).fetchone()
+                if observation is None or (
+                    observation["event_hash"], observation["item_id"],
+                    observation["logical_effect_id"],
+                    observation["revision_digest"], observation["applied"],
+                ) != (
+                    request.observation_event_hash, request.item_id,
+                    request.logical_effect_id, request.revision_digest, 0,
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation does not bind an unapplied result"
+                    )
+                cessation = connection.execute(
+                    "SELECT cessation.*, event.sequence AS cessation_sequence "
+                    "FROM validator_cessations AS cessation JOIN events AS "
+                    "event ON event.event_id = cessation.event_id WHERE "
+                    "cessation.cessation_id = ? AND cessation.event_id = ?",
+                    (request.cessation_id, request.cessation_event_id),
+                ).fetchone()
+                if cessation is None or (
+                    cessation["event_hash"] != request.cessation_event_hash
+                    or cessation["repository_id"] != request.repository_id
+                    or cessation["run_id"] != request.run_id
+                    or cessation["item_id"] != request.item_id
+                    or cessation["logical_effect_id"]
+                    != request.logical_effect_id
+                    or cessation["validator_intent_id"]
+                    != observation["validator_intent_id"]
+                    or cessation["validator_attempt_id"]
+                    != observation["validator_attempt_id"]
+                    or cessation["revision_digest"]
+                    != request.revision_digest
+                    or cessation["check_id"] != observation["check_id"]
+                    or not bool(cessation["result_available"])
+                    or cessation["result_id"]
+                    != observation["source_result_id"]
+                    or cessation["result_digest"]
+                    != observation["result_digest"]
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation requires exact result-bound "
+                        "cessation"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ) or request.expected_slot_attempt_id != observation[
+                    "parent_attempt_id"
+                ]:
+                    raise DispatchDenied(
+                        "validator reconciliation does not own the exact "
+                        "operation slot"
+                    )
+                settlement = connection.execute(
+                    "SELECT * FROM budget_settlements WHERE "
+                    "settlement_event_id = ? AND settlement_hash = ? AND "
+                    "reservation_id = ?",
+                    (
+                        request.settlement_event_id, request.settlement_hash,
+                        observation["reservation_id"],
+                    ),
+                ).fetchone()
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+                    (observation["reservation_id"],),
+                ).fetchone()
+                if (
+                    settlement is None
+                    or reservation is None
+                    or reservation["settlement_head_hash"]
+                    != request.settlement_hash
+                    or bool(settlement["uncertainty"])
+                    or BudgetDisposition(str(settlement["disposition"]))
+                    not in {
+                        BudgetDisposition.CONSUMED,
+                        BudgetDisposition.ADJUSTED,
+                    }
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation requires authoritative current "
+                        "accounting"
+                    )
+                resolved_rows = connection.execute(
+                    "SELECT instance.*, fence.reason_code FROM "
+                    "uncertainty_instances AS instance JOIN dispatch_fences AS "
+                    "fence ON fence.fence_id = instance.fence_id LEFT JOIN "
+                    "uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.uncertainty_id IN ("
+                    + ", ".join("?" for _ in request.resolved_uncertainty_ids)
+                    + ") AND resolution.uncertainty_id IS NULL",
+                    request.resolved_uncertainty_ids,
+                ).fetchall()
+                if len(resolved_rows) != len(request.resolved_uncertainty_ids):
+                    raise DispatchDenied(
+                        "validator reconciliation uncertainty is absent or resolved"
+                    )
+                all_source_uncertainties = connection.execute(
+                    "SELECT instance.uncertainty_id FROM uncertainty_instances "
+                    "AS instance LEFT JOIN uncertainty_resolutions AS resolution "
+                    "ON resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.origin_event_id = ? AND "
+                    "resolution.uncertainty_id IS NULL",
+                    (observation["event_id"],),
+                ).fetchall()
+                if {row["uncertainty_id"] for row in all_source_uncertainties} != set(
+                    request.resolved_uncertainty_ids
+                ):
+                    raise DispatchDenied(
+                        "validator reconciliation must settle every exact source "
+                        "uncertainty"
+                    )
+                for row in resolved_rows:
+                    if (
+                        row["uncertainty_kind"] not in {"ACTIVITY", "BILLING"}
+                        or row["repository_id"] != request.repository_id
+                        or row["run_id"] != request.run_id
+                        or row["item_id"] != request.item_id
+                        or row["logical_effect_id"]
+                        != request.logical_effect_id
+                        or row["attempt_id"]
+                        != observation["validator_attempt_id"]
+                        or row["check_id"] != observation["check_id"]
+                        or row["origin_event_id"] != observation["event_id"]
+                        or row["origin_event_hash"]
+                        != observation["event_hash"]
+                        or row["reservation_id"]
+                        != observation["reservation_id"]
+                        or row["reason_code"]
+                        != (
+                            "VALIDATOR_BILLING_UNKNOWN"
+                            if row["uncertainty_kind"] == "BILLING"
+                            else "VALIDATOR_ACTIVITY_UNKNOWN"
+                        )
+                        or (
+                            row["uncertainty_kind"] == "BILLING"
+                            and row["settlement_head_hash"]
+                            != observation["settlement_hash"]
+                        )
+                    ):
+                        raise DispatchDenied(
+                            "validator reconciliation proof does not cover the "
+                            "named uncertainty"
+                        )
+                validation_cursor = (
+                    "validation-application:v1:"
+                    f"{observation['observation_id']}:"
+                    f"{observation['check_id']}:"
+                    f"{observation['validator_attempt_id']}"
+                )
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                resulting_state, continuation_cursor = (
+                    self._validator_reconciliation_route_at_prefix(
+                        connection,
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        validator_observation_id=request.observation_id,
+                        validator_check_id=str(observation["check_id"]),
+                        validator_attempt_id=str(
+                            observation["validator_attempt_id"]
+                        ),
+                        resolved_uncertainty_ids=(
+                            request.resolved_uncertainty_ids
+                        ),
+                        boundary_sequence=int(run["head_sequence"]) + 1,
+                        boundary_writer_epoch=writer_epoch,
+                        preserved_cursor=run["continuation_cursor"],
+                        validation_cursor=validation_cursor,
+                    )
+                )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T17", current_state, resulting_state,
+                        TRANSITIONS["T17"].required_guards,
+                    )
+                else:
+                    authorize_transition(current_state, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                body = {
+                    **payload,
+                    "continuation_cursor": continuation_cursor,
+                    "event_kind": "RECONCILIATION_RECORDED",
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RECONCILIATION_RECORDED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, previous_hash, event_hash, body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_reconciliation_event_before_uncertainty_clearance"
+                    )
+                for row in resolved_rows:
+                    billing_resolution = row["uncertainty_kind"] == "BILLING"
+                    proof_kind = (
+                        "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                        if billing_resolution
+                        else "AUTHORITATIVE_VALIDATOR_CESSATION"
+                    )
+                    proof_event_id = (
+                        request.settlement_event_id
+                        if billing_resolution
+                        else request.cessation_event_id
+                    )
+                    proof_event_hash = (
+                        request.settlement_hash
+                        if billing_resolution
+                        else request.cessation_event_hash
+                    )
+                    resolution_body = {
+                        "event_id": request.event_id,
+                        "proof_event_hash": proof_event_hash,
+                        "proof_event_id": proof_event_id,
+                        "proof_kind": proof_kind,
+                        "reconciliation_id": request.reconciliation_id,
+                        "schema_version": 1,
+                        "uncertainty_id": row["uncertainty_id"],
+                    }
+                    connection.execute(
+                        "INSERT INTO uncertainty_resolutions VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            row["uncertainty_id"], request.reconciliation_id,
+                            request.event_id,
+                            proof_kind, proof_event_id, proof_event_hash,
+                            json.dumps(
+                                resolution_body, sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        ),
+                    )
+                    deleted = connection.execute(
+                        "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                        "repository_id = ? AND reason_code = ?",
+                        (
+                            row["fence_id"], request.repository_id,
+                            (
+                                "VALIDATOR_BILLING_UNKNOWN"
+                                if billing_resolution
+                                else "VALIDATOR_ACTIVITY_UNKNOWN"
+                            ),
+                        ),
+                    ).rowcount
+                    if deleted != 1:
+                        raise StorageIntegrityError(
+                            "resolved validator uncertainty fence is absent or "
+                            "rebound"
+                        )
+                connection.execute(
+                    "INSERT INTO reconciliation_actions VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, 'VALIDATOR_RESULT', ?, ?, ?, ?, ?, "
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        request.reconciliation_id, request.command_id,
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.plan_id, request.revision_digest,
+                        request.observation_id,
+                        request.observation_event_hash,
+                        request.cessation_id, request.cessation_event_id,
+                        request.cessation_event_hash,
+                        request.settlement_event_id, request.settlement_hash,
+                        json.dumps(request.resolved_uncertainty_ids),
+                        request.expected_slot_attempt_id,
+                        request.expected_slot_generation,
+                        continuation_cursor, payload_digest, event_hash,
+                        resulting_state.value, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, continuation_cursor, sequence,
+                        event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_reconciliation_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_reconciliation_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as error:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "reconciliation durable identity conflicts with recorded state"
+                ) from error
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.reconciliation_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
+        )
+
     def resume(
         self,
         request: ResumeRequest,
@@ -9043,6 +10844,364 @@ class SQLiteStateStore:
                 connection.commit()
                 if failure_hook is not None:
                     failure_hook("after_resume_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.resume_id, request.command_id, request.event_id, sequence,
+            event_hash, resulting_state, False,
+        )
+
+    def resume_reconciliation_pause(
+        self,
+        request: ReconciliationPauseResumeRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticReconciliationResumeEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id or (
+            capability.repository_id, capability.run_id, capability.action
+        ) != (request.repository_id, request.run_id, "RESUME"):
+            raise DispatchDenied(
+                "reconciliation resume authority does not bind the request"
+            )
+        payload = {
+            **request.__dict__,
+            "action": "RESUME",
+            "resume_binding_version": 1,
+            "resume_kind": "RECONCILIATION_PAUSE",
+            "source_kind": "T09_AFTER_T17",
+            "capability_evidence": dict(capability.__dict__),
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "resume_evidence": dict(evidence.__dict__),
+        }
+        payload_digest = self._event_hash(payload)
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_reconciliation_resume_evidence(
+                        evidence, request
+                    )
+                    prior = connection.execute(
+                        "SELECT * FROM reconciliation_resume_actions WHERE "
+                        "command_id = ?", (request.command_id,),
+                    ).fetchone()
+                    if prior is None or (
+                        prior_command["payload_digest"] != payload_digest
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "reconciliation resume command identity was reused"
+                        )
+                    connection.rollback()
+                    body = json.loads(prior["body_json"])
+                    return ControlReceipt(
+                        str(prior["resume_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                vector_digest = self._run_heads_digest(run_heads)
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or run_heads.get(request.run_id)
+                    != request.expected_run_head
+                    or request.expected_run_heads_digest != vector_digest
+                ):
+                    raise DispatchDenied(
+                        "reconciliation resume head vector is stale"
+                    )
+                authority.verify_operator_for_action(capability)
+                authority.verify_reconciliation_resume_evidence(
+                    evidence, request
+                )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?", (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                    run["lifecycle_state"], run["continuation_cursor"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                    LifecycleState.PAUSED.value,
+                    request.expected_continuation_cursor,
+                ):
+                    raise DispatchDenied(
+                        "reconciliation resume does not bind the paused run"
+                    )
+                source_pause = connection.execute(
+                    "SELECT * FROM reconciliation_pause_actions WHERE "
+                    "pause_id = ? AND event_id = ? AND event_hash = ? AND "
+                    "fence_id = ? AND repository_id = ? AND run_id = ? AND "
+                    "item_id = ? AND logical_effect_id = ? AND plan_id = ? "
+                    "AND revision_digest = ?",
+                    (
+                        request.source_pause_id, request.source_pause_event_id,
+                        request.source_pause_event_hash,
+                        request.pause_fence_id, request.repository_id,
+                        request.run_id, request.item_id,
+                        request.logical_effect_id, request.plan_id,
+                        request.revision_digest,
+                    ),
+                ).fetchone()
+                source_reconciliation = connection.execute(
+                    "SELECT action.*, event.writer_epoch FROM "
+                    "reconciliation_actions AS action JOIN events AS event ON "
+                    "event.event_id = action.event_id WHERE "
+                    "action.reconciliation_id = ? AND action.event_id = ? AND "
+                    "action.event_hash = ? AND action.repository_id = ? AND "
+                    "action.run_id = ? AND action.resulting_state = 'PAUSED' "
+                    "AND action.item_id = ? AND action.logical_effect_id = ? "
+                    "AND action.plan_id = ? AND action.revision_digest = ? "
+                    "AND action.continuation_cursor = ?",
+                    (
+                        request.source_reconciliation_id,
+                        request.source_reconciliation_event_id,
+                        request.source_reconciliation_event_hash,
+                        request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.plan_id, request.revision_digest,
+                        request.expected_continuation_cursor,
+                    ),
+                ).fetchone()
+                pause_event = connection.execute(
+                    "SELECT writer_epoch FROM events WHERE event_id = ?",
+                    (request.source_pause_event_id,),
+                ).fetchone()
+                if (
+                    source_pause is None or source_reconciliation is None
+                    or pause_event is None
+                    or int(pause_event["writer_epoch"])
+                    >= int(source_reconciliation["writer_epoch"])
+                ):
+                    raise DispatchDenied(
+                        "reconciliation resume source chain is invalid"
+                    )
+                fence = connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.source_pause_event_id,
+                    ),
+                ).fetchone()
+                if fence is None:
+                    raise DispatchDenied(
+                        "reconciliation resume pause fence is not active"
+                    )
+                checkpoint = self._validator_pause_checkpoint(
+                    connection, request.repository_id, request.run_id
+                )
+                if checkpoint["checkpoint_kind"] != "ELIGIBLE_RESULT_SETTLED":
+                    raise DispatchDenied(
+                        "reconciliation resume result is not application-eligible"
+                    )
+                observation = connection.execute(
+                    "SELECT * FROM validator_observations WHERE "
+                    "observation_id = ?",
+                    (source_reconciliation["source_id"],),
+                ).fetchone()
+                if observation is None:
+                    raise StorageIntegrityError(
+                        "reconciliation resume lost its validator observation"
+                    )
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                derived_state, derived_cursor = (
+                    self._validator_reconciliation_route_at_prefix(
+                        connection,
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        validator_observation_id=str(
+                            observation["observation_id"]
+                        ),
+                        validator_check_id=str(observation["check_id"]),
+                        validator_attempt_id=str(
+                            observation["validator_attempt_id"]
+                        ),
+                        resolved_uncertainty_ids=(),
+                        boundary_sequence=int(run["head_sequence"]) + 1,
+                        boundary_writer_epoch=writer_epoch,
+                        preserved_cursor=request.expected_continuation_cursor,
+                        validation_cursor=request.expected_continuation_cursor,
+                        cleared_fence_ids=(request.pause_fence_id,),
+                    )
+                )
+                resulting_state = (
+                    derived_state
+                    if derived_state in {
+                        LifecycleState.VALIDATING, LifecycleState.PAUSED,
+                    }
+                    else LifecycleState.BLOCKED
+                )
+                blocker_codes: set[str] = set()
+                if resulting_state is LifecycleState.BLOCKED:
+                    blocker_codes.add("OTHER_APPLICABLE_FENCE_OR_BLOCKER")
+                if derived_cursor != request.expected_continuation_cursor:
+                    raise StorageIntegrityError(
+                        "reconciliation resume changed its T17 cursor"
+                    )
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T14", LifecycleState.PAUSED, resulting_state,
+                        TRANSITIONS["T14"].required_guards,
+                    )
+                else:
+                    authorize_transition(LifecycleState.PAUSED, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                body = {
+                    **payload,
+                    "blocker_codes": sorted(blocker_codes),
+                    "continuation_cursor": request.expected_continuation_cursor,
+                    "event_kind": "RECONCILIATION_PAUSE_RESUMED",
+                    "indexes_complete": True,
+                    "lifecycle_from": LifecycleState.PAUSED.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "request_digest": evidence.request_digest,
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "verified_run_heads_digest": vector_digest,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RECONCILIATION_PAUSE_RESUMED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, request.expected_run_head,
+                        event_hash, body_json,
+                    ),
+                )
+                deleted = connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (
+                        request.pause_fence_id, request.repository_id,
+                        request.source_pause_event_id,
+                    ),
+                ).rowcount
+                if deleted != 1:
+                    raise StorageIntegrityError(
+                        "reconciliation resume did not clear exactly one fence"
+                    )
+                values = (
+                    request.resume_id, request.command_id, request.event_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.plan_id,
+                    request.revision_digest, request.source_pause_id,
+                    request.source_pause_event_id,
+                    request.source_pause_event_hash, request.pause_fence_id,
+                    request.source_reconciliation_id,
+                    request.source_reconciliation_event_id,
+                    request.source_reconciliation_event_hash,
+                    request.expected_continuation_cursor,
+                    request.expected_catalog_head,
+                    request.expected_run_head,
+                    request.expected_run_heads_digest, capability.claim_id,
+                    capability.grant_id, capability.scope_digest,
+                    authority.issuer_fingerprint, capability.issuer_mac,
+                    evidence.proof_id, evidence.request_digest,
+                    evidence.issuer_fingerprint, evidence.issuer_mac,
+                    json.dumps(sorted(blocker_codes), separators=(",", ":")),
+                    payload_digest, event_hash, resulting_state.value, body_json,
+                )
+                connection.execute(
+                    "INSERT INTO reconciliation_resume_actions VALUES ("
+                    + ", ".join("?" for _ in values) + ")", values,
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RESUME', ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        capability.scope_digest, authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor "
+                    "= ?, head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value,
+                        request.expected_continuation_cursor, sequence,
+                        event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?", (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_reconciliation_resume_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_reconciliation_resume_commit_before_acknowledgement"
+                    )
             except BaseException:
                 connection.rollback()
                 raise
@@ -12597,6 +14756,59 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                if request.usage_units is None:
+                    uncertainty_id = self._uncertainty_id(
+                        uncertainty_kind="BILLING",
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        attempt_id=request.attempt_id,
+                        check_id=None,
+                        origin_event_id=request.event_id,
+                        origin_event_hash=event_hash,
+                        reservation_id=str(settlement["reservation_id"]),
+                    )
+                    uncertainty_body = {
+                        "attempt_id": request.attempt_id,
+                        "check_id": None,
+                        "fence_id": uncertainty_id,
+                        "item_id": request.item_id,
+                        "logical_effect_id": request.logical_effect_id,
+                        "origin_event_hash": event_hash,
+                        "origin_event_id": request.event_id,
+                        "repository_id": request.repository_id,
+                        "reservation_id": settlement["reservation_id"],
+                        "run_id": request.run_id,
+                        "schema_version": 1,
+                        "settlement_head_hash": settlement_hash,
+                        "uncertainty_id": uncertainty_id,
+                        "uncertainty_kind": "BILLING",
+                    }
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, "
+                        "'EFFECT_BILLING_UNKNOWN', ?)",
+                        (
+                            uncertainty_id, request.repository_id,
+                            request.item_id, request.logical_effect_id,
+                            request.event_id,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO uncertainty_instances VALUES ("
+                        "?, ?, 'BILLING', ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?)",
+                        (
+                            uncertainty_id, uncertainty_id,
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            request.attempt_id, request.event_id, event_hash,
+                            settlement["reservation_id"], settlement_hash,
+                            json.dumps(
+                                uncertainty_body, sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        ),
+                    )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -13481,20 +15693,24 @@ class SQLiteStateStore:
                         "validator observation accounting does not bind the result"
                     )
                 current_state = LifecycleState(str(run["lifecycle_state"]))
+                matched_cessation = connection.execute(
+                    "SELECT cessation.* FROM validator_cessations AS cessation "
+                    "WHERE cessation.validator_intent_id = ? AND "
+                    "cessation.validator_attempt_id = ? AND "
+                    "cessation.result_available = 1 AND cessation.result_id = ? "
+                    "AND cessation.result_digest = ? ORDER BY rowid DESC LIMIT 1",
+                    (
+                        request.validator_intent_id,
+                        request.validator_attempt_id, request.source_result_id,
+                        request.result_digest,
+                    ),
+                ).fetchone()
+                activity_known = matched_cessation is not None
                 if request.usage_units is None:
                     if not bool(settlement["uncertainty"]):
                         raise DispatchDenied(
                             "unknown validator usage requires uncertain accounting"
                         )
-                    resulting_state = (
-                        current_state
-                        if current_state in {
-                            LifecycleState.COMPLETED,
-                            LifecycleState.FAILED_FINAL,
-                            LifecycleState.STOPPED,
-                        }
-                        else LifecycleState.RECONCILIATION_REQUIRED
-                    )
                 else:
                     if bool(settlement["uncertainty"]) or int(
                         settlement["charged_units"]
@@ -13502,7 +15718,18 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "validator usage does not match settled accounting"
                         )
-                    resulting_state = current_state
+                resulting_state = (
+                    current_state
+                    if (
+                        current_state in {
+                            LifecycleState.COMPLETED,
+                            LifecycleState.FAILED_FINAL,
+                            LifecycleState.STOPPED,
+                        }
+                        or (request.usage_units is not None and activity_known)
+                    )
+                    else LifecycleState.RECONCILIATION_REQUIRED
+                )
 
                 sequence = int(run["head_sequence"]) + 1
                 previous_hash = str(run["head_hash"])
@@ -13536,6 +15763,73 @@ class SQLiteStateStore:
                         event_hash, body_json,
                     ),
                 )
+                uncertainty_kinds = []
+                if not activity_known:
+                    uncertainty_kinds.append(
+                        ("ACTIVITY", "VALIDATOR_ACTIVITY_UNKNOWN", None)
+                    )
+                if request.usage_units is None:
+                    uncertainty_kinds.append(
+                        (
+                            "BILLING", "VALIDATOR_BILLING_UNKNOWN",
+                            request.settlement_hash,
+                        )
+                    )
+                for uncertainty_kind, reason_code, settlement_head in (
+                    uncertainty_kinds
+                ):
+                    uncertainty_id = self._uncertainty_id(
+                        uncertainty_kind=uncertainty_kind,
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        logical_effect_id=request.logical_effect_id,
+                        attempt_id=request.validator_attempt_id,
+                        check_id=request.check_id,
+                        origin_event_id=request.event_id,
+                        origin_event_hash=event_hash,
+                        reservation_id=str(intent["reservation_id"]),
+                    )
+                    uncertainty_body = {
+                        "check_id": request.check_id,
+                        "fence_id": uncertainty_id,
+                        "item_id": request.item_id,
+                        "logical_effect_id": request.logical_effect_id,
+                        "origin_event_hash": event_hash,
+                        "origin_event_id": request.event_id,
+                        "repository_id": request.repository_id,
+                        "reservation_id": intent["reservation_id"],
+                        "run_id": request.run_id,
+                        "schema_version": 1,
+                        "settlement_head_hash": settlement_head,
+                        "uncertainty_id": uncertainty_id,
+                        "uncertainty_kind": uncertainty_kind,
+                        "validator_attempt_id": request.validator_attempt_id,
+                    }
+                    uncertainty_json = json.dumps(
+                        uncertainty_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            uncertainty_id, request.repository_id,
+                            request.item_id, request.logical_effect_id,
+                            reason_code, request.event_id,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO uncertainty_instances VALUES ("
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            uncertainty_id, uncertainty_id, uncertainty_kind,
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            request.validator_attempt_id, request.check_id,
+                            request.event_id, event_hash,
+                            intent["reservation_id"], settlement_head,
+                            uncertainty_json,
+                        ),
+                    )
                 connection.execute(
                     "INSERT INTO validator_observations ("
                     "observation_id, source_result_id, command_id, event_id, "
@@ -13782,12 +16076,43 @@ class SQLiteStateStore:
                     "WHERE s.settlement_event_id = ? AND r.reservation_id = ?",
                     (observation["settlement_event_id"], observation["reservation_id"]),
                 ).fetchone()
-                if settlement is None or (
+                observation_accounting_settled = settlement is not None and not (
                     settlement["settlement_hash"] != observation["settlement_hash"]
                     or bool(settlement["current_uncertainty"])
                     or int(settlement["current_held_units"]) != 0
                     or observation["usage_units"] is None
-                ):
+                )
+                if not observation_accounting_settled:
+                    settlement = connection.execute(
+                        "SELECT settlement.*, reservation.held_units AS "
+                        "current_held_units, reservation.uncertainty AS "
+                        "current_uncertainty FROM reconciliation_actions AS "
+                        "action JOIN budget_settlements AS settlement ON "
+                        "settlement.settlement_event_id = "
+                        "action.settlement_event_id JOIN budget_reservations AS "
+                        "reservation ON reservation.reservation_id = "
+                        "settlement.reservation_id WHERE action.route = "
+                        "'VALIDATOR_RESULT' AND action.source_id = ? AND "
+                        "settlement.reservation_id = ? AND "
+                        "reservation.settlement_head_hash = "
+                        "settlement.settlement_hash ORDER BY action.rowid DESC "
+                        "LIMIT 1",
+                        (
+                            observation["observation_id"],
+                            observation["reservation_id"],
+                        ),
+                    ).fetchone()
+                    observation_accounting_settled = (
+                        settlement is not None
+                        and not bool(settlement["current_uncertainty"])
+                        and int(settlement["current_held_units"]) == 0
+                        and not bool(settlement["uncertainty"])
+                        and settlement["disposition"] in {
+                            BudgetDisposition.CONSUMED.value,
+                            BudgetDisposition.ADJUSTED.value,
+                        }
+                    )
+                if not observation_accounting_settled:
                     raise DispatchDenied("validator accounting is not fully settled")
                 if connection.execute(
                     "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
@@ -16763,6 +19088,40 @@ class SQLiteStateStore:
                 for body in validator_observations
             }
         )
+        reconciliation_event_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'RECONCILIATION_RECORDED'",
+            (repository_id,),
+        ).fetchall()
+        reconciliations = [
+            json.loads(row["body_json"]) for row in reconciliation_event_rows
+        ]
+        reconciliation_resume_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'RECONCILIATION_PAUSE_RESUMED'",
+            (repository_id,),
+        ).fetchall()
+        reconciliation_resumes = [
+            json.loads(row["body_json"]) for row in reconciliation_resume_rows
+        ]
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in reconciliations
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in reconciliation_resumes
+            }
+        )
         validator_cessation_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'VALIDATOR_CESSATION_RECORDED'",
@@ -19069,6 +21428,68 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "activity-resume projection diverges from event history"
             )
+        expected_reconciliation_resumes = {
+            body["resume_id"]: (
+                body["command_id"], body["event_id"], body["run_id"],
+                body["item_id"], body["logical_effect_id"], body["plan_id"],
+                body["revision_digest"], body["source_pause_id"],
+                body["source_pause_event_id"],
+                body["source_pause_event_hash"], body["pause_fence_id"],
+                body["source_reconciliation_id"],
+                body["source_reconciliation_event_id"],
+                body["source_reconciliation_event_hash"],
+                body["expected_continuation_cursor"],
+                body["expected_catalog_head"],
+                body["expected_run_head"],
+                body["expected_run_heads_digest"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["capability_issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["resume_evidence"]["proof_id"],
+                body["resume_evidence"]["request_digest"],
+                body["resume_evidence"]["issuer_fingerprint"],
+                body["resume_evidence"]["issuer_mac"],
+                json.dumps(body["blocker_codes"], separators=(",", ":")),
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in reconciliation_resumes
+        }
+        actual_reconciliation_resumes = {
+            row["resume_id"]: (
+                row["command_id"], row["event_id"], row["run_id"],
+                row["item_id"], row["logical_effect_id"], row["plan_id"],
+                row["revision_digest"], row["source_pause_id"],
+                row["source_pause_event_id"],
+                row["source_pause_event_hash"], row["pause_fence_id"],
+                row["source_reconciliation_id"],
+                row["source_reconciliation_event_id"],
+                row["source_reconciliation_event_hash"],
+                row["continuation_cursor"], row["expected_catalog_head"],
+                row["expected_run_head"],
+                row["expected_run_heads_digest"],
+                row["capability_claim_id"], row["capability_grant_id"],
+                row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["evidence_proof_id"],
+                row["evidence_request_digest"],
+                row["evidence_issuer_fingerprint"],
+                row["evidence_issuer_mac"], row["blocker_codes_json"],
+                row["payload_digest"], row["event_hash"],
+                row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM reconciliation_resume_actions WHERE "
+                "repository_id = ?", (repository_id,),
+            )
+        }
+        if actual_reconciliation_resumes != expected_reconciliation_resumes:
+            raise StorageIntegrityError(
+                "reconciliation-resume projection diverges from event history"
+            )
         expected_stops = {
             body["stop_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -19295,6 +21716,17 @@ class SQLiteStateStore:
         )
         expected_operator_redemptions.update(
             {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "RESUME",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in reconciliation_resumes
+            }
+        )
+        expected_operator_redemptions.update(
+            {
                 body["capability_claim_id"]: (
                     body["capability_grant_id"], body["command_id"],
                     body["run_id"], body["action"],
@@ -19507,6 +21939,252 @@ class SQLiteStateStore:
         if actual_validator_observations != expected_validator_observations:
             raise StorageIntegrityError(
                 "validator-observation projection diverges from event history"
+            )
+
+        validator_intents_by_id = {
+            body["validator_intent_id"]: body for body in validator_intents
+        }
+        expected_uncertainties: dict[str, tuple[object, ...]] = {}
+        operation_intents_by_binding = {
+            (
+                body["run_id"], body["logical_effect_id"], body["attempt_id"]
+            ): body
+            for body in intents
+        }
+        for body in observation_events:
+            if body["usage_units"] is not None:
+                continue
+            intent = operation_intents_by_binding.get(
+                (
+                    body["run_id"], body["logical_effect_id"],
+                    body["attempt_id"],
+                )
+            )
+            if intent is None:
+                raise StorageIntegrityError(
+                    "effect uncertainty lost its durable intent"
+                )
+            observation_hash = self._event_hash(body)
+            uncertainty_id = self._uncertainty_id(
+                uncertainty_kind="BILLING",
+                repository_id=body["repository_id"],
+                run_id=body["run_id"],
+                item_id=body["item_id"],
+                logical_effect_id=body["logical_effect_id"],
+                attempt_id=body["attempt_id"],
+                check_id=None,
+                origin_event_id=body["event_id"],
+                origin_event_hash=observation_hash,
+                reservation_id=intent["reservation_id"],
+            )
+            uncertainty_body = {
+                "attempt_id": body["attempt_id"],
+                "check_id": None,
+                "fence_id": uncertainty_id,
+                "item_id": body["item_id"],
+                "logical_effect_id": body["logical_effect_id"],
+                "origin_event_hash": observation_hash,
+                "origin_event_id": body["event_id"],
+                "repository_id": body["repository_id"],
+                "reservation_id": intent["reservation_id"],
+                "run_id": body["run_id"],
+                "schema_version": 1,
+                "settlement_head_hash": body["settlement_hash"],
+                "uncertainty_id": uncertainty_id,
+                "uncertainty_kind": "BILLING",
+            }
+            expected_uncertainties[uncertainty_id] = (
+                uncertainty_id, "BILLING", body["repository_id"],
+                body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["attempt_id"], None,
+                body["event_id"], observation_hash,
+                intent["reservation_id"], body["settlement_hash"],
+                json.dumps(
+                    uncertainty_body, sort_keys=True, separators=(",", ":")
+                ),
+            )
+        for body in validator_observations:
+            intent = validator_intents_by_id.get(body["validator_intent_id"])
+            if intent is None:
+                raise StorageIntegrityError(
+                    "validator uncertainty lost its durable intent"
+                )
+            observation_hash = self._event_hash(body)
+            prior_cessation = next(
+                (
+                    cessation
+                    for cessation in validator_cessations
+                    if cessation["validator_intent_id"]
+                    == body["validator_intent_id"]
+                    and cessation["validator_attempt_id"]
+                    == body["validator_attempt_id"]
+                    and cessation["result_available"] is True
+                    and cessation["result_id"] == body["source_result_id"]
+                    and cessation["result_digest"] == body["result_digest"]
+                    and int(cessation["sequence"]) < int(body["sequence"])
+                ),
+                None,
+            )
+            uncertainty_kinds = []
+            if prior_cessation is None:
+                uncertainty_kinds.append(("ACTIVITY", None))
+            if body["usage_units"] is None:
+                uncertainty_kinds.append(("BILLING", body["settlement_hash"]))
+            for uncertainty_kind, settlement_head in uncertainty_kinds:
+                uncertainty_id = self._uncertainty_id(
+                    uncertainty_kind=uncertainty_kind,
+                    repository_id=body["repository_id"],
+                    run_id=body["run_id"],
+                    item_id=body["item_id"],
+                    logical_effect_id=body["logical_effect_id"],
+                    attempt_id=body["validator_attempt_id"],
+                    check_id=body["check_id"],
+                    origin_event_id=body["event_id"],
+                    origin_event_hash=observation_hash,
+                    reservation_id=intent["reservation_id"],
+                )
+                uncertainty_body = {
+                    "check_id": body["check_id"],
+                    "fence_id": uncertainty_id,
+                    "item_id": body["item_id"],
+                    "logical_effect_id": body["logical_effect_id"],
+                    "origin_event_hash": observation_hash,
+                    "origin_event_id": body["event_id"],
+                    "repository_id": body["repository_id"],
+                    "reservation_id": intent["reservation_id"],
+                    "run_id": body["run_id"],
+                    "schema_version": 1,
+                    "settlement_head_hash": settlement_head,
+                    "uncertainty_id": uncertainty_id,
+                    "uncertainty_kind": uncertainty_kind,
+                    "validator_attempt_id": body["validator_attempt_id"],
+                }
+                expected_uncertainties[uncertainty_id] = (
+                    uncertainty_id, uncertainty_kind,
+                    body["repository_id"], body["run_id"], body["item_id"],
+                    body["logical_effect_id"], body["validator_attempt_id"],
+                    body["check_id"], body["event_id"], observation_hash,
+                    intent["reservation_id"], settlement_head,
+                    json.dumps(
+                        uncertainty_body, sort_keys=True,
+                        separators=(",", ":")
+                    ),
+                )
+        actual_uncertainties = {
+            row["uncertainty_id"]: (
+                row["fence_id"], row["uncertainty_kind"],
+                row["repository_id"], row["run_id"], row["item_id"],
+                row["logical_effect_id"], row["attempt_id"], row["check_id"],
+                row["origin_event_id"], row["origin_event_hash"],
+                row["reservation_id"], row["settlement_head_hash"],
+                row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM uncertainty_instances WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_uncertainties != expected_uncertainties:
+            raise StorageIntegrityError(
+                "uncertainty-instance projection diverges from event history"
+            )
+
+        expected_resolutions: dict[str, tuple[object, ...]] = {}
+        expected_reconciliation_actions: dict[str, tuple[object, ...]] = {}
+        for body in reconciliations:
+            for uncertainty_id in body["resolved_uncertainty_ids"]:
+                if uncertainty_id not in expected_uncertainties:
+                    raise StorageIntegrityError(
+                        "reconciliation resolves an unknown uncertainty instance"
+                    )
+                if uncertainty_id in expected_resolutions:
+                    raise StorageIntegrityError(
+                        "uncertainty instance is resolved more than once"
+                    )
+                billing_resolution = (
+                    expected_uncertainties[uncertainty_id][1] == "BILLING"
+                )
+                proof_kind = (
+                    "AUTHORITATIVE_BUDGET_SETTLEMENT"
+                    if billing_resolution
+                    else "AUTHORITATIVE_VALIDATOR_CESSATION"
+                )
+                proof_event_id = (
+                    body["settlement_event_id"]
+                    if billing_resolution
+                    else body["cessation_event_id"]
+                )
+                proof_event_hash = (
+                    body["settlement_hash"]
+                    if billing_resolution
+                    else body["cessation_event_hash"]
+                )
+                resolution_body = {
+                    "event_id": body["event_id"],
+                    "proof_event_hash": proof_event_hash,
+                    "proof_event_id": proof_event_id,
+                    "proof_kind": proof_kind,
+                    "reconciliation_id": body["reconciliation_id"],
+                    "schema_version": 1,
+                    "uncertainty_id": uncertainty_id,
+                }
+                expected_resolutions[uncertainty_id] = (
+                    body["reconciliation_id"], body["event_id"],
+                    proof_kind, proof_event_id, proof_event_hash,
+                    json.dumps(
+                        resolution_body, sort_keys=True, separators=(",", ":")
+                    ),
+                )
+            expected_reconciliation_actions[body["reconciliation_id"]] = (
+                body["command_id"], body["event_id"],
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], "VALIDATOR_RESULT",
+                body["plan_id"], body["revision_digest"],
+                body["observation_id"], body["observation_event_hash"],
+                body["cessation_id"], body["cessation_event_id"],
+                body["cessation_event_hash"],
+                body["settlement_event_id"], body["settlement_hash"],
+                json.dumps(body["resolved_uncertainty_ids"]),
+                body["expected_slot_attempt_id"],
+                body["expected_slot_generation"],
+                body["continuation_cursor"], body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+        actual_resolutions = {
+            row["uncertainty_id"]: (
+                row["reconciliation_id"], row["event_id"],
+                row["proof_kind"], row["proof_event_id"],
+                row["proof_event_hash"], row["body_json"],
+            )
+            for row in connection.execute("SELECT * FROM uncertainty_resolutions")
+        }
+        if actual_resolutions != expected_resolutions:
+            raise StorageIntegrityError(
+                "uncertainty-resolution projection diverges from event history"
+            )
+        actual_reconciliation_actions = {
+            row["reconciliation_id"]: (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["route"], row["plan_id"], row["revision_digest"],
+                row["source_id"], row["source_event_hash"],
+                row["cessation_id"], row["cessation_event_id"],
+                row["cessation_event_hash"],
+                row["settlement_event_id"], row["settlement_hash"],
+                row["resolved_uncertainty_ids_json"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["continuation_cursor"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM reconciliation_actions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_reconciliation_actions != expected_reconciliation_actions:
+            raise StorageIntegrityError(
+                "reconciliation-action projection diverges from event history"
             )
 
         expected_validator_cessations = {
@@ -19818,6 +22496,27 @@ class SQLiteStateStore:
                 if body["lifecycle_to"] == LifecycleState.FAILED_FINAL.value
             }
         )
+        resolved_uncertainty_ids = {
+            uncertainty_id
+            for body in reconciliations
+            for uncertainty_id in body["resolved_uncertainty_ids"]
+        }
+        for uncertainty_id, uncertainty in expected_uncertainties.items():
+            if uncertainty_id not in resolved_uncertainty_ids:
+                expected_fences[uncertainty_id] = (
+                    str(uncertainty[4]), str(uncertainty[5]),
+                    (
+                        "EFFECT_BILLING_UNKNOWN"
+                        if uncertainty[1] == "BILLING"
+                        and uncertainty[7] is None
+                        else (
+                            "VALIDATOR_BILLING_UNKNOWN"
+                            if uncertainty[1] == "BILLING"
+                            else "VALIDATOR_ACTIVITY_UNKNOWN"
+                        )
+                    ),
+                    str(uncertainty[8]),
+                )
         expected_fences.update(
             {
                 body["fence_id"]: (
@@ -20247,6 +22946,17 @@ class SQLiteStateStore:
                 )
             del expected_fences[body["pause_fence_id"]]
 
+        for body in reconciliation_resumes:
+            source_fence = expected_fences.get(body["pause_fence_id"])
+            if (
+                source_fence is None
+                or source_fence[3] != body["source_pause_event_id"]
+            ):
+                raise StorageIntegrityError(
+                    "reconciliation resume source fence diverges from history"
+                )
+            del expected_fences[body["pause_fence_id"]]
+
         for body in activity_resumes:
             source_fence = expected_fences.get(body["pause_fence_id"])
             if (
@@ -20383,6 +23093,32 @@ class SQLiteStateStore:
                     ) from error
                 self._validate_validator_observation_event(
                     connection, body, predecessor_state
+                )
+            if row["event_kind"] == "RECONCILIATION_RECORDED":
+                try:
+                    predecessor_state = LifecycleState(
+                        expected_lifecycle[run_id]
+                    )
+                except (KeyError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "reconciliation has no valid predecessor state"
+                    ) from error
+                self._validate_validator_reconciliation_event(
+                    connection, body, predecessor_state,
+                    expected_cursors.get(run_id),
+                )
+            if row["event_kind"] == "RECONCILIATION_PAUSE_RESUMED":
+                try:
+                    predecessor_state = LifecycleState(
+                        expected_lifecycle[run_id]
+                    )
+                except (KeyError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "reconciliation resume has no valid predecessor state"
+                    ) from error
+                self._validate_reconciliation_pause_resume_event(
+                    connection, body, predecessor_state,
+                    expected_cursors.get(run_id),
                 )
             if row["event_kind"] == "BLOCKER_RESOLVED":
                 try:
@@ -20635,7 +23371,7 @@ class SQLiteStateStore:
                     "VALIDATION_PASSED", "VALIDATION_FAILED",
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
-                    "VALIDATOR_INTENT_COMMITTED",
+                    "VALIDATOR_INTENT_COMMITTED", "RECONCILIATION_RECORDED",
                 }:
                     expected_cursors[run_id] = body.get(
                         "continuation_cursor"
@@ -20820,8 +23556,12 @@ class SQLiteStateStore:
             "local_pause_actions",
             "external_pause_actions",
             "reconciliation_pause_actions",
+            "uncertainty_instances",
+            "uncertainty_resolutions",
+            "reconciliation_actions",
             "validation_pause_actions",
             "resume_actions",
+            "reconciliation_resume_actions",
             "stop_actions",
             "stop_escalations",
             "operator_redemptions",

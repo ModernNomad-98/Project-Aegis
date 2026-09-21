@@ -21,6 +21,7 @@ from .authority import (
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
+    SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
     SyntheticValidatorCapability,
 )
@@ -44,6 +45,8 @@ from .contracts import (
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
     PauseValidationRequest,
+    ReconcileValidatorResultRequest,
+    ReconciliationPauseResumeRequest,
     ResumeRequest,
     ResumeActivitySettlementRequest,
     StopMode,
@@ -316,6 +319,27 @@ class SyntheticDispatchCoordinator:
             failure_hook=failure_hook,
         )
 
+    def resume_reconciliation_pause(
+        self,
+        request: ReconciliationPauseResumeRequest,
+        capability: SyntheticOperatorCapability,
+        resume_evidence: SyntheticReconciliationResumeEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T14", current_state, resulting_state,
+                TRANSITIONS["T14"].required_guards,
+            )
+
+        return self._store.resume_reconciliation_pause(
+            request, capability, resume_evidence, self._authority,
+            authorize_transition=authorize, failure_hook=failure_hook,
+        )
+
     def record_authority_fact(
         self,
         request: AuthorityLifecycleFactRequest,
@@ -576,6 +600,30 @@ class SyntheticValidationCoordinator:
             lose_result=lose_result,
         )
         return SyntheticValidationReceipt(commit, result)
+
+    def reconcile_result(
+        self,
+        request: ReconcileValidatorResultRequest,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T17",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T17"].required_guards,
+            )
+
+        return self._store.reconcile_validator_result(
+            request,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
 
     def intake_result(
         self,

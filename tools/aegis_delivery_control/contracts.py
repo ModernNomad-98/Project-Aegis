@@ -812,6 +812,88 @@ class OperationFinalizationReceipt:
 
 
 @dataclass(frozen=True)
+class ReconcileValidatorResultRequest:
+    reconciliation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    observation_id: str
+    observation_event_hash: str
+    cessation_id: str
+    cessation_event_id: str
+    cessation_event_hash: str
+    settlement_event_id: str
+    settlement_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+
+    def validate(self) -> None:
+        scalar_fields = (
+            self.reconciliation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.observation_id,
+            self.observation_event_hash,
+            self.cessation_id,
+            self.cessation_event_id,
+            self.cessation_event_hash,
+            self.settlement_event_id,
+            self.settlement_hash,
+            self.expected_slot_attempt_id,
+            self.expected_run_head,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_fields
+        ):
+            raise ValueError(
+                "validator reconciliation identifiers and bindings must be "
+                "non-empty"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in self.resolved_uncertainty_ids
+            )
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "validator reconciliation requires distinct uncertainty IDs"
+            )
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "validator reconciliation cursor must be non-empty or absent"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "validator reconciliation slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
 class PauseReconciliationRequest:
     pause_id: str
     command_id: str
@@ -1047,6 +1129,52 @@ class ResumeRequest:
             or not self.expected_preserved_continuation_cursor.strip()
         ):
             raise ValueError("resume preserved cursor must be non-empty or absent")
+
+
+@dataclass(frozen=True)
+class ReconciliationPauseResumeRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    source_reconciliation_id: str
+    source_reconciliation_event_id: str
+    source_reconciliation_event_hash: str
+    expected_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "reconciliation-pause resume bindings must be non-empty"
+            )
+        parts = self.expected_continuation_cursor.split(":")
+        if (
+            len(parts) != 5
+            or parts[0:2] != ["validation-application", "v1"]
+            or not all(parts[2:])
+        ):
+            raise ValueError(
+                "reconciliation-pause resume requires a typed T17 cursor"
+            )
+        if self.source_pause_event_id == self.source_reconciliation_event_id:
+            raise ValueError(
+                "pause and reconciliation resume sources must be distinct"
+            )
 
 
 @dataclass(frozen=True)

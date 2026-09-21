@@ -8,7 +8,7 @@ Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Latest reviewed implementation checkpoint: `39b3268adc984e3d0b10e55a42fe37a172229e60`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, T13, T15, T14 CORE SLICE, T05, T06 AND NARROW T07 SLICE `APPROVE`**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE AND REVIEWED T05-T09/T13-T15/T17 SLICES `APPROVE`; COMPLETE T17 AND LATER BACKLOG OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -58,6 +58,7 @@ they are preserved and must likewise not be staged or deleted:
 
 ```text
 scripts/__pycache__/
+scripts/ci/__pycache__/
 scripts/tests/__pycache__/
 ```
 
@@ -707,6 +708,64 @@ uncertainty/fence-persistence evidence does not promote those complete families,
 which remain `UNVERIFIED`. T17 with F02/F11/F12/F21 is next; PR #99 remains open,
 draft and blocked.
 
+### Stage 15 - T17 validator-result reconciliation and exact T09 resume
+
+The reviewed slice binds validator reconciliation to one immutable RESULT
+observation, authoritative cessation, versioned accounting settlement, exact
+uncertainty set, accepted plan, repository slot and unsuperseded validator
+attempt. Runtime and recovery use the same repository-prefix reducer bounded by
+global `writer_epoch` plus sequence. The reducer resolves only the named
+uncertainty instances and their exact fences, ignores later history, preserves
+a same-run pause, treats an applicable cross-run pause as a blocker and retains
+the typed validation-application cursor for the unapplied result.
+
+The paired T14 route uses a distinct versioned
+`ReconciliationPauseResumeRequest` and domain-separated issuer evidence instead
+of broadening legacy resume semantics. It independently binds the immutable T09
+pause and T17 reconciliation sources, complete catalog/run-head vector and
+current run head. One transaction clears exactly the named T09 fence, redeems
+the one-use RESUME capability, records the closed event/action projections and
+advances both heads. Two stacked T09 fences clear sequentially: the first resume
+remains `PAUSED`, the second chains from the first resume head and returns the
+eligible result to `VALIDATING`. Both historical reducers replay the exact
+clearances, so later routing and recovery do not resurrect a deleted fence.
+
+Changed production files: `contracts.py`, `authority.py`, `dispatch.py`,
+`engine.py` and `storage.py`. `test_dispatch.py` covers validator settlement,
+repository-prefix ordering, cross-run before/after boundaries, two-stage T09
+clearance, crash rollback/replay and semantic tamper; `test_storage.py` updates
+the exact closed table inventory and preserves T06 uncertainty regressions.
+Root/package routing docs, the durable backlog and this handoff record only the
+observed slice. Canonical design, approval register, BER, dependencies, CI, CLI,
+adapters, artifact/cache contents, real authority/adapters and external systems
+remain intentionally untouched.
+
+Independent review returned two `REVISE` verdicts before final acceptance. The
+first required repository-wide applicable item/effect scope and a distinct T14
+contract rather than inferred legacy resume behavior. The second found that a
+second stacked T09 fence would be stranded, the historical reducers would
+resurrect a cleared fence, and recovery incompletely rebound the T09 source.
+Signed current-head binding, `PAUSED` preservation, exact clearance replay and
+full repository/run/item/effect/plan/revision source binding closed every
+finding. Final independent verdict: `APPROVE`, with no remaining blocker or
+major.
+
+Focused regressions passed after each correction. The affected dispatch/storage
+modules passed 330 tests before the final current-head correction, and the full
+delivery-control package passed 352 tests in 41.590 seconds afterward.
+Repository validation found 184 valid skills with zero warnings, 8 script tests
+passed with 4 expected skips, all 91 gate self-test assertions passed and
+compileall passed. `git diff --check` exited 0 with Windows line-ending notices
+only. Commit, push, PR update and exact-head hosted checks are pending for this
+stage.
+
+This stage accepts only the validator-result T17 route and the exact T09-source
+T14 route. Complete T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED`: effect
+operation uncertainty backfill, complete T06 uncertainty categories,
+receipt/nonexecution reconciliation and authenticated safe retry remain ordered
+T17 work. F02, F11, F12 and F21 gain narrow evidence but remain `UNVERIFIED` as
+complete families. PR #99 remains open, draft and blocked.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -808,6 +867,13 @@ draft and blocked.
 | `git push origin feat/cp-wp-002-offline-kernel` after T09 | Remote branch advanced `9b4cc6f..9599bcb` |
 | Hosted checks on exact T09 implementation head | `gate-guard` passed in 7s; `validate-skills` passed in 1m18s; `windows-offline-checks` passed in 2m47s |
 | Live PR #99 on exact T09 implementation head | OPEN; DRAFT; BLOCKED; head `9599bcb748f2290f328561704c860f5cb3b9c4c3` |
+| T17/T14 focused stacked-fence regression after final corrections | Two T09 fences cleared sequentially; first resume remained PAUSED, second returned VALIDATING; rollback/replay and semantic tamper checks passed |
+| T17/T14 affected dispatch/storage modules before final correction | `Ran 330 tests in 40.735s`; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -p "test_*.py"` after final T17/T14 corrections | `Ran 352 tests in 41.590s`; `OK` |
+| T17/T14 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| `git diff --check` after final T17/T14 corrections | Exit 0; Windows line-ending notices only |
+| Independent T17/T14 implementation review | Two `REVISE` rounds closed repository scope/distinct contract and stacked-head/reducer/source-binding defects; final `APPROVE`, no remaining blocker or major |
+| T17/T14 delivery preflight | Local and remote head `637b2caf026ae638ae5ba34af93a788a2c3d6512`; `ba13394` ancestor; PR #99 OPEN/DRAFT/BLOCKED with all three checks successful; approvals active; owner confirmed preservation of the additional `scripts/ci/__pycache__/` path |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -898,7 +964,7 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 339 passing tests, a registry entry or an earlier milestone
+complete from the 352 passing tests, a registry entry or an earlier milestone
 paragraph. No complete exact-head traceability audit was performed at this
 checkpoint.
 
@@ -927,10 +993,10 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
-| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, T07 activity-recovery-to-BLOCKED and T08 clean recovery-to-VALIDATING slices independently accepted; other source families remain |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, T07 activity-recovery-to-BLOCKED, T08 clean recovery-to-VALIDATING and sequential exact T09-after-T17 PAUSED/VALIDATING slices independently accepted; other source families remain |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 no longer blocks terminal closure; full T16 trace remains |
-| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog |
+| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact validator-result/cessation/accounting reconciliation slice independently accepted; operation uncertainty, receipt/nonexecution and safe-retry routes remain ordered |
 | T18 | YES | YES | YES | Graceful-stop and terminal-closure slices independently accepted |
 | T19 | YES | YES | YES | Terminal closure and post-contact uncertainty slices independently accepted |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
@@ -966,7 +1032,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
 | F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 identity/non-mutation boundary slice accepted; full family remains ordered with T28 |
-| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
+| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 validator-result exact-set/fence-clearance slice accepted; complete family remains with operation reconciliation |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head accounting trace required |
 | F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting slices accepted; full family trace remains |
@@ -976,8 +1042,8 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 and T06 post-contact/late-adjustment slices accepted; full family trace remains |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
 | F10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered with T17 |
-| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution PAUSED/recovery slice accepted; validator nonlaunch and T17 completion remain |
+| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 repository-prefix, superseded-attempt and later-history exclusion slice accepted; complete family remains |
+| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution and T17 validator-result PAUSED/recovery slices accepted; operation/nonlaunch completion remains |
 | F13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
 | F14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 recoverable-failure stop slice accepted; full trace remains |
 | F15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
@@ -986,7 +1052,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal closure slice accepted; full family trace remains |
 | F19 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
 | F20 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later cross-family backlog |
-| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 uncertainty and fence persistence slice accepted; complete clearance/recovery family remains ordered with T17 |
+| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 persistence plus T17 exact uncertainty/fence clearance and sequential T14 clearance slices accepted; operation and complete recovery family remain |
 
 Immediate order:
 
@@ -999,7 +1065,7 @@ Immediate order:
 Prior-session routing context for work after stop approval was:
 
 1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
-2. T17 with F02/F11/F12/F21.
+2. Complete the remaining T17 operation uncertainty, receipt/nonexecution and authenticated safe-retry work with F02/F11/F12/F21; the validator-result/T09-resume slice is independently accepted.
 3. T22.
 4. T28 with F01.
 5. Cross-family F05/F06/F13/F20.
@@ -1092,15 +1158,17 @@ owner before interpreting it more broadly.
 ## 14. Intentionally not done / omitted
 
 - R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, the narrow T07
-  local-nonexecution slice, T08 validation-pause slice and T14 core slices are
-  independently accepted as recorded in Stages 4-14; complete T07/T08/T14
-  remain UNVERIFIED pending T17/T24 and other source families, and later exact-head/final
-  review gates remain.
+  local-nonexecution slice, T08 validation-pause slice, T14 core/T09-source
+  slices and T17 validator-result slice are
+  independently accepted as recorded in Stages 4-15; complete T07/T08/T14
+  and T17 remain UNVERIFIED pending operation reconciliation, T24 and other
+  source families, and later exact-head/final review gates remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
   pause request. T08 adds no adapter cancellation or drain side effect. T09
-  retains reconciliation uncertainty and performs no adapter call. T17 is the
+  retains reconciliation uncertainty and performs no adapter call. The remaining
+  T17 operation uncertainty, receipt/nonexecution and safe-retry routes are the
   next ordered work.
 - No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
 - No full platform matrix or final hosted check result is claimed in this
@@ -1115,7 +1183,8 @@ owner before interpreting it more broadly.
 Codex may continue only after each cold-start preflight matches this handoff and
 the next backlog item's narrow plan has independently passed review. All three
 stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accepted.
-T09 is also independently accepted.
-The next code change follows the documented order at T17 with
-F02/F11/F12/F21. Keep PR #99 draft until every remaining backlog
+T09 and the narrow T17 validator-result/T14 T09-source slice are also
+independently accepted. The next code change continues T17 in documented order
+with operation uncertainty, receipt/nonexecution, authenticated safe retry and
+the remaining F02/F11/F12/F21 obligations. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

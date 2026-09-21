@@ -15,6 +15,7 @@ from .contracts import (
     BudgetSettlementRequest,
     DispatchDenied,
     FailureClassification,
+    ReconciliationPauseResumeRequest,
     ResumeActivitySettlementRequest,
     ResumeRequest,
 )
@@ -251,6 +252,14 @@ class SyntheticActivityResumeEvidence:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticReconciliationResumeEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -426,6 +435,63 @@ class SyntheticAuthority:
         ):
             raise DispatchDenied(
                 "activity resume evidence was not issued here"
+            )
+
+    @staticmethod
+    def _reconciliation_resume_request_digest(
+        request: ReconciliationPauseResumeRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                request.__dict__, ensure_ascii=True,
+                separators=(",", ":"), sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_reconciliation_resume_evidence(
+        self, proof_id: str, request: ReconciliationPauseResumeRequest
+    ) -> SyntheticReconciliationResumeEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError(
+                "reconciliation resume proof ID must be non-empty"
+            )
+        request_digest = self._reconciliation_resume_request_digest(request)
+        return SyntheticReconciliationResumeEvidence(
+            proof_id, request_digest, self.issuer_fingerprint,
+            self._mac(
+                "RECONCILIATION_PAUSE_RESUME_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_reconciliation_resume_evidence(
+        self,
+        evidence: SyntheticReconciliationResumeEvidence,
+        request: ReconciliationPauseResumeRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied("reconciliation resume evidence is malformed")
+        request_digest = self._reconciliation_resume_request_digest(request)
+        expected_mac = self._mac(
+            "RECONCILIATION_PAUSE_RESUME_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied(
+                "reconciliation resume evidence was not issued here"
             )
 
     def issue_binding_observation(

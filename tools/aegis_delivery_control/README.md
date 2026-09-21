@@ -114,6 +114,17 @@ fixture. It is not a delivery integration.
   retains the repository slot, cursor and application obligation. T14 can clear
   only this exact T08 fence and return a clean eligible checkpoint to
   VALIDATING; unresolved checkpoints cannot resume through T14.
+- The reviewed T17 validator-result route binds one exact observation,
+  authoritative cessation, adjusted settlement and uncertainty set. Runtime and
+  recovery use the same global-writer-epoch prefix reducer, reject superseded
+  validator attempts, retain the typed validation-application cursor and route
+  remaining same-run pauses to PAUSED while treating applicable cross-run
+  fences as blockers. Its distinct versioned T14 request authenticates both the
+  immutable T09/T17 sources and the independently current run head. Sequential
+  resumes clear only their named T09 fences: the first stays PAUSED while a
+  second remains, and the final clean resume returns to VALIDATING. Historical
+  replay recognizes those exact clearances. Complete T17 operation uncertainty,
+  receipt/nonexecution reconciliation and safe retry remain unverified.
 - A local permission-use reservation is accounting, not real human authority.
 - Recovery requires an independently obtained repository identity, catalog
   head, and complete run-id/head vector. A self-consistent SQLite file is not
@@ -167,7 +178,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 339 tests successfully, and
+controller. The complete local package suite ran 352 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -226,6 +237,13 @@ the continuation cursor, accounting, outstanding slot or prior evidence, and
 supports idempotent replay plus strict recovery. Its immutable action history
 does not foreign-key the live fence, so later exact fence clearance can preserve
 that history. T09 performs no adapter call and does not clear uncertainty.
+The reviewed T17 validator-result slice and its distinct T14 T09-resume route
+also received independent `APPROVE` after two correction rounds closed
+repository-prefix scope, legacy-contract separation, stacked-fence chaining,
+historical fence replay and full source rebinding. Two exact T09 fences now
+clear sequentially without losing the typed validation-application cursor.
+Complete operation uncertainty, receipt/nonexecution reconciliation and safe
+retry remain ordered T17 work, so T17 and full T14 remain `UNVERIFIED`.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
