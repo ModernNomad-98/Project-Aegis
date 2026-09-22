@@ -12,7 +12,7 @@ import threading
 import unittest
 from dataclasses import replace
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from tools.aegis_delivery_control.adapters import (
     SyntheticEffectRequest,
@@ -35,6 +35,7 @@ from tools.aegis_delivery_control.contracts import (
     BindingMismatchRequest,
     CommitReceipt,
     DispatchDenied,
+    EffectAdoptionReceipt,
     EffectObservationCommand,
     FinalizeOperationRequest,
     InjectedFailure,
@@ -71,6 +72,9 @@ from tools.aegis_delivery_control.dispatch import (
 )
 from tools.aegis_delivery_control.engine import TransitionEngine
 from tools.aegis_delivery_control.storage import SQLiteStateStore, raise_at
+from tools.aegis_delivery_control.tests._legacy_schema import (
+    strip_t28_foundation_schema,
+)
 
 
 def BudgetSettlementRequest(*args, **kwargs):
@@ -142,6 +146,41 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_t28_coordinator_mediates_adoption_without_adapter_contact(
+        self,
+    ) -> None:
+        authority = SyntheticAuthority(b"t" * 32)
+        store = MagicMock()
+        store.is_canonical = True
+        adapter = MagicMock()
+        expected = EffectAdoptionReceipt(
+            "adoption-1", "adoption-key-1", "command-1", "event-1",
+            2, "event-hash-1", LifecycleState.VALIDATING,
+            "adoption:adoption-key-1", 1, False,
+        )
+
+        def adopt(*args, **kwargs):
+            kwargs["authorize_transition"](
+                LifecycleState.PLANNED, LifecycleState.VALIDATING
+            )
+            return expected
+
+        store.adopt_verified_effect.side_effect = adopt
+        coordinator = SyntheticDispatchCoordinator(
+            store, TransitionEngine(), authority, adapter
+        )
+        request = MagicMock()
+        readiness = MagicMock()
+        capability = MagicMock()
+
+        actual = coordinator.adopt_verified_effect(
+            request, readiness, capability
+        )
+
+        self.assertIs(actual, expected)
+        store.adopt_verified_effect.assert_called_once()
+        adapter.assert_not_called()
+
     def test_t17_ordered_source_control_settlement_evidence_is_exact(self) -> None:
         authority = SyntheticAuthority(b"s" * 32)
         binding = SourceControlUncertaintyBinding(
@@ -779,6 +818,7 @@ class MediatedDispatchTests(unittest.TestCase):
                     "DROP TABLE operation_nonexecution_resume_actions"
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
+                strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 0")
                 connection.commit()
             finally:
@@ -847,6 +887,7 @@ class MediatedDispatchTests(unittest.TestCase):
                     "DROP TABLE operation_nonexecution_resume_actions"
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
+                strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 1")
                 connection.commit()
             finally:
@@ -870,7 +911,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 3)
+            self.assertEqual(version, 4)
             self.assertEqual(action_count, 0)
             migrated.load_verified("repo-1", authority=authority)
 
@@ -914,7 +955,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 3
+                    connection.execute("PRAGMA user_version").fetchone()[0], 4
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -941,7 +982,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 4")
+                connection.execute("PRAGMA user_version = 5")
             finally:
                 connection.close()
             with self.assertRaisesRegex(

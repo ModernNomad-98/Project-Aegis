@@ -8,12 +8,16 @@ import json
 import secrets
 import threading
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from enum import Enum
 
 from .contracts import (
     AuthorityLifecycleFactRequest,
     BindingMismatchRequest,
     BudgetSettlementRequest,
     DispatchDenied,
+    SyntheticGrantKind,
+    SyntheticSourceConsumerKind,
     FailureClassification,
     ReconciliationPauseResumeRequest,
     ResumeActivitySettlementRequest,
@@ -287,6 +291,80 @@ class SyntheticSourceControlSettlementEvidence:
     issuer_mac: str
 
 
+@dataclass(frozen=True)
+class SyntheticSourceGrant:
+    grant_id: str
+    grant_kind: SyntheticGrantKind
+    action: str
+    repository_id: str
+    logical_effect_id: str
+    source_id: str
+    source_version: str
+    terms_digest: str
+    scope_digest: str
+    binding_digest: str
+    not_before: str
+    expires_at: str
+    use_limit: int
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticSourceCapability:
+    grant_id: str
+    grant_kind: SyntheticGrantKind
+    action: str
+    repository_id: str
+    logical_effect_id: str
+    source_id: str
+    source_version: str
+    terms_digest: str
+    scope_digest: str
+    binding_digest: str
+    consumer_kind: SyntheticSourceConsumerKind
+    consumer_key: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticAdoptionReadinessEvidence:
+    evidence_id: str
+    source_id: str
+    source_version: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    revision_digest: str
+    source_tree_digest: str
+    item_definition_digest: str
+    semantic_input_digest: str
+    prerequisites_met: bool
+    catalog_head: str
+    head_vector_digest: str
+    evidence_head: str
+    observed_at: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticLegacyDescriptorBindingEvidence:
+    evidence_id: str
+    repository_id: str
+    logical_effect_id: str
+    legacy_descriptor_digest: str
+    canonical_descriptor_digest: str
+    canonical_material_digest: str
+    source_event_id: str
+    source_event_hash: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
 class SyntheticAuthority:
     """Atomically claim in-memory test grants; never authenticates real authority."""
 
@@ -317,6 +395,222 @@ class SyntheticAuthority:
     @property
     def issuer_fingerprint(self) -> str:
         return hashlib.sha256(self._issuer_key).hexdigest()
+
+    @staticmethod
+    def _parse_utc(value: str, *, field: str) -> datetime:
+        if not isinstance(value, str):
+            raise ValueError(f"{field} must be a UTC timestamp")
+        try:
+            parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+                tzinfo=timezone.utc
+            )
+        except ValueError as error:
+            raise ValueError(f"{field} must be a UTC timestamp") from error
+        return parsed
+
+    def issue_source_grant(
+        self,
+        *,
+        grant_id: str,
+        grant_kind: SyntheticGrantKind,
+        action: str,
+        repository_id: str,
+        logical_effect_id: str,
+        source_id: str,
+        source_version: str,
+        terms_digest: str,
+        scope_digest: str,
+        binding_digest: str,
+        not_before: str,
+        expires_at: str,
+        use_limit: int,
+    ) -> SyntheticSourceGrant:
+        strings = (
+            grant_id, action, repository_id, logical_effect_id, source_id,
+            source_version, terms_digest, scope_digest, binding_digest,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in strings):
+            raise ValueError("synthetic source grant fields must be non-empty")
+        if not isinstance(grant_kind, SyntheticGrantKind):
+            raise ValueError("synthetic source grant kind is invalid")
+        expected_action = {
+            SyntheticGrantKind.ADOPTION: "ADOPT_VERIFIED_EFFECT",
+            SyntheticGrantKind.EFFECT_RELATIONSHIP: "DEFINE_EFFECT_RELATIONSHIP",
+        }[grant_kind]
+        if action != expected_action:
+            raise ValueError("synthetic source grant action does not match its kind")
+        if type(use_limit) is not int or use_limit <= 0:
+            raise ValueError("synthetic source grant use limit must be positive")
+        starts = self._parse_utc(not_before, field="not_before")
+        ends = self._parse_utc(expires_at, field="expires_at")
+        if ends <= starts:
+            raise ValueError("synthetic source grant expiry must follow not-before")
+        fields = {
+            "grant_id": grant_id,
+            "grant_kind": grant_kind.value,
+            "action": action,
+            "repository_id": repository_id,
+            "logical_effect_id": logical_effect_id,
+            "source_id": source_id,
+            "source_version": source_version,
+            "terms_digest": terms_digest,
+            "scope_digest": scope_digest,
+            "binding_digest": binding_digest,
+            "not_before": not_before,
+            "expires_at": expires_at,
+            "use_limit": use_limit,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        return SyntheticSourceGrant(
+            grant_id, grant_kind, action, repository_id, logical_effect_id,
+            source_id, source_version, terms_digest, scope_digest,
+            binding_digest, not_before, expires_at, use_limit,
+            self.issuer_fingerprint,
+            self._mac("SYNTHETIC_SOURCE_GRANT", **fields),
+        )
+
+    def verify_source_grant(self, grant: SyntheticSourceGrant) -> None:
+        expected = self.issue_source_grant(
+            **{
+                key: value
+                for key, value in grant.__dict__.items()
+                if key not in {"issuer_fingerprint", "issuer_mac"}
+            }
+        )
+        if (
+            grant.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(grant.issuer_mac, expected.issuer_mac)
+        ):
+            raise DispatchDenied("synthetic source grant was not issued here")
+
+    def issue_source_capability(
+        self,
+        grant: SyntheticSourceGrant,
+        *,
+        consumer_kind: SyntheticSourceConsumerKind,
+        consumer_key: str,
+        binding_digest: str,
+    ) -> SyntheticSourceCapability:
+        self.verify_source_grant(grant)
+        if not isinstance(consumer_kind, SyntheticSourceConsumerKind):
+            raise ValueError("synthetic source consumer kind is invalid")
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (consumer_key, binding_digest)
+        ):
+            raise ValueError("synthetic source consumer binding must be non-empty")
+        if binding_digest != grant.binding_digest:
+            raise DispatchDenied("synthetic source capability binding mismatch")
+        fields = {
+            "grant_id": grant.grant_id,
+            "grant_kind": grant.grant_kind.value,
+            "action": grant.action,
+            "repository_id": grant.repository_id,
+            "logical_effect_id": grant.logical_effect_id,
+            "source_id": grant.source_id,
+            "source_version": grant.source_version,
+            "terms_digest": grant.terms_digest,
+            "scope_digest": grant.scope_digest,
+            "binding_digest": binding_digest,
+            "consumer_kind": consumer_kind.value,
+            "consumer_key": consumer_key,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        return SyntheticSourceCapability(
+            grant.grant_id, grant.grant_kind, grant.action,
+            grant.repository_id, grant.logical_effect_id, grant.source_id,
+            grant.source_version, grant.terms_digest, grant.scope_digest,
+            binding_digest, consumer_kind, consumer_key,
+            self.issuer_fingerprint,
+            self._mac("SYNTHETIC_SOURCE_CAPABILITY", **fields),
+        )
+
+    def verify_source_capability(
+        self, capability: SyntheticSourceCapability
+    ) -> None:
+        fields = {
+            key: (value.value if isinstance(value, Enum) else value)
+            for key, value in capability.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_SOURCE_CAPABILITY", **fields)
+        if (
+            capability.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(capability.issuer_mac, expected)
+        ):
+            raise DispatchDenied("synthetic source capability was not issued here")
+
+    def issue_adoption_readiness_evidence(
+        self, **fields: object
+    ) -> SyntheticAdoptionReadinessEvidence:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(SyntheticAdoptionReadinessEvidence.__dataclass_fields__) - {
+            "issuer_mac"
+        }
+        if set(fields) != required:
+            raise ValueError("synthetic adoption readiness fields are incomplete")
+        if fields.get("prerequisites_met") is not True:
+            raise ValueError("synthetic adoption readiness must prove prerequisites")
+        self._parse_utc(str(fields["observed_at"]), field="observed_at")
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for key, value in fields.items()
+            if key not in {"prerequisites_met"}
+        ):
+            raise ValueError("synthetic adoption readiness fields must be non-empty")
+        return SyntheticAdoptionReadinessEvidence(
+            **fields,
+            issuer_mac=self._mac("SYNTHETIC_ADOPTION_READINESS", **fields),
+        )
+
+    def verify_adoption_readiness_evidence(
+        self, evidence: SyntheticAdoptionReadinessEvidence
+    ) -> None:
+        fields = {
+            key: value
+            for key, value in evidence.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_ADOPTION_READINESS", **fields)
+        if (
+            evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected)
+        ):
+            raise DispatchDenied("synthetic adoption readiness is untrusted")
+
+    def issue_legacy_descriptor_binding_evidence(
+        self, **fields: str
+    ) -> SyntheticLegacyDescriptorBindingEvidence:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(
+            SyntheticLegacyDescriptorBindingEvidence.__dataclass_fields__
+        ) - {"issuer_mac"}
+        if set(fields) != required or any(
+            not isinstance(value, str) or not value.strip()
+            for value in fields.values()
+        ):
+            raise ValueError("legacy descriptor binding fields are incomplete")
+        return SyntheticLegacyDescriptorBindingEvidence(
+            **fields,
+            issuer_mac=self._mac("SYNTHETIC_LEGACY_DESCRIPTOR", **fields),
+        )
+
+    def verify_legacy_descriptor_binding_evidence(
+        self, evidence: SyntheticLegacyDescriptorBindingEvidence
+    ) -> None:
+        fields = {
+            key: value
+            for key, value in evidence.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_LEGACY_DESCRIPTOR", **fields)
+        if (
+            evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected)
+        ):
+            raise DispatchDenied("legacy descriptor binding is untrusted")
 
     @staticmethod
     def _authority_fact_digest(request: AuthorityLifecycleFactRequest) -> str:
@@ -803,6 +1097,16 @@ class SyntheticAuthority:
         self, request: AuthorityLifecycleFactRequest
     ) -> None:
         request.validate()
+        if request.grant_kind in {"ADOPTION", "EFFECT_RELATIONSHIP"}:
+            expected_action = {
+                "ADOPTION": "ADOPT_VERIFIED_EFFECT",
+                "EFFECT_RELATIONSHIP": "DEFINE_EFFECT_RELATIONSHIP",
+            }[request.grant_kind]
+            if request.action != expected_action:
+                raise DispatchDenied(
+                    "source authority lifecycle action is invalid"
+                )
+            return
         with self._lock:
             if request.grant_kind == "EFFECT":
                 grant = self._grants.get(request.grant_id)

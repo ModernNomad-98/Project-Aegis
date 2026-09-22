@@ -26,6 +26,8 @@ from .authority import (
     SyntheticResumeEvidence,
     SyntheticSourceControlEvidence,
     SyntheticSourceControlSettlementEvidence,
+    SyntheticSourceCapability,
+    SyntheticAdoptionReadinessEvidence,
     SyntheticValidatorCapability,
 )
 from .contracts import (
@@ -35,6 +37,8 @@ from .contracts import (
     CommitReceipt,
     ControlReceipt,
     DispatchDenied,
+    EffectAdoptionReceipt,
+    EffectAdoptionRequest,
     EffectObservationCommand,
     EffectObservationRequest,
     FinalizeOperationRequest,
@@ -175,6 +179,33 @@ class SyntheticDispatchCoordinator:
 
         return self._store.stop(
             request,
+            capability,
+            self._authority,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def adopt_verified_effect(
+        self,
+        request: EffectAdoptionRequest,
+        readiness: SyntheticAdoptionReadinessEvidence,
+        capability: SyntheticSourceCapability,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> EffectAdoptionReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T28",
+                current_state,
+                resulting_state,
+                TRANSITIONS["T28"].required_guards,
+            )
+
+        return self._store.adopt_verified_effect(
+            request,
+            readiness,
             capability,
             self._authority,
             authorize_transition=authorize,

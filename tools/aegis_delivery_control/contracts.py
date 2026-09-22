@@ -60,6 +60,29 @@ class DispatchPosture(str, Enum):
     NOT_EVALUATED = "NOT_EVALUATED"
 
 
+class OperationOriginKind(str, Enum):
+    EXECUTION_INTENT = "EXECUTION_INTENT"
+    EFFECT_ADOPTION = "EFFECT_ADOPTION"
+
+
+class EffectRelationshipKind(str, Enum):
+    DIFFERENT_FROM = "DIFFERENT_FROM"
+    REPEAT_OF = "REPEAT_OF"
+    COMPENSATES = "COMPENSATES"
+
+
+class SyntheticGrantKind(str, Enum):
+    ADOPTION = "ADOPTION"
+    EFFECT_RELATIONSHIP = "EFFECT_RELATIONSHIP"
+
+
+class SyntheticSourceConsumerKind(str, Enum):
+    EFFECT_ADOPTION = "EFFECT_ADOPTION"
+    EFFECT_RELATIONSHIP = "EFFECT_RELATIONSHIP"
+    HOST = "HOST"
+    MANUAL = "MANUAL"
+
+
 class SourceControlClassification(str, Enum):
     """Closed synthetic classification for receipt/source authority."""
 
@@ -147,6 +170,8 @@ class AuthorityLifecycleFactRequest:
     successor_grant_id: str | None = None
     corrected_fact_id: str | None = None
     corrected_event_hash: str | None = None
+    recorded_at_utc: str | None = None
+    effective_at_utc: str | None = None
 
     def validate(self) -> None:
         required = (
@@ -157,10 +182,14 @@ class AuthorityLifecycleFactRequest:
         )
         if any(not isinstance(value, str) or not value.strip() for value in required):
             raise ValueError("authority fact identifiers must be non-empty")
-        if self.grant_kind not in {"EFFECT", "VALIDATOR", "OPERATOR"}:
+        if self.grant_kind not in {
+            "EFFECT", "VALIDATOR", "OPERATOR", "ADOPTION",
+            "EFFECT_RELATIONSHIP",
+        }:
             raise ValueError("authority fact grant kind is unsupported")
         if self.governed_boundary_kind not in {
             "NO_ACTION", "INTENT", "CLAIM", "CONTACT", "REDEMPTION",
+            "SOURCE_USE",
         }:
             raise ValueError("authority fact boundary kind is unsupported")
         boundary = (self.governed_event_id, self.governed_event_hash)
@@ -196,6 +225,38 @@ class AuthorityLifecycleFactRequest:
             and self.governed_boundary_kind == "NO_ACTION"
         ):
             raise ValueError("ordered authority fact requires a governed event")
+        source_kind = self.grant_kind in {
+            "ADOPTION", "EFFECT_RELATIONSHIP",
+        }
+        if source_kind:
+            if (
+                not isinstance(self.effective_at_utc, str)
+                or not self.effective_at_utc.strip()
+                or (
+                    self.recorded_at_utc is not None
+                    and (
+                        not isinstance(self.recorded_at_utc, str)
+                        or not self.recorded_at_utc.strip()
+                    )
+                )
+            ):
+                raise ValueError(
+                    "source authority fact requires an effective time"
+                )
+            if self.governed_boundary_kind not in {
+                "NO_ACTION", "SOURCE_USE",
+            }:
+                raise ValueError(
+                    "source authority fact boundary kind is unsupported"
+                )
+        elif (
+            self.recorded_at_utc is not None
+            or self.effective_at_utc is not None
+            or self.governed_boundary_kind == "SOURCE_USE"
+        ):
+            raise ValueError(
+                "source authority timestamps require a source grant kind"
+            )
         if self.fact_kind is AuthorityFactKind.OWN_CONSUMED and (
             self.governed_order is not GovernedOrder.DURING
             or self.governed_boundary_kind == "NO_ACTION"
@@ -313,6 +374,20 @@ class PlanAcceptanceRequest:
     item_definition_digest: str | None = None
     plan_schema_version: str | None = None
     reducer_version: str | None = None
+    effect_action: str | None = None
+    effect_target: str | None = None
+    effect_semantic_inputs: tuple[tuple[str, str], ...] = ()
+    target_generation: int | None = None
+    relationship_kind: EffectRelationshipKind | None = None
+    predecessor_logical_effect_id: str | None = None
+    relationship_grant_id: str | None = None
+    predecessor_descriptor_digest: str | None = None
+    predecessor_defining_plan_id: str | None = None
+    predecessor_defining_event_hash: str | None = None
+    relationship_source_id: str | None = None
+    relationship_source_version: str | None = None
+    relationship_terms_digest: str | None = None
+    relationship_scope_digest: str | None = None
 
     def validate(self) -> None:
         identifiers = (
@@ -356,6 +431,191 @@ class PlanAcceptanceRequest:
             raise ValueError("aggregate gate identifiers must be non-empty")
         if len(set(self.aggregate_gate_ids)) != len(self.aggregate_gate_ids):
             raise ValueError("aggregate gate identifiers must be unique")
+        descriptor_fields = (
+            self.effect_action, self.effect_target, self.target_generation,
+        )
+        has_descriptor = any(value is not None for value in descriptor_fields) or bool(
+            self.effect_semantic_inputs
+        )
+        if has_descriptor:
+            if (
+                not isinstance(self.effect_action, str)
+                or not self.effect_action.strip()
+                or not isinstance(self.effect_target, str)
+                or not self.effect_target.strip()
+                or type(self.target_generation) is not int
+                or self.target_generation <= 0
+            ):
+                raise ValueError(
+                    "canonical effect descriptor requires action, target and "
+                    "positive target generation"
+                )
+            if (
+                any(
+                    not isinstance(key, str) or not key.strip()
+                    or not isinstance(value, str) or not value.strip()
+                    for key, value in self.effect_semantic_inputs
+                )
+                or tuple(sorted(self.effect_semantic_inputs))
+                != self.effect_semantic_inputs
+                or len({key for key, _value in self.effect_semantic_inputs})
+                != len(self.effect_semantic_inputs)
+            ):
+                raise ValueError(
+                    "canonical semantic inputs must be sorted unique non-empty pairs"
+                )
+        elif any(value is not None for value in descriptor_fields):
+            raise ValueError("canonical effect descriptor must be complete")
+        relationship_fields = (
+            self.relationship_kind,
+            self.predecessor_logical_effect_id,
+            self.relationship_grant_id,
+            self.predecessor_descriptor_digest,
+            self.predecessor_defining_plan_id,
+            self.predecessor_defining_event_hash,
+            self.relationship_source_id,
+            self.relationship_source_version,
+            self.relationship_terms_digest,
+            self.relationship_scope_digest,
+        )
+        if any(value is not None for value in relationship_fields) and not all(
+            value is not None for value in relationship_fields
+        ):
+            raise ValueError("effect relationship binding must be complete")
+        if self.relationship_kind is not None:
+            if not isinstance(self.relationship_kind, EffectRelationshipKind):
+                raise ValueError("effect relationship kind is invalid")
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in (
+                    self.predecessor_logical_effect_id,
+                    self.relationship_grant_id,
+                    self.predecessor_descriptor_digest,
+                    self.predecessor_defining_plan_id,
+                    self.predecessor_defining_event_hash,
+                    self.relationship_source_id,
+                    self.relationship_source_version,
+                    self.relationship_terms_digest,
+                    self.relationship_scope_digest,
+                )
+            ):
+                raise ValueError("effect relationship identifiers must be non-empty")
+            if self.predecessor_logical_effect_id == self.logical_effect_id:
+                raise ValueError("effect relationship requires another effect ID")
+
+
+@dataclass(frozen=True)
+class EffectAdoptionRequest:
+    adoption_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    revision_digest: str
+    logical_effect_id: str
+    effect_descriptor_digest: str
+    target_generation: int
+    root_run_id: str
+    root_attempt_id: str
+    root_observation_id: str
+    root_observation_event_hash: str
+    root_observation_digest: str
+    root_finalization_id: str
+    root_finalization_key: str
+    root_finalization_event_hash: str
+    immediate_origin_kind: OperationOriginKind
+    immediate_origin_id: str
+    immediate_origin_event_hash: str
+    immediate_finalization_key: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_head_vector_digest: str
+    expected_lifecycle: LifecycleState
+    expected_continuation_cursor: str | None
+    readiness_evidence_id: str
+    adoption_grant_id: str
+    current_check_set_digest: str
+    adoption_source_id: str
+    adoption_source_version: str
+    adoption_terms_digest: str
+    adoption_scope_digest: str
+    superseded_readiness_id: str | None = None
+    superseded_readiness_event_hash: str | None = None
+    superseded_blocker_set_digest: str | None = None
+
+    def validate(self) -> None:
+        string_fields = tuple(
+            value
+            for name, value in self.__dict__.items()
+            if name not in {
+                "target_generation", "immediate_origin_kind",
+                "expected_lifecycle", "expected_continuation_cursor",
+                "superseded_readiness_id",
+                "superseded_readiness_event_hash",
+                "superseded_blocker_set_digest",
+            }
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in string_fields
+        ):
+            raise ValueError("effect adoption identifiers and digests must be non-empty")
+        if type(self.target_generation) is not int or self.target_generation <= 0:
+            raise ValueError("effect adoption target generation must be positive")
+        if not isinstance(self.immediate_origin_kind, OperationOriginKind):
+            raise ValueError("effect adoption immediate origin kind is invalid")
+        if self.expected_lifecycle not in {
+            LifecycleState.PLANNED, LifecycleState.BLOCKED,
+        }:
+            raise ValueError("T28 requires expected PLANNED or BLOCKED state")
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError("expected continuation cursor must be non-empty")
+        superseded = (
+            self.superseded_readiness_id,
+            self.superseded_readiness_event_hash,
+            self.superseded_blocker_set_digest,
+        )
+        if self.expected_lifecycle is LifecycleState.BLOCKED:
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in superseded
+            ):
+                raise ValueError(
+                    "BLOCKED adoption requires exact superseded readiness"
+                )
+        elif superseded != (None, None, None):
+            raise ValueError(
+                "PLANNED adoption cannot carry superseded readiness"
+            )
+
+
+@dataclass(frozen=True)
+class EffectAdoptionReceipt:
+    adoption_id: str
+    adoption_key: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    slot_attempt_id: str
+    slot_generation: int
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class SyntheticSourceReceipt:
+    source_event_id: str
+    sequence: int
+    event_hash: str
+    consumer_kind: SyntheticSourceConsumerKind | None
+    consumer_key: str | None
+    replayed: bool
 
 
 @dataclass(frozen=True)

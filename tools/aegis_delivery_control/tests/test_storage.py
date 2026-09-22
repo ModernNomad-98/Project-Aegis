@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import datetime, timezone
 import hashlib
+import gc
 import json
 import multiprocessing
 import sqlite3
@@ -23,6 +24,7 @@ from tools.aegis_delivery_control.authority import (
     SyntheticGrant,
     SyntheticOperatorGrant,
     SyntheticSettlementProof,
+    SyntheticSourceGrant,
     SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.adapters import (
@@ -38,11 +40,14 @@ from tools.aegis_delivery_control.contracts import (
     BudgetDisposition,
     BudgetSettlementRequest as BudgetSettlementContract,
     DispatchDenied,
+    EffectAdoptionRequest,
+    EffectRelationshipKind,
     EffectObservationRequest,
     FinalizeOperationRequest,
     InjectedFailure,
     IntentRequest,
     LifecycleState,
+    OperationOriginKind,
     GovernedOrder,
     PauseBeforeDispatchRequest,
     PauseActivitySettlementRequest,
@@ -63,6 +68,8 @@ from tools.aegis_delivery_control.contracts import (
     StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
+    SyntheticGrantKind,
+    SyntheticSourceConsumerKind,
     DispatchPosture,
     TerminalRestartDisposition,
     TerminalRestartRequest,
@@ -80,6 +87,9 @@ from tools.aegis_delivery_control.storage import (
     SQLiteStateReader,
     SQLiteStateStore,
     raise_at,
+)
+from tools.aegis_delivery_control.tests._legacy_schema import (
+    strip_t28_foundation_schema,
 )
 
 
@@ -266,6 +276,1317 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.capability = self.authority.claim(
             "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
         )
+
+    def test_t28_source_head_is_in_complete_freshness_vector(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                plan_id="source-plan-1",
+                command_id="source-plan-command-1",
+                event_id="source-plan-event-1",
+                repository_id="repo-1",
+                run_id="source-run-1",
+                item_id="source-item-1",
+                logical_effect_id="source-effect-1",
+                revision_digest="source-revision-1",
+                effect_descriptor_digest="source-descriptor-1",
+                permission_scope_digest="source-permission-1",
+                budget_policy_digest="source-budget-1",
+                check_ids=("source-check-1",),
+            ),
+            expected_head="",
+            writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        grant = self.authority.issue_source_grant(
+            grant_id="source-grant-1",
+            grant_kind=SyntheticGrantKind.ADOPTION,
+            action="ADOPT_VERIFIED_EFFECT",
+            repository_id="repo-1",
+            logical_effect_id="source-effect-1",
+            source_id="synthetic-source-1",
+            source_version="1",
+            terms_digest="source-terms-1",
+            scope_digest="source-scope-1",
+            binding_digest="source-binding-1",
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z",
+            use_limit=1,
+        )
+        registered = self.store.register_synthetic_source_grant(
+            grant, self.authority
+        )
+        self.oracle.allowed_head = registered.event_hash
+        before_catalog, before_heads = self.store.load_verified("repo-1")
+        self.assertIn("@aegis/source/synthetic-authority", before_heads)
+        rollback_path = Path(self.temporary_directory.name) / "source-rollback.sqlite3"
+        source = sqlite3.connect(self.database_path)
+        target = sqlite3.connect(rollback_path)
+        try:
+            source.backup(target)
+        finally:
+            target.close()
+            source.close()
+        capability = self.authority.issue_source_capability(
+            grant,
+            consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="manual-source-use-1",
+            binding_digest="source-binding-1",
+        )
+        consumed = self.store.consume_synthetic_source_for_test(
+            capability, self.authority
+        )
+        self.oracle.allowed_head = consumed.event_hash
+        after_catalog, after_heads = self.store.load_verified("repo-1")
+        self.assertEqual(
+            before_heads["source-run-1"], after_heads["source-run-1"]
+        )
+        self.assertNotEqual(
+            before_heads["@aegis/source/synthetic-authority"],
+            after_heads["@aegis/source/synthetic-authority"],
+        )
+        rollback = SQLiteStateStore(
+            rollback_path,
+            CompleteFreshnessOracle(after_catalog, after_heads),
+            "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        with self.assertRaisesRegex(DispatchDenied, "freshness"):
+            rollback.load_verified("repo-1")
+        del rollback
+        gc.collect()
+
+    def test_t28_adopts_completed_effect_without_delivery_or_reused_charge(
+        self,
+    ) -> None:
+        semantic_inputs = (("input", "digest-1"),)
+        descriptor = self.store.canonical_effect_descriptor_digest(
+            "WRITE", "synthetic-target-1", semantic_inputs, 1
+        )
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                descriptor, "scope-1", "budget-policy-digest",
+                ("check-1",), ("check-1",),
+                effect_action="WRITE",
+                effect_target="synthetic-target-1",
+                effect_semantic_inputs=semantic_inputs,
+                target_generation=1,
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        operation_request = replace(
+            self.request(), effect_descriptor_digest=descriptor
+        )
+        committed = self.store.commit_intent(
+            operation_request, self.capability, self.authority,
+            expected_head=plan.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        settlement_request = BudgetSettlementRequest(
+            "settlement-1", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 2, "receipt-1", "USAGE_REPORTED",
+        )
+        settlement = self.store._settle_budget(
+            settlement_request,
+            self.authority.issue_settlement_proof(
+                "proof-1", settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settlement.settlement_hash
+        root_observation = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "observation-1", "observe-command-1",
+                "observation-event-1", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "receipt-1",
+                self.capability.claim_id, descriptor, 2, "settlement-1",
+                settlement.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = root_observation.event_hash
+        validator_observation = self._record_validator_result_for(
+            root_observation, suffix="1", verdict="PASS"
+        )
+        applied = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+                validator_observation.observation_id,
+            )
+        )
+        self.oracle.allowed_head = applied.event_hash
+        root_request, root_attestation = (
+            self._finalization_request_and_attestation(applied.event_hash)
+        )
+        root_finalization = self.store._finalize_operation(
+            root_request, root_attestation, self.authority
+        )
+        self.oracle.allowed_head = root_finalization.event_hash
+        adopted_plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                "run-2", "item-2", "effect-1", "revision-2",
+                descriptor, "scope-2", "budget-policy-2", ("check-2",),
+                ("check-2",), effect_action="WRITE",
+                effect_target="synthetic-target-1",
+                effect_semantic_inputs=semantic_inputs,
+                target_generation=1,
+            ),
+            expected_head=root_finalization.event_hash, writer_epoch=100,
+        )
+        self.oracle.allowed_head = adopted_plan.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.row_factory = sqlite3.Row
+            root_row = connection.execute(
+                "SELECT observation_digest FROM effect_observations WHERE "
+                "observation_id = 'observation-1'"
+            ).fetchone()
+            intent_hash = connection.execute(
+                "SELECT event_hash FROM events WHERE event_id = 'event-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        preliminary = EffectAdoptionRequest(
+            "adoption-1", "adoption-command-1", "adoption-event-1",
+            "repo-1", "run-2", "item-2", "plan-2", "revision-2",
+            "effect-1", descriptor, 1, "run-1", "attempt-1",
+            "observation-1", root_observation.event_hash,
+            root_row["observation_digest"], root_finalization.finalization_id,
+            root_finalization.finalization_key, root_finalization.event_hash,
+            OperationOriginKind.EXECUTION_INTENT, "attempt-1", intent_hash,
+            root_finalization.finalization_key, adopted_plan.event_hash,
+            adopted_plan.event_hash, "placeholder-vector",
+            LifecycleState.PLANNED, None, "adoption-readiness-1",
+            "adoption-grant-1",
+            self.store.adoption_check_set_digest(("check-2",)),
+            "synthetic-adoption-source", "1", "adoption-terms-1",
+            "adoption-scope-1",
+        )
+        adoption_key = self.store.adoption_key(preliminary)
+        for rebound in (
+            replace(
+                preliminary,
+                root_observation_event_hash="changed-root-observation-event",
+            ),
+            replace(
+                preliminary,
+                root_finalization_event_hash="changed-root-finalization-event",
+            ),
+            replace(
+                preliminary,
+                immediate_origin_kind=OperationOriginKind.EFFECT_ADOPTION,
+                immediate_origin_id="different-immediate-adoption",
+                immediate_origin_event_hash="different-immediate-event",
+                immediate_finalization_key="different-immediate-finalization",
+            ),
+            replace(
+                preliminary,
+                current_check_set_digest=self.store.adoption_check_set_digest(
+                    ("check-2", "check-3")
+                ),
+            ),
+            replace(preliminary, adoption_source_id="changed-source"),
+            replace(preliminary, adoption_source_version="2"),
+            replace(preliminary, adoption_terms_digest="changed-terms"),
+            replace(preliminary, adoption_scope_digest="changed-scope"),
+        ):
+            self.assertNotEqual(self.store.adoption_key(rebound), adoption_key)
+        binding_digest = self.store.adoption_binding_digest(preliminary)
+        grant = self.authority.issue_source_grant(
+            grant_id="adoption-grant-1",
+            grant_kind=SyntheticGrantKind.ADOPTION,
+            action="ADOPT_VERIFIED_EFFECT",
+            repository_id="repo-1",
+            logical_effect_id="effect-1",
+            source_id="synthetic-adoption-source",
+            source_version="1",
+            terms_digest="adoption-terms-1",
+            scope_digest="adoption-scope-1",
+            binding_digest=binding_digest,
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z",
+            use_limit=1,
+        )
+        registered = self.store.register_synthetic_source_grant(
+            grant, self.authority
+        )
+        self.oracle.allowed_head = registered.event_hash
+        catalog_head, heads = self.store.load_verified("repo-1")
+        request = replace(
+            preliminary,
+            expected_catalog_head=catalog_head,
+            expected_run_head=heads["run-2"],
+            expected_head_vector_digest=(
+                self.store._complete_head_vector_digest(heads)
+            ),
+        )
+        request_digest = self.store._event_hash(
+            {
+                **request.__dict__,
+                "immediate_origin_kind": request.immediate_origin_kind.value,
+                "expected_lifecycle": request.expected_lifecycle.value,
+            }
+        )
+        semantic_input_digest = self.store._event_hash(
+            {
+                "domain": "AEGIS:EFFECT_SEMANTIC_INPUTS:v1",
+                "semantic_inputs": [list(item) for item in semantic_inputs],
+            }
+        )
+        readiness = self.authority.issue_adoption_readiness_evidence(
+            evidence_id="adoption-readiness-1",
+            source_id="synthetic-adoption-source",
+            source_version="1",
+            repository_id="repo-1", run_id="run-2", item_id="item-2",
+            plan_id="plan-2", revision_digest="revision-2",
+            source_tree_digest="source-tree-1",
+            item_definition_digest="item-definition-1",
+            semantic_input_digest=semantic_input_digest,
+            prerequisites_met=True, catalog_head=catalog_head,
+            head_vector_digest=request.expected_head_vector_digest,
+            evidence_head=heads["run-2"],
+            observed_at="2026-09-21T00:00:00.000000Z",
+            request_digest=request_digest,
+        )
+        capability = self.authority.issue_source_capability(
+            grant,
+            consumer_kind=SyntheticSourceConsumerKind.EFFECT_ADOPTION,
+            consumer_key=self.store.adoption_key(request),
+            binding_digest=binding_digest,
+        )
+        spent_path = Path(self.temporary_directory.name) / "spent-adoption.sqlite3"
+        shutil.copy2(self.database_path, spent_path)
+        spent_oracle = MutableFreshnessOracle()
+        spent_oracle.allowed_head = registered.event_hash
+        spent_store = SQLiteStateStore(
+            spent_path, spent_oracle, "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        spent_store._bind_classification_authority(self.authority)
+        manual_capability = self.authority.issue_source_capability(
+            grant, consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="manual-spend-before-adoption",
+            binding_digest=binding_digest,
+        )
+        manual_use = spent_store.consume_synthetic_source_for_test(
+            manual_capability, self.authority
+        )
+        spent_oracle.allowed_head = manual_use.event_hash
+        spent_catalog, spent_heads = spent_store.load_verified("repo-1")
+        spent_request = replace(
+            request,
+            expected_catalog_head=spent_catalog,
+            expected_run_head=spent_heads["run-2"],
+            expected_head_vector_digest=(
+                spent_store._complete_head_vector_digest(spent_heads)
+            ),
+        )
+        spent_request_digest = spent_store._event_hash(
+            {
+                **spent_request.__dict__,
+                "immediate_origin_kind": (
+                    spent_request.immediate_origin_kind.value
+                ),
+                "expected_lifecycle": spent_request.expected_lifecycle.value,
+            }
+        )
+        spent_readiness = self.authority.issue_adoption_readiness_evidence(
+            evidence_id="adoption-readiness-1",
+            source_id="synthetic-adoption-source", source_version="1",
+            repository_id="repo-1", run_id="run-2", item_id="item-2",
+            plan_id="plan-2", revision_digest="revision-2",
+            source_tree_digest="source-tree-1",
+            item_definition_digest="item-definition-1",
+            semantic_input_digest=semantic_input_digest,
+            prerequisites_met=True, catalog_head=spent_catalog,
+            head_vector_digest=spent_request.expected_head_vector_digest,
+            evidence_head=spent_heads["run-2"],
+            observed_at="2026-09-21T00:00:00.000000Z",
+            request_digest=spent_request_digest,
+        )
+        spent_capability = self.authority.issue_source_capability(
+            grant,
+            consumer_kind=SyntheticSourceConsumerKind.EFFECT_ADOPTION,
+            consumer_key=spent_store.adoption_key(spent_request),
+            binding_digest=binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "use limit"):
+            spent_store.adopt_verified_effect(
+                spent_request, spent_readiness, spent_capability,
+                self.authority,
+            )
+        connection = sqlite3.connect(spent_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM synthetic_authority_uses WHERE "
+                    "grant_id = 'adoption-grant-1'"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+        occupied_path = (
+            Path(self.temporary_directory.name) / "occupied-adoption.sqlite3"
+        )
+        shutil.copy2(self.database_path, occupied_path)
+        occupied_oracle = MutableFreshnessOracle()
+        occupied_oracle.allowed_head = registered.event_hash
+        occupied_store = SQLiteStateStore(
+            occupied_path, occupied_oracle, "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        occupied_store._bind_classification_authority(self.authority)
+        occupied_plan = occupied_store.accept_plan(
+            PlanAcceptanceRequest(
+                "occupied-plan", "occupied-plan-command",
+                "occupied-plan-event", "repo-1", "occupied-run",
+                "occupied-item", "occupied-effect", "occupied-revision",
+                "occupied-descriptor", "occupied-scope", "occupied-budget",
+                ("occupied-check",), (),
+            ),
+            expected_head=registered.event_hash, writer_epoch=101,
+        )
+        occupied_oracle.allowed_head = occupied_plan.event_hash
+        occupied_grant = SyntheticGrant(
+            "occupied-operation-grant", "repo-1", "occupied-effect",
+            "occupied-attempt", "occupied-scope",
+        )
+        self.authority.register(occupied_grant)
+        occupied_capability = self.authority.claim(
+            *occupied_grant.__dict__.values()
+        )
+        occupied_intent = occupied_store.commit_intent(
+            IntentRequest(
+                "repo-1", "occupied-run", "occupied-item",
+                "occupied-intent-command", "occupied-intent-event",
+                "occupied-effect", "occupied-descriptor", "occupied-attempt",
+                "occupied-permission", "occupied-reservation",
+                "occupied-budget", 1, 2, 100,
+            ),
+            occupied_capability, self.authority,
+            expected_head=occupied_plan.event_hash, writer_epoch=102,
+        )
+        occupied_oracle.allowed_head = occupied_intent.event_hash
+        occupied_catalog, occupied_heads = occupied_store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        occupied_request = replace(
+            request,
+            expected_catalog_head=occupied_catalog,
+            expected_run_head=occupied_heads["run-2"],
+            expected_head_vector_digest=(
+                occupied_store._complete_head_vector_digest(occupied_heads)
+            ),
+        )
+        occupied_request_digest = occupied_store._event_hash(
+            {
+                **occupied_request.__dict__,
+                "immediate_origin_kind": (
+                    occupied_request.immediate_origin_kind.value
+                ),
+                "expected_lifecycle": (
+                    occupied_request.expected_lifecycle.value
+                ),
+            }
+        )
+        occupied_readiness = self.authority.issue_adoption_readiness_evidence(
+            evidence_id="adoption-readiness-1",
+            source_id="synthetic-adoption-source", source_version="1",
+            repository_id="repo-1", run_id="run-2", item_id="item-2",
+            plan_id="plan-2", revision_digest="revision-2",
+            source_tree_digest="source-tree-1",
+            item_definition_digest="item-definition-1",
+            semantic_input_digest=semantic_input_digest,
+            prerequisites_met=True, catalog_head=occupied_catalog,
+            head_vector_digest=occupied_request.expected_head_vector_digest,
+            evidence_head=occupied_heads["run-2"],
+            observed_at="2026-09-21T00:00:00.000000Z",
+            request_digest=occupied_request_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "slot to be free"):
+            occupied_store.adopt_verified_effect(
+                occupied_request, occupied_readiness, capability,
+                self.authority,
+            )
+        stale_readiness = self.authority.issue_adoption_readiness_evidence(
+            **{
+                key: value
+                for key, value in readiness.__dict__.items()
+                if key not in {"issuer_fingerprint", "issuer_mac"}
+            }
+            | {"semantic_input_digest": "changed-input-digest"}
+        )
+        with self.assertRaisesRegex(DispatchDenied, "accepted inputs"):
+            self.store.adopt_verified_effect(
+                request, stale_readiness, capability, self.authority
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store.adopt_verified_effect(
+                request, readiness, capability, self.authority,
+                failure_hook=raise_at("after_adoption_writes_before_commit"),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM effect_adoptions"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.adopt_verified_effect(
+                request, readiness, capability, self.authority,
+                failure_hook=raise_at(
+                    "after_adoption_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            committed_adoption_hash = connection.execute(
+                "SELECT event_hash FROM effect_adoptions WHERE adoption_id = "
+                "'adoption-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = committed_adoption_hash
+        receipt = self.store.adopt_verified_effect(
+            request, readiness, capability, self.authority
+        )
+        self.assertEqual(receipt.resulting_state, LifecycleState.VALIDATING)
+        self.assertTrue(receipt.replayed)
+        replay = self.store.adopt_verified_effect(
+            request, readiness, capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        rebound_grant = self.authority.issue_source_grant(
+            **{
+                key: value
+                for key, value in grant.__dict__.items()
+                if key not in {"issuer_fingerprint", "issuer_mac"}
+            }
+            | {"source_version": "2"}
+        )
+        rebound_capability = self.authority.issue_source_capability(
+            rebound_grant,
+            consumer_kind=SyntheticSourceConsumerKind.EFFECT_ADOPTION,
+            consumer_key=self.store.adoption_key(request),
+            binding_digest=binding_digest,
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "does not bind the exact adoption"
+        ):
+            self.store.adopt_verified_effect(
+                request, readiness, rebound_capability, self.authority
+            )
+        contrary_path = (
+            Path(self.temporary_directory.name) / "contrary-adoption.sqlite3"
+        )
+        shutil.copy2(self.database_path, contrary_path)
+        contrary_oracle = MutableFreshnessOracle()
+        contrary_oracle.allowed_head = receipt.event_hash
+        contrary_store = SQLiteStateStore(
+            contrary_path, contrary_oracle, "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        contrary_store._bind_classification_authority(self.authority)
+        contrary_settlement_request = BudgetSettlementRequest(
+            "contrary-settlement", "reservation-1",
+            settlement.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            "contrary-receipt", "LATE_USAGE_CONFIRMED",
+        )
+        contrary_settlement = contrary_store._settle_budget(
+            contrary_settlement_request,
+            self.authority.issue_settlement_proof(
+                "contrary-settlement-proof", contrary_settlement_request
+            ),
+            self.authority,
+        )
+        contrary_oracle.allowed_head = contrary_settlement.settlement_hash
+        contrary = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "contrary-observation", "contrary-command", "contrary-event",
+                "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                "contrary-receipt", self.capability.claim_id, descriptor, 2,
+                "contrary-settlement", contrary_settlement.settlement_hash,
+            ),
+            store=contrary_store,
+        )
+        connection = sqlite3.connect(contrary_path)
+        try:
+            contrary_oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(
+            contrary_store.load_run_lifecycle("run-2"),
+            LifecycleState.RECONCILIATION_REQUIRED,
+        )
+        contrary_store.load_verified("repo-1", authority=self.authority)
+        connection = contrary_store._connect()
+        try:
+            contrary_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            next_epoch = int(connection.execute(
+                "SELECT MAX(writer_epoch) + 1 FROM events"
+            ).fetchone()[0])
+        finally:
+            connection.close()
+        collision_fact = AuthorityLifecycleFactRequest(
+            "contrary-observation", "collision-fact-command",
+            "collision-fact-event", "repo-1", "run-2", "item-2",
+            "effect-1", "EFFECT", "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None,
+        )
+        collision_denial = contrary_store.record_authority_fact(
+            collision_fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "collision-fact-proof", collision_fact
+            ),
+            self.authority,
+            expected_head=contrary_head, writer_epoch=next_epoch,
+        )
+        contrary_oracle.allowed_head = collision_denial.event_hash
+        collision_correction = AuthorityLifecycleFactRequest(
+            "collision-correction", "collision-correction-command",
+            "collision-correction-event", "repo-1", "run-2", "item-2",
+            "effect-1", "EFFECT", "grant-1", "EXECUTE_EFFECT", "scope-1",
+            AuthorityFactKind.CORRECTION, GovernedOrder.BEFORE, "NO_ACTION",
+            None, None, corrected_fact_id=collision_fact.fact_id,
+            corrected_event_hash=collision_denial.event_hash,
+        )
+        collision_corrected = contrary_store.record_authority_fact(
+            collision_correction,
+            self.authority.issue_authority_lifecycle_evidence(
+                "collision-correction-proof", collision_correction
+            ),
+            self.authority,
+            expected_head=collision_denial.event_hash,
+            writer_epoch=next_epoch + 1,
+        )
+        contrary_oracle.allowed_head = collision_corrected.event_hash
+        connection = contrary_store._connect()
+        try:
+            contrary_fences = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE reason_code = "
+                "'DEPENDENT_ADOPTION_CONTRARY_RECEIPT'"
+            ).fetchone()[0]
+            contrary_dependencies = connection.execute(
+                "SELECT COUNT(*) FROM dependent_adoption_fences WHERE "
+                "correction_owner_id = 'contrary-observation'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual((contrary_fences, contrary_dependencies), (1, 1))
+        self.assertEqual(
+            contrary_store.load_run_lifecycle("run-2"),
+            LifecycleState.RECONCILIATION_REQUIRED,
+        )
+        contrary_store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM events WHERE event_kind = "
+                    "'INTENT_COMMITTED'"
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM budget_reservations"
+                ).fetchone()[0],
+                2,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM synthetic_authority_uses WHERE "
+                    "consumer_kind = 'EFFECT_ADOPTION'"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+        self.store.load_verified("repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            source_use = connection.execute(
+                "SELECT source_event_id, event_hash, recorded_at FROM "
+                "synthetic_authority_uses WHERE grant_id = ?",
+                ("adoption-grant-1",),
+            ).fetchone()
+        finally:
+            connection.close()
+        advancing_times = iter(
+            datetime(2026, 9, 21, 1, 0, second, tzinfo=timezone.utc)
+            for second in range(10)
+        )
+        self.store._utc_now = lambda: next(advancing_times)
+        expiry_fact = AuthorityLifecycleFactRequest(
+            "adoption-expiry-1", "adoption-expiry-command-1",
+            "adoption-expiry-event-1", "repo-1", "run-2", "item-2",
+            "effect-1", "ADOPTION", "adoption-grant-1",
+            "ADOPT_VERIFIED_EFFECT", "adoption-scope-1",
+            AuthorityFactKind.EXPIRED, GovernedOrder.AFTER, "SOURCE_USE",
+            source_use[0], source_use[1],
+            recorded_at_utc=None,
+            effective_at_utc="2026-09-21T00:30:00.000000Z",
+        )
+        expiry = self.store.record_authority_fact(
+            expiry_fact,
+            self.authority.issue_authority_lifecycle_evidence(
+                "adoption-expiry-proof-1", expiry_fact
+            ),
+            self.authority,
+            expected_head=receipt.event_hash,
+            writer_epoch=102,
+        )
+        self.assertEqual(expiry.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = expiry.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            persisted_recorded_at = connection.execute(
+                "SELECT recorded_at FROM synthetic_authority_lifecycle_facts "
+                "WHERE fact_id = 'adoption-expiry-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(
+            persisted_recorded_at, "2026-09-21T01:00:00.000000Z"
+        )
+        validator_grant = SyntheticValidatorGrant(
+            "validator-grant-adopted", "repo-1", "effect-1", "revision-2",
+            "check-2", "input-2", "validator-attempt-adopted",
+            "read-only-scope-adopted",
+        )
+        self.authority.register_validator(validator_grant)
+        validator_capability = self.authority.claim_validator(
+            *validator_grant.__dict__.values()
+        )
+        validator_intent = self.store.commit_validator_intent(
+            ValidatorIntentRequest(
+                "validator-intent-adopted", "validator-command-adopted",
+                "validator-event-adopted", "repo-1", "run-2", "item-2",
+                "effect-1", receipt.slot_attempt_id, "observation-1",
+                root_observation.event_hash, "revision-2", "check-2",
+                "input-2", "validator-attempt-adopted",
+                "validator-permission-adopted", "validator-reservation-adopted",
+                "validator-budget-policy-adopted", 1, 2, 10,
+            ),
+            validator_capability,
+            self.authority,
+        )
+        self.oracle.allowed_head = validator_intent.event_hash
+        self.store.load_verified("repo-1")
+        stop_grant = SyntheticOperatorGrant(
+            "stop-grant-adopted", "repo-1", "run-2", "STOP_IMMEDIATE",
+            "stop-scope-adopted",
+        )
+        self.authority.register_operator(stop_grant)
+        stop_capability = self.authority.claim_operator(
+            *stop_grant.__dict__.values()
+        )
+        stopped = self.store.stop(
+            StopRequest(
+                "stop-adopted", "stop-command-adopted",
+                "stop-event-adopted", "repo-1", "run-2",
+                StopMode.IMMEDIATE, "OPERATOR_STOP",
+            ),
+            stop_capability,
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        validator_path = (
+            Path(self.temporary_directory.name) / "adopted-validator.sqlite3"
+        )
+        adapter = SyntheticValidatorAdapter(validator_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = validator_path.resolve()
+        nonexecution_attestation = self.authority.issue_nonexecution_attestation(
+            "adopted-nonexecution-attestation", "adopted-nonexecution-seal",
+            "VALIDATOR", adapter._target_digest("repo-1"),
+            validator_capability.claim_id,
+            "VALIDATOR:validator-intent-adopted", validator_intent.event_hash,
+            "validator-reservation-adopted", "repo-1", "run-2", "item-2",
+            "effect-1", "validator-attempt-adopted",
+        )
+        seal = adapter.seal_nonexecution(
+            nonexecution_attestation, self.authority
+        )
+        nonexecution_request = BudgetSettlementRequest(
+            "adopted-nonexecution", "validator-reservation-adopted", "",
+            BudgetDisposition.RELEASED, None,
+            "adopted-nonexecution-evidence", "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True, zero_liability_proven=True,
+            all_obligations_settled=True, run_id="run-2", item_id="item-2",
+            attempt_id="validator-attempt-adopted",
+        )
+        nonexecution = self.store._settle_budget(
+            nonexecution_request,
+            self.authority.issue_settlement_proof(
+                "adopted-nonexecution-proof", nonexecution_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = nonexecution.settlement_hash
+        terminal = self.store.settle_terminal_validation(
+            TerminalValidationSettlementRequest(
+                "adopted-terminal-settlement", "adopted-terminal-command",
+                "adopted-terminal-event", "repo-1", "run-2", "item-2",
+                "effect-1", "plan-2", "revision-2", "check-2",
+                "NONDISPATCH_PROVEN", "adopted-nonexecution",
+                nonexecution.settlement_hash, "CANCELLED_WITHOUT_START",
+                "validator-intent-adopted", "validator-attempt-adopted",
+            )
+        )
+        self.oracle.allowed_head = terminal.event_hash
+        self.assertTrue(terminal.slot_released)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+        self.store.load_verified("repo-1", authority=self.authority)
+        reopened = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, 1, tzinfo=timezone.utc),
+        )
+        reopened._bind_classification_authority(self.authority)
+        reopened.load_verified("repo-1", authority=self.authority)
+
+    def test_t28_source_recovery_rejects_historically_ineffective_uses(
+        self,
+    ) -> None:
+        def make_store(name: str) -> tuple[SQLiteStateStore, MutableFreshnessOracle]:
+            oracle = MutableFreshnessOracle()
+            path = Path(self.temporary_directory.name) / f"{name}.sqlite3"
+            store = SQLiteStateStore(
+                path, oracle, "repo-1",
+                utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+            )
+            store._bind_classification_authority(self.authority)
+            return store, oracle
+
+        def issue_grant(
+            name: str, *, not_before: str, expires_at: str, use_limit: int = 1,
+        ) -> SyntheticSourceGrant:
+            return self.authority.issue_source_grant(
+                grant_id=f"{name}-grant",
+                grant_kind=SyntheticGrantKind.ADOPTION,
+                action="ADOPT_VERIFIED_EFFECT", repository_id="repo-1",
+                logical_effect_id="effect-1", source_id=f"{name}-source",
+                source_version="1", terms_digest=f"{name}-terms",
+                scope_digest=f"{name}-scope",
+                binding_digest=f"{name}-binding",
+                not_before=not_before, expires_at=expires_at,
+                use_limit=use_limit,
+            )
+
+        def capability(grant: SyntheticSourceGrant, consumer: str):
+            return self.authority.issue_source_capability(
+                grant,
+                consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                consumer_key=consumer,
+                binding_digest=grant.binding_digest,
+            )
+
+        for name, column, effective_value, temporary_value in (
+            (
+                "not-yet-effective", "not_before",
+                "2026-09-22T00:00:00.000000Z",
+                "2026-09-20T00:00:00.000000Z",
+            ),
+            (
+                "already-expired", "expires_at",
+                "2026-09-20T00:00:00.000000Z",
+                "2026-09-22T00:00:00.000000Z",
+            ),
+        ):
+            with self.subTest(name=name):
+                store, _oracle = make_store(name)
+                grant = issue_grant(
+                    name,
+                    not_before=(
+                        effective_value if column == "not_before"
+                        else "2026-09-19T00:00:00.000000Z"
+                    ),
+                    expires_at=(
+                        effective_value if column == "expires_at"
+                        else "2026-09-23T00:00:00.000000Z"
+                    ),
+                )
+                store.register_synthetic_source_grant(grant, self.authority)
+                connection = store._connect()
+                try:
+                    connection.execute("BEGIN IMMEDIATE")
+                    connection.execute(
+                        f"UPDATE synthetic_authority_grants SET {column} = ? "
+                        "WHERE grant_id = ?",
+                        (temporary_value, grant.grant_id),
+                    )
+                    store._consume_synthetic_source(
+                        connection, capability(grant, f"{name}-consumer"),
+                        self.authority,
+                        recorded_at="2026-09-21T00:00:00.000000Z",
+                        expected_consumer_kind=(
+                            SyntheticSourceConsumerKind.MANUAL
+                        ),
+                    )
+                    connection.execute(
+                        f"UPDATE synthetic_authority_grants SET {column} = ? "
+                        "WHERE grant_id = ?",
+                        (effective_value, grant.grant_id),
+                    )
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(
+                    StorageIntegrityError, "source projection is invalid"
+                ):
+                    store.load_verified("repo-1", authority=self.authority)
+
+        store, _oracle = make_store("use-limit")
+        grant = issue_grant(
+            "use-limit", not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z", use_limit=1,
+        )
+        store.register_synthetic_source_grant(grant, self.authority)
+        connection = store._connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            connection.execute(
+                "UPDATE synthetic_authority_grants SET use_limit = 2 WHERE "
+                "grant_id = ?", (grant.grant_id,),
+            )
+            for index in (1, 2):
+                store._consume_synthetic_source(
+                    connection,
+                    capability(grant, f"use-limit-consumer-{index}"),
+                    self.authority,
+                    recorded_at=f"2026-09-21T00:00:0{index}.000000Z",
+                    expected_consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                )
+            connection.execute(
+                "UPDATE synthetic_authority_grants SET use_limit = 1 WHERE "
+                "grant_id = ?", (grant.grant_id,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "source projection is invalid"
+        ):
+            store.load_verified("repo-1", authority=self.authority)
+
+        store, _oracle = make_store("revoked-before-use")
+        grant = issue_grant(
+            "revoked-before-use",
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z",
+        )
+        store.register_synthetic_source_grant(grant, self.authority)
+        lifecycle = AuthorityLifecycleFactRequest(
+            "revoked-source-fact", "revoked-source-command",
+            "revoked-source-event", "repo-1", "synthetic-run",
+            "synthetic-item", "effect-1", "ADOPTION", grant.grant_id,
+            grant.action, grant.scope_digest, AuthorityFactKind.REVOKED,
+            GovernedOrder.BEFORE, "NO_ACTION", None, None,
+            effective_at_utc="2026-09-20T00:00:00.000000Z",
+        )
+        evidence = self.authority.issue_authority_lifecycle_evidence(
+            "revoked-source-proof", lifecycle
+        )
+        connection = store._connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            source_recorded_at = "2026-09-21T00:00:01.000000Z"
+            payload = {
+                **lifecycle.__dict__,
+                "fact_kind": lifecycle.fact_kind.value,
+                "governed_order": lifecycle.governed_order.value,
+            }
+            source_event_id = "source-authority-fact:revoked-source-fact"
+            _sequence, event_hash, body_json = store._append_source_event(
+                connection, source_event_id=source_event_id,
+                repository_id="repo-1",
+                event_kind="SYNTHETIC_AUTHORITY_LIFECYCLE_RECORDED",
+                recorded_at=source_recorded_at,
+                effective_at=lifecycle.effective_at_utc,
+                event_fields=payload | {
+                    "source_recorded_at_utc": source_recorded_at,
+                    "issuer_fingerprint": self.authority.issuer_fingerprint,
+                    "issuer_mac": evidence.issuer_mac,
+                    "proof_id": evidence.proof_id,
+                    "proof_digest": evidence.request_digest,
+                },
+            )
+            connection.execute(
+                "INSERT INTO synthetic_authority_lifecycle_facts VALUES ("
+                + ", ".join("?" for _ in range(20)) + ")",
+                (
+                    lifecycle.fact_id, lifecycle.repository_id,
+                    lifecycle.grant_kind, lifecycle.grant_id,
+                    lifecycle.logical_effect_id, lifecycle.action,
+                    lifecycle.scope_digest, lifecycle.fact_kind.value,
+                    lifecycle.governed_order.value,
+                    lifecycle.governed_event_id,
+                    lifecycle.governed_event_hash, source_recorded_at,
+                    lifecycle.effective_at_utc, lifecycle.corrected_fact_id,
+                    lifecycle.successor_grant_id,
+                    self.authority.issuer_fingerprint, evidence.issuer_mac,
+                    source_event_id, event_hash, body_json,
+                ),
+            )
+            store._consume_synthetic_source(
+                connection, capability(grant, "revoked-consumer"),
+                self.authority,
+                recorded_at="2026-09-21T00:00:02.000000Z",
+                expected_consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "source projection is invalid"
+        ):
+            store.load_verified("repo-1", authority=self.authority)
+
+    def test_f01_canonical_identity_and_approved_relationship_are_durable(
+        self,
+    ) -> None:
+        semantic_inputs = (("input", "digest-1"),)
+        descriptor = self.store.canonical_effect_descriptor_digest(
+            "WRITE", "synthetic-target-1", semantic_inputs, 1
+        )
+        root = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "identity-plan-1", "identity-command-1", "identity-event-1",
+                "repo-1", "identity-run-1", "identity-item-1", "effect-1",
+                "identity-revision-1", descriptor, "scope-1", "budget-1",
+                ("check-1",), (), effect_action="WRITE",
+                effect_target="synthetic-target-1",
+                effect_semantic_inputs=semantic_inputs, target_generation=1,
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = root.event_hash
+        changed_inputs = (("input", "digest-2"),)
+        changed_descriptor = self.store.canonical_effect_descriptor_digest(
+            "WRITE", "synthetic-target-1", changed_inputs, 1
+        )
+        with self.assertRaisesRegex(DispatchDenied, "predecessor relationship"):
+            self.store.accept_plan(
+                PlanAcceptanceRequest(
+                    "unrelated-plan", "unrelated-command", "unrelated-event",
+                    "repo-1", "unrelated-run", "unrelated-item",
+                    "unrelated-effect", "unrelated-revision",
+                    changed_descriptor, "unrelated-scope", "unrelated-budget",
+                    ("unrelated-check",), (), effect_action="WRITE",
+                    effect_target="synthetic-target-1",
+                    effect_semantic_inputs=changed_inputs,
+                    target_generation=1,
+                ),
+                expected_head=root.event_hash, writer_epoch=2,
+            )
+        with self.assertRaisesRegex(DispatchDenied, "retain.*canonical semantics"):
+            self.store.accept_plan(
+                PlanAcceptanceRequest(
+                    "bad-repeat-plan", "bad-repeat-command",
+                    "bad-repeat-event", "repo-1", "bad-repeat-run",
+                    "bad-repeat-item", "bad-repeat-effect",
+                    "bad-repeat-revision", changed_descriptor,
+                    "bad-repeat-scope", "bad-repeat-budget",
+                    ("bad-repeat-check",), (), effect_action="WRITE",
+                    effect_target="synthetic-target-1",
+                    effect_semantic_inputs=changed_inputs,
+                    target_generation=1,
+                    relationship_kind=EffectRelationshipKind.REPEAT_OF,
+                    predecessor_logical_effect_id="effect-1",
+                    relationship_grant_id="bad-repeat-grant",
+                    predecessor_descriptor_digest=descriptor,
+                    predecessor_defining_plan_id="identity-plan-1",
+                    predecessor_defining_event_hash=root.event_hash,
+                    relationship_source_id="bad-repeat-source",
+                    relationship_source_version="1",
+                    relationship_terms_digest="bad-repeat-terms",
+                    relationship_scope_digest="bad-repeat-source-scope",
+                ),
+                expected_head=root.event_hash, writer_epoch=2,
+            )
+        for relationship_kind in (
+            EffectRelationshipKind.DIFFERENT_FROM,
+            EffectRelationshipKind.COMPENSATES,
+        ):
+            with self.subTest(relationship_kind=relationship_kind.value):
+                with self.assertRaisesRegex(
+                    DispatchDenied, "different canonical semantics"
+                ):
+                    self.store.accept_plan(
+                        PlanAcceptanceRequest(
+                            f"bad-{relationship_kind.value}-plan",
+                            f"bad-{relationship_kind.value}-command",
+                            f"bad-{relationship_kind.value}-event",
+                            "repo-1", f"bad-{relationship_kind.value}-run",
+                            f"bad-{relationship_kind.value}-item",
+                            f"bad-{relationship_kind.value}-effect",
+                            f"bad-{relationship_kind.value}-revision",
+                            descriptor, f"bad-{relationship_kind.value}-scope",
+                            f"bad-{relationship_kind.value}-budget",
+                            (f"bad-{relationship_kind.value}-check",), (),
+                            effect_action="WRITE",
+                            effect_target="synthetic-target-1",
+                            effect_semantic_inputs=semantic_inputs,
+                            target_generation=1,
+                            relationship_kind=relationship_kind,
+                            predecessor_logical_effect_id="effect-1",
+                            relationship_grant_id=(
+                                f"bad-{relationship_kind.value}-grant"
+                            ),
+                            predecessor_descriptor_digest=descriptor,
+                            predecessor_defining_plan_id="identity-plan-1",
+                            predecessor_defining_event_hash=root.event_hash,
+                            relationship_source_id="bad-source",
+                            relationship_source_version="1",
+                            relationship_terms_digest="bad-terms",
+                            relationship_scope_digest="bad-source-scope",
+                        ),
+                        expected_head=root.event_hash, writer_epoch=2,
+                    )
+        with self.assertRaisesRegex(DispatchDenied, "predecessor relationship"):
+            self.store.accept_plan(
+                PlanAcceptanceRequest(
+                    "alias-plan", "alias-command", "alias-event", "repo-1",
+                    "alias-run", "alias-item", "alias-effect",
+                    "alias-revision", descriptor, "alias-scope", "alias-budget",
+                    ("alias-check",), (), effect_action="WRITE",
+                    effect_target="synthetic-target-1",
+                    effect_semantic_inputs=semantic_inputs,
+                    target_generation=1,
+                ),
+                expected_head=root.event_hash, writer_epoch=2,
+            )
+        repeat = PlanAcceptanceRequest(
+            "repeat-plan", "repeat-command", "repeat-event", "repo-1",
+            "repeat-run", "repeat-item", "repeat-effect", "repeat-revision",
+            descriptor, "repeat-scope", "repeat-budget", ("repeat-check",), (),
+            effect_action="WRITE", effect_target="synthetic-target-1",
+            effect_semantic_inputs=semantic_inputs, target_generation=1,
+            relationship_kind=EffectRelationshipKind.REPEAT_OF,
+            predecessor_logical_effect_id="effect-1",
+            relationship_grant_id="relationship-grant-1",
+            predecessor_descriptor_digest=descriptor,
+            predecessor_defining_plan_id="identity-plan-1",
+            predecessor_defining_event_hash=root.event_hash,
+            relationship_source_id="synthetic-relationship-source",
+            relationship_source_version="1",
+            relationship_terms_digest="relationship-terms",
+            relationship_scope_digest="relationship-scope",
+        )
+        binding_digest = self.store.effect_relationship_binding_digest(repeat)
+        relationship_key = self.store.effect_relationship_key(repeat)
+        self.assertNotEqual(
+            self.store.effect_relationship_key(
+                replace(
+                    repeat,
+                    predecessor_defining_event_hash="changed-predecessor-history",
+                )
+            ),
+            relationship_key,
+        )
+        self.assertNotEqual(
+            self.store.effect_relationship_key(
+                replace(repeat, relationship_terms_digest="changed-terms")
+            ),
+            relationship_key,
+        )
+        grant = self.authority.issue_source_grant(
+            grant_id="relationship-grant-1",
+            grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+            action="DEFINE_EFFECT_RELATIONSHIP", repository_id="repo-1",
+            logical_effect_id="repeat-effect",
+            source_id="synthetic-relationship-source", source_version="1",
+            terms_digest="relationship-terms",
+            scope_digest="relationship-scope",
+            binding_digest=binding_digest,
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z", use_limit=1,
+        )
+        registered = self.store.register_synthetic_source_grant(
+            grant, self.authority
+        )
+        self.oracle.allowed_head = registered.event_hash
+        capability = self.authority.issue_source_capability(
+            grant,
+            consumer_kind=SyntheticSourceConsumerKind.EFFECT_RELATIONSHIP,
+            consumer_key=self.store.effect_relationship_key(repeat),
+            binding_digest=binding_digest,
+        )
+        accepted = self.store.accept_plan(
+            repeat, expected_head=registered.event_hash, writer_epoch=3,
+            relationship_capability=capability,
+        )
+        self.oracle.allowed_head = "deliberately-stale-freshness-head"
+        replay = self.store.accept_plan(
+            repeat, expected_head="also-deliberately-stale", writer_epoch=99,
+            relationship_capability=capability,
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, accepted.event_hash)
+        with self.assertRaisesRegex(
+            DispatchDenied, "capability was not issued here|authority is rebound"
+        ):
+            self.store.accept_plan(
+                repeat, expected_head="ignored-on-replay", writer_epoch=100,
+                relationship_capability=replace(
+                    capability, consumer_key="rebound-relationship-key"
+                ),
+            )
+        self.oracle.allowed_head = accepted.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            relationship = connection.execute(
+                "SELECT relationship_kind, predecessor_logical_effect_id "
+                "FROM effect_relationships WHERE logical_effect_id = ?",
+                ("repeat-effect",),
+            ).fetchone()
+            uses = connection.execute(
+                "SELECT COUNT(*) FROM synthetic_authority_uses WHERE "
+                "grant_id = ?", ("relationship-grant-1",),
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(relationship, ("REPEAT_OF", "effect-1"))
+        self.assertEqual(uses, 1)
+
+    def test_f01_all_relationship_kinds_require_settled_predecessor_at_t03(
+        self,
+    ) -> None:
+        root_inputs = (("input", "root"),)
+        root_descriptor = self.store.canonical_effect_descriptor_digest(
+            "WRITE", "synthetic-target", root_inputs, 1
+        )
+        root = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "relationship-root-plan", "relationship-root-command",
+                "relationship-root-event", "repo-1", "relationship-root-run",
+                "relationship-root-item", "relationship-root-effect",
+                "relationship-root-revision", root_descriptor,
+                "relationship-root-scope", "relationship-root-budget",
+                ("relationship-root-check",), (), effect_action="WRITE",
+                effect_target="synthetic-target",
+                effect_semantic_inputs=root_inputs, target_generation=1,
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = root.event_hash
+        current_head = root.event_hash
+        writer_epoch = 2
+        for index, relationship_kind in enumerate(
+            (
+                EffectRelationshipKind.REPEAT_OF,
+                EffectRelationshipKind.DIFFERENT_FROM,
+                EffectRelationshipKind.COMPENSATES,
+            ),
+            start=1,
+        ):
+            suffix = relationship_kind.value.lower()
+            semantic_inputs = (
+                root_inputs
+                if relationship_kind is EffectRelationshipKind.REPEAT_OF
+                else (("input", f"{suffix}-{index}"),)
+            )
+            descriptor = self.store.canonical_effect_descriptor_digest(
+                "WRITE", "synthetic-target", semantic_inputs, 1
+            )
+            plan_request = PlanAcceptanceRequest(
+                f"{suffix}-plan", f"{suffix}-plan-command",
+                f"{suffix}-plan-event", "repo-1", f"{suffix}-run",
+                f"{suffix}-item", f"{suffix}-effect", f"{suffix}-revision",
+                descriptor, f"{suffix}-scope", f"{suffix}-budget",
+                (f"{suffix}-check",), (), effect_action="WRITE",
+                effect_target="synthetic-target",
+                effect_semantic_inputs=semantic_inputs, target_generation=1,
+                relationship_kind=relationship_kind,
+                predecessor_logical_effect_id="relationship-root-effect",
+                relationship_grant_id=f"{suffix}-relationship-grant",
+                predecessor_descriptor_digest=root_descriptor,
+                predecessor_defining_plan_id="relationship-root-plan",
+                predecessor_defining_event_hash=root.event_hash,
+                relationship_source_id=f"{suffix}-relationship-source",
+                relationship_source_version="1",
+                relationship_terms_digest=f"{suffix}-terms",
+                relationship_scope_digest=f"{suffix}-relationship-scope",
+            )
+            binding_digest = self.store.effect_relationship_binding_digest(
+                plan_request
+            )
+            relationship_grant = self.authority.issue_source_grant(
+                grant_id=f"{suffix}-relationship-grant",
+                grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+                action="DEFINE_EFFECT_RELATIONSHIP", repository_id="repo-1",
+                logical_effect_id=f"{suffix}-effect",
+                source_id=f"{suffix}-relationship-source",
+                source_version="1", terms_digest=f"{suffix}-terms",
+                scope_digest=f"{suffix}-relationship-scope",
+                binding_digest=binding_digest,
+                not_before="2026-09-20T00:00:00.000000Z",
+                expires_at="2026-09-22T00:00:00.000000Z", use_limit=1,
+            )
+            registered = self.store.register_synthetic_source_grant(
+                relationship_grant, self.authority
+            )
+            self.oracle.allowed_head = registered.event_hash
+            relationship_capability = self.authority.issue_source_capability(
+                relationship_grant,
+                consumer_kind=(
+                    SyntheticSourceConsumerKind.EFFECT_RELATIONSHIP
+                ),
+                consumer_key=self.store.effect_relationship_key(plan_request),
+                binding_digest=binding_digest,
+            )
+            accepted = self.store.accept_plan(
+                plan_request, expected_head=registered.event_hash,
+                writer_epoch=writer_epoch,
+                relationship_capability=relationship_capability,
+            )
+            writer_epoch += 1
+            current_head = accepted.event_hash
+            self.oracle.allowed_head = current_head
+            operation_grant = SyntheticGrant(
+                f"{suffix}-operation-grant", "repo-1", f"{suffix}-effect",
+                f"{suffix}-attempt", f"{suffix}-scope",
+            )
+            self.authority.register(operation_grant)
+            operation_capability = self.authority.claim(
+                *operation_grant.__dict__.values()
+            )
+            with self.subTest(relationship_kind=relationship_kind.value):
+                with self.assertRaisesRegex(
+                    DispatchDenied, "unsettled or disputed"
+                ):
+                    self.store.commit_intent(
+                        IntentRequest(
+                            "repo-1", f"{suffix}-run", f"{suffix}-item",
+                            f"{suffix}-intent-command",
+                            f"{suffix}-intent-event", f"{suffix}-effect",
+                            descriptor, f"{suffix}-attempt",
+                            f"{suffix}-permission", f"{suffix}-reservation",
+                            f"{suffix}-budget", 1, 2, 100,
+                        ),
+                        operation_capability, self.authority,
+                        expected_head=current_head, writer_epoch=writer_epoch,
+                    )
+            writer_epoch += 1
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def _record_signed_effect_observation(
         self,
@@ -3054,7 +4375,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
         oracle.allowed_head = committed.event_hash
         catalog_head, run_heads = store.load_verified("repo-1")
         self.assertEqual(catalog_head, committed.event_hash)
-        self.assertEqual(run_heads, {"run-1": committed.event_hash})
+        self.assertEqual(run_heads["run-1"], committed.event_hash)
+        self.assertIn("@aegis/source/synthetic-authority", run_heads)
 
     def test_database_rejects_another_repository_identity(self) -> None:
         database_path = Path(self.temporary_directory.name) / "bound.sqlite3"
@@ -3285,7 +4607,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
         catalog_head, run_heads = self.store.load_verified("repo-1")
         self.assertEqual(catalog_head, committed.event_hash)
-        self.assertEqual(run_heads, {"run-1": committed.event_hash})
+        self.assertEqual(run_heads["run-1"], committed.event_hash)
+        self.assertIn("@aegis/source/synthetic-authority", run_heads)
 
         receipt = self.store._settle_budget(request, proof, self.authority)
         self.oracle.allowed_head = receipt.settlement_hash
@@ -4004,6 +5327,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "DROP TABLE operation_nonexecution_resume_actions"
             )
             connection.execute("DROP TABLE proven_nonexecution_actions")
+            strip_t28_foundation_schema(connection)
             connection.execute("PRAGMA user_version = 0")
             connection.commit()
         finally:
@@ -4056,10 +5380,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 3)
+        self.assertEqual(semantic_version, 4)
         migrated.load_verified("repo-1", authority=self.authority)
 
-    def test_proven_nonexecution_schema_version_is_three(self) -> None:
+    def test_t28_foundation_schema_version_is_four(self) -> None:
         connection = sqlite3.connect(self.database_path)
         try:
             semantic_version = connection.execute(
@@ -4067,7 +5391,68 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(semantic_version, 3)
+        self.assertEqual(semantic_version, 4)
+
+    def test_t28_v4_reopen_rejects_schema_or_projection_healing(self) -> None:
+        semantic_inputs = (("input", "digest-1"),)
+        descriptor = self.store.canonical_effect_descriptor_digest(
+            "WRITE", "synthetic-target-1", semantic_inputs, 1
+        )
+        accepted = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "schema-plan", "schema-command", "schema-event", "repo-1",
+                "schema-run", "schema-item", "schema-effect",
+                "schema-revision", descriptor, "schema-scope",
+                "schema-budget", ("schema-check",), (),
+                effect_action="WRITE", effect_target="synthetic-target-1",
+                effect_semantic_inputs=semantic_inputs, target_generation=1,
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        for name, mutation in (
+            (
+                "missing-definition",
+                "DELETE FROM effect_definitions WHERE logical_effect_id = "
+                "'schema-effect'",
+            ),
+            (
+                "surplus-origin",
+                "INSERT INTO operation_origins VALUES ("
+                "'repo-1', 'schema-run', 'schema-effect', 'EXECUTION_INTENT', "
+                "'surplus-attempt', 'schema-event', '"
+                + accepted.event_hash
+                + "', 'schema-run', 'surplus-attempt', NULL, NULL, NULL)",
+            ),
+            (
+                "altered-schema",
+                "ALTER TABLE effect_definitions ADD COLUMN unexpected TEXT",
+            ),
+        ):
+            with self.subTest(name=name):
+                case_path = Path(self.temporary_directory.name) / f"{name}.sqlite3"
+                shutil.copy2(self.database_path, case_path)
+                connection = sqlite3.connect(case_path)
+                try:
+                    connection.execute(mutation)
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(
+                    StorageIntegrityError,
+                    "T28 foundation (schema|projections)",
+                ):
+                    SQLiteStateStore(case_path, self.oracle, "repo-1")
+                connection = sqlite3.connect(case_path)
+                try:
+                    if name == "missing-definition":
+                        remaining = connection.execute(
+                            "SELECT COUNT(*) FROM effect_definitions WHERE "
+                            "logical_effect_id = 'schema-effect'"
+                        ).fetchone()[0]
+                        self.assertEqual(remaining, 0)
+                finally:
+                    connection.close()
 
     def test_c04_conflicting_durable_identities_fail_closed(self) -> None:
         committed = self._commit_planned_intent(
@@ -5308,6 +6693,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     "DROP TABLE operation_nonexecution_resume_actions"
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
+                strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 2")
                 connection.commit()
             finally:
@@ -5340,7 +6726,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
         finally:
             connection.close()
-        self.assertEqual(migrated_state, (3, 1, 4, 0))
+        self.assertEqual(migrated_state, (4, 1, 4, 0))
 
         late_observation = self._record_signed_effect_observation(
             EffectObservationRequest(
@@ -12388,8 +13774,11 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "WHERE run_id = 'run-1'"
             ),
             "resurrected-slot": (
-                "INSERT INTO outstanding_slot VALUES "
-                "(1, 'repo-1', 'run-1', 'effect-1', 'attempt-1', 1)"
+                "INSERT INTO outstanding_slot (singleton, repository_id, "
+                "run_id, logical_effect_id, attempt_id, generation, "
+                "origin_kind, origin_id) VALUES "
+                "(1, 'repo-1', 'run-1', 'effect-1', 'attempt-1', 1, "
+                "'EXECUTION_INTENT', 'attempt-1')"
             ),
             "changed-event": (
                 "UPDATE events SET body_json = '{}' "
@@ -13447,8 +14836,11 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 (event_hash, "repo-1"),
             )
             connection.execute(
-                "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
-                ("repo-1", "run-1", "effect-1", "attempt-1"),
+                "INSERT INTO outstanding_slot (singleton, repository_id, "
+                "run_id, logical_effect_id, attempt_id, generation, "
+                "origin_kind, origin_id) VALUES (1, ?, ?, ?, ?, 1, "
+                "'EXECUTION_INTENT', ?)",
+                ("repo-1", "run-1", "effect-1", "attempt-1", "attempt-1"),
             )
             connection.commit()
         finally:
@@ -13977,8 +15369,11 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 (event_hash, "repo-1"),
             )
             connection.execute(
-                "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
-                ("repo-1", "run-1", "effect-1", "attempt-1"),
+                "INSERT INTO outstanding_slot (singleton, repository_id, "
+                "run_id, logical_effect_id, attempt_id, generation, "
+                "origin_kind, origin_id) VALUES (1, ?, ?, ?, ?, 1, "
+                "'EXECUTION_INTENT', ?)",
+                ("repo-1", "run-1", "effect-1", "attempt-1", "attempt-1"),
             )
             connection.commit()
         finally:
@@ -14889,8 +16284,11 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
             body["slot_released"] = False
             connection.execute(
-                "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
-                ("repo-1", "run-1", "effect-1", "attempt-1"),
+                "INSERT INTO outstanding_slot (singleton, repository_id, "
+                "run_id, logical_effect_id, attempt_id, generation, "
+                "origin_kind, origin_id) VALUES (1, ?, ?, ?, ?, 1, "
+                "'EXECUTION_INTENT', ?)",
+                ("repo-1", "run-1", "effect-1", "attempt-1", "attempt-1"),
             )
             connection.commit()
         finally:

@@ -9,6 +9,7 @@ import sqlite3
 import sys
 from contextlib import closing
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import BinaryIO, Callable, Mapping, cast
 
@@ -34,6 +35,10 @@ from .authority import (
     SyntheticSettlementProof,
     SyntheticSourceControlEvidence,
     SyntheticSourceControlSettlementEvidence,
+    SyntheticSourceCapability,
+    SyntheticSourceGrant,
+    SyntheticAdoptionReadinessEvidence,
+    SyntheticLegacyDescriptorBindingEvidence,
     SyntheticValidationRecoveryAttestation,
     SyntheticValidatorCessationAttestation,
     SyntheticValidatorCapability,
@@ -51,6 +56,9 @@ from .contracts import (
     DispatchPosture,
     DispatchDenied,
     EffectObservationRequest,
+    EffectAdoptionReceipt,
+    EffectAdoptionRequest,
+    EffectRelationshipKind,
     FailureClassification,
     FinalizeOperationRequest,
     FreshnessOracle,
@@ -59,6 +67,7 @@ from .contracts import (
     IntentRequest,
     LifecycleState,
     ObservationReceipt,
+    OperationOriginKind,
     OperationLaunchReceipt,
     OperationFinalizationReceipt,
     PauseBeforeDispatchRequest,
@@ -87,6 +96,9 @@ from .contracts import (
     StopEscalationSettlement,
     StopRequest,
     StorageIntegrityError,
+    SyntheticGrantKind,
+    SyntheticSourceConsumerKind,
+    SyntheticSourceReceipt,
     TerminalRestartDisposition,
     TerminalRestartReport,
     TerminalRestartRequest,
@@ -106,6 +118,9 @@ from .engine import TRANSITIONS, TransitionEngine
 
 
 FailureHook = Callable[[str], None]
+
+_SYNTHETIC_SOURCE_HEAD_MEMBER = "@aegis/source/synthetic-authority"
+_SYNTHETIC_SOURCE_GENESIS_TIME = "1970-01-01T00:00:00.000000Z"
 
 _SETTLEMENT_TRANSITIONS = {
     BudgetDisposition.RESERVED: frozenset(
@@ -176,6 +191,8 @@ _EVENT_KINDS = frozenset(
         "BINDING_MISMATCH",
         "BLOCKER_RESOLVED",
         "BUDGET_SETTLED",
+        "DEPENDENT_ADOPTION_FENCED",
+        "EFFECT_ADOPTED",
         "INTENT_COMMITTED",
         "LATE_RECEIPT_RECORDED",
         "NONDISPATCH_PROVEN",
@@ -209,6 +226,8 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "AUTHORITY_EVALUATED",
         "BINDING_MISMATCH",
         "BLOCKER_RESOLVED",
+        "DEPENDENT_ADOPTION_FENCED",
+        "EFFECT_ADOPTED",
         "INTENT_COMMITTED",
         "LATE_RECEIPT_RECORDED",
         "NONDISPATCH_PROVEN",
@@ -264,6 +283,13 @@ _LIFECYCLE_ROUTES: Mapping[
     "BLOCKER_RESOLVED": frozenset(
         {
             (LifecycleState.BLOCKED, LifecycleState.PLANNED),
+            (LifecycleState.BLOCKED, LifecycleState.VALIDATING),
+        }
+    ),
+    "DEPENDENT_ADOPTION_FENCED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "EFFECT_ADOPTED": frozenset(
+        {
+            (LifecycleState.PLANNED, LifecycleState.VALIDATING),
             (LifecycleState.BLOCKED, LifecycleState.VALIDATING),
         }
     ),
@@ -822,7 +848,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3}:
+        if semantic_version not in {0, 1, 2, 3, 4}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -843,7 +869,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3} and (
+        if semantic_version in {1, 2, 3, 4} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -1774,6 +1800,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_proven_nonexecution_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_t28_foundation_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -1786,6 +1815,944 @@ class SQLiteStateStore:
             raise
 
     @staticmethod
+    def _source_genesis_body(
+        repository_id: str, legacy_catalog_anchor: str
+    ) -> dict[str, object]:
+        return {
+            "event_kind": "SYNTHETIC_AUTHORITY_SOURCE_GENESIS",
+            "legacy_catalog_anchor": legacy_catalog_anchor,
+            "previous_source_hash": "",
+            "recorded_at": _SYNTHETIC_SOURCE_GENESIS_TIME,
+            "repository_id": repository_id,
+            "sequence": 1,
+            "source_schema_version": 1,
+        }
+
+    @staticmethod
+    def _ensure_source_genesis(
+        connection: sqlite3.Connection, repository_id: str
+    ) -> None:
+        state = connection.execute(
+            "SELECT 1 FROM synthetic_authority_source_state WHERE "
+            "repository_id = ?",
+            (repository_id,),
+        ).fetchone()
+        if state is not None:
+            return
+        repository = connection.execute(
+            "SELECT catalog_head FROM repositories WHERE repository_id = ?",
+            (repository_id,),
+        ).fetchone()
+        if repository is None:
+            raise StorageIntegrityError(
+                "synthetic authority source requires a registered repository"
+            )
+        body = SQLiteStateStore._source_genesis_body(
+            repository_id, str(repository["catalog_head"])
+        )
+        body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        event_hash = hashlib.sha256(body_json.encode("utf-8")).hexdigest()
+        event_id = f"source-genesis:{event_hash}"
+        connection.execute(
+            "INSERT INTO synthetic_authority_source_events VALUES "
+            "(?, ?, 1, 'SYNTHETIC_AUTHORITY_SOURCE_GENESIS', ?, NULL, NULL, "
+            "NULL, '', ?, ?)",
+            (
+                event_id, repository_id, _SYNTHETIC_SOURCE_GENESIS_TIME,
+                event_hash, body_json,
+            ),
+        )
+        connection.execute(
+            "INSERT INTO synthetic_authority_source_state VALUES (?, 1, ?, ?)",
+            (
+                repository_id, event_hash,
+                _SYNTHETIC_SOURCE_GENESIS_TIME,
+            ),
+        )
+
+    @staticmethod
+    def _migrate_t28_foundation_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+    ) -> None:
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {3, 4}:
+                raise StorageIntegrityError(
+                    "T28 foundation semantic version is unsupported"
+                )
+            foundation_tables = {
+                "synthetic_authority_source_events",
+                "synthetic_authority_source_state",
+                "synthetic_authority_grants",
+                "synthetic_authority_uses",
+                "synthetic_authority_lifecycle_facts",
+                "effect_definitions",
+                "effect_relationships",
+                "legacy_descriptor_bindings",
+                "operation_origins",
+                "effect_adoptions",
+                "adoption_dependencies",
+                "dependent_adoption_fences",
+            }
+            existing_foundation_tables = {
+                str(row["name"])
+                for row in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE type = 'table'"
+                )
+                if str(row["name"]) in foundation_tables
+            }
+            if version == 3 and existing_foundation_tables:
+                raise StorageIntegrityError(
+                    "T28 foundation schema is partially migrated"
+                )
+            if version == 4 and existing_foundation_tables != foundation_tables:
+                raise StorageIntegrityError(
+                    "T28 foundation schema is missing or incompatible"
+                )
+            if version == 4:
+                expected_schema_hashes = {
+                    "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
+                    "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
+                    "effect_adoptions": "fda13fd0f7c075943b3beab59adab00aee325066098af9747a80fce3b2bee9d9",
+                    "effect_definitions": "3189fcd9d6d47c65cf8f78b93679f56bb1ccdf2c0b28ee838906fc8df29c5e3d",
+                    "effect_relationships": "21475335f53950b83b5462c26665e12531adee0df37133a7133d9fa1decbfb9e",
+                    "legacy_descriptor_bindings": "cd4d3487310046d68801f35e9b87bc232812c6cfb6190f182560ab473f9233d8",
+                    "operation_origins": "f6bc07f8f854919f19db1c5bfe6c561dd80f753783a04be31debbe02c8de23c1",
+                    "synthetic_authority_grants": "17a8fc1548f0129d8ab31536967e98f07d5ad05df5ba6cb38224cdc25ed6b9f6",
+                    "synthetic_authority_lifecycle_facts": "994140df86c67544ce57ab4306ad85e6a5309445d9c5de209597b7e85c943ca0",
+                    "synthetic_authority_source_events": "51cadaa66ed356262882f56359b62a9273b8c86a59a518279d817807d4d840c2",
+                    "synthetic_authority_source_state": "79721984d36d6419662c66ad6d8d8a1c6e46edcb28dea29950f0ad84a2f4e35e",
+                    "synthetic_authority_uses": "521b30b2ecd602c63a7dd7a7095c6fb76f9225b3958c91ff50d66303ca94c08e",
+                }
+                actual_schema_hashes: dict[str, str] = {}
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+                ):
+                    table_name = str(row["name"])
+                    if table_name not in foundation_tables:
+                        continue
+                    canonical_sql = "".join(str(row["sql"]).upper().split())
+                    canonical_sql = canonical_sql.replace(
+                        "IFNOTEXISTS", ""
+                    ).rstrip(";")
+                    actual_schema_hashes[table_name] = hashlib.sha256(
+                        canonical_sql.encode("utf-8")
+                    ).hexdigest()
+                slot_columns = tuple(
+                    str(row["name"])
+                    for row in connection.execute(
+                        "PRAGMA table_info(outstanding_slot)"
+                    )
+                )
+                slot_foreign_keys = {
+                    (str(row["from"]), str(row["table"]), str(row["to"]))
+                    for row in connection.execute(
+                        "PRAGMA foreign_key_list(outstanding_slot)"
+                    )
+                }
+                if (
+                    actual_schema_hashes != expected_schema_hashes
+                    or slot_columns != (
+                        "singleton", "repository_id", "run_id",
+                        "logical_effect_id", "attempt_id", "generation",
+                        "origin_kind", "origin_id",
+                    )
+                    or slot_foreign_keys != {
+                        ("repository_id", "repositories", "repository_id"),
+                        ("run_id", "runs", "run_id"),
+                    }
+                    or any(
+                        connection.execute(
+                            f"PRAGMA foreign_key_check({table_name})"
+                        ).fetchone()
+                        is not None
+                        for table_name in (
+                            *sorted(foundation_tables), "outstanding_slot",
+                        )
+                    )
+                ):
+                    raise StorageIntegrityError(
+                        "T28 foundation schema is missing or incompatible"
+                    )
+                expected_definition_ids = {
+                    str(row["logical_effect_id"])
+                    for row in connection.execute(
+                        "SELECT logical_effect_id FROM validation_plans WHERE "
+                        "json_extract(body_json, '$.effect_action') IS NOT NULL "
+                        "UNION SELECT logical_effect_id FROM effects"
+                    )
+                }
+                actual_definition_ids = {
+                    str(row["logical_effect_id"])
+                    for row in connection.execute(
+                        "SELECT logical_effect_id FROM effect_definitions"
+                    )
+                }
+                expected_origin_runs = {
+                    str(row["run_id"])
+                    for row in connection.execute(
+                        "SELECT run_id FROM events WHERE event_kind = "
+                        "'INTENT_COMMITTED' UNION SELECT run_id FROM "
+                        "effect_adoptions"
+                    )
+                }
+                actual_origin_runs = {
+                    str(row["run_id"])
+                    for row in connection.execute(
+                        "SELECT run_id FROM operation_origins"
+                    )
+                }
+                if (
+                    actual_definition_ids != expected_definition_ids
+                    or actual_origin_runs != expected_origin_runs
+                ):
+                    raise StorageIntegrityError(
+                        "T28 foundation projections are incomplete or surplus"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM repositories AS repository LEFT JOIN "
+                    "synthetic_authority_source_state AS source ON "
+                    "source.repository_id = repository.repository_id WHERE "
+                    "source.repository_id IS NULL LIMIT 1"
+                ).fetchone() is not None:
+                    raise StorageIntegrityError(
+                        "synthetic authority source genesis is incomplete"
+                    )
+                if manage_transaction:
+                    connection.commit()
+                return
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS synthetic_authority_source_events (
+                    source_event_id TEXT PRIMARY KEY,
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    sequence INTEGER NOT NULL CHECK (sequence > 0),
+                    event_kind TEXT NOT NULL,
+                    recorded_at TEXT NOT NULL,
+                    effective_at TEXT,
+                    consumer_kind TEXT,
+                    consumer_key TEXT,
+                    previous_source_hash TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    body_json TEXT NOT NULL,
+                    UNIQUE (repository_id, sequence),
+                    UNIQUE (repository_id, consumer_kind, consumer_key)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS synthetic_authority_source_state (
+                    repository_id TEXT PRIMARY KEY
+                        REFERENCES repositories(repository_id),
+                    head_sequence INTEGER NOT NULL CHECK (head_sequence > 0),
+                    head_hash TEXT NOT NULL UNIQUE,
+                    recorded_at_floor TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS synthetic_authority_grants (
+                    grant_id TEXT PRIMARY KEY,
+                    grant_kind TEXT NOT NULL CHECK (grant_kind IN (
+                        'ADOPTION', 'EFFECT_RELATIONSHIP'
+                    )),
+                    action TEXT NOT NULL,
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    logical_effect_id TEXT NOT NULL,
+                    source_id TEXT NOT NULL,
+                    source_version TEXT NOT NULL,
+                    terms_digest TEXT NOT NULL,
+                    scope_digest TEXT NOT NULL,
+                    binding_digest TEXT NOT NULL,
+                    not_before TEXT NOT NULL,
+                    expires_at TEXT NOT NULL,
+                    use_limit INTEGER NOT NULL CHECK (use_limit > 0),
+                    issuer_fingerprint TEXT NOT NULL,
+                    issuer_mac TEXT NOT NULL,
+                    source_event_id TEXT NOT NULL UNIQUE REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    event_hash TEXT NOT NULL UNIQUE,
+                    body_json TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS synthetic_authority_uses (
+                    source_event_id TEXT PRIMARY KEY REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    grant_id TEXT NOT NULL REFERENCES
+                        synthetic_authority_grants(grant_id),
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    consumer_kind TEXT NOT NULL,
+                    consumer_key TEXT NOT NULL,
+                    binding_digest TEXT NOT NULL,
+                    recorded_at TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    body_json TEXT NOT NULL,
+                    UNIQUE (repository_id, consumer_kind, consumer_key),
+                    UNIQUE (grant_id, consumer_kind, consumer_key)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS synthetic_authority_lifecycle_facts (
+                    fact_id TEXT PRIMARY KEY,
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    grant_kind TEXT NOT NULL CHECK (
+                        grant_kind IN ('ADOPTION', 'EFFECT_RELATIONSHIP')
+                    ),
+                    grant_id TEXT NOT NULL REFERENCES
+                        synthetic_authority_grants(grant_id),
+                    logical_effect_id TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    scope_digest TEXT NOT NULL,
+                    fact_kind TEXT NOT NULL,
+                    governed_order TEXT NOT NULL,
+                    governed_source_event_id TEXT,
+                    governed_source_event_hash TEXT,
+                    recorded_at TEXT NOT NULL,
+                    effective_at TEXT NOT NULL,
+                    corrected_fact_id TEXT,
+                    successor_grant_id TEXT,
+                    issuer_fingerprint TEXT NOT NULL,
+                    issuer_mac TEXT NOT NULL,
+                    source_event_id TEXT NOT NULL UNIQUE REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    event_hash TEXT NOT NULL UNIQUE,
+                    body_json TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS effect_definitions (
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    logical_effect_id TEXT NOT NULL,
+                    effect_key TEXT NOT NULL UNIQUE,
+                    descriptor_digest TEXT NOT NULL,
+                    definition_kind TEXT NOT NULL CHECK (
+                        definition_kind IN ('CANONICAL', 'LEGACY_OPAQUE')
+                    ),
+                    canonical_material_digest TEXT,
+                    action TEXT,
+                    target TEXT,
+                    semantic_inputs_json TEXT,
+                    target_generation INTEGER CHECK (target_generation > 0),
+                    defining_plan_id TEXT,
+                    defining_event_hash TEXT,
+                    PRIMARY KEY (repository_id, logical_effect_id),
+                    CHECK (
+                        (definition_kind = 'LEGACY_OPAQUE' AND
+                         canonical_material_digest IS NULL AND action IS NULL AND
+                         target IS NULL AND semantic_inputs_json IS NULL AND
+                         target_generation IS NULL) OR
+                        (definition_kind = 'CANONICAL' AND
+                         canonical_material_digest IS NOT NULL AND action IS NOT NULL AND
+                         target IS NOT NULL AND semantic_inputs_json IS NOT NULL AND
+                         target_generation IS NOT NULL)
+                    )
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS effect_relationships (
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    logical_effect_id TEXT NOT NULL,
+                    predecessor_logical_effect_id TEXT NOT NULL,
+                    relationship_kind TEXT NOT NULL CHECK (
+                        relationship_kind IN (
+                            'DIFFERENT_FROM', 'REPEAT_OF', 'COMPENSATES'
+                        )
+                    ),
+                    relationship_key TEXT NOT NULL UNIQUE,
+                    grant_id TEXT NOT NULL,
+                    source_use_event_id TEXT NOT NULL UNIQUE REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    binding_digest TEXT NOT NULL,
+                    defining_plan_id TEXT NOT NULL,
+                    defining_event_hash TEXT NOT NULL,
+                    PRIMARY KEY (repository_id, logical_effect_id),
+                    FOREIGN KEY (repository_id, logical_effect_id) REFERENCES
+                        effect_definitions(repository_id, logical_effect_id),
+                    FOREIGN KEY (repository_id, predecessor_logical_effect_id)
+                        REFERENCES effect_definitions(
+                            repository_id, logical_effect_id
+                        ),
+                    CHECK (logical_effect_id <> predecessor_logical_effect_id)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS legacy_descriptor_bindings (
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    logical_effect_id TEXT NOT NULL,
+                    evidence_id TEXT NOT NULL UNIQUE,
+                    legacy_descriptor_digest TEXT NOT NULL,
+                    canonical_descriptor_digest TEXT NOT NULL,
+                    canonical_material_digest TEXT NOT NULL,
+                    source_anchor_event_id TEXT NOT NULL,
+                    source_anchor_event_hash TEXT NOT NULL,
+                    issuer_fingerprint TEXT NOT NULL,
+                    issuer_mac TEXT NOT NULL,
+                    binding_source_event_id TEXT NOT NULL UNIQUE REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    binding_source_event_hash TEXT NOT NULL UNIQUE,
+                    body_json TEXT NOT NULL,
+                    PRIMARY KEY (repository_id, logical_effect_id),
+                    FOREIGN KEY (repository_id, logical_effect_id) REFERENCES
+                        effect_definitions(repository_id, logical_effect_id)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS operation_origins (
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL UNIQUE REFERENCES runs(run_id),
+                    logical_effect_id TEXT NOT NULL,
+                    origin_kind TEXT NOT NULL CHECK (
+                        origin_kind IN ('EXECUTION_INTENT', 'EFFECT_ADOPTION')
+                    ),
+                    origin_id TEXT NOT NULL,
+                    origin_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    origin_event_hash TEXT NOT NULL,
+                    root_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    root_attempt_id TEXT NOT NULL,
+                    root_observation_id TEXT,
+                    root_observation_event_hash TEXT,
+                    root_finalization_key TEXT,
+                    PRIMARY KEY (repository_id, run_id)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS effect_adoptions (
+                    adoption_id TEXT PRIMARY KEY,
+                    adoption_key TEXT NOT NULL UNIQUE,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL UNIQUE REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    plan_id TEXT NOT NULL UNIQUE
+                        REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    effect_descriptor_digest TEXT NOT NULL,
+                    target_generation INTEGER NOT NULL
+                        CHECK (target_generation > 0),
+                    root_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    root_attempt_id TEXT NOT NULL,
+                    root_observation_id TEXT NOT NULL
+                        REFERENCES effect_observations(observation_id),
+                    root_observation_event_hash TEXT NOT NULL,
+                    root_observation_digest TEXT NOT NULL,
+                    root_finalization_id TEXT NOT NULL
+                        REFERENCES operation_finalizations(finalization_id),
+                    root_finalization_key TEXT NOT NULL,
+                    root_finalization_event_hash TEXT NOT NULL,
+                    immediate_origin_kind TEXT NOT NULL CHECK (
+                        immediate_origin_kind IN (
+                            'EXECUTION_INTENT', 'EFFECT_ADOPTION'
+                        )
+                    ),
+                    immediate_origin_id TEXT NOT NULL,
+                    immediate_origin_event_hash TEXT NOT NULL,
+                    immediate_finalization_key TEXT NOT NULL,
+                    readiness_evidence_id TEXT NOT NULL UNIQUE,
+                    readiness_digest TEXT NOT NULL,
+                    source_use_event_id TEXT NOT NULL UNIQUE REFERENCES
+                        synthetic_authority_source_events(source_event_id),
+                    adoption_grant_id TEXT NOT NULL,
+                    slot_attempt_id TEXT NOT NULL,
+                    slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                    request_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (
+                        resulting_state = 'VALIDATING'
+                    ),
+                    body_json TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS adoption_dependencies (
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    ancestor_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    dependent_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    depth INTEGER NOT NULL CHECK (depth > 0),
+                    adoption_id TEXT NOT NULL
+                        REFERENCES effect_adoptions(adoption_id),
+                    root_observation_id TEXT NOT NULL
+                        REFERENCES effect_observations(observation_id),
+                    PRIMARY KEY (
+                        repository_id, ancestor_run_id, dependent_run_id
+                    ),
+                    CHECK (ancestor_run_id <> dependent_run_id)
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS dependent_adoption_fences (
+                    fence_id TEXT PRIMARY KEY REFERENCES dispatch_fences(fence_id),
+                    repository_id TEXT NOT NULL
+                        REFERENCES repositories(repository_id),
+                    source_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    dependent_run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    originating_event_id TEXT NOT NULL REFERENCES events(event_id),
+                    originating_event_hash TEXT NOT NULL,
+                    correction_owner_id TEXT NOT NULL,
+                    body_json TEXT NOT NULL,
+                    UNIQUE (
+                        repository_id, source_run_id, dependent_run_id,
+                        originating_event_id
+                    )
+                )
+                """
+            )
+            slot_columns = {
+                str(row["name"])
+                for row in connection.execute(
+                    "PRAGMA table_info(outstanding_slot)"
+                )
+            }
+            if "origin_kind" not in slot_columns:
+                connection.execute(
+                    "ALTER TABLE outstanding_slot ADD COLUMN origin_kind TEXT"
+                )
+                connection.execute(
+                    "ALTER TABLE outstanding_slot ADD COLUMN origin_id TEXT"
+                )
+                connection.execute(
+                    "UPDATE outstanding_slot SET origin_kind = "
+                    "'EXECUTION_INTENT', origin_id = attempt_id"
+                )
+            elif "origin_id" not in slot_columns:
+                raise StorageIntegrityError(
+                    "outstanding-slot origin schema is partially migrated"
+                )
+            connection.execute(
+                "INSERT OR IGNORE INTO effect_definitions ("
+                "repository_id, logical_effect_id, effect_key, "
+                "descriptor_digest, definition_kind) SELECT repository_id, "
+                "logical_effect_id, effect_key, descriptor_digest, "
+                "'LEGACY_OPAQUE' FROM effects"
+            )
+            for event in connection.execute(
+                "SELECT * FROM events WHERE event_kind = 'INTENT_COMMITTED' "
+                "ORDER BY writer_epoch, sequence"
+            ).fetchall():
+                body = json.loads(str(event["body_json"]))
+                connection.execute(
+                    "INSERT OR REPLACE INTO operation_origins VALUES ("
+                    "?, ?, ?, 'EXECUTION_INTENT', ?, ?, ?, ?, ?, NULL, NULL, NULL)",
+                    (
+                        event["repository_id"], event["run_id"],
+                        body["logical_effect_id"], body["attempt_id"],
+                        event["event_id"], event["event_hash"], event["run_id"],
+                        body["attempt_id"],
+                    ),
+                )
+            for row in connection.execute(
+                "SELECT repository_id FROM repositories ORDER BY repository_id"
+            ).fetchall():
+                SQLiteStateStore._ensure_source_genesis(
+                    connection, str(row["repository_id"])
+                )
+            if version == 3:
+                connection.execute("PRAGMA user_version = 4")
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 4:
+                raise StorageIntegrityError(
+                    "T28 foundation migration did not reach version 4"
+                )
+            if connection.execute(
+                "SELECT 1 FROM repositories AS repository LEFT JOIN "
+                "synthetic_authority_source_state AS source ON "
+                "source.repository_id = repository.repository_id WHERE "
+                "source.repository_id IS NULL LIMIT 1"
+            ).fetchone() is not None:
+                raise StorageIntegrityError(
+                    "synthetic authority source genesis is incomplete"
+                )
+            if manage_transaction:
+                connection.commit()
+        except BaseException:
+            if manage_transaction:
+                connection.rollback()
+            raise
+
+    def _store_utc_now(self, connection: sqlite3.Connection) -> str:
+        now = self._utc_now()
+        if (
+            not isinstance(now, datetime)
+            or now.tzinfo is None
+            or now.utcoffset() != timezone.utc.utcoffset(now)
+        ):
+            raise StorageIntegrityError(
+                "synthetic authority source clock is not UTC"
+            )
+        normalized = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        state = connection.execute(
+            "SELECT recorded_at_floor FROM synthetic_authority_source_state "
+            "WHERE repository_id = ?",
+            (self._repository_id,),
+        ).fetchone()
+        if state is None:
+            raise StorageIntegrityError(
+                "synthetic authority source state is unavailable"
+            )
+        if now < self._parse_source_utc(
+            state["recorded_at_floor"], field="recorded_at_floor"
+        ):
+            raise DispatchDenied("synthetic authority source clock moved backward")
+        return normalized
+
+    @classmethod
+    def _append_source_event(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        source_event_id: str,
+        repository_id: str,
+        event_kind: str,
+        recorded_at: str,
+        event_fields: Mapping[str, object],
+        effective_at: str | None = None,
+        consumer_kind: SyntheticSourceConsumerKind | None = None,
+        consumer_key: str | None = None,
+    ) -> tuple[int, str, str]:
+        state = connection.execute(
+            "SELECT * FROM synthetic_authority_source_state WHERE "
+            "repository_id = ?",
+            (repository_id,),
+        ).fetchone()
+        if state is None:
+            raise StorageIntegrityError(
+                "synthetic authority source state is unavailable"
+            )
+        sequence = int(state["head_sequence"]) + 1
+        previous_hash = str(state["head_hash"])
+        body = {
+            **event_fields,
+            "event_kind": event_kind,
+            "previous_source_hash": previous_hash,
+            "recorded_at": recorded_at,
+            "repository_id": repository_id,
+            "sequence": sequence,
+            "source_schema_version": 1,
+        }
+        if effective_at is not None:
+            body["effective_at"] = effective_at
+        body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        event_hash = cls._event_hash(body)
+        connection.execute(
+            "INSERT INTO synthetic_authority_source_events VALUES "
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                source_event_id, repository_id, sequence, event_kind,
+                recorded_at, effective_at,
+                None if consumer_kind is None else consumer_kind.value,
+                consumer_key, previous_hash, event_hash, body_json,
+            ),
+        )
+        connection.execute(
+            "UPDATE synthetic_authority_source_state SET head_sequence = ?, "
+            "head_hash = ?, recorded_at_floor = ? WHERE repository_id = ?",
+            (sequence, event_hash, recorded_at, repository_id),
+        )
+        connection.execute(
+            "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+            (event_hash, repository_id),
+        )
+        return sequence, event_hash, body_json
+
+    def register_synthetic_source_grant(
+        self,
+        grant: SyntheticSourceGrant,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> SyntheticSourceReceipt:
+        authority.verify_source_grant(grant)
+        if grant.repository_id != self._repository_id:
+            raise DispatchDenied("synthetic source grant targets another repository")
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                connection.execute(
+                    "INSERT OR IGNORE INTO repositories(repository_id) VALUES (?)",
+                    (grant.repository_id,),
+                )
+                self._ensure_source_genesis(connection, grant.repository_id)
+                self._verify_projections(connection, grant.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM synthetic_authority_grants WHERE grant_id = ?",
+                    (grant.grant_id,),
+                ).fetchone()
+                grant_fields = {
+                    **grant.__dict__,
+                    "grant_kind": grant.grant_kind.value,
+                }
+                if prior is not None:
+                    prior_body = json.loads(prior["body_json"])
+                    if any(
+                        prior_body.get(key) != value
+                        for key, value in grant_fields.items()
+                    ):
+                        raise StorageIntegrityError(
+                            "synthetic source grant ID was rebound"
+                        )
+                    connection.rollback()
+                    source_event = connection.execute(
+                        "SELECT sequence FROM synthetic_authority_source_events "
+                        "WHERE source_event_id = ?",
+                        (prior["source_event_id"],),
+                    ).fetchone()
+                    return SyntheticSourceReceipt(
+                        str(prior["source_event_id"]),
+                        int(source_event["sequence"]), str(prior["event_hash"]),
+                        None, None, True,
+                    )
+                catalog_head, head_vector = self._heads(
+                    connection, grant.repository_id
+                )
+                if not self._freshness_oracle.verify(
+                    grant.repository_id, catalog_head, head_vector
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                recorded_at = self._store_utc_now(connection)
+                source_event_id = f"source-grant:{grant.grant_id}"
+                sequence, event_hash, body_json = self._append_source_event(
+                    connection,
+                    source_event_id=source_event_id,
+                    repository_id=grant.repository_id,
+                    event_kind="SYNTHETIC_AUTHORITY_GRANT_REGISTERED",
+                    recorded_at=recorded_at,
+                    event_fields=grant_fields,
+                )
+                connection.execute(
+                    "INSERT INTO synthetic_authority_grants VALUES ("
+                    + ", ".join("?" for _ in range(18)) + ")",
+                    (
+                        grant.grant_id, grant.grant_kind.value, grant.action,
+                        grant.repository_id, grant.logical_effect_id,
+                        grant.source_id, grant.source_version,
+                        grant.terms_digest, grant.scope_digest,
+                        grant.binding_digest, grant.not_before,
+                        grant.expires_at, grant.use_limit,
+                        grant.issuer_fingerprint, grant.issuer_mac,
+                        source_event_id, event_hash, body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_source_grant_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_source_grant_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        return SyntheticSourceReceipt(
+            source_event_id, sequence, event_hash, None, None, False
+        )
+
+    def _consume_synthetic_source(
+        self,
+        connection: sqlite3.Connection,
+        capability: SyntheticSourceCapability,
+        authority: SyntheticAuthority,
+        *,
+        recorded_at: str,
+        expected_consumer_kind: SyntheticSourceConsumerKind,
+    ) -> SyntheticSourceReceipt:
+        authority.verify_source_capability(capability)
+        if (
+            capability.repository_id != self._repository_id
+            or capability.consumer_kind is not expected_consumer_kind
+        ):
+            raise DispatchDenied("synthetic source capability binding mismatch")
+        prior = connection.execute(
+            "SELECT source.*, event.sequence FROM synthetic_authority_uses AS "
+            "source JOIN synthetic_authority_source_events AS event ON "
+            "event.source_event_id = source.source_event_id WHERE "
+            "source.repository_id = ? AND source.consumer_kind = ? AND "
+            "source.consumer_key = ?",
+            (
+                capability.repository_id, capability.consumer_kind.value,
+                capability.consumer_key,
+            ),
+        ).fetchone()
+        if prior is not None:
+            if (
+                prior["grant_id"] != capability.grant_id
+                or prior["binding_digest"] != capability.binding_digest
+            ):
+                raise StorageIntegrityError(
+                    "synthetic source consumer key was rebound"
+                )
+            return SyntheticSourceReceipt(
+                str(prior["source_event_id"]), int(prior["sequence"]),
+                str(prior["event_hash"]), capability.consumer_kind,
+                capability.consumer_key, True,
+            )
+        grant = connection.execute(
+            "SELECT * FROM synthetic_authority_grants WHERE grant_id = ?",
+            (capability.grant_id,),
+        ).fetchone()
+        expected = (
+            capability.grant_kind.value, capability.action,
+            capability.repository_id, capability.logical_effect_id,
+            capability.source_id, capability.source_version,
+            capability.terms_digest, capability.scope_digest,
+            capability.binding_digest, capability.issuer_fingerprint,
+        )
+        if grant is None or tuple(
+            grant[name]
+            for name in (
+                "grant_kind", "action", "repository_id", "logical_effect_id",
+                "source_id", "source_version", "terms_digest", "scope_digest",
+                "binding_digest", "issuer_fingerprint",
+            )
+        ) != expected:
+            raise DispatchDenied("synthetic source grant is unavailable")
+        evaluated = self._parse_source_utc(recorded_at, field="recorded_at")
+        if not (
+            self._parse_source_utc(grant["not_before"], field="not_before")
+            <= evaluated
+            < self._parse_source_utc(grant["expires_at"], field="expires_at")
+        ):
+            raise DispatchDenied("synthetic source grant is not currently effective")
+        use_count = int(
+            connection.execute(
+                "SELECT COUNT(*) FROM synthetic_authority_uses WHERE grant_id = ?",
+                (capability.grant_id,),
+            ).fetchone()[0]
+        )
+        if use_count >= int(grant["use_limit"]):
+            raise DispatchDenied("synthetic source grant use limit is exhausted")
+        source_event_id = self._event_hash(
+            {
+                "domain": "SYNTHETIC_AUTHORITY_SOURCE_USE",
+                "grant_id": capability.grant_id,
+                "consumer_kind": capability.consumer_kind.value,
+                "consumer_key": capability.consumer_key,
+            }
+        )
+        fields = {
+            **{
+                key: (value.value if isinstance(value, Enum) else value)
+                for key, value in capability.__dict__.items()
+            },
+            "source_event_id": source_event_id,
+        }
+        sequence, event_hash, body_json = self._append_source_event(
+            connection,
+            source_event_id=source_event_id,
+            repository_id=capability.repository_id,
+            event_kind="SYNTHETIC_AUTHORITY_SOURCE_USED",
+            recorded_at=recorded_at,
+            event_fields=fields,
+            consumer_kind=capability.consumer_kind,
+            consumer_key=capability.consumer_key,
+        )
+        connection.execute(
+            "INSERT INTO synthetic_authority_uses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                source_event_id, capability.grant_id,
+                capability.repository_id, capability.consumer_kind.value,
+                capability.consumer_key, capability.binding_digest,
+                recorded_at, event_hash, body_json,
+            ),
+        )
+        return SyntheticSourceReceipt(
+            source_event_id, sequence, event_hash, capability.consumer_kind,
+            capability.consumer_key, False,
+        )
+
+    def consume_synthetic_source_for_test(
+        self,
+        capability: SyntheticSourceCapability,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> SyntheticSourceReceipt:
+        if capability.consumer_kind not in {
+            SyntheticSourceConsumerKind.HOST,
+            SyntheticSourceConsumerKind.MANUAL,
+        }:
+            raise DispatchDenied("test source consumer must be host or manual")
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                self._verify_projections(connection, self._repository_id)
+                prior = connection.execute(
+                    "SELECT 1 FROM synthetic_authority_uses WHERE "
+                    "repository_id = ? AND consumer_kind = ? AND consumer_key = ?",
+                    (
+                        self._repository_id, capability.consumer_kind.value,
+                        capability.consumer_key,
+                    ),
+                ).fetchone()
+                recorded_at = (
+                    str(connection.execute(
+                        "SELECT recorded_at FROM synthetic_authority_uses WHERE "
+                        "repository_id = ? AND consumer_kind = ? AND consumer_key = ?",
+                        (
+                            self._repository_id, capability.consumer_kind.value,
+                            capability.consumer_key,
+                        ),
+                    ).fetchone()[0])
+                    if prior is not None
+                    else self._store_utc_now(connection)
+                )
+                receipt = self._consume_synthetic_source(
+                    connection, capability, authority,
+                    recorded_at=recorded_at,
+                    expected_consumer_kind=capability.consumer_kind,
+                )
+                if receipt.replayed:
+                    connection.rollback()
+                    return receipt
+                if failure_hook is not None:
+                    failure_hook("after_source_use_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_source_use_commit_before_acknowledgement")
+                return receipt
+            except BaseException:
+                connection.rollback()
+                raise
+
+    @staticmethod
     def _migrate_operation_uncertainty_version(
         connection: sqlite3.Connection,
         *,
@@ -1795,7 +2762,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3}:
+            if version not in {0, 1, 2, 3, 4}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -1803,7 +2770,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3}:
+            if version in {2, 3, 4}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -1855,7 +2822,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version == 3:
+                if version in {3, 4}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -2065,7 +3032,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3,
+                1, 2, 3, 4,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -2137,7 +3104,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3}:
+            if version not in {1, 2, 3, 4}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -2178,7 +3145,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3,
+                2, 3, 4,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -2381,7 +3348,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3}:
+            if version not in {2, 3, 4}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -2734,7 +3701,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "proven-nonexecution action schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 3:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                3, 4,
+            }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
                 )
@@ -4037,6 +5006,387 @@ class SQLiteStateStore:
         encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
 
+    @classmethod
+    def canonical_effect_descriptor_digest(
+        cls,
+        action: str,
+        target: str,
+        semantic_inputs: tuple[tuple[str, str], ...],
+        target_generation: int,
+    ) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:EFFECT_DESCRIPTOR:v1",
+                "action": action,
+                "target": target,
+                "semantic_inputs": [list(item) for item in semantic_inputs],
+                "target_generation": target_generation,
+            }
+        )
+
+    @classmethod
+    def canonical_effect_material_digest(
+        cls,
+        action: str,
+        target: str,
+        semantic_inputs: tuple[tuple[str, str], ...],
+        target_generation: int,
+    ) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:EFFECT_CANONICAL_MATERIAL:v1",
+                "action": action,
+                "target": target,
+                "semantic_inputs": [list(item) for item in semantic_inputs],
+                "target_generation": target_generation,
+            }
+        )
+
+    @classmethod
+    def effect_relationship_key(cls, request: PlanAcceptanceRequest) -> str:
+        if (
+            request.relationship_kind is None
+            or request.predecessor_logical_effect_id is None
+        ):
+            raise ValueError("effect relationship binding is absent")
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:EFFECT_RELATIONSHIP:v1",
+                "repository_id": request.repository_id,
+                "logical_effect_id": request.logical_effect_id,
+                "effect_descriptor_digest": request.effect_descriptor_digest,
+                "effect_canonical_material_digest": (
+                    cls.canonical_effect_material_digest(
+                        str(request.effect_action), str(request.effect_target),
+                        request.effect_semantic_inputs,
+                        int(request.target_generation),
+                    )
+                ),
+                "defining_plan_id": request.plan_id,
+                "relationship_kind": request.relationship_kind.value,
+                "predecessor_logical_effect_id": (
+                    request.predecessor_logical_effect_id
+                ),
+                "predecessor_descriptor_digest": (
+                    request.predecessor_descriptor_digest
+                ),
+                "predecessor_defining_plan_id": (
+                    request.predecessor_defining_plan_id
+                ),
+                "predecessor_defining_event_hash": (
+                    request.predecessor_defining_event_hash
+                ),
+                "relationship_grant_id": request.relationship_grant_id,
+                "relationship_source_id": request.relationship_source_id,
+                "relationship_source_version": (
+                    request.relationship_source_version
+                ),
+                "relationship_terms_digest": request.relationship_terms_digest,
+                "relationship_scope_digest": request.relationship_scope_digest,
+            }
+        )
+
+    @classmethod
+    def effect_relationship_binding_digest(
+        cls, request: PlanAcceptanceRequest
+    ) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:EFFECT_RELATIONSHIP_AUTHORITY:v1",
+                "relationship_key": cls.effect_relationship_key(request),
+                "repository_id": request.repository_id,
+                "logical_effect_id": request.logical_effect_id,
+                "plan_id": request.plan_id,
+                "relationship_grant_id": request.relationship_grant_id,
+                "relationship_source_id": request.relationship_source_id,
+                "relationship_source_version": (
+                    request.relationship_source_version
+                ),
+                "relationship_terms_digest": request.relationship_terms_digest,
+                "relationship_scope_digest": request.relationship_scope_digest,
+            }
+        )
+
+    @classmethod
+    def _validate_effect_relationship_graph(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        repository_id: str,
+        logical_effect_id: str,
+        descriptor_digest: str,
+        relationship_kind: EffectRelationshipKind | None,
+        predecessor_logical_effect_id: str | None,
+        require_settled_predecessor: bool,
+    ) -> None:
+        other_definition = connection.execute(
+            "SELECT 1 FROM effect_definitions WHERE repository_id = ? AND "
+            "logical_effect_id <> ? LIMIT 1",
+            (repository_id, logical_effect_id),
+        ).fetchone()
+        if relationship_kind is None:
+            if other_definition is not None:
+                raise DispatchDenied(
+                    "a new logical effect requires an approved predecessor relationship"
+                )
+            return
+        predecessor = connection.execute(
+            "SELECT * FROM effect_definitions WHERE repository_id = ? AND "
+            "logical_effect_id = ?",
+            (repository_id, predecessor_logical_effect_id),
+        ).fetchone()
+        if predecessor is None or predecessor["definition_kind"] != "CANONICAL":
+            raise DispatchDenied(
+                "effect relationship predecessor history is unavailable"
+            )
+        same_semantics = predecessor["descriptor_digest"] == descriptor_digest
+        if (
+            relationship_kind is EffectRelationshipKind.REPEAT_OF
+            and not same_semantics
+        ):
+            raise DispatchDenied(
+                "REPEAT_OF must retain the predecessor canonical semantics"
+            )
+        if (
+            relationship_kind in {
+                EffectRelationshipKind.DIFFERENT_FROM,
+                EffectRelationshipKind.COMPENSATES,
+            }
+            and same_semantics
+        ):
+            raise DispatchDenied(
+                "distinct or compensating effects require different canonical semantics"
+            )
+        if not require_settled_predecessor:
+            return
+        settled = connection.execute(
+            "SELECT 1 FROM operation_finalizations AS finalization JOIN runs AS "
+            "run ON run.run_id = finalization.run_id WHERE "
+            "finalization.repository_id = ? AND "
+            "finalization.logical_effect_id = ? AND "
+            "run.lifecycle_state = 'COMPLETED' LIMIT 1",
+            (repository_id, predecessor_logical_effect_id),
+        ).fetchone()
+        disputed = connection.execute(
+            "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
+            "(item_id IS NULL AND logical_effect_id IS NULL) OR "
+            "logical_effect_id = ?) LIMIT 1",
+            (repository_id, predecessor_logical_effect_id),
+        ).fetchone()
+        if settled is None or disputed is not None:
+            raise DispatchDenied(
+                "effect relationship predecessor is unsettled or disputed"
+            )
+
+    @classmethod
+    def adoption_key(cls, request: EffectAdoptionRequest) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T28:EFFECT_ADOPTION:v1",
+                "repository_id": request.repository_id,
+                "run_id": request.run_id,
+                "item_id": request.item_id,
+                "plan_id": request.plan_id,
+                "revision_digest": request.revision_digest,
+                "logical_effect_id": request.logical_effect_id,
+                "effect_descriptor_digest": request.effect_descriptor_digest,
+                "target_generation": request.target_generation,
+                "root_run_id": request.root_run_id,
+                "root_attempt_id": request.root_attempt_id,
+                "root_observation_id": request.root_observation_id,
+                "root_observation_event_hash": (
+                    request.root_observation_event_hash
+                ),
+                "root_observation_digest": request.root_observation_digest,
+                "root_finalization_id": request.root_finalization_id,
+                "root_finalization_key": request.root_finalization_key,
+                "root_finalization_event_hash": (
+                    request.root_finalization_event_hash
+                ),
+                "immediate_origin_kind": request.immediate_origin_kind.value,
+                "immediate_origin_id": request.immediate_origin_id,
+                "immediate_origin_event_hash": (
+                    request.immediate_origin_event_hash
+                ),
+                "immediate_finalization_key": (
+                    request.immediate_finalization_key
+                ),
+                "current_check_set_digest": request.current_check_set_digest,
+                "adoption_grant_id": request.adoption_grant_id,
+                "adoption_source_id": request.adoption_source_id,
+                "adoption_source_version": request.adoption_source_version,
+                "adoption_terms_digest": request.adoption_terms_digest,
+                "adoption_scope_digest": request.adoption_scope_digest,
+            }
+        )
+
+    @classmethod
+    def adoption_check_set_digest(cls, check_ids: tuple[str, ...]) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T28:CHECK_SET:v1",
+                "check_ids": sorted(check_ids),
+            }
+        )
+
+    @classmethod
+    def adoption_binding_digest(cls, request: EffectAdoptionRequest) -> str:
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T28:ADOPTION_AUTHORITY:v1",
+                "adoption_key": cls.adoption_key(request),
+                "repository_id": request.repository_id,
+                "logical_effect_id": request.logical_effect_id,
+                "root_finalization_key": request.root_finalization_key,
+                "root_observation_event_hash": (
+                    request.root_observation_event_hash
+                ),
+                "root_finalization_event_hash": (
+                    request.root_finalization_event_hash
+                ),
+                "immediate_origin_event_hash": (
+                    request.immediate_origin_event_hash
+                ),
+                "immediate_finalization_key": (
+                    request.immediate_finalization_key
+                ),
+                "current_check_set_digest": request.current_check_set_digest,
+                "adoption_grant_id": request.adoption_grant_id,
+                "adoption_source_id": request.adoption_source_id,
+                "adoption_source_version": request.adoption_source_version,
+                "adoption_terms_digest": request.adoption_terms_digest,
+                "adoption_scope_digest": request.adoption_scope_digest,
+            }
+        )
+
+    @classmethod
+    def _fence_dependent_adoptions(
+        cls,
+        connection: sqlite3.Connection,
+        *,
+        repository_id: str,
+        source_run_id: str,
+        originating_event_id: str,
+        originating_event_hash: str,
+        writer_epoch_floor: int,
+        correction_owner_id: str,
+        provenance_kind: str,
+    ) -> str | None:
+        if provenance_kind not in {"AUTHORITY", "CONTRARY_RECEIPT"}:
+            raise ValueError("dependent adoption provenance kind is invalid")
+        dependent_rows = connection.execute(
+            "SELECT dependency.dependent_run_id, run.item_id, "
+            "plan.logical_effect_id, run.lifecycle_state, "
+            "run.continuation_cursor, run.head_sequence, run.head_hash FROM "
+            "adoption_dependencies AS dependency JOIN runs AS run ON "
+            "run.run_id = dependency.dependent_run_id JOIN validation_plans "
+            "AS plan ON plan.run_id = run.run_id WHERE "
+            "dependency.repository_id = ? AND dependency.ancestor_run_id = ? "
+            "ORDER BY dependency.depth, dependency.dependent_run_id",
+            (repository_id, source_run_id),
+        ).fetchall()
+        last_hash: str | None = None
+        for offset, dependent in enumerate(dependent_rows, start=1):
+            current_state = LifecycleState(str(dependent["lifecycle_state"]))
+            if provenance_kind == "CONTRARY_RECEIPT" and current_state not in {
+                LifecycleState.COMPLETED,
+                LifecycleState.FAILED_FINAL,
+                LifecycleState.STOPPED,
+            }:
+                resulting_state = LifecycleState.RECONCILIATION_REQUIRED
+            else:
+                resulting_state = cls._authority_fact_route(
+                    current_state, AuthorityFactKind.REVOKED,
+                    GovernedOrder.BEFORE,
+                )
+            fence_digest = cls._event_hash(
+                {
+                    "domain": "AEGIS:DEPENDENT_ADOPTION_FENCE:v1",
+                    "repository_id": repository_id,
+                    "source_run_id": source_run_id,
+                    "dependent_run_id": dependent["dependent_run_id"],
+                    "originating_event_id": originating_event_id,
+                }
+            )
+            fence_id = f"dependent-adoption:{fence_digest}"
+            if connection.execute(
+                "SELECT 1 FROM dependent_adoption_fences WHERE fence_id = ?",
+                (fence_id,),
+            ).fetchone() is not None:
+                continue
+            sequence = int(dependent["head_sequence"]) + 1
+            writer_epoch = writer_epoch_floor + offset
+            event_id = f"dependent-adoption-event:{fence_digest}"
+            body = {
+                "command_id": f"dependent-adoption-command:{fence_digest}",
+                "correction_owner_id": correction_owner_id,
+                "dependent_run_id": dependent["dependent_run_id"],
+                "event_id": event_id,
+                "event_kind": "DEPENDENT_ADOPTION_FENCED",
+                "fence_id": fence_id,
+                "item_id": dependent["item_id"],
+                "lifecycle_from": current_state.value,
+                "lifecycle_to": resulting_state.value,
+                "logical_effect_id": dependent["logical_effect_id"],
+                "originating_event_hash": originating_event_hash,
+                "originating_event_id": originating_event_id,
+                "provenance_kind": provenance_kind,
+                "previous_event_hash": dependent["head_hash"],
+                "repository_id": repository_id,
+                "run_id": dependent["dependent_run_id"],
+                "schema_version": 1,
+                "sequence": sequence,
+                "source_run_id": source_run_id,
+                "writer_epoch": writer_epoch,
+            }
+            event_hash = cls._event_hash(body)
+            body_json = json.dumps(
+                body, sort_keys=True, separators=(",", ":")
+            )
+            connection.execute(
+                "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                "'DEPENDENT_ADOPTION_FENCED', ?, ?, ?)",
+                (
+                    event_id, repository_id, dependent["dependent_run_id"],
+                    dependent["item_id"], sequence, body["command_id"],
+                    writer_epoch, dependent["head_hash"], event_hash,
+                    body_json,
+                ),
+            )
+            connection.execute(
+                "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    fence_id, repository_id, dependent["item_id"],
+                    dependent["logical_effect_id"],
+                    (
+                        "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
+                        if provenance_kind == "CONTRARY_RECEIPT"
+                        else "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED"
+                    ),
+                    event_id,
+                ),
+            )
+            connection.execute(
+                "INSERT INTO dependent_adoption_fences VALUES (?, ?, ?, ?, "
+                "?, ?, ?, ?)",
+                (
+                    fence_id, repository_id, source_run_id,
+                    dependent["dependent_run_id"], originating_event_id,
+                    originating_event_hash,
+                    correction_owner_id, body_json,
+                ),
+            )
+            connection.execute(
+                "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                "head_hash = ? WHERE run_id = ?",
+                (
+                    resulting_state.value, sequence, event_hash,
+                    dependent["dependent_run_id"],
+                ),
+            )
+            last_hash = event_hash
+        return last_hash
+
     @staticmethod
     def _verified_receipt_payload(
         request: ReconcileVerifiedReceiptRequest,
@@ -4718,9 +6068,24 @@ class SQLiteStateStore:
 
     @staticmethod
     def _run_heads_digest(run_heads: Mapping[str, str]) -> str:
+        """Legacy run-only digest used by pre-v4 control records."""
         return hashlib.sha256(
             json.dumps(
-                sorted(run_heads.items()),
+                sorted(
+                    (key, value)
+                    for key, value in run_heads.items()
+                    if key != _SYNTHETIC_SOURCE_HEAD_MEMBER
+                ),
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+
+    @staticmethod
+    def _complete_head_vector_digest(heads: Mapping[str, str]) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                sorted(heads.items()),
                 ensure_ascii=True,
                 separators=(",", ":"),
             ).encode("utf-8")
@@ -4747,6 +6112,21 @@ class SQLiteStateStore:
                 "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
                 "plan_schema_version": request.plan_schema_version,
                 "reducer_version": request.reducer_version,
+                "effect_action": request.effect_action,
+                "effect_target": request.effect_target,
+                "effect_semantic_inputs": [
+                    list(item) for item in request.effect_semantic_inputs
+                ],
+                "target_generation": request.target_generation,
+                "relationship_kind": (
+                    None
+                    if request.relationship_kind is None
+                    else request.relationship_kind.value
+                ),
+                "predecessor_logical_effect_id": (
+                    request.predecessor_logical_effect_id
+                ),
+                "relationship_grant_id": request.relationship_grant_id,
             }
         )
 
@@ -8091,7 +9471,15 @@ class SQLiteStateStore:
                     observation["operation_attempt_id"],
                 ),
             ).fetchone()
-            if operation_reservation is None:
+            adoption_origin = connection.execute(
+                "SELECT adoption_id FROM effect_adoptions WHERE "
+                "repository_id = ? AND run_id = ? AND slot_attempt_id = ?",
+                (
+                    request.repository_id, request.run_id,
+                    observation["operation_attempt_id"],
+                ),
+            ).fetchone()
+            if operation_reservation is None and adoption_origin is None:
                 raise ValueError("validation application lost its operation slot")
             expected_slot_generation, _recovery_authorization_id = (
                 self._operation_attempt_generation(
@@ -8104,10 +9492,23 @@ class SQLiteStateStore:
                     sequence_limit=int(body["sequence"]),
                 )
             )
-            operation_slot_current = self._operation_slot_current_before(
-                connection, operation_reservation, int(body["sequence"]),
-                expected_generation=expected_slot_generation,
-            )
+            if adoption_origin is None:
+                operation_slot_current = self._operation_slot_current_before(
+                    connection, operation_reservation, int(body["sequence"]),
+                    expected_generation=expected_slot_generation,
+                )
+            else:
+                _fences, historical_slot, _validators = (
+                    self._historical_repository_activity(
+                        connection, request.repository_id,
+                        int(body["writer_epoch"]),
+                    )
+                )
+                operation_slot_current = historical_slot == (
+                    request.run_id, request.logical_effect_id,
+                    observation["operation_attempt_id"],
+                    expected_slot_generation,
+                )
             accounting_closed = self._accounting_closure_error(
                 connection,
                 request.repository_id,
@@ -8119,6 +9520,7 @@ class SQLiteStateStore:
                 ),
                 settling_validator_observation_id=request.observation_id,
                 settlement_sequence_limit=int(body["sequence"]),
+                operation_observation_optional=(adoption_origin is not None),
             ) is None
             (
                 _transition_id,
@@ -8172,8 +9574,13 @@ class SQLiteStateStore:
             "resulting_state", "schema_version", "sequence", "transition_id",
             "writer_epoch",
         }
+        extended_fields = expected_fields | {
+            "operation_origin_kind", "operation_origin_id",
+        }
         try:
-            if set(body) != expected_fields or (
+            if frozenset(body) not in {
+                frozenset(expected_fields), frozenset(extended_fields)
+            } or (
                 type(body["schema_version"]) is not int
                 or body["schema_version"] != 1
                 or type(body["sequence"]) is not int
@@ -8296,6 +9703,14 @@ class SQLiteStateStore:
                     raise ValueError(
                         "operation finalization has active validator work"
                     )
+            adoption_origin = connection.execute(
+                "SELECT adoption_id FROM effect_adoptions WHERE "
+                "repository_id = ? AND run_id = ? AND slot_attempt_id = ?",
+                (
+                    request.repository_id, request.run_id,
+                    request.expected_slot_attempt_id,
+                ),
+            ).fetchone()
             reservation = connection.execute(
                 "SELECT * FROM budget_reservations WHERE repository_id = ? "
                 "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
@@ -8306,10 +9721,42 @@ class SQLiteStateStore:
                     request.expected_slot_attempt_id,
                 ),
             ).fetchone()
-            if reservation is None or not self._operation_slot_current_before(
-                connection, reservation, int(body["sequence"]),
-                expected_generation=request.expected_slot_generation,
-            ):
+            if adoption_origin is not None:
+                _fences, historical_slot, _validators = (
+                    self._historical_repository_activity(
+                        connection, request.repository_id,
+                        int(body["writer_epoch"]),
+                    )
+                )
+                slot_owned = historical_slot == (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                )
+                if set(body) != extended_fields or (
+                    body["operation_origin_kind"]
+                    != OperationOriginKind.EFFECT_ADOPTION.value
+                    or body["operation_origin_id"]
+                    != adoption_origin["adoption_id"]
+                ):
+                    raise ValueError(
+                        "adoption finalization lost its origin binding"
+                    )
+            else:
+                slot_owned = reservation is not None and (
+                    self._operation_slot_current_before(
+                        connection, reservation, int(body["sequence"]),
+                        expected_generation=request.expected_slot_generation,
+                    )
+                )
+                if set(body) == extended_fields and (
+                    body["operation_origin_kind"]
+                    != OperationOriginKind.EXECUTION_INTENT.value
+                    or body["operation_origin_id"]
+                    != request.expected_slot_attempt_id
+                ):
+                    raise ValueError("execution finalization origin is invalid")
+            if not slot_owned:
                 raise ValueError("operation finalization did not own the slot")
             closure_error = self._accounting_closure_error(
                 connection,
@@ -8318,6 +9765,7 @@ class SQLiteStateStore:
                 request.logical_effect_id,
                 request.expected_slot_attempt_id,
                 settlement_sequence_limit=int(body["sequence"]),
+                operation_observation_optional=(adoption_origin is not None),
             )
             if closure_error is not None:
                 raise ValueError(
@@ -8381,7 +9829,21 @@ class SQLiteStateStore:
             "SELECT run_id, head_hash FROM runs WHERE repository_id = ? ORDER BY run_id",
             (repository_id,),
         ).fetchall()
-        return catalog_head, {str(row["run_id"]): str(row["head_hash"]) for row in rows}
+        run_heads = {
+            str(row["run_id"]): str(row["head_hash"]) for row in rows
+        }
+        if repository is not None:
+            source = connection.execute(
+                "SELECT head_hash FROM synthetic_authority_source_state WHERE "
+                "repository_id = ?",
+                (repository_id,),
+            ).fetchone()
+            if source is None:
+                raise StorageIntegrityError(
+                    "synthetic authority source head is unavailable"
+                )
+            run_heads[_SYNTHETIC_SOURCE_HEAD_MEMBER] = str(source["head_hash"])
+        return catalog_head, run_heads
 
     @staticmethod
     def _validation_checks_settled(
@@ -8437,6 +9899,7 @@ class SQLiteStateStore:
         settling_validator_observation_id: str | None = None,
         settling_validator_cessation_id: str | None = None,
         settlement_sequence_limit: int | None = None,
+        operation_observation_optional: bool = False,
     ) -> str | None:
         operation_observation = connection.execute(
             "SELECT 1 FROM effect_observations AS observation JOIN events AS "
@@ -8456,6 +9919,7 @@ class SQLiteStateStore:
         if (
             operation_observation is None
             and settling_operation_observation_id is None
+            and not operation_observation_optional
         ):
             return "final effect observation is unavailable"
 
@@ -8509,7 +9973,7 @@ class SQLiteStateStore:
                 row["logical_effect_id"], row["attempt_id"]
             ) == (logical_effect_id, operation_attempt_id)
         ]
-        if len(operation_reservations) != 1:
+        if len(operation_reservations) != (0 if operation_observation_optional else 1):
             return "operation accounting reservation is unavailable"
         for reservation in reservations:
             if reservation["settlement_body_json"] is None:
@@ -8779,7 +10243,20 @@ class SQLiteStateStore:
             return "terminal settlement does not bind the operation slot attempt"
         if int(body["slot_generation"]) != intent_generation:
             return "terminal settlement does not bind the operation slot attempt"
-        if bool(body.get("slot_released")) and connection.execute(
+        operation_origin = connection.execute(
+            "SELECT origin_kind FROM operation_origins WHERE repository_id = ? "
+            "AND run_id = ?",
+            (request.repository_id, request.run_id),
+        ).fetchone()
+        adoption_origin = (
+            operation_origin is not None
+            and operation_origin["origin_kind"]
+            == OperationOriginKind.EFFECT_ADOPTION.value
+        )
+        if (
+            bool(body.get("slot_released"))
+            and not adoption_origin
+            and connection.execute(
             "SELECT 1 FROM effect_observations AS observation JOIN events AS "
             "event ON event.event_id = observation.event_id WHERE "
             "observation.repository_id = ? AND observation.run_id = ? AND "
@@ -8790,7 +10267,8 @@ class SQLiteStateStore:
                 request.logical_effect_id, body.get("slot_attempt_id"),
                 sequence,
             ),
-        ).fetchone() is None:
+            ).fetchone() is None
+        ):
             return "released terminal settlement lacks final effect observation"
         terminal_fences = connection.execute(
             "SELECT fence.item_id, fence.logical_effect_id, event.body_json "
@@ -9029,6 +10507,16 @@ class SQLiteStateStore:
             settling_check_id=str(body["check_id"]),
         ):
             return "required validation checks remain unsettled"
+        operation_origin = connection.execute(
+            "SELECT origin_kind FROM operation_origins WHERE repository_id = ? "
+            "AND run_id = ?",
+            (body["repository_id"], body["run_id"]),
+        ).fetchone()
+        adoption_origin = (
+            operation_origin is not None
+            and operation_origin["origin_kind"]
+            == OperationOriginKind.EFFECT_ADOPTION.value
+        )
         return self._accounting_closure_error(
             connection, str(body["repository_id"]), str(body["run_id"]),
             str(body["logical_effect_id"]), str(body["slot_attempt_id"]),
@@ -9048,6 +10536,7 @@ class SQLiteStateStore:
                 else None
             ),
             settlement_sequence_limit=sequence,
+            operation_observation_optional=adoption_origin,
         )
 
     def _late_observation_release_error(
@@ -9216,6 +10705,11 @@ class SQLiteStateStore:
                         str(body["item_id"]),
                         str(body["logical_effect_id"]),
                     )
+                elif event_kind == "DEPENDENT_ADOPTION_FENCED":
+                    active_fences[str(body["fence_id"])] = (
+                        str(body["item_id"]),
+                        str(body["logical_effect_id"]),
+                    )
                 elif event_kind == "STOP_RECORDED":
                     active_fences[str(body["fence_id"])] = (
                         str(body["item_id"]),
@@ -9332,6 +10826,15 @@ class SQLiteStateStore:
                             str(body["logical_effect_id"]),
                             str(body["attempt_id"]), 1,
                         )
+                elif event_kind == "EFFECT_ADOPTED":
+                    if active_slot is not None:
+                        raise ValueError("multiple operation slots are active")
+                    active_slot = (
+                        str(body["run_id"]),
+                        str(body["logical_effect_id"]),
+                        str(body["slot_attempt_id"]),
+                        int(body["slot_generation"]),
+                    )
                 elif event_kind == "VALIDATOR_INTENT_COMMITTED":
                     reservation = connection.execute(
                         "SELECT repository_id, run_id, item_id, "
@@ -9784,17 +11287,172 @@ class SQLiteStateStore:
             "worst_case_units": int(reservation["worst_case_units"]),
         }
 
+    def bind_legacy_effect_descriptor(
+        self,
+        evidence: SyntheticLegacyDescriptorBindingEvidence,
+        authority: SyntheticAuthority,
+        *,
+        action: str,
+        target: str,
+        semantic_inputs: tuple[tuple[str, str], ...],
+        target_generation: int,
+        failure_hook: FailureHook | None = None,
+    ) -> SyntheticSourceReceipt:
+        authority.verify_legacy_descriptor_binding_evidence(evidence)
+        if evidence.repository_id != self._repository_id:
+            raise DispatchDenied("legacy descriptor binding targets another repository")
+        canonical_descriptor = self.canonical_effect_descriptor_digest(
+            action, target, semantic_inputs, target_generation
+        )
+        canonical_material = self.canonical_effect_material_digest(
+            action, target, semantic_inputs, target_generation
+        )
+        if (
+            evidence.canonical_descriptor_digest != canonical_descriptor
+            or evidence.canonical_material_digest != canonical_material
+        ):
+            raise DispatchDenied(
+                "legacy descriptor evidence does not bind canonical material"
+            )
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                self._verify_projections(connection, self._repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM legacy_descriptor_bindings WHERE "
+                    "repository_id = ? AND logical_effect_id = ?",
+                    (self._repository_id, evidence.logical_effect_id),
+                ).fetchone()
+                if prior is not None:
+                    if (
+                        prior["evidence_id"] != evidence.evidence_id
+                        or prior["canonical_descriptor_digest"]
+                        != canonical_descriptor
+                        or prior["canonical_material_digest"]
+                        != canonical_material
+                    ):
+                        raise StorageIntegrityError(
+                            "legacy descriptor binding was rebound"
+                        )
+                    source_event = connection.execute(
+                        "SELECT sequence FROM synthetic_authority_source_events "
+                        "WHERE source_event_id = ?",
+                        (prior["binding_source_event_id"],),
+                    ).fetchone()
+                    connection.rollback()
+                    return SyntheticSourceReceipt(
+                        str(prior["binding_source_event_id"]),
+                        int(source_event["sequence"]),
+                        str(prior["binding_source_event_hash"]),
+                        None, None, True,
+                    )
+                definition = connection.execute(
+                    "SELECT * FROM effect_definitions WHERE repository_id = ? "
+                    "AND logical_effect_id = ?",
+                    (self._repository_id, evidence.logical_effect_id),
+                ).fetchone()
+                anchor = connection.execute(
+                    "SELECT event_hash FROM synthetic_authority_source_events "
+                    "WHERE source_event_id = ?",
+                    (evidence.source_event_id,),
+                ).fetchone()
+                if (
+                    definition is None
+                    or definition["definition_kind"] != "LEGACY_OPAQUE"
+                    or definition["descriptor_digest"]
+                    != evidence.legacy_descriptor_digest
+                    or anchor is None
+                    or anchor["event_hash"] != evidence.source_event_hash
+                ):
+                    raise DispatchDenied(
+                        "legacy descriptor source or opaque definition is unavailable"
+                    )
+                catalog_head, heads = self._heads(
+                    connection, self._repository_id
+                )
+                if not self._freshness_oracle.verify(
+                    self._repository_id, catalog_head, heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                recorded_at = self._store_utc_now(connection)
+                source_event_id = f"legacy-descriptor:{evidence.evidence_id}"
+                fields = {
+                    **evidence.__dict__,
+                    "action": action,
+                    "target": target,
+                    "semantic_inputs": [list(item) for item in semantic_inputs],
+                    "target_generation": target_generation,
+                }
+                sequence, event_hash, body_json = self._append_source_event(
+                    connection,
+                    source_event_id=source_event_id,
+                    repository_id=self._repository_id,
+                    event_kind="SYNTHETIC_LEGACY_DESCRIPTOR_BOUND",
+                    recorded_at=recorded_at,
+                    event_fields=fields,
+                )
+                connection.execute(
+                    "INSERT INTO legacy_descriptor_bindings VALUES ("
+                    + ", ".join("?" for _ in range(13)) + ")",
+                    (
+                        self._repository_id, evidence.logical_effect_id,
+                        evidence.evidence_id,
+                        evidence.legacy_descriptor_digest,
+                        canonical_descriptor, canonical_material,
+                        evidence.source_event_id, evidence.source_event_hash,
+                        evidence.issuer_fingerprint, evidence.issuer_mac,
+                        source_event_id, event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE effect_definitions SET descriptor_digest = ?, "
+                    "definition_kind = 'CANONICAL', "
+                    "canonical_material_digest = ?, action = ?, target = ?, "
+                    "semantic_inputs_json = ?, target_generation = ? WHERE "
+                    "repository_id = ? AND logical_effect_id = ?",
+                    (
+                        canonical_descriptor, canonical_material, action,
+                        target, json.dumps(
+                            [list(item) for item in semantic_inputs],
+                            separators=(",", ":"),
+                        ), target_generation, self._repository_id,
+                        evidence.logical_effect_id,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_legacy_descriptor_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_legacy_descriptor_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return SyntheticSourceReceipt(
+            source_event_id, sequence, event_hash, None, None, False
+        )
+
     def accept_plan(
         self,
         request: PlanAcceptanceRequest,
         *,
         expected_head: str,
         writer_epoch: int,
+        relationship_capability: SyntheticSourceCapability | None = None,
         failure_hook: FailureHook | None = None,
     ) -> CommitReceipt:
         request.validate()
         if request.repository_id != self._repository_id:
             raise DispatchDenied("plan targets a different repository")
+        if request.run_id == _SYNTHETIC_SOURCE_HEAD_MEMBER:
+            raise DispatchDenied("run ID uses the reserved source-head member")
         if self._classification_authority is None:
             raise DispatchDenied(
                 "plan acceptance requires a bound classification authority"
@@ -9805,6 +11463,14 @@ class SQLiteStateStore:
             **request.__dict__,
             "check_ids": sorted(request.check_ids),
             "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+            "effect_semantic_inputs": [
+                list(item) for item in request.effect_semantic_inputs
+            ],
+            "relationship_kind": (
+                None
+                if request.relationship_kind is None
+                else request.relationship_kind.value
+            ),
         }
         payload_digest = self._event_hash(payload)
         gate_set_digest = self._event_hash(
@@ -9823,10 +11489,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied("independent recovery freshness proof failed")
                 prior = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -9836,11 +11498,93 @@ class SQLiteStateStore:
                         raise StorageIntegrityError(
                             "command ID was reused with a different payload"
                         )
+                    accepted = connection.execute(
+                        "SELECT body_json FROM validation_plans WHERE "
+                        "command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if accepted is None:
+                        raise StorageIntegrityError(
+                            "plan command outcome lost its accepted plan"
+                        )
+                    accepted_body = json.loads(accepted["body_json"])
+                    relationship_use_id = accepted_body.get(
+                        "relationship_source_use_event_id"
+                    )
+                    if relationship_use_id is None:
+                        if relationship_capability is not None:
+                            raise DispatchDenied(
+                                "replayed plan cannot add relationship authority"
+                            )
+                    else:
+                        if relationship_capability is None:
+                            raise DispatchDenied(
+                                "replayed relationship plan requires its exact authority"
+                            )
+                        self._classification_authority.verify_source_capability(
+                            relationship_capability
+                        )
+                        use_row = connection.execute(
+                            "SELECT * FROM synthetic_authority_uses WHERE "
+                            "source_event_id = ?",
+                            (relationship_use_id,),
+                        ).fetchone()
+                        if use_row is None:
+                            raise StorageIntegrityError(
+                                "relationship plan lost its authority use"
+                            )
+                        use_body = json.loads(use_row["body_json"])
+                        capability_fields = (
+                            "grant_id", "grant_kind", "action",
+                            "repository_id", "logical_effect_id", "source_id",
+                            "source_version", "terms_digest", "scope_digest",
+                            "binding_digest", "consumer_kind", "consumer_key",
+                            "issuer_fingerprint", "issuer_mac",
+                        )
+                        supplied = {
+                            "grant_id": relationship_capability.grant_id,
+                            "grant_kind": relationship_capability.grant_kind.value,
+                            "action": relationship_capability.action,
+                            "repository_id": relationship_capability.repository_id,
+                            "logical_effect_id": (
+                                relationship_capability.logical_effect_id
+                            ),
+                            "source_id": relationship_capability.source_id,
+                            "source_version": relationship_capability.source_version,
+                            "terms_digest": relationship_capability.terms_digest,
+                            "scope_digest": relationship_capability.scope_digest,
+                            "binding_digest": relationship_capability.binding_digest,
+                            "consumer_kind": (
+                                relationship_capability.consumer_kind.value
+                            ),
+                            "consumer_key": relationship_capability.consumer_key,
+                            "issuer_fingerprint": (
+                                relationship_capability.issuer_fingerprint
+                            ),
+                            "issuer_mac": relationship_capability.issuer_mac,
+                        }
+                        if (
+                            any(
+                                use_body.get(field) != supplied[field]
+                                for field in capability_fields
+                            )
+                            or use_row["event_hash"]
+                            != accepted_body.get(
+                                "relationship_source_use_event_hash"
+                            )
+                        ):
+                            raise DispatchDenied(
+                                "replayed relationship authority is rebound"
+                            )
                     connection.rollback()
                     return CommitReceipt(
                         request.command_id, str(prior["event_id"]),
                         int(prior["sequence"]), str(prior["event_hash"]), True,
                     )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
                 if connection.execute(
                     "SELECT 1 FROM runs WHERE run_id = ?", (request.run_id,)
                 ).fetchone():
@@ -9849,12 +11593,237 @@ class SQLiteStateStore:
                     "INSERT OR IGNORE INTO repositories(repository_id) VALUES (?)",
                     (request.repository_id,),
                 )
+                self._ensure_source_genesis(connection, request.repository_id)
                 repository = connection.execute(
                     "SELECT catalog_head FROM repositories WHERE repository_id = ?",
                     (request.repository_id,),
                 ).fetchone()
                 if repository["catalog_head"] != expected_head:
                     raise DispatchDenied("expected repository head does not match")
+                has_canonical_descriptor = request.effect_action is not None
+                canonical_material_digest: str | None = None
+                relationship_receipt: SyntheticSourceReceipt | None = None
+                definition = connection.execute(
+                    "SELECT * FROM effect_definitions WHERE repository_id = ? "
+                    "AND logical_effect_id = ?",
+                    (request.repository_id, request.logical_effect_id),
+                ).fetchone()
+                stored_relationship = connection.execute(
+                    "SELECT * FROM effect_relationships WHERE repository_id = ? "
+                    "AND logical_effect_id = ?",
+                    (request.repository_id, request.logical_effect_id),
+                ).fetchone()
+                if has_canonical_descriptor:
+                    assert request.effect_action is not None
+                    assert request.effect_target is not None
+                    assert request.target_generation is not None
+                    derived_descriptor = self.canonical_effect_descriptor_digest(
+                        request.effect_action, request.effect_target,
+                        request.effect_semantic_inputs,
+                        request.target_generation,
+                    )
+                    canonical_material_digest = (
+                        self.canonical_effect_material_digest(
+                            request.effect_action, request.effect_target,
+                            request.effect_semantic_inputs,
+                            request.target_generation,
+                        )
+                    )
+                    if derived_descriptor != request.effect_descriptor_digest:
+                        raise DispatchDenied(
+                            "accepted effect descriptor is not canonical"
+                        )
+                    requested_relationship = (
+                        None
+                        if request.relationship_kind is None
+                        else (
+                            request.relationship_kind.value,
+                            request.predecessor_logical_effect_id,
+                            request.relationship_grant_id,
+                        )
+                    )
+                    if definition is not None:
+                        if (
+                            definition["definition_kind"] != "CANONICAL"
+                            or definition["descriptor_digest"]
+                            != request.effect_descriptor_digest
+                            or definition["canonical_material_digest"]
+                            != canonical_material_digest
+                        ):
+                            raise StorageIntegrityError(
+                                "logical effect changed canonical descriptor"
+                            )
+                        actual_relationship = (
+                            None
+                            if stored_relationship is None
+                            else (
+                                stored_relationship["relationship_kind"],
+                                stored_relationship[
+                                    "predecessor_logical_effect_id"
+                                ],
+                                stored_relationship["grant_id"],
+                            )
+                        )
+                        if actual_relationship != requested_relationship:
+                            raise DispatchDenied(
+                                "effect relationship history is incomplete or changed"
+                            )
+                        if relationship_capability is not None:
+                            raise DispatchDenied(
+                                "existing effect relationship cannot consume authority again"
+                            )
+                    else:
+                        alias = connection.execute(
+                            "SELECT logical_effect_id FROM effect_definitions "
+                            "WHERE repository_id = ? AND descriptor_digest = ? "
+                            "LIMIT 1",
+                            (
+                                request.repository_id,
+                                request.effect_descriptor_digest,
+                            ),
+                        ).fetchone()
+                        self._validate_effect_relationship_graph(
+                            connection,
+                            repository_id=request.repository_id,
+                            logical_effect_id=request.logical_effect_id,
+                            descriptor_digest=request.effect_descriptor_digest,
+                            relationship_kind=request.relationship_kind,
+                            predecessor_logical_effect_id=(
+                                request.predecessor_logical_effect_id
+                            ),
+                            require_settled_predecessor=False,
+                        )
+                        if request.relationship_kind is None:
+                            if relationship_capability is not None:
+                                raise DispatchDenied(
+                                    "relationship capability has no declared relationship"
+                                )
+                            if alias is not None:
+                                raise DispatchDenied(
+                                    "new effect ID aliases an existing descriptor"
+                                )
+                        else:
+                            if (
+                                alias is not None
+                                and request.relationship_kind
+                                is not EffectRelationshipKind.REPEAT_OF
+                            ):
+                                raise DispatchDenied(
+                                    "only an approved repetition may reuse a descriptor"
+                                )
+                            if relationship_capability is None:
+                                raise DispatchDenied(
+                                    "effect relationship authority is unavailable"
+                                )
+                            predecessor_definition = connection.execute(
+                                "SELECT descriptor_digest, defining_plan_id, "
+                                "defining_event_hash FROM effect_definitions "
+                                "WHERE repository_id = ? AND "
+                                "logical_effect_id = ?",
+                                (
+                                    request.repository_id,
+                                    request.predecessor_logical_effect_id,
+                                ),
+                            ).fetchone()
+                            if predecessor_definition is None or (
+                                request.predecessor_descriptor_digest,
+                                request.predecessor_defining_plan_id,
+                                request.predecessor_defining_event_hash,
+                            ) != (
+                                predecessor_definition["descriptor_digest"],
+                                predecessor_definition["defining_plan_id"],
+                                predecessor_definition["defining_event_hash"],
+                            ):
+                                raise DispatchDenied(
+                                    "effect relationship predecessor history changed"
+                                )
+                            if (
+                                request.relationship_source_id,
+                                request.relationship_source_version,
+                                request.relationship_terms_digest,
+                                request.relationship_scope_digest,
+                            ) != (
+                                relationship_capability.source_id,
+                                relationship_capability.source_version,
+                                relationship_capability.terms_digest,
+                                relationship_capability.scope_digest,
+                            ):
+                                raise DispatchDenied(
+                                    "effect relationship source terms changed"
+                                )
+                            relationship_key = self.effect_relationship_key(
+                                request
+                            )
+                            binding_digest = (
+                                self.effect_relationship_binding_digest(request)
+                            )
+                            expected_capability = (
+                                SyntheticGrantKind.EFFECT_RELATIONSHIP,
+                                "DEFINE_EFFECT_RELATIONSHIP",
+                                request.repository_id,
+                                request.logical_effect_id,
+                                SyntheticSourceConsumerKind.EFFECT_RELATIONSHIP,
+                                relationship_key,
+                                binding_digest,
+                                request.relationship_grant_id,
+                            )
+                            actual_capability = (
+                                relationship_capability.grant_kind,
+                                relationship_capability.action,
+                                relationship_capability.repository_id,
+                                relationship_capability.logical_effect_id,
+                                relationship_capability.consumer_kind,
+                                relationship_capability.consumer_key,
+                                relationship_capability.binding_digest,
+                                relationship_capability.grant_id,
+                            )
+                            if actual_capability != expected_capability:
+                                raise DispatchDenied(
+                                    "effect relationship capability is rebound"
+                                )
+                            cursor = request.predecessor_logical_effect_id
+                            visited: set[str] = set()
+                            while cursor is not None:
+                                if cursor == request.logical_effect_id:
+                                    raise DispatchDenied(
+                                        "effect relationship graph is cyclic"
+                                    )
+                                if cursor in visited:
+                                    raise StorageIntegrityError(
+                                        "stored effect relationship graph is cyclic"
+                                    )
+                                visited.add(cursor)
+                                edge = connection.execute(
+                                    "SELECT predecessor_logical_effect_id FROM "
+                                    "effect_relationships WHERE repository_id = ? "
+                                    "AND logical_effect_id = ?",
+                                    (request.repository_id, cursor),
+                                ).fetchone()
+                                cursor = (
+                                    None if edge is None else str(
+                                        edge["predecessor_logical_effect_id"]
+                                    )
+                                )
+                            self._require_effective_authority(
+                                connection,
+                                self._classification_authority.issuer_fingerprint,
+                                "EFFECT_RELATIONSHIP",
+                                relationship_capability.grant_id,
+                                "DEFINE_EFFECT_RELATIONSHIP",
+                                relationship_capability.scope_digest,
+                            )
+                            relationship_receipt = self._consume_synthetic_source(
+                                connection, relationship_capability,
+                                self._classification_authority,
+                                recorded_at=self._store_utc_now(connection),
+                                expected_consumer_kind=(
+                                    SyntheticSourceConsumerKind.EFFECT_RELATIONSHIP
+                                ),
+                            )
+                elif relationship_capability is not None:
+                    raise DispatchDenied(
+                        "legacy plan cannot consume relationship authority"
+                    )
                 self._require_new_writer_epoch(
                     connection, request.repository_id, writer_epoch
                 )
@@ -9880,6 +11849,14 @@ class SQLiteStateStore:
                     "failure_policy_version": SYNTHETIC_FAILURE_POLICY_VERSION,
                     "accepted_plan_semantic_digest": accepted_plan_semantic_digest,
                     "complete_policy_digest": complete_policy_digest,
+                    "relationship_source_use_event_id": (
+                        None if relationship_receipt is None
+                        else relationship_receipt.source_event_id
+                    ),
+                    "relationship_source_use_event_hash": (
+                        None if relationship_receipt is None
+                        else relationship_receipt.event_hash
+                    ),
                     "event_kind": "PLAN_ACCEPTED",
                     "lifecycle_from": None,
                     "lifecycle_to": LifecycleState.PLANNED.value,
@@ -9935,6 +11912,49 @@ class SQLiteStateStore:
                         event_hash, body_json,
                     ),
                 )
+                if has_canonical_descriptor and definition is None:
+                    connection.execute(
+                        "INSERT INTO effect_definitions VALUES ("
+                        + ", ".join("?" for _ in range(12)) + ")",
+                        (
+                            request.repository_id, request.logical_effect_id,
+                            self.effect_key(
+                                request.repository_id,
+                                request.logical_effect_id,
+                            ),
+                            request.effect_descriptor_digest, "CANONICAL",
+                            canonical_material_digest, request.effect_action,
+                            request.effect_target,
+                            json.dumps(
+                                [
+                                    list(item)
+                                    for item in request.effect_semantic_inputs
+                                ],
+                                separators=(",", ":"),
+                            ),
+                            request.target_generation, request.plan_id,
+                            event_hash,
+                        ),
+                    )
+                    if request.relationship_kind is not None:
+                        assert relationship_receipt is not None
+                        connection.execute(
+                            "INSERT INTO effect_relationships VALUES ("
+                            + ", ".join("?" for _ in range(10)) + ")",
+                            (
+                                request.repository_id,
+                                request.logical_effect_id,
+                                request.predecessor_logical_effect_id,
+                                request.relationship_kind.value,
+                                self.effect_relationship_key(request),
+                                request.relationship_grant_id,
+                                relationship_receipt.source_event_id,
+                                self.effect_relationship_binding_digest(
+                                    request
+                                ),
+                                request.plan_id, event_hash,
+                            ),
+                        )
                 connection.executemany(
                     "INSERT INTO validation_requirements VALUES (?, ?)",
                     ((request.plan_id, check_id) for check_id in sorted(request.check_ids)),
@@ -16354,7 +18374,8 @@ class SQLiteStateStore:
                     "effect_descriptor_digest, permission_scope_digest, "
                     "budget_policy_digest, aggregate_gate_ids_json, "
                     "gate_set_digest, finalization_policy_id, "
-                    "finalization_policy_version, finalization_issuer_fingerprint "
+                    "finalization_policy_version, finalization_issuer_fingerprint, "
+                    "body_json "
                     "FROM validation_plans WHERE repository_id = ? AND run_id = ?",
                     (request.repository_id, request.run_id),
                 ).fetchall()
@@ -16513,6 +18534,74 @@ class SQLiteStateStore:
                 ).fetchone():
                     raise DispatchDenied("repository has an active dispatch fence")
 
+                plan_body = json.loads(str(plan["body_json"]))
+                if plan_body.get("effect_action") is not None:
+                    definition = connection.execute(
+                        "SELECT * FROM effect_definitions WHERE repository_id = ? "
+                        "AND logical_effect_id = ?",
+                        (request.repository_id, request.logical_effect_id),
+                    ).fetchone()
+                    canonical_descriptor = self.canonical_effect_descriptor_digest(
+                        str(plan_body["effect_action"]),
+                        str(plan_body["effect_target"]),
+                        tuple(
+                            tuple(item)
+                            for item in plan_body["effect_semantic_inputs"]
+                        ),
+                        int(plan_body["target_generation"]),
+                    )
+                    if (
+                        definition is None
+                        or definition["definition_kind"] != "CANONICAL"
+                        or definition["descriptor_digest"]
+                        != canonical_descriptor
+                        or request.effect_descriptor_digest
+                        != canonical_descriptor
+                    ):
+                        raise DispatchDenied(
+                            "effect identity graph is incomplete or changed"
+                        )
+                    relationship_kind = plan_body.get("relationship_kind")
+                    relationship = connection.execute(
+                        "SELECT * FROM effect_relationships WHERE "
+                        "repository_id = ? AND logical_effect_id = ?",
+                        (request.repository_id, request.logical_effect_id),
+                    ).fetchone()
+                    if relationship_kind is None:
+                        if relationship is not None:
+                            raise StorageIntegrityError(
+                                "effect relationship projection lost its plan binding"
+                            )
+                    elif (
+                        relationship is None
+                        or relationship["relationship_kind"]
+                        != relationship_kind
+                        or relationship["predecessor_logical_effect_id"]
+                        != plan_body["predecessor_logical_effect_id"]
+                        or relationship["grant_id"]
+                        != plan_body["relationship_grant_id"]
+                    ):
+                        raise DispatchDenied(
+                            "effect relationship graph is incomplete or changed"
+                        )
+                    self._validate_effect_relationship_graph(
+                        connection,
+                        repository_id=request.repository_id,
+                        logical_effect_id=request.logical_effect_id,
+                        descriptor_digest=canonical_descriptor,
+                        relationship_kind=(
+                            None
+                            if relationship_kind is None
+                            else EffectRelationshipKind(relationship_kind)
+                        ),
+                        predecessor_logical_effect_id=(
+                            None
+                            if relationship is None
+                            else str(relationship["predecessor_logical_effect_id"])
+                        ),
+                        require_settled_predecessor=True,
+                    )
+
                 effect_key = self.effect_key(
                     request.repository_id, request.logical_effect_id
                 )
@@ -16604,6 +18693,19 @@ class SQLiteStateStore:
                             request.effect_descriptor_digest,
                         ),
                     )
+                    connection.execute(
+                        "INSERT OR IGNORE INTO effect_definitions ("
+                        "repository_id, logical_effect_id, effect_key, "
+                        "descriptor_digest, definition_kind, defining_plan_id, "
+                        "defining_event_hash) VALUES (?, ?, ?, ?, "
+                        "'LEGACY_OPAQUE', ?, ?)",
+                        (
+                            request.repository_id,
+                            request.logical_effect_id, effect_key,
+                            request.effect_descriptor_digest,
+                            plan["plan_id"], event_hash,
+                        ),
+                    )
                 connection.execute(
                     "INSERT INTO permission_uses VALUES (?, ?, ?, ?)",
                     (
@@ -16649,17 +18751,29 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                connection.execute(
+                    "INSERT OR REPLACE INTO operation_origins VALUES ("
+                    "?, ?, ?, 'EXECUTION_INTENT', ?, ?, ?, ?, ?, NULL, NULL, NULL)",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.attempt_id,
+                        request.event_id, event_hash, request.run_id,
+                        request.attempt_id,
+                    ),
+                )
                 if recovered_nonexecution:
                     assert isinstance(request, ProvenNonexecutionIntentRequest)
                     assert recovery_authorization is not None
                     if connection.execute(
                         "UPDATE outstanding_slot SET attempt_id = ?, "
-                        "generation = ? WHERE repository_id = ? AND run_id = ? "
+                        "generation = ?, origin_kind = 'EXECUTION_INTENT', "
+                        "origin_id = ? WHERE repository_id = ? AND run_id = ? "
                         "AND logical_effect_id = ? AND attempt_id = ? AND "
                         "generation = ?",
                         (
                             request.attempt_id,
                             request.expected_target_generation,
+                            request.attempt_id,
                             request.repository_id, request.run_id,
                             request.logical_effect_id,
                             request.prior_attempt_id,
@@ -16691,11 +18805,15 @@ class SQLiteStateStore:
                         )
                 else:
                     connection.execute(
-                        "INSERT INTO outstanding_slot VALUES (1, ?, ?, ?, ?, 1)",
+                        "INSERT INTO outstanding_slot (singleton, repository_id, "
+                        "run_id, logical_effect_id, attempt_id, generation, "
+                        "origin_kind, origin_id) VALUES (1, ?, ?, ?, ?, 1, "
+                        "'EXECUTION_INTENT', ?)",
                         (
                             request.repository_id,
                             request.run_id,
                             request.logical_effect_id,
+                            request.attempt_id,
                             request.attempt_id,
                         ),
                     )
@@ -17649,6 +19767,25 @@ class SQLiteStateStore:
         sequence_limit: int | None = None,
     ) -> tuple[int, str | None]:
         """Return the immutable slot generation bound by one exact intent."""
+        adoption = connection.execute(
+            "SELECT adoption.slot_generation, event.sequence FROM "
+            "effect_adoptions AS adoption JOIN events AS event ON "
+            "event.event_id = adoption.event_id WHERE "
+            "adoption.repository_id = ? AND adoption.run_id = ? AND "
+            "adoption.item_id = ? AND adoption.logical_effect_id = ? AND "
+            "adoption.slot_attempt_id = ?",
+            (
+                repository_id, run_id, item_id, logical_effect_id, attempt_id,
+            ),
+        ).fetchone()
+        if adoption is not None:
+            if sequence_limit is not None and int(adoption["sequence"]) >= (
+                sequence_limit
+            ):
+                raise StorageIntegrityError(
+                    "adoption origin does not precede the requested boundary"
+                )
+            return int(adoption["slot_generation"]), None
         sequence_clause = (
             "" if sequence_limit is None else " AND event.sequence < ?"
         )
@@ -19327,9 +21464,21 @@ class SQLiteStateStore:
                     "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, head_hash = ? WHERE run_id = ?",
                     (resulting_state.value, sequence, event_hash, request.run_id),
                 )
+                dependent_head = None
+                if body["event_kind"] == "LATE_RECEIPT_RECORDED":
+                    dependent_head = self._fence_dependent_adoptions(
+                        connection,
+                        repository_id=request.repository_id,
+                        source_run_id=request.run_id,
+                        originating_event_id=request.event_id,
+                        originating_event_hash=event_hash,
+                        writer_epoch_floor=writer_epoch,
+                        correction_owner_id=request.observation_id,
+                        provenance_kind="CONTRARY_RECEIPT",
+                    )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
-                    (event_hash, request.repository_id),
+                    (dependent_head or event_hash, request.repository_id),
                 )
                 if failure_hook is not None:
                     failure_hook("after_observation_writes_before_commit")
@@ -19779,7 +21928,9 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "unattempted validation check does not accept recovery"
                         )
-                    if run["continuation_cursor"] is not None:
+                    if run["continuation_cursor"] not in {
+                        None, LifecycleState.VALIDATING.value,
+                    }:
                         raise DispatchDenied(
                             "another validation recovery is pending"
                         )
@@ -19833,34 +21984,61 @@ class SQLiteStateStore:
                     "SELECT * FROM effect_observations WHERE observation_id = ?",
                     (request.parent_observation_id,),
                 ).fetchone()
-                if observation is None or (
-                    observation["repository_id"],
-                    observation["run_id"],
-                    observation["item_id"],
-                    observation["logical_effect_id"],
-                    observation["attempt_id"],
-                    observation["event_hash"],
-                ) != (
-                    request.repository_id,
-                    request.run_id,
-                    request.item_id,
-                    request.logical_effect_id,
-                    request.parent_attempt_id,
-                    request.parent_event_hash,
-                ):
+                adoption_origin = connection.execute(
+                    "SELECT * FROM effect_adoptions WHERE repository_id = ? "
+                    "AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if adoption_origin is None:
+                    observation_binding = (
+                        request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.parent_attempt_id, request.parent_event_hash,
+                    )
+                    actual_observation_binding = (
+                        None if observation is None else observation["repository_id"],
+                        None if observation is None else observation["run_id"],
+                        None if observation is None else observation["item_id"],
+                        None if observation is None else observation["logical_effect_id"],
+                        None if observation is None else observation["attempt_id"],
+                        None if observation is None else observation["event_hash"],
+                    )
+                else:
+                    observation_binding = (
+                        request.repository_id, adoption_origin["root_run_id"],
+                        request.logical_effect_id,
+                        adoption_origin["root_observation_id"],
+                        adoption_origin["root_observation_event_hash"],
+                        adoption_origin["slot_attempt_id"],
+                    )
+                    actual_observation_binding = (
+                        None if observation is None else observation["repository_id"],
+                        None if observation is None else observation["run_id"],
+                        None if observation is None else observation["logical_effect_id"],
+                        request.parent_observation_id,
+                        None if observation is None else observation["event_hash"],
+                        request.parent_attempt_id,
+                    )
+                if actual_observation_binding != observation_binding:
                     raise DispatchDenied(
                         "validator intent does not bind the parent observation"
                     )
-                parent_slot_generation, parent_recovery_authorization_id = (
-                    self._operation_attempt_generation(
-                        connection,
-                        request.repository_id,
-                        request.run_id,
-                        request.item_id,
-                        request.logical_effect_id,
-                        request.parent_attempt_id,
+                if adoption_origin is None:
+                    parent_slot_generation, parent_recovery_authorization_id = (
+                        self._operation_attempt_generation(
+                            connection,
+                            request.repository_id,
+                            request.run_id,
+                            request.item_id,
+                            request.logical_effect_id,
+                            request.parent_attempt_id,
+                        )
                     )
-                )
+                else:
+                    parent_slot_generation = int(
+                        adoption_origin["slot_generation"]
+                    )
+                    parent_recovery_authorization_id = None
                 try:
                     parent_observation_body = json.loads(
                         observation["body_json"]
@@ -19869,7 +22047,7 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "validator parent observation body is invalid"
                     ) from error
-                if (
+                if adoption_origin is None and (
                     parent_observation_body.get("slot_attempt_id")
                     != request.parent_attempt_id
                     or parent_observation_body.get("slot_generation")
@@ -19879,12 +22057,18 @@ class SQLiteStateStore:
                         "validator intent parent observation lost its slot binding"
                     )
                 latest_observation = connection.execute(
-                    "SELECT event_hash FROM effect_observations WHERE run_id = ? ORDER BY rowid DESC LIMIT 1",
-                    (request.run_id,),
+                    "SELECT event_hash FROM effect_observations WHERE run_id = ? "
+                    "ORDER BY rowid DESC LIMIT 1",
+                    (
+                        request.run_id
+                        if adoption_origin is None
+                        else adoption_origin["root_run_id"],
+                    ),
                 ).fetchone()
                 if (
                     latest_observation is None
-                    or latest_observation["event_hash"] != request.parent_event_hash
+                    or latest_observation["event_hash"]
+                    != request.parent_event_hash
                 ):
                     raise DispatchDenied(
                         "validator intent parent observation is not current"
@@ -20702,6 +22886,15 @@ class SQLiteStateStore:
                 )
                 accounting_closed = False
                 if classification_value is FailureClassification.FINAL:
+                    adoption_origin = connection.execute(
+                        "SELECT 1 FROM effect_adoptions WHERE "
+                        "repository_id = ? AND run_id = ? AND "
+                        "slot_attempt_id = ?",
+                        (
+                            request.repository_id, request.run_id,
+                            observation["operation_attempt_id"],
+                        ),
+                    ).fetchone()
                     accounting_closed = self._accounting_closure_error(
                         connection,
                         request.repository_id,
@@ -20713,6 +22906,9 @@ class SQLiteStateStore:
                         ),
                         settling_validator_observation_id=str(
                             observation["observation_id"]
+                        ),
+                        operation_observation_optional=(
+                            adoption_origin is not None
                         ),
                     ) is None
                 (
@@ -21567,6 +23763,16 @@ class SQLiteStateStore:
                     )
                 slot_released = False
                 if all_checks_settled:
+                    operation_origin = connection.execute(
+                        "SELECT origin_kind FROM operation_origins WHERE "
+                        "repository_id = ? AND run_id = ?",
+                        (request.repository_id, request.run_id),
+                    ).fetchone()
+                    adoption_origin = (
+                        operation_origin is not None
+                        and operation_origin["origin_kind"]
+                        == OperationOriginKind.EFFECT_ADOPTION.value
+                    )
                     closure_error = self._accounting_closure_error(
                         connection, request.repository_id, request.run_id,
                         str(slot["logical_effect_id"]), str(slot["attempt_id"]),
@@ -21584,6 +23790,7 @@ class SQLiteStateStore:
                             None if cessation is None
                             else str(cessation["cessation_id"])
                         ),
+                        operation_observation_optional=adoption_origin,
                     )
                     if closure_error is None:
                         slot_released = True
@@ -21846,6 +24053,33 @@ class SQLiteStateStore:
     ) -> sqlite3.Row | None:
         if request.governed_boundary_kind == "NO_ACTION":
             return None
+        if request.governed_boundary_kind == "SOURCE_USE":
+            row = connection.execute(
+                "SELECT event_kind, event_hash, repository_id, sequence, "
+                "recorded_at, "
+                "body_json, source_event_id AS event_id FROM "
+                "synthetic_authority_source_events WHERE source_event_id = ?",
+                (request.governed_event_id,),
+            ).fetchone()
+            if (
+                row is None
+                or row["event_hash"] != request.governed_event_hash
+                or row["repository_id"] != request.repository_id
+                or row["event_kind"] != "SYNTHETIC_AUTHORITY_SOURCE_USED"
+            ):
+                raise DispatchDenied(
+                    "source authority governed use is unavailable"
+                )
+            body = json.loads(str(row["body_json"]))
+            if (
+                body.get("grant_id") != request.grant_id
+                or body.get("logical_effect_id")
+                != request.logical_effect_id
+            ):
+                raise DispatchDenied(
+                    "source authority governed use changed binding"
+                )
+            return row
         row = connection.execute(
             "SELECT event_kind, event_hash, repository_id, run_id, item_id, sequence, "
             "body_json FROM events WHERE event_id = ?",
@@ -21882,6 +24116,18 @@ class SQLiteStateStore:
                 "redemption.action FROM operator_redemptions AS redemption "
                 "JOIN command_outcomes AS outcome ON outcome.command_id = "
                 "redemption.command_id WHERE outcome.event_id = ?",
+                (governed_event_id,),
+            ).fetchone()
+            return None if row is None else (
+                str(row["grant_id"]), str(row["scope_digest"]),
+                str(row["action"]),
+            )
+        if grant_kind in {"ADOPTION", "EFFECT_RELATIONSHIP"}:
+            row = connection.execute(
+                "SELECT use.grant_id, grant.scope_digest, grant.action FROM "
+                "synthetic_authority_uses AS use JOIN "
+                "synthetic_authority_grants AS grant ON grant.grant_id = "
+                "use.grant_id WHERE use.source_event_id = ?",
                 (governed_event_id,),
             ).fetchone()
             return None if row is None else (
@@ -22245,7 +24491,58 @@ class SQLiteStateStore:
                 ).fetchone()
                 if plan is None or plan["logical_effect_id"] != request.logical_effect_id:
                     raise DispatchDenied("authority fact does not bind the accepted plan")
+                source_grant_kind = request.grant_kind in {
+                    "ADOPTION", "EFFECT_RELATIONSHIP",
+                }
+                source_grant = None
+                if source_grant_kind:
+                    source_grant = connection.execute(
+                        "SELECT * FROM synthetic_authority_grants WHERE "
+                        "repository_id = ? AND grant_id = ?",
+                        (request.repository_id, request.grant_id),
+                    ).fetchone()
+                    expected_kind = {
+                        "ADOPTION": SyntheticGrantKind.ADOPTION.value,
+                        "EFFECT_RELATIONSHIP": (
+                            SyntheticGrantKind.EFFECT_RELATIONSHIP.value
+                        ),
+                    }[request.grant_kind]
+                    if source_grant is None or (
+                        source_grant["grant_kind"], source_grant["action"],
+                        source_grant["logical_effect_id"],
+                        source_grant["scope_digest"],
+                        source_grant["issuer_fingerprint"],
+                    ) != (
+                        expected_kind, request.action,
+                        request.logical_effect_id, request.scope_digest,
+                        authority.issuer_fingerprint,
+                    ):
+                        raise DispatchDenied(
+                            "source authority lifecycle grant binding mismatch"
+                        )
+                    source_recorded_at = self._store_utc_now(connection)
+                    recorded_at = self._parse_source_utc(
+                        source_recorded_at, field="source_recorded_at_utc"
+                    )
+                    effective_at = self._parse_source_utc(
+                        str(request.effective_at_utc), field="effective_at_utc"
+                    )
                 boundary = self._verify_authority_boundary(connection, request)
+                if source_grant_kind and boundary is not None:
+                    boundary_time = self._parse_source_utc(
+                        str(boundary["recorded_at"]),
+                        field="governed_recorded_at",
+                    )
+                    ordered = {
+                        GovernedOrder.BEFORE: effective_at < boundary_time,
+                        GovernedOrder.DURING: effective_at == boundary_time,
+                        GovernedOrder.AFTER: effective_at > boundary_time,
+                        GovernedOrder.UNKNOWN: True,
+                    }[request.governed_order]
+                    if not ordered:
+                        raise DispatchDenied(
+                            "source authority effective time contradicts governed order"
+                        )
                 key = (
                     authority.issuer_fingerprint, request.grant_kind,
                     request.grant_id, request.action, request.scope_digest,
@@ -22379,6 +24676,34 @@ class SQLiteStateStore:
                 self._require_new_writer_epoch(
                     connection, request.repository_id, writer_epoch
                 )
+                source_lifecycle_event_id: str | None = None
+                source_lifecycle_event_hash: str | None = None
+                source_lifecycle_body_json: str | None = None
+                if source_grant_kind:
+                    assert request.effective_at_utc is not None
+                    source_lifecycle_event_id = (
+                        f"source-authority-fact:{request.fact_id}"
+                    )
+                    source_fields = request_payload | {
+                        "source_recorded_at_utc": source_recorded_at,
+                        "issuer_fingerprint": authority.issuer_fingerprint,
+                        "issuer_mac": evidence.issuer_mac,
+                        "proof_id": evidence.proof_id,
+                        "proof_digest": evidence.request_digest,
+                    }
+                    (
+                        _source_sequence,
+                        source_lifecycle_event_hash,
+                        source_lifecycle_body_json,
+                    ) = self._append_source_event(
+                        connection,
+                        source_event_id=source_lifecycle_event_id,
+                        repository_id=request.repository_id,
+                        event_kind="SYNTHETIC_AUTHORITY_LIFECYCLE_RECORDED",
+                        recorded_at=source_recorded_at,
+                        effective_at=request.effective_at_utc,
+                        event_fields=source_fields,
+                    )
                 body = request_payload | {
                     "event_kind": "AUTHORITY_EVALUATED",
                     "issuer_fingerprint": authority.issuer_fingerprint,
@@ -22388,6 +24713,11 @@ class SQLiteStateStore:
                     "payload_digest": payload_digest,
                     "generation": generation,
                     "fence_id": fence_id,
+                    "source_lifecycle_event_id": source_lifecycle_event_id,
+                    "source_lifecycle_event_hash": source_lifecycle_event_hash,
+                    "source_recorded_at_utc": (
+                        source_recorded_at if source_grant_kind else None
+                    ),
                     "lifecycle_from": current_state.value,
                     "lifecycle_to": resulting_state.value,
                     "previous_event_hash": previous_hash,
@@ -22424,6 +24754,31 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                if source_grant_kind:
+                    assert source_lifecycle_event_id is not None
+                    assert source_lifecycle_event_hash is not None
+                    assert source_lifecycle_body_json is not None
+                    connection.execute(
+                        "INSERT INTO synthetic_authority_lifecycle_facts VALUES ("
+                        + ", ".join("?" for _ in range(20)) + ")",
+                        (
+                            request.fact_id, request.repository_id,
+                            request.grant_kind, request.grant_id,
+                            request.logical_effect_id, request.action,
+                            request.scope_digest, request.fact_kind.value,
+                            request.governed_order.value,
+                            request.governed_event_id,
+                            request.governed_event_hash,
+                            source_recorded_at,
+                            request.effective_at_utc,
+                            request.corrected_fact_id,
+                            request.successor_grant_id,
+                            authority.issuer_fingerprint, evidence.issuer_mac,
+                            source_lifecycle_event_id,
+                            source_lifecycle_event_hash,
+                            source_lifecycle_body_json,
+                        ),
+                    )
                 if effective_status is not None:
                     connection.execute(
                         "INSERT OR REPLACE INTO effective_authority VALUES "
@@ -22441,6 +24796,22 @@ class SQLiteStateStore:
                     connection.execute(
                         "DELETE FROM authority_supersessions WHERE "
                         "originating_fact_id = ?",
+                        (request.corrected_fact_id,),
+                    )
+                    dependent_fence_rows = connection.execute(
+                        "SELECT fence_id FROM dependent_adoption_fences WHERE "
+                        "correction_owner_id = ? AND json_extract(body_json, "
+                        "'$.provenance_kind') = 'AUTHORITY'",
+                        (request.corrected_fact_id,),
+                    ).fetchall()
+                    connection.executemany(
+                        "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                        ((row["fence_id"],) for row in dependent_fence_rows),
+                    )
+                    connection.execute(
+                        "DELETE FROM dependent_adoption_fences WHERE "
+                        "correction_owner_id = ? AND json_extract(body_json, "
+                        "'$.provenance_kind') = 'AUTHORITY'",
                         (request.corrected_fact_id,),
                     )
                     replacement = connection.execute(
@@ -22502,9 +24873,47 @@ class SQLiteStateStore:
                     "head_hash = ? WHERE run_id = ?",
                     (resulting_state.value, sequence, event_hash, request.run_id),
                 )
+                dependent_head = None
+                if (
+                    request.grant_kind in {
+                        "ADOPTION", "EFFECT_RELATIONSHIP", "OPERATION",
+                        "VALIDATOR",
+                    }
+                    and request.fact_kind not in {
+                        AuthorityFactKind.OWN_CONSUMED,
+                        AuthorityFactKind.CORRECTION,
+                    }
+                    and request.governed_order is not GovernedOrder.AFTER
+                ):
+                    source_run_id = request.run_id
+                    if request.grant_kind == "ADOPTION":
+                        if request.governed_boundary_kind != "SOURCE_USE":
+                            raise DispatchDenied(
+                                "adoption authority fact lacks its source use"
+                            )
+                        adopted = connection.execute(
+                            "SELECT run_id FROM effect_adoptions WHERE "
+                            "source_use_event_id = ? AND adoption_grant_id = ?",
+                            (request.governed_event_id, request.grant_id),
+                        ).fetchone()
+                        if adopted is None:
+                            raise DispatchDenied(
+                                "source authority fact lost its adopted operation"
+                            )
+                        source_run_id = str(adopted["run_id"])
+                    dependent_head = self._fence_dependent_adoptions(
+                        connection,
+                        repository_id=request.repository_id,
+                        source_run_id=source_run_id,
+                        originating_event_id=request.event_id,
+                        originating_event_hash=event_hash,
+                        writer_epoch_floor=writer_epoch,
+                        correction_owner_id=request.fact_id,
+                        provenance_kind="AUTHORITY",
+                    )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
-                    (event_hash, request.repository_id),
+                    (dependent_head or event_hash, request.repository_id),
                 )
                 if failure_hook is not None:
                     failure_hook("after_authority_fact_writes_before_commit")
@@ -22517,6 +24926,610 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.fact_id, request.command_id, request.event_id, sequence,
             event_hash, resulting_state, False,
+        )
+
+    @staticmethod
+    def _adoption_receipt(
+        row: sqlite3.Row, *, replayed: bool
+    ) -> EffectAdoptionReceipt:
+        return EffectAdoptionReceipt(
+            str(row["adoption_id"]), str(row["adoption_key"]),
+            str(row["command_id"]), str(row["event_id"]),
+            int(json.loads(row["body_json"])["sequence"]),
+            str(row["event_hash"]),
+            LifecycleState(str(row["resulting_state"])),
+            str(row["slot_attempt_id"]), int(row["slot_generation"]),
+            replayed,
+        )
+
+    def adopt_verified_effect(
+        self,
+        request: EffectAdoptionRequest,
+        readiness: SyntheticAdoptionReadinessEvidence,
+        capability: SyntheticSourceCapability,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[
+            [LifecycleState, LifecycleState], None
+        ] | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> EffectAdoptionReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("effect adoption targets another repository")
+        self._bind_classification_authority(authority)
+        authority.verify_adoption_readiness_evidence(readiness)
+        authority.verify_source_capability(capability)
+        request_payload = {
+            **request.__dict__,
+            "immediate_origin_kind": request.immediate_origin_kind.value,
+            "expected_lifecycle": request.expected_lifecycle.value,
+        }
+        request_digest = self._event_hash(request_payload)
+        readiness_digest = self._event_hash(readiness.__dict__)
+        semantic_key = self.adoption_key(request)
+        expected_binding_digest = self.adoption_binding_digest(request)
+        expected_capability = (
+            SyntheticGrantKind.ADOPTION,
+            "ADOPT_VERIFIED_EFFECT",
+            request.repository_id,
+            request.logical_effect_id,
+            SyntheticSourceConsumerKind.EFFECT_ADOPTION,
+            semantic_key,
+            expected_binding_digest,
+            request.adoption_grant_id,
+            request.adoption_source_id,
+            request.adoption_source_version,
+            request.adoption_terms_digest,
+            request.adoption_scope_digest,
+        )
+        actual_capability = (
+            capability.grant_kind, capability.action,
+            capability.repository_id, capability.logical_effect_id,
+            capability.consumer_kind, capability.consumer_key,
+            capability.binding_digest, capability.grant_id,
+            capability.source_id, capability.source_version,
+            capability.terms_digest, capability.scope_digest,
+        )
+        if actual_capability != expected_capability:
+            raise DispatchDenied(
+                "adoption capability does not bind the exact adoption"
+            )
+        with RepositoryWriterLock(self._database_path.parent), closing(
+            self._connect()
+        ) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM effect_adoptions WHERE adoption_key = ?",
+                    (semantic_key,),
+                ).fetchone()
+                if prior is not None:
+                    if (
+                        prior["request_digest"] != request_digest
+                        or prior["readiness_digest"] != readiness_digest
+                        or prior["adoption_grant_id"] != capability.grant_id
+                    ):
+                        raise StorageIntegrityError(
+                            "effect adoption key was rebound"
+                        )
+                    prior_body = json.loads(prior["body_json"])
+                    source_use = connection.execute(
+                        "SELECT * FROM synthetic_authority_uses WHERE "
+                        "source_event_id = ?",
+                        (prior["source_use_event_id"],),
+                    ).fetchone()
+                    if source_use is None:
+                        raise StorageIntegrityError(
+                            "effect adoption lost its authority use"
+                        )
+                    use_body = json.loads(source_use["body_json"])
+                    supplied = {
+                        "grant_id": capability.grant_id,
+                        "grant_kind": capability.grant_kind.value,
+                        "action": capability.action,
+                        "repository_id": capability.repository_id,
+                        "logical_effect_id": capability.logical_effect_id,
+                        "source_id": capability.source_id,
+                        "source_version": capability.source_version,
+                        "terms_digest": capability.terms_digest,
+                        "scope_digest": capability.scope_digest,
+                        "binding_digest": capability.binding_digest,
+                        "consumer_kind": capability.consumer_kind.value,
+                        "consumer_key": capability.consumer_key,
+                        "issuer_fingerprint": capability.issuer_fingerprint,
+                        "issuer_mac": capability.issuer_mac,
+                    }
+                    if (
+                        any(
+                            use_body.get(field) != value
+                            for field, value in supplied.items()
+                        )
+                        or source_use["event_hash"]
+                        != prior_body.get("source_use_event_hash")
+                    ):
+                        raise DispatchDenied(
+                            "replayed adoption authority is rebound"
+                        )
+                    connection.rollback()
+                    return self._adoption_receipt(prior, replayed=True)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                vector_digest = self._complete_head_vector_digest(run_heads)
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or request.expected_head_vector_digest != vector_digest
+                    or readiness.catalog_head != catalog_head
+                    or readiness.head_vector_digest != vector_digest
+                ):
+                    raise DispatchDenied("adoption freshness binding is stale")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ?",
+                    (request.repository_id, request.run_id, request.plan_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                    plan["effect_descriptor_digest"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                    request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied(
+                        "effect adoption does not bind the accepted plan"
+                    )
+                current_check_ids = tuple(
+                    str(row["check_id"])
+                    for row in connection.execute(
+                        "SELECT check_id FROM validation_requirements WHERE "
+                        "plan_id = ? ORDER BY check_id",
+                        (request.plan_id,),
+                    )
+                )
+                if request.current_check_set_digest != (
+                    self.adoption_check_set_digest(current_check_ids)
+                ):
+                    raise DispatchDenied(
+                        "effect adoption validation check set changed"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if (
+                    current_state is not request.expected_lifecycle
+                    or run["head_hash"] != request.expected_run_head
+                    or run["continuation_cursor"]
+                    != request.expected_continuation_cursor
+                ):
+                    raise DispatchDenied("effect adoption expected state is stale")
+                if authorize_transition is not None:
+                    authorize_transition(
+                        current_state, LifecycleState.VALIDATING
+                    )
+                if current_state is LifecycleState.BLOCKED:
+                    prior_readiness = connection.execute(
+                        "SELECT * FROM readiness_evaluations WHERE run_id = ? "
+                        "AND readiness_id = ?",
+                        (
+                            request.run_id,
+                            request.superseded_readiness_id,
+                        ),
+                    ).fetchone()
+                    prior_body = {} if prior_readiness is None else json.loads(
+                        prior_readiness["body_json"]
+                    )
+                    blocker_set_digest = self._event_hash(
+                        {
+                            "domain": "AEGIS:T28:SUPERSEDED_BLOCKERS:v1",
+                            "blocker_codes": sorted(
+                                prior_body.get("blocker_codes", ())
+                            ),
+                        }
+                    )
+                    if (
+                        run["continuation_cursor"] is not None
+                        or prior_readiness is None
+                        or prior_readiness["event_hash"]
+                        != request.superseded_readiness_event_hash
+                        or prior_readiness["event_hash"] != run["head_hash"]
+                        or set(prior_body.get("blocker_codes", ()))
+                        != {"INPUTS_NOT_READY"}
+                        or blocker_set_digest
+                        != request.superseded_blocker_set_digest
+                    ):
+                        raise DispatchDenied(
+                            "BLOCKED adoption requires only superseded input readiness"
+                        )
+                plan_body = json.loads(plan["body_json"])
+                descriptor_fields = (
+                    plan_body.get("effect_action"),
+                    plan_body.get("effect_target"),
+                    plan_body.get("target_generation"),
+                )
+                if (
+                    not all(value is not None for value in descriptor_fields)
+                    or type(plan_body["target_generation"]) is not int
+                ):
+                    raise DispatchDenied(
+                        "effect adoption requires a canonical effect descriptor"
+                    )
+                semantic_inputs = tuple(
+                    tuple(item)
+                    for item in plan_body.get("effect_semantic_inputs", ())
+                )
+                canonical_descriptor = self.canonical_effect_descriptor_digest(
+                    str(plan_body["effect_action"]),
+                    str(plan_body["effect_target"]), semantic_inputs,
+                    int(plan_body["target_generation"]),
+                )
+                semantic_input_digest = self._event_hash(
+                    {
+                        "domain": "AEGIS:EFFECT_SEMANTIC_INPUTS:v1",
+                        "semantic_inputs": [list(item) for item in semantic_inputs],
+                    }
+                )
+                if (
+                    canonical_descriptor != request.effect_descriptor_digest
+                    or request.target_generation
+                    != int(plan_body["target_generation"])
+                ):
+                    raise DispatchDenied(
+                        "adoption descriptor or target generation changed"
+                    )
+                definition = connection.execute(
+                    "SELECT * FROM effect_definitions WHERE repository_id = ? "
+                    "AND logical_effect_id = ?",
+                    (request.repository_id, request.logical_effect_id),
+                ).fetchone()
+                if (
+                    definition is None
+                    or definition["definition_kind"] != "CANONICAL"
+                    or definition["descriptor_digest"] != canonical_descriptor
+                    or definition["canonical_material_digest"]
+                    != self.canonical_effect_material_digest(
+                        str(plan_body["effect_action"]),
+                        str(plan_body["effect_target"]), semantic_inputs,
+                        int(plan_body["target_generation"]),
+                    )
+                ):
+                    raise DispatchDenied(
+                        "adoption effect identity graph is incomplete or changed"
+                    )
+                expected_readiness = (
+                    request.readiness_evidence_id,
+                    capability.source_id, capability.source_version,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.plan_id, request.revision_digest,
+                    plan["source_tree_digest"],
+                    plan["item_definition_digest"], semantic_input_digest,
+                    True, catalog_head, vector_digest, run["head_hash"],
+                    request_digest, authority.issuer_fingerprint,
+                )
+                actual_readiness = (
+                    readiness.evidence_id, readiness.source_id,
+                    readiness.source_version, readiness.repository_id,
+                    readiness.run_id, readiness.item_id, readiness.plan_id,
+                    readiness.revision_digest, readiness.source_tree_digest,
+                    readiness.item_definition_digest,
+                    readiness.semantic_input_digest,
+                    readiness.prerequisites_met, readiness.catalog_head,
+                    readiness.head_vector_digest, readiness.evidence_head,
+                    readiness.request_digest, readiness.issuer_fingerprint,
+                )
+                if actual_readiness != expected_readiness:
+                    raise DispatchDenied(
+                        "adoption readiness does not bind current accepted inputs"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM outstanding_slot LIMIT 1"
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "effect adoption requires the repository slot to be free"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
+                    "(item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.item_id,
+                        request.logical_effect_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied("effect adoption has an active fence")
+                observation = connection.execute(
+                    "SELECT * FROM effect_observations WHERE repository_id = ? "
+                    "AND run_id = ? AND observation_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.root_run_id,
+                        request.root_observation_id, request.root_attempt_id,
+                    ),
+                ).fetchone()
+                finalization = connection.execute(
+                    "SELECT * FROM operation_finalizations WHERE "
+                    "repository_id = ? AND run_id = ? AND finalization_id = ?",
+                    (
+                        request.repository_id, request.root_run_id,
+                        request.root_finalization_id,
+                    ),
+                ).fetchone()
+                if (
+                    observation is None or finalization is None
+                    or (
+                        observation["logical_effect_id"],
+                        observation["event_hash"],
+                        observation["observation_digest"],
+                    ) != (
+                        request.logical_effect_id,
+                        request.root_observation_event_hash,
+                        request.root_observation_digest,
+                    )
+                    or (
+                        finalization["logical_effect_id"],
+                        finalization["finalization_key"],
+                        finalization["event_hash"],
+                    ) != (
+                        request.logical_effect_id,
+                        request.root_finalization_key,
+                        request.root_finalization_event_hash,
+                    )
+                ):
+                    raise DispatchDenied(
+                        "adoption root is not an exact completed final effect"
+                    )
+                if self._accounting_closure_error(
+                    connection, request.repository_id, request.root_run_id,
+                    request.logical_effect_id, request.root_attempt_id,
+                ) is not None:
+                    raise DispatchDenied(
+                        "adoption root accounting is not fully settled"
+                    )
+                intent = connection.execute(
+                    "SELECT body_json, event_hash FROM events WHERE "
+                    "repository_id = ? AND run_id = ? AND "
+                    "event_kind = 'INTENT_COMMITTED' AND "
+                    "json_extract(body_json, '$.attempt_id') = ?",
+                    (
+                        request.repository_id, request.root_run_id,
+                        request.root_attempt_id,
+                    ),
+                ).fetchone()
+                if intent is None:
+                    raise DispatchDenied("adoption root intent is unavailable")
+                intent_body = json.loads(intent["body_json"])
+                invalid_authority = connection.execute(
+                    "SELECT 1 FROM authority_facts WHERE issuer_fingerprint = ? "
+                    "AND grant_kind = 'OPERATION' AND grant_id = ? AND "
+                    "scope_digest = ? AND governed_order IN ('BEFORE', 'UNKNOWN') "
+                    "AND fact_kind NOT IN ('OWN_CONSUMED', 'CORRECTION') LIMIT 1",
+                    (
+                        authority.issuer_fingerprint,
+                        intent_body["capability_grant_id"],
+                        intent_body["capability_scope_digest"],
+                    ),
+                ).fetchone()
+                if invalid_authority is not None:
+                    raise DispatchDenied(
+                        "original action authority is historically disputed"
+                    )
+                if request.immediate_origin_kind is OperationOriginKind.EXECUTION_INTENT:
+                    if (
+                        request.immediate_origin_id != request.root_attempt_id
+                        or request.immediate_origin_event_hash
+                        != intent["event_hash"]
+                        or request.immediate_finalization_key
+                        != request.root_finalization_key
+                    ):
+                        raise DispatchDenied(
+                            "adoption immediate execution origin is invalid"
+                        )
+                else:
+                    immediate = connection.execute(
+                        "SELECT * FROM effect_adoptions WHERE adoption_id = ?",
+                        (request.immediate_origin_id,),
+                    ).fetchone()
+                    immediate_finalization = connection.execute(
+                        "SELECT finalization_key FROM operation_finalizations "
+                        "WHERE run_id = ?",
+                        (None if immediate is None else immediate["run_id"],),
+                    ).fetchone()
+                    if (
+                        immediate is None or immediate_finalization is None
+                        or immediate["root_run_id"] != request.root_run_id
+                        or immediate["root_observation_id"]
+                        != request.root_observation_id
+                        or immediate["event_hash"]
+                        != request.immediate_origin_event_hash
+                        or immediate_finalization["finalization_key"]
+                        != request.immediate_finalization_key
+                    ):
+                        raise DispatchDenied(
+                            "transitive adoption origin is incomplete or disputed"
+                        )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()[0])
+                recorded_at = self._store_utc_now(connection)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "ADOPTION",
+                    capability.grant_id, "ADOPT_VERIFIED_EFFECT",
+                    capability.scope_digest,
+                )
+                source_receipt = self._consume_synthetic_source(
+                    connection, capability, authority,
+                    recorded_at=recorded_at,
+                    expected_consumer_kind=(
+                        SyntheticSourceConsumerKind.EFFECT_ADOPTION
+                    ),
+                )
+                slot_attempt_id = f"adoption:{semantic_key}"
+                slot_generation = 1
+                body = request_payload | {
+                    "transition_id": "T28",
+                    "event_kind": "EFFECT_ADOPTED",
+                    "adoption_key": semantic_key,
+                    "readiness_digest": readiness_digest,
+                    "readiness_evidence": readiness.__dict__,
+                    "source_capability": {
+                        key: (value.value if isinstance(value, Enum) else value)
+                        for key, value in capability.__dict__.items()
+                    },
+                    "source_use_event_id": source_receipt.source_event_id,
+                    "source_use_event_hash": source_receipt.event_hash,
+                    "request_digest": request_digest,
+                    "slot_attempt_id": slot_attempt_id,
+                    "slot_generation": slot_generation,
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "continuation_cursor": LifecycleState.VALIDATING.value,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'EFFECT_ADOPTED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, run["head_hash"], event_hash, body_json,
+                    ),
+                )
+                values = (
+                    request.adoption_id, semantic_key, request.command_id,
+                    request.event_id, request.repository_id, request.run_id,
+                    request.item_id, request.plan_id, request.revision_digest,
+                    request.logical_effect_id,
+                    request.effect_descriptor_digest,
+                    request.target_generation, request.root_run_id,
+                    request.root_attempt_id, request.root_observation_id,
+                    request.root_observation_event_hash,
+                    request.root_observation_digest,
+                    request.root_finalization_id,
+                    request.root_finalization_key,
+                    request.root_finalization_event_hash,
+                    request.immediate_origin_kind.value,
+                    request.immediate_origin_id,
+                    request.immediate_origin_event_hash,
+                    request.immediate_finalization_key,
+                    request.readiness_evidence_id, readiness_digest,
+                    source_receipt.source_event_id,
+                    request.adoption_grant_id, slot_attempt_id,
+                    slot_generation, request_digest, event_hash,
+                    LifecycleState.VALIDATING.value, body_json,
+                )
+                connection.execute(
+                    "INSERT INTO effect_adoptions VALUES ("
+                    + ", ".join("?" for _ in values) + ")",
+                    values,
+                )
+                connection.execute(
+                    "INSERT INTO operation_origins VALUES (?, ?, ?, "
+                    "'EFFECT_ADOPTION', ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, request.adoption_id,
+                        request.event_id, event_hash, request.root_run_id,
+                        request.root_attempt_id, request.root_observation_id,
+                        request.root_observation_event_hash,
+                        request.root_finalization_key,
+                    ),
+                )
+                immediate_run_id = (
+                    request.root_run_id
+                    if request.immediate_origin_kind
+                    is OperationOriginKind.EXECUTION_INTENT
+                    else str(immediate["run_id"])
+                )
+                ancestor_rows = connection.execute(
+                    "SELECT ancestor_run_id, depth FROM adoption_dependencies "
+                    "WHERE repository_id = ? AND dependent_run_id = ? "
+                    "ORDER BY depth",
+                    (request.repository_id, immediate_run_id),
+                ).fetchall() if (
+                    request.immediate_origin_kind
+                    is OperationOriginKind.EFFECT_ADOPTION
+                ) else ()
+                dependencies = {
+                    immediate_run_id: 1,
+                    **{
+                        str(row["ancestor_run_id"]): int(row["depth"]) + 1
+                        for row in ancestor_rows
+                    },
+                }
+                connection.executemany(
+                    "INSERT INTO adoption_dependencies VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        (
+                            request.repository_id, ancestor_run_id,
+                            request.run_id, depth, request.adoption_id,
+                            request.root_observation_id,
+                        )
+                        for ancestor_run_id, depth in sorted(
+                            dependencies.items(), key=lambda item: item[1]
+                        )
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO outstanding_slot (singleton, repository_id, "
+                    "run_id, logical_effect_id, attempt_id, generation, "
+                    "origin_kind, origin_id) VALUES (1, ?, ?, ?, ?, ?, "
+                    "'EFFECT_ADOPTION', ?)",
+                    (
+                        request.repository_id, request.run_id,
+                        request.logical_effect_id, slot_attempt_id,
+                        slot_generation, request.adoption_id,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, request_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'VALIDATING', "
+                    "continuation_cursor = 'VALIDATING', head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_adoption_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_adoption_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        return EffectAdoptionReceipt(
+            request.adoption_id, semantic_key, request.command_id,
+            request.event_id, sequence, event_hash,
+            LifecycleState.VALIDATING, slot_attempt_id, slot_generation, False,
         )
 
     def _finalize_operation(
@@ -22695,12 +25708,21 @@ class SQLiteStateStore:
                     (request.repository_id, request.run_id),
                 ).fetchone() is not None:
                     raise DispatchDenied("validator activity remains unsettled")
+                adoption_origin = connection.execute(
+                    "SELECT adoption_id FROM effect_adoptions WHERE "
+                    "repository_id = ? AND run_id = ? AND slot_attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id,
+                        request.expected_slot_attempt_id,
+                    ),
+                ).fetchone()
                 accounting_error = self._accounting_closure_error(
                     connection,
                     request.repository_id,
                     request.run_id,
                     request.logical_effect_id,
                     request.expected_slot_attempt_id,
+                    operation_observation_optional=(adoption_origin is not None),
                 )
                 if accounting_error is not None:
                     raise DispatchDenied(accounting_error)
@@ -22791,6 +25813,16 @@ class SQLiteStateStore:
                     "finalization_policy_version": attestation.policy_version,
                     "finalization_issuer_fingerprint": (
                         authority.finalization_issuer_fingerprint
+                    ),
+                    "operation_origin_kind": (
+                        OperationOriginKind.EFFECT_ADOPTION.value
+                        if adoption_origin is not None
+                        else OperationOriginKind.EXECUTION_INTENT.value
+                    ),
+                    "operation_origin_id": (
+                        str(adoption_origin["adoption_id"])
+                        if adoption_origin is not None
+                        else request.expected_slot_attempt_id
                     ),
                 }
                 event_hash = self._event_hash(body)
@@ -22960,10 +25992,469 @@ class SQLiteStateStore:
             replayed=replayed,
         )
 
+    @staticmethod
+    def _parse_source_utc(value: object, *, field: str) -> datetime:
+        if not isinstance(value, str):
+            raise StorageIntegrityError(
+                f"synthetic authority source {field} is invalid"
+            )
+        try:
+            parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+                tzinfo=timezone.utc
+            )
+        except ValueError as error:
+            raise StorageIntegrityError(
+                f"synthetic authority source {field} is invalid"
+            ) from error
+        return parsed
+
+    def _verify_source_history(
+        self,
+        connection: sqlite3.Connection,
+        repository_id: str,
+        expected_head: str,
+    ) -> None:
+        rows = connection.execute(
+            "SELECT * FROM synthetic_authority_source_events WHERE "
+            "repository_id = ? ORDER BY sequence",
+            (repository_id,),
+        ).fetchall()
+        previous_hash = ""
+        expected_sequence = 1
+        recorded_floor: datetime | None = None
+        for row in rows:
+            if int(row["sequence"]) != expected_sequence:
+                raise StorageIntegrityError(
+                    "synthetic authority source sequence is not contiguous"
+                )
+            if row["previous_source_hash"] != previous_hash:
+                raise StorageIntegrityError(
+                    "synthetic authority source predecessor hash mismatch"
+                )
+            try:
+                body = json.loads(row["body_json"])
+            except (TypeError, json.JSONDecodeError) as error:
+                raise StorageIntegrityError(
+                    "synthetic authority source body is invalid"
+                ) from error
+            if not isinstance(body, dict) or self._event_hash(body) != row[
+                "event_hash"
+            ]:
+                raise StorageIntegrityError(
+                    "synthetic authority source body hash mismatch"
+                )
+            bindings = {
+                "event_kind": row["event_kind"],
+                "previous_source_hash": row["previous_source_hash"],
+                "recorded_at": row["recorded_at"],
+                "repository_id": row["repository_id"],
+                "sequence": row["sequence"],
+            }
+            if any(body.get(key) != value for key, value in bindings.items()):
+                raise StorageIntegrityError(
+                    "synthetic authority source binding mismatch"
+                )
+            recorded_at = self._parse_source_utc(
+                row["recorded_at"], field="recorded_at"
+            )
+            if recorded_floor is not None and recorded_at < recorded_floor:
+                raise StorageIntegrityError(
+                    "synthetic authority source clock moves backward"
+                )
+            recorded_floor = recorded_at
+            if row["effective_at"] is not None:
+                self._parse_source_utc(
+                    row["effective_at"], field="effective_at"
+                )
+                if body.get("effective_at") != row["effective_at"]:
+                    raise StorageIntegrityError(
+                        "synthetic authority effective time diverges"
+                    )
+            previous_hash = str(row["event_hash"])
+            expected_sequence += 1
+        state = connection.execute(
+            "SELECT * FROM synthetic_authority_source_state WHERE "
+            "repository_id = ?",
+            (repository_id,),
+        ).fetchone()
+        if (
+            not rows
+            or state is None
+            or previous_hash != expected_head
+            or state["head_hash"] != expected_head
+            or int(state["head_sequence"]) != expected_sequence - 1
+            or recorded_floor is None
+            or self._parse_source_utc(
+                state["recorded_at_floor"], field="recorded_at_floor"
+            )
+            != recorded_floor
+        ):
+            raise StorageIntegrityError(
+                "synthetic authority source head diverges from history"
+            )
+        first = json.loads(rows[0]["body_json"])
+        if (
+            rows[0]["event_kind"]
+            != "SYNTHETIC_AUTHORITY_SOURCE_GENESIS"
+            or first != self._source_genesis_body(
+                repository_id, str(first.get("legacy_catalog_anchor", ""))
+            )
+        ):
+            raise StorageIntegrityError(
+                "synthetic authority source genesis is invalid"
+            )
+        expected_grants: dict[str, tuple[object, ...]] = {}
+        expected_uses: dict[str, tuple[object, ...]] = {}
+        expected_legacy_bindings: dict[str, tuple[object, ...]] = {}
+        expected_lifecycle_facts: dict[str, tuple[object, ...]] = {}
+        source_grants: dict[str, SyntheticSourceGrant] = {}
+        source_use_counts: dict[str, int] = {}
+        source_lifecycle: dict[str, AuthorityLifecycleFactRequest] = {}
+        for row in rows[1:]:
+            body = json.loads(row["body_json"])
+            try:
+                if row["event_kind"] == "SYNTHETIC_AUTHORITY_GRANT_REGISTERED":
+                    grant = SyntheticSourceGrant(
+                        grant_id=body["grant_id"],
+                        grant_kind=SyntheticGrantKind(body["grant_kind"]),
+                        action=body["action"],
+                        repository_id=body["repository_id"],
+                        logical_effect_id=body["logical_effect_id"],
+                        source_id=body["source_id"],
+                        source_version=body["source_version"],
+                        terms_digest=body["terms_digest"],
+                        scope_digest=body["scope_digest"],
+                        binding_digest=body["binding_digest"],
+                        not_before=body["not_before"],
+                        expires_at=body["expires_at"],
+                        use_limit=body["use_limit"],
+                        issuer_fingerprint=body["issuer_fingerprint"],
+                        issuer_mac=body["issuer_mac"],
+                    )
+                    if self._classification_authority is not None:
+                        self._classification_authority.verify_source_grant(grant)
+                    if grant.grant_id in source_grants:
+                        raise ValueError("synthetic source grant ID was rebound")
+                    source_grants[grant.grant_id] = grant
+                    expected_grants[grant.grant_id] = (
+                        grant.grant_kind.value, grant.action,
+                        grant.repository_id, grant.logical_effect_id,
+                        grant.source_id, grant.source_version,
+                        grant.terms_digest, grant.scope_digest,
+                        grant.binding_digest, grant.not_before,
+                        grant.expires_at, grant.use_limit,
+                        grant.issuer_fingerprint, grant.issuer_mac,
+                        row["source_event_id"], row["event_hash"],
+                        row["body_json"],
+                    )
+                elif row["event_kind"] == "SYNTHETIC_AUTHORITY_SOURCE_USED":
+                    capability = SyntheticSourceCapability(
+                        grant_id=body["grant_id"],
+                        grant_kind=SyntheticGrantKind(body["grant_kind"]),
+                        action=body["action"],
+                        repository_id=body["repository_id"],
+                        logical_effect_id=body["logical_effect_id"],
+                        source_id=body["source_id"],
+                        source_version=body["source_version"],
+                        terms_digest=body["terms_digest"],
+                        scope_digest=body["scope_digest"],
+                        binding_digest=body["binding_digest"],
+                        consumer_kind=SyntheticSourceConsumerKind(
+                            body["consumer_kind"]
+                        ),
+                        consumer_key=body["consumer_key"],
+                        issuer_fingerprint=body["issuer_fingerprint"],
+                        issuer_mac=body["issuer_mac"],
+                    )
+                    if self._classification_authority is not None:
+                        self._classification_authority.verify_source_capability(
+                            capability
+                        )
+                    grant = source_grants.get(capability.grant_id)
+                    if grant is None:
+                        raise ValueError(
+                            "synthetic source use precedes its grant"
+                        )
+                    if (
+                        capability.grant_kind is not grant.grant_kind
+                        or capability.action != grant.action
+                        or capability.repository_id != grant.repository_id
+                        or capability.logical_effect_id
+                        != grant.logical_effect_id
+                        or capability.source_id != grant.source_id
+                        or capability.source_version != grant.source_version
+                        or capability.terms_digest != grant.terms_digest
+                        or capability.scope_digest != grant.scope_digest
+                        or capability.binding_digest != grant.binding_digest
+                        or capability.issuer_fingerprint
+                        != grant.issuer_fingerprint
+                    ):
+                        raise ValueError(
+                            "synthetic source use diverges from its grant"
+                        )
+                    use_time = self._parse_source_utc(
+                        row["recorded_at"], field="use_recorded_at"
+                    )
+                    if not (
+                        self._parse_source_utc(
+                            grant.not_before, field="not_before"
+                        )
+                        <= use_time
+                        < self._parse_source_utc(
+                            grant.expires_at, field="expires_at"
+                        )
+                    ):
+                        raise ValueError(
+                            "synthetic source use occurred outside its grant window"
+                        )
+                    use_count = source_use_counts.get(grant.grant_id, 0) + 1
+                    if use_count > grant.use_limit:
+                        raise ValueError(
+                            "synthetic source grant use limit was exceeded"
+                        )
+                    source_use_counts[grant.grant_id] = use_count
+                    effective_corrections = {
+                        fact.corrected_fact_id
+                        for fact in source_lifecycle.values()
+                        if fact.fact_kind is AuthorityFactKind.CORRECTION
+                        and self._parse_source_utc(
+                            fact.effective_at_utc, field="effective_at"
+                        ) <= use_time
+                    }
+                    for fact_id, fact in source_lifecycle.items():
+                        if (
+                            fact_id in effective_corrections
+                            or fact.fact_kind is AuthorityFactKind.CORRECTION
+                            or fact.grant_id != grant.grant_id
+                            or fact.action != grant.action
+                            or fact.scope_digest != grant.scope_digest
+                            or self._parse_source_utc(
+                                fact.effective_at_utc, field="effective_at"
+                            ) > use_time
+                        ):
+                            continue
+                        raise ValueError(
+                            "synthetic source grant was not effective at use"
+                        )
+                    if (
+                        row["consumer_kind"] != capability.consumer_kind.value
+                        or row["consumer_key"] != capability.consumer_key
+                        or body["source_event_id"] != row["source_event_id"]
+                    ):
+                        raise ValueError("synthetic source use binding is invalid")
+                    expected_uses[str(row["source_event_id"])] = (
+                        capability.grant_id, capability.repository_id,
+                        capability.consumer_kind.value,
+                        capability.consumer_key, capability.binding_digest,
+                        row["recorded_at"], row["event_hash"],
+                        row["body_json"],
+                    )
+                elif row["event_kind"] == "SYNTHETIC_LEGACY_DESCRIPTOR_BOUND":
+                    evidence = SyntheticLegacyDescriptorBindingEvidence(
+                        evidence_id=body["evidence_id"],
+                        repository_id=body["repository_id"],
+                        logical_effect_id=body["logical_effect_id"],
+                        legacy_descriptor_digest=body[
+                            "legacy_descriptor_digest"
+                        ],
+                        canonical_descriptor_digest=body[
+                            "canonical_descriptor_digest"
+                        ],
+                        canonical_material_digest=body[
+                            "canonical_material_digest"
+                        ],
+                        source_event_id=body["source_event_id"],
+                        source_event_hash=body["source_event_hash"],
+                        issuer_fingerprint=body["issuer_fingerprint"],
+                        issuer_mac=body["issuer_mac"],
+                    )
+                    if self._classification_authority is not None:
+                        self._classification_authority.verify_legacy_descriptor_binding_evidence(
+                            evidence
+                        )
+                    canonical_descriptor = self.canonical_effect_descriptor_digest(
+                        body["action"], body["target"],
+                        tuple(tuple(item) for item in body["semantic_inputs"]),
+                        body["target_generation"],
+                    )
+                    canonical_material = self.canonical_effect_material_digest(
+                        body["action"], body["target"],
+                        tuple(tuple(item) for item in body["semantic_inputs"]),
+                        body["target_generation"],
+                    )
+                    if (
+                        evidence.canonical_descriptor_digest
+                        != canonical_descriptor
+                        or evidence.canonical_material_digest
+                        != canonical_material
+                    ):
+                        raise ValueError(
+                            "legacy descriptor canonical material changed"
+                        )
+                    expected_legacy_bindings[evidence.logical_effect_id] = (
+                        evidence.evidence_id,
+                        evidence.legacy_descriptor_digest,
+                        evidence.canonical_descriptor_digest,
+                        evidence.canonical_material_digest,
+                        evidence.source_event_id, evidence.source_event_hash,
+                        evidence.issuer_fingerprint, evidence.issuer_mac,
+                        row["source_event_id"], row["event_hash"],
+                        row["body_json"],
+                    )
+                elif row["event_kind"] == (
+                    "SYNTHETIC_AUTHORITY_LIFECYCLE_RECORDED"
+                ):
+                    request_values = {
+                        key: body[key]
+                        for key in AuthorityLifecycleFactRequest.__dataclass_fields__
+                    }
+                    request_values["fact_kind"] = AuthorityFactKind(
+                        body["fact_kind"]
+                    )
+                    request_values["governed_order"] = GovernedOrder(
+                        body["governed_order"]
+                    )
+                    request = AuthorityLifecycleFactRequest(**request_values)
+                    evidence = SyntheticAuthorityLifecycleEvidence(
+                        body["proof_id"], body["proof_digest"],
+                        body["issuer_fingerprint"], body["issuer_mac"],
+                    )
+                    if self._classification_authority is not None:
+                        self._classification_authority.verify_authority_lifecycle_evidence(
+                            evidence, request
+                        )
+                        self._classification_authority.verify_authority_fact_binding(
+                            request
+                        )
+                    if (
+                        row["recorded_at"] != body["source_recorded_at_utc"]
+                        or row["effective_at"] != request.effective_at_utc
+                    ):
+                        raise ValueError(
+                            "source lifecycle time binding is invalid"
+                        )
+                    grant = source_grants.get(request.grant_id)
+                    if grant is None or (
+                        request.grant_kind != grant.grant_kind.value
+                        or request.repository_id != grant.repository_id
+                        or request.logical_effect_id != grant.logical_effect_id
+                        or request.action != grant.action
+                        or request.scope_digest != grant.scope_digest
+                        or evidence.issuer_fingerprint
+                        != grant.issuer_fingerprint
+                    ):
+                        raise ValueError(
+                            "source lifecycle fact diverges from its grant"
+                        )
+                    if request.fact_id in source_lifecycle:
+                        raise ValueError("source lifecycle fact ID was rebound")
+                    if (
+                        request.fact_kind is AuthorityFactKind.CORRECTION
+                        and request.corrected_fact_id not in source_lifecycle
+                    ):
+                        raise ValueError(
+                            "source lifecycle correction precedes its fact"
+                        )
+                    source_lifecycle[request.fact_id] = request
+                    expected_lifecycle_facts[request.fact_id] = (
+                        request.grant_kind, request.grant_id,
+                        request.logical_effect_id, request.action,
+                        request.scope_digest, request.fact_kind.value,
+                        request.governed_order.value,
+                        request.governed_event_id,
+                        request.governed_event_hash,
+                        body["source_recorded_at_utc"], request.effective_at_utc,
+                        request.corrected_fact_id,
+                        request.successor_grant_id,
+                        evidence.issuer_fingerprint, evidence.issuer_mac,
+                        row["source_event_id"], row["event_hash"],
+                        row["body_json"],
+                    )
+                else:
+                    raise ValueError("synthetic source event kind is unsupported")
+            except (DispatchDenied, KeyError, TypeError, ValueError) as error:
+                raise StorageIntegrityError(
+                    "synthetic authority source projection is invalid"
+                ) from error
+        actual_grants = {
+            str(row["grant_id"]): (
+                row["grant_kind"], row["action"], row["repository_id"],
+                row["logical_effect_id"], row["source_id"],
+                row["source_version"], row["terms_digest"],
+                row["scope_digest"], row["binding_digest"],
+                row["not_before"], row["expires_at"],
+                int(row["use_limit"]), row["issuer_fingerprint"],
+                row["issuer_mac"], row["source_event_id"],
+                row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM synthetic_authority_grants WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        actual_uses = {
+            str(row["source_event_id"]): (
+                row["grant_id"], row["repository_id"], row["consumer_kind"],
+                row["consumer_key"], row["binding_digest"],
+                row["recorded_at"], row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM synthetic_authority_uses WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        actual_legacy_bindings = {
+            str(row["logical_effect_id"]): (
+                row["evidence_id"], row["legacy_descriptor_digest"],
+                row["canonical_descriptor_digest"],
+                row["canonical_material_digest"],
+                row["source_anchor_event_id"],
+                row["source_anchor_event_hash"], row["issuer_fingerprint"],
+                row["issuer_mac"], row["binding_source_event_id"],
+                row["binding_source_event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM legacy_descriptor_bindings WHERE "
+                "repository_id = ?", (repository_id,),
+            )
+        }
+        actual_lifecycle_facts = {
+            str(row["fact_id"]): (
+                row["grant_kind"], row["grant_id"],
+                row["logical_effect_id"], row["action"],
+                row["scope_digest"], row["fact_kind"],
+                row["governed_order"], row["governed_source_event_id"],
+                row["governed_source_event_hash"], row["recorded_at"],
+                row["effective_at"], row["corrected_fact_id"],
+                row["successor_grant_id"], row["issuer_fingerprint"],
+                row["issuer_mac"], row["source_event_id"],
+                row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM synthetic_authority_lifecycle_facts WHERE "
+                "repository_id = ?", (repository_id,),
+            )
+        }
+        if (
+            actual_grants != expected_grants
+            or actual_uses != expected_uses
+            or actual_legacy_bindings != expected_legacy_bindings
+            or actual_lifecycle_facts != expected_lifecycle_facts
+        ):
+            raise StorageIntegrityError(
+                "synthetic authority source projection diverges from history"
+            )
+
     def _verify_event_history(
         self, connection: sqlite3.Connection, repository_id: str
     ) -> None:
         catalog_head, run_heads = self._heads(connection, repository_id)
+        all_head_values = set(run_heads.values())
+        source_head = run_heads.pop(_SYNTHETIC_SOURCE_HEAD_MEMBER, None)
+        if source_head is not None:
+            self._verify_source_history(
+                connection, repository_id, source_head
+            )
         epoch_groups: dict[int, list[sqlite3.Row]] = {}
         for row in connection.execute(
             "SELECT event_id, run_id, sequence, command_id, writer_epoch, "
@@ -23167,7 +26658,7 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "run head sequence diverges from verified history"
                 )
-        if run_heads and catalog_head not in set(run_heads.values()):
+        if run_heads and catalog_head not in all_head_values:
             raise StorageIntegrityError("catalog head is absent from run histories")
 
     def load_verified(
@@ -23461,6 +26952,23 @@ class SQLiteStateStore:
             (repository_id,),
         ).fetchall()
         plans = [json.loads(row["body_json"]) for row in plan_event_rows]
+        adoption_event_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'EFFECT_ADOPTED'",
+            (repository_id,),
+        ).fetchall()
+        adoptions = [
+            json.loads(row["body_json"]) for row in adoption_event_rows
+        ]
+        dependent_fence_events = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'DEPENDENT_ADOPTION_FENCED' ORDER BY "
+                "writer_epoch, sequence",
+                (repository_id,),
+            )
+        ]
         readiness_event_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'READINESS_EVALUATED'",
@@ -23748,6 +27256,15 @@ class SQLiteStateStore:
         expected_outcomes.update(
             {
                 body["command_id"]: (
+                    body["request_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in adoptions
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
                     body["payload_digest"], body["event_id"],
                     body["sequence"], self._event_hash(body),
                 )
@@ -23812,7 +27329,15 @@ class SQLiteStateStore:
             parent_observation_body = json.loads(
                 parent_observation["body_json"]
             )
-            if (
+            adoption_origin = connection.execute(
+                "SELECT * FROM effect_adoptions WHERE repository_id = ? AND "
+                "run_id = ? AND slot_attempt_id = ?",
+                (
+                    validator_body["repository_id"], validator_body["run_id"],
+                    validator_body["parent_attempt_id"],
+                ),
+            ).fetchone()
+            if adoption_origin is None and (
                 parent_observation_body.get("slot_attempt_id")
                 != validator_body["parent_attempt_id"]
                 or parent_observation_body.get("slot_generation")
@@ -23820,6 +27345,17 @@ class SQLiteStateStore:
             ):
                 raise StorageIntegrityError(
                     "validator intent parent slot binding is invalid"
+                )
+            if adoption_origin is not None and (
+                adoption_origin["root_observation_id"]
+                != validator_body["parent_observation_id"]
+                or adoption_origin["root_observation_event_hash"]
+                != validator_body["parent_event_hash"]
+                or int(adoption_origin["slot_generation"])
+                != parent_generation
+            ):
+                raise StorageIntegrityError(
+                    "validator intent adoption origin binding is invalid"
                 )
             recovery_fields = {
                 "validator_intent_binding_version",
@@ -25693,6 +29229,47 @@ class SQLiteStateStore:
                         item_definition_digest=body["item_definition_digest"],
                         plan_schema_version=body["plan_schema_version"],
                         reducer_version=body["reducer_version"],
+                        effect_action=body.get("effect_action"),
+                        effect_target=body.get("effect_target"),
+                        effect_semantic_inputs=tuple(
+                            tuple(item)
+                            for item in body.get("effect_semantic_inputs", ())
+                        ),
+                        target_generation=body.get("target_generation"),
+                        relationship_kind=(
+                            None
+                            if body.get("relationship_kind") is None
+                            else EffectRelationshipKind(
+                                body["relationship_kind"]
+                            )
+                        ),
+                        predecessor_logical_effect_id=body.get(
+                            "predecessor_logical_effect_id"
+                        ),
+                        relationship_grant_id=body.get(
+                            "relationship_grant_id"
+                        ),
+                        predecessor_descriptor_digest=body.get(
+                            "predecessor_descriptor_digest"
+                        ),
+                        predecessor_defining_plan_id=body.get(
+                            "predecessor_defining_plan_id"
+                        ),
+                        predecessor_defining_event_hash=body.get(
+                            "predecessor_defining_event_hash"
+                        ),
+                        relationship_source_id=body.get(
+                            "relationship_source_id"
+                        ),
+                        relationship_source_version=body.get(
+                            "relationship_source_version"
+                        ),
+                        relationship_terms_digest=body.get(
+                            "relationship_terms_digest"
+                        ),
+                        relationship_scope_digest=body.get(
+                            "relationship_scope_digest"
+                        ),
                     )
                     plan_request.validate()
                 except (KeyError, TypeError, ValueError) as error:
@@ -25796,6 +29373,182 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "validation-plan projection diverges from event history"
             )
+        expected_definitions: dict[str, tuple[object, ...]] = {
+            row["logical_effect_id"]: (
+                row["effect_key"], row["descriptor_digest"],
+                "LEGACY_OPAQUE", None, None, None, None, None,
+            )
+            for row in connection.execute(
+                "SELECT * FROM effects WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        expected_relationships: dict[str, tuple[object, ...]] = {}
+        for body in plans:
+            if body.get("effect_action") is None:
+                continue
+            semantic_inputs = tuple(
+                tuple(item) for item in body["effect_semantic_inputs"]
+            )
+            canonical_material = self.canonical_effect_material_digest(
+                body["effect_action"], body["effect_target"],
+                semantic_inputs, body["target_generation"],
+            )
+            definition_value = (
+                self.effect_key(repository_id, body["logical_effect_id"]),
+                body["effect_descriptor_digest"], "CANONICAL",
+                canonical_material, body["effect_action"],
+                body["effect_target"],
+                json.dumps(
+                    [list(item) for item in semantic_inputs],
+                    separators=(",", ":"),
+                ),
+                body["target_generation"],
+            )
+            existing_definition = expected_definitions.get(
+                body["logical_effect_id"]
+            )
+            if existing_definition is not None and existing_definition not in {
+                definition_value,
+                (
+                    definition_value[0], body["effect_descriptor_digest"],
+                    "LEGACY_OPAQUE", None, None, None, None, None,
+                ),
+            }:
+                raise StorageIntegrityError(
+                    "canonical effect definition changed across plans"
+                )
+            expected_definitions[body["logical_effect_id"]] = definition_value
+            if body.get("relationship_kind") is not None:
+                try:
+                    plan_request = PlanAcceptanceRequest(
+                        **{
+                            key: (
+                                tuple(tuple(item) for item in body[key])
+                                if key == "effect_semantic_inputs"
+                                else tuple(body[key])
+                                if key in {"check_ids", "aggregate_gate_ids"}
+                                else EffectRelationshipKind(body[key])
+                                if key == "relationship_kind"
+                                else body[key]
+                            )
+                            for key in PlanAcceptanceRequest.__dataclass_fields__
+                            if key in body
+                        }
+                    )
+                    predecessor = connection.execute(
+                        "SELECT descriptor_digest, defining_plan_id, "
+                        "defining_event_hash FROM effect_definitions WHERE "
+                        "repository_id = ? AND logical_effect_id = ?",
+                        (
+                            repository_id,
+                            plan_request.predecessor_logical_effect_id,
+                        ),
+                    ).fetchone()
+                    if predecessor is None or (
+                        plan_request.predecessor_descriptor_digest,
+                        plan_request.predecessor_defining_plan_id,
+                        plan_request.predecessor_defining_event_hash,
+                    ) != (
+                        predecessor["descriptor_digest"],
+                        predecessor["defining_plan_id"],
+                        predecessor["defining_event_hash"],
+                    ):
+                        raise ValueError(
+                            "relationship predecessor history changed"
+                        )
+                    source_use = connection.execute(
+                        "SELECT * FROM synthetic_authority_uses "
+                        "WHERE repository_id = ? AND consumer_kind = ? AND "
+                        "consumer_key = ?",
+                        (
+                            repository_id,
+                            SyntheticSourceConsumerKind.EFFECT_RELATIONSHIP.value,
+                            self.effect_relationship_key(plan_request),
+                        ),
+                    ).fetchone()
+                    if source_use is None:
+                        raise ValueError("relationship source use is absent")
+                    source_use_body = json.loads(source_use["body_json"])
+                    if (
+                        plan_request.relationship_source_id,
+                        plan_request.relationship_source_version,
+                        plan_request.relationship_terms_digest,
+                        plan_request.relationship_scope_digest,
+                    ) != (
+                        source_use_body["source_id"],
+                        source_use_body["source_version"],
+                        source_use_body["terms_digest"],
+                        source_use_body["scope_digest"],
+                    ):
+                        raise ValueError("relationship source terms changed")
+                except (KeyError, TypeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "effect relationship plan binding is invalid"
+                    ) from error
+                expected_relationships[body["logical_effect_id"]] = (
+                    body["predecessor_logical_effect_id"],
+                    body["relationship_kind"],
+                    self.effect_relationship_key(plan_request),
+                    body["relationship_grant_id"],
+                    source_use["source_event_id"],
+                    self.effect_relationship_binding_digest(plan_request),
+                    body["plan_id"], self._event_hash(body),
+                )
+        for row in connection.execute(
+            "SELECT binding.*, source.body_json AS source_body_json FROM "
+            "legacy_descriptor_bindings AS binding JOIN "
+            "synthetic_authority_source_events AS source ON "
+            "source.source_event_id = binding.binding_source_event_id WHERE "
+            "binding.repository_id = ?", (repository_id,),
+        ):
+            source_body = json.loads(row["source_body_json"])
+            semantic_inputs = tuple(
+                tuple(item) for item in source_body["semantic_inputs"]
+            )
+            expected_definitions[row["logical_effect_id"]] = (
+                self.effect_key(repository_id, row["logical_effect_id"]),
+                row["canonical_descriptor_digest"], "CANONICAL",
+                row["canonical_material_digest"], source_body["action"],
+                source_body["target"],
+                json.dumps(
+                    [list(item) for item in semantic_inputs],
+                    separators=(",", ":"),
+                ), source_body["target_generation"],
+            )
+        actual_definitions = {
+            row["logical_effect_id"]: (
+                row["effect_key"], row["descriptor_digest"],
+                row["definition_kind"], row["canonical_material_digest"],
+                row["action"], row["target"],
+                row["semantic_inputs_json"], row["target_generation"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM effect_definitions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        actual_relationships = {
+            row["logical_effect_id"]: (
+                row["predecessor_logical_effect_id"],
+                row["relationship_kind"], row["relationship_key"],
+                row["grant_id"], row["source_use_event_id"],
+                row["binding_digest"], row["defining_plan_id"],
+                row["defining_event_hash"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM effect_relationships WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_definitions != expected_definitions:
+            raise StorageIntegrityError(
+                "effect-definition projection diverges from history"
+            )
+        if actual_relationships != expected_relationships:
+            raise StorageIntegrityError(
+                "effect-relationship projection diverges from history"
+            )
         expected_readiness = {
             body["readiness_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -25824,6 +29577,308 @@ class SQLiteStateStore:
         if actual_readiness != expected_readiness:
             raise StorageIntegrityError(
                 "readiness projection diverges from event history"
+            )
+        for body in adoptions:
+            try:
+                request_values = {
+                    key: body[key]
+                    for key in EffectAdoptionRequest.__dataclass_fields__
+                }
+                request_values["immediate_origin_kind"] = OperationOriginKind(
+                    body["immediate_origin_kind"]
+                )
+                request_values["expected_lifecycle"] = LifecycleState(
+                    body["expected_lifecycle"]
+                )
+                adoption_request = EffectAdoptionRequest(**request_values)
+                adoption_request.validate()
+                readiness_evidence = SyntheticAdoptionReadinessEvidence(
+                    **body["readiness_evidence"]
+                )
+                capability_values = dict(body["source_capability"])
+                capability_values["grant_kind"] = SyntheticGrantKind(
+                    capability_values["grant_kind"]
+                )
+                capability_values["consumer_kind"] = (
+                    SyntheticSourceConsumerKind(
+                        capability_values["consumer_kind"]
+                    )
+                )
+                source_capability = SyntheticSourceCapability(
+                    **capability_values
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied(
+                        "effect adoption recovery requires its authority"
+                    )
+                self._classification_authority.verify_adoption_readiness_evidence(
+                    readiness_evidence
+                )
+                self._classification_authority.verify_source_capability(
+                    source_capability
+                )
+                recovered_check_ids = tuple(
+                    str(row["check_id"])
+                    for row in connection.execute(
+                        "SELECT check_id FROM validation_requirements WHERE "
+                        "plan_id = ? ORDER BY check_id",
+                        (adoption_request.plan_id,),
+                    )
+                )
+                if (
+                    body["adoption_key"] != self.adoption_key(adoption_request)
+                    or adoption_request.current_check_set_digest
+                    != self.adoption_check_set_digest(recovered_check_ids)
+                    or body["request_digest"] != self._event_hash(
+                        {
+                            **adoption_request.__dict__,
+                            "immediate_origin_kind": (
+                                adoption_request.immediate_origin_kind.value
+                            ),
+                            "expected_lifecycle": (
+                                adoption_request.expected_lifecycle.value
+                            ),
+                        }
+                    )
+                    or body["readiness_digest"]
+                    != self._event_hash(readiness_evidence.__dict__)
+                    or source_capability.consumer_key
+                    != body["adoption_key"]
+                    or source_capability.binding_digest
+                    != self.adoption_binding_digest(adoption_request)
+                    or body["source_use_event_id"]
+                    != connection.execute(
+                        "SELECT source_event_id FROM synthetic_authority_uses "
+                        "WHERE repository_id = ? AND consumer_kind = ? AND "
+                        "consumer_key = ?",
+                        (
+                            repository_id,
+                            SyntheticSourceConsumerKind.EFFECT_ADOPTION.value,
+                            body["adoption_key"],
+                        ),
+                    ).fetchone()["source_event_id"]
+                ):
+                    raise ValueError("effect adoption binding is invalid")
+                historical_fences, historical_slot, _historical_validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
+                )
+                if historical_slot is not None:
+                    raise ValueError(
+                        "effect adoption historical slot was not free"
+                    )
+                if any(
+                    (item_id is None and effect_id is None)
+                    or item_id == body["item_id"]
+                    or effect_id == body["logical_effect_id"]
+                    for item_id, effect_id in historical_fences.values()
+                ):
+                    raise ValueError(
+                        "effect adoption historical fence union was not clear"
+                    )
+                prior_run_event = connection.execute(
+                    "SELECT event_hash, body_json FROM events WHERE run_id = ? "
+                    "AND sequence < ? ORDER BY sequence DESC LIMIT 1",
+                    (body["run_id"], body["sequence"]),
+                ).fetchone()
+                if prior_run_event is None or (
+                    prior_run_event["event_hash"] != body["previous_event_hash"]
+                ):
+                    raise ValueError(
+                        "effect adoption historical run head is unavailable"
+                    )
+                prior_run_body = json.loads(prior_run_event["body_json"])
+                if prior_run_body.get("lifecycle_to") != body["lifecycle_from"]:
+                    raise ValueError(
+                        "effect adoption historical lifecycle is invalid"
+                    )
+                if body["lifecycle_from"] == LifecycleState.BLOCKED.value:
+                    readiness_row = connection.execute(
+                        "SELECT readiness.*, event.writer_epoch FROM "
+                        "readiness_evaluations AS readiness JOIN events AS event "
+                        "ON event.event_id = readiness.event_id WHERE "
+                        "readiness.run_id = ? AND readiness.readiness_id = ?",
+                        (
+                            body["run_id"],
+                            body["superseded_readiness_id"],
+                        ),
+                    ).fetchone()
+                    readiness_body = (
+                        {} if readiness_row is None
+                        else json.loads(readiness_row["body_json"])
+                    )
+                    blocker_digest = self._event_hash(
+                        {
+                            "domain": "AEGIS:T28:SUPERSEDED_BLOCKERS:v1",
+                            "blocker_codes": sorted(
+                                readiness_body.get("blocker_codes", ())
+                            ),
+                        }
+                    )
+                    if (
+                        readiness_row is None
+                        or readiness_row["event_hash"]
+                        != body["superseded_readiness_event_hash"]
+                        or readiness_row["event_hash"]
+                        != body["previous_event_hash"]
+                        or int(readiness_row["writer_epoch"])
+                        >= int(body["writer_epoch"])
+                        or set(readiness_body.get("blocker_codes", ()))
+                        != {"INPUTS_NOT_READY"}
+                        or blocker_digest
+                        != body["superseded_blocker_set_digest"]
+                    ):
+                        raise ValueError(
+                            "effect adoption superseded readiness is invalid"
+                        )
+                elif any(
+                    body.get(field) is not None
+                    for field in (
+                        "superseded_readiness_id",
+                        "superseded_readiness_event_hash",
+                        "superseded_blocker_set_digest",
+                    )
+                ):
+                    raise ValueError(
+                        "planned effect adoption carries blocked readiness"
+                    )
+                root_observation = connection.execute(
+                    "SELECT observation.*, event.writer_epoch FROM "
+                    "effect_observations AS observation JOIN events AS event ON "
+                    "event.event_id = observation.event_id WHERE "
+                    "observation.observation_id = ?",
+                    (body["root_observation_id"],),
+                ).fetchone()
+                root_finalization = connection.execute(
+                    "SELECT finalization.*, event.writer_epoch FROM "
+                    "operation_finalizations AS finalization JOIN events AS "
+                    "event ON event.event_id = finalization.event_id WHERE "
+                    "finalization.finalization_id = ?",
+                    (body["root_finalization_id"],),
+                ).fetchone()
+                if (
+                    root_observation is None
+                    or root_finalization is None
+                    or int(root_observation["writer_epoch"])
+                    >= int(body["writer_epoch"])
+                    or int(root_finalization["writer_epoch"])
+                    >= int(body["writer_epoch"])
+                    or root_observation["event_hash"]
+                    != body["root_observation_event_hash"]
+                    or root_observation["observation_digest"]
+                    != body["root_observation_digest"]
+                    or root_finalization["event_hash"]
+                    != body["root_finalization_event_hash"]
+                    or root_finalization["finalization_key"]
+                    != body["root_finalization_key"]
+                ):
+                    raise ValueError(
+                        "effect adoption historical root is invalid"
+                    )
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+                json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "effect adoption proof or schema is invalid"
+                ) from error
+        expected_adoptions = {
+            body["adoption_id"]: (
+                body["adoption_key"], body["command_id"], body["event_id"],
+                body["run_id"], body["item_id"], body["plan_id"],
+                body["revision_digest"], body["logical_effect_id"],
+                body["effect_descriptor_digest"], body["target_generation"],
+                body["root_run_id"], body["root_attempt_id"],
+                body["root_observation_id"],
+                body["root_observation_event_hash"],
+                body["root_observation_digest"],
+                body["root_finalization_id"],
+                body["root_finalization_key"],
+                body["root_finalization_event_hash"],
+                body["immediate_origin_kind"], body["immediate_origin_id"],
+                body["immediate_origin_event_hash"],
+                body["immediate_finalization_key"],
+                body["readiness_evidence_id"], body["readiness_digest"],
+                body["source_use_event_id"], body["adoption_grant_id"],
+                body["slot_attempt_id"], body["slot_generation"],
+                body["request_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in adoptions
+        }
+        actual_adoptions = {
+            row["adoption_id"]: (
+                row["adoption_key"], row["command_id"], row["event_id"],
+                row["run_id"], row["item_id"], row["plan_id"],
+                row["revision_digest"], row["logical_effect_id"],
+                row["effect_descriptor_digest"], row["target_generation"],
+                row["root_run_id"], row["root_attempt_id"],
+                row["root_observation_id"],
+                row["root_observation_event_hash"],
+                row["root_observation_digest"],
+                row["root_finalization_id"],
+                row["root_finalization_key"],
+                row["root_finalization_event_hash"],
+                row["immediate_origin_kind"], row["immediate_origin_id"],
+                row["immediate_origin_event_hash"],
+                row["immediate_finalization_key"],
+                row["readiness_evidence_id"], row["readiness_digest"],
+                row["source_use_event_id"], row["adoption_grant_id"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["request_digest"], row["event_hash"],
+                row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM effect_adoptions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_adoptions != expected_adoptions:
+            raise StorageIntegrityError(
+                "effect-adoption projection diverges from event history"
+            )
+        adoption_by_id = {
+            body["adoption_id"]: body for body in adoptions
+        }
+        closure_by_run: dict[str, dict[str, int]] = {}
+        expected_dependencies: dict[
+            tuple[str, str], tuple[int, str, str]
+        ] = {}
+        for body in adoptions:
+            immediate_run_id = (
+                body["root_run_id"]
+                if body["immediate_origin_kind"]
+                == OperationOriginKind.EXECUTION_INTENT.value
+                else adoption_by_id[body["immediate_origin_id"]]["run_id"]
+            )
+            closure = {immediate_run_id: 1}
+            closure.update({
+                ancestor: depth + 1
+                for ancestor, depth in closure_by_run.get(
+                    immediate_run_id, {}
+                ).items()
+            })
+            closure_by_run[body["run_id"]] = closure
+            for ancestor, depth in closure.items():
+                expected_dependencies[(ancestor, body["run_id"])] = (
+                    depth, body["adoption_id"],
+                    body["root_observation_id"],
+                )
+        actual_dependencies = {
+            (row["ancestor_run_id"], row["dependent_run_id"]): (
+                row["depth"], row["adoption_id"],
+                row["root_observation_id"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM adoption_dependencies WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_dependencies != expected_dependencies:
+            raise StorageIntegrityError(
+                "adoption dependency projection diverges from event history"
             )
         expected_finalizations = {
             body["finalization_id"]: (
@@ -27981,6 +32036,40 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "authority-supersession projection diverges from history"
             )
+        active_dependent_fence_events = {
+            body["fence_id"]: body
+            for body in dependent_fence_events
+            if not (
+                body["provenance_kind"] == "AUTHORITY"
+                and body["correction_owner_id"] in corrected_fact_ids
+            )
+        }
+        expected_dependent_fences = {
+            fence_id: (
+                body["source_run_id"], body["dependent_run_id"],
+                body["originating_event_id"],
+                body["originating_event_hash"],
+                body["correction_owner_id"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for fence_id, body in active_dependent_fence_events.items()
+        }
+        actual_dependent_fences = {
+            row["fence_id"]: (
+                row["source_run_id"], row["dependent_run_id"],
+                row["originating_event_id"],
+                row["originating_event_hash"], row["correction_owner_id"],
+                row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM dependent_adoption_fences WHERE "
+                "repository_id = ?", (repository_id,),
+            )
+        }
+        if actual_dependent_fences != expected_dependent_fences:
+            raise StorageIntegrityError(
+                "dependent-adoption fence projection diverges from history"
+            )
         expected_fences: dict[str, tuple[str | None, str | None, str, str]] = {}
         expected_fences.update(
             {
@@ -27988,6 +32077,20 @@ class SQLiteStateStore:
                     None, None, body["reason_code"], body["request_event_id"]
                 )
                 for body in pauses
+            }
+        )
+        expected_fences.update(
+            {
+                fence_id: (
+                    body["item_id"], body["logical_effect_id"],
+                    (
+                        "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
+                        if body["provenance_kind"] == "CONTRARY_RECEIPT"
+                        else "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED"
+                    ),
+                    body["event_id"],
+                )
+                for fence_id, body in active_dependent_fence_events.items()
             }
         )
         expected_fences.update(
@@ -28650,6 +32753,35 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "event lifecycle route is invalid for its kind"
                     )
+                if event_kind == "DEPENDENT_ADOPTION_FENCED":
+                    provenance_kind = body.get("provenance_kind")
+                    if provenance_kind == "CONTRARY_RECEIPT":
+                        expected_dependent_state = (
+                            predecessor_state
+                            if predecessor_state in {
+                                LifecycleState.COMPLETED,
+                                LifecycleState.FAILED_FINAL,
+                                LifecycleState.STOPPED,
+                            }
+                            else LifecycleState.RECONCILIATION_REQUIRED
+                        )
+                    elif provenance_kind == "AUTHORITY":
+                        if predecessor_state is None:
+                            raise StorageIntegrityError(
+                                "dependent authority fence has no predecessor"
+                            )
+                        expected_dependent_state = self._authority_fact_route(
+                            predecessor_state, AuthorityFactKind.REVOKED,
+                            GovernedOrder.BEFORE,
+                        )
+                    else:
+                        raise StorageIntegrityError(
+                            "dependent adoption provenance kind is invalid"
+                        )
+                    if resulting_state is not expected_dependent_state:
+                        raise StorageIntegrityError(
+                            "dependent adoption lifecycle route diverges"
+                        )
             if row["event_kind"] in {
                 "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
             }:
@@ -28786,10 +32918,26 @@ class SQLiteStateStore:
                             }
                         ),
                     )
-                    if boundary is not None and int(boundary["sequence"]) >= int(
-                        body["sequence"]
-                    ):
-                        raise ValueError("authority boundary is not historical")
+                    if boundary is not None:
+                        if body["governed_boundary_kind"] == "SOURCE_USE":
+                            source_fact = connection.execute(
+                                "SELECT sequence FROM "
+                                "synthetic_authority_source_events WHERE "
+                                "source_event_id = ?",
+                                (body["source_lifecycle_event_id"],),
+                            ).fetchone()
+                            if (
+                                source_fact is None
+                                or int(boundary["sequence"])
+                                >= int(source_fact["sequence"])
+                            ):
+                                raise ValueError(
+                                    "source authority boundary is not historical"
+                                )
+                        elif int(boundary["sequence"]) >= int(body["sequence"]):
+                            raise ValueError(
+                                "authority boundary is not historical"
+                            )
                     if (
                         body["lifecycle_from"] != predecessor_state.value
                         or body["lifecycle_to"] != expected_state.value
@@ -29016,6 +33164,7 @@ class SQLiteStateStore:
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
                     "VALIDATOR_INTENT_COMMITTED", "RECONCILIATION_RECORDED",
+                    "EFFECT_ADOPTED",
                 }:
                     expected_cursors[run_id] = body.get(
                         "continuation_cursor"
@@ -29053,6 +33202,10 @@ class SQLiteStateStore:
                 str(body["logical_effect_id"]),
                 str(body["expected_slot_attempt_id"]),
                 settlement_sequence_limit=int(body["sequence"]),
+                operation_observation_optional=(
+                    body.get("operation_origin_kind")
+                    == OperationOriginKind.EFFECT_ADOPTION.value
+                ),
             )
             if closure_error is not None:
                 raise StorageIntegrityError(
@@ -29073,7 +33226,19 @@ class SQLiteStateStore:
                     body["logical_effect_id"],
                 ),
             ).fetchall()
-            if len(operation_attempts) != 1:
+            operation_origin = connection.execute(
+                "SELECT * FROM operation_origins WHERE repository_id = ? AND "
+                "run_id = ?",
+                (repository_id, body["run_id"]),
+            ).fetchone()
+            adoption_origin = (
+                operation_origin is not None
+                and operation_origin["origin_kind"]
+                == OperationOriginKind.EFFECT_ADOPTION.value
+            )
+            if (not adoption_origin and len(operation_attempts) != 1) or (
+                adoption_origin and operation_attempts
+            ):
                 raise StorageIntegrityError(
                     "final failure violates accounting closure: "
                     "final effect observation is unavailable"
@@ -29092,7 +33257,10 @@ class SQLiteStateStore:
                 repository_id,
                 str(body["run_id"]),
                 str(body["logical_effect_id"]),
-                str(operation_attempts[0]["attempt_id"]),
+                str(
+                    body["slot_attempt_id"]
+                    if adoption_origin else operation_attempts[0]["attempt_id"]
+                ),
                 settling_validator_intent_id=str(
                     settling_observation["validator_intent_id"]
                 ),
@@ -29100,6 +33268,7 @@ class SQLiteStateStore:
                     settling_observation["observation_id"]
                 ),
                 settlement_sequence_limit=int(body["sequence"]),
+                operation_observation_optional=adoption_origin,
             )
             if closure_error is not None:
                 raise StorageIntegrityError(
@@ -29121,13 +33290,37 @@ class SQLiteStateStore:
                     body["logical_effect_id"], body["slot_attempt_id"],
                 ),
             ).fetchone()
+            operation_origin = connection.execute(
+                "SELECT origin_kind FROM operation_origins WHERE repository_id = ? "
+                "AND run_id = ?",
+                (body["repository_id"], body["run_id"]),
+            ).fetchone()
+            adoption_origin = (
+                operation_origin is not None
+                and operation_origin["origin_kind"]
+                == OperationOriginKind.EFFECT_ADOPTION.value
+            )
             release_error = self._terminal_release_error(connection, body)
-            should_release = (
-                reservation is not None
-                and self._operation_slot_current_before(
-                    connection, reservation, int(body["sequence"]),
-                    expected_generation=int(body["slot_generation"]),
+            if adoption_origin:
+                _fences, historical_slot, _validators = (
+                    self._historical_repository_activity(
+                        connection, repository_id, int(body["writer_epoch"])
+                    )
                 )
+                slot_current = historical_slot == (
+                    body["run_id"], body["logical_effect_id"],
+                    body["slot_attempt_id"], body["slot_generation"],
+                )
+            else:
+                slot_current = (
+                    reservation is not None
+                    and self._operation_slot_current_before(
+                        connection, reservation, int(body["sequence"]),
+                        expected_generation=int(body["slot_generation"]),
+                    )
+                )
+            should_release = (
+                slot_current
                 and release_error is None
             )
             if body["slot_released"] is not should_release:
@@ -29145,6 +33338,44 @@ class SQLiteStateStore:
                     "late receipt release decision has an invalid type"
                 )
 
+        expected_origins: dict[str, tuple[object, ...]] = {}
+        for body in intents:
+            expected_origins[body["run_id"]] = (
+                body["logical_effect_id"],
+                OperationOriginKind.EXECUTION_INTENT.value,
+                body["attempt_id"], body["event_id"],
+                self._event_hash(body), body["run_id"], body["attempt_id"],
+                None, None, None,
+            )
+        for body in adoptions:
+            expected_origins[body["run_id"]] = (
+                body["logical_effect_id"],
+                OperationOriginKind.EFFECT_ADOPTION.value,
+                body["adoption_id"], body["event_id"],
+                self._event_hash(body), body["root_run_id"],
+                body["root_attempt_id"], body["root_observation_id"],
+                body["root_observation_event_hash"],
+                body["root_finalization_key"],
+            )
+        actual_origins = {
+            row["run_id"]: (
+                row["logical_effect_id"], row["origin_kind"],
+                row["origin_id"], row["origin_event_id"],
+                row["origin_event_hash"], row["root_run_id"],
+                row["root_attempt_id"], row["root_observation_id"],
+                row["root_observation_event_hash"],
+                row["root_finalization_key"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM operation_origins WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_origins != expected_origins:
+            raise StorageIntegrityError(
+                "operation-origin projection diverges from event history"
+            )
+
         slot = connection.execute(
             "SELECT * FROM outstanding_slot WHERE repository_id = ?", (repository_id,)
         ).fetchone()
@@ -29158,11 +33389,48 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "active validator obligation is detached from the operation slot"
             )
-        if len(slot_obligations) > 1:
+        released_adoption_run_ids = {
+            str(body["run_id"]) for body in finalizations
+        }
+        released_adoption_run_ids.update(
+            str(body["run_id"])
+            for body in applications
+            if body.get("slot_released") is True
+        )
+        released_adoption_run_ids.update(
+            str(body["run_id"])
+            for body in terminal_settlements
+            if body.get("slot_released") is True
+        )
+        released_adoption_run_ids.update(
+            str(body["run_id"])
+            for body in observation_events
+            if body.get("slot_released") is True
+        )
+        active_adoptions = [
+            body for body in adoptions
+            if str(body["run_id"]) not in released_adoption_run_ids
+        ]
+        if len(slot_obligations) + len(active_adoptions) > 1:
             raise StorageIntegrityError("multiple unresolved operations violate the slot")
-        if not slot_obligations and slot is not None:
+        if not slot_obligations and not active_adoptions and slot is not None:
             raise StorageIntegrityError("slot exists without an unresolved operation")
-        if slot_obligations:
+        if active_adoptions:
+            adoption = active_adoptions[0]
+            if slot is None or (
+                slot["run_id"], slot["logical_effect_id"],
+                slot["attempt_id"], int(slot["generation"]),
+                slot["origin_kind"], slot["origin_id"],
+            ) != (
+                adoption["run_id"], adoption["logical_effect_id"],
+                adoption["slot_attempt_id"], adoption["slot_generation"],
+                OperationOriginKind.EFFECT_ADOPTION.value,
+                adoption["adoption_id"],
+            ):
+                raise StorageIntegrityError(
+                    "adoption slot projection diverges from event history"
+                )
+        elif slot_obligations:
             reservation = slot_obligations[0]
             expected_generation = 1
             for body in intents:
@@ -29179,10 +33447,13 @@ class SQLiteStateStore:
                     )
             if slot is None or (
                 slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
-                int(slot["generation"]),
+                int(slot["generation"]), slot["origin_kind"],
+                slot["origin_id"],
             ) != (
                 reservation["run_id"], reservation["logical_effect_id"],
                 reservation["attempt_id"], expected_generation,
+                OperationOriginKind.EXECUTION_INTENT.value,
+                reservation["attempt_id"],
             ):
                 raise StorageIntegrityError("slot projection diverges from event history")
 
@@ -29332,7 +33603,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 3:
+            if version != 4:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )
