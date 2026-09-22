@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption, cross-family F05/F06/F13/F20 and Windows filesystem ownership/reparse/path-swap protection. The complete local delivery-control suite passes 433 tests, but slice evidence does not promote unaudited T/C/F rows. POSIX runtime evidence and the final exact-head architecture/security/QA reviews remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption, cross-family F05/F06/F13/F20 and Windows filesystem ownership/reparse/path-swap protection. The independently approved exact-head status map records 18/28 T rows, 8/9 C rows and 18/22 F rows implemented; trusted readiness, selected-check gates and the remaining named matrix gaps still block DONE. POSIX runtime evidence and final exact-head architecture/security/QA approval also remain blocking |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1062,6 +1062,45 @@ be established.
 This filesystem slice and its corrected pre-commit diff are independently
 accepted. Exact committed-head/hosted confirmation is next. PR #99 remains
 draft and not merge-ready; no release or deployment is authorized.
+
+### 5.23 Exact-head T/C/F trace authoring checkpoint
+
+The accumulated trace authoring pass is anchored to implementation head
+`a9dbeab2b2e28f2914df32dd55558a2d051517e6`. Its three hosted checks passed:
+`gate-guard` in 6 seconds, `validate-skills` in 1 minute 10 seconds and
+`windows-offline-checks` in 3 minutes 6 seconds. The exact local package suite
+passed 433 tests in 78.889 seconds with zero skips on Windows 10.0.26200,
+Python 3.14.7 and Windows PowerShell 5.1.26100.9444. Windows capability probes
+executed; POSIX runtime remains `UNVERIFIED`.
+
+The inventory is 59 normative rows: T01-T28, C01-C09 and 22 F rows because
+F04a and F04b are separate. Corrected assertion-level mapping establishes
+implementation surfaces for 18 T rows, 8 C rows and 18 F rows, with complete
+test coverage for 15 T rows, 8 C rows and 14 F rows. Existing independently
+accepted rows retain their verdicts. Corrected-map re-review approved these
+conservative statuses; rows without prior complete acceptance remain
+`UNVERIFIED` rather than being promoted by the mapping review itself.
+
+The audit does not hide the remaining gaps. T01-T03 lack trusted readiness and
+dependency provenance; T11/T27 lack selected-check dependency and launch-gate
+bindings; T07, T08, T14 and T17 are partial; T24 lacks mandatory terminal-
+policy intake behavior. T18/T19 need durable every-nonterminal-state matrices,
+and T25 has incomplete all-state/contradiction coverage. C01 inherits the
+readiness gap. F02, F03, F04a, F09, F11, F17, F18 and F19 remain incomplete.
+The handoff records exact routes, test evidence and missing clauses. These rows
+stay `UNVERIFIED`; CP-WP-002 and PR #99 remain blocked from DONE/merge until the
+gaps are corrected and independently accepted.
+
+The plan audit first returned `REVISE` because it counted 58 rows and did not
+separate F04a/F04b; the corrected 59-row, assertion-level, non-circular plan
+returned `APPROVE` before these documentation edits. The first implementation
+review then returned `REVISE` for two BLOCKER root causes (trusted readiness and
+selected-check gates), plus terminal-policy, proof-free terminal-entry and stop-
+matrix corrections. Corrected-map re-review returned `APPROVE` with no findings
+and confirmed exact aggregate counts of T 28/18/15/8, C 9/8/8/0 and F
+22/18/14/5 (rows/implemented/tested/independently accepted). Canonical design,
+approval register, BER, dependencies, CI workflows, production/provider
+surfaces and preserved artifacts/caches remain untouched.
 
 ## 6. Handoff contract
 

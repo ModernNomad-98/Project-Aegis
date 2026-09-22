@@ -6,9 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed checkpoint: `ad9b1d149b6c361a72e8650654d395f3114a7f9b`
+Latest pushed checkpoint: `a9dbeab2b2e28f2914df32dd55558a2d051517e6`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - IMPLEMENTED SLICES AND FILESYSTEM DIFF `APPROVE`; EXACT COMMITTED-HEAD/HOSTED AND FINAL TRACE GATES OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - FILESYSTEM AND CORRECTED TRACE MAP `APPROVE`; CANONICAL ROW GAPS AND POSIX RUNTIME EVIDENCE OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -1399,9 +1399,10 @@ pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
-complete from the 384 passing tests, a registry entry or an earlier milestone
-paragraph. No complete exact-head traceability audit was performed at this
-checkpoint.
+complete from a passing suite, a registry entry or an earlier milestone
+paragraph. The authoring pass below is anchored to implementation head
+`a9dbeab2b2e28f2914df32dd55558a2d051517e6`; new independent-acceptance
+promotions remain pending row-level review.
 
 Status legend: `YES` means directly established at this checkpoint;
 `NO` means a verified absence or failed gate; `UNVERIFIED` means the exact-head
@@ -1415,34 +1416,34 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| T01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Code/test names exist; exact-head trace required |
-| T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical readiness work exists; exact-head trace required |
-| T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical focused evidence only |
-| T04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `accept_plan` binds repo/item/effect/policy/checks but has no operator-role binding or dependency graph/cycle model; full canonical acceptance is absent |
+| T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `evaluate_readiness` is atomic/replay-safe, but trusts caller `prerequisites_met` and an unsigned input digest; no trusted verifier establishes current inputs/dependencies |
+| T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Intent/dispatch guards exist, but T03 carries no verified-readiness reference and accepts the initial T01-created PLANNED state, allowing T02 to be skipped |
+| T04 | YES | YES | UNVERIFIED | `pause_before_dispatch`; dual-event atomic commit, lost-ack replay, operator binding and fence-tamper assertions in `test_t04_*`; row-level review pending |
 | T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
-| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05-local/T25-authoritative nonexecution settlement and BLOCKED-only T14 recovery slice independently accepted; T08/T24/other source families remain |
-| T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle/exact-settled-result pause, unresolved reconciliation, contacted worst-case accounting and clean VALIDATING T14 slice independently accepted; active drain/cancel and broader cessation sources remain |
+| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `settle_activity_pause` is deliberately restricted to exact T05 plus T25 local nonexecution. No T07 activity-settled route covers contacted T06 or active/ceased T08 validator work; full row remains open |
+| T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle, uncontacted, contacted-unknown, settled-result and unresolved-result paths are asserted, but no bounded active validator cancel/drain path reaches T07/PAUSED; full row remains open |
 | T09 | YES | YES | YES | Exact current-head reconciliation fence, one-use authority, idempotent replay, stacked fence, no-adapter invariants and strict recovery independently accepted |
-| T10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
-| T12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Historical validation work only |
+| T10 | YES | YES | UNVERIFIED | Effect receipt intake verifies request/effect/source/control/usage binding, persists observation plus settlement atomically, routes unknowns to reconciliation and delegates contradictions to T23; C04/T06/T17 assertions; row-level review pending |
+| T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PASS application/reference/finalization behavior exists, but no per-check dependency/application-gate model can route an unmet next check to BLOCKED as required |
+| T12 | YES | YES | UNVERIFIED | `_apply_validator_observation` FAIL path separates recoverable BLOCKED from atomic FAILED_FINAL fence/closure, with classification, accounting, replay and pending-check assertions; row-level review pending |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
-| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, T07 activity recovery, T08 clean recovery, sequential T09 clearance and operation-nonexecution stacked-pause slices independently accepted; other source families remain |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, exact T07-local, clean T08, sequential T09 and operation-nonexecution resume sources are asserted, but the missing T07/T08 activity families prevent complete cursor/source coverage |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
-| T16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal closure plus typed operation-recovery authorization/finalization slices accepted; full T16 trace remains |
-| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and generation-bound safe-retry slices independently accepted; accumulated exact-head trace remains |
-| T18 | YES | YES | YES | Graceful-stop and terminal-closure slices independently accepted |
-| T19 | YES | YES | YES | Terminal closure and post-contact uncertainty slices independently accepted |
+| T16 | YES | YES | UNVERIFIED | Typed validation/operation blocker recovery and distinct finalization are implemented with exact evidence heads, aggregate gates, accounting/fence/slot closure, atomic replay and tamper assertions; row-level review pending |
+| T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and generation-bound safe-retry routes are asserted. No explicit proof-free STOPPED/FAILED_FINAL/report-only reconciliation route completes the canonical row |
+| T18 | YES | UNVERIFIED | UNVERIFIED | Graceful stop and R-STOP closure slices are asserted, but no durable every-nonterminal-state matrix covers PAUSING/RECONCILIATION_REQUIRED and prior review did not accept the complete row |
+| T19 | YES | UNVERIFIED | UNVERIFIED | Immediate stop and post-contact uncertainty slices are asserted, but no durable every-nonterminal-state matrix covers PAUSING/RECONCILIATION_REQUIRED and prior review did not accept the complete row |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
-| T21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
+| T21 | YES | YES | UNVERIFIED | Stable `writer.lock` identity and OS exclusion are implemented; an actual second process is denied and lock replacement/reacquisition behavior is asserted; row-level review pending |
 | T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |
-| T23 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction plus generation-2 late-receipt/retry-invalidation slice independently accepted; full trace remains |
-| T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop interaction inspected, not independently accepted |
-| T25 | UNVERIFIED | UNVERIFIED | UNVERIFIED | INTENT_ONLY/LAUNCHED/CONTACTED canonical-seal, exact proof-prefix clearance and operation-recovery slices independently accepted; full all-state/contradiction trace remains |
-| T26 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Applied-evidence closure and generation-2 terminal-settlement migration/replay slices accepted; full T26 trace remains |
-| T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Generation-2 parent binding, validator contact and recovery/replay slices independently accepted; full trace remains |
-| T28 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Verified-effect adoption slice independently accepted; accumulated exact-head trace remains |
+| T23 | YES | YES | UNVERIFIED | Late/contrary receipt intake preserves terminal state, true/unknown accounting, other slot owners and dependent retry/adoption fences across every lifecycle class; `test_f13_*`, stop/T26 ordering and retry-invalidation assertions; row-level review pending |
+| T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | RESULT/cessation intake exists, but no mandatory-terminal-policy model atomically records the required irreversible stop obligation/fence at intake |
+| T25 | YES | UNVERIFIED | UNVERIFIED | Typed all-path nonexecution seals and recovery exist for operation/validator intents, but the canonical before/after-handoff, every-state, terminal-contradiction and dependent-adoption matrix is not completely asserted |
+| T26 | YES | YES | UNVERIFIED | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; row-level review pending |
+| T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Validator intent enforces declaration/authority/budget/containment/recovery/slot/fences, but accepted plans and intents cannot bind or recheck selected-check dependencies/launch gates |
+| T28 | YES | YES | YES | Exact accepted validation-only adoption, separate authority consumption, free-slot check, no adapter contact, crash replay, contrary-fact fencing and source-history recovery independently accepted in the T28/F01 review |
 
 ### C01-C09 crash-boundary matrix
 
@@ -1450,15 +1451,15 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| C01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| C02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| C03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 plus generation-bound same-effect retry preserve original effect/slot/accounting through missing-receipt reconciliation; complete family trace remains |
-| C04 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier receipt slice plus generation-2 receipt/replay evidence accepted; accumulated exact head not re-audited |
-| C05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice accepted; accumulated exact head not re-audited |
-| C06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T05/T06/T07/T09 and T17/T25/T14/T16 recovery pre/post-commit rollback/replay, atomic settlement and durable-fence slices accepted; full crash family remains unverified |
-| C07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T22 read-only local status versus independent-current freshness and closed stale/unverified reporting accepted; broader restore/export family remains |
-| C08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/unknown-claim slice accepted; complete atomic-claim trace remains |
-| C09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Earlier slice evidence exists; accumulated exact head not re-audited |
+| C01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Pre-intent rollback is asserted, but retry can proceed from initial PLANNED without a trusted T02 readiness evaluation, so cached/unverified prerequisites are not excluded |
+| C02 | YES | YES | UNVERIFIED | Operation and validator intent/launch commit-before-contact failures retain intent, claim, reservation and slot, deny redispatch, and require bound nonexecution/recovery; row-level review pending |
+| C03 | YES | YES | UNVERIFIED | Accepted synthetic effect with missing receipt preserves original key, worst-case accounting and slot; canonical-ledger recovery and no-redispatch assertions cover restart; row-level review pending |
+| C04 | YES | YES | UNVERIFIED | Effect and validator observation intake pre/post-commit failures preserve one immutable observation/accounting reference and later apply without recontact/recharge; row-level review pending |
+| C05 | YES | YES | UNVERIFIED | PASS, recoverable FAIL, final FAIL and distinct finalization pre/post-commit failures replay the committed application/finalization key exactly once with correct slot disposition; row-level review pending |
+| C06 | YES | YES | UNVERIFIED | T04-T09 and T18-T20 control transactions inject before-commit rollback and after-commit lost acknowledgement, acknowledge only committed fences and expose retained uncertainty; row-level review pending |
+| C07 | YES | YES | UNVERIFIED | Older internally valid effect/source checkpoints, incomplete vectors and unavailable/stale/contradictory anchors remain read-only/denied until a complete independent vector matches; row-level review pending |
+| C08 | YES | YES | UNVERIFIED | Source claim/redemption identity, lost/unknown claim status, one-use races and replay preserve the original claim and deny re-claim/contact; row-level review pending |
+| C09 | YES | YES | UNVERIFIED | Budget settlement/slot-release pre-commit rollback and lost-ack replay prevent duplicate credit, dropped charge and duplicate slot release across restart; row-level review pending |
 
 ### F01-F21 acceptance-family matrix
 
@@ -1466,28 +1467,60 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 non-mutation plus canonical relationship/T28 adoption slices independently accepted; accumulated exact-head trace remains |
-| F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 proof-free denial, exact nonexecution proof and generation-bound same-effect retry slices accepted; complete family trace remains |
-| F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
-| F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 verified-receipt ancestry, conditional billing and canonical nonexecution zero-liability release slices accepted; complete family trace remains |
-| F04b | UNVERIFIED | UNVERIFIED | UNVERIFIED | Stop accounting plus T22 repeated terminal-read no-reset/no-release evidence accepted; full family trace remains |
-| F05 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Complete-vector mutation inventory, source/run/effect rollback and stale one-use source denial independently accepted; final exact-head trace remains |
-| F06 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Repository-wide lifecycle/accounting matrix and generation-bound same-effect retry independently accepted; final exact-head trace remains |
-| F07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T06 unknown late-receipt retention plus T17 typed source/control settlement and verified-receipt clearance accepted; complete family remains |
-| F08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-03 and T06 post-contact/late-adjustment slices accepted; full family trace remains |
-| F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal-closure slice accepted; full family trace remains |
-| F10 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 typed query/time/source/response settlement, repository-prefix, exact-origin ordering and operation-proof prefix accepted; complete claim-settlement family remains |
-| F12 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T07 local-nonexecution plus T17 validator/receipt/operation PAUSED-to-BLOCKED recovery slices and semantic migrations accepted; complete family trace remains |
-| F13 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Known/unknown proof-first contrary receipts across exact nonterminal and terminal lifecycle states independently accepted; final exact-head trace remains |
-| F14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 recoverable-failure stop slice accepted; full trace remains |
-| F15 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F16 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact-head trace required |
-| F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | R-STOP-01 terminal closure slice accepted; full family trace remains |
-| F19 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T25 exact all-path nonexecution seal and operation recovery slice accepted; complete before/after-handoff and contradiction trace remains |
-| F20 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Typed bounded validator containment, authority binding, pure checking and strict migration/recovery independently accepted; final exact-head trace remains |
-| F21 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T09 persistence plus T17 exact derivation, receipt/nonexecution clearance, stacked-pause recovery and one-use retry accepted; complete family trace remains |
+| F01 | YES | YES | YES | Canonical effect identity/relationship plus T28 adoption covers revisions/runs, aliases/descriptors, occupied slot, authority consumption/replay, contrary provenance and no-contact behavior; independently accepted |
+| F02 | YES | UNVERIFIED | UNVERIFIED | Proof-bound same-key recovery and one-attempt retry exist, but an explicit matrix proving risk-acceptance, assume-failed, stop/report and new-ID compensation cannot resend or erase history is not complete |
+| F03 | YES | UNVERIFIED | UNVERIFIED | Source-atomic one-use claims, typed lifecycle facts, manual consumption and concurrent redemption exist; no durable assertion currently proves persisted clock rollback denial, and the complete other-host/manual/lost-claim interleaving matrix remains open |
+| F04a | YES | UNVERIFIED | UNVERIFIED | Absolute settlement, worst-case accounting, nonexecution release and authoritative adjustment exist; the explicit below/equal/above-reservation plus no-known-bound-before-contact matrix is incomplete |
+| F04b | YES | YES | UNVERIFIED | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; row-level review pending |
+| F05 | YES | YES | YES | Complete-vector mutation inventory, effect/source rollback, incomplete/stale/unavailable anchors and stale one-use source denial independently accepted |
+| F06 | YES | YES | YES | Repository-wide lifecycle/accounting slot matrix, other item/run denial, crash/restart retention, terminal settlement and generation-bound same-effect retry independently accepted |
+| F07 | YES | YES | UNVERIFIED | Valid receipt plus missing usage/source is retained in reconciliation, cannot launch validation/release slot, and authoritative settlement restores only the original continuation; row-level review pending |
+| F08 | YES | YES | UNVERIFIED | Terminal late receipt with missing/invalid/known usage preserves terminal state, worst-case or prior known charge, slot and later absolute adjustment without reopen/double charge; row-level review pending |
+| F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | No-start/late-result/cessation/order slices exist, but the mandatory terminal-policy failure branch has no policy model or atomic stop-obligation/fence intake route |
+| F10 | YES | YES | UNVERIFIED | Empty check set denies; independent A/B application, FINALIZING cursor, aggregate-gate wait and distinct T16 finalization retain the slot and avoid reapplication; row-level review pending |
+| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Source/control settlement restores the pending validation cursor, but the missing selected-check gate/dependency model prevents the required fresh gate recheck before launch |
+| F12 | YES | YES | UNVERIFIED | Validator non-launch routes to typed BLOCKED/VALIDATING recovery, pause resumes through BLOCKED, T02/accounting cannot bypass T16 and terminal remains unchanged; row-level review pending |
+| F13 | YES | YES | YES | Known/unknown proof-first contrary receipts across every nonterminal and terminal lifecycle class preserve prior proof, true/unknown liability, another slot owner and terminal state; independently accepted |
+| F14 | YES | YES | UNVERIFIED | Recoverable failure retains slot/blocker, explicit remediation permits one fresh T27 attempt, all bypass routes deny and later terminal closure requires complete settlement; row-level review pending |
+| F15 | YES | YES | UNVERIFIED | Result, cessation/cancellation and delayed result remain separate facts; terminal lifecycle does not reopen, contradictions fence and unknown cessation retains the slot; row-level review pending |
+| F16 | YES | YES | UNVERIFIED | UNKNOWN observation is retained once, later APPLY references it, denied/replayed applications are idempotent and finalization is distinct with no duplicate charge/slot release; row-level review pending |
+| F17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Authority/budget/containment/fence denials exist, but per-check dependency and launch-gate bindings do not; missing/stale selected-check prerequisite cases cannot be expressed or tested |
+| F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Final-failure slices exist, but canonical F18 also requires the missing proof-free T17 terminal-entry/permanent-fence path |
+| F19 | YES | UNVERIFIED | UNVERIFIED | Exact operation/validator all-path nonexecution and recovery exist, but the required before/after-handoff plus contrary proof in every lifecycle/dependent-adoption matrix is incomplete |
+| F20 | YES | YES | YES | Typed bounded validator containment, authority binding, pure checking, output/path/action limits and strict migration/recovery independently accepted |
+| F21 | YES | YES | UNVERIFIED | Exact generated uncertainty fences clear only by bound receipt/nonexecution/accounting proof; stacked/newer/cross-attempt fences survive and crash/retry-initiation ordering is asserted; row-level review pending |
+
+### Exact-head trace authoring evidence
+
+The inventory contains 59 normative rows: 28 transitions, 9 crash boundaries
+and 22 acceptance-family rows because F04a and F04b are separate obligations.
+The authoring audit read the concrete storage/coordinator/adapter routes and the
+assertions behind the cited test groups; names and suite counts were not treated
+as coverage. Independent row review corrected optimistic readiness, selected-
+check gate, terminal-policy and stop-matrix claims. The corrected map finds 18
+implemented transition rows, 15 fully tested transition rows, 8 implemented and
+tested crash rows, 18 implemented acceptance rows and 14 fully tested acceptance
+rows. It retains `UNVERIFIED` for partial rows and for every new independent
+verdict until the corrected map is re-reviewed.
+
+Open transition implementation/coverage includes T01-T03, T07, T08, T11, T14,
+T17, T24 and T27. T18/T19 have implementation surfaces but incomplete durable
+all-state tests; T25 has an implementation surface but incomplete canonical
+test coverage. C01 inherits the missing verified-readiness guarantee. Open F
+rows are F02, F03, F04a, F09, F11, F17, F18 and F19. These are gaps, not
+failures silently converted to acceptance.
+
+| Evidence field | Exact value |
+| --- | --- |
+| Source/evidence head | `a9dbeab2b2e28f2914df32dd55558a2d051517e6` |
+| Host | Microsoft Windows 10.0.26200; Windows NT 10.0.26200.0 |
+| Python / shell | Python 3.14.7; Windows PowerShell Desktop 5.1.26100.9444 |
+| Local package command | `python -m unittest discover -s tools/aegis_delivery_control/tests -p "test_*.py"` |
+| Local package result | Exit 0; 433 tests passed in 78.889 seconds; zero skips |
+| Hosted exact-head result | `gate-guard` passed in 6s; `validate-skills` passed in 1m10s; `windows-offline-checks` passed in 3m6s |
+| Capability outcome | Windows ownership/ACL/reparse/path-swap and process-lock probes executed; POSIX policy unit tests passed but POSIX runtime remains `UNVERIFIED` |
+| Trace plan review | Initial `REVISE` corrected 58 to 59 rows and separated F04a/F04b plus row-level acceptance rules; corrected plan `APPROVE` |
+| Trace implementation review | Initial `REVISE` identified two BLOCKER root causes (verified readiness/dependency provenance and selected-check gates), plus mandatory terminal-policy, proof-free T17/F18 and durable T18/T19 all-state matrix corrections; corrected map re-review `APPROVE`, no findings |
 
 Immediate order:
 
@@ -1497,26 +1530,26 @@ Immediate order:
    `APPROVE`.
 4. Aggregate stop gate - complete; independent `APPROVE`.
 
-Current durable order after the accepted T17 work is:
+Current durable order after the independently approved exact-head trace map is:
 
 1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
-2. The ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and authenticated safe-retry slices are complete and independently accepted; the accumulated matrix row remains UNVERIFIED pending exact-head trace.
+2. The ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and authenticated safe-retry slices are complete and independently accepted; the full row remains `UNVERIFIED` because its proof-free terminal/report-only branch is absent.
 3. T22 complete and independently accepted.
-4. T28 with F01 complete and independently accepted; accumulated rows remain `UNVERIFIED` pending exact-head trace.
-5. Cross-family F05/F06/F13/F20 complete and independently accepted; accumulated rows remain `UNVERIFIED` pending the final exact-head trace.
+4. T28 with F01 complete and independently accepted.
+5. Cross-family F05/F06/F13/F20 complete and independently accepted.
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
-7. Documentation refresh in progress in this checkpoint.
-8. Full local repository validation complete; exact-head hosted validation remains pending commit/push.
-9. Independent pre-commit architecture, security and QA reviews complete with `APPROVE`; exact committed-head/hosted confirmation remains.
-10. Commit, push, PR update and administrator merge only after all gates pass.
+7. Correct the trusted-readiness/dependency-provenance root cause spanning T01-T03/C01, then independently review it.
+8. Correct selected-check dependency/launch-gate binding spanning T11/T27/F11/F17, then independently review it.
+9. Continue through the remaining exact gaps recorded in the matrix: T24/F09, T17/F18, T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
+10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
+11. Commit and push only reviewed checkpoints. Keep PR #99 draft and do not merge until every canonical row and final gate is independently accepted.
 
 This later order is recovered session context, not a superseding design record.
 Before each item, compare it with the current backlog, design and actual diff.
 Any mismatch triggers source reconciliation, not silent reordering. Earlier
-milestones C04, C05 and C09 have historical focused evidence in the backlog, but
-the accumulated exact-head implementation still requires final cross-family
-review. Complete transition/acceptance mapping and final exact-head reviews
-remain open until proven otherwise.
+milestones C04, C05 and C09 have historical focused evidence in the backlog.
+The complete transition/acceptance status map is independently approved; the
+named canonical gaps and final merge-readiness reviews remain open.
 
 CP-WP-003, CP-WP-004 and CP-FUT-001 remain blocked. Do not begin them under
 AEGIS-APR-004.
@@ -1598,9 +1631,11 @@ owner before interpreting it more broadly.
   local-nonexecution slice, T08 validation-pause slice, T14 core/T09-source
   slices, and all ordered T17 validator-result, operation-uncertainty,
   verified-receipt, authoritative-nonexecution and safe-retry slices are
-  independently accepted as recorded in Stages 4-18. Complete T07/T08/T14 and
-  the accumulated T17 row remain UNVERIFIED pending T24/other source families
-  or their exact-head trace, and later final review gates remain.
+  independently accepted as recorded in Stages 4-18. Complete T07/T08/T14 remain
+  `UNVERIFIED` for their missing activity/source families. T17 remains
+  `UNVERIFIED` for its missing proof-free terminal/report-only branch, while
+  T24 separately lacks mandatory terminal-policy intake. Later final review
+  gates also remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
@@ -1609,11 +1644,13 @@ owner before interpreting it more broadly.
   foundation derives and preserves uncertainty; the verified-receipt route now
   resolves only its exact proof-covered set. The authoritative-nonexecution and
   safe-retry slice adds no real adapter, authority or provider integration.
-- No complete T01-T28/C01-C09/F01-F21 exact-head mapping was claimed.
-- No full platform matrix or final hosted check result is claimed in this
-  document unless PR #99 later records it.
-- No independent final architecture, security or QA approval exists for the
-  accumulated checkpoint.
+- The exact-head T01-T28/C01-C09/F01-F21 map is complete and independently
+  approved as an honest status map; it does not promote the open rows listed in
+  Section 10.
+- Windows exact-head hosted checks are recorded for `a9dbeab`; POSIX runtime
+  evidence remains absent.
+- Independent final architecture, security and QA approval of a merge-ready
+  accumulated checkpoint does not yet exist.
 - No merge, release, deployment, provider call, production-data operation,
   external integration or real authority/adapter work was performed.
 
@@ -1628,8 +1665,8 @@ verified-receipt route and the authoritative-nonexecution/safe-retry slice. The
 T22 terminal-restart report, T28/F01 verified-effect adoption and cross-family
 F05/F06/F13/F20 are also independently accepted. Filesystem ownership/reparse/
 path-swap protection is independently accepted on Windows; POSIX runtime remains
-`UNVERIFIED`. The corrected pre-commit diff has independent architecture,
-security and QA `APPROVE`. The next gates are exact committed-head/hosted
-confirmation and the final trace. Keep PR
-#99 draft until every remaining backlog and final review gate passes; no merge
+`UNVERIFIED`. Exact committed-head hosted checks for `a9dbeab` passed, and the
+corrected exact-head trace map has independent `APPROVE`. The next implementation
+gate is the T01-T03/C01 trusted-readiness/dependency-provenance root cause. Keep
+PR #99 draft until every remaining backlog and final review gate passes; no merge
 or deployment decision is currently due.
