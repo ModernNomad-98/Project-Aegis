@@ -1159,6 +1159,36 @@ remain conservatively `UNVERIFIED` until the final exact-head trace. PR #99
 remains open, draft and blocked; documentation and final architecture/security/
 QA review gates remain, and this checkpoint authorizes no release or deployment.
 
+### Stage 19 - T01-T03/C01 trusted readiness and dependency provenance
+
+The local reviewed checkpoint makes T01 accept only separately HMAC-bound
+synthetic operator-role evidence and records explicit prior plan dependencies.
+T02 requires separately signed readiness evidence with a durable dependency
+snapshot and complete predecessor/source-head vector. T03 consumes only the
+current verified T02 record, preserves its source anchor in the intent, and
+requires a fresh T02 for the authorized proven-nonexecution retry. Dependency
+snapshot issuance, write-time validation and recovery all use the same next
+writer-epoch history boundary.
+
+The focused four-test regression set passed in 2.499 seconds and covered
+completed dependency -> ready -> T03, late UNKNOWN receipt -> dependent
+re-block, source-anchor tamper/restart, and retry denial before a fresh T02.
+Storage tests passed 327 tests in 67.146 seconds; the complete delivery-control
+package passed 442 tests in 99.746 seconds. `git diff --check` passed with only
+Windows line-ending notices.
+The plan audit reached `APPROVE` after correction; the independent implementation
+review and its post-hardening re-review both returned `APPROVE` with no findings.
+
+Changed files are `authority.py`, `contracts.py`, `storage.py`,
+`test_dispatch.py`, `test_recovery.py`, `test_storage.py` and the new test
+helper `tests/_trusted_readiness_store.py` intended for explicit staging.
+Canonical design, approval
+register, BER, dependencies, CI, real authority/adapters, external systems and
+preserved artifact/cache paths remain intentionally untouched. This evidence is
+local and uncommitted at handoff-authoring time: T01-T03/C01 remain
+`UNVERIFIED` in the accumulated exact-head matrix until committed-head trace
+review and hosted checks justify any promotion.
+
 ## 8. Proven invocations
 
 | Command | Tell-tale result |
@@ -1416,9 +1446,9 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| T01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `accept_plan` binds repo/item/effect/policy/checks but has no operator-role binding or dependency graph/cycle model; full canonical acceptance is absent |
-| T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `evaluate_readiness` is atomic/replay-safe, but trusts caller `prerequisites_met` and an unsigned input digest; no trusted verifier establishes current inputs/dependencies |
-| T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Intent/dispatch guards exist, but T03 carries no verified-readiness reference and accepts the initial T01-created PLANNED state, allowing T02 to be skipped |
+| T01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Local Stage 19 adds authenticated acceptance and explicit prior dependency provenance; aggregate exact-head trace/review is still pending |
+| T02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Local Stage 19 adds signed readiness, epoch-bound dependency snapshots and predecessor/source vectors; aggregate exact-head trace/review is still pending |
+| T03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Local Stage 19 requires current verified T02 provenance and fresh retry readiness with a durable source anchor; aggregate exact-head trace/review is still pending |
 | T04 | YES | YES | UNVERIFIED | `pause_before_dispatch`; dual-event atomic commit, lost-ack replay, operator binding and fence-tamper assertions in `test_t04_*`; row-level review pending |
 | T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
@@ -1451,7 +1481,7 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| C01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Pre-intent rollback is asserted, but retry can proceed from initial PLANNED without a trusted T02 readiness evaluation, so cached/unverified prerequisites are not excluded |
+| C01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Local Stage 19 rejects initial/retry dispatch without current signed T02 readiness and asserts rollback/recovery; aggregate exact-head trace/review is still pending |
 | C02 | YES | YES | UNVERIFIED | Operation and validator intent/launch commit-before-contact failures retain intent, claim, reservation and slot, deny redispatch, and require bound nonexecution/recovery; row-level review pending |
 | C03 | YES | YES | UNVERIFIED | Accepted synthetic effect with missing receipt preserves original key, worst-case accounting and slot; canonical-ledger recovery and no-redispatch assertions cover restart; row-level review pending |
 | C04 | YES | YES | UNVERIFIED | Effect and validator observation intake pre/post-commit failures preserve one immutable observation/accounting reference and later apply without recontact/recharge; row-level review pending |
@@ -1503,11 +1533,11 @@ tested crash rows, 18 implemented acceptance rows and 14 fully tested acceptance
 rows. It retains `UNVERIFIED` for partial rows and for every new independent
 verdict until the corrected map is re-reviewed.
 
-Open transition implementation/coverage includes T01-T03, T07, T08, T11, T14,
-T17, T24 and T27. T18/T19 have implementation surfaces but incomplete durable
-all-state tests; T25 has an implementation surface but incomplete canonical
-test coverage. C01 inherits the missing verified-readiness guarantee. Open F
-rows are F02, F03, F04a, F09, F11, F17, F18 and F19. These are gaps, not
+Open transition implementation/coverage includes T07, T08, T11, T14, T17, T24
+and T27. T18/T19 have implementation surfaces but incomplete durable all-state
+tests; T25 has an implementation surface but incomplete canonical test coverage.
+C01 remains conservatively unverified pending an exact-head aggregate trace.
+Open F rows are F02, F03, F04a, F09, F11, F17, F18 and F19. These are gaps, not
 failures silently converted to acceptance.
 
 | Evidence field | Exact value |
@@ -1538,7 +1568,7 @@ Current durable order after the independently approved exact-head trace map is:
 4. T28 with F01 complete and independently accepted.
 5. Cross-family F05/F06/F13/F20 complete and independently accepted.
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
-7. Correct the trusted-readiness/dependency-provenance root cause spanning T01-T03/C01, then independently review it.
+7. T01-T03/C01 trusted-readiness/dependency-provenance local correction is independently approved; retain aggregate rows as `UNVERIFIED` pending committed exact-head trace.
 8. Correct selected-check dependency/launch-gate binding spanning T11/T27/F11/F17, then independently review it.
 9. Continue through the remaining exact gaps recorded in the matrix: T24/F09, T17/F18, T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
@@ -1666,7 +1696,9 @@ T22 terminal-restart report, T28/F01 verified-effect adoption and cross-family
 F05/F06/F13/F20 are also independently accepted. Filesystem ownership/reparse/
 path-swap protection is independently accepted on Windows; POSIX runtime remains
 `UNVERIFIED`. Exact committed-head hosted checks for `a9dbeab` passed, and the
-corrected exact-head trace map has independent `APPROVE`. The next implementation
-gate is the T01-T03/C01 trusted-readiness/dependency-provenance root cause. Keep
-PR #99 draft until every remaining backlog and final review gate passes; no merge
-or deployment decision is currently due.
+corrected exact-head trace map has independent `APPROVE`. The local
+T01-T03/C01 trusted-readiness/dependency-provenance correction is independently
+approved but remains aggregate-`UNVERIFIED` until committed exact-head trace
+review. The next implementation gate is selected-check dependency/launch-gate
+binding across T11/T27/F11/F17. Keep PR #99 draft until every remaining backlog
+and final review gate passes; no merge or deployment decision is currently due.

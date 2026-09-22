@@ -1081,15 +1081,16 @@ accepted rows retain their verdicts. Corrected-map re-review approved these
 conservative statuses; rows without prior complete acceptance remain
 `UNVERIFIED` rather than being promoted by the mapping review itself.
 
-The audit does not hide the remaining gaps. T01-T03 lack trusted readiness and
-dependency provenance; T11/T27 lack selected-check dependency and launch-gate
-bindings; T07, T08, T14 and T17 are partial; T24 lacks mandatory terminal-
-policy intake behavior. T18/T19 need durable every-nonterminal-state matrices,
-and T25 has incomplete all-state/contradiction coverage. C01 inherits the
-readiness gap. F02, F03, F04a, F09, F11, F17, F18 and F19 remain incomplete.
-The handoff records exact routes, test evidence and missing clauses. These rows
-stay `UNVERIFIED`; CP-WP-002 and PR #99 remain blocked from DONE/merge until the
-gaps are corrected and independently accepted.
+The audit does not hide the remaining gaps. The local reviewed T01-T03/C01
+trusted-readiness/dependency-provenance correction remains aggregate
+`UNVERIFIED` until committed exact-head trace review. T11/T27 lack selected-
+check dependency and launch-gate bindings; T07, T08, T14 and T17 are partial;
+T24 lacks mandatory terminal-policy intake behavior. T18/T19 need durable
+every-nonterminal-state matrices, and T25 has incomplete all-state/contradiction
+coverage. F02, F03, F04a, F09, F11, F17, F18 and F19 remain incomplete. The
+handoff records exact routes, test evidence and missing clauses. CP-WP-002 and
+PR #99 remain blocked from DONE/merge until the gaps are corrected and
+independently accepted.
 
 The plan audit first returned `REVISE` because it counted 58 rows and did not
 separate F04a/F04b; the corrected 59-row, assertion-level, non-circular plan

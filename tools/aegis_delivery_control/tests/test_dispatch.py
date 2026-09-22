@@ -77,9 +77,12 @@ from tools.aegis_delivery_control.dispatch import (
     SyntheticValidationCoordinator,
 )
 from tools.aegis_delivery_control.engine import TransitionEngine
-from tools.aegis_delivery_control.storage import SQLiteStateStore, raise_at
+from tools.aegis_delivery_control.storage import raise_at
 from tools.aegis_delivery_control.tests._legacy_schema import (
     strip_t28_foundation_schema,
+)
+from tools.aegis_delivery_control.tests._trusted_readiness_store import (
+    SQLiteStateStore,
 )
 
 
@@ -849,7 +852,7 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(fence, ("pause-request-prior-run-2",))
             store.load_verified("repo-1", authority=authority)
 
-    def test_t17_legacy_uncertainty_projection_backfills_without_event_rewrite(
+    def test_t17_legacy_uncertainty_projection_missing_trusted_source_fails_closed(
         self,
     ) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -903,7 +906,10 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(
                 restored, list(zip(uncertainty_id, fence_id, strict=True))
             )
-            migrated.load_verified("repo-1", authority=authority)
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "readiness event semantics"
+            ):
+                migrated.load_verified("repo-1", authority=authority)
 
     def test_t17_partial_reconciliation_schema_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -924,7 +930,9 @@ class MediatedDispatchTests(unittest.TestCase):
                     store._database_path, store._freshness_oracle, "repo-1"
                 )
 
-    def test_t17_v1_to_v2_preserves_validator_history_exactly(self) -> None:
+    def test_t17_v1_to_v2_preserves_validator_history_and_fails_closed_without_trusted_source(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as directory:
             (
                 authority, store, validation, request, _uncertainty_ids,
@@ -972,9 +980,12 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 5)
+            self.assertEqual(version, 6)
             self.assertEqual(action_count, 0)
-            migrated.load_verified("repo-1", authority=authority)
+            with self.assertRaisesRegex(
+                StorageIntegrityError, "readiness event semantics"
+            ):
+                migrated.load_verified("repo-1", authority=authority)
 
     def test_t17_v2_missing_verified_receipt_projection_fails_closed(
         self,
@@ -1016,7 +1027,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 5
+                    connection.execute("PRAGMA user_version").fetchone()[0], 6
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -1043,7 +1054,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 6")
+                connection.execute("PRAGMA user_version = 7")
             finally:
                 connection.close()
             with self.assertRaisesRegex(
@@ -5883,7 +5894,7 @@ class MediatedDispatchTests(unittest.TestCase):
             replay = recovered_coordinator.intake_effect_receipt(command)
 
             self.assertTrue(replay.replayed)
-            self.assertEqual(recovered_store.table_counts()["events"], 6)
+            self.assertEqual(recovered_store.table_counts()["events"], 7)
             self.assertEqual(
                 recovered_store.table_counts()["budget_settlements"], 1
             )

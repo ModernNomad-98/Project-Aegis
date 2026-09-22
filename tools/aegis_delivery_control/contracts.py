@@ -391,6 +391,7 @@ class PlanAcceptanceRequest:
     relationship_source_version: str | None = None
     relationship_terms_digest: str | None = None
     relationship_scope_digest: str | None = None
+    dependency_plan_ids: tuple[str, ...] = ()
 
     def validate(self) -> None:
         identifiers = (
@@ -427,6 +428,15 @@ class PlanAcceptanceRequest:
             raise ValueError("validation check identifiers must be non-empty")
         if len(set(self.check_ids)) != len(self.check_ids):
             raise ValueError("validation check identifiers must be unique")
+        if any(
+            not isinstance(plan_id, str) or not plan_id.strip()
+            for plan_id in self.dependency_plan_ids
+        ):
+            raise ValueError("dependency plan identifiers must be non-empty")
+        if len(set(self.dependency_plan_ids)) != len(self.dependency_plan_ids):
+            raise ValueError("dependency plan identifiers must be unique")
+        if self.plan_id in self.dependency_plan_ids:
+            raise ValueError("accepted plan cannot depend on itself")
         if any(
             not gate_id or not gate_id.strip()
             for gate_id in self.aggregate_gate_ids

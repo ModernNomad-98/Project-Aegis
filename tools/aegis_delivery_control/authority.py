@@ -354,6 +354,46 @@ class SyntheticAdoptionReadinessEvidence:
 
 
 @dataclass(frozen=True)
+class SyntheticPlanAcceptanceEvidence:
+    evidence_id: str
+    source_id: str
+    source_version: str
+    operator_id: str
+    operator_role: str
+    action: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    command_id: str
+    acceptance_payload_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticOperationReadinessEvidence:
+    evidence_id: str
+    source_id: str
+    source_version: str
+    action: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    revision_digest: str
+    acceptance_payload_digest: str
+    inputs_evidence_digest: str
+    prerequisites_met: bool
+    dependency_snapshot: tuple[tuple[str, str, str, str, str], ...]
+    predecessor_head_vector: tuple[tuple[str, str], ...]
+    predecessor_catalog_head: str
+    observed_at: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
 class SyntheticLegacyDescriptorBindingEvidence:
     evidence_id: str
     repository_id: str
@@ -580,6 +620,139 @@ class SyntheticAuthority:
             or not hmac.compare_digest(evidence.issuer_mac, expected)
         ):
             raise DispatchDenied("synthetic adoption readiness is untrusted")
+
+    def issue_plan_acceptance_evidence(
+        self, **fields: str
+    ) -> SyntheticPlanAcceptanceEvidence:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(SyntheticPlanAcceptanceEvidence.__dataclass_fields__) - {
+            "issuer_mac"
+        }
+        if set(fields) != required:
+            raise ValueError("synthetic plan-acceptance fields are incomplete")
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in fields.values()
+        ):
+            raise ValueError("synthetic plan-acceptance fields must be non-empty")
+        if (
+            fields["operator_role"] != "PLAN_ACCEPTOR"
+            or fields["action"] != "ACCEPT_PLAN"
+        ):
+            raise ValueError(
+                "synthetic plan acceptance requires the fixed operator role"
+            )
+        return SyntheticPlanAcceptanceEvidence(
+            **fields,
+            issuer_mac=self._mac("SYNTHETIC_PLAN_ACCEPTANCE", **fields),
+        )
+
+    def verify_plan_acceptance_evidence(
+        self, evidence: SyntheticPlanAcceptanceEvidence
+    ) -> None:
+        fields = {
+            key: value for key, value in evidence.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_PLAN_ACCEPTANCE", **fields)
+        if (
+            evidence.issuer_fingerprint != self.issuer_fingerprint
+            or evidence.operator_role != "PLAN_ACCEPTOR"
+            or evidence.action != "ACCEPT_PLAN"
+            or not hmac.compare_digest(evidence.issuer_mac, expected)
+        ):
+            raise DispatchDenied("synthetic plan acceptance is untrusted")
+
+    def issue_operation_readiness_evidence(
+        self, **fields: object
+    ) -> SyntheticOperationReadinessEvidence:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(SyntheticOperationReadinessEvidence.__dataclass_fields__) - {
+            "issuer_mac"
+        }
+        if set(fields) != required:
+            raise ValueError("synthetic operation-readiness fields are incomplete")
+        if fields.get("action") != "EVALUATE_OPERATION_READINESS":
+            raise ValueError("synthetic readiness requires the fixed verifier action")
+        if type(fields.get("prerequisites_met")) is not bool:
+            raise ValueError("synthetic readiness prerequisite result must be boolean")
+        self._parse_utc(str(fields["observed_at"]), field="observed_at")
+        string_fields = {
+            key: value for key, value in fields.items()
+            if key not in {
+                "prerequisites_met", "dependency_snapshot",
+                "predecessor_head_vector",
+            }
+        }
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in string_fields.values()
+        ):
+            raise ValueError("synthetic operation-readiness fields must be non-empty")
+        dependency_snapshot = fields.get("dependency_snapshot")
+        predecessor_head_vector = fields.get("predecessor_head_vector")
+        if not isinstance(dependency_snapshot, tuple) or any(
+            not isinstance(row, tuple)
+            or len(row) != 5
+            or any(not isinstance(value, str) or not value for value in row)
+            for row in dependency_snapshot
+        ):
+            raise ValueError("synthetic readiness dependency snapshot is invalid")
+        if (
+            dependency_snapshot
+            != tuple(sorted(dependency_snapshot, key=lambda row: row[0]))
+            or len({row[0] for row in dependency_snapshot})
+            != len(dependency_snapshot)
+        ):
+            raise ValueError(
+                "synthetic readiness dependency snapshot must be canonical"
+            )
+        if not isinstance(predecessor_head_vector, tuple) or any(
+            not isinstance(row, tuple)
+            or len(row) != 2
+            or any(not isinstance(value, str) or not value for value in row)
+            for row in predecessor_head_vector
+        ):
+            raise ValueError("synthetic readiness head vector is invalid")
+        if (
+            predecessor_head_vector != tuple(sorted(predecessor_head_vector))
+            or len({row[0] for row in predecessor_head_vector})
+            != len(predecessor_head_vector)
+        ):
+            raise ValueError(
+                "synthetic readiness head vector must be canonical"
+            )
+        return SyntheticOperationReadinessEvidence(
+            **fields,
+            issuer_mac=self._mac("SYNTHETIC_OPERATION_READINESS", **fields),
+        )
+
+    def verify_operation_readiness_evidence(
+        self, evidence: SyntheticOperationReadinessEvidence
+    ) -> None:
+        fields = {
+            key: value for key, value in evidence.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_OPERATION_READINESS", **fields)
+        canonical_dependencies = tuple(
+            sorted(evidence.dependency_snapshot, key=lambda row: row[0])
+        )
+        canonical_heads = tuple(sorted(evidence.predecessor_head_vector))
+        if (
+            evidence.issuer_fingerprint != self.issuer_fingerprint
+            or evidence.action != "EVALUATE_OPERATION_READINESS"
+            or evidence.dependency_snapshot != canonical_dependencies
+            or len({row[0] for row in evidence.dependency_snapshot})
+            != len(evidence.dependency_snapshot)
+            or evidence.predecessor_head_vector != canonical_heads
+            or len({row[0] for row in evidence.predecessor_head_vector})
+            != len(evidence.predecessor_head_vector)
+            or not hmac.compare_digest(evidence.issuer_mac, expected)
+        ):
+            raise DispatchDenied("synthetic operation readiness is untrusted")
 
     def issue_legacy_descriptor_binding_evidence(
         self, **fields: str

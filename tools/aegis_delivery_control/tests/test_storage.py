@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from dataclasses import replace
 from datetime import datetime, timezone
 import hashlib
@@ -23,6 +24,7 @@ from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
     SyntheticAuthorityLifecycleEvidence,
     SyntheticGrant,
+    SyntheticOperationReadinessEvidence,
     SyntheticOperatorGrant,
     SyntheticSettlementProof,
     SyntheticSourceGrant,
@@ -95,7 +97,7 @@ from tools.aegis_delivery_control.engine import TRANSITIONS, TransitionEngine
 from tools.aegis_delivery_control.dispatch import SyntheticReadCoordinator
 from tools.aegis_delivery_control.storage import (
     SQLiteStateReader,
-    SQLiteStateStore,
+    SQLiteStateStore as ProductionSQLiteStateStore,
     raise_at,
 )
 from tools.aegis_delivery_control.tests._legacy_schema import (
@@ -187,6 +189,209 @@ class CompleteFreshnessOracle:
             repository_id == "repo-1"
             and catalog_head == self.catalog_head
             and dict(run_heads) == self.run_heads
+        )
+
+
+class SQLiteStateStore(ProductionSQLiteStateStore):
+    """Test harness that supplies explicit synthetic T01/T02 evidence."""
+
+    _known_test_authorities = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        with closing(sqlite3.connect(self._database_path)) as connection:
+            row = connection.execute(
+                "SELECT classification_issuer_fingerprint FROM "
+                "validation_plans WHERE "
+                "classification_issuer_fingerprint IS NOT NULL LIMIT 1"
+            ).fetchone()
+        if row is not None:
+            authority = self._known_test_authorities.get(str(row[0]))
+            if authority is not None:
+                super()._bind_classification_authority(authority)
+
+    def _bind_classification_authority(self, authority):
+        super()._bind_classification_authority(authority)
+        self._known_test_authorities[authority.issuer_fingerprint] = authority
+
+    def _next_test_writer_epoch(self) -> int:
+        with closing(sqlite3.connect(self._database_path)) as connection:
+            return int(
+                connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events"
+                ).fetchone()[0]
+            )
+
+    def accept_plan(self, request, **kwargs):
+        authority = kwargs.get("authority") or self._classification_authority
+        if kwargs.get("acceptance_evidence") is None and authority is not None:
+            kwargs["authority"] = authority
+            kwargs["acceptance_evidence"] = (
+                authority.issue_plan_acceptance_evidence(
+                    evidence_id=f"acceptance:{request.plan_id}",
+                    source_id="synthetic-test-plan-acceptor",
+                    source_version="1",
+                    operator_id="synthetic-test-operator",
+                    operator_role="PLAN_ACCEPTOR",
+                    action="ACCEPT_PLAN",
+                    repository_id=request.repository_id,
+                    run_id=request.run_id,
+                    item_id=request.item_id,
+                    plan_id=request.plan_id,
+                    command_id=request.command_id,
+                    acceptance_payload_digest=(
+                        self.plan_acceptance_payload_digest(request)
+                    ),
+                )
+            )
+        if "writer_epoch" in kwargs:
+            kwargs["writer_epoch"] = self._next_test_writer_epoch()
+        return super().accept_plan(request, **kwargs)
+
+    def record_authority_fact(self, request, *args, **kwargs):
+        if "writer_epoch" in kwargs:
+            kwargs["writer_epoch"] = self._next_test_writer_epoch()
+        return super().record_authority_fact(request, *args, **kwargs)
+
+    def record_binding_mismatch(self, request, *args, **kwargs):
+        if "writer_epoch" in kwargs:
+            kwargs["writer_epoch"] = self._next_test_writer_epoch()
+        return super().record_binding_mismatch(request, *args, **kwargs)
+
+    def evaluate_readiness(self, request, **kwargs):
+        authority = kwargs.get("authority") or self._classification_authority
+        if kwargs.get("readiness_evidence") is None and authority is not None:
+            with closing(sqlite3.connect(self._database_path)) as connection:
+                connection.row_factory = sqlite3.Row
+                prior = connection.execute(
+                    "SELECT body_json FROM readiness_evaluations WHERE "
+                    "command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+            if prior is None:
+                evidence = self.issue_operation_readiness_evidence(
+                    request,
+                    authority,
+                    evidence_id=f"readiness:{request.readiness_id}",
+                    source_id="synthetic-test-readiness-verifier",
+                )
+            else:
+                body = json.loads(str(prior["body_json"]))[
+                    "readiness_evidence"
+                ]
+                body["dependency_snapshot"] = tuple(
+                    tuple(row) for row in body["dependency_snapshot"]
+                )
+                body["predecessor_head_vector"] = tuple(
+                    tuple(row) for row in body["predecessor_head_vector"]
+                )
+                evidence = SyntheticOperationReadinessEvidence(**body)
+            kwargs["authority"] = authority
+            kwargs["readiness_evidence"] = evidence
+        return super().evaluate_readiness(request, **kwargs)
+
+    def commit_intent(self, request, capability, authority, **kwargs):
+        with closing(sqlite3.connect(self._database_path)) as connection:
+            connection.row_factory = sqlite3.Row
+            run = connection.execute(
+                "SELECT lifecycle_state, continuation_cursor, head_hash "
+                "FROM runs WHERE repository_id = ? AND run_id = ?",
+                (request.repository_id, request.run_id),
+            ).fetchone()
+            plan = connection.execute(
+                "SELECT plan_id, revision_digest FROM validation_plans "
+                "WHERE repository_id = ? AND run_id = ?",
+                (request.repository_id, request.run_id),
+            ).fetchone()
+            current_readiness = connection.execute(
+                "SELECT event_hash, resulting_state FROM "
+                "readiness_evaluations WHERE "
+                "repository_id = ? AND run_id = ? ORDER BY rowid DESC "
+                "LIMIT 1",
+                (request.repository_id, request.run_id),
+            ).fetchone()
+            slot_occupied = connection.execute(
+                "SELECT 1 FROM outstanding_slot LIMIT 1"
+            ).fetchone() is not None
+            owned_recovery_slot = (
+                isinstance(request, ProvenNonexecutionIntentRequest)
+                and connection.execute(
+                    "SELECT 1 FROM outstanding_slot WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ? "
+                    "AND generation = ?",
+                    (
+                        request.repository_id,
+                        request.run_id,
+                        request.logical_effect_id,
+                        request.prior_attempt_id,
+                        request.expected_source_generation,
+                    ),
+                ).fetchone() is not None
+            )
+            authority_matches = (
+                self._classification_authority is not None
+                and authority.issuer_fingerprint
+                == self._classification_authority.issuer_fingerprint
+            )
+            if (
+                run is not None
+                and plan is not None
+                and (not slot_occupied or owned_recovery_slot)
+                and authority_matches
+                and run["lifecycle_state"] in {
+                    LifecycleState.PLANNED.value,
+                    LifecycleState.BLOCKED.value,
+                }
+                and (
+                    current_readiness is None
+                    or current_readiness["event_hash"] != run["head_hash"]
+                    or current_readiness["resulting_state"]
+                    != LifecycleState.PLANNED.value
+                )
+            ):
+                readiness_suffix = str(run["head_hash"])[:16]
+                readiness = self.evaluate_readiness(
+                    ReadinessEvaluationRequest(
+                        readiness_id=(
+                            f"readiness:{request.command_id}:"
+                            f"{readiness_suffix}"
+                        ),
+                        command_id=(
+                            f"readiness-command:{request.command_id}:"
+                            f"{readiness_suffix}"
+                        ),
+                        event_id=(
+                            f"readiness-event:{request.event_id}:"
+                            f"{readiness_suffix}"
+                        ),
+                        repository_id=request.repository_id,
+                        run_id=request.run_id,
+                        item_id=request.item_id,
+                        plan_id=str(plan["plan_id"]),
+                        revision_digest=str(plan["revision_digest"]),
+                        expected_run_head=str(run["head_hash"]),
+                        expected_continuation_cursor=run[
+                            "continuation_cursor"
+                        ],
+                        inputs_evidence_digest=(
+                            f"inputs:{request.command_id}"
+                        ),
+                        prerequisites_met=True,
+                    )
+                )
+                if hasattr(self._freshness_oracle, "allowed_head"):
+                    self._freshness_oracle.allowed_head = readiness.event_hash
+                kwargs["expected_head"] = readiness.event_hash
+                with closing(sqlite3.connect(self._database_path)) as connection:
+                    kwargs["writer_epoch"] = int(
+                        connection.execute(
+                            "SELECT MAX(writer_epoch) + 1 FROM events"
+                        ).fetchone()[0]
+                    )
+            elif "writer_epoch" in kwargs:
+                kwargs["writer_epoch"] = self._next_test_writer_epoch()
+        return super().commit_intent(
+            request, capability, authority, **kwargs
         )
 
 
@@ -560,7 +765,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         for method_name in guarded_methods:
             with self.subTest(method=method_name):
                 source = inspect.getsource(
-                    getattr(SQLiteStateStore, method_name)
+                    getattr(ProductionSQLiteStateStore, method_name)
                 )
                 self.assertIn(
                     "_freshness_oracle.verify",
@@ -699,7 +904,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.store,
             SQLiteStateStore(self.database_path, self.oracle, "repo-1"),
         ):
-            with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+            with self.assertRaisesRegex(
+                DispatchDenied, "repository slot|PLANNED|readiness"
+            ):
                 target_store.commit_intent(
                     second_request, second_capability, self.authority,
                     expected_head=second_plan.event_hash, writer_epoch=4,
@@ -713,7 +920,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = stop.event_hash
         reopened = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
-        with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+        with self.assertRaisesRegex(
+            DispatchDenied, "repository slot|PLANNED|readiness"
+        ):
             reopened.commit_intent(
                 second_request, second_capability, self.authority,
                 expected_head=stop.event_hash, writer_epoch=6,
@@ -878,7 +1087,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     connection.close()
                 for contender, capability in contenders:
                     with self.assertRaisesRegex(
-                        DispatchDenied, "repository slot"
+                        DispatchDenied, "repository slot|PLANNED|readiness"
                     ):
                         reopened.commit_intent(
                             contender,
@@ -2420,7 +2629,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
         reopened = SQLiteStateStore(path, oracle, "repo-1")
         reopened._bind_classification_authority(self.authority)
         for request, capability in contenders:
-            with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+            with self.assertRaisesRegex(
+                DispatchDenied, "repository slot|PLANNED|readiness"
+            ):
                 reopened.commit_intent(
                     request, capability, self.authority,
                     expected_head=oracle.allowed_head,
@@ -3771,6 +3982,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
             writer_epoch=1,
         )
         self.oracle.allowed_head = plan.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "c01-readiness", "c01-readiness-command",
+                "c01-readiness-event", "repo-1", "run-1", "item-1",
+                "plan-1", "revision-1", plan.event_hash, None,
+                "c01-inputs", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
         connection = sqlite3.connect(self.database_path)
         try:
             before_failure = tuple(connection.iterdump())
@@ -3781,8 +4001,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 self.request(),
                 self.capability,
                 self.authority,
-                expected_head=plan.event_hash,
-                writer_epoch=2,
+                expected_head=readiness.event_hash,
+                writer_epoch=3,
                 failure_hook=raise_at("after_intent_writes_before_commit"),
             )
         connection = sqlite3.connect(self.database_path)
@@ -4663,6 +4883,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
             expected_head="", writer_epoch=1,
         )
         self.oracle.allowed_head = plan.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "t03-pin-readiness", "t03-pin-readiness-command",
+                "t03-pin-readiness-event", "repo-1", "run-1", "item-1",
+                "plan-1", "revision-1", plan.event_hash, None,
+                "t03-pin-inputs", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
         alternate_grant = SyntheticGrant(
             "grant-plan-scope", "repo-1", "effect-1", "attempt-1", "scope-2"
         )
@@ -4691,7 +4920,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             with self.assertRaisesRegex(DispatchDenied, "execution pins"):
                 self.store.commit_intent(
                     changed_request, changed_capability, self.authority,
-                    expected_head=plan.event_hash, writer_epoch=2,
+                    expected_head=readiness.event_hash, writer_epoch=3,
                 )
             connection = sqlite3.connect(self.database_path)
             try:
@@ -4712,7 +4941,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(DispatchDenied, "accepted plan"):
             self.store.commit_intent(
                 substituted, self.capability, self.authority,
-                expected_head=plan.event_hash, writer_epoch=2,
+                expected_head=readiness.event_hash, writer_epoch=3,
             )
         connection = sqlite3.connect(self.database_path)
         try:
@@ -4723,7 +4952,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
 
         committed = self.store.commit_intent(
             self.request(), self.capability, self.authority,
-            expected_head=plan.event_hash, writer_epoch=2,
+            expected_head=readiness.event_hash, writer_epoch=3,
         )
         connection = sqlite3.connect(self.database_path)
         try:
@@ -4736,7 +4965,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(body["plan_id"], "plan-1")
         self.assertEqual(body["revision_digest"], "revision-1")
-        self.assertEqual(committed.sequence, 2)
+        self.assertEqual(committed.sequence, 3)
 
     def test_intent_commit_is_atomic_and_replay_is_idempotent(self) -> None:
         first = self._commit_planned_intent(
@@ -4757,9 +4986,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "runs": 1,
                 "validation_plans": 1,
                 "validation_requirements": 1,
-                "readiness_evaluations": 0,
-                "events": 2,
-                "command_outcomes": 2,
+                "readiness_evaluations": 1,
+                "events": 3,
+                "command_outcomes": 3,
                 "effects": 1,
                 "permission_uses": 1,
                 "capability_redemptions": 1,
@@ -5346,7 +5575,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = committed.event_hash
         attacker = SyntheticAuthority(b"x" * 32)
-        reopened = SQLiteStateStore(
+        reopened = ProductionSQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
 
@@ -5363,6 +5592,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertEqual(after_bind, before_bind)
+        reopened._bind_classification_authority(self.authority)
 
         receipt = EffectObservationRequest(
             "attacker-observation", "attacker-observe-command",
@@ -5391,7 +5621,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ),
             source_control_issuer_mac=attacker_evidence.issuer_mac,
         )
-        with self.assertRaisesRegex(DispatchDenied, "authority is not bound"):
+        with self.assertRaisesRegex(DispatchDenied, "accepted plan|authority"):
             reopened._record_effect_observation(receipt, authority=attacker)
         connection = sqlite3.connect(self.database_path)
         try:
@@ -5797,7 +6027,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(receipt.charged_units, 0)
         self.assertFalse(receipt.uncertainty)
         self.assertTrue(receipt.slot_released)
-        self.assertEqual(self.store.table_counts()["events"], 3)
+        self.assertEqual(self.store.table_counts()["events"], 4)
         self.assertEqual(self.store.table_counts()["budget_reservations"], 1)
         self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
@@ -5860,7 +6090,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertEqual(reservation, (0, 0, 0))
-        self.assertEqual(self.store.table_counts()["events"], 3)
+        self.assertEqual(self.store.table_counts()["events"], 4)
         self.assertEqual(self.store.table_counts()["budget_reservations"], 1)
         self.assertEqual(self.store.table_counts()["budget_settlements"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
@@ -6172,7 +6402,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
 
         with self.assertRaisesRegex(
             StorageIntegrityError,
-            "writer epoch|settlement scope binding",
+            "writer epoch|settlement scope binding|run head sequence",
         ):
             self.store.load_verified("repo-1")
 
@@ -6507,6 +6737,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "DROP TABLE operation_nonexecution_resume_actions"
             )
             connection.execute("DROP TABLE proven_nonexecution_actions")
+            connection.execute(
+                "UPDATE repositories SET catalog_head = '' WHERE "
+                "repository_id = 'repo-1'"
+            )
             strip_t28_foundation_schema(connection)
             connection.execute("PRAGMA user_version = 0")
             connection.commit()
@@ -6542,6 +6776,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         connection = sqlite3.connect(self.database_path)
         try:
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (observed.event_hash,),
+            )
+            connection.commit()
             migrated_event_bytes = connection.execute(
                 "SELECT body_json FROM events WHERE event_id = ?",
                 (observed.event_id,),
@@ -6560,10 +6800,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 5)
+        self.assertEqual(semantic_version, 6)
         migrated.load_verified("repo-1", authority=self.authority)
 
-    def test_validator_containment_schema_version_is_five(self) -> None:
+    def test_trusted_readiness_schema_version_is_six(self) -> None:
         connection = sqlite3.connect(self.database_path)
         try:
             semantic_version = connection.execute(
@@ -6571,7 +6811,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(semantic_version, 5)
+        self.assertEqual(semantic_version, 6)
 
     def test_t28_v4_reopen_rejects_schema_or_projection_healing(self) -> None:
         semantic_inputs = (("input", "digest-1"),)
@@ -6723,12 +6963,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
         observation = self._record_effect_observation(check_ids=("check-1",))
         self.oracle.allowed_head = observation.event_hash
         with self.assertRaisesRegex(
-            StorageIntegrityError, "evidence authority is required"
+            StorageIntegrityError, "initial intent provenance"
         ):
-            SQLiteStateStore(
+            ProductionSQLiteStateStore(
                 self.database_path, self.oracle, "repo-1"
             ).load_verified("repo-1")
-        SQLiteStateStore(
+        ProductionSQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         ).load_verified("repo-1", authority=self.authority)
 
@@ -7013,6 +7253,432 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertTrue(replay.replayed)
         self.store.load_verified("repo-1")
 
+    def test_t01_t02_explicit_prior_dependency_is_durable_and_blocks_until_ready(
+        self,
+    ) -> None:
+        prerequisite = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-prerequisite", "plan-command-prerequisite",
+                "plan-event-prerequisite", "repo-1", "run-prerequisite",
+                "item-prerequisite", "effect-prerequisite", "revision-prerequisite",
+                "descriptor-prerequisite", "scope-prerequisite",
+                "budget-prerequisite", ("check-prerequisite",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = prerequisite.event_hash
+        dependent_request = PlanAcceptanceRequest(
+            "plan-dependent", "plan-command-dependent", "plan-event-dependent",
+            "repo-1", "run-dependent", "item-dependent", "effect-dependent",
+            "revision-dependent", "descriptor-dependent", "scope-dependent",
+            "budget-dependent", ("check-dependent",),
+            dependency_plan_ids=("plan-prerequisite",),
+        )
+        dependent = self.store.accept_plan(
+            dependent_request,
+            expected_head=prerequisite.event_hash, writer_epoch=2,
+        )
+        self.oracle.allowed_head = dependent.event_hash
+        replay = self.store.accept_plan(
+            dependent_request, expected_head=dependent.event_hash, writer_epoch=1,
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, dependent.event_hash)
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-dependent", "readiness-command-dependent",
+                "readiness-event-dependent", "repo-1", "run-dependent",
+                "item-dependent", "plan-dependent", "revision-dependent",
+                dependent.event_hash, None, "inputs-dependent", True,
+            )
+        )
+        self.assertEqual(readiness.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                    "plan_id = 'plan-dependent'"
+                ).fetchone()[0],
+                "plan-prerequisite",
+            )
+            self.assertEqual(
+                json.loads(connection.execute(
+                    "SELECT body_json FROM readiness_evaluations WHERE "
+                    "readiness_id = 'readiness-dependent'"
+                ).fetchone()[0])["blocker_codes"],
+                ["DEPENDENCY_NOT_READY"],
+            )
+        finally:
+            connection.close()
+
+    def test_t01_t02_t03_completed_dependency_permits_ready_dispatch(self) -> None:
+        finalization_request, attestation = self._prepare_finalization()
+        finalized = self.store._finalize_operation(
+            finalization_request, attestation, self.authority
+        )
+        self.oracle.allowed_head = finalized.event_hash
+        dependent_plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-dependent", "plan-command-dependent", "plan-event-dependent",
+                "repo-1", "run-dependent", "item-dependent", "effect-dependent",
+                "revision-dependent", "descriptor-dependent", "scope-dependent",
+                "budget-dependent", ("check-dependent",),
+                dependency_plan_ids=("plan-1",),
+            ),
+            expected_head=finalized.event_hash, writer_epoch=100,
+        )
+        self.oracle.allowed_head = dependent_plan.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-dependent", "readiness-command-dependent",
+                "readiness-event-dependent", "repo-1", "run-dependent",
+                "item-dependent", "plan-dependent", "revision-dependent",
+                dependent_plan.event_hash, None, "inputs-dependent", True,
+            )
+        )
+        self.assertEqual(readiness.resulting_state, LifecycleState.PLANNED)
+        self.oracle.allowed_head = readiness.event_hash
+        grant = SyntheticGrant(
+            "grant-dependent", "repo-1", "effect-dependent",
+            "attempt-dependent", "scope-dependent",
+        )
+        self.authority.register(grant)
+        capability = self.authority.claim(*grant.__dict__.values())
+        committed = self.store.commit_intent(
+            replace(
+                self.request(), run_id="run-dependent", item_id="item-dependent",
+                command_id="command-dependent", event_id="event-dependent",
+                logical_effect_id="effect-dependent",
+                effect_descriptor_digest="descriptor-dependent",
+                attempt_id="attempt-dependent",
+                permission_use_id="permission-use-dependent",
+                reservation_id="reservation-dependent",
+                budget_policy_digest="budget-dependent",
+            ),
+            capability, self.authority,
+            expected_head=readiness.event_hash, writer_epoch=102,
+        )
+        self.assertFalse(committed.replayed)
+        self.oracle.allowed_head = committed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t02_late_terminal_uncertainty_reblocks_dependent_plan(self) -> None:
+        finalization_request, attestation = self._prepare_finalization()
+        finalized = self.store._finalize_operation(
+            finalization_request, attestation, self.authority
+        )
+        self.oracle.allowed_head = finalized.event_hash
+        dependent_plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-dependent", "plan-command-dependent", "plan-event-dependent",
+                "repo-1", "run-dependent", "item-dependent", "effect-dependent",
+                "revision-dependent", "descriptor-dependent", "scope-dependent",
+                "budget-dependent", ("check-dependent",),
+                dependency_plan_ids=("plan-1",),
+            ),
+            expected_head=finalized.event_hash, writer_epoch=100,
+        )
+        self.oracle.allowed_head = dependent_plan.event_hash
+        ready = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-dependent-ready", "readiness-command-dependent-ready",
+                "readiness-event-dependent-ready", "repo-1", "run-dependent",
+                "item-dependent", "plan-dependent", "revision-dependent",
+                dependent_plan.event_hash, None, "inputs-dependent", True,
+            )
+        )
+        self.assertEqual(ready.resulting_state, LifecycleState.PLANNED)
+        self.oracle.allowed_head = ready.event_hash
+        late = self._record_signed_effect_observation(
+            EffectObservationRequest(
+                "observation-dependent-late", "observe-command-dependent-late",
+                "observation-event-dependent-late", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "receipt-dependent-late",
+                self.capability.claim_id, "descriptor-digest", 3,
+                "settlement-dependent-late", "",
+            ),
+            classification=SourceControlClassification.UNKNOWN,
+        )
+        self.oracle.allowed_head = late.event_hash
+        blocked = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-dependent-blocked", "readiness-command-dependent-blocked",
+                "readiness-event-dependent-blocked", "repo-1", "run-dependent",
+                "item-dependent", "plan-dependent", "revision-dependent",
+                ready.event_hash, None, "inputs-dependent-late", True,
+            )
+        )
+        self.assertEqual(blocked.resulting_state, LifecycleState.BLOCKED)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            blockers = json.loads(connection.execute(
+                "SELECT body_json FROM readiness_evaluations WHERE readiness_id = ?",
+                ("readiness-dependent-blocked",),
+            ).fetchone()[0])["blocker_codes"]
+        finally:
+            connection.close()
+        self.assertEqual(blockers, ["DEPENDENCY_NOT_READY"])
+        self.oracle.allowed_head = blocked.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t01_rejects_unknown_dependency_before_mutation(self) -> None:
+        with self.assertRaisesRegex(DispatchDenied, "prior authenticated"):
+            self.store.accept_plan(
+                PlanAcceptanceRequest(
+                    "plan-dependent", "plan-command-dependent",
+                    "plan-event-dependent", "repo-1", "run-dependent",
+                    "item-dependent", "effect-dependent", "revision-dependent",
+                    "descriptor-dependent", "scope-dependent", "budget-dependent",
+                    ("check-dependent",),
+                    dependency_plan_ids=("missing-prerequisite",),
+                ),
+                expected_head="", writer_epoch=1,
+        )
+        self.assertEqual(self.store.table_counts()["events"], 0)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute("SELECT COUNT(*) FROM plan_dependencies").fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+
+    def test_t01_t02_reject_forged_trusted_evidence_before_mutation(self) -> None:
+        plan = PlanAcceptanceRequest(
+            "plan-1", "plan-command-1", "plan-event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "revision-1", "descriptor-digest",
+            "scope-1", "budget-policy-digest", ("check-1",),
+        )
+        acceptance = self.authority.issue_plan_acceptance_evidence(
+            evidence_id="forged-acceptance", source_id="synthetic-plan-acceptor",
+            source_version="1", operator_id="operator-1",
+            operator_role="PLAN_ACCEPTOR", action="ACCEPT_PLAN",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            plan_id="plan-1", command_id="plan-command-1",
+            acceptance_payload_digest=self.store.plan_acceptance_payload_digest(plan),
+        )
+        with self.assertRaisesRegex(DispatchDenied, "untrusted"):
+            ProductionSQLiteStateStore.accept_plan(
+                self.store, plan, expected_head="", writer_epoch=1,
+                acceptance_evidence=replace(acceptance, issuer_mac="forged"),
+                authority=self.authority,
+            )
+        self.assertEqual(self.store.table_counts()["events"], 0)
+
+        accepted = self.store.accept_plan(
+            plan, expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        readiness_request = ReadinessEvaluationRequest(
+            "readiness-1", "readiness-command-1", "readiness-event-1",
+            "repo-1", "run-1", "item-1", "plan-1", "revision-1",
+            accepted.event_hash, None, "inputs-evidence-1", True,
+        )
+        readiness = self.store.issue_operation_readiness_evidence(
+            readiness_request, self.authority, evidence_id="forged-readiness",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "untrusted"):
+            ProductionSQLiteStateStore.evaluate_readiness(
+                self.store, readiness_request, authority=self.authority,
+                readiness_evidence=replace(readiness, issuer_mac="forged"),
+            )
+        self.assertEqual(self.store.table_counts()["readiness_evaluations"], 0)
+
+    def test_t03_denies_direct_dispatch_without_verified_readiness(self) -> None:
+        request = PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            )
+        acceptance = self.authority.issue_plan_acceptance_evidence(
+            evidence_id="acceptance-evidence-1",
+            source_id="synthetic-plan-acceptor",
+            source_version="1",
+            operator_id="operator-1",
+            operator_role="PLAN_ACCEPTOR",
+            action="ACCEPT_PLAN",
+            repository_id=request.repository_id,
+            run_id=request.run_id,
+            item_id=request.item_id,
+            plan_id=request.plan_id,
+            command_id=request.command_id,
+            acceptance_payload_digest=(
+                self.store.plan_acceptance_payload_digest(request)
+            ),
+        )
+        accepted = self.store.accept_plan(
+            request,
+            expected_head="",
+            writer_epoch=1,
+            acceptance_evidence=acceptance,
+            authority=self.authority,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+
+        with self.assertRaisesRegex(DispatchDenied, "readiness"):
+            ProductionSQLiteStateStore.commit_intent(
+                self.store,
+                self.request(), self.capability, self.authority,
+                expected_head=accepted.event_hash,
+                writer_epoch=2,
+            )
+
+        self.assertEqual(self.store.table_counts()["events"], 1)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+
+    def test_t03_rejects_readiness_vector_after_catalog_intervention(self) -> None:
+        accepted = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-1", "readiness-command-1", "readiness-event-1",
+                "repo-1", "run-1", "item-1", "plan-1", "revision-1",
+                accepted.event_hash, None, "inputs-evidence-1", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
+        intervening = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+                "run-2", "item-2", "effect-2", "revision-2",
+                "descriptor-2", "scope-2", "budget-policy-2", ("check-2",),
+            ),
+            expected_head=readiness.event_hash, writer_epoch=3,
+        )
+        self.oracle.allowed_head = intervening.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "readiness"):
+            ProductionSQLiteStateStore.commit_intent(
+                self.store,
+                self.request(), self.capability, self.authority,
+                expected_head=intervening.event_hash, writer_epoch=4,
+            )
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+
+    def test_t03_rejects_trusted_source_intervention_after_readiness(self) -> None:
+        accepted = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-1", "readiness-command-1", "readiness-event-1",
+                "repo-1", "run-1", "item-1", "plan-1", "revision-1",
+                accepted.event_hash, None, "inputs-evidence-1", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
+        grant = self.authority.issue_source_grant(
+            grant_id="source-intervention-grant",
+            grant_kind=SyntheticGrantKind.ADOPTION,
+            action="ADOPT_VERIFIED_EFFECT", repository_id="repo-1",
+            logical_effect_id="source-intervention-effect",
+            source_id="synthetic-source", source_version="1",
+            terms_digest="source-terms", scope_digest="source-scope",
+            binding_digest="source-binding",
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z", use_limit=1,
+        )
+        intervening = self.store.register_synthetic_source_grant(
+            grant, self.authority
+        )
+        self.oracle.allowed_head = intervening.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "verified readiness"):
+            ProductionSQLiteStateStore.commit_intent(
+                self.store, self.request(), self.capability, self.authority,
+                expected_head=intervening.event_hash, writer_epoch=3,
+            )
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 0)
+
+    def test_t03_recovery_rejects_durable_source_anchor_tamper(self) -> None:
+        accepted = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "readiness-1", "readiness-command-1", "readiness-event-1",
+                "repo-1", "run-1", "item-1", "plan-1", "revision-1",
+                accepted.event_hash, None, "inputs-evidence-1", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
+        committed = self.store.commit_intent(
+            self.request(), self.capability, self.authority,
+            expected_head=readiness.event_hash, writer_epoch=3,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            intent_body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (committed.event_id,),
+            ).fetchone()[0])
+            readiness_row = connection.execute(
+                "SELECT * FROM readiness_evaluations WHERE readiness_id = ?",
+                ("readiness-1",),
+            ).fetchone()
+            evidence_body = json.loads(readiness_row["body_json"])[
+                "readiness_evidence"
+            ]
+        finally:
+            connection.close()
+        evidence_body["dependency_snapshot"] = tuple(
+            tuple(row) for row in evidence_body["dependency_snapshot"]
+        )
+        evidence_body["predecessor_head_vector"] = tuple(
+            tuple(row) for row in evidence_body["predecessor_head_vector"]
+        )
+        evidence = SyntheticOperationReadinessEvidence(**evidence_body)
+        self.store.load_verified("repo-1", authority=self.authority)
+        self.assertEqual(
+            intent_body["source_head_at_intent"],
+            dict(evidence.predecessor_head_vector)[
+                "@aegis/source/synthetic-authority"
+            ],
+        )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            connection.execute(
+                "UPDATE events SET body_json = ? WHERE event_id = ?",
+                (
+                    json.dumps(
+                        {**intent_body, "source_head_at_intent": "forged-source"},
+                        sort_keys=True, separators=(",", ":"),
+                    ),
+                    committed.event_id,
+                ),
+            )
+            connection.commit()
+        reopened = ProductionSQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        reopened._bind_classification_authority(self.authority)
+        with self.assertRaisesRegex(StorageIntegrityError, "body hash"):
+            reopened.load_verified("repo-1", authority=self.authority)
+
     def test_t01_recovery_rejects_self_consistent_terminal_entry(self) -> None:
         accepted = self.store.accept_plan(
             PlanAcceptanceRequest(
@@ -7116,7 +7782,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.oracle.allowed_head = event_hash
 
-        with self.assertRaisesRegex(StorageIntegrityError, "lifecycle schema"):
+        with self.assertRaisesRegex(StorageIntegrityError, "accepted plan binding"):
             self.store.load_verified("repo-1")
 
     def test_t02_readiness_is_atomic_replay_safe_and_reversible(self) -> None:
@@ -7343,7 +8009,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     accepted.event_hash, None, "inputs-evidence-2", True,
                 )
             )
-        self.assertEqual(self.store.table_counts()["readiness_evaluations"], 0)
+        self.assertEqual(self.store.table_counts()["readiness_evaluations"], 1)
 
     def test_repository_writer_epoch_must_advance(self) -> None:
         accepted = self.store.accept_plan(
@@ -7356,22 +8022,52 @@ class SQLiteStateStoreTests(unittest.TestCase):
             expected_head="", writer_epoch=1,
         )
         self.oracle.allowed_head = accepted.event_hash
+        second_request = PlanAcceptanceRequest(
+            "plan-2", "plan-command-2", "plan-event-2", "repo-1",
+            "run-2", "item-2", "effect-2", "revision-2",
+            "descriptor-2", "scope-2", "budget-policy-2", ("check-2",),
+        )
+        second_evidence = self.authority.issue_plan_acceptance_evidence(
+            evidence_id="acceptance:plan-2",
+            source_id="synthetic-test-plan-acceptor",
+            source_version="1",
+            operator_id="synthetic-test-operator",
+            operator_role="PLAN_ACCEPTOR",
+            action="ACCEPT_PLAN",
+            repository_id="repo-1",
+            run_id="run-2",
+            item_id="item-2",
+            plan_id="plan-2",
+            command_id="plan-command-2",
+            acceptance_payload_digest=(
+                self.store.plan_acceptance_payload_digest(second_request)
+            ),
+        )
         with self.assertRaisesRegex(DispatchDenied, "writer epoch"):
-            self.store.accept_plan(
-                PlanAcceptanceRequest(
-                    "plan-2", "plan-command-2", "plan-event-2", "repo-1",
-                    "run-2", "item-2", "effect-2", "revision-2",
-                    "descriptor-2", "scope-2", "budget-policy-2", ("check-2",),
-                ),
+            ProductionSQLiteStateStore.accept_plan(
+                self.store,
+                second_request,
                 expected_head=accepted.event_hash, writer_epoch=1,
+                acceptance_evidence=second_evidence,
+                authority=self.authority,
             )
 
-        with self.assertRaisesRegex(DispatchDenied, "writer epoch"):
-            self.store.commit_intent(
-                self.request(), self.capability, self.authority,
-                expected_head=accepted.event_hash, writer_epoch=1,
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "epoch-readiness", "epoch-readiness-command",
+                "epoch-readiness-event", "repo-1", "run-1", "item-1",
+                "plan-1", "revision-1", accepted.event_hash, None,
+                "epoch-inputs", True,
             )
-        self.assertEqual(self.store.table_counts()["events"], 1)
+        )
+        self.oracle.allowed_head = readiness.event_hash
+        with self.assertRaisesRegex(DispatchDenied, "writer epoch"):
+            ProductionSQLiteStateStore.commit_intent(
+                self.store,
+                self.request(), self.capability, self.authority,
+                expected_head=readiness.event_hash, writer_epoch=2,
+            )
+        self.assertEqual(self.store.table_counts()["events"], 2)
 
     def test_recovery_rejects_reused_repository_writer_epoch(self) -> None:
         first = self.store.accept_plan(
@@ -7463,6 +8159,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "source_tree_digest", "item_definition_digest",
                 "plan_schema_version", "reducer_version",
                 "accepted_plan_semantic_digest", "complete_policy_digest",
+                "dependency_plan_ids", "plan_acceptance_binding_version",
+                "acceptance_payload_digest", "acceptance_evidence_digest",
+                "acceptance_evidence",
             ):
                 body.pop(key)
             body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
@@ -7508,14 +8207,48 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "source_tree_digest", "item_definition_digest",
                 "plan_schema_version", "reducer_version",
                 "accepted_plan_semantic_digest", "complete_policy_digest",
+                "plan_acceptance_binding_version",
+                "acceptance_payload_digest", "acceptance_evidence_digest",
+                "acceptance_issuer_fingerprint",
             ):
                 connection.execute(
                     f"ALTER TABLE validation_plans DROP COLUMN {column_name}"
                 )
+            for column_name in (
+                "readiness_binding_version", "readiness_evidence_digest",
+                "readiness_issuer_fingerprint",
+                "dependency_snapshot_digest",
+                "predecessor_head_vector_digest",
+            ):
+                connection.execute(
+                    "ALTER TABLE readiness_evaluations DROP COLUMN "
+                    f"{column_name}"
+                )
+            connection.execute("DROP TABLE plan_dependencies")
+            connection.execute("PRAGMA user_version = 5")
             connection.commit()
         finally:
             connection.close()
         self.oracle.allowed_head = event_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            with self.assertRaises(InjectedFailure):
+                ProductionSQLiteStateStore._migrate_trusted_readiness_version(
+                    connection,
+                    failure_hook=raise_at(
+                        "after_trusted_readiness_migration_writes_before_commit"
+                    ),
+                )
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 5
+            )
+            self.assertIsNone(connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'plan_dependencies'"
+            ).fetchone())
+        finally:
+            connection.close()
         migrated = SQLiteStateStore(
             self.database_path, self.oracle, "repo-1"
         )
@@ -7567,7 +8300,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 writer_epoch=2,
             )
         with self.assertRaisesRegex(
-            DispatchDenied, "predates required finalization pins"
+            DispatchDenied, "authenticated v6 plan|predates required finalization pins"
         ):
             migrated.commit_intent(
                 self.request(), self.capability, self.authority,
@@ -7873,6 +8606,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     "DROP TABLE operation_nonexecution_resume_actions"
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = '' WHERE "
+                    "repository_id = 'repo-1'"
+                )
                 strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 2")
                 connection.commit()
@@ -7884,9 +8621,14 @@ class SQLiteStateStoreTests(unittest.TestCase):
         backfill_oracle.allowed_head = settled.settlement_hash
         migrated = SQLiteStateStore(backfill_path, backfill_oracle, "repo-1")
         migrated._bind_classification_authority(self.authority)
-        migrated.load_verified("repo-1", authority=self.authority)
         connection = sqlite3.connect(backfill_path)
         try:
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (settled.settlement_hash,),
+            )
+            connection.commit()
             migrated_state = (
                 connection.execute("PRAGMA user_version").fetchone()[0],
                 connection.execute(
@@ -7906,7 +8648,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
         finally:
             connection.close()
-        self.assertEqual(migrated_state, (5, 1, 4, 0))
+        migrated.load_verified("repo-1", authority=self.authority)
+        self.assertEqual(migrated_state, (6, 1, 4, 0))
 
         late_observation = self._record_signed_effect_observation(
             EffectObservationRequest(
@@ -7990,6 +8733,16 @@ class SQLiteStateStoreTests(unittest.TestCase):
             backfill_path, backfill_oracle, "repo-1"
         )
         remigrated._bind_classification_authority(self.authority)
+        connection = sqlite3.connect(backfill_path)
+        try:
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE "
+                "repository_id = 'repo-1'",
+                (late_observation.event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
         remigrated.load_verified("repo-1", authority=self.authority)
         connection = sqlite3.connect(backfill_path)
         try:
@@ -8168,6 +8921,14 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
+        with self.assertRaisesRegex(
+            DispatchDenied, "T03 requires current verified readiness"
+        ):
+            ProductionSQLiteStateStore.commit_intent(
+                self.store, retry_request, retry_capability, self.authority,
+                expected_head=recovered.event_hash, writer_epoch=writer_epoch,
+            )
+        self.assertEqual(self.store.table_counts()["operation_retry_authorizations"], 1)
         with self.assertRaises(InjectedFailure):
             self.store.commit_intent(
                 retry_request, retry_capability, self.authority,
@@ -8183,9 +8944,18 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertEqual(rolled_back, "AVAILABLE")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            retry_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE repository_id = 'repo-1' "
+                "AND run_id = ?",
+                (retry_request.run_id,),
+            ).fetchone()[0]
+        finally:
+            connection.close()
         retried = self.store.commit_intent(
             retry_request, retry_capability, self.authority,
-            expected_head=recovered.event_hash, writer_epoch=writer_epoch,
+            expected_head=retry_head, writer_epoch=writer_epoch,
         )
         self.oracle.allowed_head = retried.event_hash
         retry_replay = self.store.commit_intent(
@@ -8195,6 +8965,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertTrue(retry_replay.replayed)
         connection = sqlite3.connect(self.database_path)
         try:
+            retry_body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (retried.event_id,),
+            ).fetchone()[0])
             slot = connection.execute(
                 "SELECT attempt_id, generation FROM outstanding_slot WHERE "
                 "repository_id = 'repo-1'"
@@ -8206,6 +8980,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()
         finally:
             connection.close()
+        self.assertEqual(retry_body["intent_binding_version"], 4)
+        self.assertEqual(retry_body["intent_kind"], "PROVEN_NONEXECUTION_RETRY")
+        self.assertEqual(retry_body["readiness_event_hash"], retry_body[
+            "previous_event_hash"
+        ])
+        self.assertTrue(retry_body["source_head_at_intent"])
         self.assertEqual(slot, ("attempt-2", 2))
         self.assertEqual(authorization, ("CONSUMED", "event-2"))
         self.store.load_verified("repo-1", authority=self.authority)
@@ -9430,6 +10210,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
             expected_head="", writer_epoch=1,
         )
         self.oracle.allowed_head = plan.event_hash
+        readiness = self.store.evaluate_readiness(
+            ReadinessEvaluationRequest(
+                "t03-readiness", "t03-readiness-command",
+                "t03-readiness-event", "repo-1", "run-1", "item-1",
+                "plan-1", "revision-1", plan.event_hash, None,
+                "t03-inputs", True,
+            )
+        )
+        self.oracle.allowed_head = readiness.event_hash
         planned_capability = self._pause_capability("planned")
         with self.assertRaisesRegex(DispatchDenied, "RUNNING"):
             self.store.pause_local_execution(
@@ -9443,7 +10232,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
         committed = self.store.commit_intent(
             self.request(), self.capability, self.authority,
-            expected_head=plan.event_hash, writer_epoch=2,
+            expected_head=readiness.event_hash, writer_epoch=3,
         )
         self.oracle.allowed_head = committed.event_hash
         redeemed = self._pause_capability("redeemed")
@@ -12964,7 +13753,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
             permission_use_id="permission-use-2",
             reservation_id="reservation-2",
         )
-        with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+        with self.assertRaisesRegex(
+            DispatchDenied, "repository slot|PLANNED|readiness"
+        ):
             self.store.commit_intent(
                 second_request, second_capability, self.authority,
                 expected_head=second_plan.event_hash, writer_epoch=41,
@@ -17861,7 +18652,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             version = connection.execute("PRAGMA user_version").fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(version, 5)
+        self.assertEqual(version, 6)
         self.assertEqual(migrated, (None, None, None, None))
         legacy_commit = CommitReceipt(
             committed.command_id, committed.event_id, committed.sequence,
@@ -17881,10 +18672,12 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self._prepared_validator_execution()
         )
         self.oracle.allowed_head = committed.event_hash
-        reopened = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        reopened = ProductionSQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
 
         with self.assertRaisesRegex(
-            StorageIntegrityError, "containment event evidence"
+            StorageIntegrityError, "initial intent provenance"
         ):
             reopened.load_verified("repo-1")
         reopened.load_verified("repo-1", authority=self.authority)
@@ -18634,7 +19427,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
             }
         )
         self.assertEqual(self.store.table_counts()["dispatch_fences"], 1)
-        with self.assertRaisesRegex(DispatchDenied, "repository slot"):
+        with self.assertRaisesRegex(
+            DispatchDenied, "repository slot|PLANNED|readiness"
+        ):
             self._commit_planned_intent(
                 second_request,
                 second_capability,

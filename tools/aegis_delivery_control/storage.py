@@ -29,7 +29,9 @@ from .authority import (
     SyntheticFinalizationAttestation,
     SyntheticNonexecutionAttestation,
     SyntheticOperationNonexecutionResumeEvidence,
+    SyntheticOperationReadinessEvidence,
     SyntheticOperatorCapability,
+    SyntheticPlanAcceptanceEvidence,
     SyntheticResumeEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticSettlementProof,
@@ -932,7 +934,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -953,7 +955,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -1020,12 +1022,23 @@ class SQLiteStateStore:
                 plan_schema_version TEXT,
                 reducer_version TEXT,
                 accepted_plan_semantic_digest TEXT,
-                complete_policy_digest TEXT
+                complete_policy_digest TEXT,
+                plan_acceptance_binding_version INTEGER,
+                acceptance_payload_digest TEXT,
+                acceptance_evidence_digest TEXT,
+                acceptance_issuer_fingerprint TEXT
             );
             CREATE TABLE IF NOT EXISTS validation_requirements (
                 plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
                 check_id TEXT NOT NULL,
                 PRIMARY KEY (plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS plan_dependencies (
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                dependency_plan_id TEXT NOT NULL
+                    REFERENCES validation_plans(plan_id),
+                PRIMARY KEY (plan_id, dependency_plan_id),
+                CHECK (plan_id <> dependency_plan_id)
             );
             CREATE TABLE IF NOT EXISTS readiness_evaluations (
                 readiness_id TEXT PRIMARY KEY,
@@ -1042,7 +1055,12 @@ class SQLiteStateStore:
                 event_hash TEXT NOT NULL UNIQUE,
                 resulting_state TEXT NOT NULL CHECK (resulting_state IN ('PLANNED', 'BLOCKED')),
                 continuation_cursor TEXT,
-                body_json TEXT NOT NULL
+                body_json TEXT NOT NULL,
+                readiness_binding_version INTEGER,
+                readiness_evidence_digest TEXT,
+                readiness_issuer_fingerprint TEXT,
+                dependency_snapshot_digest TEXT,
+                predecessor_head_vector_digest TEXT
             );
             CREATE TABLE IF NOT EXISTS operation_finalizations (
                 finalization_id TEXT PRIMARY KEY,
@@ -1890,6 +1908,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_validator_containment_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_trusted_readiness_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -1967,7 +1988,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5}:
+            if version not in {3, 4, 5, 6}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -1996,11 +2017,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5}:
+            if version in {4, 5, 6}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2519,7 +2540,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5}:
+            if version not in {4, 5, 6}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2744,6 +2765,182 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "validator containment history is invalid"
             ) from error
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_trusted_readiness_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        plan_columns = (
+            ("plan_acceptance_binding_version", "INTEGER"),
+            ("acceptance_payload_digest", "TEXT"),
+            ("acceptance_evidence_digest", "TEXT"),
+            ("acceptance_issuer_fingerprint", "TEXT"),
+        )
+        readiness_columns = (
+            ("readiness_binding_version", "INTEGER"),
+            ("readiness_evidence_digest", "TEXT"),
+            ("readiness_issuer_fingerprint", "TEXT"),
+            ("dependency_snapshot_digest", "TEXT"),
+            ("predecessor_head_vector_digest", "TEXT"),
+        )
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {5, 6}:
+                raise StorageIntegrityError(
+                    "trusted-readiness semantic version is unsupported"
+                )
+            existing_plan = {
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(validation_plans)")
+            }
+            existing_readiness = {
+                str(row["name"])
+                for row in connection.execute(
+                    "PRAGMA table_info(readiness_evaluations)"
+                )
+            }
+            plan_present = existing_plan.intersection(name for name, _ in plan_columns)
+            readiness_present = existing_readiness.intersection(
+                name for name, _ in readiness_columns
+            )
+            if plan_present and plan_present != {name for name, _ in plan_columns}:
+                raise StorageIntegrityError(
+                    "plan-acceptance provenance schema is partially migrated"
+                )
+            if readiness_present and readiness_present != {
+                name for name, _ in readiness_columns
+            }:
+                raise StorageIntegrityError(
+                    "operation-readiness provenance schema is partially migrated"
+                )
+            dependency_table = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'plan_dependencies'"
+            ).fetchone()
+            if version == 5:
+                for name, column_type in plan_columns:
+                    if name not in existing_plan:
+                        connection.execute(
+                            f"ALTER TABLE validation_plans ADD COLUMN {name} "
+                            f"{column_type}"
+                        )
+                for name, column_type in readiness_columns:
+                    if name not in existing_readiness:
+                        connection.execute(
+                            f"ALTER TABLE readiness_evaluations ADD COLUMN {name} "
+                            f"{column_type}"
+                        )
+                if dependency_table is None:
+                    connection.execute(
+                        "CREATE TABLE plan_dependencies ("
+                        "plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id), "
+                        "dependency_plan_id TEXT NOT NULL REFERENCES "
+                        "validation_plans(plan_id), PRIMARY KEY "
+                        "(plan_id, dependency_plan_id), CHECK "
+                        "(plan_id <> dependency_plan_id))"
+                    )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_trusted_readiness_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 6")
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 6:
+                raise StorageIntegrityError(
+                    "trusted-readiness migration did not reach version 6"
+                )
+            final_plan = {
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(validation_plans)")
+            }
+            final_readiness = {
+                str(row["name"])
+                for row in connection.execute(
+                    "PRAGMA table_info(readiness_evaluations)"
+                )
+            }
+            if not {name for name, _ in plan_columns}.issubset(final_plan) or not {
+                name for name, _ in readiness_columns
+            }.issubset(final_readiness):
+                raise StorageIntegrityError(
+                    "trusted-readiness schema is missing or incompatible"
+                )
+            if connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'plan_dependencies'"
+            ).fetchone() is None:
+                raise StorageIntegrityError(
+                    "plan dependency schema is missing after migration"
+                )
+            plan_info = {
+                str(row["name"]): str(row["type"]).upper()
+                for row in connection.execute(
+                    "PRAGMA table_info(validation_plans)"
+                )
+            }
+            readiness_info = {
+                str(row["name"]): str(row["type"]).upper()
+                for row in connection.execute(
+                    "PRAGMA table_info(readiness_evaluations)"
+                )
+            }
+            if any(
+                plan_info.get(name) != column_type
+                for name, column_type in plan_columns
+            ) or any(
+                readiness_info.get(name) != column_type
+                for name, column_type in readiness_columns
+            ):
+                raise StorageIntegrityError(
+                    "trusted-readiness column types are incompatible"
+                )
+            dependency_info = tuple(
+                (
+                    str(row["name"]), str(row["type"]).upper(),
+                    int(row["notnull"]), int(row["pk"]),
+                )
+                for row in connection.execute(
+                    "PRAGMA table_info(plan_dependencies)"
+                )
+            )
+            dependency_foreign_keys = {
+                (str(row["from"]), str(row["table"]), str(row["to"]))
+                for row in connection.execute(
+                    "PRAGMA foreign_key_list(plan_dependencies)"
+                )
+            }
+            dependency_sql = str(
+                connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                    "name = 'plan_dependencies'"
+                ).fetchone()["sql"]
+            )
+            if dependency_info != (
+                ("plan_id", "TEXT", 1, 1),
+                ("dependency_plan_id", "TEXT", 1, 2),
+            ) or dependency_foreign_keys != {
+                ("plan_id", "validation_plans", "plan_id"),
+                (
+                    "dependency_plan_id", "validation_plans", "plan_id",
+                ),
+            } or "CHECK (plan_id <> dependency_plan_id)" not in dependency_sql:
+                raise StorageIntegrityError(
+                    "plan dependency schema is incompatible"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 5:
+                    failure_hook(
+                        "after_trusted_readiness_migration_commit_before_acknowledgement"
+                    )
         except BaseException:
             if manage_transaction and connection.in_transaction:
                 connection.rollback()
@@ -3117,7 +3314,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5}:
+            if version not in {0, 1, 2, 3, 4, 5, 6}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -3125,7 +3322,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5}:
+            if version in {2, 3, 4, 5, 6}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -3177,7 +3374,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5}:
+                if version in {3, 4, 5, 6}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -3387,7 +3584,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5, 6,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -3459,7 +3656,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5}:
+            if version not in {1, 2, 3, 4, 5, 6}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -3500,7 +3697,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5,
+                2, 3, 4, 5, 6,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -3703,7 +3900,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5}:
+            if version not in {2, 3, 4, 5, 6}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -4057,7 +4254,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5,
+                3, 4, 5, 6,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -4811,6 +5008,12 @@ class SQLiteStateStore:
             "accepted_plan_semantic_digest",
             "complete_policy_digest",
         )
+        trusted_readiness_columns = {
+            "plan_acceptance_binding_version",
+            "acceptance_payload_digest",
+            "acceptance_evidence_digest",
+            "acceptance_issuer_fingerprint",
+        }
         existing = {
             str(row["name"])
             for row in connection.execute("PRAGMA table_info(validation_plans)")
@@ -4820,7 +5023,12 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "validation plan binding schema is partially migrated"
             )
-        if existing not in (set(base_columns), set(base_columns) | set(columns)):
+        if existing not in (
+            set(base_columns),
+            set(base_columns) | trusted_readiness_columns,
+            set(base_columns) | set(columns),
+            set(base_columns) | set(columns) | trusted_readiness_columns,
+        ):
             raise StorageIntegrityError(
                 "validation plan binding schema is incompatible"
             )
@@ -4845,7 +5053,10 @@ class SQLiteStateStore:
             rows_after = connection.execute(
                 "SELECT * FROM validation_plans"
             ).fetchall()
-            if migrated_columns != set(base_columns) | set(columns) or [
+            expected_migrated_columns = set(base_columns) | set(columns)
+            if trusted_readiness_columns.issubset(existing):
+                expected_migrated_columns |= trusted_readiness_columns
+            if migrated_columns != expected_migrated_columns or [
                 tuple(row[column] for column in base_columns)
                 for row in rows_after
             ] != rows_before or any(
@@ -6465,6 +6676,7 @@ class SQLiteStateStore:
                 "budget_policy_digest": request.budget_policy_digest,
                 "check_ids": sorted(request.check_ids),
                 "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+                "dependency_plan_ids": sorted(request.dependency_plan_ids),
                 "plan_schema_version": request.plan_schema_version,
                 "reducer_version": request.reducer_version,
                 "effect_action": request.effect_action,
@@ -6482,6 +6694,32 @@ class SQLiteStateStore:
                     request.predecessor_logical_effect_id
                 ),
                 "relationship_grant_id": request.relationship_grant_id,
+            }
+        )
+
+    @classmethod
+    def plan_acceptance_payload_digest(
+        cls, request: PlanAcceptanceRequest
+    ) -> str:
+        request.validate()
+        payload = {
+            **request.__dict__,
+            "check_ids": sorted(request.check_ids),
+            "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+            "dependency_plan_ids": sorted(request.dependency_plan_ids),
+            "effect_semantic_inputs": [
+                list(item) for item in request.effect_semantic_inputs
+            ],
+            "relationship_kind": (
+                None
+                if request.relationship_kind is None
+                else request.relationship_kind.value
+            ),
+        }
+        return cls._event_hash(
+            {
+                "domain": "AEGIS:T01:PLAN_ACCEPTANCE_PAYLOAD:v1",
+                "request": payload,
             }
         )
 
@@ -6520,6 +6758,7 @@ class SQLiteStateStore:
                 "budget_policy_digest": request.budget_policy_digest,
                 "check_ids": sorted(request.check_ids),
                 "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+                "dependency_plan_ids": sorted(request.dependency_plan_ids),
                 "failure_policy_id": failure_policy_id,
                 "failure_policy_version": failure_policy_version,
                 "classification_issuer_fingerprint": (
@@ -9550,12 +9789,22 @@ class SQLiteStateStore:
         predecessor_state: LifecycleState,
         predecessor_cursor: str | None,
     ) -> None:
+        binding_version = body.get("readiness_binding_version")
         expected_fields = set(ReadinessEvaluationRequest.__dataclass_fields__) | {
             "blocker_codes", "continuation_cursor", "event_kind",
             "lifecycle_from", "lifecycle_to", "previous_event_hash",
             "request_digest", "schema_version", "sequence", "transition_id",
             "writer_epoch",
         }
+        if binding_version == 1:
+            expected_fields.update(
+                {
+                    "readiness_binding_version", "readiness_evidence_digest",
+                    "readiness_evidence", "readiness_issuer_fingerprint",
+                    "dependency_snapshot_digest",
+                    "predecessor_head_vector_digest",
+                }
+            )
         try:
             if set(body) != expected_fields or (
                 type(body["schema_version"]) is not int
@@ -9579,8 +9828,80 @@ class SQLiteStateStore:
                 }
             )
             request.validate()
+            evidence = None
+            expected_request_digest = self._event_hash(request.__dict__)
+            if binding_version == 1:
+                evidence = self._verified_readiness_evidence(body)
+                evidence_digest = self._event_hash(evidence.__dict__)
+                expected_request_digest = self._event_hash(
+                    {
+                        "request": request.__dict__,
+                        "readiness_evidence_digest": evidence_digest,
+                    }
+                )
+                if (
+                    evidence.repository_id,
+                    evidence.run_id,
+                    evidence.item_id,
+                    evidence.plan_id,
+                    evidence.revision_digest,
+                    evidence.inputs_evidence_digest,
+                    evidence.prerequisites_met,
+                ) != (
+                    request.repository_id,
+                    request.run_id,
+                    request.item_id,
+                    request.plan_id,
+                    request.revision_digest,
+                    request.inputs_evidence_digest,
+                    request.prerequisites_met,
+                ):
+                    raise ValueError("readiness evidence is rebound")
+                prefix_rows = connection.execute(
+                    "SELECT run_id, event_hash FROM events WHERE "
+                    "repository_id = ? AND writer_epoch < ? ORDER BY "
+                    "writer_epoch, rowid",
+                    (request.repository_id, int(body["writer_epoch"])),
+                ).fetchall()
+                prefix_heads: dict[str, str] = {}
+                prefix_catalog_head = ""
+                for prefix_row in prefix_rows:
+                    prefix_heads[str(prefix_row["run_id"])] = str(
+                        prefix_row["event_hash"]
+                    )
+                    prefix_catalog_head = str(prefix_row["event_hash"])
+                signed_heads = dict(evidence.predecessor_head_vector)
+                signed_source_head = signed_heads.pop(
+                    _SYNTHETIC_SOURCE_HEAD_MEMBER, None
+                )
+                source_row = connection.execute(
+                    "SELECT 1 FROM synthetic_authority_source_events WHERE "
+                    "repository_id = ? AND event_hash = ?",
+                    (request.repository_id, signed_source_head),
+                ).fetchone()
+                catalog_is_source = (
+                    evidence.predecessor_catalog_head == signed_source_head
+                    and source_row is not None
+                )
+                if (
+                    signed_heads != prefix_heads
+                    or request.expected_run_head
+                    != signed_heads.get(request.run_id)
+                    or signed_source_head is None
+                    or source_row is None
+                    or evidence.predecessor_catalog_head
+                    not in {prefix_catalog_head, signed_source_head}
+                    or (
+                        evidence.predecessor_catalog_head
+                        != prefix_catalog_head
+                        and not catalog_is_source
+                    )
+                ):
+                    raise ValueError(
+                        "readiness historical head vector is invalid"
+                    )
             if (
-                body["request_digest"] != self._event_hash(request.__dict__)
+                body["request_digest"] != expected_request_digest
                 or request.expected_run_head != body["previous_event_hash"]
                 or request.expected_continuation_cursor != predecessor_cursor
             ):
@@ -9598,17 +9919,53 @@ class SQLiteStateStore:
                 plan["item_id"], plan["revision_digest"],
             ) != (request.item_id, request.revision_digest):
                 raise ValueError("readiness accepted plan binding is invalid")
-            blockers = self._readiness_blockers(
+            if binding_version == 1 and (
+                plan["plan_acceptance_binding_version"] != 1
+                or evidence is None
+                or evidence.acceptance_payload_digest
+                != plan["acceptance_payload_digest"]
+            ):
+                raise ValueError("readiness authenticated plan binding is invalid")
+            blockers = set(self._readiness_blockers(
                 connection, request, plan, predecessor_state,
                 predecessor_cursor, int(body["sequence"]),
                 int(body["writer_epoch"]),
-            )
+            ))
+            if evidence is not None:
+                dependency_ids = tuple(
+                    str(row["dependency_plan_id"])
+                    for row in connection.execute(
+                        "SELECT dependency_plan_id FROM plan_dependencies "
+                        "WHERE plan_id = ? ORDER BY dependency_plan_id",
+                        (request.plan_id,),
+                    )
+                )
+                historical_dependencies = [
+                    self._dependency_readiness_snapshot(
+                        connection,
+                        dependency_plan_id,
+                        before_writer_epoch=int(body["writer_epoch"]),
+                    )
+                    for dependency_plan_id in dependency_ids
+                ]
+                historical_snapshot = tuple(
+                    row for row, _ready in historical_dependencies
+                )
+                if historical_snapshot != evidence.dependency_snapshot:
+                    raise ValueError(
+                        "readiness dependency history is rebound"
+                    )
+                if any(
+                    not ready for _row, ready in historical_dependencies
+                ):
+                    blockers.add("DEPENDENCY_NOT_READY")
+            blocker_codes = tuple(sorted(blockers))
             expected_state = (
                 LifecycleState.PLANNED
-                if not blockers else LifecycleState.BLOCKED
+                if not blocker_codes else LifecycleState.BLOCKED
             )
             if (
-                body["blocker_codes"] != list(blockers)
+                body["blocker_codes"] != list(blocker_codes)
                 or body["continuation_cursor"] != predecessor_cursor
                 or body["event_kind"] != "READINESS_EVALUATED"
                 or body["transition_id"] != "T02"
@@ -9616,7 +9973,10 @@ class SQLiteStateStore:
                 or body["lifecycle_to"] != expected_state.value
             ):
                 raise ValueError("readiness route diverges from history")
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
             raise StorageIntegrityError(
                 "readiness event semantics are invalid"
             ) from error
@@ -9932,9 +10292,11 @@ class SQLiteStateStore:
         extended_fields = expected_fields | {
             "operation_origin_kind", "operation_origin_id",
         }
+        released_extended_fields = extended_fields | {"slot_released"}
         try:
             if frozenset(body) not in {
-                frozenset(expected_fields), frozenset(extended_fields)
+                frozenset(expected_fields), frozenset(extended_fields),
+                frozenset(released_extended_fields),
             } or (
                 type(body["schema_version"]) is not int
                 or body["schema_version"] != 1
@@ -9942,6 +10304,10 @@ class SQLiteStateStore:
                 or int(body["sequence"]) <= 0
                 or type(body["writer_epoch"]) is not int
                 or int(body["writer_epoch"]) <= 0
+                or (
+                    "slot_released" in body
+                    and body["slot_released"] is not True
+                )
             ):
                 raise ValueError("operation finalization schema is invalid")
             request = FinalizeOperationRequest(
@@ -11157,7 +11523,7 @@ class SQLiteStateStore:
                             int(body["expected_source_generation"]),
                         )
                         if (
-                            body.get("intent_binding_version") != 2
+                            body.get("intent_binding_version") not in {2, 4}
                             or active_slot != expected_prior_slot
                             or type(body.get("expected_target_generation"))
                             is not int
@@ -11306,7 +11672,14 @@ class SQLiteStateStore:
             if prior is not None and prior["event_kind"] == "READINESS_EVALUATED":
                 prior_body = json.loads(prior["body_json"])
                 prior_blockers = set(prior_body.get("blocker_codes", ()))
-            if prior_blockers != {"INPUTS_NOT_READY"}:
+            reversible_readiness_blockers = {
+                "INPUTS_NOT_READY", "TYPED_CURSOR_PENDING",
+                "DISPATCH_FENCE_PRESENT", "OPERATION_SLOT_OCCUPIED",
+                "VALIDATOR_ACTIVITY_ACTIVE", "DEPENDENCY_NOT_READY",
+            }
+            if not prior_blockers or not prior_blockers.issubset(
+                reversible_readiness_blockers
+            ):
                 blockers.add("UNRESOLVED_BLOCKED_STATE")
         fences, active_slot, active_validators = (
             self._historical_repository_activity(
@@ -11323,10 +11696,586 @@ class SQLiteStateStore:
         ):
             blockers.add("DISPATCH_FENCE_PRESENT")
         if active_slot is not None:
-            blockers.add("OPERATION_SLOT_OCCUPIED")
+            retry = connection.execute(
+                "SELECT authorization.source_generation, "
+                "authorization.target_generation FROM "
+                "operation_retry_authorizations AS authorization JOIN "
+                "operation_recovery_actions AS recovery ON "
+                "recovery.recovery_id = authorization.recovery_id JOIN "
+                "events AS recovery_event ON recovery_event.event_id = "
+                "recovery.event_id LEFT JOIN "
+                "events AS consuming_event ON consuming_event.event_id = "
+                "authorization.consuming_event_id LEFT JOIN events AS "
+                "disabling_event ON disabling_event.event_id = "
+                "authorization.disabling_event_id WHERE "
+                "authorization.repository_id = ? AND authorization.run_id = ? "
+                "AND authorization.item_id = ? AND "
+                "authorization.logical_effect_id = ? AND "
+                "recovery_event.writer_epoch < ? AND ("
+                "consuming_event.writer_epoch IS NULL OR "
+                "consuming_event.writer_epoch > ?) AND ("
+                "disabling_event.writer_epoch IS NULL OR "
+                "disabling_event.writer_epoch > ?) AND recovery.plan_id = ?",
+                (
+                    request.repository_id,
+                    request.run_id,
+                    request.item_id,
+                    plan["logical_effect_id"],
+                    writer_epoch,
+                    writer_epoch,
+                    writer_epoch,
+                    plan["plan_id"],
+                ),
+            ).fetchall()
+            owned_retry_slot = len(retry) == 1 and (
+                active_slot[0], active_slot[1], active_slot[3]
+            ) == (
+                request.run_id,
+                plan["logical_effect_id"],
+                int(retry[0]["source_generation"]),
+            ) and int(retry[0]["target_generation"]) == (
+                int(retry[0]["source_generation"]) + 1
+            )
+            if not owned_retry_slot:
+                blockers.add("OPERATION_SLOT_OCCUPIED")
         if active_validators:
             blockers.add("VALIDATOR_ACTIVITY_ACTIVE")
         return tuple(sorted(blockers))
+
+    def _dependency_readiness_snapshot(
+        self,
+        connection: sqlite3.Connection,
+        dependency_plan_id: str,
+        *,
+        before_writer_epoch: int | None = None,
+    ) -> tuple[tuple[str, str, str, str, str], bool]:
+        dependency = connection.execute(
+            "SELECT plan.*, run.lifecycle_state, run.head_hash, "
+            "event.writer_epoch AS plan_writer_epoch FROM "
+            "validation_plans AS plan JOIN runs AS run ON run.run_id = "
+            "plan.run_id JOIN events AS event ON event.event_id = "
+            "plan.event_id WHERE plan.plan_id = ? AND plan.repository_id = ?",
+            (dependency_plan_id, self._repository_id),
+        ).fetchone()
+        if dependency is None or (
+            before_writer_epoch is not None
+            and int(dependency["plan_writer_epoch"]) >= before_writer_epoch
+        ):
+            raise DispatchDenied("readiness dependency is unavailable")
+        historical_sequence: int | None = None
+        lifecycle_state = str(dependency["lifecycle_state"])
+        head_hash = str(dependency["head_hash"])
+        if before_writer_epoch is not None:
+            historical_head = connection.execute(
+                "SELECT sequence, event_hash, body_json FROM events WHERE "
+                "repository_id = ? AND run_id = ? AND writer_epoch < ? "
+                "ORDER BY writer_epoch DESC, rowid DESC LIMIT 1",
+                (
+                    self._repository_id, dependency["run_id"],
+                    before_writer_epoch,
+                ),
+            ).fetchone()
+            if historical_head is None:
+                raise DispatchDenied("readiness dependency history is unavailable")
+            historical_body = json.loads(str(historical_head["body_json"]))
+            historical_sequence = int(historical_head["sequence"])
+            lifecycle_state = str(historical_body["lifecycle_to"])
+            head_hash = str(historical_head["event_hash"])
+        finalization_query = (
+            "SELECT finalization.* FROM operation_finalizations AS "
+            "finalization JOIN events AS event ON event.event_id = "
+            "finalization.event_id WHERE finalization.plan_id = ?"
+        )
+        finalization_parameters: tuple[object, ...] = (dependency_plan_id,)
+        if before_writer_epoch is not None:
+            finalization_query += " AND event.writer_epoch < ?"
+            finalization_parameters += (before_writer_epoch,)
+        finalization = connection.execute(
+            finalization_query, finalization_parameters
+        ).fetchone()
+        reasons: list[str] = []
+        if dependency["plan_acceptance_binding_version"] != 1:
+            reasons.append("UNAUTHENTICATED_PLAN")
+        if lifecycle_state != LifecycleState.COMPLETED.value:
+            reasons.append("NOT_COMPLETED")
+        finalization_body: dict[str, object] = {}
+        if finalization is None:
+            reasons.append("NOT_FINALIZED")
+        else:
+            finalization_body = json.loads(str(finalization["body_json"]))
+            if (
+                finalization["resulting_state"]
+                != LifecycleState.COMPLETED.value
+                or finalization_body.get("slot_released") is not True
+            ):
+                reasons.append("FINALIZATION_INCOMPLETE")
+        if not self._validation_checks_settled(
+            connection,
+            dependency_plan_id,
+            sequence_limit=(
+                None
+                if historical_sequence is None
+                else historical_sequence + 1
+            ),
+        ):
+            reasons.append("VALIDATION_UNSETTLED")
+        if before_writer_epoch is None:
+            slot_retained = connection.execute(
+                "SELECT 1 FROM outstanding_slot WHERE repository_id = ? AND "
+                "run_id = ?",
+                (self._repository_id, dependency["run_id"]),
+            ).fetchone() is not None
+            validator_active = connection.execute(
+                "SELECT 1 FROM validator_intents WHERE repository_id = ? AND "
+                "run_id = ? AND status <> 'SETTLED' LIMIT 1",
+                (self._repository_id, dependency["run_id"]),
+            ).fetchone() is not None
+            fences = {
+                (row["item_id"], row["logical_effect_id"])
+                for row in connection.execute(
+                    "SELECT item_id, logical_effect_id FROM dispatch_fences "
+                    "WHERE repository_id = ?",
+                    (self._repository_id,),
+                )
+            }
+        else:
+            historical_fences, historical_slot, active_validators = (
+                self._historical_repository_activity(
+                    connection, self._repository_id, before_writer_epoch
+                )
+            )
+            slot_retained = (
+                historical_slot is not None
+                and historical_slot[0] == dependency["run_id"]
+            )
+            validator_active = any(
+                run_id == dependency["run_id"]
+                for _intent_id, run_id in active_validators
+            )
+            fences = set(historical_fences.values())
+        if slot_retained:
+            reasons.append("SLOT_RETAINED")
+        if validator_active:
+            reasons.append("VALIDATOR_ACTIVE")
+        uncertainty_query = (
+            "SELECT 1 FROM uncertainty_instances AS uncertainty JOIN events "
+            "AS origin ON origin.event_id = uncertainty.origin_event_id LEFT "
+            "JOIN uncertainty_resolutions AS resolution ON "
+            "resolution.uncertainty_id = uncertainty.uncertainty_id LEFT JOIN "
+            "events AS resolved ON resolved.event_id = resolution.event_id "
+            "WHERE uncertainty.repository_id = ? AND uncertainty.run_id = ?"
+        )
+        uncertainty_parameters: tuple[object, ...] = (
+            self._repository_id, dependency["run_id"],
+        )
+        if before_writer_epoch is None:
+            uncertainty_query += " AND resolution.uncertainty_id IS NULL"
+        else:
+            uncertainty_query += (
+                " AND origin.writer_epoch < ? AND (resolved.writer_epoch IS "
+                "NULL OR resolved.writer_epoch >= ?)"
+            )
+            uncertainty_parameters += (
+                before_writer_epoch, before_writer_epoch,
+            )
+        uncertainty_query += " LIMIT 1"
+        if connection.execute(
+            uncertainty_query, uncertainty_parameters
+        ).fetchone() is not None:
+            reasons.append("UNCERTAINTY_RETAINED")
+        if any(
+            (item_id is None or item_id == dependency["item_id"])
+            and (
+                logical_effect_id is None
+                or logical_effect_id == dependency["logical_effect_id"]
+            )
+            for item_id, logical_effect_id in fences
+        ):
+            reasons.append("FENCE_RETAINED")
+        if finalization is not None and finalization_body.get(
+            "slot_attempt_id"
+        ):
+            accounting_error = self._accounting_closure_error(
+                connection,
+                self._repository_id,
+                str(dependency["run_id"]),
+                str(dependency["logical_effect_id"]),
+                str(finalization_body["slot_attempt_id"]),
+                settlement_sequence_limit=(
+                    None
+                    if historical_sequence is None
+                    else historical_sequence + 1
+                ),
+            )
+            if accounting_error is not None:
+                reasons.append("ACCOUNTING_UNSETTLED")
+        status_digest = self._event_hash(
+            {
+                "domain": "AEGIS:T02:DEPENDENCY_STATUS:v1",
+                "plan_id": dependency_plan_id,
+                "run_id": dependency["run_id"],
+                "lifecycle_state": lifecycle_state,
+                "run_head": head_hash,
+                "finalization_event_hash": (
+                    "" if finalization is None else finalization["event_hash"]
+                ),
+                "reasons": sorted(set(reasons)),
+            }
+        )
+        status_binding = (
+            "READY:" if not reasons else "BLOCKED:"
+        ) + status_digest
+        return (
+            dependency_plan_id,
+            str(dependency["run_id"]),
+            lifecycle_state,
+            head_hash,
+            status_binding,
+        ), not reasons
+
+    def issue_operation_readiness_evidence(
+        self,
+        request: ReadinessEvaluationRequest,
+        authority: SyntheticAuthority,
+        *,
+        evidence_id: str,
+        source_id: str = "synthetic-readiness-verifier",
+        source_version: str = "1",
+    ) -> SyntheticOperationReadinessEvidence:
+        request.validate()
+        with closing(self._connect()) as connection:
+            catalog_head, head_vector = self._heads(
+                connection, request.repository_id
+            )
+            next_writer_epoch = int(connection.execute(
+                "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events WHERE "
+                "repository_id = ?",
+                (request.repository_id,),
+            ).fetchone()[0])
+            self._verify_projections(connection, request.repository_id)
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE repository_id = ? AND "
+                "run_id = ? AND plan_id = ?",
+                (request.repository_id, request.run_id, request.plan_id),
+            ).fetchone()
+            if plan is None or plan["plan_acceptance_binding_version"] != 1:
+                raise DispatchDenied(
+                    "readiness evidence requires an authenticated v6 plan"
+                )
+            dependency_ids = [
+                str(row["dependency_plan_id"])
+                for row in connection.execute(
+                    "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                    "plan_id = ? ORDER BY dependency_plan_id",
+                    (request.plan_id,),
+                )
+            ]
+            dependency_snapshot = tuple(
+                self._dependency_readiness_snapshot(
+                    connection, plan_id,
+                    before_writer_epoch=next_writer_epoch,
+                )[0]
+                for plan_id in dependency_ids
+            )
+        observed = self._utc_now()
+        if observed.tzinfo is None or observed.utcoffset() != timezone.utc.utcoffset(
+            observed
+        ):
+            raise StorageIntegrityError("readiness verifier clock is not UTC")
+        return authority.issue_operation_readiness_evidence(
+            evidence_id=evidence_id,
+            source_id=source_id,
+            source_version=source_version,
+            action="EVALUATE_OPERATION_READINESS",
+            repository_id=request.repository_id,
+            run_id=request.run_id,
+            item_id=request.item_id,
+            plan_id=request.plan_id,
+            revision_digest=request.revision_digest,
+            acceptance_payload_digest=str(plan["acceptance_payload_digest"]),
+            inputs_evidence_digest=request.inputs_evidence_digest,
+            prerequisites_met=request.prerequisites_met,
+            dependency_snapshot=dependency_snapshot,
+            predecessor_head_vector=tuple(sorted(head_vector.items())),
+            predecessor_catalog_head=catalog_head,
+            observed_at=observed.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        )
+
+    def _verified_plan_acceptance_evidence(
+        self, body: Mapping[str, object]
+    ) -> SyntheticPlanAcceptanceEvidence:
+        if self._classification_authority is None:
+            raise DispatchDenied("plan-acceptance verifier is unavailable")
+        if body.get("plan_acceptance_binding_version") != 1:
+            raise DispatchDenied("plan acceptance is not authenticated")
+        expected_body_fields = set(PlanAcceptanceRequest.__dataclass_fields__) | {
+            "classification_issuer_fingerprint",
+            "gate_set_digest",
+            "finalization_policy_id",
+            "finalization_policy_version",
+            "finalization_issuer_fingerprint",
+            "failure_policy_id",
+            "failure_policy_version",
+            "accepted_plan_semantic_digest",
+            "complete_policy_digest",
+            "plan_acceptance_binding_version",
+            "acceptance_payload_digest",
+            "acceptance_evidence_digest",
+            "acceptance_evidence",
+            "relationship_source_use_event_id",
+            "relationship_source_use_event_hash",
+            "event_kind",
+            "lifecycle_from",
+            "lifecycle_to",
+            "previous_event_hash",
+            "schema_version",
+            "sequence",
+            "writer_epoch",
+        }
+        if set(body) != expected_body_fields:
+            raise DispatchDenied("plan-acceptance event schema is invalid")
+        evidence_value = body.get("acceptance_evidence")
+        if not isinstance(evidence_value, dict) or set(evidence_value) != set(
+            SyntheticPlanAcceptanceEvidence.__dataclass_fields__
+        ):
+            raise DispatchDenied("plan-acceptance evidence schema is invalid")
+        try:
+            evidence = SyntheticPlanAcceptanceEvidence(**evidence_value)
+            self._classification_authority.verify_plan_acceptance_evidence(
+                evidence
+            )
+        except (TypeError, ValueError) as error:
+            raise DispatchDenied(
+                "plan-acceptance evidence is invalid"
+            ) from error
+        request_values = {
+            key: body[key] for key in PlanAcceptanceRequest.__dataclass_fields__
+        }
+        for tuple_field in (
+            "check_ids", "aggregate_gate_ids", "dependency_plan_ids",
+        ):
+            request_values[tuple_field] = tuple(
+                request_values.get(tuple_field, ())
+            )
+        request_values["effect_semantic_inputs"] = tuple(
+            tuple(item)
+            for item in request_values.get("effect_semantic_inputs", ())
+        )
+        if request_values.get("relationship_kind") is not None:
+            request_values["relationship_kind"] = EffectRelationshipKind(
+                request_values["relationship_kind"]
+            )
+        try:
+            request = PlanAcceptanceRequest(**request_values)
+            request.validate()
+        except (KeyError, TypeError, ValueError) as error:
+            raise DispatchDenied(
+                "plan-acceptance request binding is invalid"
+            ) from error
+        payload_digest = self.plan_acceptance_payload_digest(request)
+        evidence_digest = self._event_hash(evidence.__dict__)
+        if (
+            evidence.repository_id,
+            evidence.run_id,
+            evidence.item_id,
+            evidence.plan_id,
+            evidence.command_id,
+            evidence.acceptance_payload_digest,
+            evidence.issuer_fingerprint,
+        ) != (
+            request.repository_id,
+            request.run_id,
+            request.item_id,
+            request.plan_id,
+            request.command_id,
+            payload_digest,
+            self._classification_authority.issuer_fingerprint,
+        ) or (
+            body.get("acceptance_payload_digest") != payload_digest
+            or body.get("acceptance_evidence_digest") != evidence_digest
+        ):
+            raise DispatchDenied("plan-acceptance evidence is rebound")
+        return evidence
+
+    def _verified_readiness_evidence(
+        self, body: Mapping[str, object]
+    ) -> SyntheticOperationReadinessEvidence:
+        if self._classification_authority is None:
+            raise DispatchDenied("readiness verifier is unavailable")
+        if body.get("readiness_binding_version") != 1:
+            raise DispatchDenied("readiness is not authenticated")
+        evidence_value = body.get("readiness_evidence")
+        if not isinstance(evidence_value, dict) or set(evidence_value) != set(
+            SyntheticOperationReadinessEvidence.__dataclass_fields__
+        ):
+            raise DispatchDenied("readiness evidence schema is invalid")
+        evidence_body = dict(evidence_value)
+        try:
+            evidence_body["dependency_snapshot"] = tuple(
+                tuple(row) for row in evidence_body["dependency_snapshot"]
+            )
+            evidence_body["predecessor_head_vector"] = tuple(
+                tuple(row)
+                for row in evidence_body["predecessor_head_vector"]
+            )
+            evidence = SyntheticOperationReadinessEvidence(**evidence_body)
+            self._classification_authority.verify_operation_readiness_evidence(
+                evidence
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise DispatchDenied("readiness evidence is invalid") from error
+        evidence_digest = self._event_hash(evidence.__dict__)
+        if (
+            body.get("readiness_evidence_digest") != evidence_digest
+            or body.get("readiness_issuer_fingerprint")
+            != evidence.issuer_fingerprint
+            or body.get("dependency_snapshot_digest")
+            != self._event_hash(
+                {
+                    "domain": "AEGIS:T02:DEPENDENCY_SNAPSHOT:v1",
+                    "rows": [
+                        list(row) for row in evidence.dependency_snapshot
+                    ],
+                }
+            )
+            or body.get("predecessor_head_vector_digest")
+            != self._complete_head_vector_digest(
+                dict(evidence.predecessor_head_vector)
+            )
+        ):
+            raise DispatchDenied("readiness evidence binding is invalid")
+        return evidence
+
+    def _verify_current_readiness_for_intent(
+        self,
+        connection: sqlite3.Connection,
+        request: IntentRequest,
+        plan: sqlite3.Row,
+        readiness: sqlite3.Row,
+        *,
+        catalog_head: str,
+        run_heads: Mapping[str, str],
+        writer_epoch: int,
+        continuation_cursor: str | None,
+        next_sequence: int,
+    ) -> tuple[Mapping[str, object], SyntheticOperationReadinessEvidence]:
+        try:
+            readiness_body = json.loads(str(readiness["body_json"]))
+        except (TypeError, json.JSONDecodeError) as error:
+            raise DispatchDenied("current readiness body is invalid") from error
+        if not isinstance(readiness_body, dict):
+            raise DispatchDenied("current readiness body is invalid")
+        evidence = self._verified_readiness_evidence(readiness_body)
+        plan_body = json.loads(str(plan["body_json"]))
+        if not isinstance(plan_body, dict):
+            raise DispatchDenied("accepted plan body is invalid")
+        self._verified_plan_acceptance_evidence(plan_body)
+        readiness_request = ReadinessEvaluationRequest(
+            **{
+                field: readiness_body[field]
+                for field in ReadinessEvaluationRequest.__dataclass_fields__
+            }
+        )
+        readiness_request.validate()
+        if (
+            readiness["readiness_binding_version"] != 1
+            or readiness["resulting_state"] != LifecycleState.PLANNED.value
+            or readiness_body.get("blocker_codes") != []
+            or readiness["event_hash"] != catalog_head
+            or readiness["event_hash"] != run_heads.get(request.run_id)
+            or readiness_body.get("lifecycle_to")
+            != LifecycleState.PLANNED.value
+            or (
+                readiness["repository_id"], readiness["run_id"],
+                readiness["item_id"], readiness["plan_id"],
+                readiness["revision_digest"],
+            ) != (
+                request.repository_id, request.run_id, request.item_id,
+                plan["plan_id"], plan["revision_digest"],
+            )
+            or evidence.acceptance_payload_digest
+            != plan["acceptance_payload_digest"]
+        ):
+            raise DispatchDenied("T03 requires current verified readiness")
+        predecessor_heads = dict(evidence.predecessor_head_vector)
+        expected_successor_heads = dict(predecessor_heads)
+        expected_successor_heads[request.run_id] = str(readiness["event_hash"])
+        if (
+            readiness_request.expected_run_head
+            != predecessor_heads.get(request.run_id)
+            or readiness_body.get("previous_event_hash")
+            != readiness_request.expected_run_head
+            or dict(run_heads) != expected_successor_heads
+        ):
+            raise DispatchDenied(
+                "T03 readiness head-vector successor is invalid"
+            )
+        dependency_ids = [
+            str(row["dependency_plan_id"])
+            for row in connection.execute(
+                "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                "plan_id = ? ORDER BY dependency_plan_id",
+                (plan["plan_id"],),
+            )
+        ]
+        dependency_rows = [
+            self._dependency_readiness_snapshot(connection, dependency_plan_id)
+            for dependency_plan_id in dependency_ids
+        ]
+        current_snapshot = tuple(row for row, _ready in dependency_rows)
+        if (
+            tuple(row[0] for row in evidence.dependency_snapshot)
+            != tuple(dependency_ids)
+            or current_snapshot != evidence.dependency_snapshot
+            or any(not ready for _row, ready in dependency_rows)
+        ):
+            raise DispatchDenied("T03 dependency readiness changed")
+        blockers = self._readiness_blockers(
+            connection,
+            readiness_request,
+            plan,
+            LifecycleState.PLANNED,
+            continuation_cursor,
+            next_sequence,
+            writer_epoch,
+        )
+        if blockers:
+            raise DispatchDenied("T03 readiness is no longer blocker-free")
+        return readiness_body, evidence
+
+    def _verify_intent_readiness_successor_vector(
+        self,
+        connection: sqlite3.Connection,
+        intent_body: Mapping[str, object],
+        readiness: sqlite3.Row,
+        evidence: SyntheticOperationReadinessEvidence,
+    ) -> None:
+        """Reconstruct the only permitted T02-to-T03 history prefix."""
+        prefix_rows = connection.execute(
+            "SELECT run_id, event_hash FROM events WHERE repository_id = ? "
+            "AND writer_epoch < ? ORDER BY writer_epoch, rowid",
+            (intent_body["repository_id"], int(intent_body["writer_epoch"])),
+        ).fetchall()
+        prefix_heads: dict[str, str] = {}
+        prefix_catalog_head = ""
+        for row in prefix_rows:
+            prefix_heads[str(row["run_id"])] = str(row["event_hash"])
+            prefix_catalog_head = str(row["event_hash"])
+        signed_heads = dict(evidence.predecessor_head_vector)
+        signed_source_head = signed_heads.pop(_SYNTHETIC_SOURCE_HEAD_MEMBER, None)
+        expected_heads = dict(signed_heads)
+        expected_heads[str(intent_body["run_id"])] = str(readiness["event_hash"])
+        if (
+            not isinstance(signed_source_head, str)
+            or not signed_source_head
+            or intent_body.get("source_head_at_intent") != signed_source_head
+            or prefix_heads != expected_heads
+            or prefix_catalog_head != readiness["event_hash"]
+            or intent_body["previous_event_hash"] != readiness["event_hash"]
+        ):
+            raise StorageIntegrityError(
+                "intent readiness successor vector is invalid"
+            )
 
     def _validator_pause_checkpoint(
         self,
@@ -11800,6 +12749,8 @@ class SQLiteStateStore:
         *,
         expected_head: str,
         writer_epoch: int,
+        acceptance_evidence: SyntheticPlanAcceptanceEvidence | None = None,
+        authority: SyntheticAuthority | None = None,
         relationship_capability: SyntheticSourceCapability | None = None,
         failure_hook: FailureHook | None = None,
     ) -> CommitReceipt:
@@ -11812,12 +12763,23 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "plan acceptance requires a bound classification authority"
             )
+        if (
+            acceptance_evidence is None
+            or authority is None
+            or authority.issuer_fingerprint
+            != self._classification_authority.issuer_fingerprint
+        ):
+            raise DispatchDenied(
+                "plan acceptance requires trusted operator-role evidence"
+            )
+        authority.verify_plan_acceptance_evidence(acceptance_evidence)
         if writer_epoch <= 0:
             raise ValueError("writer_epoch must be positive")
         payload = {
             **request.__dict__,
             "check_ids": sorted(request.check_ids),
             "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
+            "dependency_plan_ids": sorted(request.dependency_plan_ids),
             "effect_semantic_inputs": [
                 list(item) for item in request.effect_semantic_inputs
             ],
@@ -11827,7 +12789,32 @@ class SQLiteStateStore:
                 else request.relationship_kind.value
             ),
         }
-        payload_digest = self._event_hash(payload)
+        acceptance_payload_digest = self.plan_acceptance_payload_digest(request)
+        if (
+            acceptance_evidence.repository_id,
+            acceptance_evidence.run_id,
+            acceptance_evidence.item_id,
+            acceptance_evidence.plan_id,
+            acceptance_evidence.command_id,
+            acceptance_evidence.acceptance_payload_digest,
+        ) != (
+            request.repository_id,
+            request.run_id,
+            request.item_id,
+            request.plan_id,
+            request.command_id,
+            acceptance_payload_digest,
+        ):
+            raise DispatchDenied("plan acceptance evidence is rebound")
+        acceptance_evidence_digest = self._event_hash(
+            acceptance_evidence.__dict__
+        )
+        payload_digest = self._event_hash(
+            {
+                "request": payload,
+                "acceptance_evidence_digest": acceptance_evidence_digest,
+            }
+        )
         gate_set_digest = self._event_hash(
             {"aggregate_gate_ids": payload["aggregate_gate_ids"]}
         )
@@ -11955,6 +12942,25 @@ class SQLiteStateStore:
                 ).fetchone()
                 if repository["catalog_head"] != expected_head:
                     raise DispatchDenied("expected repository head does not match")
+                for dependency_plan_id in sorted(request.dependency_plan_ids):
+                    dependency = connection.execute(
+                        "SELECT plan.repository_id, "
+                        "plan.plan_acceptance_binding_version, "
+                        "event.writer_epoch FROM validation_plans AS plan "
+                        "JOIN events AS event ON event.event_id = plan.event_id "
+                        "WHERE plan.plan_id = ?",
+                        (dependency_plan_id,),
+                    ).fetchone()
+                    if dependency is None or (
+                        dependency["repository_id"],
+                        dependency["plan_acceptance_binding_version"],
+                    ) != (request.repository_id, 1) or int(
+                        dependency["writer_epoch"]
+                    ) >= writer_epoch:
+                        raise DispatchDenied(
+                            "plan dependency must be a prior authenticated "
+                            "plan in this repository"
+                        )
                 has_canonical_descriptor = request.effect_action is not None
                 canonical_material_digest: str | None = None
                 relationship_receipt: SyntheticSourceReceipt | None = None
@@ -12204,6 +13210,10 @@ class SQLiteStateStore:
                     "failure_policy_version": SYNTHETIC_FAILURE_POLICY_VERSION,
                     "accepted_plan_semantic_digest": accepted_plan_semantic_digest,
                     "complete_policy_digest": complete_policy_digest,
+                    "plan_acceptance_binding_version": 1,
+                    "acceptance_payload_digest": acceptance_payload_digest,
+                    "acceptance_evidence_digest": acceptance_evidence_digest,
+                    "acceptance_evidence": acceptance_evidence.__dict__,
                     "relationship_source_use_event_id": (
                         None if relationship_receipt is None
                         else relationship_receipt.source_event_id
@@ -12242,9 +13252,12 @@ class SQLiteStateStore:
                     "source_tree_digest, item_definition_digest, "
                     "plan_schema_version, reducer_version, "
                     "accepted_plan_semantic_digest, complete_policy_digest, "
-                    "payload_digest, event_hash, body_json) VALUES ("
+                    "payload_digest, event_hash, body_json, "
+                    "plan_acceptance_binding_version, acceptance_payload_digest, "
+                    "acceptance_evidence_digest, acceptance_issuer_fingerprint) "
+                    "VALUES ("
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    "?, ?, ?, ?, ?, ?)",
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         request.plan_id, request.command_id, request.event_id,
                         request.repository_id, request.run_id, request.item_id,
@@ -12265,6 +13278,9 @@ class SQLiteStateStore:
                         complete_policy_digest,
                         payload_digest,
                         event_hash, body_json,
+                        1, acceptance_payload_digest,
+                        acceptance_evidence_digest,
+                        acceptance_evidence.issuer_fingerprint,
                     ),
                 )
                 if has_canonical_descriptor and definition is None:
@@ -12314,6 +13330,15 @@ class SQLiteStateStore:
                     "INSERT INTO validation_requirements VALUES (?, ?)",
                     ((request.plan_id, check_id) for check_id in sorted(request.check_ids)),
                 )
+                connection.executemany(
+                    "INSERT INTO plan_dependencies VALUES (?, ?)",
+                    (
+                        (request.plan_id, dependency_plan_id)
+                        for dependency_plan_id in sorted(
+                            request.dependency_plan_ids
+                        )
+                    ),
+                )
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, 1, ?)",
                     (request.command_id, payload_digest, request.event_id, event_hash),
@@ -12340,12 +13365,49 @@ class SQLiteStateStore:
         self,
         request: ReadinessEvaluationRequest,
         *,
+        readiness_evidence: SyntheticOperationReadinessEvidence | None = None,
+        authority: SyntheticAuthority | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ControlReceipt:
         request.validate()
         if request.repository_id != self._repository_id:
             raise DispatchDenied("readiness evaluation targets another repository")
-        payload_digest = self._event_hash(request.__dict__)
+        if (
+            readiness_evidence is None
+            or authority is None
+            or self._classification_authority is None
+            or authority.issuer_fingerprint
+            != self._classification_authority.issuer_fingerprint
+        ):
+            raise DispatchDenied("readiness evaluation requires trusted evidence")
+        authority.verify_operation_readiness_evidence(readiness_evidence)
+        if (
+            readiness_evidence.repository_id,
+            readiness_evidence.run_id,
+            readiness_evidence.item_id,
+            readiness_evidence.plan_id,
+            readiness_evidence.revision_digest,
+            readiness_evidence.inputs_evidence_digest,
+            readiness_evidence.prerequisites_met,
+        ) != (
+            request.repository_id,
+            request.run_id,
+            request.item_id,
+            request.plan_id,
+            request.revision_digest,
+            request.inputs_evidence_digest,
+            request.prerequisites_met,
+        ):
+            raise DispatchDenied("readiness evidence is rebound")
+        readiness_evidence_digest = self._event_hash(
+            readiness_evidence.__dict__
+        )
+        payload_digest = self._event_hash(
+            {
+                "request": request.__dict__,
+                "readiness_evidence_digest": readiness_evidence_digest,
+            }
+        )
         with self._writer_lock(), closing(
             self._connect()
         ) as connection:
@@ -12355,12 +13417,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -12392,6 +13448,12 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return self._readiness_receipt(prior, replayed=True)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 run = connection.execute(
                     "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
                     (request.repository_id, request.run_id),
@@ -12409,6 +13471,51 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "readiness evaluation does not bind the accepted plan"
                     )
+                if (
+                    plan["plan_acceptance_binding_version"] != 1
+                    or plan["acceptance_payload_digest"]
+                    != readiness_evidence.acceptance_payload_digest
+                ):
+                    raise DispatchDenied(
+                        "readiness cannot authorize an unauthenticated plan"
+                    )
+                if (
+                    readiness_evidence.predecessor_catalog_head != catalog_head
+                    or readiness_evidence.predecessor_head_vector
+                    != tuple(sorted(run_heads.items()))
+                ):
+                    raise DispatchDenied(
+                        "readiness evidence predecessor vector is stale"
+                    )
+                dependency_ids = [
+                    str(row["dependency_plan_id"])
+                    for row in connection.execute(
+                        "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                        "plan_id = ? ORDER BY dependency_plan_id",
+                        (request.plan_id,),
+                    )
+                ]
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                dependency_rows = [
+                    self._dependency_readiness_snapshot(
+                        connection, dependency_plan_id,
+                        before_writer_epoch=writer_epoch,
+                    )
+                    for dependency_plan_id in dependency_ids
+                ]
+                dependency_snapshot = tuple(
+                    row for row, _ready in dependency_rows
+                )
+                if dependency_snapshot != readiness_evidence.dependency_snapshot:
+                    raise DispatchDenied(
+                        "readiness dependency snapshot is stale or rebound"
+                    )
                 current_state = LifecycleState(str(run["lifecycle_state"]))
                 if current_state not in {
                     LifecycleState.PLANNED, LifecycleState.BLOCKED,
@@ -12425,31 +13532,46 @@ class SQLiteStateStore:
                         "readiness evaluation expected state is stale"
                     )
                 sequence = int(run["head_sequence"]) + 1
-                writer_epoch = int(
-                    connection.execute(
-                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
-                        "WHERE repository_id = ?",
-                        (request.repository_id,),
-                    ).fetchone()[0]
-                )
-                blockers = self._readiness_blockers(
+                blockers = set(self._readiness_blockers(
                     connection, request, plan, current_state,
                     request.expected_continuation_cursor, sequence,
                     writer_epoch,
-                )
+                ))
+                if any(not ready for _row, ready in dependency_rows):
+                    blockers.add("DEPENDENCY_NOT_READY")
+                blocker_codes = tuple(sorted(blockers))
                 resulting_state = (
                     LifecycleState.PLANNED
-                    if not blockers else LifecycleState.BLOCKED
+                    if not blocker_codes else LifecycleState.BLOCKED
+                )
+                dependency_snapshot_digest = self._event_hash(
+                    {
+                        "domain": "AEGIS:T02:DEPENDENCY_SNAPSHOT:v1",
+                        "rows": [list(row) for row in dependency_snapshot],
+                    }
+                )
+                predecessor_head_vector_digest = (
+                    self._complete_head_vector_digest(run_heads)
                 )
                 body = {
                     **request.__dict__,
-                    "blocker_codes": list(blockers),
+                    "blocker_codes": list(blocker_codes),
                     "continuation_cursor": request.expected_continuation_cursor,
                     "event_kind": "READINESS_EVALUATED",
                     "lifecycle_from": current_state.value,
                     "lifecycle_to": resulting_state.value,
                     "previous_event_hash": request.expected_run_head,
                     "request_digest": payload_digest,
+                    "readiness_binding_version": 1,
+                    "readiness_evidence_digest": readiness_evidence_digest,
+                    "readiness_evidence": readiness_evidence.__dict__,
+                    "readiness_issuer_fingerprint": (
+                        readiness_evidence.issuer_fingerprint
+                    ),
+                    "dependency_snapshot_digest": dependency_snapshot_digest,
+                    "predecessor_head_vector_digest": (
+                        predecessor_head_vector_digest
+                    ),
                     "schema_version": 1,
                     "sequence": sequence,
                     "transition_id": "T02",
@@ -12471,7 +13593,7 @@ class SQLiteStateStore:
                 )
                 connection.execute(
                     "INSERT INTO readiness_evaluations VALUES ("
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         request.readiness_id, request.command_id,
                         request.event_id, request.repository_id, request.run_id,
@@ -12481,6 +13603,10 @@ class SQLiteStateStore:
                         int(request.prerequisites_met), payload_digest,
                         event_hash, resulting_state.value,
                         request.expected_continuation_cursor, body_json,
+                        1, readiness_evidence_digest,
+                        readiness_evidence.issuer_fingerprint,
+                        dependency_snapshot_digest,
+                        predecessor_head_vector_digest,
                     ),
                 )
                 connection.execute(
@@ -18688,17 +19814,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied("independent recovery freshness proof failed")
-                self._require_plan_issuer(
-                    connection,
-                    request.repository_id,
-                    request.run_id,
-                    authority,
-                )
-
                 prior = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -18718,6 +19833,17 @@ class SQLiteStateStore:
                         replayed=True,
                     )
 
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
+                self._require_plan_issuer(
+                    connection,
+                    request.repository_id,
+                    request.run_id,
+                    authority,
+                )
+
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "EFFECT",
                     capability.grant_id, "EXECUTE_EFFECT",
@@ -18730,6 +19856,9 @@ class SQLiteStateStore:
                     "budget_policy_digest, aggregate_gate_ids_json, "
                     "gate_set_digest, finalization_policy_id, "
                     "finalization_policy_version, finalization_issuer_fingerprint, "
+                    "plan_acceptance_binding_version, "
+                    "acceptance_payload_digest, acceptance_evidence_digest, "
+                    "acceptance_issuer_fingerprint, "
                     "body_json "
                     "FROM validation_plans WHERE repository_id = ? AND run_id = ?",
                     (request.repository_id, request.run_id),
@@ -18756,6 +19885,10 @@ class SQLiteStateStore:
                         "finalization_policy_id",
                         "finalization_policy_version",
                         "finalization_issuer_fingerprint",
+                        "plan_acceptance_binding_version",
+                        "acceptance_payload_digest",
+                        "acceptance_evidence_digest",
+                        "acceptance_issuer_fingerprint",
                     )
                 ):
                     raise DispatchDenied(
@@ -18794,7 +19927,8 @@ class SQLiteStateStore:
                     raise DispatchDenied("expected repository head does not match")
 
                 existing_run = connection.execute(
-                    "SELECT item_id, lifecycle_state, head_sequence, head_hash FROM runs WHERE run_id = ?",
+                    "SELECT item_id, lifecycle_state, continuation_cursor, "
+                    "head_sequence, head_hash FROM runs WHERE run_id = ?",
                     (request.run_id,),
                 ).fetchone()
                 if existing_run is None:
@@ -18807,6 +19941,33 @@ class SQLiteStateStore:
                     raise DispatchDenied("T03 requires durable PLANNED state")
                 sequence = int(existing_run["head_sequence"]) + 1
                 previous_hash = str(existing_run["head_hash"])
+                self._require_new_writer_epoch(
+                    connection, request.repository_id, writer_epoch
+                )
+                readiness = None
+                readiness_body = None
+                readiness_evidence = None
+                readiness = connection.execute(
+                    "SELECT * FROM readiness_evaluations WHERE "
+                    "repository_id = ? AND run_id = ? ORDER BY rowid DESC "
+                    "LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if readiness is None:
+                    raise DispatchDenied("T03 requires current verified readiness")
+                readiness_body, readiness_evidence = (
+                    self._verify_current_readiness_for_intent(
+                        connection,
+                        request,
+                        plan,
+                        readiness,
+                        catalog_head=catalog_head,
+                        run_heads=run_heads,
+                        writer_epoch=writer_epoch,
+                        continuation_cursor=existing_run["continuation_cursor"],
+                        next_sequence=sequence,
+                    )
+                )
 
                 recovery_authorization = None
                 if recovered_nonexecution:
@@ -18982,9 +20143,6 @@ class SQLiteStateStore:
                 ).fetchone()[0]
                 if int(aggregate) + request.reserved_units > request.cap_units:
                     raise DispatchDenied("budget cap would be exceeded")
-                self._require_new_writer_epoch(
-                    connection, request.repository_id, writer_epoch
-                )
 
                 body = {
                     "capability_claim_id": capability.claim_id,
@@ -19014,12 +20172,37 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                assert readiness is not None
+                assert readiness_body is not None
+                assert readiness_evidence is not None
+                body.update(
+                    {
+                        "readiness_id": readiness["readiness_id"],
+                        "readiness_event_id": readiness["event_id"],
+                        "readiness_event_hash": readiness["event_hash"],
+                        "readiness_evidence_digest": readiness[
+                            "readiness_evidence_digest"
+                        ],
+                        "dependency_snapshot_digest": readiness[
+                            "dependency_snapshot_digest"
+                        ],
+                        "predecessor_head_vector_digest": readiness[
+                            "predecessor_head_vector_digest"
+                        ],
+                        "source_head_at_intent": run_heads[
+                            _SYNTHETIC_SOURCE_HEAD_MEMBER
+                        ],
+                        "acceptance_evidence_digest": plan[
+                            "acceptance_evidence_digest"
+                        ],
+                    }
+                )
                 if recovered_nonexecution:
                     assert isinstance(request, ProvenNonexecutionIntentRequest)
                     assert recovery_authorization is not None
                     body.update(
                         {
-                            "intent_binding_version": 2,
+                            "intent_binding_version": 4,
                             "intent_kind": "PROVEN_NONEXECUTION_RETRY",
                             "recovery_authorization_id": (
                                 request.recovery_authorization_id
@@ -19034,6 +20217,13 @@ class SQLiteStateStore:
                             "expected_target_generation": (
                                 request.expected_target_generation
                             ),
+                        }
+                    )
+                else:
+                    body.update(
+                        {
+                            "intent_binding_version": 2,
+                            "intent_kind": "INITIAL_DISPATCH",
                         }
                     )
                 event_hash = self._event_hash(body)
@@ -20258,9 +21448,27 @@ class SQLiteStateStore:
                         "ordinary operation intent carries recovery fields"
                     )
                 return 1, None
+            if body.get("intent_kind") == "INITIAL_DISPATCH":
+                required = {
+                    "readiness_id", "readiness_event_id",
+                    "readiness_event_hash", "readiness_evidence_digest",
+                    "dependency_snapshot_digest",
+                    "predecessor_head_vector_digest",
+                    "source_head_at_intent",
+                    "acceptance_evidence_digest",
+                }
+                if body.get("intent_binding_version") != 2 or any(
+                    not isinstance(body.get(field), str)
+                    or not body[field]
+                    for field in required
+                ):
+                    raise ValueError(
+                        "initial operation intent readiness binding is invalid"
+                    )
+                return 1, None
             if (
                 body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY"
-                or body.get("intent_binding_version") != 2
+                or body.get("intent_binding_version") not in {2, 4}
                 or type(body.get("expected_source_generation")) is not int
                 or type(body.get("expected_target_generation")) is not int
                 or body["expected_source_generation"] <= 0
@@ -21239,6 +22447,14 @@ class SQLiteStateStore:
         if not request.source_control_classification or authority is None:
             raise DispatchDenied(
                 "new observations require complete source/control evidence"
+            )
+        if (
+            self._classification_authority is None
+            or authority.issuer_fingerprint
+            != self._classification_authority.issuer_fingerprint
+        ):
+            raise DispatchDenied(
+                "observation authority does not match the accepted plan"
             )
         evidence_request = SourceControlEvidenceRequest(
                 repository_id=request.repository_id,
@@ -26280,6 +27496,7 @@ class SQLiteStateStore:
                         if adoption_origin is not None
                         else request.expected_slot_attempt_id
                     ),
+                    "slot_released": True,
                 }
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
@@ -27151,6 +28368,109 @@ class SQLiteStateStore:
         ).fetchall()
         launches = [json.loads(row["body_json"]) for row in launch_event_rows]
         intents_by_event = {body["event_id"]: body for body in intents}
+        initial_intent_fields = {
+            "capability_claim_id", "capability_grant_id",
+            "capability_scope_digest", "command_id", "attempt_id",
+            "budget_policy_digest", "budget_cap_units",
+            "budget_reserved_units", "budget_worst_case_units",
+            "effect_descriptor_digest", "event_id", "event_kind", "item_id",
+            "logical_effect_id", "lifecycle_from", "lifecycle_to",
+            "permission_use_id", "plan_id", "previous_event_hash",
+            "repository_id", "revision_digest", "run_id", "reservation_id",
+            "schema_version", "sequence", "writer_epoch",
+            "intent_binding_version", "intent_kind", "readiness_id",
+            "readiness_event_id", "readiness_event_hash",
+            "readiness_evidence_digest", "dependency_snapshot_digest",
+            "predecessor_head_vector_digest", "source_head_at_intent",
+            "acceptance_evidence_digest",
+        }
+        for intent_body in intents:
+            if intent_body.get("intent_kind") != "INITIAL_DISPATCH":
+                continue
+            if set(intent_body) != initial_intent_fields or (
+                intent_body.get("intent_binding_version") != 2
+                or intent_body.get("event_kind") != "INTENT_COMMITTED"
+            ):
+                raise StorageIntegrityError(
+                    "initial intent schema is invalid"
+                )
+            readiness = connection.execute(
+                "SELECT evaluation.*, event.sequence AS readiness_sequence, "
+                "event.writer_epoch AS readiness_writer_epoch FROM "
+                "readiness_evaluations AS evaluation JOIN events AS event ON "
+                "event.event_id = evaluation.event_id WHERE "
+                "evaluation.readiness_id = ? AND evaluation.event_id = ? "
+                "AND evaluation.event_hash = ?",
+                (
+                    intent_body["readiness_id"],
+                    intent_body["readiness_event_id"],
+                    intent_body["readiness_event_hash"],
+                ),
+            ).fetchone()
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                "repository_id = ? AND run_id = ?",
+                (
+                    intent_body["plan_id"], intent_body["repository_id"],
+                    intent_body["run_id"],
+                ),
+            ).fetchone()
+            if readiness is None or plan is None:
+                raise StorageIntegrityError(
+                    "initial intent lost readiness or plan provenance"
+                )
+            try:
+                readiness_body = json.loads(str(readiness["body_json"]))
+                plan_body = json.loads(str(plan["body_json"]))
+                if not isinstance(readiness_body, dict) or not isinstance(
+                    plan_body, dict
+                ):
+                    raise ValueError("provenance body is not an object")
+                evidence = self._verified_readiness_evidence(readiness_body)
+                self._verified_plan_acceptance_evidence(plan_body)
+            except (
+                DispatchDenied, TypeError, ValueError, json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "initial intent provenance is invalid"
+                ) from error
+            dependency_ids = tuple(
+                str(row["dependency_plan_id"])
+                for row in connection.execute(
+                    "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                    "plan_id = ? ORDER BY dependency_plan_id",
+                    (intent_body["plan_id"],),
+                )
+            )
+            if (
+                int(readiness["readiness_sequence"])
+                >= int(intent_body["sequence"])
+                or int(readiness["readiness_writer_epoch"])
+                >= int(intent_body["writer_epoch"])
+                or readiness["resulting_state"]
+                != LifecycleState.PLANNED.value
+                or readiness_body.get("blocker_codes") != []
+                or intent_body["previous_event_hash"]
+                != readiness["event_hash"]
+                or intent_body["readiness_evidence_digest"]
+                != readiness["readiness_evidence_digest"]
+                or intent_body["dependency_snapshot_digest"]
+                != readiness["dependency_snapshot_digest"]
+                or intent_body["predecessor_head_vector_digest"]
+                != readiness["predecessor_head_vector_digest"]
+                or intent_body["acceptance_evidence_digest"]
+                != plan["acceptance_evidence_digest"]
+                or evidence.acceptance_payload_digest
+                != plan["acceptance_payload_digest"]
+                or tuple(row[0] for row in evidence.dependency_snapshot)
+                != dependency_ids
+            ):
+                raise StorageIntegrityError(
+                    "initial intent readiness binding is invalid"
+                )
+            self._verify_intent_readiness_successor_vector(
+                connection, intent_body, readiness, evidence
+            )
         recovered_intent_fields = {
             "capability_claim_id", "capability_grant_id",
             "capability_scope_digest", "command_id", "attempt_id",
@@ -27166,15 +28486,103 @@ class SQLiteStateStore:
             "prior_attempt_id", "expected_source_generation",
             "expected_target_generation",
         }
+        recovery_readiness_fields = {
+            "readiness_id", "readiness_event_id", "readiness_event_hash",
+            "readiness_evidence_digest", "dependency_snapshot_digest",
+            "predecessor_head_vector_digest", "source_head_at_intent",
+            "acceptance_evidence_digest",
+        }
         for intent_body in intents:
             if intent_body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY":
                 continue
-            if set(intent_body) != recovered_intent_fields or (
-                intent_body.get("intent_binding_version") != 2
+            binding_version = intent_body.get("intent_binding_version")
+            expected_fields = (
+                recovered_intent_fields
+                if binding_version == 2
+                else recovered_intent_fields | recovery_readiness_fields
+            )
+            if set(intent_body) != expected_fields or (
+                binding_version not in {2, 4}
                 or intent_body.get("event_kind") != "INTENT_COMMITTED"
             ):
                 raise StorageIntegrityError(
                     "recovered intent schema is invalid"
+                )
+            if binding_version == 4:
+                readiness = connection.execute(
+                    "SELECT evaluation.*, event.sequence AS readiness_sequence, "
+                    "event.writer_epoch AS readiness_writer_epoch FROM "
+                    "readiness_evaluations AS evaluation JOIN events AS event ON "
+                    "event.event_id = evaluation.event_id WHERE "
+                    "evaluation.readiness_id = ? AND evaluation.event_id = ? "
+                    "AND evaluation.event_hash = ?",
+                    (
+                        intent_body["readiness_id"],
+                        intent_body["readiness_event_id"],
+                        intent_body["readiness_event_hash"],
+                    ),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (
+                        intent_body["plan_id"], intent_body["repository_id"],
+                        intent_body["run_id"],
+                    ),
+                ).fetchone()
+                if readiness is None or plan is None:
+                    raise StorageIntegrityError(
+                        "recovered intent lost readiness or plan provenance"
+                    )
+                try:
+                    readiness_body = json.loads(str(readiness["body_json"]))
+                    plan_body = json.loads(str(plan["body_json"]))
+                    if not isinstance(readiness_body, dict) or not isinstance(
+                        plan_body, dict
+                    ):
+                        raise ValueError("provenance body is not an object")
+                    evidence = self._verified_readiness_evidence(readiness_body)
+                    self._verified_plan_acceptance_evidence(plan_body)
+                except (
+                    DispatchDenied, TypeError, ValueError, json.JSONDecodeError,
+                ) as error:
+                    raise StorageIntegrityError(
+                        "recovered intent provenance is invalid"
+                    ) from error
+                dependency_ids = tuple(
+                    str(row["dependency_plan_id"])
+                    for row in connection.execute(
+                        "SELECT dependency_plan_id FROM plan_dependencies WHERE "
+                        "plan_id = ? ORDER BY dependency_plan_id",
+                        (intent_body["plan_id"],),
+                    )
+                )
+                if (
+                    int(readiness["readiness_sequence"])
+                    >= int(intent_body["sequence"])
+                    or int(readiness["readiness_writer_epoch"])
+                    >= int(intent_body["writer_epoch"])
+                    or readiness["resulting_state"] != LifecycleState.PLANNED.value
+                    or readiness_body.get("blocker_codes") != []
+                    or intent_body["previous_event_hash"] != readiness["event_hash"]
+                    or intent_body["readiness_evidence_digest"]
+                    != readiness["readiness_evidence_digest"]
+                    or intent_body["dependency_snapshot_digest"]
+                    != readiness["dependency_snapshot_digest"]
+                    or intent_body["predecessor_head_vector_digest"]
+                    != readiness["predecessor_head_vector_digest"]
+                    or intent_body["acceptance_evidence_digest"]
+                    != plan["acceptance_evidence_digest"]
+                    or evidence.acceptance_payload_digest
+                    != plan["acceptance_payload_digest"]
+                    or tuple(row[0] for row in evidence.dependency_snapshot)
+                    != dependency_ids
+                ):
+                    raise StorageIntegrityError(
+                        "recovered intent readiness binding is invalid"
+                    )
+                self._verify_intent_readiness_successor_vector(
+                    connection, intent_body, readiness, evidence
                 )
             authorization = connection.execute(
                 "SELECT authorization.*, recovery.event_id AS "
@@ -27702,6 +29110,25 @@ class SQLiteStateStore:
             reconstructed.validate()
             return reconstructed
 
+        def plan_payload_digest_from_body(
+            body: Mapping[str, object],
+        ) -> str:
+            request_payload = {
+                key: body[key]
+                for key in PlanAcceptanceRequest.__dataclass_fields__
+                if key in body
+            }
+            if body.get("plan_acceptance_binding_version") == 1:
+                return self._event_hash(
+                    {
+                        "request": request_payload,
+                        "acceptance_evidence_digest": body[
+                            "acceptance_evidence_digest"
+                        ],
+                    }
+                )
+            return self._event_hash(request_payload)
+
         expected_outcomes = {
             body["command_id"]: (
                 self._payload_digest(intent_request_from_body(body)),
@@ -27714,13 +29141,7 @@ class SQLiteStateStore:
         expected_outcomes.update(
             {
                 body["command_id"]: (
-                    self._event_hash(
-                        {
-                            key: body[key]
-                            for key in PlanAcceptanceRequest.__dataclass_fields__
-                            if key in body
-                        }
-                    ),
+                    plan_payload_digest_from_body(body),
                     body["event_id"], body["sequence"], self._event_hash(body),
                 )
                 for body in plans
@@ -29809,6 +31230,9 @@ class SQLiteStateStore:
                         budget_policy_digest=body["budget_policy_digest"],
                         check_ids=tuple(body["check_ids"]),
                         aggregate_gate_ids=tuple(body["aggregate_gate_ids"]),
+                        dependency_plan_ids=tuple(
+                            body.get("dependency_plan_ids", ())
+                        ),
                         source_tree_digest=body["source_tree_digest"],
                         item_definition_digest=body["item_definition_digest"],
                         plan_schema_version=body["plan_schema_version"],
@@ -29856,7 +31280,45 @@ class SQLiteStateStore:
                         ),
                     )
                     plan_request.validate()
-                except (KeyError, TypeError, ValueError) as error:
+                    if body.get("plan_acceptance_binding_version") == 1:
+                        evidence = self._verified_plan_acceptance_evidence(
+                            body
+                        )
+                        if (
+                            body.get("acceptance_issuer_fingerprint")
+                            is not None
+                            and body["acceptance_issuer_fingerprint"]
+                            != evidence.issuer_fingerprint
+                        ):
+                            raise ValueError(
+                                "plan acceptance issuer binding changed"
+                            )
+                        for dependency_plan_id in (
+                            plan_request.dependency_plan_ids
+                        ):
+                            dependency = connection.execute(
+                                "SELECT plan.repository_id, "
+                                "plan.plan_acceptance_binding_version, "
+                                "event.writer_epoch FROM validation_plans AS "
+                                "plan JOIN events AS event ON event.event_id = "
+                                "plan.event_id WHERE plan.plan_id = ?",
+                                (dependency_plan_id,),
+                            ).fetchone()
+                            if dependency is None or (
+                                dependency["repository_id"],
+                                dependency[
+                                    "plan_acceptance_binding_version"
+                                ],
+                            ) != (repository_id, 1) or int(
+                                dependency["writer_epoch"]
+                            ) >= int(body["writer_epoch"]):
+                                raise ValueError(
+                                    "plan dependency is not a prior "
+                                    "authenticated plan"
+                                )
+                except (
+                    DispatchDenied, KeyError, TypeError, ValueError,
+                ) as error:
                     raise StorageIntegrityError(
                         "accepted plan binding is invalid"
                     ) from error
@@ -29918,14 +31380,18 @@ class SQLiteStateStore:
                 body.get("reducer_version"),
                 body.get("accepted_plan_semantic_digest"),
                 body.get("complete_policy_digest"),
-                self._event_hash(
-                    {
-                        key: body[key]
-                        for key in PlanAcceptanceRequest.__dataclass_fields__
-                        if key in body
-                    }
-                ),
+                plan_payload_digest_from_body(body),
                 self._event_hash(body),
+                body.get("plan_acceptance_binding_version"),
+                body.get("acceptance_payload_digest"),
+                body.get("acceptance_evidence_digest"),
+                (
+                    body.get("acceptance_evidence", {}).get(
+                        "issuer_fingerprint"
+                    )
+                    if isinstance(body.get("acceptance_evidence"), dict)
+                    else None
+                ),
             )
             for body in plans
         }
@@ -29947,6 +31413,10 @@ class SQLiteStateStore:
                 row["accepted_plan_semantic_digest"],
                 row["complete_policy_digest"],
                 row["payload_digest"], row["event_hash"],
+                row["plan_acceptance_binding_version"],
+                row["acceptance_payload_digest"],
+                row["acceptance_evidence_digest"],
+                row["acceptance_issuer_fingerprint"],
             )
             for row in connection.execute(
                 "SELECT * FROM validation_plans WHERE repository_id = ?",
@@ -30141,6 +31611,11 @@ class SQLiteStateStore:
                 body["request_digest"], self._event_hash(body),
                 body["lifecycle_to"], body["continuation_cursor"],
                 json.dumps(body, sort_keys=True, separators=(",", ":")),
+                body.get("readiness_binding_version"),
+                body.get("readiness_evidence_digest"),
+                body.get("readiness_issuer_fingerprint"),
+                body.get("dependency_snapshot_digest"),
+                body.get("predecessor_head_vector_digest"),
             )
             for body in readiness_evaluations
         }
@@ -30152,6 +31627,11 @@ class SQLiteStateStore:
                 row["request_digest"], row["event_hash"],
                 row["resulting_state"], row["continuation_cursor"],
                 row["body_json"],
+                row["readiness_binding_version"],
+                row["readiness_evidence_digest"],
+                row["readiness_issuer_fingerprint"],
+                row["dependency_snapshot_digest"],
+                row["predecessor_head_vector_digest"],
             )
             for row in connection.execute(
                 "SELECT * FROM readiness_evaluations WHERE repository_id = ?",
@@ -30539,6 +32019,46 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "validation-requirement projection diverges from event history"
             )
+        expected_dependencies = {
+            (body["plan_id"], dependency_plan_id)
+            for body in plans
+            for dependency_plan_id in body.get("dependency_plan_ids", ())
+        }
+        actual_dependencies = {
+            (row["plan_id"], row["dependency_plan_id"])
+            for row in connection.execute(
+                "SELECT dependency.plan_id, dependency.dependency_plan_id "
+                "FROM plan_dependencies AS dependency JOIN validation_plans "
+                "AS plan ON plan.plan_id = dependency.plan_id WHERE "
+                "plan.repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_dependencies != expected_dependencies:
+            raise StorageIntegrityError(
+                "plan-dependency projection diverges from event history"
+            )
+        dependency_graph: dict[str, set[str]] = {}
+        for plan_id, dependency_plan_id in actual_dependencies:
+            dependency_graph.setdefault(plan_id, set()).add(
+                dependency_plan_id
+            )
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit_dependency(plan_id: str) -> None:
+            if plan_id in visiting:
+                raise StorageIntegrityError("plan dependency graph is cyclic")
+            if plan_id in visited:
+                return
+            visiting.add(plan_id)
+            for dependency_plan_id in dependency_graph.get(plan_id, set()):
+                visit_dependency(dependency_plan_id)
+            visiting.remove(plan_id)
+            visited.add(plan_id)
+
+        for plan_id in dependency_graph:
+            visit_dependency(plan_id)
         expected_applications = {
             body["application_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -34237,7 +35757,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 5:
+            if version != 6:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

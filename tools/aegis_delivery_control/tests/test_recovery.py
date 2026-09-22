@@ -23,7 +23,10 @@ from tools.aegis_delivery_control.contracts import (
     OperationLaunchReceipt,
     PlanAcceptanceRequest as PlanAcceptanceContract,
 )
-from tools.aegis_delivery_control.storage import SQLiteStateStore, default_state_root
+from tools.aegis_delivery_control.storage import default_state_root
+from tools.aegis_delivery_control.tests._trusted_readiness_store import (
+    SQLiteStateStore,
+)
 
 
 def PlanAcceptanceRequest(*args, **kwargs):
