@@ -1007,6 +1007,7 @@ nonlaunchable.
 | Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
 | Independent implementation review | Three `REVISE` rounds closed caller-asserted output bounds, nested roots, optional recovery authority, exact schema/event checks, incomplete F05/F06/F13 matrices, stale source-use freshness and a mislabeled PAUSING fixture; final `APPROVE`, no remaining blocker or major |
+| Commit/push and hosted checks | DCO-signed commit `cf09be260bbffcb78dc44847b317d6c4a0de8237` pushed to the existing branch after remote head `676c4e2bc366290f28802721cd1dd99467a71707` matched its parent; exact-head `gate-guard` passed in 6s, `validate-skills` in 1m19s and `windows-offline-checks` in 1m55s; PR #99 remained open, draft and blocked |
 | T/C/F traceability | Adds independently accepted F05/F06/F13/F20 evidence across their implicated T/C routes; complete accumulated rows remain conservatively `UNVERIFIED` pending the final exact-head trace |
 | Files changed | `adapters.py`, `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py` and `test_storage.py`; this backlog/handoff and status READMEs record evidence separately |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
