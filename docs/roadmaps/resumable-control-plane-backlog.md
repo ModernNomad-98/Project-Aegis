@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption and cross-family F05/F06/F13/F20. The complete local delivery-control suite passes 413 tests, but slice evidence does not promote unaudited T/C/F rows. Filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption, cross-family F05/F06/F13/F20 and Windows filesystem ownership/reparse/path-swap protection. The complete local delivery-control suite passes 433 tests, but slice evidence does not promote unaudited T/C/F rows. POSIX runtime evidence and the final exact-head architecture/security/QA reviews remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -220,8 +220,14 @@ before independent freshness can pass. Synthetic capabilities and settlement
 proofs are issuer-verifiable. One state database atomically records claim
 redemption with intent, and a separate durable synthetic target ledger preserves
 accepted effects and receipts across adapter instances. These facts do not
-establish protection against filesystem path replacement/permission attacks or
-real source-atomic authority consumption.
+establish real source-atomic authority consumption. The reviewed filesystem
+slice now fails closed on unsafe ownership, ACL, hardlink, sidecar, reparse and
+identity conditions; retains checked Windows handles for the fixed-volume and
+known-folder anchors and every managed descendant; and pins the stable writer-
+lock identity for the lifetime of a store. Windows tests use actual junction
+and rename probes. The POSIX descriptor-relative policy is implemented and
+unit-checked, but has not run on a POSIX host and therefore is not promoted to
+verified platform evidence.
 
 Focused local evidence through 2026-09-19 includes the package `unittest` suite
 on Windows and an actual second-process writer-lock denial. This evidence covers
@@ -255,8 +261,8 @@ not yet establish the complete normative rows. Before DONE, complete executable
 finalization records and crash replay for C06; then
 cover the remaining F01-F21 families, especially multi-check validation,
 stop/late-receipt ordering, adoption, exact fence clearance and complete
-transition application. Add filesystem ownership/reparse/path-swap protections
-and durable application paths for the remaining lifecycle rows. Re-run independent
+transition application. Add durable application paths for the remaining
+lifecycle rows. Re-run independent
 architecture, security and QA reviews against the resulting exact head. Power-loss
 durability and any real authority/execution capability remain unavailable, not
 inferred from these process-level tests.
@@ -1012,9 +1018,50 @@ nonlaunchable.
 | Files changed | `adapters.py`, `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py` and `test_storage.py`; this backlog/handoff and status READMEs record evidence separately |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
 
-Cross-family F05/F06/F13/F20 is independently accepted. Filesystem ownership,
-reparse-point and path-swap protection is next in documented order. PR #99
-remains draft and not merge-ready; no release or deployment is authorized.
+Cross-family F05/F06/F13/F20 is independently accepted. The next documented
+slice was filesystem ownership/reparse/path-swap protection, recorded below.
+PR #99 remains draft and not merge-ready; no release or deployment is authorized.
+
+### 5.22 Filesystem ownership/reparse/path-swap checkpoint
+
+The filesystem slice routes the controller database, synthetic execution and
+validator ledgers, stable writer lock and read-only CLI/reader access through a
+standard-library checked-path capability. On Windows, the OS-known LocalAppData
+path is bound to a retained non-reparse handle, a fixed-volume-root handle and a
+normalized handle-verified lexical path; every managed descendant and leaf is
+retained and identity checked. Same-volume known-folder rebinding, junctions,
+leaf/ancestor replacement, hardlinks, unsafe ACLs, WAL/SHM sidecars and unsafe
+rollback journals fail closed. The original `writer.lock` identity is retained
+by each store and required by every later mutation, so lock replacement cannot
+split repository serialization.
+
+POSIX traversal starts at `/`, uses descriptor-relative `O_NOFOLLOW`, rejects
+mount transitions and untrusted owners, and requires an owner-private child
+after a sticky directory. That policy is implemented and its decision rules are
+unit tested, but no POSIX runtime was available; it remains `UNVERIFIED` rather
+than inheriting the Windows result. A legitimate owned rollback journal is
+accepted for SQLite crash recovery, while WAL/SHM and linked journals are
+rejected. Read-only status and terminal-report access neither create nor repair
+state and return a typed unavailable result when the checked capability cannot
+be established.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Two `REVISE` rounds corrected exact OS anchors, same-owner prevention/detection claims, short-lived rollback-journal checks and read-only behavior; final `APPROVE` preceded editing |
+| Focused platform regressions | Initial 22-test module and independent 23-test falsifier rerun passed; final-review corrections expanded the module to 27 passing tests covering unavailable canonical-root routing, explicit-path independence, hostile Windows ACL denial, initialized-status nonmutation and missing POSIX traversal flags |
+| Complete delivery-control package | 433 tests passed in 78.889 seconds on the final reviewed diff |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found Windows ancestor/anchor binding, stable-lock identity, POSIX ownership and cleanup gaps; correction rounds closed them, including a same-volume known-folder rebound probe; final `APPROVE`, no remaining blocker or major |
+| Final-review correction pass | Architecture `REVISE` found premature canonical-root discovery in path-independent/noncanonical routes; QA `REVISE` required durable hostile-ACL and initialized-status nonmutation tests; security initially `APPROVE` with minor wording/test/flag notes. Corrections passed 27 platform and 433 package tests; architecture, security and QA re-reviews all returned `APPROVE` with no blocker or major. Exact committed-head/hosted confirmation remains pending |
+| T/C/F traceability | Strengthens platform/exclusion evidence implicated by T03/T21/T22 and path-escape families; accumulated T/C/F rows remain conservatively `UNVERIFIED` pending final exact-head trace |
+| Files changed | New `owned_paths.py`; `storage.py`, `adapters.py`, `cli.py`, `test_platform.py`, and isolation/canonical-path fixtures in `test_dispatch.py`, `test_recovery.py` and `test_storage.py`; backlog, handoff and status READMEs record evidence |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI workflows, real authority/adapters, external systems and preserved artifact/cache paths |
+| Known limitation | The current sandbox principal does not own its OS-returned LocalAppData directory, so a real default-root smoke run is correctly `UNAVAILABLE`; tests use a checked temporary known-folder seam. POSIX runtime evidence is absent |
+
+This filesystem slice and its corrected pre-commit diff are independently
+accepted. Exact committed-head/hosted confirmation is next. PR #99 remains
+draft and not merge-ready; no release or deployment is authorized.
 
 ## 6. Handoff contract
 

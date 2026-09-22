@@ -649,10 +649,12 @@ independent `APPROVE`: complete-vector freshness covers one-use source
 consumption, the repository-wide slot is exercised across lifecycle/generation
 boundaries, contrary receipts follow exact durable states and validator
 containment is typed, bounded and strictly recovered. Filesystem ownership,
-reparse-point and path-swap protection is next in the documented order. The PR
-remains draft and not
-merge-ready while the exact
-T/C/F backlog and final review gates remain. Read the
+reparse-point and path-swap protection now also has independent `APPROVE` on
+Windows: checked OS-known-folder and descendant handles, stable lock identity,
+sidecar/hardlink denial and actual junction/replacement probes fail closed.
+POSIX runtime evidence remains `UNVERIFIED`. The PR remains draft and not
+merge-ready while the exact T/C/F trace and final architecture/security/QA
+review gates remain. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
 continuing. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:

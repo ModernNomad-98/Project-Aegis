@@ -180,12 +180,20 @@ Unsupported or uncertain guarantees close dispatch.
 
 The default database location is outside the checkout:
 
-- Windows: `%LOCALAPPDATA%/ProjectAegis/control-plane/<repo-id-hash>/state.sqlite3`
+- Windows: the OS-known LocalAppData folder returned by
+  `SHGetKnownFolderPath`, then
+  `ProjectAegis/control-plane/<repo-id-hash>/state.sqlite3`; environment
+  variables are not authority
 - Linux: `${XDG_STATE_HOME:-$HOME/.local/state}/project-aegis/control-plane/<repo-id-hash>/state.sqlite3`
 
 The stable `writer.lock` supplies cooperative OS-backed writer exclusion. It is
-never deleted to take ownership and does not replace the durable outstanding
-operation slot.
+never deleted to take ownership, its initialized identity is required by every
+later store mutation, and it does not replace the durable outstanding operation
+slot. Checked paths reject lexical escapes, links, unsafe ownership/ACLs,
+hardlinks, WAL/SHM and unsafe rollback journals. Windows retains the fixed-
+volume/known-folder and managed-descendant handles for each connection/lock
+scope. POSIX uses descriptor-relative no-follow traversal, but the current
+checkpoint has no POSIX runtime receipt and does not claim one.
 
 ## Commands
 
@@ -203,7 +211,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 413 tests successfully, and
+controller. The complete local package suite ran 433 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -294,8 +302,11 @@ violations. Cross-family F05/F06/F13/F20 now also has independent implementation
 repository-wide slot tests cover lifecycle and generation boundaries, contrary
 receipts are recovered across exact durable states, and validator containment
 is typed, bounded, authority-bound and strictly reconstructed. Filesystem
-ownership/reparse/path-swap protection is next in documented order. The broader
-exact T/C/F backlog and final reviews remain, so this checkpoint is
+ownership/reparse/path-swap protection now also has independent implementation
+`APPROVE`: Windows actual junction/replacement and same-volume known-folder
+rebound probes pass, the stable lock identity is pinned, and unsafe sidecars and
+hardlinks fail closed. POSIX runtime remains `UNVERIFIED`. The broader exact
+T/C/F trace and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
 
@@ -324,5 +335,4 @@ behavior, plus T26 closure by exact already-applied PASS/recoverable-failure
 evidence across T18/T19, crash/replay, migration and tamper boundaries. Passing
 tests do not establish the remaining complete T/C/F families.
 The backlog remains the source of truth for acceptance cases not yet implemented,
-including complete transition application and
-filesystem ownership/reparse/path-swap enforcement.
+including complete transition application and final exact-head trace/review.

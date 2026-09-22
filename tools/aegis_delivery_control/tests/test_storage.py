@@ -649,7 +649,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = self.database_path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         spec = parse_validator_containment_spec(intent.containment_spec_json)
         request = SyntheticValidatorRequest(
             "repo-1", "effect-1", "revision-1", "check-1", "input-1",
@@ -909,7 +909,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_nonexecution_attestation(
             "f06-unknown-attestation", "f06-unknown-seal", "EFFECT",
             adapter._target_digest("repo-1"), self.capability.claim_id,
@@ -1636,7 +1636,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         nonexecution_attestation = self.authority.issue_nonexecution_attestation(
             "adopted-nonexecution-attestation", "adopted-nonexecution-seal",
             "VALIDATOR", adapter._target_digest("repo-1"),
@@ -2609,7 +2609,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         spec = parse_validator_containment_spec(containment_json)
         result_digest = f"result-digest-{suffix}"
         validator_request = SyntheticValidatorRequest(
@@ -2761,7 +2761,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_nonexecution_attestation(
             "intent-nonexecution-attestation-1",
             "intent-nonexecution-seal-1", "EFFECT",
@@ -3208,7 +3208,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         retry_attestation = self.authority.issue_nonexecution_attestation(
             "activity-retry-nonexecution-attestation-1",
             "activity-retry-nonexecution-seal-1", "EFFECT",
@@ -3609,7 +3609,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_nonexecution_attestation(
             "launched-nonexecution-attestation-1",
             "launched-nonexecution-seal-1", "EFFECT",
@@ -3691,7 +3691,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         rebound = self.authority.issue_nonexecution_attestation(
             "intent-proof-rebound-attestation", "intent-proof-rebound-seal",
             "EFFECT", adapter._target_digest("repo-1"),
@@ -7762,7 +7762,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         target_path = self.database_path.parent / "synthetic-target.sqlite3"
         adapter = SyntheticExecutionAdapter(target_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = target_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_nonexecution_attestation(
             "contacted-nonexecution-attestation",
             "contacted-nonexecution-seal", "EFFECT",
@@ -12438,7 +12438,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = self.database_path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         spec = parse_validator_containment_spec(intent.containment_spec_json)
         request = SyntheticValidatorRequest(
             "repo-1", "effect-1", "revision-1", "check-1", "input-1",
@@ -12528,7 +12528,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = self.database_path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         if result_available:
             connection = sqlite3.connect(validator_path)
             try:
@@ -16075,7 +16075,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = self.database_path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_validator_cessation_attestation(
             "cessation-attestation-1", "cessation-1",
             adapter._target_digest("repo-1"), capability.claim_id,
@@ -16939,7 +16939,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         validator_path = self.database_path.parent / "synthetic-validator.sqlite3"
         adapter = SyntheticValidatorAdapter(validator_path)
         adapter._canonical_repository_id = "repo-1"
-        adapter._canonical_ledger_path = validator_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         attestation = self.authority.issue_nonexecution_attestation(
             "terminal-nonexecution-attestation", "terminal-nonexecution-seal",
             "VALIDATOR", adapter._target_digest("repo-1"),

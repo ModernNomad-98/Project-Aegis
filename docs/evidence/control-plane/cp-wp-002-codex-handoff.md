@@ -6,9 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed implementation checkpoint: `cf09be260bbffcb78dc44847b317d6c4a0de8237`
+Latest pushed checkpoint: `ad9b1d149b6c361a72e8650654d395f3114a7f9b`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, REVIEWED T05-T09/T13-T15, ORDERED T17 SLICES, T22, T28/F01 AND F05/F06/F13/F20 `APPROVE`; FILESYSTEM AND FINAL GATES OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - IMPLEMENTED SLICES AND FILESYSTEM DIFF `APPROVE`; EXACT COMMITTED-HEAD/HOSTED AND FINAL TRACE GATES OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -51,6 +51,7 @@ tools/behavioral_eval_runner/__pycache__/
 tools/behavioral_eval_runner/adapters/__pycache__/
 tools/behavioral_eval_runner/graders/__pycache__/
 tools/behavioral_eval_runner/judge/__pycache__/
+tools/behavioral_eval_runner/tests/__pycache__/
 ```
 
 Stage 5's local validator invocation also generated these untracked cache paths;
@@ -1112,8 +1113,51 @@ and blocked.
 
 F05/F06/F13/F20 receive independently accepted evidence but remain
 conservatively `UNVERIFIED` as accumulated matrix rows until the final exact-head
-trace. Filesystem ownership/reparse/path-swap protection is next. PR #99 remains
-open, draft and blocked; this checkpoint authorizes no release or deployment.
+trace. The next documented slice was filesystem ownership/reparse/path-swap
+protection.
+
+### Filesystem ownership/reparse/path-swap checkpoint
+
+The checked-path layer now covers the controller database, both synthetic
+adapter ledgers, the stable writer lock, CLI status and read-only terminal
+reporting. Windows binds the OS-known LocalAppData result to retained fixed-
+volume and known-folder handles, a normalized handle-verified lexical path and every
+managed descendant identity. It denies junctions, same-volume known-folder
+rebinding, leaf/ancestor replacement, hardlinks, unsafe ACLs, WAL/SHM sidecars
+and unsafe rollback journals. Every later store mutation requires the original
+`writer.lock` identity, preventing replacement from splitting serialization.
+
+The POSIX path uses descriptor-relative `O_NOFOLLOW`, rejects mount transitions
+and untrusted ancestor owners, and requires an owner-private child after sticky
+directories. Its policy tests pass, but no POSIX runtime evidence exists, so the
+platform result remains `UNVERIFIED`. Windows can prevent untrusted-principal
+swaps while checked handles are live; same-owner replacement is detected at the
+next identity-pinned connection. No continuity across a new process is claimed
+beyond the protected root plus durable journal/freshness checks.
+
+The final focused platform module passed 27 tests. The complete delivery-control
+package passed 433 tests in 78.889 seconds on the final reviewed diff. Repository validation found 184
+valid skills with zero warnings, 8 script tests passed with 4 expected skips,
+all 91 gate self-test assertions passed, compileall passed and `git diff --check`
+exited 0 with Windows line-ending notices only. Independent implementation
+review corrected full Windows ancestor/anchor binding, persistent lock identity,
+POSIX ownership/sticky semantics, error cleanup and same-volume path rebinding;
+its final verdict was `APPROVE` with no remaining blocker or major.
+
+Changed implementation files are new `owned_paths.py`, `storage.py`,
+`adapters.py`, `cli.py`, `test_platform.py`, and narrow isolation/canonical-path
+fixtures in `test_dispatch.py`, `test_recovery.py` and `test_storage.py`. This
+handoff, the backlog and status READMEs record the evidence. Canonical design,
+approval register, BER, dependencies, CI workflows, real authority/adapters,
+external systems and preserved artifact/cache paths remain intentionally
+untouched. The current sandbox principal does not own its OS-returned
+LocalAppData directory, so a real default-root smoke run is correctly
+`UNAVAILABLE`; tests use the checked known-folder seam.
+
+The filesystem slice is independently accepted, but accumulated T/C/F rows
+remain conservatively `UNVERIFIED` until the final exact-head trace. PR #99
+remains open, draft and blocked; documentation and final architecture/security/
+QA review gates remain, and this checkpoint authorizes no release or deployment.
 
 ## 8. Proven invocations
 
@@ -1258,6 +1302,13 @@ open, draft and blocked; this checkpoint authorizes no release or deployment.
 | Cross-family F05/F06/F13/F20 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
 | Independent cross-family F05/F06/F13/F20 implementation review | Three correction rounds closed all output-bound/root/authority/schema/matrix/freshness/fixture findings; final `APPROVE`, no remaining blocker or major |
 | Cross-family F05/F06/F13/F20 delivery | DCO-signed implementation commit `cf09be260bbffcb78dc44847b317d6c4a0de8237` pushed after remote head `676c4e2bc366290f28802721cd1dd99467a71707` matched its parent; exact-head `gate-guard`, `validate-skills` and `windows-offline-checks` passed; PR #99 remained OPEN/DRAFT/BLOCKED |
+| Filesystem plan audit | Two `REVISE` rounds corrected exact anchors, prevention/detection limits, rollback-journal handling and noncreating read-only access; final `APPROVE` before editing |
+| Filesystem focused platform module | Initial `Ran 22 tests`; `OK`; independent falsifier-plus-module rerun passed 23/23; final-review corrections expanded the module to 27 passing tests |
+| Filesystem complete delivery-control package | `Ran 433 tests in 78.889s`; `OK` on the final reviewed diff |
+| Filesystem repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Filesystem diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent filesystem implementation review | `REVISE` rounds closed Windows ancestor/known-folder binding, stable-lock identity, POSIX owner/sticky checks, cleanup leaks and same-volume rebinding; final `APPROVE`, no remaining blocker or major |
+| Final-review correction pass | Architecture `REVISE` found premature canonical-root discovery affecting `capabilities`, typed `status` and explicit-path stores; QA `REVISE` required hostile Windows ACL and valid-status nonmutation regressions; security initially `APPROVE` with wording/test/flag notes. Corrections pass the 27-test platform module and 433-test package; architecture, security and QA re-reviews all returned `APPROVE` with no blocker or major |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -1453,10 +1504,10 @@ Current durable order after the accepted T17 work is:
 3. T22 complete and independently accepted.
 4. T28 with F01 complete and independently accepted; accumulated rows remain `UNVERIFIED` pending exact-head trace.
 5. Cross-family F05/F06/F13/F20 complete and independently accepted; accumulated rows remain `UNVERIFIED` pending the final exact-head trace.
-6. Filesystem ownership/reparse/path-swap protection.
-7. Documentation refresh.
-8. Full repository validation.
-9. Independent architecture, security and QA reviews.
+6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
+7. Documentation refresh in progress in this checkpoint.
+8. Full local repository validation complete; exact-head hosted validation remains pending commit/push.
+9. Independent pre-commit architecture, security and QA reviews complete with `APPROVE`; exact committed-head/hosted confirmation remains.
 10. Commit, push, PR update and administrator merge only after all gates pass.
 
 This later order is recovered session context, not a superseding design record.
@@ -1464,8 +1515,8 @@ Before each item, compare it with the current backlog, design and actual diff.
 Any mismatch triggers source reconciliation, not silent reordering. Earlier
 milestones C04, C05 and C09 have historical focused evidence in the backlog, but
 the accumulated exact-head implementation still requires final cross-family
-review. Filesystem ownership, reparse/path-swap protection and complete
-transition/acceptance mapping remain open until proven otherwise.
+review. Complete transition/acceptance mapping and final exact-head reviews
+remain open until proven otherwise.
 
 CP-WP-003, CP-WP-004 and CP-FUT-001 remain blocked. Do not begin them under
 AEGIS-APR-004.
@@ -1575,8 +1626,10 @@ T09 and the narrow T17 validator-result/T14 T09-source slice are also
 independently accepted, as are the T17 operation-uncertainty foundation and
 verified-receipt route and the authoritative-nonexecution/safe-retry slice. The
 T22 terminal-restart report, T28/F01 verified-effect adoption and cross-family
-F05/F06/F13/F20 are also independently accepted. The next code change addresses
-filesystem ownership/reparse/path-swap protection only after its narrow plan
-independently passes review. Keep
-PR #99 draft until every remaining backlog
-and final review gate passes; no merge or deployment decision is currently due.
+F05/F06/F13/F20 are also independently accepted. Filesystem ownership/reparse/
+path-swap protection is independently accepted on Windows; POSIX runtime remains
+`UNVERIFIED`. The corrected pre-commit diff has independent architecture,
+security and QA `APPROVE`. The next gates are exact committed-head/hosted
+confirmation and the final trace. Keep PR
+#99 draft until every remaining backlog and final review gate passes; no merge
+or deployment decision is currently due.

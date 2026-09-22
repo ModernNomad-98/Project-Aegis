@@ -117,6 +117,15 @@ from .contracts import (
     parse_validator_containment_spec,
     validator_containment_digest,
 )
+from .owned_paths import (
+    CheckedPathCapability,
+    PathCapabilityUnavailable,
+    PathIdentity,
+    connect_checked,
+    known_local_state_base,
+    nearest_existing_trusted_root,
+    prepare_owned_file,
+)
 from .engine import TRANSITIONS, TransitionEngine
 
 
@@ -661,32 +670,54 @@ def _derive_validation_application_route(
 
 def default_state_root(repository_id: str) -> Path:
     identity = hashlib.sha256(repository_id.encode("utf-8")).hexdigest()[:24]
-    if sys.platform == "win32":
-        base = os.environ.get("LOCALAPPDATA")
-        if not base:
-            raise StorageIntegrityError("LOCALAPPDATA is required on Windows")
-        return Path(base) / "ProjectAegis" / "control-plane" / identity
-    base = os.environ.get("XDG_STATE_HOME")
-    if base:
-        return Path(base) / "project-aegis" / "control-plane" / identity
-    return Path.home() / ".local" / "state" / "project-aegis" / "control-plane" / identity
+    base = known_local_state_base()
+    product = "ProjectAegis" if sys.platform == "win32" else "project-aegis"
+    return base / product / "control-plane" / identity
 
 
 class RepositoryWriterLock:
     """Stable cooperative OS lock; it never replaces the durable operation slot."""
 
-    def __init__(self, state_root: Path) -> None:
+    def __init__(
+        self,
+        state_root: Path,
+        *,
+        allow_create: bool = False,
+        expected: PathIdentity | None = None,
+        trusted_root: Path | None = None,
+        os_known_root: bool = False,
+    ) -> None:
         self._path = state_root / "writer.lock"
+        self._allow_create = allow_create
+        self._expected = expected
+        self._trusted_root = trusted_root
+        self._os_known_root = os_known_root
         self._stream: BinaryIO | None = None
+        self._path_capability: CheckedPathCapability | None = None
+        self.identity: PathIdentity | None = None
 
     def __enter__(self) -> "RepositoryWriterLock":
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-        stream = self._path.open("a+b")
-        stream.seek(0, os.SEEK_END)
-        if stream.tell() == 0:
-            stream.write(b"\0")
-            stream.flush()
-        stream.seek(0)
+        capability = CheckedPathCapability(
+            self._path,
+            create=self._allow_create,
+            read_only=False,
+            expected=self._expected,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
+        stream: BinaryIO | None = None
+        try:
+            stream = self._path.open("r+b")
+            stream.seek(0, os.SEEK_END)
+            if stream.tell() == 0:
+                stream.write(b"\0")
+                stream.flush()
+            stream.seek(0)
+        except BaseException:
+            if stream is not None:
+                stream.close()
+            capability.close()
+            raise
         try:
             if sys.platform == "win32":
                 import msvcrt
@@ -698,8 +729,11 @@ class RepositoryWriterLock:
                 fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except (OSError, BlockingIOError) as error:
             stream.close()
+            capability.close()
             raise DispatchDenied("repository writer lock is unavailable") from error
         self._stream = stream
+        self._path_capability = capability
+        self.identity = capability.identity
         return self
 
     def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
@@ -718,6 +752,9 @@ class RepositoryWriterLock:
         finally:
             self._stream.close()
             self._stream = None
+            if self._path_capability is not None:
+                self._path_capability.close()
+                self._path_capability = None
 
 
 class SQLiteStateStore:
@@ -730,6 +767,7 @@ class SQLiteStateStore:
         repository_id: str,
         *,
         utc_now: Callable[[], datetime] | None = None,
+        _canonical_trusted_root: Path | None = None,
     ) -> None:
         if not repository_id.strip():
             raise ValueError("repository_id must be non-empty")
@@ -738,12 +776,29 @@ class SQLiteStateStore:
         self._repository_id = repository_id
         self._utc_now = utc_now or (lambda: datetime.now(timezone.utc))
         self._classification_authority: SyntheticAuthority | None = None
-        expected = default_state_root(repository_id) / "state.sqlite3"
-        self._is_canonical = database_path.resolve(
-            strict=False
-        ) == expected.resolve(strict=False)
-        database_path.parent.mkdir(parents=True, exist_ok=True)
-        with RepositoryWriterLock(database_path.parent):
+        self._is_canonical = _canonical_trusted_root is not None
+        self._trusted_root = (
+            _canonical_trusted_root
+            if self._is_canonical
+            else nearest_existing_trusted_root(database_path.parent)
+        )
+        self._os_known_root = self._is_canonical and sys.platform == "win32"
+        database_existed = database_path.exists() or database_path.is_symlink()
+        with RepositoryWriterLock(
+            database_path.parent,
+            allow_create=not database_existed,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        ) as writer_lock:
+            if writer_lock.identity is None:
+                raise StorageIntegrityError("writer lock identity is unavailable")
+            self._writer_lock_identity = writer_lock.identity
+            self._path_identity = prepare_owned_file(
+                database_path,
+                create=not database_existed,
+                trusted_root=self._trusted_root,
+                os_known_root=self._os_known_root,
+            )
             with closing(self._connect()) as connection:
                 self._create_schema(connection)
                 self._bind_repository(connection)
@@ -752,10 +807,12 @@ class SQLiteStateStore:
     def open_canonical(
         cls, repository_id: str, freshness_oracle: FreshnessOracle
     ) -> "SQLiteStateStore":
+        database_path = default_state_root(repository_id) / "state.sqlite3"
         return cls(
-            default_state_root(repository_id) / "state.sqlite3",
+            database_path,
             freshness_oracle,
             repository_id,
+            _canonical_trusted_root=database_path.parents[3],
         )
 
     @property
@@ -826,7 +883,12 @@ class SQLiteStateStore:
             raise StorageIntegrityError("state database belongs to another repository")
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self._database_path, isolation_level=None)
+        connection = connect_checked(
+            self._database_path,
+            expected=self._path_identity,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA journal_mode = DELETE")
@@ -839,10 +901,27 @@ class SQLiteStateStore:
             raise StorageIntegrityError("SQLite FULL synchronization is unavailable")
         return connection
 
+    def _writer_lock(self) -> RepositoryWriterLock:
+        return RepositoryWriterLock(
+            self._database_path.parent,
+            expected=self._writer_lock_identity,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
+
     @staticmethod
     def _connect_read_only_database(database_path: Path) -> sqlite3.Connection:
-        uri = f"{database_path.resolve(strict=False).as_uri()}?mode=ro"
-        connection = sqlite3.connect(uri, uri=True, isolation_level=None)
+        identity = prepare_owned_file(
+            database_path,
+            create=False,
+            trusted_root=nearest_existing_trusted_root(database_path.parent),
+        )
+        connection = connect_checked(
+            database_path,
+            expected=identity,
+            read_only=True,
+            trusted_root=nearest_existing_trusted_root(database_path.parent),
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA query_only = ON")
         if connection.execute("PRAGMA query_only").fetchone()[0] != 1:
@@ -2765,7 +2844,7 @@ class SQLiteStateStore:
         authority.verify_source_grant(grant)
         if grant.repository_id != self._repository_id:
             raise DispatchDenied("synthetic source grant targets another repository")
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -2974,7 +3053,7 @@ class SQLiteStateStore:
             SyntheticSourceConsumerKind.MANUAL,
         }:
             raise DispatchDenied("test source consumer must be host or manual")
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -3798,7 +3877,7 @@ class SQLiteStateStore:
                         json.dumps(
                             [
                                 "EFFECT", event["repository_id"],
-                                str(target_path.resolve()),
+                                os.path.abspath(target_path),
                             ],
                             ensure_ascii=True, separators=(",", ":"),
                         ).encode("ascii")
@@ -11590,7 +11669,7 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "legacy descriptor evidence does not bind canonical material"
             )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -11756,7 +11835,7 @@ class SQLiteStateStore:
         complete_policy_digest = self._complete_policy_digest(
             request, self._classification_authority
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -12267,7 +12346,7 @@ class SQLiteStateStore:
         if request.repository_id != self._repository_id:
             raise DispatchDenied("readiness evaluation targets another repository")
         payload_digest = self._event_hash(request.__dict__)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -12473,7 +12552,7 @@ class SQLiteStateStore:
             "capability_issuer_fingerprint": authority.issuer_fingerprint,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -12773,7 +12852,7 @@ class SQLiteStateStore:
             "capability_issuer_fingerprint": authority.issuer_fingerprint,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -13293,7 +13372,7 @@ class SQLiteStateStore:
             "source_kind": "NONDISPATCH_PROVEN",
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -13704,7 +13783,7 @@ class SQLiteStateStore:
             "capability_scope_digest": capability.scope_digest,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -13959,7 +14038,7 @@ class SQLiteStateStore:
             "observation_event_hash", "observation_settlement_event_id",
             "observation_settlement_event_hash",
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -14466,7 +14545,7 @@ class SQLiteStateStore:
             "capability_issuer_fingerprint": authority.issuer_fingerprint,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -14753,7 +14832,7 @@ class SQLiteStateStore:
         self._verify_source_control_settlement_authority(request)
         payload = self._verified_receipt_payload(request)
         command_payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -15315,7 +15394,7 @@ class SQLiteStateStore:
             "route": "VALIDATOR_RESULT",
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -15817,7 +15896,7 @@ class SQLiteStateStore:
             "resume_evidence": resume_evidence,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -16196,7 +16275,7 @@ class SQLiteStateStore:
             "resume_evidence": dict(evidence.__dict__),
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -16565,7 +16644,7 @@ class SQLiteStateStore:
             "resume_evidence": dict(evidence.__dict__),
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -16936,7 +17015,7 @@ class SQLiteStateStore:
             "capability_issuer_fingerprint": authority.issuer_fingerprint,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -17284,7 +17363,7 @@ class SQLiteStateStore:
             "resume_evidence": resume_evidence,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -17650,7 +17729,7 @@ class SQLiteStateStore:
             "capability_scope_digest": capability.scope_digest,
         }
         payload_digest = self._event_hash(payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -18012,7 +18091,7 @@ class SQLiteStateStore:
             "capability_scope_digest": capability.scope_digest,
         }
         payload_digest = self._event_hash(request_payload)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -18600,7 +18679,7 @@ class SQLiteStateStore:
             raise ValueError("writer_epoch must be positive")
         payload_digest = self._payload_digest(request)
 
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -19155,7 +19234,7 @@ class SQLiteStateStore:
             raise DispatchDenied("operation launch targets another repository")
         launch_id = f"launch:{request.command_id}"
         event_id = f"launch:{request.event_id}"
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -19372,7 +19451,7 @@ class SQLiteStateStore:
             if isinstance(request, ProvenNonexecutionIntentRequest)
             else 1
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -19521,7 +19600,7 @@ class SQLiteStateStore:
         containment_verifier: Callable[[], str] | None = None,
         failure_hook: FailureHook | None = None,
     ) -> None:
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -19948,7 +20027,7 @@ class SQLiteStateStore:
             [
                 contact_kind,
                 repository_id,
-                str((self._database_path.parent / filename).resolve()),
+                os.path.abspath(self._database_path.parent / filename),
             ],
             ensure_ascii=True,
             separators=(",", ":"),
@@ -20508,7 +20587,7 @@ class SQLiteStateStore:
         }
         payload_digest = self._event_hash(payload)
 
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -21189,7 +21268,7 @@ class SQLiteStateStore:
         command_payload_digest = self._event_hash(request_payload)
         observation_digest = self._observation_digest(request)
 
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -21866,7 +21945,7 @@ class SQLiteStateStore:
         authority.verify_validation_recovery_attestation(attestation)
         request_digest = self._event_hash(request.__dict__)
         attestation_digest = self._event_hash(attestation.__dict__)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -22172,7 +22251,7 @@ class SQLiteStateStore:
             )
         payload_digest = self._event_hash(request.__dict__)
 
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -22669,7 +22748,7 @@ class SQLiteStateStore:
         }
         observation_digest = self._event_hash(observation_payload)
 
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -22994,7 +23073,7 @@ class SQLiteStateStore:
             request.check_id, request.validator_attempt_id,
             request.observation_id,
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -23462,7 +23541,7 @@ class SQLiteStateStore:
         if request.repository_id != self._repository_id:
             raise DispatchDenied("validator cessation targets another repository")
         payload_digest = self._event_hash(request.__dict__)
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -23738,7 +23817,7 @@ class SQLiteStateStore:
                 }
             }
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -24281,7 +24360,7 @@ class SQLiteStateStore:
     def load_validator_intent_binding(
         self, validator_intent_id: str, *, require_active: bool = True
     ) -> ValidatorIntentBinding:
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             self._verify_projections(connection, self._repository_id)
@@ -24306,7 +24385,7 @@ class SQLiteStateStore:
             )
 
     def load_run_lifecycle(self, run_id: str) -> LifecycleState:
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             self._verify_projections(connection, self._repository_id)
@@ -24564,7 +24643,7 @@ class SQLiteStateStore:
                 "observation_issuer_mac": observation.issuer_mac,
             }
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -24817,7 +24896,7 @@ class SQLiteStateStore:
                 "issuer_fingerprint": evidence.issuer_fingerprint,
             }
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -25372,7 +25451,7 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "adoption capability does not bind the exact adoption"
             )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -25932,7 +26011,7 @@ class SQLiteStateStore:
             request.repository_id, request.run_id, request.item_id,
             request.logical_effect_id, request.plan_id, request.revision_digest,
         )
-        with RepositoryWriterLock(self._database_path.parent), closing(
+        with self._writer_lock(), closing(
             self._connect()
         ) as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -34057,6 +34136,14 @@ class SQLiteStateReader:
         self._freshness_oracle = freshness_oracle
         self._repository_id = repository_id
         self._authority = authority
+        try:
+            self._path_identity: PathIdentity | None = prepare_owned_file(
+                database_path,
+                create=False,
+                trusted_root=nearest_existing_trusted_root(database_path.parent),
+            )
+        except PathCapabilityUnavailable:
+            self._path_identity = None
         verifier = object.__new__(SQLiteStateStore)
         verifier._database_path = database_path
         verifier._freshness_oracle = freshness_oracle
@@ -34066,9 +34153,24 @@ class SQLiteStateReader:
         self._verifier = verifier
 
     def _connect_read_only(self) -> sqlite3.Connection:
-        return SQLiteStateStore._connect_read_only_database(
-            self._database_path
+        if self._path_identity is None:
+            raise StorageIntegrityError(
+                "read-only state path capability is unavailable"
+            )
+        connection = connect_checked(
+            self._database_path,
+            expected=self._path_identity,
+            read_only=True,
+            trusted_root=nearest_existing_trusted_root(
+                self._database_path.parent
+            ),
         )
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA query_only = ON")
+        if connection.execute("PRAGMA query_only").fetchone()[0] != 1:
+            connection.close()
+            raise StorageIntegrityError("SQLite query-only mode is unavailable")
+        return connection
 
     @staticmethod
     def _untrusted_observed_state(

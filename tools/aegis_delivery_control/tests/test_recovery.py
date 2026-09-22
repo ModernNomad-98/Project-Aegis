@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
@@ -48,11 +47,12 @@ class SyntheticBoundaryTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary_directory.cleanup)
-        self.environment = patch.dict(
-            os.environ, {"LOCALAPPDATA": self.temporary_directory.name}
+        self.state_root = patch(
+            "tools.aegis_delivery_control.storage.known_local_state_base",
+            return_value=Path(self.temporary_directory.name),
         )
-        self.environment.start()
-        self.addCleanup(self.environment.stop)
+        self.state_root.start()
+        self.addCleanup(self.state_root.stop)
         self.ledger_path = default_state_root("repo-1") / "synthetic-target.sqlite3"
         self.authority = SyntheticAuthority()
         self.oracle = MutableFreshnessOracle()

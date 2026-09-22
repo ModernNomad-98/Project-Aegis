@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
+import sys
 from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
@@ -35,6 +37,11 @@ from .contracts import (
     validator_containment_digest,
 )
 from .storage import default_state_root
+from .owned_paths import (
+    connect_checked,
+    nearest_existing_trusted_root,
+    prepare_owned_file,
+)
 
 if TYPE_CHECKING:
     from .storage import SQLiteStateStore
@@ -343,11 +350,27 @@ def validate_synthetic_validator_containment(
 class SyntheticExecutionAdapter:
     """Record effects in a durable synthetic target without external I/O."""
 
-    def __init__(self, ledger_path: Path) -> None:
+    def __init__(
+        self,
+        ledger_path: Path,
+        *,
+        trusted_root: Path | None = None,
+        os_known_root: bool = False,
+    ) -> None:
         self._ledger_path = ledger_path
+        self._trusted_root = trusted_root or nearest_existing_trusted_root(
+            ledger_path.parent
+        )
+        self._os_known_root = os_known_root
         self._canonical_repository_id: str | None = None
         self._canonical_ledger_path: Path | None = None
-        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        existed = ledger_path.exists() or ledger_path.is_symlink()
+        self._path_identity = prepare_owned_file(
+            ledger_path,
+            create=not existed,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
         with closing(self._connect()) as connection:
             connection.execute(
                 """
@@ -369,30 +392,41 @@ class SyntheticExecutionAdapter:
 
     @classmethod
     def open_canonical(cls, repository_id: str) -> "SyntheticExecutionAdapter":
-        adapter = cls(default_state_root(repository_id) / "synthetic-target.sqlite3")
+        state_root = default_state_root(repository_id)
+        adapter = cls(
+            state_root / "synthetic-target.sqlite3",
+            trusted_root=state_root.parents[2],
+            os_known_root=sys.platform == "win32",
+        )
         adapter._canonical_repository_id = repository_id
-        adapter._canonical_ledger_path = adapter._ledger_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         return adapter
 
     def is_canonical_for(self, repository_id: str) -> bool:
         return (
             self._canonical_repository_id == repository_id
             and self._canonical_ledger_path is not None
-            and self._ledger_path.resolve() == self._canonical_ledger_path
+            and os.path.normcase(os.path.abspath(self._ledger_path))
+            == os.path.normcase(os.path.abspath(self._canonical_ledger_path))
         )
 
     def _target_digest(self, repository_id: str) -> str:
         if not self.is_canonical_for(repository_id):
             raise DispatchDenied("synthetic target is not the canonical repository root")
         identity = json.dumps(
-            ["EFFECT", repository_id, str(self._ledger_path.resolve())],
+            ["EFFECT", repository_id, self._path_identity.canonical_path],
             ensure_ascii=True,
             separators=(",", ":"),
         )
         return hashlib.sha256(identity.encode("ascii")).hexdigest()
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self._ledger_path, isolation_level=None)
+        connection = connect_checked(
+            self._ledger_path,
+            expected=self._path_identity,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA journal_mode = DELETE")
         connection.execute("PRAGMA synchronous = FULL")
@@ -614,11 +648,28 @@ class SyntheticValidatorAdapter:
         )
     """
 
-    def __init__(self, ledger_path: Path, *, migration_failure_hook=None) -> None:
+    def __init__(
+        self,
+        ledger_path: Path,
+        *,
+        migration_failure_hook=None,
+        trusted_root: Path | None = None,
+        os_known_root: bool = False,
+    ) -> None:
         self._ledger_path = ledger_path
+        self._trusted_root = trusted_root or nearest_existing_trusted_root(
+            ledger_path.parent
+        )
+        self._os_known_root = os_known_root
         self._canonical_repository_id: str | None = None
         self._canonical_ledger_path: Path | None = None
-        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        existed = ledger_path.exists() or ledger_path.is_symlink()
+        self._path_identity = prepare_owned_file(
+            ledger_path,
+            create=not existed,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
         with closing(self._connect()) as connection:
             self._migrate_ledger(connection, failure_hook=migration_failure_hook)
 
@@ -742,18 +793,22 @@ class SyntheticValidatorAdapter:
 
     @classmethod
     def open_canonical(cls, repository_id: str) -> "SyntheticValidatorAdapter":
+        state_root = default_state_root(repository_id)
         adapter = cls(
-            default_state_root(repository_id) / "synthetic-validator.sqlite3"
+            state_root / "synthetic-validator.sqlite3",
+            trusted_root=state_root.parents[2],
+            os_known_root=sys.platform == "win32",
         )
         adapter._canonical_repository_id = repository_id
-        adapter._canonical_ledger_path = adapter._ledger_path.resolve()
+        adapter._canonical_ledger_path = Path(adapter._path_identity.canonical_path)
         return adapter
 
     def is_canonical_for(self, repository_id: str) -> bool:
         return (
             self._canonical_repository_id == repository_id
             and self._canonical_ledger_path is not None
-            and self._ledger_path.resolve() == self._canonical_ledger_path
+            and os.path.normcase(os.path.abspath(self._ledger_path))
+            == os.path.normcase(os.path.abspath(self._canonical_ledger_path))
         )
 
     def _target_digest(self, repository_id: str) -> str:
@@ -762,14 +817,19 @@ class SyntheticValidatorAdapter:
                 "synthetic validator is not the canonical repository root"
             )
         identity = json.dumps(
-            ["VALIDATOR", repository_id, str(self._ledger_path.resolve())],
+            ["VALIDATOR", repository_id, self._path_identity.canonical_path],
             ensure_ascii=True,
             separators=(",", ":"),
         )
         return hashlib.sha256(identity.encode("ascii")).hexdigest()
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self._ledger_path, isolation_level=None)
+        connection = connect_checked(
+            self._ledger_path,
+            expected=self._path_identity,
+            trusted_root=self._trusted_root,
+            os_known_root=self._os_known_root,
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA journal_mode = DELETE")
         connection.execute("PRAGMA synchronous = FULL")

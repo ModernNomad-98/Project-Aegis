@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import json
 import sqlite3
 import sys
@@ -12,6 +13,12 @@ from typing import Mapping, Sequence
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
 from .storage import SQLiteStateStore, default_state_root
+from .owned_paths import (
+    PathCapabilityUnavailable,
+    connect_checked,
+    nearest_existing_trusted_root,
+    prepare_owned_file,
+)
 
 
 class ExpectedFreshnessOracle:
@@ -112,21 +119,51 @@ def _database_path(arguments: argparse.Namespace) -> Path:
     return default_state_root(arguments.repository_id) / "state.sqlite3"
 
 
-def _status(database_path: Path) -> dict[str, object]:
-    if not database_path.is_file():
-        return {"initialized": False, "database": str(database_path)}
-    uri = f"file:{database_path.as_posix()}?mode=ro"
-    with sqlite3.connect(uri, uri=True) as connection:
-        repository = connection.execute(
-            "SELECT repository_id, catalog_head FROM repositories LIMIT 1"
-        ).fetchone()
-        slot = connection.execute(
-            "SELECT run_id, logical_effect_id, attempt_id, generation FROM outstanding_slot"
-        ).fetchone()
-        fences = connection.execute("SELECT COUNT(*) FROM dispatch_fences").fetchone()[0]
+def _status(
+    database_path: Path,
+    *,
+    trusted_root: Path | None = None,
+    os_known_root: bool = False,
+) -> dict[str, object]:
+    trusted_root = trusted_root or nearest_existing_trusted_root(
+        database_path.parent
+    )
+    try:
+        identity = prepare_owned_file(
+            database_path,
+            create=False,
+            trusted_root=trusted_root,
+            os_known_root=os_known_root,
+        )
+        with closing(connect_checked(
+            database_path,
+            expected=identity,
+            read_only=True,
+            trusted_root=trusted_root,
+            os_known_root=os_known_root,
+        )) as connection:
+            repository = connection.execute(
+                "SELECT repository_id, catalog_head FROM repositories LIMIT 1"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT run_id, logical_effect_id, attempt_id, generation "
+                "FROM outstanding_slot"
+            ).fetchone()
+            fences = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences"
+            ).fetchone()[0]
+    except (PathCapabilityUnavailable, sqlite3.Error, OSError) as error:
+        return {
+            "initialized": False,
+            "database": str(database_path),
+            "path_capability": "UNAVAILABLE",
+            "verified": False,
+            "reason": str(error),
+        }
     return {
         "initialized": True,
         "database": str(database_path),
+        "path_capability": "VERIFIED",
         "repository_id": None if repository is None else repository[0],
         "catalog_head": None if repository is None else repository[1],
         "outstanding_slot": None
@@ -143,7 +180,6 @@ def _status(database_path: Path) -> dict[str, object]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
-    database_path = _database_path(arguments)
     if arguments.command == "capabilities":
         print(
             json.dumps(
@@ -160,8 +196,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0
+    try:
+        database_path = _database_path(arguments)
+    except (PathCapabilityUnavailable, OSError) as error:
+        if arguments.command == "status":
+            print(json.dumps(
+                {
+                    "initialized": False,
+                    "database": None,
+                    "path_capability": "UNAVAILABLE",
+                    "verified": False,
+                    "reason": str(error),
+                },
+                sort_keys=True,
+            ))
+            return 0
+        print(f"verification failed: {error}", file=sys.stderr)
+        return 3
     if arguments.command == "status":
-        print(json.dumps(_status(database_path), sort_keys=True))
+        print(json.dumps(
+            _status(
+                database_path,
+                trusted_root=database_path.parents[3],
+                os_known_root=sys.platform == "win32",
+            ),
+            sort_keys=True,
+        ))
         return 0
     if not database_path.is_file():
         print("state database does not exist", file=sys.stderr)

@@ -172,16 +172,19 @@ def _launch_validator_until_terminated(
     ready,
     errors,
 ):
-    environment = (
-        {"LOCALAPPDATA": str(root)}
+    state_root = (
+        patch(
+            "tools.aegis_delivery_control.storage.known_local_state_base",
+            return_value=Path(root),
+        )
         if sys.platform == "win32"
-        else {"XDG_STATE_HOME": str(root)}
+        else patch.dict(os.environ, {"XDG_STATE_HOME": str(root)})
     )
     try:
         authority = SyntheticAuthority(issuer_key)
         authority.register_validator(grant)
         capability = authority.claim_validator(*grant.__dict__.values())
-        with patch.dict(os.environ, environment):
+        with state_root:
             store = SQLiteStateStore.open_canonical(
                 "repo-1", AlwaysFreshOracle()
             )
@@ -2352,7 +2355,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(effect_grant)
             effect_capability = authority.claim(*effect_grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -3335,7 +3338,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(effect_grant)
             effect_capability = authority.claim(*effect_grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -3855,7 +3858,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4054,7 +4057,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(effect_grant)
             effect_capability = authority.claim(*effect_grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4188,10 +4191,13 @@ class MediatedDispatchTests(unittest.TestCase):
                 self.assertEqual(len(errors), 0)
 
     @staticmethod
-    def state_environment(root: Path) -> dict[str, str]:
+    def state_root_context(root: Path):
         if sys.platform == "win32":
-            return {"LOCALAPPDATA": str(root)}
-        return {"XDG_STATE_HOME": str(root)}
+            return patch(
+                "tools.aegis_delivery_control.storage.known_local_state_base",
+                return_value=root,
+            )
+        return patch.dict(os.environ, {"XDG_STATE_HOME": str(root)})
 
     @staticmethod
     def _accept_operation_plan(
@@ -4236,7 +4242,7 @@ class MediatedDispatchTests(unittest.TestCase):
         )
         authority.register(effect_grant)
         effect_capability = authority.claim(*effect_grant.__dict__.values())
-        with patch.dict(os.environ, self.state_environment(root)):
+        with self.state_root_context(root):
             store = SQLiteStateStore.open_canonical(
                 "repo-1", AlwaysFreshOracle()
             )
@@ -4372,7 +4378,7 @@ class MediatedDispatchTests(unittest.TestCase):
         )
         authority.register(effect_grant)
         effect_capability = authority.claim(*effect_grant.__dict__.values())
-        with patch.dict(os.environ, self.state_environment(root)):
+        with self.state_root_context(root):
             store = SQLiteStateStore.open_canonical(
                 "repo-1", AlwaysFreshOracle()
             )
@@ -4521,7 +4527,7 @@ class MediatedDispatchTests(unittest.TestCase):
         )
         authority.register(grant)
         capability = authority.claim(*grant.__dict__.values())
-        with patch.dict(os.environ, self.state_environment(root)):
+        with self.state_root_context(root):
             store = SQLiteStateStore.open_canonical(
                 "repo-1", AlwaysFreshOracle()
             )
@@ -4557,7 +4563,7 @@ class MediatedDispatchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             authority = SyntheticAuthority()
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4596,7 +4602,7 @@ class MediatedDispatchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             authority = SyntheticAuthority()
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4641,7 +4647,7 @@ class MediatedDispatchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             authority = SyntheticAuthority()
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4735,7 +4741,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 scope_digest="scope-1",
                 payload_digest="payload-1",
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4775,7 +4781,7 @@ class MediatedDispatchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             authority = SyntheticAuthority()
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 canonical_store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -4839,7 +4845,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 "claim", "grant-1", "repo-1", "effect-1", "attempt-1",
                 "scope-1", "untrusted",
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 coordinator = SyntheticDispatchCoordinator(
                     store,
@@ -4872,7 +4878,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 "budget_reservations", "outstanding_slot",
             ):
                 self.assertEqual(counts[table], 0)
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 self.assertIsNone(
                     SyntheticExecutionAdapter.open_canonical(
                         "repo-1"
@@ -4888,7 +4894,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
                 coordinator = SyntheticDispatchCoordinator(
@@ -4917,11 +4923,12 @@ class MediatedDispatchTests(unittest.TestCase):
                     writer_epoch=2,
                 )
 
-            self.assertIsNone(
-                SyntheticExecutionAdapter.open_canonical("repo-1").reconcile(
-                    capability.claim_id
+            with self.state_root_context(root):
+                self.assertIsNone(
+                    SyntheticExecutionAdapter.open_canonical("repo-1").reconcile(
+                        capability.claim_id
+                    )
                 )
-            )
             self.assertEqual(store.table_counts()["operation_launches"], 1)
             release = BudgetSettlementRequest(
                 "release-after-launch", "reservation-1", "",
@@ -4970,7 +4977,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5001,7 +5008,7 @@ class MediatedDispatchTests(unittest.TestCase):
             replay = adapter.seal_nonexecution(attestation, authority)
             self.assertFalse(sealed.replayed)
             self.assertTrue(replay.replayed)
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5067,14 +5074,38 @@ class MediatedDispatchTests(unittest.TestCase):
                 encoding="utf-8",
             )
             environment = os.environ.copy()
-            environment.update(self.state_environment(root))
-            verified = subprocess.run(
+            command = [
+                sys.executable,
+                "-m",
+                "tools.aegis_delivery_control",
+            ]
+            if sys.platform == "win32":
+                command = [
+                    sys.executable,
+                    "-c",
+                    (
+                        "import sys; from pathlib import Path; "
+                        "from unittest.mock import patch; "
+                        "scope = patch("
+                        "'tools.aegis_delivery_control.storage.known_local_state_base', "
+                        "return_value=Path(sys.argv.pop(1))); "
+                        "scope.start(); "
+                        "from tools.aegis_delivery_control.cli import main; "
+                        "raise SystemExit(main())"
+                    ),
+                    str(root),
+                ]
+            else:
+                environment["XDG_STATE_HOME"] = str(root)
+            command.extend(
                 [
-                    sys.executable, "-m", "tools.aegis_delivery_control",
                     "--repository-id", "repo-1", "verify",
                     "--expected-vector", str(expected_vector),
                     "--authority-key-file", str(authority_key),
-                ],
+                ]
+            )
+            verified = subprocess.run(
+                command,
                 cwd=Path(__file__).parents[3],
                 env=environment,
                 capture_output=True,
@@ -5098,7 +5129,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 adapter.seal_nonexecution(
                     replace(attestation, source_event_hash="forged"), authority
                 )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 validator_adapter = SyntheticValidatorAdapter.open_canonical(
                     "repo-1"
                 )
@@ -5290,7 +5321,7 @@ class MediatedDispatchTests(unittest.TestCase):
             operation_capability = authority.claim(
                 *operation_grant.__dict__.values()
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5374,7 +5405,7 @@ class MediatedDispatchTests(unittest.TestCase):
             validator_capability = authority.claim_validator(
                 *validator_grant.__dict__.values()
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 reopened = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5426,7 +5457,7 @@ class MediatedDispatchTests(unittest.TestCase):
             operation_capability = authority.claim(
                 *operation_grant.__dict__.values()
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5581,7 +5612,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5654,7 +5685,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5735,7 +5766,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register_validator(grant)
             capability = authority.claim_validator(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5785,7 +5816,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
                 coordinator = SyntheticDispatchCoordinator(
@@ -5841,7 +5872,7 @@ class MediatedDispatchTests(unittest.TestCase):
                         "after_observation_commit_before_acknowledgement"
                     ),
                 )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 recovered_store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5883,7 +5914,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
@@ -5978,7 +6009,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(grant)
             capability = authority.claim(*grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 adapter = SyntheticExecutionAdapter.open_canonical("repo-1")
                 coordinator = SyntheticDispatchCoordinator(
@@ -6030,7 +6061,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             authority.register(operation_grant)
             operation_capability = authority.claim(*operation_grant.__dict__.values())
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 store = SQLiteStateStore.open_canonical("repo-1", AlwaysFreshOracle())
                 dispatch = SyntheticDispatchCoordinator(
                     store,
@@ -6356,7 +6387,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 ),
                 "attempt-1", 1,
             )
-            with patch.dict(os.environ, self.state_environment(root)):
+            with self.state_root_context(root):
                 second_store = SQLiteStateStore.open_canonical(
                     "repo-1", AlwaysFreshOracle()
                 )
