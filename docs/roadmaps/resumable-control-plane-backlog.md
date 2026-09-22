@@ -1172,10 +1172,44 @@ post-disable T25/T16 continuation, T11 READY/BLOCKED routes, exact T16 recovery,
 malformed signed-snapshot denial and old-schema migration. The corrected
 implementation received independent `APPROVE` with no findings. T11, T27, F11 and
 F17 remain `UNVERIFIED` until the corrected accumulated exact-head trace is
-reviewed and accepted. T17 proof-free terminal entry, T24/F09, T07/T08/T14,
+reviewed and accepted. T17 proof-free terminal entry, T07/T08/T14,
 T18/T19, T25/F19, F02/F03/F04a, POSIX runtime evidence and final
 architecture/security/QA gates remain open. PR #99 remains draft and no real
 authority, adapter, provider, release or deployment is authorized.
+
+### 5.26 T24/F09 mandatory terminal-policy intake checkpoint
+
+The mandatory late-result branch is implemented and locally tested. Every new
+accepted plan now carries a closed, complete per-check terminal-policy map in
+the operator-signed acceptance payload and complete-policy digest; intake does
+not accept policy applicability or stop mode from its caller. A FAIL arriving
+after authoritative all-descendant cessation without a retained result records
+one unapplied observation, treats cessation as settled activity, and atomically
+creates its exact plan/check/attempt/result-bound terminal-policy obligation and
+irreversible fence. Legacy authenticated plans fail closed with a policy-unknown
+obligation/fence rather than silently assuming `NONE`.
+
+The prescribed immediate T19 route binds the complete sorted set of open
+obligations in its event and uses the closed `MANDATORY_TERMINAL_POLICY:ALL_OPEN`
+reason. An ordinary or wrong-mode stop is denied; the matching stop atomically
+enters `STOPPED` and fulfills every bound obligation while retaining the
+irreversible policy and stop fences. A late FAIL first observed after terminal
+entry is recorded as `TERMINAL_FIXED` without reopening the run. Direct and transitive dependent
+adoptions receive durable terminal-policy provenance fences without reopening
+terminal dependents. T11/T12/finalization and new dispatch remain denied by the
+active fence. Rollback before commit leaves no partial observation/obligation/
+fence, while lost acknowledgement replays the complete bundle once.
+
+Focused storage coverage includes accepted-policy persistence, authoritative
+cessation followed by late FAIL, no fabricated activity uncertainty, rollback,
+lost acknowledgement, exact replay, ordinary- and wrong-mode-stop denial,
+exact T19 fulfillment, post-STOPPED late failure and restart projection
+verification. T24 and F09 remain aggregate
+`UNVERIFIED` pending the committed exact-head trace. Independent implementation
+review returned `APPROVE` after the one-result-per-validator-attempt invariant
+and complete stop-obligation binding were corrected; 352 storage tests passed
+in the reviewer run. The next ordered correction is T17/F18 proof-free terminal
+entry.
 
 ## 6. Handoff contract
 

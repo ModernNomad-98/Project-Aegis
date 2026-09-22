@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 465-test package suite passes locally; all three stop findings, T13
+its full 467-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07

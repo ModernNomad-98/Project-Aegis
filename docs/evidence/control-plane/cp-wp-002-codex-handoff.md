@@ -1505,7 +1505,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T21 | YES | YES | UNVERIFIED | Stable `writer.lock` identity and OS exclusion are implemented; an actual second process is denied and lock replacement/reacquisition behavior is asserted; row-level review pending |
 | T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |
 | T23 | YES | YES | UNVERIFIED | Late/contrary receipt intake preserves terminal state, true/unknown accounting, other slot owners and dependent retry/adoption fences across every lifecycle class; `test_f13_*`, stop/T26 ordering and retry-invalidation assertions; row-level review pending |
-| T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | RESULT/cessation intake exists, but no mandatory-terminal-policy model atomically records the required irreversible stop obligation/fence at intake |
+| T24 | YES | YES | UNVERIFIED | RESULT/cessation intake now derives the signed accepted per-check terminal policy, atomically records the late-FAIL obligation/fence without application, fences dependent adoptions and requires exact T19 fulfillment; independent exact-head review pending |
 | T25 | YES | UNVERIFIED | UNVERIFIED | Typed all-path nonexecution seals and recovery exist for operation/validator intents, but the canonical before/after-handoff, every-state, terminal-contradiction and dependent-adoption matrix is not completely asserted |
 | T26 | YES | YES | UNVERIFIED | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; row-level review pending |
 | T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Accepted v2 plans bind topological per-check dependencies/gates and T27 enforces dependency order plus fail-closed legacy/declared-gate denial; signed complete launch snapshots, pre-claim decisions and atomic contact rechecks remain absent |
@@ -1542,7 +1542,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F06 | YES | YES | YES | Repository-wide lifecycle/accounting slot matrix, other item/run denial, crash/restart retention, terminal settlement and generation-bound same-effect retry independently accepted |
 | F07 | YES | YES | UNVERIFIED | Valid receipt plus missing usage/source is retained in reconciliation, cannot launch validation/release slot, and authoritative settlement restores only the original continuation; row-level review pending |
 | F08 | YES | YES | UNVERIFIED | Terminal late receipt with missing/invalid/known usage preserves terminal state, worst-case or prior known charge, slot and later absolute adjustment without reopen/double charge; row-level review pending |
-| F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | No-start/late-result/cessation/order slices exist, but the mandatory terminal-policy failure branch has no policy model or atomic stop-obligation/fence intake route |
+| F09 | YES | YES | UNVERIFIED | Existing no-start/late-result/cessation/order slices now include accepted mandatory terminal-policy intake, fail-closed legacy policy, exact stop fulfillment, crash/replay and durable projection checks; independent exact-head review pending |
 | F10 | YES | YES | UNVERIFIED | Empty check set denies; independent A/B application, FINALIZING cursor, aggregate-gate wait and distinct T16 finalization retain the slot and avoid reapplication; row-level review pending |
 | F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Source/control settlement restores the pending validation cursor and v2 bindings exist, but post-T17 fresh signed launch evidence and exact cursor recheck remain absent |
 | F12 | YES | YES | UNVERIFIED | Validator non-launch routes to typed BLOCKED/VALIDATING recovery, pause resumes through BLOCKED, T02/accounting cannot bypass T16 and terminal remains unchanged; row-level review pending |
@@ -1567,13 +1567,18 @@ check gate, terminal-policy and stop-matrix claims. The corrected map finds 18
 implemented transition rows, 15 fully tested transition rows, 8 implemented and
 tested crash rows, 18 implemented acceptance rows and 14 fully tested acceptance
 rows. It retains `UNVERIFIED` for partial rows and for every new independent
-verdict until the corrected map is re-reviewed.
+verdict until the corrected map is re-reviewed. The subsequent local T24/F09
+increment raises the provisional implementation/test counts to 19/16 transition
+rows and 19/15 acceptance rows. Its implementation review returned `APPROVE`
+after exact replay, terminal-fixed intake, complete stop binding and the
+one-result-per-validator-attempt invariant were corrected; committed exact-head
+trace review is still pending.
 
-Open transition implementation/coverage includes T07, T08, T11, T14, T17, T24
-and T27. T18/T19 have implementation surfaces but incomplete durable all-state
+Open transition implementation/coverage includes T07, T08, T11, T14, T17 and
+T27. T18/T19 have implementation surfaces but incomplete durable all-state
 tests; T25 has an implementation surface but incomplete canonical test coverage.
 C01 remains conservatively unverified pending an exact-head aggregate trace.
-Open F rows are F02, F03, F04a, F09, F11, F17, F18 and F19. These are gaps, not
+Open F rows are F02, F03, F04a, F11, F17, F18 and F19. These are gaps, not
 failures silently converted to acceptance.
 
 | Evidence field | Exact value |
@@ -1609,8 +1614,8 @@ Current durable order after the independently approved exact-head trace map is:
    universal no-preclaim T27, T11 routing, T16 recovery and contact-time
    recheck are complete and independently approved; retain aggregate rows as
    `UNVERIFIED` until committed exact-head trace review.
-9. Continue through the remaining exact gaps recorded in the matrix: T24/F09,
-   T17/F18, T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
+9. Continue through the remaining exact gaps recorded in the matrix: T17/F18,
+   T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
 11. Commit and push only reviewed checkpoints. Keep PR #99 draft and do not merge until every canonical row and final gate is independently accepted.
 
@@ -1703,9 +1708,10 @@ owner before interpreting it more broadly.
   verified-receipt, authoritative-nonexecution and safe-retry slices are
   independently accepted as recorded in Stages 4-18. Complete T07/T08/T14 remain
   `UNVERIFIED` for their missing activity/source families. T17 remains
-  `UNVERIFIED` for its missing proof-free terminal/report-only branch, while
-  T24 separately lacks mandatory terminal-policy intake. Later final review
-  gates also remain.
+  `UNVERIFIED` for its missing proof-free terminal/report-only branch. T24/F09
+  now has independently approved mandatory terminal-policy intake and exact-stop
+  coverage, with its committed exact-head verdict still pending. Later final review gates
+  also remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
@@ -1745,6 +1751,6 @@ projections, signed PASS/FAIL/UNKNOWN facts and complete snapshots, universal
 no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
 replay/recheck and T25/T16 post-disable continuation. Aggregate
 T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
-The next implementation gate is T24/F09, followed by T17/F18 and the remaining
+The next implementation gate is T17/F18, followed by the remaining
 order in Section 10. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

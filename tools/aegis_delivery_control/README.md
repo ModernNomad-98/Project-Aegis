@@ -19,6 +19,12 @@ fixture. It is not a delivery integration.
   before contacting the synthetic validator ledger. T24 intake reconstructs a
   final result from that canonical ledger and records it once. T11 application
   then consumes only that stored RESULT; intake never applies it implicitly.
+- Accepted plans now pin a complete per-check terminal policy inside the signed
+  acceptance payload and complete-policy digest. A late FAIL after authoritative
+  all-descendant cessation creates the unapplied observation, irreversible
+  terminal-policy obligation and fence atomically; exact immediate T19 stop
+  fulfillment binds every open obligation, terminal-late intake never reopens
+  the run, and dependent adoptions are fenced transitively.
 - T01 atomically registers the accepted revision and its non-empty validation
   check set. T27 rejects checks outside that durable set.
 - C04 admits effect receipts only through the canonical coordinator. Receipts

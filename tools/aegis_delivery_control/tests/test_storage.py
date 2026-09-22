@@ -9132,6 +9132,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "acceptance_payload_digest", "acceptance_evidence_digest",
                 "acceptance_evidence", "check_dependency_ids",
                 "check_launch_gate_ids", "check_order",
+                "terminal_policy_binding_version",
+                "terminal_policy_directives",
             ):
                 body.pop(key)
             body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
@@ -18046,6 +18048,282 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 intent,
                 usage_units=1,
             )
+
+    def test_t24_late_fail_atomically_records_accepted_terminal_policy(self) -> None:
+        parent = self._record_effect_observation(check_ids=("check-1",))
+        intent, capability = self._validator_intent(parent)
+        committed = self.store.commit_validator_intent(
+            intent, capability, self.authority
+        )
+        self.oracle.allowed_head = committed.event_hash
+        adapter = SyntheticValidatorAdapter(
+            self.database_path.parent / "synthetic-validator.sqlite3"
+        )
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = Path(
+            adapter._path_identity.canonical_path
+        )
+        attestation = self.authority.issue_validator_cessation_attestation(
+            "late-policy-cessation-attestation", "late-policy-cessation",
+            adapter._target_digest("repo-1"), capability.claim_id,
+            "VALIDATOR:validator-intent-1", committed.event_hash,
+            "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+            "check-1", "validator-attempt-1",
+        )
+        seal = adapter.seal_cessation(attestation, self.authority)
+        self.assertFalse(seal.result_available)
+        cessation = self.store.record_validator_cessation(
+            ValidatorCessationRequest(
+                "late-policy-cessation", "late-policy-cessation-command",
+                "late-policy-cessation-event", "repo-1", "run-1", "item-1",
+                "effect-1", "validator-intent-1", "validator-attempt-1",
+                "revision-1", "check-1", seal.cessation_hash,
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = cessation.event_hash
+        settlement_request = BudgetSettlementRequest(
+            "late-policy-settlement", "validator-reservation-1", "",
+            BudgetDisposition.CONSUMED, 1, "late-policy-result",
+            "VALIDATOR_USAGE_REPORTED", attempt_id="validator-attempt-1",
+        )
+        settlement = self.store._settle_budget(
+            settlement_request,
+            self.authority.issue_settlement_proof(
+                "late-policy-settlement-proof", settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settlement.settlement_hash
+        request = ValidatorObservationRequest(
+            "late-policy-observation", "late-policy-command",
+            "late-policy-event", "repo-1", "run-1", "item-1", "effect-1",
+            "validator-intent-1", "validator-attempt-1",
+            "late-policy-result", capability.claim_id, "revision-1", "check-1",
+            "input-1", "late-policy-result-digest", "FAIL", 1,
+            settlement_request.settlement_event_id, settlement.settlement_hash,
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store._record_validator_observation(
+                request,
+                failure_hook=raise_at(
+                    "after_validator_observation_writes_before_commit"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM terminal_policy_obligations"
+                ).fetchone()[0],
+                0,
+            )
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store._record_validator_observation(
+                request,
+                failure_hook=raise_at(
+                    "after_validator_observation_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            row = connection.execute(
+                "SELECT * FROM terminal_policy_obligations"
+            ).fetchone()
+            fence = connection.execute(
+                "SELECT reason_code FROM dispatch_fences WHERE fence_id = ?",
+                (row["fence_id"],),
+            ).fetchone()
+            uncertainty_count = connection.execute(
+                "SELECT COUNT(*) FROM uncertainty_instances WHERE "
+                "origin_event_id = 'late-policy-event'"
+            ).fetchone()[0]
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        replay = self.store._record_validator_observation(request)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.resulting_state, LifecycleState.VALIDATING)
+        self.assertEqual(row["directive"], "FAIL_STOP_IMMEDIATE")
+        self.assertEqual(row["prescribed_mode"], "IMMEDIATE")
+        self.assertEqual(row["status"], "OPEN")
+        self.assertEqual(fence[0], "MANDATORY_TERMINAL_POLICY")
+        self.assertEqual(uncertainty_count, 0)
+        adjustment_request = BudgetSettlementRequest(
+            "late-policy-settlement-2", "validator-reservation-1",
+            settlement.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            "late-policy-result-2", "LATE_USAGE_CONFIRMED",
+            attempt_id="validator-attempt-1",
+        )
+        adjustment = self.store._settle_budget(
+            adjustment_request,
+            self.authority.issue_settlement_proof(
+                "late-policy-settlement-proof-2", adjustment_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = adjustment.settlement_hash
+        with self.assertRaisesRegex(
+            DispatchDenied, "one result observation"
+        ):
+            self.store._record_validator_observation(
+                replace(
+                    request,
+                    observation_id="late-policy-observation-2",
+                    command_id="late-policy-command-2",
+                    event_id="late-policy-event-2",
+                    source_result_id="late-policy-result-2",
+                    result_digest="late-policy-result-digest-2",
+                    usage_units=2,
+                    settlement_event_id=adjustment_request.settlement_event_id,
+                    settlement_hash=adjustment.settlement_hash,
+                )
+            )
+        stop_capability = self._stop_capability(
+            StopMode.IMMEDIATE, suffix="late-policy"
+        )
+        ordinary_stop = self._stop_request(
+            StopMode.IMMEDIATE, suffix="late-policy"
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "exact mandatory terminal policy"
+        ):
+            self.store.stop(ordinary_stop, stop_capability, self.authority)
+        graceful_capability = self._stop_capability(
+            StopMode.GRACEFUL, suffix="late-policy-wrong-mode"
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "exact mandatory terminal policy"
+        ):
+            self.store.stop(
+                replace(
+                    self._stop_request(
+                        StopMode.GRACEFUL, suffix="late-policy-wrong-mode"
+                    ),
+                    reason_code="MANDATORY_TERMINAL_POLICY:ALL_OPEN",
+                ),
+                graceful_capability,
+                self.authority,
+            )
+        mandatory_stop = replace(
+            ordinary_stop,
+            reason_code="MANDATORY_TERMINAL_POLICY:ALL_OPEN",
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.stop(
+                mandatory_stop, stop_capability, self.authority,
+                failure_hook=raise_at("after_stop_writes_before_commit"),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM terminal_policy_obligations "
+                    "WHERE status = 'OPEN'"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.stop(
+                mandatory_stop, stop_capability, self.authority,
+                failure_hook=raise_at(
+                    "after_stop_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            statuses = connection.execute(
+                "SELECT obligation_id, status FROM terminal_policy_obligations "
+                "ORDER BY obligation_id"
+            ).fetchall()
+            stop_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM stop_actions WHERE stop_id = ?",
+                    (mandatory_stop.stop_id,),
+                ).fetchone()[0]
+            )
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        fulfilled = self.store.stop(
+            mandatory_stop, stop_capability, self.authority
+        )
+        self.assertTrue(fulfilled.replayed)
+        self.assertEqual(
+            statuses,
+            [
+                ("terminal-policy:late-policy-observation", "FULFILLED"),
+            ],
+        )
+        self.assertEqual(
+            stop_body["terminal_policy_obligation_ids"],
+            [
+                "terminal-policy:late-policy-observation",
+            ],
+        )
+        self.assertEqual(fulfilled.resulting_state, LifecycleState.STOPPED)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t24_late_fail_after_stop_is_terminal_fixed(self) -> None:
+        parent = self._record_effect_observation(check_ids=("check-1",))
+        intent, capability = self._validator_intent(parent)
+        committed = self.store.commit_validator_intent(
+            intent, capability, self.authority
+        )
+        self.oracle.allowed_head = committed.event_hash
+        self._record_validator_cessation_for()
+        settlement_request = BudgetSettlementRequest(
+            "terminal-late-settlement", "validator-reservation-1", "",
+            BudgetDisposition.CONSUMED, 1, "validator-result-1",
+            "VALIDATOR_USAGE_REPORTED", attempt_id="validator-attempt-1",
+        )
+        settlement = self.store._settle_budget(
+            settlement_request,
+            self.authority.issue_settlement_proof(
+                "terminal-late-settlement-proof", settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settlement.settlement_hash
+        stopped = self.store.stop(
+            self._stop_request(suffix="before-late-result"),
+            self._stop_capability(
+                StopMode.IMMEDIATE, suffix="before-late-result"
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        recorded = self.store._record_validator_observation(
+            ValidatorObservationRequest(
+                "terminal-late-observation", "terminal-late-command",
+                "terminal-late-event", "repo-1", "run-1", "item-1",
+                "effect-1", "validator-intent-1", "validator-attempt-1",
+                "validator-result-1", capability.claim_id, "revision-1",
+                "check-1", "input-1", "terminal-late-result-digest", "FAIL",
+                1, settlement_request.settlement_event_id,
+                settlement.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = recorded.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            status = connection.execute(
+                "SELECT status FROM terminal_policy_obligations"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(status, "TERMINAL_FIXED")
+        self.assertEqual(recorded.resulting_state, LifecycleState.STOPPED)
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def test_t26_terminal_result_is_atomic_and_replay_safe(self) -> None:
         parent = self._record_effect_observation()

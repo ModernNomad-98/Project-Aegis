@@ -5238,6 +5238,35 @@ class SQLiteStateStore:
                 event_hash TEXT NOT NULL UNIQUE,
                 body_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS terminal_policy_obligations (
+                obligation_id TEXT PRIMARY KEY,
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                validator_intent_id TEXT NOT NULL REFERENCES validator_intents(validator_intent_id),
+                validator_attempt_id TEXT NOT NULL,
+                observation_id TEXT NOT NULL UNIQUE REFERENCES validator_observations(observation_id),
+                source_result_id TEXT NOT NULL UNIQUE,
+                result_digest TEXT NOT NULL,
+                policy_id TEXT NOT NULL,
+                policy_version TEXT NOT NULL,
+                directive TEXT NOT NULL CHECK (directive IN (
+                    'FAIL_STOP_IMMEDIATE', 'POLICY_UNKNOWN'
+                )),
+                prescribed_mode TEXT CHECK (
+                    prescribed_mode = 'IMMEDIATE' OR prescribed_mode IS NULL
+                ),
+                fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                status TEXT NOT NULL CHECK (status IN (
+                    'OPEN', 'FULFILLED', 'TERMINAL_FIXED', 'POLICY_UNKNOWN'
+                )),
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS validation_check_routes (
                 route_id TEXT PRIMARY KEY,
                 source_application_id TEXT NOT NULL UNIQUE
@@ -6109,7 +6138,9 @@ class SQLiteStateStore:
         correction_owner_id: str,
         provenance_kind: str,
     ) -> str | None:
-        if provenance_kind not in {"AUTHORITY", "CONTRARY_RECEIPT"}:
+        if provenance_kind not in {
+            "AUTHORITY", "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+        }:
             raise ValueError("dependent adoption provenance kind is invalid")
         dependent_rows = connection.execute(
             "SELECT dependency.dependent_run_id, run.item_id, "
@@ -6125,7 +6156,9 @@ class SQLiteStateStore:
         last_hash: str | None = None
         for offset, dependent in enumerate(dependent_rows, start=1):
             current_state = LifecycleState(str(dependent["lifecycle_state"]))
-            if provenance_kind == "CONTRARY_RECEIPT" and current_state not in {
+            if provenance_kind in {
+                "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+            } and current_state not in {
                 LifecycleState.COMPLETED,
                 LifecycleState.FAILED_FINAL,
                 LifecycleState.STOPPED,
@@ -6195,11 +6228,15 @@ class SQLiteStateStore:
                 (
                     fence_id, repository_id, dependent["item_id"],
                     dependent["logical_effect_id"],
-                    (
-                        "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
-                        if provenance_kind == "CONTRARY_RECEIPT"
-                        else "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED"
-                    ),
+                    {
+                        "CONTRARY_RECEIPT": (
+                            "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
+                        ),
+                        "AUTHORITY": "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED",
+                        "TERMINAL_POLICY": (
+                            "DEPENDENT_ADOPTION_TERMINAL_POLICY"
+                        ),
+                    }[provenance_kind],
                     event_id,
                 ),
             )
@@ -6988,7 +7025,8 @@ class SQLiteStateStore:
 
     @classmethod
     def plan_acceptance_payload_digest(
-        cls, request: PlanAcceptanceRequest, *, binding_version: int = 2
+        cls, request: PlanAcceptanceRequest, *, binding_version: int = 2,
+        include_terminal_policy: bool = True,
     ) -> str:
         request.validate()
         payload = {
@@ -7016,6 +7054,16 @@ class SQLiteStateStore:
                 else request.relationship_kind.value
             ),
         }
+        if include_terminal_policy:
+            payload["terminal_policy_binding_version"] = 1
+            payload["terminal_policy_directives"] = [
+                [
+                    check_id, "FAIL_STOP_IMMEDIATE",
+                    SYNTHETIC_FAILURE_POLICY_ID,
+                    SYNTHETIC_FAILURE_POLICY_VERSION,
+                ]
+                for check_id in sorted(request.check_ids)
+            ]
         if binding_version == 1:
             payload.pop("check_dependency_ids", None)
             payload.pop("check_launch_gate_ids", None)
@@ -7057,6 +7105,7 @@ class SQLiteStateStore:
         finalization_policy_version: str,
         finalization_issuer_fingerprint: str,
         binding_version: int = 2,
+        include_terminal_policy: bool = True,
     ) -> str:
         payload = {
                 "domain": f"AEGIS:T15:COMPLETE_POLICY:v{binding_version}",
@@ -7076,6 +7125,15 @@ class SQLiteStateStore:
                 "plan_schema_version": request.plan_schema_version,
                 "reducer_version": request.reducer_version,
         }
+        if include_terminal_policy:
+            payload["terminal_policy_binding_version"] = 1
+            payload["terminal_policy_directives"] = [
+                [
+                    check_id, "FAIL_STOP_IMMEDIATE",
+                    failure_policy_id, failure_policy_version,
+                ]
+                for check_id in sorted(request.check_ids)
+            ]
         if binding_version == 2:
             payload.update(
                 {
@@ -7567,11 +7625,18 @@ class SQLiteStateStore:
         extended_fields = legacy_fields | {
             "uncertainty_snapshot", "uncertainty_snapshot_version",
         }
-        is_extended = set(body) == extended_fields
+        policy_fields = {"terminal_policy_obligation_ids"}
+        supported_fields = (
+            legacy_fields,
+            extended_fields,
+            legacy_fields | policy_fields,
+            extended_fields | policy_fields,
+        )
+        is_extended = "uncertainty_snapshot" in body
         if (
             type(body.get("schema_version")) is not int
             or body.get("schema_version") != 1
-            or set(body) not in (legacy_fields, extended_fields)
+            or set(body) not in supported_fields
         ):
             raise StorageIntegrityError(
                 "unsupported STOP_RECORDED event schema"
@@ -7604,6 +7669,19 @@ class SQLiteStateStore:
                 for field in string_fields
             ):
                 raise ValueError("stop event strings are invalid")
+            if "terminal_policy_obligation_ids" in body:
+                obligation_ids = body["terminal_policy_obligation_ids"]
+                if (
+                    not isinstance(obligation_ids, list)
+                    or not obligation_ids
+                    or obligation_ids != sorted(set(obligation_ids))
+                    or any(
+                        not isinstance(obligation_id, str)
+                        or not obligation_id.strip()
+                        for obligation_id in obligation_ids
+                    )
+                ):
+                    raise ValueError("stop terminal-policy binding is invalid")
             mode = StopMode(cast(str, body["mode"]))
             if is_extended:
                 if (
@@ -8580,6 +8658,8 @@ class SQLiteStateStore:
             "previous_event_hash", "schema_version", "sequence",
             "writer_epoch",
         }
+        if "terminal_policy_obligation" in body:
+            expected_fields.add("terminal_policy_obligation")
         try:
             if set(body) != expected_fields or (
                 type(body["schema_version"]) is not int
@@ -8678,18 +8758,92 @@ class SQLiteStateStore:
                         "validator usage does not match settled accounting"
                     )
             matched_cessation = connection.execute(
-                "SELECT 1 FROM validator_cessations AS cessation JOIN events "
-                "AS event ON event.event_id = cessation.event_id WHERE "
-                "cessation.validator_intent_id = ? AND "
+                "SELECT cessation.* FROM validator_cessations AS cessation "
+                "JOIN events AS event ON event.event_id = cessation.event_id "
+                "WHERE cessation.validator_intent_id = ? AND "
                 "cessation.validator_attempt_id = ? AND "
                 "cessation.result_available = 1 AND cessation.result_id = ? "
-                "AND cessation.result_digest = ? AND event.sequence < ? LIMIT 1",
+                "AND cessation.result_digest = ? AND event.sequence < ? "
+                "ORDER BY event.sequence DESC LIMIT 1",
                 (
                     request.validator_intent_id,
                     request.validator_attempt_id, request.source_result_id,
                     request.result_digest, body["sequence"],
                 ),
             ).fetchone()
+            prior_unavailable_cessation = connection.execute(
+                "SELECT cessation.* FROM validator_cessations AS cessation "
+                "JOIN events AS event ON event.event_id = cessation.event_id "
+                "WHERE cessation.validator_intent_id = ? AND "
+                "cessation.validator_attempt_id = ? AND "
+                "cessation.result_available = 0 AND event.sequence < ? "
+                "ORDER BY event.sequence DESC LIMIT 1",
+                (
+                    request.validator_intent_id,
+                    request.validator_attempt_id, body["sequence"],
+                ),
+            ).fetchone()
+            obligation = body.get("terminal_policy_obligation")
+            late_failed_result = (
+                prior_unavailable_cessation is not None
+                and request.verdict == "FAIL"
+            )
+            if late_failed_result != isinstance(obligation, dict):
+                raise ValueError("terminal policy obligation applicability is invalid")
+            if isinstance(obligation, dict):
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE run_id = ?",
+                    (request.run_id,),
+                ).fetchone()
+                if plan is None:
+                    raise ValueError("terminal policy plan is unavailable")
+                plan_body = json.loads(plan["body_json"])
+                directives = plan_body.get("terminal_policy_directives")
+                if directives is None:
+                    expected_directive = "POLICY_UNKNOWN"
+                    expected_mode = None
+                    expected_reason = "TERMINAL_POLICY_APPLICABILITY_UNKNOWN"
+                    expected_policy_id = str(plan_body["failure_policy_id"])
+                    expected_policy_version = str(
+                        plan_body["failure_policy_version"]
+                    )
+                else:
+                    rows = [row for row in directives if row[0] == request.check_id]
+                    if len(rows) != 1:
+                        raise ValueError("terminal policy map is incomplete")
+                    expected_directive = rows[0][1]
+                    expected_policy_id = str(rows[0][2])
+                    expected_policy_version = str(rows[0][3])
+                    expected_mode = "IMMEDIATE"
+                    expected_reason = "MANDATORY_TERMINAL_POLICY"
+                expected_obligation = {
+                    "obligation_id": f"terminal-policy:{request.observation_id}",
+                    "plan_id": str(plan["plan_id"]),
+                    "policy_id": expected_policy_id,
+                    "policy_version": expected_policy_version,
+                    "directive": expected_directive,
+                    "prescribed_mode": expected_mode,
+                    "fence_id": f"terminal-policy-fence:{request.observation_id}",
+                    "reason_code": expected_reason,
+                    "source_cessation_id": str(
+                        prior_unavailable_cessation["cessation_id"]
+                    ),
+                    "status": (
+                        "POLICY_UNKNOWN"
+                        if expected_directive == "POLICY_UNKNOWN"
+                        else (
+                            "TERMINAL_FIXED"
+                            if predecessor_state in {
+                                LifecycleState.COMPLETED,
+                                LifecycleState.FAILED_FINAL,
+                                LifecycleState.STOPPED,
+                            }
+                            else "OPEN"
+                        )
+                    ),
+                }
+                if obligation != expected_obligation:
+                    raise ValueError("terminal policy obligation binding is invalid")
             resulting_state = (
                 predecessor_state
                 if (
@@ -8701,7 +8855,10 @@ class SQLiteStateStore:
                     }
                     or (
                         request.usage_units is not None
-                        and matched_cessation is not None
+                        and (
+                            matched_cessation is not None
+                            or prior_unavailable_cessation is not None
+                        )
                     )
                 )
                 else LifecycleState.RECONCILIATION_REQUIRED
@@ -12494,6 +12651,17 @@ class SQLiteStateStore:
         }
         if binding_version == 2:
             expected_body_fields.add("check_order")
+        has_terminal_policy = (
+            "terminal_policy_binding_version" in body
+            or "terminal_policy_directives" in body
+        )
+        if has_terminal_policy:
+            expected_body_fields.update(
+                {
+                    "terminal_policy_binding_version",
+                    "terminal_policy_directives",
+                }
+            )
         if set(body) != expected_body_fields:
             raise DispatchDenied("plan-acceptance event schema is invalid")
         evidence_value = body.get("acceptance_evidence")
@@ -12551,8 +12719,23 @@ class SQLiteStateStore:
             request.canonical_check_order()
         ):
             raise DispatchDenied("plan check order is rebound")
+        expected_terminal_policy = [
+            [
+                check_id, "FAIL_STOP_IMMEDIATE",
+                SYNTHETIC_FAILURE_POLICY_ID,
+                SYNTHETIC_FAILURE_POLICY_VERSION,
+            ]
+            for check_id in sorted(request.check_ids)
+        ]
+        if has_terminal_policy and (
+            body.get("terminal_policy_binding_version") != 1
+            or body.get("terminal_policy_directives")
+            != expected_terminal_policy
+        ):
+            raise DispatchDenied("plan terminal policy binding is invalid")
         payload_digest = self.plan_acceptance_payload_digest(
-            request, binding_version=int(binding_version)
+            request, binding_version=int(binding_version),
+            include_terminal_policy=has_terminal_policy,
         )
         evidence_digest = self._event_hash(evidence.__dict__)
         if (
@@ -13256,6 +13439,14 @@ class SQLiteStateStore:
         authority.verify_plan_acceptance_evidence(acceptance_evidence)
         if writer_epoch <= 0:
             raise ValueError("writer_epoch must be positive")
+        terminal_policy_directives = [
+            [
+                check_id, "FAIL_STOP_IMMEDIATE",
+                SYNTHETIC_FAILURE_POLICY_ID,
+                SYNTHETIC_FAILURE_POLICY_VERSION,
+            ]
+            for check_id in sorted(request.check_ids)
+        ]
         payload = {
             **request.__dict__,
             "check_ids": sorted(request.check_ids),
@@ -13280,6 +13471,8 @@ class SQLiteStateStore:
                 if request.relationship_kind is None
                 else request.relationship_kind.value
             ),
+            "terminal_policy_binding_version": 1,
+            "terminal_policy_directives": terminal_policy_directives,
         }
         acceptance_payload_digest = self.plan_acceptance_payload_digest(request)
         if (
@@ -19456,6 +19649,35 @@ class SQLiteStateStore:
                         "stop run has no consistent accepted-plan binding"
                     )
                 current_state = LifecycleState(str(run["lifecycle_state"]))
+                terminal_policies = connection.execute(
+                    "SELECT * FROM terminal_policy_obligations WHERE "
+                    "repository_id = ? AND run_id = ? AND status = 'OPEN' "
+                    "ORDER BY obligation_id",
+                    (request.repository_id, request.run_id),
+                ).fetchall()
+                terminal_policy_ids = [
+                    str(policy["obligation_id"])
+                    for policy in terminal_policies
+                ]
+                if terminal_policies:
+                    if (
+                        request.mode is not StopMode.IMMEDIATE
+                        or request.reason_code
+                        != "MANDATORY_TERMINAL_POLICY:ALL_OPEN"
+                        or any(
+                            policy["prescribed_mode"] != "IMMEDIATE"
+                            for policy in terminal_policies
+                        )
+                    ):
+                        raise DispatchDenied(
+                            "stop does not fulfill the exact mandatory terminal policy"
+                        )
+                elif request.reason_code.startswith(
+                    "MANDATORY_TERMINAL_POLICY:"
+                ):
+                    raise DispatchDenied(
+                        "stop references no open terminal-policy obligation"
+                    )
                 transition_id = (
                     "T18" if request.mode is StopMode.GRACEFUL else "T19"
                 )
@@ -19614,6 +19836,8 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if terminal_policy_ids:
+                    body["terminal_policy_obligation_ids"] = terminal_policy_ids
                 if request.mode is StopMode.IMMEDIATE:
                     body.update(
                         {
@@ -19657,6 +19881,18 @@ class SQLiteStateStore:
                         body_json,
                     ),
                 )
+                if terminal_policy_ids:
+                    updated = 0
+                    for obligation_id in terminal_policy_ids:
+                        updated += connection.execute(
+                            "UPDATE terminal_policy_obligations SET status = "
+                            "'FULFILLED' WHERE obligation_id = ? AND status = 'OPEN'",
+                            (obligation_id,),
+                        ).rowcount
+                    if updated != len(terminal_policy_ids):
+                        raise StorageIntegrityError(
+                            "terminal-policy obligation fulfillment was not atomic"
+                        )
                 connection.execute(
                     "INSERT INTO operator_redemptions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     (
@@ -25779,6 +26015,20 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return self._validator_observation_receipt(prior, replayed=True)
+                prior_attempt_observation = connection.execute(
+                    "SELECT observation_id FROM validator_observations WHERE "
+                    "repository_id = ? AND run_id = ? AND validator_intent_id = ? "
+                    "AND validator_attempt_id = ? LIMIT 1",
+                    (
+                        request.repository_id, request.run_id,
+                        request.validator_intent_id,
+                        request.validator_attempt_id,
+                    ),
+                ).fetchone()
+                if prior_attempt_observation is not None:
+                    raise DispatchDenied(
+                        "validator intent and attempt already has its one result observation"
+                    )
 
                 intent = connection.execute(
                     "SELECT * FROM validator_intents WHERE validator_intent_id = ?",
@@ -25856,7 +26106,89 @@ class SQLiteStateStore:
                         request.result_digest,
                     ),
                 ).fetchone()
-                activity_known = matched_cessation is not None
+                prior_unavailable_cessation = connection.execute(
+                    "SELECT cessation.* FROM validator_cessations AS cessation "
+                    "JOIN events AS event ON event.event_id = cessation.event_id "
+                    "WHERE cessation.validator_intent_id = ? AND "
+                    "cessation.validator_attempt_id = ? AND "
+                    "cessation.result_available = 0 "
+                    "ORDER BY event.sequence DESC LIMIT 1",
+                    (
+                        request.validator_intent_id,
+                        request.validator_attempt_id,
+                    ),
+                ).fetchone()
+                terminal_policy_obligation = None
+                if (
+                    prior_unavailable_cessation is not None
+                    and request.verdict == "FAIL"
+                ):
+                    plan = connection.execute(
+                        "SELECT * FROM validation_plans WHERE run_id = ?",
+                        (request.run_id,),
+                    ).fetchone()
+                    if plan is None:
+                        raise StorageIntegrityError(
+                            "late validator result lost its accepted plan"
+                        )
+                    plan_body = json.loads(plan["body_json"])
+                    directives = plan_body.get("terminal_policy_directives")
+                    if directives is None:
+                        directive = "POLICY_UNKNOWN"
+                        policy_id = str(plan["failure_policy_id"])
+                        policy_version = str(plan["failure_policy_version"])
+                        reason_code = "TERMINAL_POLICY_APPLICABILITY_UNKNOWN"
+                        prescribed_mode = None
+                    else:
+                        matches = [
+                            row for row in directives
+                            if isinstance(row, list) and len(row) == 4
+                            and row[0] == request.check_id
+                        ]
+                        if len(matches) != 1:
+                            raise StorageIntegrityError(
+                                "accepted terminal policy map is incomplete"
+                            )
+                        _, directive, policy_id, policy_version = matches[0]
+                        if directive != "FAIL_STOP_IMMEDIATE":
+                            raise StorageIntegrityError(
+                                "accepted terminal policy directive is unsupported"
+                            )
+                        reason_code = "MANDATORY_TERMINAL_POLICY"
+                        prescribed_mode = "IMMEDIATE"
+                    obligation_id = (
+                        f"terminal-policy:{request.observation_id}"
+                    )
+                    terminal_policy_obligation = {
+                        "obligation_id": obligation_id,
+                        "plan_id": str(plan["plan_id"]),
+                        "policy_id": str(policy_id),
+                        "policy_version": str(policy_version),
+                        "directive": str(directive),
+                        "prescribed_mode": prescribed_mode,
+                        "fence_id": f"terminal-policy-fence:{request.observation_id}",
+                        "reason_code": reason_code,
+                        "source_cessation_id": str(
+                            prior_unavailable_cessation["cessation_id"]
+                        ),
+                        "status": (
+                            "POLICY_UNKNOWN"
+                            if directive == "POLICY_UNKNOWN"
+                            else (
+                                "TERMINAL_FIXED"
+                                if current_state in {
+                                    LifecycleState.COMPLETED,
+                                    LifecycleState.FAILED_FINAL,
+                                    LifecycleState.STOPPED,
+                                }
+                                else "OPEN"
+                            )
+                        ),
+                    }
+                activity_known = (
+                    matched_cessation is not None
+                    or prior_unavailable_cessation is not None
+                )
                 if request.usage_units is None:
                     if not bool(settlement["uncertainty"]):
                         raise DispatchDenied(
@@ -25903,6 +26235,10 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if terminal_policy_obligation is not None:
+                    body["terminal_policy_obligation"] = (
+                        terminal_policy_obligation
+                    )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
@@ -26004,6 +26340,53 @@ class SQLiteStateStore:
                         resulting_state.value, body_json,
                     ),
                 )
+                if terminal_policy_obligation is not None:
+                    obligation = terminal_policy_obligation
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            obligation["fence_id"], request.repository_id,
+                            request.item_id, request.logical_effect_id,
+                            obligation["reason_code"], request.event_id,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO terminal_policy_obligations VALUES ("
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            obligation["obligation_id"], request.repository_id,
+                            request.run_id, request.item_id,
+                            request.logical_effect_id, obligation["plan_id"],
+                            request.revision_digest, request.check_id,
+                            request.validator_intent_id,
+                            request.validator_attempt_id,
+                            request.observation_id, request.source_result_id,
+                            request.result_digest, obligation["policy_id"],
+                            obligation["policy_version"], obligation["directive"],
+                            obligation["prescribed_mode"], obligation["fence_id"],
+                            obligation["status"], event_hash, body_json,
+                        ),
+                    )
+                catalog_head_hash = event_hash
+                if (
+                    terminal_policy_obligation is not None
+                    and terminal_policy_obligation["directive"]
+                    == "FAIL_STOP_IMMEDIATE"
+                ):
+                    dependent_head = self._fence_dependent_adoptions(
+                        connection,
+                        repository_id=request.repository_id,
+                        source_run_id=request.run_id,
+                        originating_event_id=request.event_id,
+                        originating_event_hash=event_hash,
+                        writer_epoch_floor=writer_epoch,
+                        correction_owner_id=str(
+                            terminal_policy_obligation["obligation_id"]
+                        ),
+                        provenance_kind="TERMINAL_POLICY",
+                    )
+                    if dependent_head is not None:
+                        catalog_head_hash = dependent_head
                 connection.execute(
                     "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
                     (
@@ -26017,7 +26400,7 @@ class SQLiteStateStore:
                 )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
-                    (event_hash, request.repository_id),
+                    (catalog_head_hash, request.repository_id),
                 )
                 if failure_hook is not None:
                     failure_hook(
@@ -31373,6 +31756,13 @@ class SQLiteStateStore:
             }
             if body.get("plan_acceptance_binding_version") == 2:
                 request_payload["check_order"] = body["check_order"]
+            if "terminal_policy_directives" in body:
+                request_payload["terminal_policy_binding_version"] = body[
+                    "terminal_policy_binding_version"
+                ]
+                request_payload["terminal_policy_directives"] = body[
+                    "terminal_policy_directives"
+                ]
             if body.get("plan_acceptance_binding_version") in {1, 2}:
                 return self._event_hash(
                     {
@@ -33706,6 +34096,9 @@ class SQLiteStateStore:
                         binding_version=int(
                             body.get("plan_acceptance_binding_version", 1)
                         ),
+                        include_terminal_policy=(
+                            "terminal_policy_directives" in body
+                        ),
                     )
                 ):
                     raise StorageIntegrityError(
@@ -35774,6 +36167,17 @@ class SQLiteStateStore:
             )
             for body in validator_observations
         }
+        observation_attempts = [
+            (
+                str(body["run_id"]), str(body["validator_intent_id"]),
+                str(body["validator_attempt_id"]),
+            )
+            for body in validator_observations
+        ]
+        if len(observation_attempts) != len(set(observation_attempts)):
+            raise StorageIntegrityError(
+                "validator intent and attempt has multiple result observations"
+            )
         actual_validator_observations = {
             row["observation_id"]: (
                 row["source_result_id"], row["command_id"], row["event_id"],
@@ -35794,6 +36198,121 @@ class SQLiteStateStore:
         if actual_validator_observations != expected_validator_observations:
             raise StorageIntegrityError(
                 "validator-observation projection diverges from event history"
+            )
+
+        obligation_bodies = {
+            str(body["terminal_policy_obligation"]["obligation_id"]): body[
+                "terminal_policy_obligation"
+            ]
+            for body in validator_observations
+            if isinstance(body.get("terminal_policy_obligation"), dict)
+        }
+        terminal_policy_statuses = {
+            obligation_id: str(obligation["status"])
+            for obligation_id, obligation in obligation_bodies.items()
+        }
+        terminal_policy_runs = {
+            str(body["terminal_policy_obligation"]["obligation_id"]): str(
+                body["run_id"]
+            )
+            for body in validator_observations
+            if isinstance(body.get("terminal_policy_obligation"), dict)
+        }
+        policy_events = sorted(
+            [
+                (int(body["sequence"]), "OBLIGATION", body)
+                for body in validator_observations
+                if isinstance(body.get("terminal_policy_obligation"), dict)
+            ]
+            + [(int(body["sequence"]), "STOP", body) for body in stops],
+            key=lambda entry: entry[0],
+        )
+        open_terminal_policy_ids: set[str] = set()
+        for _sequence, event_kind, event_body in policy_events:
+            if event_kind == "OBLIGATION":
+                obligation = event_body["terminal_policy_obligation"]
+                obligation_id = str(obligation["obligation_id"])
+                if obligation["status"] == "OPEN":
+                    open_terminal_policy_ids.add(obligation_id)
+                continue
+            expected_ids = sorted(
+                obligation_id
+                for obligation_id in open_terminal_policy_ids
+                if terminal_policy_runs[obligation_id] == event_body["run_id"]
+            )
+            recorded_ids = event_body.get("terminal_policy_obligation_ids")
+            if expected_ids:
+                if (
+                    recorded_ids != expected_ids
+                    or event_body["mode"] != "IMMEDIATE"
+                    or event_body["reason_code"]
+                    != "MANDATORY_TERMINAL_POLICY:ALL_OPEN"
+                    or any(
+                        obligation_bodies[obligation_id]["prescribed_mode"]
+                        != "IMMEDIATE"
+                        or obligation_bodies[obligation_id]["directive"]
+                        != "FAIL_STOP_IMMEDIATE"
+                        for obligation_id in expected_ids
+                    )
+                ):
+                    raise StorageIntegrityError(
+                        "terminal-policy stop fulfillment is invalid"
+                    )
+                for obligation_id in expected_ids:
+                    terminal_policy_statuses[obligation_id] = "FULFILLED"
+                    open_terminal_policy_ids.remove(obligation_id)
+            elif (
+                recorded_ids is not None
+                or str(event_body["reason_code"]).startswith(
+                    "MANDATORY_TERMINAL_POLICY:"
+                )
+            ):
+                raise StorageIntegrityError(
+                    "terminal-policy stop references no open obligation"
+                )
+        expected_terminal_policy_obligations = {
+            body["terminal_policy_obligation"]["obligation_id"]: (
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["terminal_policy_obligation"]["plan_id"],
+                body["revision_digest"], body["check_id"],
+                body["validator_intent_id"], body["validator_attempt_id"],
+                body["observation_id"], body["source_result_id"],
+                body["result_digest"],
+                body["terminal_policy_obligation"]["policy_id"],
+                body["terminal_policy_obligation"]["policy_version"],
+                body["terminal_policy_obligation"]["directive"],
+                body["terminal_policy_obligation"]["prescribed_mode"],
+                body["terminal_policy_obligation"]["fence_id"],
+                terminal_policy_statuses[
+                    body["terminal_policy_obligation"]["obligation_id"]
+                ],
+                self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in validator_observations
+            if isinstance(body.get("terminal_policy_obligation"), dict)
+        }
+        actual_terminal_policy_obligations = {
+            row["obligation_id"]: (
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["plan_id"], row["revision_digest"], row["check_id"],
+                row["validator_intent_id"], row["validator_attempt_id"],
+                row["observation_id"], row["source_result_id"],
+                row["result_digest"], row["policy_id"],
+                row["policy_version"], row["directive"],
+                row["prescribed_mode"], row["fence_id"], row["status"],
+                row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM terminal_policy_obligations WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_terminal_policy_obligations != (
+            expected_terminal_policy_obligations
+        ):
+            raise StorageIntegrityError(
+                "terminal-policy obligation projection diverges from event history"
             )
 
         validator_intents_by_id = {
@@ -35822,9 +36341,6 @@ class SQLiteStateStore:
                     == body["validator_intent_id"]
                     and cessation["validator_attempt_id"]
                     == body["validator_attempt_id"]
-                    and cessation["result_available"] is True
-                    and cessation["result_id"] == body["source_result_id"]
-                    and cessation["result_digest"] == body["result_digest"]
                     and int(cessation["sequence"]) < int(body["sequence"])
                 ),
                 None,
@@ -36629,11 +37145,15 @@ class SQLiteStateStore:
             {
                 fence_id: (
                     body["item_id"], body["logical_effect_id"],
-                    (
-                        "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
-                        if body["provenance_kind"] == "CONTRARY_RECEIPT"
-                        else "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED"
-                    ),
+                    {
+                        "CONTRARY_RECEIPT": (
+                            "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
+                        ),
+                        "AUTHORITY": "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED",
+                        "TERMINAL_POLICY": (
+                            "DEPENDENT_ADOPTION_TERMINAL_POLICY"
+                        ),
+                    }[body["provenance_kind"]],
                     body["event_id"],
                 )
                 for fence_id, body in active_dependent_fence_events.items()
@@ -36713,6 +37233,17 @@ class SQLiteStateStore:
                     str(body["reason_code"]), str(body["event_id"]),
                 )
                 for body in validator_initiation_disables
+            }
+        )
+        expected_fences.update(
+            {
+                str(body["terminal_policy_obligation"]["fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    str(body["terminal_policy_obligation"]["reason_code"]),
+                    str(body["event_id"]),
+                )
+                for body in validator_observations
+                if isinstance(body.get("terminal_policy_obligation"), dict)
             }
         )
         for row in connection.execute(
@@ -37332,7 +37863,9 @@ class SQLiteStateStore:
                     )
                 if event_kind == "DEPENDENT_ADOPTION_FENCED":
                     provenance_kind = body.get("provenance_kind")
-                    if provenance_kind == "CONTRARY_RECEIPT":
+                    if provenance_kind in {
+                        "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+                    }:
                         expected_dependent_state = (
                             predecessor_state
                             if predecessor_state in {
