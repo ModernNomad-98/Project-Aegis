@@ -82,6 +82,9 @@ from tools.aegis_delivery_control.contracts import (
     TerminalRestartVerification,
     TerminalValidationSettlementRequest,
     ValidationApplicationRequest,
+    ValidationGateFactRequest,
+    ValidationLaunchRequest,
+    ValidationLaunchResolutionRequest,
     ValidationRecoveryRequest,
     ValidatorCessationRequest,
     ValidatorContainmentSpec,
@@ -222,6 +225,53 @@ class SQLiteStateStore(ProductionSQLiteStateStore):
     def _bind_classification_authority(self, authority):
         super()._bind_classification_authority(authority)
         self._known_test_authorities[authority.issuer_fingerprint] = authority
+
+    def commit_validator_intent(self, request, capability, authority, **kwargs):
+        """Adapt legacy tests onto the production unclaimed launch contract."""
+        if capability is None:
+            return super().commit_validator_intent(
+                request, capability, authority, **kwargs
+            )
+        with authority._lock:
+            issued = authority._validator_claims.get(capability.grant_id)
+            committed = capability.claim_id in authority._committed_claims
+        if issued == capability and not committed:
+            authority.release_uncommitted_validator_claim(capability)
+        suffix = request.command_id
+        with closing(sqlite3.connect(self._database_path)) as connection:
+            plan_id = connection.execute(
+                "SELECT plan_id FROM validation_plans WHERE run_id = ?",
+                (request.run_id,),
+            ).fetchone()[0]
+        launch = super().prepare_validation_launch(
+            ValidationLaunchRequest(
+                f"test-launch-evaluation:{suffix}",
+                f"test-launch-decision:{suffix}",
+                f"test-launch-command:{suffix}",
+                f"test-launch-event:{suffix}",
+                f"test-launch-decision-event:{suffix}",
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, plan_id, request.revision_digest,
+                request.check_id,
+            ),
+            authority,
+        )
+        if not launch.ready:
+            raise DispatchDenied("test fixture validation launch is blocked")
+        if hasattr(self._freshness_oracle, "allowed_head"):
+            with closing(sqlite3.connect(self._database_path)) as connection:
+                self._freshness_oracle.allowed_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = ?", (request.repository_id,),
+                ).fetchone()[0]
+        snapshot = super().load_validation_launch_snapshot(
+            launch.snapshot_id, authority
+        )
+        return super().commit_validator_intent(
+            request, None, authority, grant_id=capability.grant_id,
+            scope_digest=capability.scope_digest,
+            launch_snapshot=snapshot, **kwargs,
+        )
 
     def _next_test_writer_epoch(self) -> int:
         with closing(sqlite3.connect(self._database_path)) as connection:
@@ -4044,6 +4094,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "runs": 0,
                 "validation_plans": 0,
                 "validation_requirements": 0,
+                "validation_gate_facts": 0,
+                "validation_launch_evaluations": 0,
+                "validation_launch_decisions": 0,
+                "validation_check_routes": 0,
                 "readiness_evaluations": 0,
                 "events": 0,
                 "command_outcomes": 0,
@@ -4995,6 +5049,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "runs": 1,
                 "validation_plans": 1,
                 "validation_requirements": 1,
+                "validation_gate_facts": 0,
+                "validation_launch_evaluations": 0,
+                "validation_launch_decisions": 0,
+                "validation_check_routes": 0,
                 "readiness_evaluations": 1,
                 "events": 3,
                 "command_outcomes": 3,
@@ -7339,8 +7397,33 @@ class SQLiteStateStoreTests(unittest.TestCase):
             observation, check_id="check-1"
         )
         before = self.store.table_counts()
-        with self.assertRaisesRegex(DispatchDenied, "launch-gate evidence"):
+        with self.assertRaisesRegex(DispatchDenied, "launch is blocked"):
             self.store.commit_validator_intent(
+                request, capability, self.authority
+            )
+        after = self.store.table_counts()
+        for table in (
+            "validator_intents", "permission_uses", "budget_reservations",
+            "capability_redemptions",
+        ):
+            self.assertEqual(after[table], before[table], table)
+        self.assertEqual(after["validation_launch_evaluations"], 1)
+        self.assertEqual(after["validation_launch_decisions"], 1)
+
+    def test_t27_production_store_rejects_preclaimed_zero_gate_launch(self) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        request, capability = self._validator_intent(
+            observation, check_id="check-1"
+        )
+        production = ProductionSQLiteStateStore(
+            self.database_path,
+            self.oracle,
+            "repo-1",
+            utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+        )
+        before = self.store.table_counts()
+        with self.assertRaisesRegex(DispatchDenied, "preclaimed.*forbidden"):
+            production.commit_validator_intent(
                 request, capability, self.authority
             )
         after = self.store.table_counts()
@@ -7349,6 +7432,732 @@ class SQLiteStateStoreTests(unittest.TestCase):
             "capability_redemptions", "events",
         ):
             self.assertEqual(after[table], before[table], table)
+
+    def _record_gate_fact(
+        self, status: str, *, sequence: int = 1, suffix: str = "1",
+        gate_id: str = "gate-1", check_id: str = "check-1",
+    ):
+        fact = self.authority.issue_validation_gate_fact(
+            fact_id=f"gate-fact-{suffix}",
+            source_id=f"synthetic-gate:{gate_id}",
+            source_sequence=sequence,
+            action="ATTEST_VALIDATION_GATE",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1", check_id=check_id,
+            gate_id=gate_id, status=status,
+            evidence_digest=f"gate-evidence-{suffix}",
+            observed_at=f"2026-09-22T00:00:0{sequence}.000000Z",
+        )
+        receipt = self.store.record_validation_gate_fact(
+            ValidationGateFactRequest(
+                f"gate-command-{suffix}", f"gate-event-{suffix}",
+                "repo-1", "run-1", "item-1", "effect-1", "plan-1",
+                "revision-1", fact.fact_id,
+            ),
+            fact,
+            self.authority,
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        return receipt, fact
+
+    @staticmethod
+    def _launch_request(suffix: str = "1") -> ValidationLaunchRequest:
+        return ValidationLaunchRequest(
+            f"launch-evaluation-{suffix}", f"launch-decision-{suffix}",
+            f"launch-command-{suffix}", f"launch-event-{suffix}",
+            f"launch-decision-event-{suffix}", "repo-1", "run-1",
+            "item-1", "effect-1", "plan-1", "revision-1", "check-1",
+        )
+
+    def _prepare_canonical_gated_validator_material(
+        self, *, gate_ids=("gate-1",)
+    ):
+        observation = self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", gate_ids),),
+        )
+        for index, gate_id in enumerate(gate_ids, start=1):
+            self._record_gate_fact(
+                "PASS", sequence=1, suffix=str(index), gate_id=gate_id
+            )
+        ready = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.oracle.allowed_head = ready.event_hash
+        snapshot = self.store.load_validation_launch_snapshot(
+            ready.snapshot_id, self.authority
+        )
+        containment_json, containment_digest = validator_containment(
+            "input-1", "1"
+        )
+        grant = SyntheticValidatorGrant(
+            "validator-grant-1", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-1",
+            "read-only-scope-1", containment_digest,
+        )
+        self.authority.register_validator(grant)
+        request = ValidatorIntentRequest(
+            "validator-intent-1", "validator-command-1", "validator-event-1",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            "observation-1", observation.event_hash, "revision-1", "check-1",
+            "input-1", "validator-attempt-1", "validator-permission-1",
+            "validator-reservation-1", "validator-budget-policy-1",
+            1, 2, 10, None, containment_json,
+        )
+        return request, grant, snapshot
+
+    def _prepare_canonical_gated_validator_intent(self):
+        request, grant, snapshot = (
+            self._prepare_canonical_gated_validator_material()
+        )
+        committed = self.store.commit_validator_intent(
+            request, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        capability = self.authority.claim_or_recover_validator(
+            *grant.__dict__.values()
+        )
+        return request, capability, committed
+
+    def test_t27_preclaim_missing_or_unknown_gate_records_exact_blocker(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        before = self.store.table_counts()
+        blocked = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.assertFalse(blocked.ready)
+        self.assertEqual(blocked.resulting_state, LifecycleState.BLOCKED)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone(),
+                (
+                    "BLOCKED",
+                    "validation-launch:check-1:launch-decision-1",
+                ),
+            )
+            snapshot = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM validation_launch_evaluations"
+                ).fetchone()[0]
+            )["snapshot"]
+            self.assertEqual(
+                snapshot["gate_vector"],
+                [["gate-1", "UNKNOWN", "MISSING", "MISSING", "MISSING"]],
+            )
+        after = self.store.table_counts()
+        for table in (
+            "validator_intents", "permission_uses", "budget_reservations",
+            "capability_redemptions",
+        ):
+            self.assertEqual(after[table], before[table], table)
+        self.oracle.allowed_head = blocked.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_signed_unknown_gate_fact_blocks_exactly(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        fact_receipt, fact = self._record_gate_fact("UNKNOWN")
+        blocked = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.assertFalse(blocked.ready)
+        self.assertEqual(blocked.resulting_state, LifecycleState.BLOCKED)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM validation_launch_evaluations"
+            ).fetchone()[0])
+            self.assertEqual(
+                body["snapshot"]["gate_vector"],
+                [[
+                    "gate-1", "UNKNOWN", fact.fact_id,
+                    fact_receipt.event_hash, fact.evidence_digest,
+                ]],
+            )
+
+    def test_validation_gate_fact_is_atomic_across_acknowledgement_loss(
+        self,
+    ) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        fact = self.authority.issue_validation_gate_fact(
+            fact_id="gate-fact-atomic", source_id="synthetic-gate:gate-1",
+            source_sequence=1, action="ATTEST_VALIDATION_GATE",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1", check_id="check-1",
+            gate_id="gate-1", status="PASS", evidence_digest="gate-evidence",
+            observed_at="2026-09-22T00:00:01.000000Z",
+        )
+        request = ValidationGateFactRequest(
+            "gate-command-atomic", "gate-event-atomic", "repo-1", "run-1",
+            "item-1", "effect-1", "plan-1", "revision-1", fact.fact_id,
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.record_validation_gate_fact(
+                request, fact, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_gate_fact_writes_before_commit"
+                ),
+            )
+        self.assertEqual(self.store.table_counts()["validation_gate_facts"], 0)
+        with self.assertRaises(InjectedFailure):
+            self.store.record_validation_gate_fact(
+                request, fact, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_gate_fact_commit_before_acknowledgement"
+                ),
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM validation_gate_facts WHERE fact_id = ?",
+                (fact.fact_id,),
+            ).fetchone()[0]
+        self.oracle.allowed_head = event_hash
+        replay = self.store.record_validation_gate_fact(
+            request, fact, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, event_hash)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_validation_launch_is_atomic_across_acknowledgement_loss(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        self._record_gate_fact("PASS")
+        request = self._launch_request()
+        with self.assertRaises(InjectedFailure):
+            self.store.prepare_validation_launch(
+                request, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_launch_writes_before_commit"
+                ),
+            )
+        self.assertEqual(
+            self.store.table_counts()["validation_launch_evaluations"], 0
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.prepare_validation_launch(
+                request, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_launch_commit_before_acknowledgement"
+                ),
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM validation_launch_evaluations WHERE "
+                "evaluation_id = ?", (request.evaluation_id,),
+            ).fetchone()[0]
+        self.oracle.allowed_head = event_hash
+        replay = self.store.prepare_validation_launch(request, self.authority)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, event_hash)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t16_resolves_exact_validation_launch_blocker_after_pass_fact(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        blocked = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.oracle.allowed_head = blocked.event_hash
+        self._record_gate_fact("PASS")
+        request = ValidationLaunchResolutionRequest(
+            "launch-resolution-1", "launch-resolution-command-1",
+            "launch-resolution-event-1", "launch-decision-1", "repo-1",
+            "run-1", "item-1", "effect-1", "plan-1", "revision-1",
+            "check-1",
+        )
+        resolved = self.store.resolve_validation_launch_blocker(
+            request, self.authority
+        )
+        self.assertEqual(resolved.resulting_state, LifecycleState.VALIDATING)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone(),
+                ("VALIDATING", "validation-check:check-1"),
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT resolved FROM validation_launch_decisions WHERE "
+                    "decision_id = 'launch-decision-1'"
+                ).fetchone()[0],
+                1,
+            )
+        self.oracle.allowed_head = resolved.event_hash
+        replay = self.store.resolve_validation_launch_blocker(
+            request, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t16_launch_resolution_is_atomic_across_acknowledgement_loss(
+        self,
+    ) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        blocked = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.oracle.allowed_head = blocked.event_hash
+        self._record_gate_fact("PASS")
+        request = ValidationLaunchResolutionRequest(
+            "launch-resolution-atomic", "launch-resolution-command-atomic",
+            "launch-resolution-event-atomic", "launch-decision-1", "repo-1",
+            "run-1", "item-1", "effect-1", "plan-1", "revision-1",
+            "check-1",
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.resolve_validation_launch_blocker(
+                request, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_launch_resolution_writes_before_commit"
+                ),
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT resolved FROM validation_launch_decisions WHERE "
+                    "decision_id = 'launch-decision-1'"
+                ).fetchone()[0],
+                0,
+            )
+        with self.assertRaises(InjectedFailure):
+            self.store.resolve_validation_launch_blocker(
+                request, self.authority,
+                failure_hook=raise_at(
+                    "after_validation_launch_resolution_commit_before_acknowledgement"
+                ),
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM events WHERE event_id = ?",
+                (request.event_id,),
+            ).fetchone()[0]
+        self.oracle.allowed_head = event_hash
+        replay = self.store.resolve_validation_launch_blocker(
+            request, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, event_hash)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_preclaim_pass_gate_returns_signed_complete_snapshot(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        _receipt, fact = self._record_gate_fact("PASS")
+        ready = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.assertTrue(ready.ready)
+        self.assertEqual(ready.resulting_state, LifecycleState.VALIDATING)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM validation_launch_evaluations"
+                ).fetchone()[0]
+            )
+        self.assertEqual(
+            body["snapshot"]["gate_vector"][0][:3],
+            ["gate-1", "PASS", fact.fact_id],
+        )
+        self.oracle.allowed_head = ready.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_ready_snapshot_claims_and_commits_in_one_transaction(self) -> None:
+        observation = self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        self._record_gate_fact("PASS")
+        ready = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.oracle.allowed_head = ready.event_hash
+        snapshot = self.store.load_validation_launch_snapshot(
+            ready.snapshot_id, self.authority
+        )
+        containment_json, containment_digest = validator_containment(
+            "input-1", "1"
+        )
+        grant = SyntheticValidatorGrant(
+            "validator-grant-1", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-1",
+            "read-only-scope-1", containment_digest,
+        )
+        self.authority.register_validator(grant)
+        request = ValidatorIntentRequest(
+            "validator-intent-1", "validator-command-1", "validator-event-1",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            "observation-1", observation.event_hash, "revision-1", "check-1",
+            "input-1", "validator-attempt-1", "validator-permission-1",
+            "validator-reservation-1", "validator-budget-policy-1",
+            1, 2, 10, None, containment_json,
+        )
+        committed = self.store.commit_validator_intent(
+            request,
+            None,
+            self.authority,
+            grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest,
+            launch_snapshot=snapshot,
+        )
+        self.assertFalse(committed.replayed)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            connection.row_factory = sqlite3.Row
+            intent = connection.execute(
+                "SELECT * FROM validator_intents WHERE validator_intent_id = ?",
+                (request.validator_intent_id,),
+            ).fetchone()
+            body = json.loads(intent["body_json"])
+            self.assertEqual(body["launch_binding_version"], 1)
+            self.assertEqual(body["launch_snapshot_id"], ready.snapshot_id)
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM capability_redemptions "
+                    "WHERE command_id = 'validator-command-1'"
+                ).fetchone()[0],
+                1,
+            )
+        self.oracle.allowed_head = committed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_zero_gate_plan_still_requires_ready_snapshot_and_unclaimed_grant(
+        self,
+    ) -> None:
+        request, grant, snapshot = self._prepare_canonical_gated_validator_material(
+            gate_ids=()
+        )
+        self.assertEqual(snapshot.gate_vector, ())
+        committed = self.store.commit_validator_intent(
+            request, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.assertFalse(committed.replayed)
+        self.oracle.allowed_head = committed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_unclaimed_form_rejects_a_preclaimed_grant(self) -> None:
+        request, grant, snapshot = (
+            self._prepare_canonical_gated_validator_material()
+        )
+        self.authority.claim_validator(*grant.__dict__.values())
+        before = self.store.table_counts()
+        with self.assertRaisesRegex(DispatchDenied, "already claimed"):
+            self.store.commit_validator_intent(
+                request, None, self.authority, grant_id=grant.grant_id,
+                scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+            )
+        after = self.store.table_counts()
+        for table in (
+            "validator_intents", "permission_uses", "budget_reservations",
+            "capability_redemptions", "events",
+        ):
+            self.assertEqual(after[table], before[table], table)
+
+    def test_t27_rejects_tampered_or_stale_snapshot_before_claim(self) -> None:
+        request, grant, snapshot = (
+            self._prepare_canonical_gated_validator_material()
+        )
+        with self.assertRaisesRegex(DispatchDenied, "untrusted"):
+            self.store.commit_validator_intent(
+                request, None, self.authority, grant_id=grant.grant_id,
+                scope_digest=grant.scope_digest,
+                launch_snapshot=replace(snapshot, selected_check_order=99),
+            )
+        with self.assertRaisesRegex(DispatchDenied, "untrusted"):
+            self.authority.verify_validation_launch_snapshot(
+                replace(snapshot, gate_vector=(("gate-1",),))
+            )
+        self._record_gate_fact("FAIL", sequence=2, suffix="2")
+        before = self.store.table_counts()
+        with self.assertRaisesRegex(DispatchDenied, "stale or rebound"):
+            self.store.commit_validator_intent(
+                request, None, self.authority, grant_id=grant.grant_id,
+                scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+            )
+        after = self.store.table_counts()
+        for table in (
+            "validator_intents", "permission_uses", "budget_reservations",
+            "capability_redemptions", "events",
+        ):
+            self.assertEqual(after[table], before[table], table)
+        self.authority.claim_validator(*grant.__dict__.values())
+
+    def test_t27_writer_rollback_releases_transactional_validator_claim(
+        self,
+    ) -> None:
+        request, grant, snapshot = (
+            self._prepare_canonical_gated_validator_material()
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.commit_validator_intent(
+                request, None, self.authority, grant_id=grant.grant_id,
+                scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+                failure_hook=raise_at(
+                    "after_validator_intent_writes_before_commit"
+                ),
+            )
+        self.assertEqual(self.store.table_counts()["validator_intents"], 0)
+        committed = self.store.commit_validator_intent(
+            request, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.assertFalse(committed.replayed)
+        self.oracle.allowed_head = committed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_lost_ack_recovers_only_from_durable_intent(self) -> None:
+        request, grant, snapshot = (
+            self._prepare_canonical_gated_validator_material()
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.commit_validator_intent(
+                request, None, self.authority, grant_id=grant.grant_id,
+                scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+                failure_hook=raise_at(
+                    "after_validator_intent_commit_before_acknowledgement"
+                ),
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            event_hash = connection.execute(
+                "SELECT event_hash FROM validator_intents WHERE "
+                "validator_intent_id = ?", (request.validator_intent_id,),
+            ).fetchone()[0]
+        self.oracle.allowed_head = event_hash
+        replay = self.store.commit_validator_intent(
+            request, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, event_hash)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_contact_durably_disables_changed_launch_prerequisite(self) -> None:
+        observation = self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        self._record_gate_fact("PASS")
+        ready = self.store.prepare_validation_launch(
+            self._launch_request(), self.authority
+        )
+        self.oracle.allowed_head = ready.event_hash
+        snapshot = self.store.load_validation_launch_snapshot(
+            ready.snapshot_id, self.authority
+        )
+        containment_json, containment_digest = validator_containment(
+            "input-1", "1"
+        )
+        grant = SyntheticValidatorGrant(
+            "validator-grant-1", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-1",
+            "read-only-scope-1", containment_digest,
+        )
+        self.authority.register_validator(grant)
+        request = ValidatorIntentRequest(
+            "validator-intent-1", "validator-command-1", "validator-event-1",
+            "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+            "observation-1", observation.event_hash, "revision-1", "check-1",
+            "input-1", "validator-attempt-1", "validator-permission-1",
+            "validator-reservation-1", "validator-budget-policy-1",
+            1, 2, 10, None, containment_json,
+        )
+        committed = self.store.commit_validator_intent(
+            request, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        self._record_gate_fact("FAIL", sequence=2, suffix="2")
+        capability = self.authority.claim_or_recover_validator(
+            *grant.__dict__.values()
+        )
+        with self.assertRaisesRegex(DispatchDenied, "durably disabled"):
+            self.store._contact_committed_validator(
+                request,
+                capability,
+                committed,
+                self.store._adapter_target_digest("repo-1", "VALIDATOR"),
+                self.authority,
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone(),
+                (
+                    "BLOCKED",
+                    "validator-initiation-disabled:validator-intent-1",
+                ),
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT reason_code FROM dispatch_fences WHERE fence_id = "
+                    "'validator-initiation-disabled:validator-intent-1'"
+                ).fetchone()[0],
+                "VALIDATION_LAUNCH_PREREQUISITE_CHANGED",
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM adapter_contacts WHERE source_id = "
+                    "'VALIDATOR:validator-intent-1'"
+                ).fetchone()[0],
+                0,
+            )
+            disabled_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        self.oracle.allowed_head = disabled_head
+        self.store.load_verified("repo-1", authority=self.authority)
+        settlement_request = BudgetSettlementRequest(
+            "validator-nondispatch-1",
+            "validator-reservation-1",
+            "",
+            BudgetDisposition.RELEASED,
+            None,
+            "validator-nondispatch-evidence-1",
+            "NONDISPATCH_PROVEN",
+            non_dispatch_proven=True,
+            zero_liability_proven=True,
+            all_obligations_settled=True,
+            repository_id="repo-1",
+            run_id="run-1",
+            item_id="item-1",
+            logical_effect_id="effect-1",
+            attempt_id="validator-attempt-1",
+        )
+        settled = self.store._settle_budget(
+            settlement_request,
+            self.authority.issue_settlement_proof(
+                "validator-nondispatch-proof-1", settlement_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT status FROM validator_intents WHERE "
+                    "validator_intent_id = 'validator-intent-1'"
+                ).fetchone()[0],
+                "SETTLED",
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                    "'validator-initiation-disabled:validator-intent-1'"
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone(),
+                (
+                    "BLOCKED",
+                    "validator-initiation-disabled:validator-intent-1",
+                ),
+            )
+        self.store.load_verified("repo-1", authority=self.authority)
+        self._record_gate_fact("PASS", sequence=3, suffix="3")
+        resumed = self.store.resolve_validation_launch_blocker(
+            ValidationLaunchResolutionRequest(
+                "disabled-resolution-1", "disabled-resolution-command-1",
+                "disabled-resolution-event-1",
+                "validator-initiation-disabled:validator-intent-1",
+                "repo-1", "run-1", "item-1", "effect-1", "plan-1",
+                "revision-1", "check-1",
+            ),
+            self.authority,
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = resumed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t27_contact_replay_wins_over_later_gate_change(self) -> None:
+        request, capability, committed = (
+            self._prepare_canonical_gated_validator_intent()
+        )
+        target_digest = self.store._adapter_target_digest(
+            "repo-1", "VALIDATOR"
+        )
+        self.store._contact_committed_validator(
+            request, capability, committed, target_digest, self.authority
+        )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            contact_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        self.oracle.allowed_head = contact_head
+        self._record_gate_fact("FAIL", sequence=2, suffix="2")
+        self.store._contact_committed_validator(
+            request, capability, committed, target_digest, self.authority
+        )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM adapter_contacts WHERE source_id = "
+                    "'VALIDATOR:validator-intent-1'"
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM events WHERE event_kind = "
+                    "'VALIDATOR_INITIATION_DISABLED'"
+                ).fetchone()[0],
+                0,
+            )
+
+    def test_gate_fact_rejects_signed_sequence_rollback(self) -> None:
+        self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        self._record_gate_fact("PASS", sequence=2, suffix="2")
+        fact = self.authority.issue_validation_gate_fact(
+            fact_id="gate-fact-old", source_id="synthetic-gate:gate-1",
+            source_sequence=1, action="ATTEST_VALIDATION_GATE",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1", check_id="check-1",
+            gate_id="gate-1", status="FAIL", evidence_digest="old-evidence",
+            observed_at="2026-09-21T23:59:59.000000Z",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "rolled back"):
+            self.store.record_validation_gate_fact(
+                ValidationGateFactRequest(
+                    "gate-command-old", "gate-event-old", "repo-1", "run-1",
+                    "item-1", "effect-1", "plan-1", "revision-1",
+                    fact.fact_id,
+                ),
+                fact,
+                self.authority,
+            )
 
     def test_t27_launches_dependency_order_not_lexical_check_order(self) -> None:
         observation = self._record_effect_observation(
@@ -8386,6 +9195,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     f"{column_name}"
                 )
             connection.execute("DROP TABLE plan_dependencies")
+            connection.execute("DROP TABLE validation_launch_decisions")
+            connection.execute("DROP TABLE validation_check_routes")
+            connection.execute("DROP TABLE validation_launch_evaluations")
+            connection.execute("DROP TABLE validation_gate_facts")
             connection.execute("DROP TABLE validation_check_launch_gates")
             connection.execute("DROP TABLE validation_check_dependencies")
             connection.execute("DROP TABLE validation_check_bindings")
@@ -8420,6 +9233,16 @@ class SQLiteStateStoreTests(unittest.TestCase):
         migrated.load_verified("repo-1")
         connection = sqlite3.connect(self.database_path)
         try:
+            for table in (
+                "validation_gate_facts",
+                "validation_launch_evaluations",
+                "validation_launch_decisions",
+                "validation_check_routes",
+            ):
+                self.assertIsNotNone(connection.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                    "name = ?", (table,),
+                ).fetchone())
             run_columns = {
                 row[1] for row in connection.execute("PRAGMA table_info(runs)")
             }
@@ -13198,7 +14021,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.authority,
         )
         self.oracle.allowed_head = stopped.event_hash
-        with self.assertRaisesRegex(DispatchDenied, "durable VALIDATING"):
+        with self.assertRaisesRegex(DispatchDenied, "VALIDATING plan"):
             self.store.commit_validator_intent(
                 intent, validator_capability, self.authority
             )
@@ -13808,7 +14631,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         connection = sqlite3.connect(self.database_path)
         try:
             event_hash = connection.execute(
-                "SELECT event_hash FROM validation_applications WHERE application_id = 'application-1'"
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
             ).fetchone()[0]
         finally:
             connection.close()
@@ -13821,6 +14644,145 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self.store.table_counts()["validation_applications"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
         self.store.load_verified("repo-1")
+
+    def test_t11_pass_atomically_routes_exact_next_check_blocker(self) -> None:
+        parent = self._record_effect_observation(
+            check_ids=("check-1", "check-2"),
+            check_dependency_ids=(
+                ("check-1", ()),
+                ("check-2", ("check-1",)),
+            ),
+            check_launch_gate_ids=(
+                ("check-1", ()),
+                ("check-2", ("gate-2",)),
+            ),
+        )
+        self._record_validator_result_for(parent, suffix="1", verdict="PASS")
+        applied = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+                "validator-observation-1",
+            )
+        )
+        self.assertEqual(applied.resulting_state, LifecycleState.BLOCKED)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            application_hash = connection.execute(
+                "SELECT event_hash FROM validation_applications WHERE "
+                "application_id = 'application-1'"
+            ).fetchone()[0]
+            route_body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM validation_check_routes WHERE "
+                    "source_application_id = 'application-1'"
+                ).fetchone()[0]
+            )
+            self.assertEqual(
+                route_body["snapshot"]["dependency_vector"],
+                [["check-1", "PASS", "application-1", application_hash]],
+            )
+            self.assertEqual(
+                route_body["snapshot"]["gate_vector"],
+                [["gate-2", "UNKNOWN", "MISSING", "MISSING", "MISSING"]],
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor, head_hash "
+                    "FROM runs WHERE run_id = 'run-1'"
+                ).fetchone(),
+                (
+                    "BLOCKED",
+                    "validation-route:check-2:validation-route:application-1",
+                    applied.event_hash,
+                ),
+            )
+        self.oracle.allowed_head = applied.event_hash
+        replay = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+                "validator-observation-1",
+            )
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay, replace(applied, replayed=True))
+        self.store.load_verified("repo-1", authority=self.authority)
+        self._record_gate_fact(
+            "PASS", suffix="route-2", gate_id="gate-2", check_id="check-2"
+        )
+        resolved = self.store.resolve_validation_launch_blocker(
+            ValidationLaunchResolutionRequest(
+                "route-resolution-1", "route-resolution-command-1",
+                "route-resolution-event-1", "validation-route:application-1",
+                "repo-1", "run-1", "item-1", "effect-1", "plan-1",
+                "revision-1", "check-2",
+            ),
+            self.authority,
+        )
+        self.assertEqual(resolved.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = resolved.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t11_ready_route_requires_fresh_t27_snapshot_then_commits(self) -> None:
+        parent = self._record_effect_observation(
+            check_ids=("check-1", "check-2"),
+            check_dependency_ids=(
+                ("check-1", ()),
+                ("check-2", ("check-1",)),
+            ),
+        )
+        self._record_validator_result_for(parent, suffix="1", verdict="PASS")
+        routed = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-1", "apply-command-1", "apply-event-1",
+                "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                "check-1", "validator-attempt-1",
+                "validator-observation-1",
+            )
+        )
+        self.assertEqual(routed.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = routed.event_hash
+        launch_request = ValidationLaunchRequest(
+            "launch-evaluation-2", "launch-decision-2",
+            "launch-command-2", "launch-event-2",
+            "launch-decision-event-2", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", "check-2",
+        )
+        ready = self.store.prepare_validation_launch(
+            launch_request, self.authority
+        )
+        self.assertTrue(ready.ready)
+        self.oracle.allowed_head = ready.event_hash
+        snapshot = self.store.load_validation_launch_snapshot(
+            ready.snapshot_id, self.authority
+        )
+        containment_json, containment_digest = validator_containment(
+            "input-1", "2"
+        )
+        grant = SyntheticValidatorGrant(
+            "validator-grant-2", "repo-1", "effect-1", "revision-1",
+            "check-2", "input-1", "validator-attempt-2",
+            "read-only-scope-2", containment_digest,
+        )
+        self.authority.register_validator(grant)
+        intent = ValidatorIntentRequest(
+            "validator-intent-2", "validator-command-2",
+            "validator-event-2", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1", "observation-1", parent.event_hash, "revision-1",
+            "check-2", "input-1", "validator-attempt-2",
+            "validator-permission-2", "validator-reservation-2",
+            "validator-budget-policy-1", 1, 2, 10, None,
+            containment_json,
+        )
+        committed = self.store.commit_validator_intent(
+            intent, None, self.authority, grant_id=grant.grant_id,
+            scope_digest=grant.scope_digest, launch_snapshot=snapshot,
+        )
+        self.assertFalse(committed.replayed)
+        self.oracle.allowed_head = committed.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def test_c05_last_pass_blocks_for_distinct_finalization(self) -> None:
         self._record_validator_result(only_check=True)
@@ -16307,7 +17269,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             replace(observation, event_hash=parent_event_hash),
             suffix="2", check_id="check-1",
         )
-        with self.assertRaisesRegex(DispatchDenied, "durable VALIDATING"):
+        with self.assertRaisesRegex(DispatchDenied, "VALIDATING plan"):
             self.store.commit_validator_intent(
                 missing_request, missing_capability, self.authority
             )
@@ -16343,7 +17305,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         request, capability = self._validator_intent(
             effect_observation, suffix="3", check_id="check-1"
         )
-        with self.assertRaisesRegex(DispatchDenied, "already passed"):
+        with self.assertRaisesRegex(DispatchDenied, "dependency-ordered"):
             self.store.commit_validator_intent(
                 request, capability, self.authority
             )
@@ -19229,7 +20191,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
     def test_t27_denies_check_not_declared_by_accepted_plan(self) -> None:
         observation = self._record_effect_observation()
         request, capability = self._validator_intent(observation, suffix="3")
-        with self.assertRaisesRegex(DispatchDenied, "not declared"):
+        with self.assertRaisesRegex(DispatchDenied, "dependency-ordered"):
             self.store.commit_validator_intent(request, capability, self.authority)
         self.assertEqual(self.store.table_counts()["validator_intents"], 0)
 
@@ -19241,7 +20203,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.oracle.allowed_head = first.event_hash
         second_request, second_capability = self._validator_intent(
-            observation, suffix="2"
+            observation, suffix="2", check_id="check-1"
         )
         with self.assertRaisesRegex(DispatchDenied, "active"):
             self.store.commit_validator_intent(

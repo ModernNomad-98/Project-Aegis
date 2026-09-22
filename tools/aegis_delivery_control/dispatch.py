@@ -29,6 +29,7 @@ from .authority import (
     SyntheticSourceControlSettlementEvidence,
     SyntheticSourceCapability,
     SyntheticAdoptionReadinessEvidence,
+    SyntheticValidationLaunchSnapshot,
     SyntheticValidatorCapability,
 )
 from .contracts import (
@@ -72,6 +73,8 @@ from .contracts import (
     ValidatorObservationCommand,
     ValidatorObservationRequest,
     ProvenNonexecutionIntentRequest,
+    parse_validator_containment_spec,
+    validator_containment_digest,
 )
 from .engine import TRANSITIONS, TransitionEngine
 from .storage import FailureHook, SQLiteStateReader, SQLiteStateStore
@@ -774,15 +777,18 @@ class SyntheticValidationCoordinator:
         self._adapter = adapter
         self._store._bind_classification_authority(authority)
 
-    def launch(
+    def launch_prepared(
         self,
         intent: ValidatorIntentRequest,
-        capability: SyntheticValidatorCapability,
-        request: SyntheticValidatorRequest,
         *,
+        grant_id: str,
+        scope_digest: str,
+        launch_snapshot: SyntheticValidationLaunchSnapshot,
+        request: SyntheticValidatorRequest,
         usage_units: int | None = 0,
         lose_result: bool = False,
     ) -> SyntheticValidationReceipt:
+        """Launch from an unclaimed grant and a durable READY snapshot."""
         if not self._adapter.is_canonical_for(intent.repository_id):
             raise DispatchDenied(
                 "synthetic validator is not the canonical repository root"
@@ -799,16 +805,54 @@ class SyntheticValidationCoordinator:
             LifecycleState.VALIDATING,
             TRANSITIONS["T27"].required_guards,
         )
-        self._authority.verify_validator_issued(capability)
-        self._adapter._validate_request_binding(capability, request, intent)
-        validate_synthetic_validator_containment(capability, request, intent)
+        containment_digest = validator_containment_digest(
+            parse_validator_containment_spec(intent.containment_spec_json)
+        )
+        if (
+            request.repository_id,
+            request.logical_effect_id,
+            request.revision_digest,
+            request.check_id,
+            request.input_digest,
+            request.validator_attempt_id,
+            request.scope_digest,
+            request.containment_digest,
+        ) != (
+            intent.repository_id,
+            intent.logical_effect_id,
+            intent.revision_digest,
+            intent.check_id,
+            intent.input_digest,
+            intent.validator_attempt_id,
+            scope_digest,
+            containment_digest,
+        ):
+            raise DispatchDenied(
+                "synthetic validator request does not bind the durable intent"
+            )
         commit = self._store.commit_validator_intent(
-            intent, capability, self._authority
+            intent,
+            None,
+            self._authority,
+            grant_id=grant_id,
+            scope_digest=scope_digest,
+            launch_snapshot=launch_snapshot,
         )
         if commit.replayed:
             raise DispatchDenied(
                 "synthetic validator capability was already redeemed"
             )
+        capability = self._authority.claim_or_recover_validator(
+            grant_id,
+            intent.repository_id,
+            intent.logical_effect_id,
+            intent.revision_digest,
+            intent.check_id,
+            intent.input_digest,
+            intent.validator_attempt_id,
+            scope_digest,
+            containment_digest,
+        )
         result = self._adapter._execute_committed(
             capability,
             request,

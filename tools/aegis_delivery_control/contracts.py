@@ -1117,6 +1117,86 @@ class ValidatorIntentRequest:
 
 
 @dataclass(frozen=True)
+class ValidationGateFactRequest:
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    fact_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError("validation gate fact identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidationLaunchRequest:
+    evaluation_id: str
+    decision_id: str
+    command_id: str
+    event_id: str
+    decision_event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError("validation launch identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidationLaunchReceipt:
+    evaluation_id: str
+    decision_id: str | None
+    snapshot_id: str
+    snapshot_digest: str
+    ready: bool
+    event_id: str
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class ValidationLaunchResolutionRequest:
+    resolution_id: str
+    command_id: str
+    event_id: str
+    decision_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "validation launch resolution identifiers must be non-empty"
+            )
+
+
+@dataclass(frozen=True)
 class ValidatorObservationRequest:
     observation_id: str
     command_id: str

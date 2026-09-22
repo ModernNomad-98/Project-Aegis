@@ -63,7 +63,7 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
 CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) but is
-still an unaccepted draft checkpoint. The full local package suite passed 446
+still an unaccepted draft checkpoint. The full local package suite passed 465
 tests on 2026-09-22; all three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
@@ -85,12 +85,15 @@ stacked-pause replay and proof-prefix-safe migration. T22 terminal-restart
 reporting is now independently accepted with strictly read-only main/auxiliary
 verification and typed stale/unverified status. T28 with F01 is next in the
 documented order.
-The independently accepted selected-check foundation now binds explicit v2
+The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
-order, reconstructs projections strictly, and denies legacy or declared-gate
-T27 launch without evidence. Signed launch-readiness evidence and the related
-T11/T16/T17 routes remain open; this foundation does not promote T11, T27, F11
-or F17.
+order and reconstructs projections strictly. The current increment adds signed
+monotonic gate facts and complete launch snapshots, universal no-preclaim T27,
+atomic T11 next-check routing, exact T16 route recovery and contact-time stale
+launch disablement with T25/T16 continuation. T11, T27, F11 and F17 remain
+`UNVERIFIED` pending committed exact-head trace review even though the corrected
+increment received independent `APPROVE`; broader T17 and the
+remaining canonical gaps still block merge.
 Remaining exact
 T/C/F backlog and final review gates still
 block merge, so the

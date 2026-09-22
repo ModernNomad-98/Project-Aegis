@@ -314,13 +314,19 @@ The selected-check foundation is independently accepted. New plan acceptance
 uses authenticated v2 declarations for every check's dependencies and launch
 gates, binds a deterministic topological order, persists normalized projections
 and reconstructs them from event history. Legacy v1 plans fail closed at T27,
-dependency order is enforced at validator intent, and any declared launch gate
-currently denies before intent, permission use, budget reservation, redemption
-or adapter contact. The focused falsification first failed on the absent
-`check_order`; the corrected tests and complete 446-test package pass. Signed
-complete gate vectors, pre-claim launch-readiness decisions, T11 next-check
-routing, T16 unblocking, T17 refreshed cursors and atomic contact rechecks remain
-open. T11, T27, F11 and F17 therefore remain `UNVERIFIED`.
+dependency order is enforced before validator intent, and authenticated
+monotonic PASS/FAIL/UNKNOWN gate facts feed a signed complete launch snapshot.
+Every v2 launch, including a zero-gate plan, now requires that current READY
+snapshot and acquires an unclaimed validator grant inside the writer operation;
+the production preclaimed entrypoints were removed. T11 atomically records an
+exact signed next-check route, T16 resolves its bound blocked route after fresh
+prerequisites pass, and contact rechecks either replay an existing contact or
+durably disable stale initiation for exact T25 settlement and later T16 resume.
+Crash rollback, lost acknowledgement, stale/rebound evidence, migration and
+strict projection recovery are covered, and the corrected increment received
+independent `APPROVE` with no findings. T11, T27, F11 and F17 remain
+`UNVERIFIED` pending committed exact-head trace review; the broader T17 and
+remaining canonical gaps are still open.
 
 ## Validation
 

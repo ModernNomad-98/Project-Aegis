@@ -1,6 +1,6 @@
 # CP-WP-002 Codex continuation handoff
 
-Date: 2026-09-21
+Date: 2026-09-22
 Repository: `ModernNomad-98/Project-Aegis` (Role A source library)
 Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
@@ -8,7 +8,7 @@ Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Latest pushed checkpoint: `a9dbeab2b2e28f2914df32dd55558a2d051517e6`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - FILESYSTEM AND CORRECTED TRACE MAP `APPROVE`; CANONICAL ROW GAPS AND POSIX RUNTIME EVIDENCE OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - AUTHENTICATED SELECTED-CHECK LAUNCH `APPROVE`; CANONICAL ROW GAPS AND POSIX RUNTIME EVIDENCE OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -1605,8 +1605,12 @@ Current durable order after the independently approved exact-head trace map is:
 5. Cross-family F05/F06/F13/F20 complete and independently accepted.
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
 7. T01-T03/C01 trusted-readiness/dependency-provenance local correction is independently approved; retain aggregate rows as `UNVERIFIED` pending committed exact-head trace.
-8. Correct selected-check dependency/launch-gate binding spanning T11/T27/F11/F17, then independently review it.
-9. Continue through the remaining exact gaps recorded in the matrix: T24/F09, T17/F18, T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
+8. Selected-check dependency/launch-gate binding, authenticated gate snapshots,
+   universal no-preclaim T27, T11 routing, T16 recovery and contact-time
+   recheck are complete and independently approved; retain aggregate rows as
+   `UNVERIFIED` until committed exact-head trace review.
+9. Continue through the remaining exact gaps recorded in the matrix: T24/F09,
+   T17/F18, T07/T08/T14, T18/T19, T25/F19, F02, F03 and F04a.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
 11. Commit and push only reviewed checkpoints. Keep PR #99 draft and do not merge until every canonical row and final gate is independently accepted.
 
@@ -1735,9 +1739,12 @@ path-swap protection is independently accepted on Windows; POSIX runtime remains
 corrected exact-head trace map has independent `APPROVE`. The local
 T01-T03/C01 trusted-readiness/dependency-provenance correction is independently
 approved but remains aggregate-`UNVERIFIED` until committed exact-head trace
-review. The selected-check v2 binding foundation is independently accepted,
-including topological dependency order, strict projections, v1 T27 refusal and
-declared-gate no-mutation denial. The next implementation gate is authenticated
-complete launch-readiness evidence and the remaining T11/T27/F11/F17 routes in
-Stage 20. Keep PR #99 draft until every remaining backlog
+review. The selected-check v2 binding and authenticated-launch increment is
+independently accepted, including topological dependency order, strict
+projections, signed PASS/FAIL/UNKNOWN facts and complete snapshots, universal
+no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
+replay/recheck and T25/T16 post-disable continuation. Aggregate
+T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
+The next implementation gate is T24/F09, followed by T17/F18 and the remaining
+order in Section 10. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

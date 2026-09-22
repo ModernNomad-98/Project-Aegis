@@ -1134,6 +1134,49 @@ atomic contact recheck with T25 nonexecution settlement. PR #99 remains draft
 and not merge-ready. No real authority, adapter, provider, deployment or later
 work package is authorized by this foundation.
 
+### 5.25 Authenticated selected-check launch and routing checkpoint
+
+The next selected-check increment implements the previously open launch and
+routing foundation without promoting a canonical row. Issuer-authenticated,
+monotonic PASS/FAIL/UNKNOWN gate facts are append-only inputs to a signed
+complete dependency/gate snapshot. A missing, FAIL or UNKNOWN prerequisite
+records an exact BLOCKED decision before intent, permission use, budget
+reservation, capability redemption or adapter contact. A READY decision is
+bound to the accepted v2 plan, selected check, complete predecessor head vector
+and current event head.
+
+T27 now accepts only an unclaimed validator grant plus that durable READY
+snapshot, including for zero-gate plans. Capability acquisition and intent
+commit share the writer operation; rollback releases the synthetic claim, while
+only a durable command outcome permits lost-ack claim recovery. The old
+production preclaimed coordinator entrypoint and caller-controlled compatibility
+escape were removed. A final contact check replays an existing contact before
+testing current gates; otherwise changed prerequisites atomically record
+`VALIDATOR_INITIATION_DISABLED`, a scoped fence and an exact launch decision.
+T25 nonexecution settlement clears that fence without erasing its cursor, and
+fresh prerequisites can then resume only through the bound T16 resolution.
+
+T11 PASS now atomically appends a signed next-check route in accepted
+topological order. READY routes retain VALIDATING; unmet dependency/gate vectors
+record BLOCKED and can be resolved through exact T16 after all current values
+pass. A routed READY check still performs a fresh T27 launch evaluation rather
+than treating its older route snapshot as spend authority. Replay returns the
+same final route event identity. Strict recovery reconstructs gate facts,
+launch evaluations/decisions and check routes from authenticated history, and
+the schema migration creates all four projections for pre-increment stores.
+
+Focused coverage includes zero-gate launch, disguised preclaim denial,
+transaction rollback and lost acknowledgement, signed UNKNOWN/FAIL and missing
+facts, stale/rebound snapshots, contact replay versus later gate changes,
+post-disable T25/T16 continuation, T11 READY/BLOCKED routes, exact T16 recovery,
+malformed signed-snapshot denial and old-schema migration. The corrected
+implementation received independent `APPROVE` with no findings. T11, T27, F11 and
+F17 remain `UNVERIFIED` until the corrected accumulated exact-head trace is
+reviewed and accepted. T17 proof-free terminal entry, T24/F09, T07/T08/T14,
+T18/T19, T25/F19, F02/F03/F04a, POSIX runtime evidence and final
+architecture/security/QA gates remain open. PR #99 remains draft and no real
+authority, adapter, provider, release or deployment is authorized.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

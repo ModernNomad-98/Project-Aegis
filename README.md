@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 446-test package suite passes locally; all three stop findings, T13
+its full 465-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -653,10 +653,15 @@ reparse-point and path-swap protection now also has independent `APPROVE` on
 Windows: checked OS-known-folder and descendant handles, stable lock identity,
 sidecar/hardlink denial and actual junction/replacement probes fail closed.
 POSIX runtime evidence remains `UNVERIFIED`.
-The selected-check foundation now has independently accepted v2 per-check
-dependency/launch-gate declarations, deterministic topological order, strict
-projection recovery and fail-closed legacy/gated T27 behavior. Signed launch
-readiness plus T11/T16/T17 routing remain open, so no complete row is promoted.
+The selected-check foundation has independently accepted v2 per-check
+dependency/launch-gate declarations, deterministic topological order and strict
+projection recovery. The current increment adds authenticated monotonic gate
+facts, signed complete READY snapshots, universal no-preclaim T27 commit,
+atomic T11 next-check routing, exact T16 launch-route recovery, and contact-time
+stale-prerequisite disablement with T25/T16 continuation; the corrected
+increment received independent `APPROVE`. No complete row is
+promoted until committed exact-head trace review; broader T17 and the remaining
+canonical gaps stay open.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA
 review gates remain. Read the

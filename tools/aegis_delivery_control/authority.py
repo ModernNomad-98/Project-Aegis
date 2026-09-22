@@ -394,6 +394,52 @@ class SyntheticOperationReadinessEvidence:
 
 
 @dataclass(frozen=True)
+class SyntheticValidationGateFact:
+    fact_id: str
+    source_id: str
+    source_sequence: int
+    action: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+    gate_id: str
+    status: str
+    evidence_digest: str
+    observed_at: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticValidationLaunchSnapshot:
+    snapshot_id: str
+    action: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    plan_event_hash: str
+    acceptance_payload_digest: str
+    plan_binding_version: int
+    check_binding_digest: str
+    selected_check_id: str
+    selected_check_order: int
+    dependency_vector: tuple[tuple[str, str, str, str], ...]
+    gate_vector: tuple[tuple[str, str, str, str, str], ...]
+    predecessor_catalog_head: str
+    predecessor_head_vector: tuple[tuple[str, str], ...]
+    observed_at: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
 class SyntheticLegacyDescriptorBindingEvidence:
     evidence_id: str
     repository_id: str
@@ -753,6 +799,188 @@ class SyntheticAuthority:
             or not hmac.compare_digest(evidence.issuer_mac, expected)
         ):
             raise DispatchDenied("synthetic operation readiness is untrusted")
+
+    def issue_validation_gate_fact(
+        self, **fields: object
+    ) -> SyntheticValidationGateFact:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(SyntheticValidationGateFact.__dataclass_fields__) - {
+            "issuer_mac"
+        }
+        if set(fields) != required:
+            raise ValueError("synthetic validation gate fields are incomplete")
+        if fields.get("action") != "ATTEST_VALIDATION_GATE":
+            raise ValueError("synthetic validation gate action is invalid")
+        if fields.get("status") not in {"PASS", "FAIL", "UNKNOWN"}:
+            raise ValueError("synthetic validation gate status is invalid")
+        if (
+            type(fields.get("source_sequence")) is not int
+            or int(fields["source_sequence"]) <= 0
+        ):
+            raise ValueError("synthetic validation gate sequence is invalid")
+        if fields.get("source_id") != f"synthetic-gate:{fields.get('gate_id')}":
+            raise ValueError("synthetic validation gate source is noncanonical")
+        self._parse_utc(str(fields["observed_at"]), field="observed_at")
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for key, value in fields.items()
+            if key != "source_sequence"
+        ):
+            raise ValueError("synthetic validation gate fields must be non-empty")
+        return SyntheticValidationGateFact(
+            **fields,
+            issuer_mac=self._mac("SYNTHETIC_VALIDATION_GATE_FACT", **fields),
+        )
+
+    def verify_validation_gate_fact(
+        self, fact: SyntheticValidationGateFact
+    ) -> None:
+        fields = {
+            key: value for key, value in fact.__dict__.items()
+            if key != "issuer_mac"
+        }
+        expected = self._mac("SYNTHETIC_VALIDATION_GATE_FACT", **fields)
+        if (
+            fact.issuer_fingerprint != self.issuer_fingerprint
+            or fact.action != "ATTEST_VALIDATION_GATE"
+            or fact.status not in {"PASS", "FAIL", "UNKNOWN"}
+            or type(fact.source_sequence) is not int
+            or fact.source_sequence <= 0
+            or fact.source_id != f"synthetic-gate:{fact.gate_id}"
+            or not hmac.compare_digest(fact.issuer_mac, expected)
+        ):
+            raise DispatchDenied("synthetic validation gate fact is untrusted")
+
+    def issue_validation_launch_snapshot(
+        self, **fields: object
+    ) -> SyntheticValidationLaunchSnapshot:
+        fields = dict(fields)
+        fields["issuer_fingerprint"] = self.issuer_fingerprint
+        required = set(
+            SyntheticValidationLaunchSnapshot.__dataclass_fields__
+        ) - {"issuer_mac"}
+        if set(fields) != required:
+            raise ValueError("synthetic validation launch fields are incomplete")
+        if fields.get("action") != "EVALUATE_VALIDATION_LAUNCH":
+            raise ValueError("synthetic validation launch action is invalid")
+        if (
+            type(fields.get("plan_binding_version")) is not int
+            or int(fields["plan_binding_version"]) != 2
+            or type(fields.get("selected_check_order")) is not int
+            or int(fields["selected_check_order"]) < 0
+        ):
+            raise ValueError("synthetic validation launch binding is invalid")
+        self._parse_utc(str(fields["observed_at"]), field="observed_at")
+        dependency_vector = fields.get("dependency_vector")
+        gate_vector = fields.get("gate_vector")
+        head_vector = fields.get("predecessor_head_vector")
+        if (
+            not isinstance(dependency_vector, tuple)
+            or any(
+                not isinstance(row, tuple) or len(row) != 4
+                or any(not isinstance(value, str) or not value for value in row)
+                for row in dependency_vector
+            )
+            or dependency_vector != tuple(sorted(dependency_vector))
+            or len({row[0] for row in dependency_vector})
+            != len(dependency_vector)
+        ):
+            raise ValueError("synthetic validation dependency vector is invalid")
+        if (
+            not isinstance(gate_vector, tuple)
+            or any(
+                not isinstance(row, tuple) or len(row) != 5
+                or any(not isinstance(value, str) or not value for value in row)
+                or row[1] not in {"PASS", "FAIL", "UNKNOWN"}
+                for row in gate_vector
+            )
+            or gate_vector != tuple(sorted(gate_vector))
+            or len({row[0] for row in gate_vector}) != len(gate_vector)
+        ):
+            raise ValueError("synthetic validation gate vector is invalid")
+        if (
+            not isinstance(head_vector, tuple)
+            or any(
+                not isinstance(row, tuple) or len(row) != 2
+                or any(not isinstance(value, str) or not value for value in row)
+                for row in head_vector
+            )
+            or head_vector != tuple(sorted(head_vector))
+            or len({row[0] for row in head_vector}) != len(head_vector)
+        ):
+            raise ValueError("synthetic validation head vector is invalid")
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for key, value in fields.items()
+            if key not in {
+                "plan_binding_version", "selected_check_order",
+                "dependency_vector", "gate_vector", "predecessor_head_vector",
+            }
+        ):
+            raise ValueError("synthetic validation launch fields must be non-empty")
+        return SyntheticValidationLaunchSnapshot(
+            **fields,
+            issuer_mac=self._mac(
+                "SYNTHETIC_VALIDATION_LAUNCH_SNAPSHOT", **fields
+            ),
+        )
+
+    def verify_validation_launch_snapshot(
+        self, snapshot: SyntheticValidationLaunchSnapshot
+    ) -> None:
+        fields = {
+            key: value for key, value in snapshot.__dict__.items()
+            if key != "issuer_mac"
+        }
+        try:
+            expected = self._mac(
+                "SYNTHETIC_VALIDATION_LAUNCH_SNAPSHOT", **fields
+            )
+            valid = (
+                snapshot.issuer_fingerprint == self.issuer_fingerprint
+                and snapshot.action == "EVALUATE_VALIDATION_LAUNCH"
+                and type(snapshot.plan_binding_version) is int
+                and snapshot.plan_binding_version == 2
+                and type(snapshot.selected_check_order) is int
+                and snapshot.selected_check_order >= 0
+                and isinstance(snapshot.dependency_vector, tuple)
+                and all(
+                    isinstance(row, tuple) and len(row) == 4
+                    and all(isinstance(value, str) and value for value in row)
+                    for row in snapshot.dependency_vector
+                )
+                and snapshot.dependency_vector
+                == tuple(sorted(snapshot.dependency_vector))
+                and len({row[0] for row in snapshot.dependency_vector})
+                == len(snapshot.dependency_vector)
+                and isinstance(snapshot.gate_vector, tuple)
+                and all(
+                    isinstance(row, tuple) and len(row) == 5
+                    and all(isinstance(value, str) and value for value in row)
+                    and row[1] in {"PASS", "FAIL", "UNKNOWN"}
+                    for row in snapshot.gate_vector
+                )
+                and snapshot.gate_vector == tuple(sorted(snapshot.gate_vector))
+                and len({row[0] for row in snapshot.gate_vector})
+                == len(snapshot.gate_vector)
+                and isinstance(snapshot.predecessor_head_vector, tuple)
+                and all(
+                    isinstance(row, tuple) and len(row) == 2
+                    and all(isinstance(value, str) and value for value in row)
+                    for row in snapshot.predecessor_head_vector
+                )
+                and snapshot.predecessor_head_vector
+                == tuple(sorted(snapshot.predecessor_head_vector))
+                and len({row[0] for row in snapshot.predecessor_head_vector})
+                == len(snapshot.predecessor_head_vector)
+                and isinstance(snapshot.issuer_mac, str)
+                and hmac.compare_digest(snapshot.issuer_mac, expected)
+            )
+        except (IndexError, TypeError, ValueError):
+            valid = False
+        if not valid:
+            raise DispatchDenied("synthetic validation launch snapshot is untrusted")
 
     def issue_legacy_descriptor_binding_evidence(
         self, **fields: str
@@ -1525,6 +1753,84 @@ class SyntheticAuthority:
             self._validator_claims[grant_id] = capability
             return capability
 
+    def claim_or_recover_validator(
+        self,
+        grant_id: str,
+        repository_id: str,
+        logical_effect_id: str,
+        revision_digest: str,
+        check_id: str,
+        input_digest: str,
+        validator_attempt_id: str,
+        scope_digest: str,
+        containment_digest: str,
+    ) -> SyntheticValidatorCapability:
+        """Claim once, or recover the exact deterministic claim after lost ack."""
+        requested = (
+            repository_id,
+            logical_effect_id,
+            revision_digest,
+            check_id,
+            input_digest,
+            validator_attempt_id,
+            scope_digest,
+            containment_digest,
+        )
+        with self._lock:
+            grant = self._validator_grants.get(grant_id)
+            if grant is None:
+                raise DispatchDenied("synthetic validator grant is unavailable")
+            expected = tuple(grant.__dict__.values())[1:]
+            if requested != expected:
+                raise DispatchDenied("synthetic validator grant binding mismatch")
+            issued = self._validator_claims.get(grant_id)
+            if issued is not None:
+                if tuple(issued.__dict__.values())[2:-1] != requested:
+                    raise DispatchDenied(
+                        "synthetic validator grant was claimed with another binding"
+                    )
+                return issued
+            claim_id = hashlib.sha256(
+                "\0".join(("VALIDATOR", grant_id, *requested)).encode("utf-8")
+            ).hexdigest()
+            capability = SyntheticValidatorCapability(
+                claim_id,
+                grant_id,
+                *requested,
+                self._mac(
+                    "VALIDATOR_CAPABILITY",
+                    claim_id=claim_id,
+                    grant_id=grant_id,
+                    repository_id=repository_id,
+                    logical_effect_id=logical_effect_id,
+                    revision_digest=revision_digest,
+                    check_id=check_id,
+                    input_digest=input_digest,
+                    validator_attempt_id=validator_attempt_id,
+                    scope_digest=scope_digest,
+                    containment_digest=containment_digest,
+                ),
+            )
+            self._validator_claims[grant_id] = capability
+            return capability
+
+    def release_uncommitted_validator_claim(
+        self, capability: SyntheticValidatorCapability
+    ) -> None:
+        """Undo this exact in-memory claim after its writer transaction rolls back."""
+        self.verify_validator_evidence(capability)
+        with self._lock:
+            issued = self._validator_claims.get(capability.grant_id)
+            if issued != capability:
+                raise DispatchDenied(
+                    "synthetic validator claim rollback does not bind the grant"
+                )
+            if capability.claim_id in self._committed_claims:
+                raise DispatchDenied(
+                    "committed synthetic validator claim cannot be released"
+                )
+            del self._validator_claims[capability.grant_id]
+
     def verify_validator_issued(
         self, capability: SyntheticValidatorCapability
     ) -> None:
@@ -1566,6 +1872,14 @@ class SyntheticAuthority:
         self, capability: SyntheticValidatorCapability
     ) -> None:
         self.verify_validator_for_intent(capability)
+        with self._lock:
+            self._committed_claims.add(capability.claim_id)
+
+    def mark_or_recover_validator_intent_committed(
+        self, capability: SyntheticValidatorCapability
+    ) -> None:
+        """Restore the in-memory committed marker from a durable replay."""
+        self.verify_validator_issued(capability)
         with self._lock:
             self._committed_claims.add(capability.claim_id)
 

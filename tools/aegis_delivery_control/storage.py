@@ -42,6 +42,8 @@ from .authority import (
     SyntheticAdoptionReadinessEvidence,
     SyntheticLegacyDescriptorBindingEvidence,
     SyntheticValidationRecoveryAttestation,
+    SyntheticValidationGateFact,
+    SyntheticValidationLaunchSnapshot,
     SyntheticValidatorCessationAttestation,
     SyntheticValidatorCapability,
 )
@@ -108,6 +110,10 @@ from .contracts import (
     TerminalValidationSettlementReceipt,
     TerminalValidationSettlementRequest,
     ValidationApplicationRequest,
+    ValidationGateFactRequest,
+    ValidationLaunchReceipt,
+    ValidationLaunchRequest,
+    ValidationLaunchResolutionRequest,
     ValidationRecoveryReceipt,
     ValidationRecoveryRequest,
     ValidatorCessationReceipt,
@@ -225,10 +231,15 @@ _EVENT_KINDS = frozenset(
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
+        "VALIDATION_CHECK_ROUTED",
+        "VALIDATION_GATE_FACT_RECORDED",
+        "VALIDATION_LAUNCH_BLOCKED",
+        "VALIDATION_LAUNCH_EVALUATED",
         "VALIDATION_PAUSE_CHECKPOINTED",
         "VALIDATION_PAUSE_REQUESTED",
         "VALIDATION_PASSED",
         "VALIDATOR_CESSATION_RECORDED",
+        "VALIDATOR_INITIATION_DISABLED",
         "VALIDATOR_INTENT_COMMITTED",
         "VALIDATOR_OBSERVATION_RECORDED",
     }
@@ -260,10 +271,15 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "STOP_ESCALATED",
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
+        "VALIDATION_CHECK_ROUTED",
+        "VALIDATION_GATE_FACT_RECORDED",
+        "VALIDATION_LAUNCH_BLOCKED",
+        "VALIDATION_LAUNCH_EVALUATED",
         "VALIDATION_PAUSE_CHECKPOINTED",
         "VALIDATION_PAUSE_REQUESTED",
         "VALIDATION_PASSED",
         "VALIDATOR_CESSATION_RECORDED",
+        "VALIDATOR_INITIATION_DISABLED",
         "VALIDATOR_INTENT_COMMITTED",
         "VALIDATOR_OBSERVATION_RECORDED",
     }
@@ -417,8 +433,25 @@ _LIFECYCLE_ROUTES: Mapping[
         }
     ),
     "VALIDATION_FAILED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "VALIDATION_CHECK_ROUTED": frozenset(
+        {
+            (LifecycleState.VALIDATING, LifecycleState.VALIDATING),
+            (LifecycleState.VALIDATING, LifecycleState.BLOCKED),
+        }
+    ),
+    "VALIDATION_GATE_FACT_RECORDED": _PRESERVE_LIFECYCLE_ROUTES,
+    "VALIDATION_LAUNCH_EVALUATED": _PRESERVE_LIFECYCLE_ROUTES,
+    "VALIDATION_LAUNCH_BLOCKED": frozenset(
+        {
+            (LifecycleState.VALIDATING, LifecycleState.BLOCKED),
+            (LifecycleState.BLOCKED, LifecycleState.BLOCKED),
+        }
+    ),
     "VALIDATION_PASSED": _SPECIALIZED_LIFECYCLE_ROUTES,
     "VALIDATOR_CESSATION_RECORDED": _PRESERVE_LIFECYCLE_ROUTES,
+    "VALIDATOR_INITIATION_DISABLED": frozenset(
+        {(LifecycleState.VALIDATING, LifecycleState.BLOCKED)}
+    ),
     "VALIDATOR_INTENT_COMMITTED": frozenset(
         {(LifecycleState.VALIDATING, LifecycleState.VALIDATING)}
     ),
@@ -579,7 +612,11 @@ def _derive_nonexecution_route(
     resulting_state = current_state
     continuation_cursor = current_cursor
     recovery_cursor = (
-        LifecycleState.VALIDATING.value
+        current_cursor
+        if validator_nonexecution
+        and isinstance(current_cursor, str)
+        and current_cursor.startswith("validator-initiation-disabled:")
+        else LifecycleState.VALIDATING.value
         if validator_nonexecution
         else f"operation-recovery:{attempt_id}"
     )
@@ -1058,6 +1095,93 @@ class SQLiteStateStore:
                 check_id TEXT NOT NULL,
                 gate_id TEXT NOT NULL,
                 PRIMARY KEY (plan_id, check_id, gate_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_gate_facts (
+                fact_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                gate_id TEXT NOT NULL,
+                source_id TEXT NOT NULL,
+                source_sequence INTEGER NOT NULL CHECK (source_sequence > 0),
+                status TEXT NOT NULL CHECK (status IN ('PASS', 'FAIL', 'UNKNOWN')),
+                observed_at TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL,
+                issuer_fingerprint TEXT NOT NULL,
+                fact_digest TEXT NOT NULL UNIQUE,
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
+                UNIQUE (
+                    repository_id, run_id, plan_id, check_id, gate_id,
+                    source_id, source_sequence
+                ),
+                FOREIGN KEY (plan_id, check_id, gate_id)
+                    REFERENCES validation_check_launch_gates(plan_id, check_id, gate_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_launch_evaluations (
+                evaluation_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL UNIQUE,
+                snapshot_digest TEXT NOT NULL UNIQUE,
+                ready INTEGER NOT NULL CHECK (ready IN (0, 1)),
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_launch_decisions (
+                decision_id TEXT PRIMARY KEY,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                evaluation_id TEXT NOT NULL UNIQUE
+                    REFERENCES validation_launch_evaluations(evaluation_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL,
+                snapshot_digest TEXT NOT NULL,
+                cursor TEXT NOT NULL,
+                resolved INTEGER NOT NULL DEFAULT 0 CHECK (resolved IN (0, 1)),
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_routes (
+                route_id TEXT PRIMARY KEY,
+                source_application_id TEXT NOT NULL UNIQUE
+                    REFERENCES validation_applications(application_id),
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL UNIQUE,
+                snapshot_digest TEXT NOT NULL UNIQUE,
+                ready INTEGER NOT NULL CHECK (ready IN (0, 1)),
+                cursor TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
                 FOREIGN KEY (plan_id, check_id)
                     REFERENCES validation_check_bindings(plan_id, check_id)
             );
@@ -5045,6 +5169,93 @@ class SQLiteStateStore:
                 check_id TEXT NOT NULL,
                 gate_id TEXT NOT NULL,
                 PRIMARY KEY (plan_id, check_id, gate_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_gate_facts (
+                fact_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                gate_id TEXT NOT NULL,
+                source_id TEXT NOT NULL,
+                source_sequence INTEGER NOT NULL CHECK (source_sequence > 0),
+                status TEXT NOT NULL CHECK (status IN ('PASS', 'FAIL', 'UNKNOWN')),
+                observed_at TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL,
+                issuer_fingerprint TEXT NOT NULL,
+                fact_digest TEXT NOT NULL UNIQUE,
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
+                UNIQUE (
+                    repository_id, run_id, plan_id, check_id, gate_id,
+                    source_id, source_sequence
+                ),
+                FOREIGN KEY (plan_id, check_id, gate_id)
+                    REFERENCES validation_check_launch_gates(plan_id, check_id, gate_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_launch_evaluations (
+                evaluation_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL UNIQUE,
+                snapshot_digest TEXT NOT NULL UNIQUE,
+                ready INTEGER NOT NULL CHECK (ready IN (0, 1)),
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_launch_decisions (
+                decision_id TEXT PRIMARY KEY,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                evaluation_id TEXT NOT NULL UNIQUE
+                    REFERENCES validation_launch_evaluations(evaluation_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL,
+                snapshot_digest TEXT NOT NULL,
+                cursor TEXT NOT NULL,
+                resolved INTEGER NOT NULL DEFAULT 0 CHECK (resolved IN (0, 1)),
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_routes (
+                route_id TEXT PRIMARY KEY,
+                source_application_id TEXT NOT NULL UNIQUE
+                    REFERENCES validation_applications(application_id),
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL UNIQUE,
+                snapshot_digest TEXT NOT NULL UNIQUE,
+                ready INTEGER NOT NULL CHECK (ready IN (0, 1)),
+                cursor TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                body_json TEXT NOT NULL,
                 FOREIGN KEY (plan_id, check_id)
                     REFERENCES validation_check_bindings(plan_id, check_id)
             );
@@ -9228,9 +9439,10 @@ class SQLiteStateStore:
                         "BLOCKER", "FAILED_FINAL_APPLICATION"
                     )
             elif event_kind == "BLOCKER_RESOLVED":
-                recoverable_applications.discard(
-                    str(body["failed_application_id"])
-                )
+                if body.get("recovery_kind") is None:
+                    recoverable_applications.discard(
+                        str(body["failed_application_id"])
+                    )
             elif event_kind in {
                 "RESUME_ACCEPTED", "RECONCILIATION_PAUSE_RESUMED",
             } and relevant(body):
@@ -9734,6 +9946,121 @@ class SQLiteStateStore:
         ) as error:
             raise StorageIntegrityError(
                 "validation recovery attestation or semantics are invalid"
+            ) from error
+
+    def _validate_validation_launch_recovery_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            ValidationLaunchResolutionRequest.__dataclass_fields__
+        ) | {
+            "payload_digest", "recovery_kind",
+            "source_decision_event_hash", "source_snapshot_id",
+            "source_snapshot_digest", "check_order", "dependency_vector",
+            "gate_vector", "event_kind", "transition_id",
+            "lifecycle_from", "lifecycle_to", "continuation_cursor",
+            "previous_event_hash", "schema_version", "sequence",
+            "writer_epoch",
+        }
+        try:
+            if set(body) != expected_fields:
+                raise ValueError("validation launch recovery schema is invalid")
+            request = ValidationLaunchResolutionRequest(
+                **{
+                    key: body[key]
+                    for key in ValidationLaunchResolutionRequest.__dataclass_fields__
+                }
+            )
+            request.validate()
+            decision = connection.execute(
+                "SELECT decision.*, event.sequence AS source_sequence FROM "
+                "validation_launch_decisions AS decision JOIN events AS event "
+                "ON event.event_id = decision.event_id WHERE "
+                "decision.decision_id = ?",
+                (request.decision_id,),
+            ).fetchone()
+            if decision is None:
+                decision = connection.execute(
+                    "SELECT route.*, event.sequence AS source_sequence FROM "
+                    "validation_check_routes AS route JOIN events AS event "
+                    "ON event.event_id = route.event_id WHERE route.route_id = ? "
+                    "AND route.ready = 0",
+                    (request.decision_id,),
+                ).fetchone()
+            dependencies = tuple(
+                tuple(row) for row in body["dependency_vector"]
+            )
+            gates = tuple(tuple(row) for row in body["gate_vector"])
+            if decision is None or (
+                decision["event_hash"], decision["snapshot_id"],
+                decision["snapshot_digest"], decision["repository_id"],
+                decision["run_id"], decision["item_id"],
+                decision["logical_effect_id"], decision["plan_id"],
+                decision["revision_digest"], decision["check_id"],
+            ) != (
+                body["source_decision_event_hash"],
+                body["source_snapshot_id"], body["source_snapshot_digest"],
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, request.plan_id,
+                request.revision_digest, request.check_id,
+            ) or int(decision["source_sequence"]) >= int(body["sequence"]):
+                raise ValueError(
+                    "validation launch recovery decision binding is invalid"
+                )
+            if (
+                body["payload_digest"] != self._event_hash(request.__dict__)
+                or body["recovery_kind"] != "VALIDATION_LAUNCH"
+                or body["event_kind"] != "BLOCKER_RESOLVED"
+                or body["transition_id"] != "T16"
+                or predecessor_state is not LifecycleState.BLOCKED
+                or predecessor_cursor != decision["cursor"]
+                or body["lifecycle_from"] != LifecycleState.BLOCKED.value
+                or body["lifecycle_to"] != LifecycleState.VALIDATING.value
+                or body["continuation_cursor"]
+                != f"validation-check:{request.check_id}"
+                or any(row[1] != "PASS" for row in dependencies)
+                or any(row[1] != "PASS" for row in gates)
+            ):
+                raise ValueError("validation launch recovery route is invalid")
+            for check_id, status, application_id, application_hash in dependencies:
+                application = connection.execute(
+                    "SELECT application.check_id, application.verdict, "
+                    "event.sequence FROM validation_applications AS application "
+                    "JOIN events AS event ON event.event_id = application.event_id "
+                    "WHERE application.application_id = ? AND "
+                    "application.event_hash = ?",
+                    (application_id, application_hash),
+                ).fetchone()
+                if application is None or (
+                    application["check_id"], application["verdict"], status
+                ) != (check_id, "PASS", "PASS") or int(
+                    application["sequence"]
+                ) >= int(body["sequence"]):
+                    raise ValueError(
+                        "validation launch recovery dependency is invalid"
+                    )
+            for gate_id, status, fact_id, fact_hash, evidence_digest in gates:
+                fact = connection.execute(
+                    "SELECT fact.gate_id, fact.status, fact.evidence_digest, "
+                    "event.sequence FROM validation_gate_facts AS fact JOIN "
+                    "events AS event ON event.event_id = fact.event_id WHERE "
+                    "fact.fact_id = ? AND fact.event_hash = ?",
+                    (fact_id, fact_hash),
+                ).fetchone()
+                if fact is None or (
+                    fact["gate_id"], fact["status"],
+                    fact["evidence_digest"], status
+                ) != (gate_id, "PASS", evidence_digest, "PASS") or int(
+                    fact["sequence"]
+                ) >= int(body["sequence"]):
+                    raise ValueError("validation launch recovery gate is invalid")
+        except (KeyError, TypeError, ValueError) as error:
+            raise StorageIntegrityError(
+                "validation launch recovery semantics are invalid"
             ) from error
 
     def _validate_operation_recovery_event(
@@ -10365,6 +10692,20 @@ class SQLiteStateStore:
                 operation_slot_current=operation_slot_current,
                 accounting_closed=accounting_closed,
             )
+            route = connection.execute(
+                "SELECT check_id FROM validation_check_routes WHERE "
+                "source_application_id = ?",
+                (request.application_id,),
+            ).fetchone()
+            if route is not None:
+                if (
+                    str(observation["verdict"]) != "PASS"
+                    or not another_pending
+                ):
+                    raise ValueError(
+                        "validation route does not follow a pending PASS"
+                    )
+                expected_cursor = f"validation-check:{route['check_id']}"
             if (
                 predecessor_state is not LifecycleState.VALIDATING
                 or body["lifecycle_from"] != LifecycleState.VALIDATING.value
@@ -21131,47 +21472,6 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "validator contact lost its T16 recovery binding"
                         )
-                run = connection.execute(
-                    "SELECT lifecycle_state FROM runs WHERE run_id = ? AND "
-                    "repository_id = ? AND item_id = ?",
-                    (request.run_id, request.repository_id, request.item_id),
-                ).fetchone()
-                if run is None or run["lifecycle_state"] != LifecycleState.VALIDATING.value:
-                    raise DispatchDenied("validator contact requires VALIDATING state")
-                reservation = connection.execute(
-                    "SELECT disposition, settlement_head_hash FROM "
-                    "budget_reservations WHERE reservation_id = ?",
-                    (request.reservation_id,),
-                ).fetchone()
-                if reservation is None or (
-                    reservation["disposition"] != BudgetDisposition.RESERVED.value
-                    or reservation["settlement_head_hash"]
-                ):
-                    raise DispatchDenied(
-                        "validator contact requires an unsettled reservation"
-                    )
-                slot = connection.execute(
-                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
-                    (request.repository_id,),
-                ).fetchone()
-                if slot is None or (
-                    slot["run_id"], slot["logical_effect_id"],
-                    slot["attempt_id"], int(slot["generation"]),
-                ) != (
-                    request.run_id, request.logical_effect_id,
-                    request.parent_attempt_id, parent_slot_generation,
-                ):
-                    raise DispatchDenied("validator contact does not bind the slot")
-                if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
-                    "(item_id IS NULL AND logical_effect_id IS NULL) OR "
-                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
-                    (
-                        request.repository_id, request.item_id,
-                        request.logical_effect_id,
-                    ),
-                ).fetchone() is not None:
-                    raise DispatchDenied("validator contact has an active dispatch fence")
                 existing_contact = connection.execute(
                     "SELECT * FROM adapter_contacts WHERE source_id = ?",
                     (f"VALIDATOR:{request.validator_intent_id}",),
@@ -21223,6 +21523,128 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return
+                run = connection.execute(
+                    "SELECT lifecycle_state FROM runs WHERE run_id = ? AND "
+                    "repository_id = ? AND item_id = ?",
+                    (request.run_id, request.repository_id, request.item_id),
+                ).fetchone()
+                if run is None or run["lifecycle_state"] != LifecycleState.VALIDATING.value:
+                    raise DispatchDenied("validator contact requires VALIDATING state")
+                reservation = connection.execute(
+                    "SELECT disposition, settlement_head_hash FROM "
+                    "budget_reservations WHERE reservation_id = ?",
+                    (request.reservation_id,),
+                ).fetchone()
+                if reservation is None or (
+                    reservation["disposition"] != BudgetDisposition.RESERVED.value
+                    or reservation["settlement_head_hash"]
+                ):
+                    raise DispatchDenied(
+                        "validator contact requires an unsettled reservation"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.parent_attempt_id, parent_slot_generation,
+                ):
+                    raise DispatchDenied("validator contact does not bind the slot")
+                launch_fields = {
+                    "launch_binding_version",
+                    "launch_snapshot_id",
+                    "launch_snapshot_digest",
+                }
+                if launch_fields.issubset(validator_body):
+                    evaluation = connection.execute(
+                        "SELECT * FROM validation_launch_evaluations WHERE "
+                        "snapshot_id = ? AND snapshot_digest = ? AND ready = 1",
+                        (
+                            validator_body["launch_snapshot_id"],
+                            validator_body["launch_snapshot_digest"],
+                        ),
+                    ).fetchone()
+                    plan = connection.execute(
+                        "SELECT * FROM validation_plans WHERE run_id = ?",
+                        (request.run_id,),
+                    ).fetchone()
+                    launch_stale = evaluation is None or plan is None
+                    if not launch_stale:
+                        snapshot_fields = dict(
+                            json.loads(evaluation["body_json"])["snapshot"]
+                        )
+                        snapshot_fields["dependency_vector"] = tuple(
+                            tuple(row)
+                            for row in snapshot_fields["dependency_vector"]
+                        )
+                        snapshot_fields["gate_vector"] = tuple(
+                            tuple(row) for row in snapshot_fields["gate_vector"]
+                        )
+                        snapshot_fields["predecessor_head_vector"] = tuple(
+                            tuple(row)
+                            for row in snapshot_fields[
+                                "predecessor_head_vector"
+                            ]
+                        )
+                        snapshot = SyntheticValidationLaunchSnapshot(
+                            **snapshot_fields
+                        )
+                        authority.verify_validation_launch_snapshot(snapshot)
+                        current_order, current_dependencies, current_gates = (
+                            self._validation_launch_vectors(
+                                connection,
+                                str(plan["plan_id"]),
+                                request.check_id,
+                            )
+                        )
+                        launch_stale = (
+                            snapshot.plan_event_hash != plan["event_hash"]
+                            or snapshot.acceptance_payload_digest
+                            != plan["acceptance_payload_digest"]
+                            or snapshot.check_binding_digest
+                            != self._validation_check_binding_digest(
+                                connection, str(plan["plan_id"])
+                            )
+                            or snapshot.selected_check_order != current_order
+                            or snapshot.dependency_vector
+                            != current_dependencies
+                            or snapshot.gate_vector != current_gates
+                            or any(
+                                row[1] != "PASS"
+                                for row in current_dependencies
+                            )
+                            or any(row[1] != "PASS" for row in current_gates)
+                        )
+                    if launch_stale:
+                        self._record_validator_initiation_disabled(
+                            connection,
+                            request,
+                            validator_body,
+                            reason_code="VALIDATION_LAUNCH_PREREQUISITE_CHANGED",
+                        )
+                        connection.commit()
+                        raise DispatchDenied(
+                            "validator initiation was durably disabled because "
+                            "launch prerequisites changed"
+                        )
+                elif launch_fields.intersection(validator_body):
+                    raise StorageIntegrityError(
+                        "validator launch snapshot binding is partial"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
+                    "(item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.item_id,
+                        request.logical_effect_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied("validator contact has an active dispatch fence")
                 if containment_verifier is not None:
                     verified_digest = containment_verifier()
                     if verified_digest != durable_containment_digest:
@@ -21270,6 +21692,123 @@ class SQLiteStateStore:
             except BaseException:
                 connection.rollback()
                 raise
+
+    def _record_validator_initiation_disabled(
+        self,
+        connection: sqlite3.Connection,
+        request: ValidatorIntentRequest,
+        validator_body: Mapping[str, object],
+        *,
+        reason_code: str,
+    ) -> None:
+        fence_id = (
+            f"validator-initiation-disabled:{request.validator_intent_id}"
+        )
+        if connection.execute(
+            "SELECT 1 FROM dispatch_fences WHERE fence_id = ?", (fence_id,)
+        ).fetchone() is not None:
+            raise DispatchDenied("validator initiation is already disabled")
+        run = connection.execute(
+            "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+            (request.run_id, request.repository_id),
+        ).fetchone()
+        if run is None or run["lifecycle_state"] != LifecycleState.VALIDATING.value:
+            raise DispatchDenied(
+                "validator initiation disable requires VALIDATING state"
+            )
+        command_id = fence_id
+        event_id = f"event:{fence_id}"
+        sequence = int(run["head_sequence"]) + 1
+        writer_epoch = int(
+            connection.execute(
+                "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                "WHERE repository_id = ?", (request.repository_id,),
+            ).fetchone()[0]
+        )
+        body = {
+            "command_id": command_id,
+            "event_id": event_id,
+            "event_kind": "VALIDATOR_INITIATION_DISABLED",
+            "fence_id": fence_id,
+            "item_id": request.item_id,
+            "lifecycle_from": LifecycleState.VALIDATING.value,
+            "lifecycle_to": LifecycleState.BLOCKED.value,
+            "logical_effect_id": request.logical_effect_id,
+            "revision_digest": request.revision_digest,
+            "check_id": request.check_id,
+            "reason_code": reason_code,
+            "repository_id": request.repository_id,
+            "run_id": request.run_id,
+            "schema_version": 1,
+            "sequence": sequence,
+            "validator_intent_event_hash": validator_body["event_hash"]
+            if "event_hash" in validator_body
+            else self._event_hash(dict(validator_body)),
+            "validator_intent_id": request.validator_intent_id,
+            "validator_attempt_id": request.validator_attempt_id,
+            "launch_snapshot_id": validator_body["launch_snapshot_id"],
+            "launch_snapshot_digest": validator_body[
+                "launch_snapshot_digest"
+            ],
+            "continuation_cursor": fence_id,
+            "previous_event_hash": run["head_hash"],
+            "writer_epoch": writer_epoch,
+        }
+        event_hash = self._event_hash(body)
+        body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        connection.execute(
+            "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+            (
+                event_id, request.repository_id, request.run_id,
+                request.item_id, sequence, command_id, writer_epoch,
+                "VALIDATOR_INITIATION_DISABLED", run["head_hash"],
+                event_hash, body_json,
+            ),
+        )
+        connection.execute(
+            "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                fence_id, request.repository_id, request.item_id,
+                request.logical_effect_id, reason_code, event_id,
+            ),
+        )
+        evaluation = connection.execute(
+            "SELECT evaluation_id, plan_id, snapshot_id, snapshot_digest "
+            "FROM validation_launch_evaluations WHERE snapshot_id = ? AND "
+            "snapshot_digest = ? AND ready = 1",
+            (
+                validator_body["launch_snapshot_id"],
+                validator_body["launch_snapshot_digest"],
+            ),
+        ).fetchone()
+        if evaluation is None:
+            raise StorageIntegrityError(
+                "validator initiation disable lost its launch evaluation"
+            )
+        connection.execute(
+            "INSERT INTO validation_launch_decisions VALUES ("
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+            (
+                fence_id, event_id, evaluation["evaluation_id"],
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, evaluation["plan_id"],
+                request.revision_digest, request.check_id,
+                evaluation["snapshot_id"], evaluation["snapshot_digest"],
+                fence_id, event_hash, body_json,
+            ),
+        )
+        connection.execute(
+            "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+            "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+            (
+                LifecycleState.BLOCKED.value, fence_id, sequence,
+                event_hash, request.run_id,
+            ),
+        )
+        connection.execute(
+            "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+            (event_hash, request.repository_id),
+        )
 
     def _claim_adapter_contact(
         self,
@@ -22247,6 +22786,38 @@ class SQLiteStateStore:
                             "continuation_cursor": continuation_cursor,
                         }
                     )
+                    if (
+                        validator_nonexecution is not None
+                        and not nonexecution_contradiction
+                        and not uncertainty
+                        and request.all_obligations_settled
+                        and current_state not in {
+                            LifecycleState.FAILED_FINAL,
+                            LifecycleState.STOPPED,
+                        }
+                    ):
+                        initiation_fence_id = (
+                            "validator-initiation-disabled:"
+                            f"{validator_nonexecution['validator_intent_id']}"
+                        )
+                        initiation_fence = connection.execute(
+                            "SELECT reason_code FROM dispatch_fences WHERE "
+                            "fence_id = ? AND repository_id = ?",
+                            (
+                                initiation_fence_id,
+                                reservation["repository_id"],
+                            ),
+                        ).fetchone()
+                        if initiation_fence is not None:
+                            if initiation_fence["reason_code"] != (
+                                "VALIDATION_LAUNCH_PREREQUISITE_CHANGED"
+                            ):
+                                raise StorageIntegrityError(
+                                    "validator initiation fence was rebound"
+                                )
+                            settlement_body[
+                                "resolved_validator_initiation_fence_id"
+                            ] = initiation_fence_id
                 settlement_hash = self._event_hash(settlement_body)
                 body_json = json.dumps(
                     settlement_body, sort_keys=True, separators=(",", ":")
@@ -22295,6 +22866,23 @@ class SQLiteStateStore:
                         "WHERE validator_intent_id = ?",
                         (validator_nonexecution["validator_intent_id"],),
                     )
+                    resolved_initiation_fence_id = settlement_body.get(
+                        "resolved_validator_initiation_fence_id"
+                    )
+                    if resolved_initiation_fence_id is not None and (
+                        connection.execute(
+                            "DELETE FROM dispatch_fences WHERE fence_id = ? "
+                            "AND repository_id = ? AND reason_code = ?",
+                            (
+                                resolved_initiation_fence_id,
+                                reservation["repository_id"],
+                                "VALIDATION_LAUNCH_PREREQUISITE_CHANGED",
+                            ),
+                        ).rowcount != 1
+                    ):
+                        raise StorageIntegrityError(
+                            "validator initiation fence was not cleared"
+                        )
                 connection.execute(
                     "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
@@ -23327,6 +23915,598 @@ class SQLiteStateStore:
             replayed=False,
         )
 
+    @staticmethod
+    def _validation_check_binding_digest(
+        connection: sqlite3.Connection, plan_id: str
+    ) -> str:
+        order = [
+            (str(row["check_id"]), int(row["check_order"]))
+            for row in connection.execute(
+                "SELECT check_id, check_order FROM validation_check_bindings "
+                "WHERE plan_id = ? ORDER BY check_order",
+                (plan_id,),
+            )
+        ]
+        dependencies = [
+            (str(row["check_id"]), str(row["dependency_check_id"]))
+            for row in connection.execute(
+                "SELECT check_id, dependency_check_id FROM "
+                "validation_check_dependencies WHERE plan_id = ? "
+                "ORDER BY check_id, dependency_check_id",
+                (plan_id,),
+            )
+        ]
+        gates = [
+            (str(row["check_id"]), str(row["gate_id"]))
+            for row in connection.execute(
+                "SELECT check_id, gate_id FROM validation_check_launch_gates "
+                "WHERE plan_id = ? ORDER BY check_id, gate_id",
+                (plan_id,),
+            )
+        ]
+        return SQLiteStateStore._event_hash(
+            {"order": order, "dependencies": dependencies, "gates": gates}
+        )
+
+    def record_validation_gate_fact(
+        self,
+        request: ValidationGateFactRequest,
+        fact: SyntheticValidationGateFact,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> CommitReceipt:
+        request.validate()
+        authority.verify_validation_gate_fact(fact)
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("validation gate fact targets another repository")
+        if (
+            request.fact_id,
+            request.repository_id,
+            request.run_id,
+            request.item_id,
+            request.logical_effect_id,
+            request.plan_id,
+            request.revision_digest,
+        ) != (
+            fact.fact_id,
+            fact.repository_id,
+            fact.run_id,
+            fact.item_id,
+            fact.logical_effect_id,
+            fact.plan_id,
+            fact.revision_digest,
+        ):
+            raise DispatchDenied("validation gate fact context is rebound")
+        payload_digest = self._event_hash(request.__dict__)
+        fact_digest = self._event_hash(fact.__dict__)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    stored = connection.execute(
+                        "SELECT fact_digest FROM validation_gate_facts "
+                        "WHERE command_id = ?", (request.command_id,)
+                    ).fetchone()
+                    if stored is None or stored["fact_digest"] != fact_digest:
+                        raise StorageIntegrityError(
+                            "validation gate replay lost its signed fact"
+                        )
+                    connection.rollback()
+                    return CommitReceipt(
+                        request.command_id, str(prior["event_id"]),
+                        int(prior["sequence"]), str(prior["event_hash"]), True,
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND run_id = ?",
+                    (request.plan_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                ):
+                    raise DispatchDenied(
+                        "validation gate fact does not bind the accepted plan"
+                    )
+                if plan["plan_acceptance_binding_version"] != 2:
+                    raise DispatchDenied(
+                        "validation gate facts require per-check plan bindings"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM validation_check_launch_gates WHERE "
+                    "plan_id = ? AND check_id = ? AND gate_id = ?",
+                    (request.plan_id, fact.check_id, fact.gate_id),
+                ).fetchone() is None:
+                    raise DispatchDenied("validation gate was not declared")
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                latest = connection.execute(
+                    "SELECT * FROM validation_gate_facts WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ? AND check_id = ? AND "
+                    "gate_id = ? AND source_id = ? ORDER BY source_sequence DESC "
+                    "LIMIT 1",
+                    (
+                        request.repository_id, request.run_id, request.plan_id,
+                        fact.check_id, fact.gate_id, fact.source_id,
+                    ),
+                ).fetchone()
+                if latest is not None and (
+                    fact.source_sequence <= int(latest["source_sequence"])
+                    or fact.observed_at <= str(latest["observed_at"])
+                ):
+                    raise DispatchDenied(
+                        "validation gate fact sequence or time rolled back"
+                    )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,)
+                ).fetchone()[0])
+                body = {
+                    **request.__dict__, "fact": fact.__dict__,
+                    "fact_digest": fact_digest, "payload_digest": payload_digest,
+                    "event_kind": "VALIDATION_GATE_FACT_RECORDED",
+                    "lifecycle_from": run["lifecycle_state"],
+                    "lifecycle_to": run["lifecycle_state"],
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1, "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, "VALIDATION_GATE_FACT_RECORDED",
+                        run["head_hash"], event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO validation_gate_facts VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        fact.fact_id, request.command_id, request.event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.plan_id,
+                        request.revision_digest, fact.check_id, fact.gate_id,
+                        fact.source_id, fact.source_sequence, fact.status,
+                        fact.observed_at, fact.evidence_digest,
+                        fact.issuer_fingerprint, fact_digest, event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_validation_gate_fact_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_gate_fact_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return CommitReceipt(
+            request.command_id, request.event_id, sequence, event_hash, False
+        )
+
+    def _validation_launch_vectors(
+        self,
+        connection: sqlite3.Connection,
+        plan_id: str,
+        check_id: str,
+    ) -> tuple[
+        int,
+        tuple[tuple[str, str, str, str], ...],
+        tuple[tuple[str, str, str, str, str], ...],
+    ]:
+        binding = connection.execute(
+            "SELECT check_order FROM validation_check_bindings WHERE "
+            "plan_id = ? AND check_id = ?", (plan_id, check_id)
+        ).fetchone()
+        if binding is None:
+            raise DispatchDenied("validation check has no accepted binding")
+        dependencies: list[tuple[str, str, str, str]] = []
+        for row in connection.execute(
+            "SELECT dependency_check_id FROM validation_check_dependencies "
+            "WHERE plan_id = ? AND check_id = ? ORDER BY dependency_check_id",
+            (plan_id, check_id),
+        ):
+            application = self._latest_validation_application(
+                connection, plan_id, str(row["dependency_check_id"])
+            )
+            if application is None or application["verdict"] != "PASS":
+                dependencies.append(
+                    (str(row["dependency_check_id"]), "UNMET", "MISSING", "MISSING")
+                )
+            else:
+                dependencies.append(
+                    (
+                        str(row["dependency_check_id"]), "PASS",
+                        str(application["application_id"]),
+                        str(application["event_hash"]),
+                    )
+                )
+        gates: list[tuple[str, str, str, str, str]] = []
+        for row in connection.execute(
+            "SELECT gate_id FROM validation_check_launch_gates WHERE "
+            "plan_id = ? AND check_id = ? ORDER BY gate_id", (plan_id, check_id)
+        ):
+            fact = connection.execute(
+                "SELECT * FROM validation_gate_facts WHERE plan_id = ? AND "
+                "check_id = ? AND gate_id = ? ORDER BY source_sequence DESC LIMIT 1",
+                (plan_id, check_id, row["gate_id"]),
+            ).fetchone()
+            gates.append(
+                (
+                    str(row["gate_id"]),
+                    "UNKNOWN" if fact is None else str(fact["status"]),
+                    "MISSING" if fact is None else str(fact["fact_id"]),
+                    "MISSING" if fact is None else str(fact["event_hash"]),
+                    "MISSING" if fact is None else str(fact["evidence_digest"]),
+                )
+            )
+        return int(binding["check_order"]), tuple(dependencies), tuple(gates)
+
+    def prepare_validation_launch(
+        self,
+        request: ValidationLaunchRequest,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ValidationLaunchReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("validation launch targets another repository")
+        payload_digest = self._event_hash(request.__dict__)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "command ID was reused with a different payload"
+                        )
+                    evaluation = connection.execute(
+                        "SELECT * FROM validation_launch_evaluations WHERE "
+                        "command_id = ?", (request.command_id,)
+                    ).fetchone()
+                    if evaluation is None:
+                        raise StorageIntegrityError(
+                            "validation launch replay lost its evaluation"
+                        )
+                    decision = connection.execute(
+                        "SELECT decision_id FROM validation_launch_decisions "
+                        "WHERE evaluation_id = ?", (request.evaluation_id,)
+                    ).fetchone()
+                    connection.rollback()
+                    return ValidationLaunchReceipt(
+                        request.evaluation_id,
+                        None if decision is None else str(decision["decision_id"]),
+                        str(evaluation["snapshot_id"]),
+                        str(evaluation["snapshot_digest"]),
+                        bool(evaluation["ready"]), str(prior["event_id"]),
+                        str(prior["event_hash"]),
+                        LifecycleState.VALIDATING if bool(evaluation["ready"])
+                        else LifecycleState.BLOCKED,
+                        True,
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND run_id = ?",
+                    (request.plan_id, request.run_id),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"], run["lifecycle_state"],
+                ) != (
+                    request.item_id, request.item_id,
+                    request.logical_effect_id, request.revision_digest,
+                    LifecycleState.VALIDATING.value,
+                ):
+                    raise DispatchDenied(
+                        "validation launch does not bind a VALIDATING plan"
+                    )
+                if plan["plan_acceptance_binding_version"] != 2:
+                    raise DispatchDenied(
+                        "validation launch requires per-check plan bindings"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                ordered = [
+                    str(row["check_id"])
+                    for row in connection.execute(
+                        "SELECT check_id FROM validation_check_bindings WHERE "
+                        "plan_id = ? ORDER BY check_order", (request.plan_id,)
+                    )
+                ]
+                next_unresolved = next(
+                    (
+                        check for check in ordered
+                        if (
+                            (application := self._latest_validation_application(
+                                connection, request.plan_id, check
+                            )) is None or application["verdict"] != "PASS"
+                        )
+                    ), None,
+                )
+                if next_unresolved != request.check_id:
+                    raise DispatchDenied(
+                        "validation launch check is not dependency-ordered"
+                    )
+                check_order, dependencies, gates = self._validation_launch_vectors(
+                    connection, request.plan_id, request.check_id
+                )
+                ready = all(row[1] == "PASS" for row in dependencies) and all(
+                    row[1] == "PASS" for row in gates
+                )
+                ready_cursor = f"validation-check:{request.check_id}"
+                if (
+                    isinstance(run["continuation_cursor"], str)
+                    and str(run["continuation_cursor"]).startswith(
+                        "validation-recovery:"
+                    )
+                ):
+                    ready_cursor = str(run["continuation_cursor"])
+                snapshot = authority.issue_validation_launch_snapshot(
+                    snapshot_id=f"validation-launch-snapshot:{request.evaluation_id}",
+                    action="EVALUATE_VALIDATION_LAUNCH",
+                    repository_id=request.repository_id, run_id=request.run_id,
+                    item_id=request.item_id,
+                    logical_effect_id=request.logical_effect_id,
+                    plan_id=request.plan_id,
+                    revision_digest=request.revision_digest,
+                    plan_event_hash=str(plan["event_hash"]),
+                    acceptance_payload_digest=str(plan["acceptance_payload_digest"]),
+                    plan_binding_version=2,
+                    check_binding_digest=self._validation_check_binding_digest(
+                        connection, request.plan_id
+                    ),
+                    selected_check_id=request.check_id,
+                    selected_check_order=check_order,
+                    dependency_vector=dependencies, gate_vector=gates,
+                    predecessor_catalog_head=catalog_head,
+                    predecessor_head_vector=tuple(sorted(run_heads.items())),
+                    observed_at=self._utc_now().strftime(
+                        "%Y-%m-%dT%H:%M:%S.%fZ"
+                    ),
+                )
+                snapshot_digest = self._event_hash(snapshot.__dict__)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,)
+                ).fetchone()[0])
+                evaluation_body = {
+                    **request.__dict__, "snapshot": snapshot.__dict__,
+                    "snapshot_digest": snapshot_digest, "ready": ready,
+                    "payload_digest": payload_digest,
+                    "continuation_cursor": ready_cursor,
+                    "event_kind": "VALIDATION_LAUNCH_EVALUATED",
+                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1, "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                evaluation_hash = self._event_hash(evaluation_body)
+                evaluation_json = json.dumps(
+                    evaluation_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id, writer_epoch,
+                        "VALIDATION_LAUNCH_EVALUATED", run["head_hash"],
+                        evaluation_hash, evaluation_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO validation_launch_evaluations VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        request.evaluation_id, request.command_id, request.event_id,
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.plan_id,
+                        request.revision_digest, request.check_id,
+                        snapshot.snapshot_id, snapshot_digest, int(ready),
+                        evaluation_hash, evaluation_json,
+                    ),
+                )
+                final_event_id = request.event_id
+                final_hash = evaluation_hash
+                final_sequence = sequence
+                resulting_state = LifecycleState.VALIDATING
+                decision_id: str | None = None
+                cursor = ready_cursor
+                if not ready:
+                    decision_id = request.decision_id
+                    final_sequence += 1
+                    writer_epoch += 1
+                    cursor = (
+                        f"validation-launch:{request.check_id}:{request.decision_id}"
+                    )
+                    decision_body = {
+                        **request.__dict__, "snapshot_id": snapshot.snapshot_id,
+                        "snapshot_digest": snapshot_digest, "cursor": cursor,
+                        "payload_digest": payload_digest,
+                        "event_id": request.decision_event_id,
+                        "continuation_cursor": cursor,
+                        "event_kind": "VALIDATION_LAUNCH_BLOCKED",
+                        "lifecycle_from": LifecycleState.VALIDATING.value,
+                        "lifecycle_to": LifecycleState.BLOCKED.value,
+                        "previous_event_hash": evaluation_hash,
+                        "schema_version": 1, "sequence": final_sequence,
+                        "writer_epoch": writer_epoch,
+                    }
+                    final_hash = self._event_hash(decision_body)
+                    decision_json = json.dumps(
+                        decision_body, sort_keys=True, separators=(",", ":")
+                    )
+                    final_event_id = request.decision_event_id
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+                        (
+                            final_event_id, request.repository_id, request.run_id,
+                            request.item_id, final_sequence, request.command_id,
+                            writer_epoch, "VALIDATION_LAUNCH_BLOCKED",
+                            evaluation_hash, final_hash, decision_json,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO validation_launch_decisions VALUES ("
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+                        (
+                            request.decision_id, final_event_id,
+                            request.evaluation_id, request.repository_id,
+                            request.run_id, request.item_id,
+                            request.logical_effect_id, request.plan_id,
+                            request.revision_digest, request.check_id,
+                            snapshot.snapshot_id, snapshot_digest, cursor,
+                            final_hash, decision_json,
+                        ),
+                    )
+                    resulting_state = LifecycleState.BLOCKED
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, final_event_id,
+                        final_sequence, final_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, cursor, final_sequence,
+                        final_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (final_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_validation_launch_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_launch_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return ValidationLaunchReceipt(
+            request.evaluation_id, decision_id, snapshot.snapshot_id,
+            snapshot_digest, ready, final_event_id, final_hash,
+            resulting_state, False,
+        )
+
+    def load_validation_launch_snapshot(
+        self,
+        snapshot_id: str,
+        authority: SyntheticAuthority,
+    ) -> SyntheticValidationLaunchSnapshot:
+        """Load and authenticate the exact durable preclaim launch snapshot."""
+        if not isinstance(snapshot_id, str) or not snapshot_id.strip():
+            raise ValueError("validation launch snapshot ID must be non-empty")
+        with closing(self._connect()) as connection:
+            evaluation = connection.execute(
+                "SELECT snapshot_digest, body_json FROM "
+                "validation_launch_evaluations WHERE snapshot_id = ?",
+                (snapshot_id,),
+            ).fetchone()
+        if evaluation is None:
+            raise DispatchDenied("validation launch snapshot is unavailable")
+        try:
+            body = json.loads(str(evaluation["body_json"]))
+            fields = dict(body["snapshot"])
+            fields["dependency_vector"] = tuple(
+                tuple(row) for row in fields["dependency_vector"]
+            )
+            fields["gate_vector"] = tuple(
+                tuple(row) for row in fields["gate_vector"]
+            )
+            fields["predecessor_head_vector"] = tuple(
+                tuple(row) for row in fields["predecessor_head_vector"]
+            )
+            snapshot = SyntheticValidationLaunchSnapshot(**fields)
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+            raise StorageIntegrityError(
+                "validation launch snapshot body is invalid"
+            ) from error
+        authority.verify_validation_launch_snapshot(snapshot)
+        if (
+            snapshot.snapshot_id != snapshot_id
+            or self._event_hash(snapshot.__dict__)
+            != evaluation["snapshot_digest"]
+            or body.get("snapshot_digest") != evaluation["snapshot_digest"]
+        ):
+            raise StorageIntegrityError(
+                "validation launch snapshot projection changed"
+            )
+        return snapshot
+
     def resolve_validation_blocker(
         self,
         request: ValidationRecoveryRequest,
@@ -23608,26 +24788,239 @@ class SQLiteStateStore:
             sequence, event_hash, LifecycleState.VALIDATING, False,
         )
 
-    def commit_validator_intent(
+    def resolve_validation_launch_blocker(
         self,
-        request: ValidatorIntentRequest,
-        capability: SyntheticValidatorCapability,
+        request: ValidationLaunchResolutionRequest,
         authority: SyntheticAuthority,
         *,
         failure_hook: FailureHook | None = None,
-    ) -> CommitReceipt:
+    ) -> ControlReceipt:
+        """Resolve one exact preclaim launch blocker after every vector passes."""
         request.validate()
         if request.repository_id != self._repository_id:
-            raise DispatchDenied("validator intent targets a different repository")
-        capability_binding = (
-            capability.repository_id,
-            capability.logical_effect_id,
-            capability.revision_digest,
-            capability.check_id,
-            capability.input_digest,
-            capability.validator_attempt_id,
-            capability.containment_digest,
+            raise DispatchDenied(
+                "validation launch resolution targets another repository"
+            )
+        payload_digest = self._event_hash(request.__dict__)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "validation launch resolution command was rebound"
+                        )
+                    body = json.loads(connection.execute(
+                        "SELECT body_json FROM events WHERE event_id = ?",
+                        (prior["event_id"],),
+                    ).fetchone()[0])
+                    connection.rollback()
+                    return ControlReceipt(
+                        request.resolution_id, request.command_id,
+                        str(prior["event_id"]), int(prior["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(body["lifecycle_to"])), True,
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                decision = connection.execute(
+                    "SELECT * FROM validation_launch_decisions WHERE "
+                    "decision_id = ? AND resolved = 0",
+                    (request.decision_id,),
+                ).fetchone()
+                route = None
+                if decision is None:
+                    route = connection.execute(
+                        "SELECT * FROM validation_check_routes WHERE "
+                        "route_id = ? AND ready = 0",
+                        (request.decision_id,),
+                    ).fetchone()
+                    duplicate_route_resolution = connection.execute(
+                        "SELECT 1 FROM events WHERE event_kind = "
+                        "'BLOCKER_RESOLVED' AND json_extract(body_json, "
+                        "'$.recovery_kind') = 'VALIDATION_LAUNCH' AND "
+                        "json_extract(body_json, '$.decision_id') = ?",
+                        (request.decision_id,),
+                    ).fetchone()
+                    if duplicate_route_resolution is not None:
+                        raise DispatchDenied(
+                            "validation check route was already resolved"
+                        )
+                source = decision if decision is not None else route
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "run_id = ?",
+                    (request.plan_id, request.run_id),
+                ).fetchone()
+                if run is None or source is None or plan is None or (
+                    run["item_id"], run["lifecycle_state"],
+                    run["continuation_cursor"], source["repository_id"],
+                    source["run_id"], source["item_id"],
+                    source["logical_effect_id"], source["plan_id"],
+                    source["revision_digest"], source["check_id"],
+                ) != (
+                    request.item_id, LifecycleState.BLOCKED.value,
+                    source["cursor"], request.repository_id,
+                    request.run_id, request.item_id,
+                    request.logical_effect_id, request.plan_id,
+                    request.revision_digest, request.check_id,
+                ):
+                    raise DispatchDenied(
+                        "validation launch resolution does not bind the blocker"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                check_order, dependencies, gates = self._validation_launch_vectors(
+                    connection, request.plan_id, request.check_id
+                )
+                if any(row[1] != "PASS" for row in dependencies) or any(
+                    row[1] != "PASS" for row in gates
+                ):
+                    raise DispatchDenied(
+                        "validation launch blocker prerequisites remain unmet"
+                    )
+                ordered = [
+                    str(row["check_id"])
+                    for row in connection.execute(
+                        "SELECT check_id FROM validation_check_bindings WHERE "
+                        "plan_id = ? ORDER BY check_order", (request.plan_id,)
+                    )
+                ]
+                next_unresolved = next(
+                    (
+                        check for check in ordered
+                        if (
+                            (application := self._latest_validation_application(
+                                connection, request.plan_id, check
+                            )) is None or application["verdict"] != "PASS"
+                        )
+                    ), None,
+                )
+                if next_unresolved != request.check_id:
+                    raise DispatchDenied(
+                        "validation launch blocker is no longer current"
+                    )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,)
+                ).fetchone()[0])
+                cursor = f"validation-check:{request.check_id}"
+                body = {
+                    **request.__dict__,
+                    "payload_digest": payload_digest,
+                    "recovery_kind": "VALIDATION_LAUNCH",
+                    "source_decision_event_hash": source["event_hash"],
+                    "source_snapshot_id": source["snapshot_id"],
+                    "source_snapshot_digest": source["snapshot_digest"],
+                    "check_order": check_order,
+                    "dependency_vector": dependencies,
+                    "gate_vector": gates,
+                    "event_kind": "BLOCKER_RESOLVED",
+                    "transition_id": "T16",
+                    "lifecycle_from": LifecycleState.BLOCKED.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "continuation_cursor": cursor,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'BLOCKER_RESOLVED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id,
+                        request.run_id, request.item_id, sequence,
+                        request.command_id, writer_epoch, run["head_hash"],
+                        event_hash, body_json,
+                    ),
+                )
+                if decision is not None and connection.execute(
+                    "UPDATE validation_launch_decisions SET resolved = 1 "
+                    "WHERE decision_id = ? AND resolved = 0",
+                    (request.decision_id,),
+                ).rowcount != 1:
+                    raise StorageIntegrityError(
+                        "validation launch blocker resolution raced"
+                    )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        LifecycleState.VALIDATING.value, cursor, sequence,
+                        event_hash, request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?", (event_hash, request.repository_id)
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_launch_resolution_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_launch_resolution_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.resolution_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.VALIDATING, False,
         )
+
+    def commit_validator_intent(
+        self,
+        request: ValidatorIntentRequest,
+        capability: SyntheticValidatorCapability | None,
+        authority: SyntheticAuthority,
+        *,
+        grant_id: str | None = None,
+        scope_digest: str | None = None,
+        launch_snapshot: SyntheticValidationLaunchSnapshot | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> CommitReceipt:
+        request.validate()
+        canonical_unclaimed_launch = capability is None
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("validator intent targets a different repository")
+        if capability is not None:
+            raise DispatchDenied(
+                "preclaimed validator authority is forbidden; prepare a durable "
+                "launch snapshot and commit from an unclaimed grant"
+            )
         containment_spec = parse_validator_containment_spec(
             request.containment_spec_json
         )
@@ -23641,11 +25034,37 @@ class SQLiteStateStore:
             request.validator_attempt_id,
             containment_digest,
         )
-        if capability_binding != request_binding:
-            raise DispatchDenied(
-                "synthetic validator capability does not bind this intent"
+        if capability is not None:
+            capability_binding = (
+                capability.repository_id,
+                capability.logical_effect_id,
+                capability.revision_digest,
+                capability.check_id,
+                capability.input_digest,
+                capability.validator_attempt_id,
+                capability.containment_digest,
+            )
+            if capability_binding != request_binding:
+                raise DispatchDenied(
+                    "synthetic validator capability does not bind this intent"
+                )
+            if grant_id is not None or scope_digest is not None:
+                raise ValueError(
+                    "validator launch cannot mix claimed and unclaimed authority"
+                )
+            grant_id = capability.grant_id
+            scope_digest = capability.scope_digest
+        elif (
+            not isinstance(grant_id, str) or not grant_id.strip()
+            or not isinstance(scope_digest, str) or not scope_digest.strip()
+            or launch_snapshot is None
+        ):
+            raise ValueError(
+                "canonical validator launch requires an unclaimed grant and snapshot"
             )
         payload_digest = self._event_hash(request.__dict__)
+        claimed_for_commit = False
+        transaction_committed = False
 
         with self._writer_lock(), closing(
             self._connect()
@@ -23667,6 +25086,14 @@ class SQLiteStateStore:
                     (request.command_id,),
                 ).fetchone()
                 if prior is not None:
+                    if capability is None:
+                        capability = authority.claim_or_recover_validator(
+                            str(grant_id), request.repository_id,
+                            request.logical_effect_id, request.revision_digest,
+                            request.check_id, request.input_digest,
+                            request.validator_attempt_id, str(scope_digest),
+                            containment_digest,
+                        )
                     authority.verify_validator_issued(capability)
                     if prior["payload_digest"] != payload_digest:
                         raise StorageIntegrityError(
@@ -23681,6 +25108,10 @@ class SQLiteStateStore:
                             "validator command outcome lost its intent"
                         )
                     connection.rollback()
+                    if canonical_unclaimed_launch:
+                        authority.mark_or_recover_validator_intent_committed(
+                            capability
+                        )
                     return CommitReceipt(
                         request.command_id,
                         str(prior["event_id"]),
@@ -23712,7 +25143,7 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "accepted plan predates per-check launch bindings"
                     )
-                if connection.execute(
+                if launch_snapshot is None and connection.execute(
                     "SELECT 1 FROM validation_check_launch_gates WHERE "
                     "plan_id = ? AND check_id = ? LIMIT 1",
                     (preflight_plan["plan_id"], request.check_id),
@@ -23729,11 +25160,11 @@ class SQLiteStateStore:
 
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "VALIDATOR",
-                    capability.grant_id, "RUN_VALIDATOR",
-                    capability.scope_digest,
+                    str(grant_id), "RUN_VALIDATOR", str(scope_digest),
                 )
-                authority.verify_validator_for_intent(capability)
-                if connection.execute(
+                if capability is not None:
+                    authority.verify_validator_for_intent(capability)
+                if capability is not None and connection.execute(
                     "SELECT 1 FROM capability_redemptions WHERE claim_id = ?",
                     (capability.claim_id,),
                 ).fetchone():
@@ -23751,6 +25182,7 @@ class SQLiteStateStore:
                 plan = connection.execute(
                     "SELECT plan_id, logical_effect_id, revision_digest, "
                     "plan_acceptance_binding_version, "
+                    "event_hash, acceptance_payload_digest, "
                     "aggregate_gate_ids_json, gate_set_digest, "
                     "finalization_policy_id, finalization_policy_version, "
                     "finalization_issuer_fingerprint FROM validation_plans "
@@ -23793,9 +25225,25 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "unattempted validation check does not accept recovery"
                         )
-                    if run["continuation_cursor"] not in {
-                        None, LifecycleState.VALIDATING.value,
-                    }:
+                    allowed_cursors = {None, LifecycleState.VALIDATING.value}
+                    if launch_snapshot is not None:
+                        allowed_cursors.add(
+                            f"validation-check:{request.check_id}"
+                        )
+                    elif connection.execute(
+                        "SELECT 1 FROM validation_check_routes WHERE "
+                        "run_id = ? AND check_id = ? AND ready = 1 AND "
+                        "cursor = ?",
+                        (
+                            request.run_id,
+                            request.check_id,
+                            f"validation-check:{request.check_id}",
+                        ),
+                    ).fetchone() is not None:
+                        allowed_cursors.add(
+                            f"validation-check:{request.check_id}"
+                        )
+                    if run["continuation_cursor"] not in allowed_cursors:
                         raise DispatchDenied(
                             "another validation recovery is pending"
                         )
@@ -24005,6 +25453,67 @@ class SQLiteStateStore:
                 if aggregate + request.reserved_units > request.cap_units:
                     raise DispatchDenied("budget cap would be exceeded")
 
+                if launch_snapshot is not None:
+                    authority.verify_validation_launch_snapshot(launch_snapshot)
+                    launch_digest = self._event_hash(launch_snapshot.__dict__)
+                    evaluation = connection.execute(
+                        "SELECT * FROM validation_launch_evaluations WHERE "
+                        "snapshot_id = ? AND snapshot_digest = ? AND ready = 1",
+                        (launch_snapshot.snapshot_id, launch_digest),
+                    ).fetchone()
+                    if evaluation is None or (
+                        evaluation["repository_id"], evaluation["run_id"],
+                        evaluation["item_id"], evaluation["logical_effect_id"],
+                        evaluation["plan_id"], evaluation["revision_digest"],
+                        evaluation["check_id"], evaluation["event_hash"],
+                    ) != (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, plan["plan_id"],
+                        request.revision_digest, request.check_id,
+                        run["head_hash"],
+                    ):
+                        raise DispatchDenied(
+                            "validation launch snapshot is stale or rebound"
+                        )
+                    current_order, current_dependencies, current_gates = (
+                        self._validation_launch_vectors(
+                            connection, str(plan["plan_id"]), request.check_id
+                        )
+                    )
+                    if (
+                        launch_snapshot.plan_event_hash != plan["event_hash"]
+                        or launch_snapshot.acceptance_payload_digest
+                        != plan["acceptance_payload_digest"]
+                        or launch_snapshot.check_binding_digest
+                        != self._validation_check_binding_digest(
+                            connection, str(plan["plan_id"])
+                        )
+                        or launch_snapshot.selected_check_order != current_order
+                        or launch_snapshot.dependency_vector
+                        != current_dependencies
+                        or launch_snapshot.gate_vector != current_gates
+                        or any(row[1] != "PASS" for row in current_dependencies)
+                        or any(row[1] != "PASS" for row in current_gates)
+                    ):
+                        raise DispatchDenied(
+                            "validation launch prerequisites are stale or unmet"
+                        )
+                    if capability is None:
+                        capability = authority.claim_validator(
+                            str(grant_id), request.repository_id,
+                            request.logical_effect_id, request.revision_digest,
+                            request.check_id, request.input_digest,
+                            request.validator_attempt_id, str(scope_digest),
+                            containment_digest,
+                        )
+                        claimed_for_commit = True
+                        authority.verify_validator_for_intent(capability)
+
+                if capability is None:
+                    raise StorageIntegrityError(
+                        "validator launch lost its authority capability"
+                    )
+
                 sequence = int(run["head_sequence"]) + 1
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
@@ -24032,6 +25541,16 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
+                if launch_snapshot is not None:
+                    body.update(
+                        {
+                            "launch_binding_version": 1,
+                            "launch_snapshot_id": launch_snapshot.snapshot_id,
+                            "launch_snapshot_digest": self._event_hash(
+                                launch_snapshot.__dict__
+                            ),
+                        }
+                    )
                 if parent_slot_generation > 1:
                     if parent_recovery_authorization_id is None:
                         raise StorageIntegrityError(
@@ -24174,12 +25693,19 @@ class SQLiteStateStore:
                 if failure_hook is not None:
                     failure_hook("after_validator_intent_writes_before_commit")
                 connection.commit()
+                transaction_committed = True
                 if failure_hook is not None:
                     failure_hook(
                         "after_validator_intent_commit_before_acknowledgement"
                     )
             except BaseException:
                 connection.rollback()
+                if (
+                    claimed_for_commit
+                    and not transaction_committed
+                    and capability is not None
+                ):
+                    authority.release_uncommitted_validator_claim(capability)
                 raise
 
         authority.mark_validator_intent_committed(capability)
@@ -24579,7 +26105,23 @@ class SQLiteStateStore:
                             "validation application replay supplied a contradictory "
                             "failure classification"
                         )
+                    route = connection.execute(
+                        "SELECT * FROM validation_check_routes WHERE "
+                        "source_application_id = ?",
+                        (request.application_id,),
+                    ).fetchone()
                     connection.rollback()
+                    if route is not None:
+                        route_body = json.loads(route["body_json"])
+                        return ApplicationReceipt(
+                            request.application_id,
+                            request.command_id,
+                            str(route["event_id"]),
+                            int(route_body["sequence"]),
+                            str(route["event_hash"]),
+                            LifecycleState(str(route_body["lifecycle_to"])),
+                            True,
+                        )
                     return self._application_receipt(prior, replayed=True)
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
@@ -24768,6 +26310,42 @@ class SQLiteStateStore:
                     "event.sequence DESC LIMIT 1), '') <> 'PASS' LIMIT 1",
                     (plan["plan_id"], request.check_id),
                 ).fetchone() is not None
+                next_check_id: str | None = None
+                if (
+                    observation["verdict"] == "PASS"
+                    and another_pending
+                    and plan["plan_acceptance_binding_version"] == 2
+                ):
+                    ordered_checks = [
+                        str(row["check_id"])
+                        for row in connection.execute(
+                            "SELECT check_id FROM validation_check_bindings "
+                            "WHERE plan_id = ? ORDER BY check_order",
+                            (plan["plan_id"],),
+                        )
+                    ]
+                    next_check_id = next(
+                        (
+                            check_id
+                            for check_id in ordered_checks
+                            if check_id != request.check_id
+                            and (
+                                (
+                                    application := self._latest_validation_application(
+                                        connection,
+                                        str(plan["plan_id"]),
+                                        check_id,
+                                    )
+                                ) is None
+                                or application["verdict"] != "PASS"
+                            )
+                        ),
+                        None,
+                    )
+                    if next_check_id is None:
+                        raise StorageIntegrityError(
+                            "pending validation check lost its accepted binding"
+                        )
                 remaining_active_validator = connection.execute(
                     "SELECT 1 FROM validator_intents WHERE repository_id = ? "
                     "AND run_id = ? AND status = 'ACTIVE' AND validator_intent_id <> ? "
@@ -24837,6 +26415,8 @@ class SQLiteStateStore:
                     operation_slot_current=operation_slot_current,
                     accounting_closed=accounting_closed,
                 )
+                if next_check_id is not None:
+                    continuation_cursor = f"validation-check:{next_check_id}"
                 sequence = int(run["head_sequence"]) + 1
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
@@ -24883,6 +26463,7 @@ class SQLiteStateStore:
                     "slot_released": slot_released,
                 }
                 event_hash = self._event_hash(body)
+                final_event_id = request.event_id
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
                 connection.execute(
                     "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
@@ -24963,6 +26544,130 @@ class SQLiteStateStore:
                         sequence, event_hash,
                     ),
                 )
+                if next_check_id is not None:
+                    if self._classification_authority is None:
+                        raise DispatchDenied(
+                            "next-check routing requires the accepted plan issuer"
+                        )
+                    check_order, dependencies, gates = (
+                        self._validation_launch_vectors(
+                            connection, str(plan["plan_id"]), next_check_id
+                        )
+                    )
+                    route_ready = all(
+                        row[1] == "PASS" for row in dependencies
+                    ) and all(row[1] == "PASS" for row in gates)
+                    route_id = f"validation-route:{request.application_id}"
+                    route_event_id = f"event:{route_id}"
+                    route_command_id = route_id
+                    route_snapshot_id = f"snapshot:{route_id}"
+                    predecessor_heads = dict(run_heads)
+                    predecessor_heads[request.run_id] = event_hash
+                    route_snapshot = (
+                        self._classification_authority.issue_validation_launch_snapshot(
+                            snapshot_id=route_snapshot_id,
+                            action="EVALUATE_VALIDATION_LAUNCH",
+                            repository_id=request.repository_id,
+                            run_id=request.run_id,
+                            item_id=request.item_id,
+                            logical_effect_id=request.logical_effect_id,
+                            plan_id=str(plan["plan_id"]),
+                            revision_digest=request.revision_digest,
+                            plan_event_hash=str(plan["event_hash"]),
+                            acceptance_payload_digest=str(
+                                plan["acceptance_payload_digest"]
+                            ),
+                            plan_binding_version=2,
+                            check_binding_digest=(
+                                self._validation_check_binding_digest(
+                                    connection, str(plan["plan_id"])
+                                )
+                            ),
+                            selected_check_id=next_check_id,
+                            selected_check_order=check_order,
+                            dependency_vector=dependencies,
+                            gate_vector=gates,
+                            predecessor_catalog_head=event_hash,
+                            predecessor_head_vector=tuple(
+                                sorted(predecessor_heads.items())
+                            ),
+                            observed_at=self._store_utc_now(connection),
+                        )
+                    )
+                    route_snapshot_digest = self._event_hash(
+                        route_snapshot.__dict__
+                    )
+                    route_cursor = (
+                        f"validation-check:{next_check_id}"
+                        if route_ready
+                        else f"validation-route:{next_check_id}:{route_id}"
+                    )
+                    route_state = (
+                        LifecycleState.VALIDATING
+                        if route_ready else LifecycleState.BLOCKED
+                    )
+                    route_sequence = sequence + 1
+                    route_writer_epoch = writer_epoch + 1
+                    route_body = {
+                        "route_id": route_id,
+                        "source_application_id": request.application_id,
+                        "source_application_event_id": request.event_id,
+                        "source_application_event_hash": event_hash,
+                        "command_id": route_command_id,
+                        "event_id": route_event_id,
+                        "event_kind": "VALIDATION_CHECK_ROUTED",
+                        "repository_id": request.repository_id,
+                        "run_id": request.run_id,
+                        "item_id": request.item_id,
+                        "logical_effect_id": request.logical_effect_id,
+                        "plan_id": plan["plan_id"],
+                        "revision_digest": request.revision_digest,
+                        "check_id": next_check_id,
+                        "snapshot": route_snapshot.__dict__,
+                        "snapshot_digest": route_snapshot_digest,
+                        "ready": route_ready,
+                        "continuation_cursor": route_cursor,
+                        "lifecycle_from": LifecycleState.VALIDATING.value,
+                        "lifecycle_to": route_state.value,
+                        "previous_event_hash": event_hash,
+                        "schema_version": 1,
+                        "sequence": route_sequence,
+                        "writer_epoch": route_writer_epoch,
+                    }
+                    route_hash = self._event_hash(route_body)
+                    route_json = json.dumps(
+                        route_body, sort_keys=True, separators=(",", ":")
+                    )
+                    connection.execute(
+                        "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                        "?, ?, ?, ?)",
+                        (
+                            route_event_id, request.repository_id,
+                            request.run_id, request.item_id, route_sequence,
+                            route_command_id, route_writer_epoch,
+                            "VALIDATION_CHECK_ROUTED", event_hash,
+                            route_hash, route_json,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO validation_check_routes VALUES ("
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            route_id, request.application_id, route_event_id,
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            plan["plan_id"], request.revision_digest,
+                            next_check_id, route_snapshot.snapshot_id,
+                            route_snapshot_digest, int(route_ready),
+                            route_cursor, route_hash, route_json,
+                        ),
+                    )
+                    sequence = route_sequence
+                    writer_epoch = route_writer_epoch
+                    event_hash = route_hash
+                    final_event_id = route_event_id
+                    continuation_cursor = route_cursor
+                    resulting_state = route_state
                 connection.execute(
                     "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
                     "head_sequence = ?, head_hash = ? WHERE run_id = ?",
@@ -24986,7 +26691,7 @@ class SQLiteStateStore:
                 connection.rollback()
                 raise
         return ApplicationReceipt(
-            request.application_id, request.command_id, request.event_id,
+            request.application_id, request.command_id, final_event_id,
             sequence, event_hash, resulting_state, False,
         )
 
@@ -29111,6 +30816,310 @@ class SQLiteStateStore:
         readiness_evaluations = [
             json.loads(row["body_json"]) for row in readiness_event_rows
         ]
+        validation_gate_events = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'VALIDATION_GATE_FACT_RECORDED'",
+                (repository_id,),
+            )
+        ]
+        validation_launch_evaluations = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'VALIDATION_LAUNCH_EVALUATED'",
+                (repository_id,),
+            )
+        ]
+        validation_launch_decisions = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'VALIDATION_LAUNCH_BLOCKED'",
+                (repository_id,),
+            )
+        ]
+        validator_initiation_disables = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'VALIDATOR_INITIATION_DISABLED'",
+                (repository_id,),
+            )
+        ]
+        validation_check_routes = [
+            json.loads(row["body_json"])
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'VALIDATION_CHECK_ROUTED'",
+                (repository_id,),
+            )
+        ]
+        if self._classification_authority is None and (
+            validation_gate_events or validation_launch_evaluations
+            or validation_check_routes
+        ):
+            raise StorageIntegrityError(
+                "validation launch recovery requires the recorded issuer"
+            )
+        expected_gate_facts: dict[str, tuple[object, ...]] = {}
+        for body in validation_gate_events:
+            try:
+                fact = SyntheticValidationGateFact(**body["fact"])
+                request = ValidationGateFactRequest(
+                    **{
+                        key: body[key]
+                        for key in ValidationGateFactRequest.__dataclass_fields__
+                    }
+                )
+                request.validate()
+                assert self._classification_authority is not None
+                self._classification_authority.verify_validation_gate_fact(fact)
+                if (
+                    body["fact_digest"] != self._event_hash(fact.__dict__)
+                    or body["payload_digest"] != self._event_hash(request.__dict__)
+                    or request.fact_id != fact.fact_id
+                ):
+                    raise ValueError("validation gate durable binding changed")
+            except (KeyError, TypeError, ValueError, DispatchDenied) as error:
+                raise StorageIntegrityError(
+                    "validation gate fact schema or signature is invalid"
+                ) from error
+            expected_gate_facts[fact.fact_id] = (
+                request.command_id, request.event_id, request.repository_id,
+                request.run_id, request.item_id, request.logical_effect_id,
+                request.plan_id, request.revision_digest, fact.check_id,
+                fact.gate_id, fact.source_id, fact.source_sequence, fact.status,
+                fact.observed_at, fact.evidence_digest, fact.issuer_fingerprint,
+                body["fact_digest"], self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+        actual_gate_facts = {
+            str(row["fact_id"]): (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["plan_id"], row["revision_digest"], row["check_id"],
+                row["gate_id"], row["source_id"], int(row["source_sequence"]),
+                row["status"], row["observed_at"], row["evidence_digest"],
+                row["issuer_fingerprint"], row["fact_digest"],
+                row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM validation_gate_facts WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_gate_facts != expected_gate_facts:
+            raise StorageIntegrityError(
+                "validation-gate projection diverges from event history"
+            )
+        expected_launch_evaluations: dict[str, tuple[object, ...]] = {}
+        for body in validation_launch_evaluations:
+            try:
+                snapshot_body = dict(body["snapshot"])
+                snapshot_body["dependency_vector"] = tuple(
+                    tuple(row) for row in snapshot_body["dependency_vector"]
+                )
+                snapshot_body["gate_vector"] = tuple(
+                    tuple(row) for row in snapshot_body["gate_vector"]
+                )
+                snapshot_body["predecessor_head_vector"] = tuple(
+                    tuple(row)
+                    for row in snapshot_body["predecessor_head_vector"]
+                )
+                snapshot = SyntheticValidationLaunchSnapshot(**snapshot_body)
+                request = ValidationLaunchRequest(
+                    **{
+                        key: body[key]
+                        for key in ValidationLaunchRequest.__dataclass_fields__
+                    }
+                )
+                request.validate()
+                assert self._classification_authority is not None
+                self._classification_authority.verify_validation_launch_snapshot(
+                    snapshot
+                )
+                if (
+                    body["snapshot_digest"]
+                    != self._event_hash(snapshot.__dict__)
+                    or body["payload_digest"]
+                    != self._event_hash(request.__dict__)
+                    or snapshot.selected_check_id != request.check_id
+                ):
+                    raise ValueError("validation launch durable binding changed")
+            except (KeyError, TypeError, ValueError, DispatchDenied) as error:
+                raise StorageIntegrityError(
+                    "validation launch snapshot schema or signature is invalid"
+                ) from error
+            expected_launch_evaluations[request.evaluation_id] = (
+                request.command_id, request.event_id, request.repository_id,
+                request.run_id, request.item_id, request.logical_effect_id,
+                request.plan_id, request.revision_digest, request.check_id,
+                snapshot.snapshot_id, body["snapshot_digest"], int(body["ready"]),
+                self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+        actual_launch_evaluations = {
+            str(row["evaluation_id"]): (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["plan_id"], row["revision_digest"], row["check_id"],
+                row["snapshot_id"], row["snapshot_digest"], int(row["ready"]),
+                row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM validation_launch_evaluations WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_launch_evaluations != expected_launch_evaluations:
+            raise StorageIntegrityError(
+                "validation-launch projection diverges from event history"
+            )
+        resolved_launch_decision_ids = {
+            body["decision_id"]
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE repository_id = ? AND "
+                "event_kind = 'BLOCKER_RESOLVED'",
+                (repository_id,),
+            )
+            if (
+                (body := json.loads(row["body_json"])).get("recovery_kind")
+                == "VALIDATION_LAUNCH"
+            )
+        }
+        expected_launch_decisions = {
+            body["decision_id"]: (
+                body["decision_event_id"], body["evaluation_id"],
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["plan_id"],
+                body["revision_digest"], body["check_id"],
+                body["snapshot_id"], body["snapshot_digest"], body["cursor"],
+                int(body["decision_id"] in resolved_launch_decision_ids),
+                self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in validation_launch_decisions
+        }
+        for body in validator_initiation_disables:
+            evaluation = connection.execute(
+                "SELECT evaluation_id, plan_id FROM "
+                "validation_launch_evaluations WHERE snapshot_id = ? AND "
+                "snapshot_digest = ? AND ready = 1",
+                (
+                    body["launch_snapshot_id"],
+                    body["launch_snapshot_digest"],
+                ),
+            ).fetchone()
+            if evaluation is None:
+                raise StorageIntegrityError(
+                    "validator initiation disable lost its launch evaluation"
+                )
+            expected_launch_decisions[body["fence_id"]] = (
+                body["event_id"], evaluation["evaluation_id"],
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], evaluation["plan_id"],
+                body["revision_digest"], body["check_id"],
+                body["launch_snapshot_id"], body["launch_snapshot_digest"],
+                body["continuation_cursor"],
+                int(body["fence_id"] in resolved_launch_decision_ids),
+                self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+        actual_launch_decisions = {
+            str(row["decision_id"]): (
+                row["event_id"], row["evaluation_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["plan_id"], row["revision_digest"], row["check_id"],
+                row["snapshot_id"], row["snapshot_digest"], row["cursor"],
+                int(row["resolved"]), row["event_hash"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM validation_launch_decisions WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_launch_decisions != expected_launch_decisions:
+            raise StorageIntegrityError(
+                "validation-launch decision projection diverges from history"
+            )
+        expected_check_routes: dict[str, tuple[object, ...]] = {}
+        for body in validation_check_routes:
+            try:
+                snapshot_body = dict(body["snapshot"])
+                snapshot_body["dependency_vector"] = tuple(
+                    tuple(row) for row in snapshot_body["dependency_vector"]
+                )
+                snapshot_body["gate_vector"] = tuple(
+                    tuple(row) for row in snapshot_body["gate_vector"]
+                )
+                snapshot_body["predecessor_head_vector"] = tuple(
+                    tuple(row)
+                    for row in snapshot_body["predecessor_head_vector"]
+                )
+                snapshot = SyntheticValidationLaunchSnapshot(**snapshot_body)
+                assert self._classification_authority is not None
+                self._classification_authority.verify_validation_launch_snapshot(
+                    snapshot
+                )
+                application = connection.execute(
+                    "SELECT * FROM validation_applications WHERE "
+                    "application_id = ?",
+                    (body["source_application_id"],),
+                ).fetchone()
+                if application is None or (
+                    application["event_id"], application["event_hash"],
+                    application["verdict"], body["check_id"],
+                    snapshot.selected_check_id, body["snapshot_digest"],
+                ) != (
+                    body["source_application_event_id"],
+                    body["source_application_event_hash"], "PASS",
+                    snapshot.selected_check_id, snapshot.selected_check_id,
+                    self._event_hash(snapshot.__dict__),
+                ):
+                    raise ValueError("validation check route binding changed")
+                ready = all(
+                    row[1] == "PASS" for row in snapshot.dependency_vector
+                ) and all(row[1] == "PASS" for row in snapshot.gate_vector)
+                if body["ready"] is not ready or body["lifecycle_to"] != (
+                    LifecycleState.VALIDATING.value
+                    if ready else LifecycleState.BLOCKED.value
+                ):
+                    raise ValueError("validation check route decision changed")
+            except (KeyError, TypeError, ValueError, DispatchDenied) as error:
+                raise StorageIntegrityError(
+                    "validation check route schema or signature is invalid"
+                ) from error
+            expected_check_routes[str(body["route_id"])] = (
+                body["source_application_id"], body["event_id"],
+                body["repository_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["plan_id"],
+                body["revision_digest"], body["check_id"],
+                snapshot.snapshot_id, body["snapshot_digest"],
+                int(body["ready"]), body["continuation_cursor"],
+                self._event_hash(body),
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+        actual_check_routes = {
+            str(row["route_id"]): (
+                row["source_application_id"], row["event_id"],
+                row["repository_id"], row["run_id"], row["item_id"],
+                row["logical_effect_id"], row["plan_id"],
+                row["revision_digest"], row["check_id"],
+                row["snapshot_id"], row["snapshot_digest"],
+                int(row["ready"]), row["cursor"], row["event_hash"],
+                row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM validation_check_routes WHERE repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_check_routes != expected_check_routes:
+            raise StorageIntegrityError(
+                "validation-check route projection diverges from history"
+            )
         authority_event_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'AUTHORITY_EVALUATED' ORDER BY writer_epoch, sequence",
@@ -29405,6 +31414,30 @@ class SQLiteStateStore:
         expected_outcomes.update(
             {
                 body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in validation_gate_events
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in (
+                    [
+                        item for item in validation_launch_evaluations
+                        if item["ready"] is True
+                    ]
+                    + validation_launch_decisions
+                )
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
                     body["request_digest"], body["event_id"],
                     body["sequence"], self._event_hash(body),
                 )
@@ -29536,12 +31569,45 @@ class SQLiteStateStore:
                 "parent_slot_generation",
                 "parent_recovery_authorization_id",
             }
+            launch_fields = {
+                "launch_binding_version",
+                "launch_snapshot_id",
+                "launch_snapshot_digest",
+            }
             if set(validator_body) not in {
                 frozenset(expected_fields),
                 frozenset(expected_fields | recovery_fields),
+                frozenset(expected_fields | launch_fields),
+                frozenset(expected_fields | recovery_fields | launch_fields),
             }:
                 raise StorageIntegrityError(
                     "validator intent event schema is invalid"
+                )
+            if launch_fields.issubset(validator_body):
+                launch = connection.execute(
+                    "SELECT * FROM validation_launch_evaluations WHERE "
+                    "snapshot_id = ? AND snapshot_digest = ? AND ready = 1",
+                    (
+                        validator_body["launch_snapshot_id"],
+                        validator_body["launch_snapshot_digest"],
+                    ),
+                ).fetchone()
+                if (
+                    validator_body["launch_binding_version"] != 1
+                    or launch is None
+                    or launch["run_id"] != validator_body["run_id"]
+                    or launch["check_id"] != validator_body["check_id"]
+                    or int(connection.execute(
+                        "SELECT sequence FROM events WHERE event_id = ?",
+                        (launch["event_id"],),
+                    ).fetchone()[0]) >= int(validator_body["sequence"])
+                ):
+                    raise StorageIntegrityError(
+                        "validator launch snapshot binding is invalid"
+                    )
+            elif launch_fields.intersection(validator_body):
+                raise StorageIntegrityError(
+                    "validator launch snapshot binding is partial"
                 )
             parent_generation, parent_authorization_id = (
                 self._operation_attempt_generation(
@@ -29645,8 +31711,15 @@ class SQLiteStateStore:
             body for body in all_recoveries
             if body.get("recovery_kind") == "PROVEN_NONEXECUTION"
         ]
-        if len(validation_recoveries) + len(operation_recoveries) != len(
-            all_recoveries
+        validation_launch_recoveries = [
+            body for body in all_recoveries
+            if body.get("recovery_kind") == "VALIDATION_LAUNCH"
+        ]
+        if (
+            len(validation_recoveries)
+            + len(operation_recoveries)
+            + len(validation_launch_recoveries)
+            != len(all_recoveries)
         ):
             raise StorageIntegrityError(
                 "blocker-recovery history contains an unknown discriminator"
@@ -29667,6 +31740,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in operation_recoveries
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in validation_launch_recoveries
             }
         )
         validator_observation_rows = connection.execute(
@@ -34626,6 +36708,33 @@ class SQLiteStateStore:
         )
         expected_fences.update(
             {
+                str(body["fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    str(body["reason_code"]), str(body["event_id"]),
+                )
+                for body in validator_initiation_disables
+            }
+        )
+        for row in connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'NONDISPATCH_PROVEN' ORDER BY writer_epoch, sequence",
+            (repository_id,),
+        ):
+            nonexecution_body = json.loads(row["body_json"])
+            resolved_fence_id = nonexecution_body.get(
+                "resolved_validator_initiation_fence_id"
+            )
+            if resolved_fence_id is not None:
+                resolved_fence = expected_fences.get(str(resolved_fence_id))
+                if resolved_fence is None or resolved_fence[2] != (
+                    "VALIDATION_LAUNCH_PREREQUISITE_CHANGED"
+                ):
+                    raise StorageIntegrityError(
+                        "T25 validator initiation fence resolution is invalid"
+                    )
+                del expected_fences[str(resolved_fence_id)]
+        expected_fences.update(
+            {
                 f"failed-final:{body['application_id']}": (
                     body["item_id"], body["logical_effect_id"],
                     "FAILED_FINAL_APPLICATION", body["event_id"]
@@ -34747,6 +36856,10 @@ class SQLiteStateStore:
                             "lifecycle_to",
                         }
                     )
+                    if "resolved_validator_initiation_fence_id" in body:
+                        expected_body_keys.add(
+                            "resolved_validator_initiation_fence_id"
+                        )
                 if set(body) != expected_body_keys:
                     raise StorageIntegrityError(
                         "settlement schema has missing or surplus fields"
@@ -35337,6 +37450,11 @@ class SQLiteStateStore:
                         connection, body, predecessor_state,
                         expected_cursors.get(run_id),
                     )
+                elif body.get("recovery_kind") == "VALIDATION_LAUNCH":
+                    self._validate_validation_launch_recovery_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
                 elif body.get("recovery_kind") is None:
                     self._validate_validation_recovery_event(
                         connection, body, predecessor_state,
@@ -35628,7 +37746,10 @@ class SQLiteStateStore:
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
                     "VALIDATOR_INTENT_COMMITTED", "RECONCILIATION_RECORDED",
-                    "EFFECT_ADOPTED",
+                    "EFFECT_ADOPTED", "VALIDATION_LAUNCH_EVALUATED",
+                    "VALIDATION_LAUNCH_BLOCKED",
+                    "VALIDATION_CHECK_ROUTED",
+                    "VALIDATOR_INITIATION_DISABLED",
                 }:
                     expected_cursors[run_id] = body.get(
                         "continuation_cursor"
@@ -35938,7 +38059,11 @@ class SQLiteStateStore:
             "runs",
             "validation_plans",
             "validation_requirements",
-                        "readiness_evaluations",
+            "validation_gate_facts",
+            "validation_launch_evaluations",
+            "validation_launch_decisions",
+            "validation_check_routes",
+            "readiness_evaluations",
             "events",
             "command_outcomes",
             "effects",

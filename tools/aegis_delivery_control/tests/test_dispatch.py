@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 import json
 import multiprocessing
 import os
@@ -20,6 +21,7 @@ from tools.aegis_delivery_control.adapters import (
     SyntheticValidatorAdapter,
     SyntheticValidatorRequest as SyntheticValidatorRequestContract,
     synthetic_validator_output_size,
+    validate_synthetic_validator_containment,
 )
 from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
@@ -62,6 +64,7 @@ from tools.aegis_delivery_control.contracts import (
     StopRequest,
     StorageIntegrityError,
     ValidationApplicationRequest,
+    ValidationLaunchRequest,
     ValidatorCessationRequest,
     ValidatorContainmentSpec,
     ValidatorIntentRequest as ValidatorIntentRequestContract,
@@ -81,6 +84,59 @@ from tools.aegis_delivery_control.storage import raise_at
 from tools.aegis_delivery_control.tests._legacy_schema import (
     strip_t28_foundation_schema,
 )
+
+ProductionSyntheticValidationCoordinator = SyntheticValidationCoordinator
+
+
+class SyntheticValidationCoordinator(ProductionSyntheticValidationCoordinator):
+    """Legacy test facade that exercises the production prepared-launch path."""
+
+    def launch(
+        self, intent, capability, request, *, usage_units=0, lose_result=False
+    ):
+        intent.validate()
+        request.validate()
+        if usage_units is not None and (
+            type(usage_units) is not int or usage_units < 0
+        ):
+            raise ValueError("usage_units must be non-negative or unknown")
+        self._authority.verify_validator_issued(capability)
+        self._adapter._validate_request_binding(capability, request, intent)
+        validate_synthetic_validator_containment(capability, request, intent)
+        with self._authority._lock:
+            committed = capability.claim_id in self._authority._committed_claims
+        if not committed:
+            self._authority.release_uncommitted_validator_claim(capability)
+        with closing(sqlite3.connect(self._store._database_path)) as connection:
+            plan_id = connection.execute(
+                "SELECT plan_id FROM validation_plans WHERE run_id = ?",
+                (intent.run_id,),
+            ).fetchone()[0]
+        suffix = intent.command_id
+        launch = self._store.prepare_validation_launch(
+            ValidationLaunchRequest(
+                f"test-launch-evaluation:{suffix}",
+                f"test-launch-decision:{suffix}",
+                f"test-launch-command:{suffix}",
+                f"test-launch-event:{suffix}",
+                f"test-launch-decision-event:{suffix}",
+                intent.repository_id, intent.run_id, intent.item_id,
+                intent.logical_effect_id, plan_id, intent.revision_digest,
+                intent.check_id,
+            ),
+            self._authority,
+        )
+        if not launch.ready:
+            raise DispatchDenied("test fixture validation launch is blocked")
+        snapshot = self._store.load_validation_launch_snapshot(
+            launch.snapshot_id, self._authority
+        )
+        return super().launch_prepared(
+            intent, grant_id=capability.grant_id,
+            scope_digest=capability.scope_digest,
+            launch_snapshot=snapshot, request=request,
+            usage_units=usage_units, lose_result=lose_result,
+        )
 from tools.aegis_delivery_control.tests._trusted_readiness_store import (
     SQLiteStateStore,
 )

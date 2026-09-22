@@ -20,6 +20,7 @@ from tools.aegis_delivery_control.contracts import (
     LifecycleState,
     ProvenNonexecutionIntentRequest,
     ReadinessEvaluationRequest,
+    ValidationLaunchRequest,
 )
 from tools.aegis_delivery_control.storage import SQLiteStateStore as ProductionSQLiteStateStore
 
@@ -44,6 +45,53 @@ class SQLiteStateStore(ProductionSQLiteStateStore):
     def _bind_classification_authority(self, authority):
         super()._bind_classification_authority(authority)
         self._known_test_authorities[authority.issuer_fingerprint] = authority
+
+    def commit_validator_intent(self, request, capability, authority, **kwargs):
+        """Adapt legacy tests onto the production unclaimed launch contract."""
+        if capability is None:
+            return super().commit_validator_intent(
+                request, capability, authority, **kwargs
+            )
+        with authority._lock:
+            issued = authority._validator_claims.get(capability.grant_id)
+            committed = capability.claim_id in authority._committed_claims
+        if issued == capability and not committed:
+            authority.release_uncommitted_validator_claim(capability)
+        suffix = request.command_id
+        with closing(sqlite3.connect(self._database_path)) as connection:
+            plan_id = connection.execute(
+                "SELECT plan_id FROM validation_plans WHERE run_id = ?",
+                (request.run_id,),
+            ).fetchone()[0]
+        launch = super().prepare_validation_launch(
+            ValidationLaunchRequest(
+                f"test-launch-evaluation:{suffix}",
+                f"test-launch-decision:{suffix}",
+                f"test-launch-command:{suffix}",
+                f"test-launch-event:{suffix}",
+                f"test-launch-decision-event:{suffix}",
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, plan_id, request.revision_digest,
+                request.check_id,
+            ),
+            authority,
+        )
+        if not launch.ready:
+            raise RuntimeError("test fixture validation launch is blocked")
+        if hasattr(self._freshness_oracle, "allowed_head"):
+            with closing(sqlite3.connect(self._database_path)) as connection:
+                self._freshness_oracle.allowed_head = connection.execute(
+                    "SELECT catalog_head FROM repositories WHERE "
+                    "repository_id = ?", (request.repository_id,),
+                ).fetchone()[0]
+        snapshot = super().load_validation_launch_snapshot(
+            launch.snapshot_id, authority
+        )
+        return super().commit_validator_intent(
+            request, None, authority, grant_id=capability.grant_id,
+            scope_digest=capability.scope_digest,
+            launch_snapshot=snapshot, **kwargs,
+        )
 
     def _next_test_writer_epoch(self) -> int:
         with closing(sqlite3.connect(self._database_path)) as connection:
