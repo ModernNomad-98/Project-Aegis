@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from pathlib import PurePosixPath
 from typing import Mapping, Protocol, Sequence
 
 
@@ -823,6 +826,122 @@ class ObservationReceipt:
     replayed: bool
 
 
+VALIDATOR_CONTAINMENT_BINDING_VERSION = 1
+VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES = 4096
+VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS = (
+    "READ_PINNED_INPUT",
+    "EMIT_BOUNDED_RESULT",
+)
+SYNTHETIC_VALIDATOR_SUPPORT_ID = "aegis.synthetic.validator.in-process.v1"
+SYNTHETIC_VALIDATOR_SUPPORT_DIGEST = hashlib.sha256(
+    json.dumps(
+        {
+            "arbitrary_code": False,
+            "descendants": "DENY",
+            "external_io": False,
+            "network": "DENY",
+            "support_id": SYNTHETIC_VALIDATOR_SUPPORT_ID,
+            "tools": "DENY",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("ascii")
+).hexdigest()
+
+
+def _validate_containment_path(value: str, field_name: str) -> None:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise ValueError(f"validator containment {field_name} is invalid")
+    path = PurePosixPath(value)
+    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+        raise ValueError(f"validator containment {field_name} escapes its root")
+
+
+@dataclass(frozen=True)
+class ValidatorContainmentSpec:
+    binding_version: int
+    support_id: str
+    support_digest: str
+    input_digest: str
+    input_root: str
+    output_root: str
+    scratch_root: str
+    allowed_actions: tuple[str, ...]
+    max_output_bytes: int
+    descendant_mode: str
+    tool_mode: str
+    network_mode: str
+
+    def validate(self) -> None:
+        if self.binding_version != VALIDATOR_CONTAINMENT_BINDING_VERSION:
+            raise ValueError("validator containment binding version is unsupported")
+        if (
+            self.support_id != SYNTHETIC_VALIDATOR_SUPPORT_ID
+            or self.support_digest != SYNTHETIC_VALIDATOR_SUPPORT_DIGEST
+        ):
+            raise ValueError("validator containment support is unavailable")
+        if not isinstance(self.input_digest, str) or not self.input_digest:
+            raise ValueError("validator containment input digest is invalid")
+        for field_name in ("input_root", "output_root", "scratch_root"):
+            _validate_containment_path(getattr(self, field_name), field_name)
+        roots = tuple(
+            PurePosixPath(getattr(self, field_name)).parts
+            for field_name in ("input_root", "output_root", "scratch_root")
+        )
+        if any(
+            left[: len(right)] == right or right[: len(left)] == left
+            for index, left in enumerate(roots)
+            for right in roots[index + 1 :]
+        ):
+            raise ValueError("validator containment roots must be isolated")
+        if self.allowed_actions != VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS:
+            raise ValueError("validator containment actions are unsupported")
+        if (
+            type(self.max_output_bytes) is not int
+            or self.max_output_bytes <= 0
+            or self.max_output_bytes > VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES
+        ):
+            raise ValueError("validator containment output bound is invalid")
+        if (
+            self.descendant_mode,
+            self.tool_mode,
+            self.network_mode,
+        ) != ("DENY", "DENY", "DENY"):
+            raise ValueError("validator containment mutation channels must be denied")
+
+
+def validator_containment_spec_json(spec: ValidatorContainmentSpec) -> str:
+    spec.validate()
+    return json.dumps(spec.__dict__, sort_keys=True, separators=(",", ":"))
+
+
+def parse_validator_containment_spec(value: str) -> ValidatorContainmentSpec:
+    try:
+        payload = json.loads(value)
+    except (TypeError, json.JSONDecodeError) as error:
+        raise ValueError("validator containment specification is invalid") from error
+    expected = set(ValidatorContainmentSpec.__dataclass_fields__)
+    if not isinstance(payload, dict) or set(payload) != expected:
+        raise ValueError("validator containment specification schema is invalid")
+    if not isinstance(payload.get("allowed_actions"), list):
+        raise ValueError("validator containment actions are invalid")
+    payload["allowed_actions"] = tuple(payload["allowed_actions"])
+    try:
+        spec = ValidatorContainmentSpec(**payload)
+    except TypeError as error:
+        raise ValueError("validator containment specification is invalid") from error
+    spec.validate()
+    if value != validator_containment_spec_json(spec):
+        raise ValueError("validator containment specification is not canonical")
+    return spec
+
+
+def validator_containment_digest(spec: ValidatorContainmentSpec) -> str:
+    return hashlib.sha256(
+        validator_containment_spec_json(spec).encode("utf-8")
+    ).hexdigest()
+
+
 @dataclass(frozen=True)
 class ValidatorIntentRequest:
     validator_intent_id: str
@@ -846,6 +965,7 @@ class ValidatorIntentRequest:
     worst_case_units: int
     cap_units: int
     recovery_id: str | None = None
+    containment_spec_json: str = ""
 
     def validate(self) -> None:
         identifiers = (
@@ -884,6 +1004,14 @@ class ValidatorIntentRequest:
             raise ValueError("validator reserve cannot exceed worst-case units")
         if self.worst_case_units > self.cap_units:
             raise ValueError("validator worst-case units cannot exceed the budget cap")
+        try:
+            containment = parse_validator_containment_spec(
+                self.containment_spec_json
+            )
+        except ValueError as error:
+            raise ValueError("validator containment specification is required") from error
+        if containment.input_digest != self.input_digest:
+            raise ValueError("validator containment does not bind the pinned input")
 
 
 @dataclass(frozen=True)
@@ -907,11 +1035,17 @@ class ValidatorObservationRequest:
     usage_units: int | None
     settlement_event_id: str
     settlement_hash: str
+    containment_digest: str | None = None
 
     def validate(self) -> None:
-        required = tuple(self.__dict__.values())[:-3] + (
-            self.settlement_event_id,
-            self.settlement_hash,
+        required = (
+            self.observation_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.validator_intent_id,
+            self.validator_attempt_id, self.source_result_id,
+            self.source_claim_id, self.revision_digest, self.check_id,
+            self.input_digest, self.result_digest, self.verdict,
+            self.settlement_event_id, self.settlement_hash,
         )
         if any(not isinstance(value, str) or not value.strip() for value in required):
             raise ValueError("validator observation fields must be non-empty")
@@ -921,6 +1055,11 @@ class ValidatorObservationRequest:
             type(self.usage_units) is not int or self.usage_units < 0
         ):
             raise ValueError("validator observation usage must be non-negative or unknown")
+        if self.containment_digest is not None and (
+            not isinstance(self.containment_digest, str)
+            or not self.containment_digest.strip()
+        ):
+            raise ValueError("validator observation containment digest is invalid")
 
 
 @dataclass(frozen=True)
@@ -2378,6 +2517,7 @@ class ValidatorIntentBinding:
     input_digest: str
     validator_attempt_id: str
     capability_claim_id: str
+    containment_digest: str | None = None
 
 
 @dataclass(frozen=True)

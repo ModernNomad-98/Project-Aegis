@@ -11,6 +11,7 @@ from .adapters import (
     SyntheticValidatorAdapter,
     SyntheticValidatorRequest,
     SyntheticValidatorResult,
+    validate_synthetic_validator_containment,
 )
 from .authority import (
     SyntheticAuthority,
@@ -800,6 +801,7 @@ class SyntheticValidationCoordinator:
         )
         self._authority.verify_validator_issued(capability)
         self._adapter._validate_request_binding(capability, request, intent)
+        validate_synthetic_validator_containment(capability, request, intent)
         commit = self._store.commit_validator_intent(
             intent, capability, self._authority
         )
@@ -891,6 +893,7 @@ class SyntheticValidationCoordinator:
                 binding.revision_digest, binding.check_id, binding.input_digest,
                 result.result_digest, result.verdict, result.usage_units,
                 command.settlement_event_id, command.settlement_hash,
+                result.containment_digest,
             ),
             failure_hook=failure_hook,
         )

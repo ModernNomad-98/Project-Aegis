@@ -18,14 +18,15 @@ from tools.aegis_delivery_control.adapters import (
     SyntheticEffectRequest,
     SyntheticExecutionAdapter,
     SyntheticValidatorAdapter,
-    SyntheticValidatorRequest,
+    SyntheticValidatorRequest as SyntheticValidatorRequestContract,
+    synthetic_validator_output_size,
 )
 from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
     SyntheticCapability,
     SyntheticGrant,
     SyntheticOperatorGrant,
-    SyntheticValidatorGrant,
+    SyntheticValidatorGrant as SyntheticValidatorGrantContract,
 )
 from tools.aegis_delivery_control.contracts import (
     ApplicationReceipt,
@@ -62,8 +63,13 @@ from tools.aegis_delivery_control.contracts import (
     StorageIntegrityError,
     ValidationApplicationRequest,
     ValidatorCessationRequest,
-    ValidatorIntentRequest,
+    ValidatorContainmentSpec,
+    ValidatorIntentRequest as ValidatorIntentRequestContract,
     ValidatorObservationCommand,
+    SYNTHETIC_VALIDATOR_SUPPORT_DIGEST,
+    SYNTHETIC_VALIDATOR_SUPPORT_ID,
+    validator_containment_digest,
+    validator_containment_spec_json,
 )
 from tools.aegis_delivery_control.dispatch import (
     SyntheticDispatchCoordinator,
@@ -93,6 +99,58 @@ def PlanAcceptanceRequest(*args, **kwargs):
     kwargs.setdefault("plan_schema_version", "plan-schema-1")
     kwargs.setdefault("reducer_version", "reducer-1")
     return PlanAcceptanceContract(*args, **kwargs)
+
+
+def _validator_containment(input_digest: str, suffix: str):
+    safe_suffix = suffix.replace(":", "-")
+    spec = ValidatorContainmentSpec(
+        1,
+        SYNTHETIC_VALIDATOR_SUPPORT_ID,
+        SYNTHETIC_VALIDATOR_SUPPORT_DIGEST,
+        input_digest,
+        f"inputs/{safe_suffix}",
+        f"outputs/{safe_suffix}",
+        f"scratch/{safe_suffix}",
+        ("READ_PINNED_INPUT", "EMIT_BOUNDED_RESULT"),
+        4096,
+        "DENY",
+        "DENY",
+        "DENY",
+    )
+    return spec, validator_containment_spec_json(spec), validator_containment_digest(spec)
+
+
+def SyntheticValidatorGrant(*args, **kwargs):
+    input_digest = kwargs.get("input_digest", args[5])
+    suffix = kwargs.get("validator_attempt_id", args[6])
+    _, _, digest = _validator_containment(input_digest, suffix)
+    kwargs.setdefault("containment_digest", digest)
+    return SyntheticValidatorGrantContract(*args, **kwargs)
+
+
+def ValidatorIntentRequest(*args, **kwargs):
+    input_digest = kwargs.get("input_digest", args[12])
+    suffix = kwargs.get("validator_attempt_id", args[13])
+    _, spec_json, _ = _validator_containment(input_digest, suffix)
+    kwargs.setdefault("containment_spec_json", spec_json)
+    return ValidatorIntentRequestContract(*args, **kwargs)
+
+
+def SyntheticValidatorRequest(*args, **kwargs):
+    input_digest = kwargs.get("input_digest", args[4])
+    suffix = kwargs.get("validator_attempt_id", args[5])
+    spec, _, digest = _validator_containment(input_digest, suffix)
+    kwargs.setdefault("containment_digest", digest)
+    kwargs.setdefault("requested_actions", spec.allowed_actions)
+    kwargs.setdefault("read_path", spec.input_root)
+    kwargs.setdefault("output_path", f"{spec.output_root}/result.json")
+    kwargs.setdefault("scratch_path", f"{spec.scratch_root}/work")
+    result_digest = kwargs.get("result_digest", args[7])
+    verdict = kwargs.get("verdict", args[8])
+    kwargs.setdefault(
+        "output_bytes", synthetic_validator_output_size(result_digest, verdict)
+    )
+    return SyntheticValidatorRequestContract(*args, **kwargs)
 
 
 class AlwaysFreshOracle:
@@ -911,7 +969,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 4)
+            self.assertEqual(version, 5)
             self.assertEqual(action_count, 0)
             migrated.load_verified("repo-1", authority=authority)
 
@@ -955,7 +1013,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 4
+                    connection.execute("PRAGMA user_version").fetchone()[0], 5
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -982,7 +1040,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 5")
+                connection.execute("PRAGMA user_version = 6")
             finally:
                 connection.close()
             with self.assertRaisesRegex(
@@ -6094,6 +6152,47 @@ class MediatedDispatchTests(unittest.TestCase):
                         validator_capability,
                         invalid_request,
                         usage_units=invalid_usage,
+                    )
+            valid_contained_request = SyntheticValidatorRequest(
+                "repo-1", "effect-1", "revision-1", "check-1", "input-1",
+                "validator-attempt-1", "read-only-1", "result-digest-1",
+                "PASS",
+            )
+            with self.assertRaisesRegex(DispatchDenied, "output size binding"):
+                validation.launch(
+                    validator_intent,
+                    validator_capability,
+                    replace(valid_contained_request, output_bytes=0),
+                    usage_units=1,
+                )
+            base_spec = json.loads(validator_intent.containment_spec_json)
+            invalid_specs = (
+                {
+                    **base_spec,
+                    "output_root": f"{base_spec['input_root']}/nested",
+                },
+                {
+                    **base_spec,
+                    "input_root": f"{base_spec['output_root']}/nested",
+                },
+                {**base_spec, "max_output_bytes": 4097},
+            )
+            for invalid_spec in invalid_specs:
+                with self.subTest(invalid_spec=invalid_spec), self.assertRaisesRegex(
+                    ValueError, "containment"
+                ):
+                    validation.launch(
+                        replace(
+                            validator_intent,
+                            containment_spec_json=json.dumps(
+                                invalid_spec,
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                        ),
+                        validator_capability,
+                        valid_contained_request,
+                        usage_units=1,
                     )
             connection = sqlite3.connect(store._database_path)
             try:

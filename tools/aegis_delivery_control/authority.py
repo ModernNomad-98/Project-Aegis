@@ -69,6 +69,7 @@ class SyntheticValidatorGrant:
     input_digest: str
     validator_attempt_id: str
     scope_digest: str
+    containment_digest: str
 
 
 @dataclass(frozen=True)
@@ -82,6 +83,7 @@ class SyntheticValidatorCapability:
     input_digest: str
     validator_attempt_id: str
     scope_digest: str
+    containment_digest: str
     issuer_mac: str
 
 
@@ -1305,6 +1307,7 @@ class SyntheticAuthority:
         input_digest: str,
         validator_attempt_id: str,
         scope_digest: str,
+        containment_digest: str,
     ) -> SyntheticValidatorCapability:
         requested = (
             repository_id,
@@ -1314,6 +1317,7 @@ class SyntheticAuthority:
             input_digest,
             validator_attempt_id,
             scope_digest,
+            containment_digest,
         )
         with self._lock:
             grant = self._validator_grants.get(grant_id)
@@ -1342,12 +1346,24 @@ class SyntheticAuthority:
                     input_digest=input_digest,
                     validator_attempt_id=validator_attempt_id,
                     scope_digest=scope_digest,
+                    containment_digest=containment_digest,
                 ),
             )
             self._validator_claims[grant_id] = capability
             return capability
 
     def verify_validator_issued(
+        self, capability: SyntheticValidatorCapability
+    ) -> None:
+        self.verify_validator_evidence(capability)
+        with self._lock:
+            issued = self._validator_claims.get(capability.grant_id)
+            if issued != capability:
+                raise DispatchDenied(
+                    "synthetic validator capability was not issued here"
+                )
+
+    def verify_validator_evidence(
         self, capability: SyntheticValidatorCapability
     ) -> None:
         expected_mac = self._mac(
@@ -1358,14 +1374,10 @@ class SyntheticAuthority:
                 if name != "issuer_mac"
             },
         )
-        with self._lock:
-            issued = self._validator_claims.get(capability.grant_id)
-            if issued != capability or not hmac.compare_digest(
-                expected_mac, capability.issuer_mac
-            ):
-                raise DispatchDenied(
-                    "synthetic validator capability was not issued here"
-                )
+        if not hmac.compare_digest(expected_mac, capability.issuer_mac):
+            raise DispatchDenied(
+                "synthetic validator capability was not issued here"
+            )
 
     def verify_validator_for_intent(
         self, capability: SyntheticValidatorCapability

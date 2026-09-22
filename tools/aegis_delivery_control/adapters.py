@@ -8,6 +8,7 @@ import sqlite3
 from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import TYPE_CHECKING
 
 from .authority import (
@@ -25,6 +26,13 @@ from .contracts import (
     OperationLaunchReceipt,
     ValidatorCessationSealReceipt,
     ValidatorIntentRequest,
+    VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS,
+    VALIDATOR_CONTAINMENT_BINDING_VERSION,
+    VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES,
+    SYNTHETIC_VALIDATOR_SUPPORT_DIGEST,
+    SYNTHETIC_VALIDATOR_SUPPORT_ID,
+    parse_validator_containment_spec,
+    validator_containment_digest,
 )
 from .storage import default_state_root
 
@@ -198,15 +206,51 @@ class SyntheticValidatorRequest:
     scope_digest: str
     result_digest: str
     verdict: str
+    containment_digest: str = ""
+    requested_actions: tuple[str, ...] = ()
+    read_path: str = ""
+    output_path: str = ""
+    scratch_path: str = ""
+    output_bytes: int = 0
+    uses_subprocess: bool = False
+    uses_tool: bool = False
+    uses_network: bool = False
 
     def validate(self) -> None:
-        if any(
-            not isinstance(value, str) or not value.strip()
-            for value in self.__dict__.values()
-        ):
+        required_strings = (
+            self.repository_id,
+            self.logical_effect_id,
+            self.revision_digest,
+            self.check_id,
+            self.input_digest,
+            self.validator_attempt_id,
+            self.scope_digest,
+            self.result_digest,
+            self.verdict,
+            self.containment_digest,
+            self.read_path,
+            self.output_path,
+            self.scratch_path,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required_strings):
             raise ValueError("synthetic validator request fields must be non-empty")
         if self.verdict not in {"PASS", "FAIL"}:
             raise ValueError("synthetic validator verdict must be PASS or FAIL")
+        if (
+            not isinstance(self.requested_actions, tuple)
+            or any(
+                not isinstance(action, str) or not action
+                for action in self.requested_actions
+            )
+        ):
+            raise ValueError("synthetic validator requested actions are invalid")
+        if type(self.output_bytes) is not int or self.output_bytes < 0:
+            raise ValueError("synthetic validator output size must be non-negative")
+        if any(
+            type(value) is not bool
+            for value in (self.uses_subprocess, self.uses_tool, self.uses_network)
+        ):
+            raise ValueError("synthetic validator mutation flags must be boolean")
 
 
 @dataclass(frozen=True)
@@ -223,6 +267,77 @@ class SyntheticValidatorResult:
     verdict: str
     usage_units: int | None
     final: bool
+    containment_version: int | None
+    containment_digest: str | None
+
+
+def _is_contained_path(path_value: str, root_value: str, *, allow_root: bool) -> bool:
+    if "\\" in path_value:
+        return False
+    path = PurePosixPath(path_value)
+    root = PurePosixPath(root_value)
+    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+        return False
+    if len(path.parts) < len(root.parts) or path.parts[: len(root.parts)] != root.parts:
+        return False
+    return allow_root or len(path.parts) > len(root.parts)
+
+
+def synthetic_validator_output_size(result_digest: str, verdict: str) -> int:
+    """Return the adapter-derived byte size of the canonical bounded result."""
+
+    return len(
+        json.dumps(
+            {"result_digest": result_digest, "verdict": verdict},
+            ensure_ascii=True,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("ascii")
+    )
+
+
+def validate_synthetic_validator_containment(
+    capability: SyntheticValidatorCapability,
+    request: SyntheticValidatorRequest,
+    intent: ValidatorIntentRequest,
+) -> str:
+    """Pure closed check used both before intent and at final contact."""
+
+    try:
+        spec = parse_validator_containment_spec(intent.containment_spec_json)
+    except ValueError as error:
+        raise DispatchDenied("validator containment specification is invalid") from error
+    digest = validator_containment_digest(spec)
+    if (
+        spec.support_id != SYNTHETIC_VALIDATOR_SUPPORT_ID
+        or spec.support_digest != SYNTHETIC_VALIDATOR_SUPPORT_DIGEST
+        or capability.containment_digest != digest
+        or request.containment_digest != digest
+        or spec.input_digest != intent.input_digest
+        or spec.input_digest != request.input_digest
+    ):
+        raise DispatchDenied("validator containment binding mismatch")
+    if request.requested_actions != VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS:
+        raise DispatchDenied("validator containment denied requested mutation action")
+    if (
+        not _is_contained_path(request.read_path, spec.input_root, allow_root=True)
+        or not _is_contained_path(request.output_path, spec.output_root, allow_root=False)
+        or not _is_contained_path(request.scratch_path, spec.scratch_root, allow_root=False)
+    ):
+        raise DispatchDenied("validator containment denied path escape")
+    output_bytes = synthetic_validator_output_size(
+        request.result_digest, request.verdict
+    )
+    if request.output_bytes != output_bytes:
+        raise DispatchDenied("validator containment output size binding mismatch")
+    if (
+        output_bytes > spec.max_output_bytes
+        or output_bytes > VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES
+    ):
+        raise DispatchDenied("validator containment denied oversized output")
+    if request.uses_subprocess or request.uses_tool or request.uses_network:
+        raise DispatchDenied("validator containment denied descendant tool or network use")
+    return digest
 
 
 class SyntheticExecutionAdapter:
@@ -468,32 +583,162 @@ class SyntheticExecutionAdapter:
 class SyntheticValidatorAdapter:
     """Durable synthetic RESULT ledger; it performs no real validation."""
 
-    def __init__(self, ledger_path: Path) -> None:
+    _RESULT_TABLE_V1 = """
+        CREATE TABLE synthetic_validator_results (
+            claim_id TEXT PRIMARY KEY,
+            result_id TEXT NOT NULL UNIQUE,
+            repository_id TEXT NOT NULL,
+            logical_effect_id TEXT NOT NULL,
+            revision_digest TEXT NOT NULL,
+            check_id TEXT NOT NULL,
+            input_digest TEXT NOT NULL,
+            validator_attempt_id TEXT NOT NULL,
+            result_digest TEXT NOT NULL,
+            verdict TEXT NOT NULL CHECK (verdict IN ('PASS', 'FAIL')),
+            usage_units INTEGER,
+            final INTEGER NOT NULL CHECK (final = 1),
+            containment_version INTEGER,
+            containment_digest TEXT,
+            CHECK (
+                (containment_version IS NULL AND containment_digest IS NULL)
+                OR (containment_version = 1 AND containment_digest <> '')
+            )
+        )
+    """
+    _METADATA_TABLE_V1 = """
+        CREATE TABLE synthetic_validator_metadata (
+            singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+            semantic_version INTEGER NOT NULL CHECK (semantic_version = 1),
+            support_id TEXT NOT NULL,
+            support_digest TEXT NOT NULL
+        )
+    """
+
+    def __init__(self, ledger_path: Path, *, migration_failure_hook=None) -> None:
         self._ledger_path = ledger_path
         self._canonical_repository_id: str | None = None
         self._canonical_ledger_path: Path | None = None
         ledger_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
-            connection.execute(
-                """
-                CREATE TABLE IF NOT EXISTS synthetic_validator_results (
-                    claim_id TEXT PRIMARY KEY,
-                    result_id TEXT NOT NULL UNIQUE,
-                    repository_id TEXT NOT NULL,
-                    logical_effect_id TEXT NOT NULL,
-                    revision_digest TEXT NOT NULL,
-                    check_id TEXT NOT NULL,
-                    input_digest TEXT NOT NULL,
-                    validator_attempt_id TEXT NOT NULL,
-                    result_digest TEXT NOT NULL,
-                    verdict TEXT NOT NULL CHECK (verdict IN ('PASS', 'FAIL')),
-                    usage_units INTEGER,
-                    final INTEGER NOT NULL CHECK (final = 1)
+            self._migrate_ledger(connection, failure_hook=migration_failure_hook)
+
+    @staticmethod
+    def _canonical_schema(sql: str) -> str:
+        return "".join(sql.upper().split()).replace(
+            "IFNOTEXISTS", ""
+        ).rstrip(";")
+
+    @classmethod
+    def _migrate_ledger(cls, connection: sqlite3.Connection, *, failure_hook=None) -> None:
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {0, 1}:
+                raise DispatchDenied(
+                    "synthetic validator ledger semantic version is unsupported"
                 )
-                """
-            )
-            connection.execute(_NONEXECUTION_SEAL_SCHEMA)
-            connection.execute(_VALIDATOR_CESSATION_SCHEMA)
+            expected_tables = {
+                "synthetic_validator_results",
+                "synthetic_validator_metadata",
+                "synthetic_nonexecution_seals",
+                "synthetic_validator_cessations",
+            }
+            existing = {
+                str(row[0]): str(row[1])
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                    "AND name LIKE 'synthetic_%'"
+                )
+            }
+            if version == 0:
+                legacy_tables = expected_tables - {"synthetic_validator_metadata"}
+                if existing and set(existing) != legacy_tables:
+                    raise DispatchDenied(
+                        "synthetic validator ledger schema is partially migrated"
+                    )
+                if not existing:
+                    connection.execute(cls._RESULT_TABLE_V1)
+                    connection.execute(_NONEXECUTION_SEAL_SCHEMA)
+                    connection.execute(_VALIDATOR_CESSATION_SCHEMA)
+                else:
+                    legacy_columns = tuple(
+                        str(row[1])
+                        for row in connection.execute(
+                            "PRAGMA table_info(synthetic_validator_results)"
+                        )
+                    )
+                    if legacy_columns != (
+                        "claim_id", "result_id", "repository_id",
+                        "logical_effect_id", "revision_digest", "check_id",
+                        "input_digest", "validator_attempt_id", "result_digest",
+                        "verdict", "usage_units", "final",
+                    ):
+                        raise DispatchDenied(
+                            "synthetic validator legacy result schema is incompatible"
+                        )
+                    connection.execute(
+                        "ALTER TABLE synthetic_validator_results RENAME TO "
+                        "synthetic_validator_results_v0"
+                    )
+                    connection.execute(cls._RESULT_TABLE_V1)
+                    connection.execute(
+                        "INSERT INTO synthetic_validator_results "
+                        "(claim_id, result_id, repository_id, logical_effect_id, "
+                        "revision_digest, check_id, input_digest, "
+                        "validator_attempt_id, result_digest, verdict, usage_units, "
+                        "final, containment_version, containment_digest) SELECT "
+                        "claim_id, result_id, repository_id, logical_effect_id, "
+                        "revision_digest, check_id, input_digest, "
+                        "validator_attempt_id, result_digest, verdict, usage_units, "
+                        "final, NULL, NULL FROM synthetic_validator_results_v0"
+                    )
+                    connection.execute("DROP TABLE synthetic_validator_results_v0")
+                connection.execute(cls._METADATA_TABLE_V1)
+                connection.execute(
+                    "INSERT INTO synthetic_validator_metadata VALUES (1, 1, ?, ?)",
+                    (SYNTHETIC_VALIDATOR_SUPPORT_ID, SYNTHETIC_VALIDATOR_SUPPORT_DIGEST),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_validator_ledger_migration_writes_before_commit")
+                connection.execute("PRAGMA user_version = 1")
+            rows = {
+                str(row[0]): str(row[1])
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                    "AND name LIKE 'synthetic_%'"
+                )
+            }
+            expected_sql = {
+                "synthetic_validator_results": cls._RESULT_TABLE_V1,
+                "synthetic_validator_metadata": cls._METADATA_TABLE_V1,
+                "synthetic_nonexecution_seals": _NONEXECUTION_SEAL_SCHEMA,
+                "synthetic_validator_cessations": _VALIDATOR_CESSATION_SCHEMA,
+            }
+            metadata = connection.execute(
+                "SELECT semantic_version, support_id, support_digest FROM "
+                "synthetic_validator_metadata WHERE singleton = 1"
+            ).fetchall()
+            if (
+                int(connection.execute("PRAGMA user_version").fetchone()[0]) != 1
+                or set(rows) != expected_tables
+                or any(
+                    cls._canonical_schema(rows[name])
+                    != cls._canonical_schema(expected_sql[name])
+                    for name in expected_tables
+                )
+                or [tuple(row) for row in metadata]
+                != [(1, SYNTHETIC_VALIDATOR_SUPPORT_ID, SYNTHETIC_VALIDATOR_SUPPORT_DIGEST)]
+            ):
+                raise DispatchDenied(
+                    "synthetic validator ledger schema or support identity is incompatible"
+                )
+            connection.commit()
+            if failure_hook is not None:
+                failure_hook("after_validator_ledger_migration_commit_before_acknowledgement")
+        except BaseException:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
 
     @classmethod
     def open_canonical(cls, repository_id: str) -> "SyntheticValidatorAdapter":
@@ -660,16 +905,26 @@ class SyntheticValidatorAdapter:
         request: SyntheticValidatorRequest,
         intent: ValidatorIntentRequest,
     ) -> None:
-        capability_binding = tuple(capability.__dict__.values())[2:-1]
+        capability_binding = (
+            capability.repository_id, capability.logical_effect_id,
+            capability.revision_digest, capability.check_id,
+            capability.input_digest, capability.validator_attempt_id,
+            capability.scope_digest, capability.containment_digest,
+        )
         request_binding = (
             request.repository_id, request.logical_effect_id,
             request.revision_digest, request.check_id, request.input_digest,
             request.validator_attempt_id, request.scope_digest,
+            request.containment_digest,
+        )
+        intent_containment = validator_containment_digest(
+            parse_validator_containment_spec(intent.containment_spec_json)
         )
         intent_binding = (
             intent.repository_id, intent.logical_effect_id,
             intent.revision_digest, intent.check_id, intent.input_digest,
             intent.validator_attempt_id, capability.scope_digest,
+            intent_containment,
         )
         if request_binding != capability_binding or request_binding != intent_binding:
             raise DispatchDenied(
@@ -687,6 +942,7 @@ class SyntheticValidatorAdapter:
         *,
         usage_units: int | None = 0,
         lose_result: bool = False,
+        failure_hook=None,
     ) -> SyntheticValidatorResult | None:
         if commit.replayed or not commit.event_hash:
             raise DispatchDenied("synthetic validator requires a new durable intent")
@@ -698,6 +954,9 @@ class SyntheticValidatorAdapter:
         ):
             raise ValueError("usage_units must be non-negative or unknown")
         self._validate_request_binding(capability, request, intent)
+        containment_digest = validate_synthetic_validator_containment(
+            capability, request, intent
+        )
         result_id = hashlib.sha256(
             "\0".join((capability.claim_id, request.result_digest, request.verdict)).encode("utf-8")
         ).hexdigest()
@@ -705,6 +964,21 @@ class SyntheticValidatorAdapter:
             with closing(self._connect()) as connection:
                 connection.execute("BEGIN IMMEDIATE")
                 try:
+                    metadata = connection.execute(
+                        "SELECT semantic_version, support_id, support_digest FROM "
+                        "synthetic_validator_metadata WHERE singleton = 1"
+                    ).fetchone()
+                    if metadata is None or tuple(metadata) != (
+                        1,
+                        SYNTHETIC_VALIDATOR_SUPPORT_ID,
+                        SYNTHETIC_VALIDATOR_SUPPORT_DIGEST,
+                    ):
+                        raise DispatchDenied(
+                            "synthetic validator containment support changed"
+                        )
+                    validate_synthetic_validator_containment(
+                        capability, request, intent
+                    )
                     if connection.execute(
                         "SELECT 1 FROM synthetic_validator_cessations "
                         "WHERE claim_id = ?",
@@ -730,16 +1004,26 @@ class SyntheticValidatorAdapter:
                         )
                     connection.execute(
                         "INSERT INTO synthetic_validator_results VALUES "
-                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)",
                         (
                             capability.claim_id, result_id,
                             request.repository_id, request.logical_effect_id,
                             request.revision_digest, request.check_id,
                             request.input_digest, request.validator_attempt_id,
                             request.result_digest, request.verdict, usage_units,
+                            VALIDATOR_CONTAINMENT_BINDING_VERSION,
+                            containment_digest,
                         ),
                     )
+                    if failure_hook is not None:
+                        failure_hook(
+                            "after_validator_result_insert_before_commit"
+                        )
                     connection.commit()
+                    if failure_hook is not None:
+                        failure_hook(
+                            "after_validator_result_commit_before_acknowledgement"
+                        )
                 except BaseException:
                     connection.rollback()
                     raise
@@ -749,12 +1033,24 @@ class SyntheticValidatorAdapter:
                 request.check_id, request.input_digest,
                 request.validator_attempt_id, request.result_digest,
                 request.verdict, usage_units, True,
+                VALIDATOR_CONTAINMENT_BINDING_VERSION,
+                containment_digest,
             )
             return None if lose_result else result
 
         store._contact_committed_validator(
-            intent, capability, commit, target_digest, authority
+            intent,
+            capability,
+            commit,
+            target_digest,
+            authority,
+            containment_digest=containment_digest,
+            containment_verifier=lambda: validate_synthetic_validator_containment(
+                capability, request, intent
+            ),
         )
+        if failure_hook is not None:
+            failure_hook("after_validator_contact_before_result_transaction")
         return contact()
 
     def reconcile(self, claim_id: str) -> SyntheticValidatorResult | None:
@@ -773,4 +1069,14 @@ class SyntheticValidatorAdapter:
             str(row["result_digest"]), str(row["verdict"]),
             None if row["usage_units"] is None else int(row["usage_units"]),
             bool(row["final"]),
+            (
+                None
+                if row["containment_version"] is None
+                else int(row["containment_version"])
+            ),
+            (
+                None
+                if row["containment_digest"] is None
+                else str(row["containment_digest"])
+            ),
         )

@@ -113,6 +113,9 @@ from .contracts import (
     ValidatorIntentRequest,
     ValidatorIntentBinding,
     ValidatorObservationRequest,
+    VALIDATOR_CONTAINMENT_BINDING_VERSION,
+    parse_validator_containment_spec,
+    validator_containment_digest,
 )
 from .engine import TRANSITIONS, TransitionEngine
 
@@ -499,6 +502,8 @@ def _derive_effect_observation_route(
         LifecycleState.STOPPED,
     }:
         resulting_state = current_state
+    elif not ordinary_receipt:
+        resulting_state = LifecycleState.RECONCILIATION_REQUIRED
     elif (
         unresolved_billing
         or source_control_classification == SourceControlClassification.UNKNOWN.value
@@ -848,7 +853,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -869,7 +874,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4} and (
+        if semantic_version in {1, 2, 3, 4, 5} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -1179,8 +1184,8 @@ class SQLiteStateStore:
                 payload_digest TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE,
                 status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'SETTLED')),
-                recovery_id TEXT,
                 body_json TEXT NOT NULL,
+                recovery_id TEXT,
                 UNIQUE (repository_id, run_id, check_id, validator_attempt_id)
             );
             CREATE TABLE IF NOT EXISTS validator_observations (
@@ -1803,6 +1808,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_t28_foundation_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_validator_containment_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -1880,7 +1888,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4}:
+            if version not in {3, 4, 5}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -1909,11 +1917,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version == 4 and existing_foundation_tables != foundation_tables:
+            if version in {4, 5} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version == 4:
+            if version in {4, 5}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2404,6 +2412,264 @@ class SQLiteStateStore:
                 connection.rollback()
             raise
 
+    @staticmethod
+    def _migrate_validator_containment_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        containment_columns = (
+            "containment_binding_version",
+            "containment_digest",
+            "containment_spec_json",
+            "containment_capability_json",
+        )
+        legacy_columns = (
+            "validator_intent_id", "command_id", "event_id", "repository_id",
+            "run_id", "item_id", "logical_effect_id", "parent_attempt_id",
+            "parent_observation_id", "parent_event_hash", "revision_digest",
+            "check_id", "input_digest", "validator_attempt_id",
+            "capability_claim_id", "capability_grant_id",
+            "capability_scope_digest", "permission_use_id", "reservation_id",
+            "payload_digest", "event_hash", "status", "body_json", "recovery_id",
+        )
+        expected_columns = legacy_columns + containment_columns
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            migrated = version == 4
+            if version not in {4, 5}:
+                raise StorageIntegrityError(
+                    "validator containment semantic version is unsupported"
+                )
+            columns = tuple(
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(validator_intents)")
+            )
+            present = set(columns).intersection(containment_columns)
+            if version == 4:
+                if present and present != set(containment_columns):
+                    raise StorageIntegrityError(
+                        "validator containment schema is partially migrated"
+                    )
+                if not present and columns != legacy_columns:
+                    raise StorageIntegrityError(
+                        "legacy validator-intent schema is incompatible"
+                    )
+                if not present:
+                    connection.execute(
+                        "ALTER TABLE validator_intents ADD COLUMN "
+                        "containment_binding_version INTEGER"
+                    )
+                    connection.execute(
+                        "ALTER TABLE validator_intents ADD COLUMN containment_digest TEXT"
+                    )
+                    connection.execute(
+                        "ALTER TABLE validator_intents ADD COLUMN containment_spec_json TEXT"
+                    )
+                    connection.execute(
+                        "ALTER TABLE validator_intents ADD COLUMN "
+                        "containment_capability_json TEXT"
+                    )
+                elif (
+                    columns != expected_columns
+                ):
+                    raise StorageIntegrityError(
+                        "validator containment schema is missing or incompatible"
+                    )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validator_containment_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 5")
+            columns = tuple(
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(validator_intents)")
+            )
+            if (
+                columns != expected_columns
+            ):
+                raise StorageIntegrityError(
+                    "validator containment schema is missing or incompatible"
+                )
+            nullable_columns = {
+                "recovery_id",
+                "containment_binding_version",
+                "containment_digest",
+                "containment_spec_json",
+                "containment_capability_json",
+            }
+            column_specs = tuple(
+                (
+                    str(row["name"]),
+                    str(row["type"]).upper(),
+                    int(row["notnull"]),
+                    row["dflt_value"],
+                    int(row["pk"]),
+                )
+                for row in connection.execute(
+                    "PRAGMA table_info(validator_intents)"
+                )
+            )
+            expected_specs = tuple(
+                (
+                    name,
+                    "INTEGER" if name == "containment_binding_version" else "TEXT",
+                    0 if name in nullable_columns or name == "validator_intent_id" else 1,
+                    None,
+                    1 if name == "validator_intent_id" else 0,
+                )
+                for name in expected_columns
+            )
+            if column_specs != expected_specs:
+                raise StorageIntegrityError(
+                    "validator containment schema is missing or incompatible"
+                )
+            table_sql_row = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'validator_intents'"
+            ).fetchone()
+            table_sql = (
+                "" if table_sql_row is None
+                else "".join(str(table_sql_row["sql"]).upper().split())
+            )
+            expected_table_sql = "".join(
+                """
+                CREATE TABLE validator_intents (
+                    validator_intent_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    parent_attempt_id TEXT NOT NULL,
+                    parent_observation_id TEXT NOT NULL REFERENCES effect_observations(observation_id),
+                    parent_event_hash TEXT NOT NULL,
+                    revision_digest TEXT NOT NULL,
+                    check_id TEXT NOT NULL,
+                    input_digest TEXT NOT NULL,
+                    validator_attempt_id TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_scope_digest TEXT NOT NULL,
+                    permission_use_id TEXT NOT NULL UNIQUE REFERENCES permission_uses(permission_use_id),
+                    reservation_id TEXT NOT NULL UNIQUE REFERENCES budget_reservations(reservation_id),
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'SETTLED')),
+                    body_json TEXT NOT NULL,
+                    recovery_id TEXT,
+                    containment_binding_version INTEGER,
+                    containment_digest TEXT,
+                    containment_spec_json TEXT,
+                    containment_capability_json TEXT,
+                    UNIQUE (repository_id, run_id, check_id, validator_attempt_id)
+                )
+                """.upper().split()
+            )
+            if table_sql != expected_table_sql:
+                raise StorageIntegrityError(
+                    "validator containment schema is missing or incompatible"
+                )
+            unique_indexes = set()
+            for index in connection.execute(
+                "PRAGMA index_list(validator_intents)"
+            ):
+                if int(index["unique"]) != 1:
+                    continue
+                unique_indexes.add(
+                    tuple(
+                        str(row["name"])
+                        for row in connection.execute(
+                            f"PRAGMA index_info('{index['name']}')"
+                        )
+                    )
+                )
+            if unique_indexes != {
+                ("validator_intent_id",),
+                ("command_id",),
+                ("event_id",),
+                ("capability_claim_id",),
+                ("permission_use_id",),
+                ("reservation_id",),
+                ("event_hash",),
+                ("recovery_id",),
+                ("repository_id", "run_id", "check_id", "validator_attempt_id"),
+            }:
+                raise StorageIntegrityError(
+                    "validator containment schema is missing or incompatible"
+                )
+            recovery_index_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'index' AND "
+                "name = 'uq_validator_intents_recovery_id'"
+            ).fetchone()
+            if recovery_index_sql is None or "".join(
+                str(recovery_index_sql["sql"]).upper().split()
+            ) != "".join(
+                "CREATE UNIQUE INDEX uq_validator_intents_recovery_id ON "
+                "validator_intents(recovery_id) WHERE recovery_id IS NOT NULL"
+                .upper().split()
+            ):
+                raise StorageIntegrityError(
+                    "validator containment schema is missing or incompatible"
+                )
+            for row in connection.execute("SELECT * FROM validator_intents"):
+                values = tuple(row[name] for name in containment_columns)
+                body = json.loads(str(row["body_json"]))
+                body_has_containment = "containment_binding_version" in body
+                if not body_has_containment:
+                    if any(value is not None for value in values):
+                        raise StorageIntegrityError(
+                            "legacy validator intent manufactured containment"
+                        )
+                    continue
+                if any(value is None for value in values):
+                    raise StorageIntegrityError(
+                        "validator containment projection is incomplete"
+                    )
+                spec = parse_validator_containment_spec(
+                    str(row["containment_spec_json"])
+                )
+                capability_json = json.dumps(
+                    body.get("capability_evidence"),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                if (
+                    int(row["containment_binding_version"])
+                    != VALIDATOR_CONTAINMENT_BINDING_VERSION
+                    or row["containment_binding_version"]
+                    != body.get("containment_binding_version")
+                    or row["containment_digest"] != body.get("containment_digest")
+                    or row["containment_spec_json"]
+                    != body.get("containment_spec_json")
+                    or row["containment_capability_json"] != capability_json
+                    or row["containment_digest"]
+                    != validator_containment_digest(spec)
+                ):
+                    raise StorageIntegrityError(
+                        "validator containment projection diverges from history"
+                    )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and migrated:
+                    failure_hook(
+                        "after_validator_containment_migration_commit_before_acknowledgement"
+                    )
+        except (TypeError, ValueError, json.JSONDecodeError) as error:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise StorageIntegrityError(
+                "validator containment history is invalid"
+            ) from error
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
     def _store_utc_now(self, connection: sqlite3.Connection) -> str:
         now = self._utc_now()
         if (
@@ -2722,6 +2988,16 @@ class SQLiteStateStore:
                         capability.consumer_key,
                     ),
                 ).fetchone()
+                if prior is None:
+                    catalog_head, run_heads = self._heads(
+                        connection, self._repository_id
+                    )
+                    if not self._freshness_oracle.verify(
+                        self._repository_id, catalog_head, run_heads
+                    ):
+                        raise DispatchDenied(
+                            "independent recovery freshness proof failed"
+                        )
                 recorded_at = (
                     str(connection.execute(
                         "SELECT recorded_at FROM synthetic_authority_uses WHERE "
@@ -2762,7 +3038,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4}:
+            if version not in {0, 1, 2, 3, 4, 5}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -2770,7 +3046,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4}:
+            if version in {2, 3, 4, 5}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -2822,7 +3098,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4}:
+                if version in {3, 4, 5}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -3032,7 +3308,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4,
+                1, 2, 3, 4, 5,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -3104,7 +3380,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4}:
+            if version not in {1, 2, 3, 4, 5}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -3145,7 +3421,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4,
+                2, 3, 4, 5,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -3348,7 +3624,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4}:
+            if version not in {2, 3, 4, 5}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -3702,7 +3978,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4,
+                3, 4, 5,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -19241,6 +19517,8 @@ class SQLiteStateStore:
         target_digest: str,
         authority: SyntheticAuthority,
         *,
+        containment_digest: str | None = None,
+        containment_verifier: Callable[[], str] | None = None,
         failure_hook: FailureHook | None = None,
     ) -> None:
         with RepositoryWriterLock(self._database_path.parent), closing(
@@ -19303,6 +19581,51 @@ class SQLiteStateStore:
                         "validator contact does not bind a durable active intent"
                     )
                 validator_body = json.loads(validator["body_json"])
+                if (
+                    validator_body.get("containment_binding_version")
+                    != VALIDATOR_CONTAINMENT_BINDING_VERSION
+                    or not isinstance(
+                        validator_body.get("containment_digest"), str
+                    )
+                    or not validator_body.get("containment_digest")
+                    or validator_body.get("capability_evidence")
+                    != capability.__dict__
+                    or validator_body.get("capability_issuer_fingerprint")
+                    != authority.issuer_fingerprint
+                ):
+                    raise DispatchDenied(
+                        "legacy or incomplete validator containment cannot launch"
+                    )
+                authority.verify_validator_evidence(capability)
+                durable_spec = parse_validator_containment_spec(
+                    str(validator_body.get("containment_spec_json", ""))
+                )
+                durable_containment_digest = validator_containment_digest(
+                    durable_spec
+                )
+                if (
+                    durable_containment_digest
+                    != validator_body["containment_digest"]
+                    or capability.containment_digest
+                    != durable_containment_digest
+                    or validator["containment_binding_version"]
+                    != VALIDATOR_CONTAINMENT_BINDING_VERSION
+                    or validator["containment_digest"]
+                    != durable_containment_digest
+                    or validator["containment_spec_json"]
+                    != validator_body["containment_spec_json"]
+                    or json.loads(str(validator["containment_capability_json"]))
+                    != capability.__dict__
+                ):
+                    raise DispatchDenied(
+                        "validator containment durable binding changed"
+                    )
+                if containment_digest is None:
+                    containment_digest = durable_containment_digest
+                if containment_digest != durable_containment_digest:
+                    raise DispatchDenied(
+                        "validator containment contact binding changed"
+                    )
                 durable_validator_request = {
                     key: validator_body.get(key)
                     for key in ValidatorIntentRequest.__dataclass_fields__
@@ -19425,11 +19748,13 @@ class SQLiteStateStore:
                         existing_contact["target_digest"],
                         existing_body.get("logical_effect_id"),
                         existing_body.get("attempt_id"),
+                        existing_body.get("containment_digest"),
                     ) != (
                         request.repository_id, request.run_id, request.item_id,
                         "VALIDATOR", target_digest,
                         request.logical_effect_id,
                         request.validator_attempt_id,
+                        durable_containment_digest,
                     ) or any(
                         existing_body.get(key) != value
                         for key, value in expected_recovery_fields.items()
@@ -19449,6 +19774,12 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return
+                if containment_verifier is not None:
+                    verified_digest = containment_verifier()
+                    if verified_digest != durable_containment_digest:
+                        raise DispatchDenied(
+                            "validator containment final check changed"
+                        )
                 self._claim_adapter_contact(
                     connection,
                     contact_kind="VALIDATOR",
@@ -19459,6 +19790,16 @@ class SQLiteStateStore:
                     logical_effect_id=request.logical_effect_id,
                     attempt_id=request.validator_attempt_id,
                     target_digest=target_digest,
+                    binding_evidence={
+                        "capability_evidence": dict(capability.__dict__),
+                        "capability_issuer_fingerprint": (
+                            authority.issuer_fingerprint
+                        ),
+                        "containment_binding_version": (
+                            VALIDATOR_CONTAINMENT_BINDING_VERSION
+                        ),
+                        "containment_digest": durable_containment_digest,
+                    },
                     slot_generation=(
                         parent_slot_generation
                         if parent_slot_generation > 1 else None
@@ -19493,6 +19834,7 @@ class SQLiteStateStore:
         logical_effect_id: str,
         attempt_id: str,
         target_digest: str,
+        binding_evidence: Mapping[str, object] | None = None,
         slot_generation: int | None = None,
         recovery_authorization_id: str | None = None,
     ) -> None:
@@ -19544,6 +19886,13 @@ class SQLiteStateStore:
             "target_digest": target_digest,
             "writer_epoch": writer_epoch,
         }
+        if binding_evidence is not None:
+            if not binding_evidence:
+                raise DispatchDenied("adapter contact binding evidence is empty")
+            for key, value in binding_evidence.items():
+                if key in body:
+                    raise DispatchDenied("adapter contact binding evidence overlaps")
+                body[key] = value
         if slot_generation is not None or recovery_authorization_id is not None:
             if (
                 type(slot_generation) is not int
@@ -20921,9 +21270,6 @@ class SQLiteStateStore:
                         request.logical_effect_id, request.attempt_id,
                     ),
                 ).fetchone()
-                ordinary_receipt = current_state in {
-                    LifecycleState.RUNNING, LifecycleState.PAUSING,
-                } and retry_authorization is None
                 self._require_plan_issuer(
                     connection,
                     request.repository_id,
@@ -21236,18 +21582,6 @@ class SQLiteStateStore:
                 )
                 if accounting_error is not None:
                     raise DispatchDenied(accounting_error)
-                transition_id, event_kind, resulting_state = (
-                    _derive_effect_observation_route(
-                        current_state,
-                        request.usage_units,
-                        request.source_control_classification,
-                        accounting_unknown=(
-                            BudgetDisposition(str(settlement["disposition"]))
-                            is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
-                        ),
-                        force_late=retry_authorization is not None,
-                    )
-                )
                 slot = connection.execute(
                     "SELECT * FROM outstanding_slot WHERE repository_id = ?",
                     (request.repository_id,),
@@ -21261,10 +21595,24 @@ class SQLiteStateStore:
                     request.logical_effect_id,
                     request.attempt_id,
                 )
-                if ordinary_receipt and not owns_slot:
-                    raise StorageIntegrityError(
-                        "observation attempt does not own the outstanding slot"
+                ordinary_receipt = (
+                    current_state
+                    in {LifecycleState.RUNNING, LifecycleState.PAUSING}
+                    and retry_authorization is None
+                    and owns_slot
+                )
+                transition_id, event_kind, resulting_state = (
+                    _derive_effect_observation_route(
+                        current_state,
+                        request.usage_units,
+                        request.source_control_classification,
+                        accounting_unknown=(
+                            BudgetDisposition(str(settlement["disposition"]))
+                            is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                        ),
+                        force_late=not ordinary_receipt,
                     )
+                )
 
                 slot_released = False
                 if (
@@ -21803,7 +22151,12 @@ class SQLiteStateStore:
             capability.check_id,
             capability.input_digest,
             capability.validator_attempt_id,
+            capability.containment_digest,
         )
+        containment_spec = parse_validator_containment_spec(
+            request.containment_spec_json
+        )
+        containment_digest = validator_containment_digest(containment_spec)
         request_binding = (
             request.repository_id,
             request.logical_effect_id,
@@ -21811,6 +22164,7 @@ class SQLiteStateStore:
             request.check_id,
             request.input_digest,
             request.validator_attempt_id,
+            containment_digest,
         )
         if capability_binding != request_binding:
             raise DispatchDenied(
@@ -22125,6 +22479,12 @@ class SQLiteStateStore:
                     "capability_claim_id": capability.claim_id,
                     "capability_grant_id": capability.grant_id,
                     "capability_scope_digest": capability.scope_digest,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": authority.issuer_fingerprint,
+                    "containment_binding_version": (
+                        VALIDATOR_CONTAINMENT_BINDING_VERSION
+                    ),
+                    "containment_digest": containment_digest,
                     "event_kind": "VALIDATOR_INTENT_COMMITTED",
                     "lifecycle_from": LifecycleState.VALIDATING.value,
                     "lifecycle_to": LifecycleState.VALIDATING.value,
@@ -22202,9 +22562,11 @@ class SQLiteStateStore:
                     "check_id, input_digest, validator_attempt_id, "
                     "capability_claim_id, capability_grant_id, "
                     "capability_scope_digest, permission_use_id, reservation_id, "
-                    "payload_digest, event_hash, status, recovery_id, body_json"
+                    "payload_digest, event_hash, status, recovery_id, body_json, "
+                    "containment_binding_version, containment_digest, "
+                    "containment_spec_json, containment_capability_json"
                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    "?, ?, ?, ?, ?, 'ACTIVE', ?, ?)",
+                    "?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?, ?, ?, ?)",
                     (
                         request.validator_intent_id,
                         request.command_id,
@@ -22229,6 +22591,14 @@ class SQLiteStateStore:
                         event_hash,
                         request.recovery_id,
                         body_json,
+                        VALIDATOR_CONTAINMENT_BINDING_VERSION,
+                        containment_digest,
+                        request.containment_spec_json,
+                        json.dumps(
+                            capability.__dict__,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ),
                     ),
                 )
                 connection.execute(
@@ -22366,12 +22736,14 @@ class SQLiteStateStore:
                     intent["logical_effect_id"], intent["validator_attempt_id"],
                     intent["capability_claim_id"], intent["revision_digest"],
                     intent["check_id"], intent["input_digest"],
+                    intent["containment_digest"],
                 )
                 requested_binding = (
                     request.repository_id, request.run_id, request.item_id,
                     request.logical_effect_id, request.validator_attempt_id,
                     request.source_claim_id, request.revision_digest,
                     request.check_id, request.input_digest,
+                    request.containment_digest,
                 )
                 if binding != requested_binding:
                     raise DispatchDenied(
@@ -23926,6 +24298,11 @@ class SQLiteStateStore:
                 str(row["check_id"]), str(row["input_digest"]),
                 str(row["validator_attempt_id"]),
                 str(row["capability_claim_id"]),
+                (
+                    None
+                    if row["containment_digest"] is None
+                    else str(row["containment_digest"])
+                ),
             )
 
     def load_run_lifecycle(self, run_id: str) -> LifecycleState:
@@ -26874,6 +27251,32 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "validator contact attempt binding is invalid"
                     )
+                if "containment_binding_version" in validator_body:
+                    if (
+                        contact_body.get("containment_binding_version")
+                        != VALIDATOR_CONTAINMENT_BINDING_VERSION
+                        or contact_body.get("containment_digest")
+                        != validator_body.get("containment_digest")
+                        or contact_body.get("capability_evidence")
+                        != validator_body.get("capability_evidence")
+                        or contact_body.get("capability_issuer_fingerprint")
+                        != validator_body.get("capability_issuer_fingerprint")
+                    ):
+                        raise StorageIntegrityError(
+                            "validator contact lost its containment binding"
+                        )
+                elif any(
+                    field in contact_body
+                    for field in (
+                        "containment_binding_version",
+                        "containment_digest",
+                        "capability_evidence",
+                        "capability_issuer_fingerprint",
+                    )
+                ):
+                    raise StorageIntegrityError(
+                        "legacy validator contact manufactured containment"
+                    )
                 recovery_fields = {
                     "contact_binding_version",
                     "recovery_authorization_id",
@@ -27303,6 +27706,97 @@ class SQLiteStateStore:
         ).fetchall()
         validator_intents = [json.loads(row["body_json"]) for row in validator_event_rows]
         for validator_body in validator_intents:
+            has_containment = "containment_binding_version" in validator_body
+            containment_fields = {
+                "containment_binding_version",
+                "containment_digest",
+                "containment_spec_json",
+                "capability_evidence",
+                "capability_issuer_fingerprint",
+            }
+            if has_containment:
+                if not containment_fields.issubset(validator_body):
+                    raise StorageIntegrityError(
+                        "validator containment event evidence is incomplete"
+                    )
+                try:
+                    spec = parse_validator_containment_spec(
+                        str(validator_body["containment_spec_json"])
+                    )
+                    capability_evidence = SyntheticValidatorCapability(
+                        **validator_body["capability_evidence"]
+                    )
+                    if (
+                        validator_body["containment_binding_version"]
+                        != VALIDATOR_CONTAINMENT_BINDING_VERSION
+                        or validator_body["containment_digest"]
+                        != validator_containment_digest(spec)
+                        or capability_evidence.containment_digest
+                        != validator_body["containment_digest"]
+                        or validator_body["capability_claim_id"]
+                        != capability_evidence.claim_id
+                        or validator_body["capability_grant_id"]
+                        != capability_evidence.grant_id
+                        or validator_body["capability_scope_digest"]
+                        != capability_evidence.scope_digest
+                    ):
+                        raise ValueError("validator containment evidence mismatch")
+                    if self._classification_authority is None:
+                        raise ValueError(
+                            "validator containment authority is not bound"
+                        )
+                    if (
+                        validator_body["capability_issuer_fingerprint"]
+                        != self._classification_authority.issuer_fingerprint
+                    ):
+                        raise ValueError("validator containment issuer mismatch")
+                    self._classification_authority.verify_validator_evidence(
+                        capability_evidence
+                    )
+                except (DispatchDenied, TypeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "validator containment event evidence is invalid"
+                    ) from error
+            elif containment_fields.intersection(validator_body):
+                raise StorageIntegrityError(
+                    "legacy validator intent has partial containment evidence"
+                )
+            event_fields = {
+                "capability_claim_id",
+                "capability_grant_id",
+                "capability_scope_digest",
+                "event_kind",
+                "lifecycle_from",
+                "lifecycle_to",
+                "previous_event_hash",
+                "schema_version",
+                "sequence",
+                "writer_epoch",
+            }
+            request_fields = set(ValidatorIntentRequest.__dataclass_fields__)
+            if has_containment:
+                expected_fields = request_fields | event_fields | {
+                    "capability_evidence",
+                    "capability_issuer_fingerprint",
+                    "containment_binding_version",
+                    "containment_digest",
+                }
+            else:
+                expected_fields = (
+                    request_fields - {"containment_spec_json"}
+                ) | event_fields
+            recovery_fields = {
+                "validator_intent_binding_version",
+                "parent_slot_generation",
+                "parent_recovery_authorization_id",
+            }
+            if set(validator_body) not in {
+                frozenset(expected_fields),
+                frozenset(expected_fields | recovery_fields),
+            }:
+                raise StorageIntegrityError(
+                    "validator intent event schema is invalid"
+                )
             parent_generation, parent_authorization_id = (
                 self._operation_attempt_generation(
                     connection,
@@ -27357,11 +27851,6 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "validator intent adoption origin binding is invalid"
                 )
-            recovery_fields = {
-                "validator_intent_binding_version",
-                "parent_slot_generation",
-                "parent_recovery_authorization_id",
-            }
             if parent_generation == 1:
                 if recovery_fields.intersection(validator_body):
                     raise StorageIntegrityError(
@@ -27441,6 +27930,22 @@ class SQLiteStateStore:
         validator_observations = [
             json.loads(row["body_json"]) for row in validator_observation_rows
         ]
+        validator_intents_by_id = {
+            body["validator_intent_id"]: body for body in validator_intents
+        }
+        for observation_body in validator_observations:
+            intent_body = validator_intents_by_id.get(
+                observation_body.get("validator_intent_id")
+            )
+            if intent_body is None:
+                raise StorageIntegrityError(
+                    "validator observation lost its durable intent"
+                )
+            expected_containment = intent_body.get("containment_digest")
+            if observation_body.get("containment_digest") != expected_containment:
+                raise StorageIntegrityError(
+                    "validator observation lost its containment binding"
+                )
         expected_outcomes.update(
             {
                 body["command_id"]: (
@@ -31179,6 +31684,18 @@ class SQLiteStateStore:
                 body["permission_use_id"],
                 body["reservation_id"],
                 body.get("recovery_id"),
+                body.get("containment_binding_version"),
+                body.get("containment_digest"),
+                body.get("containment_spec_json"),
+                (
+                    None
+                    if body.get("capability_evidence") is None
+                    else json.dumps(
+                        body["capability_evidence"],
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
+                ),
                 self._event_hash(
                     {
                         key: body[key]
@@ -31201,6 +31718,10 @@ class SQLiteStateStore:
                 row["capability_grant_id"], row["capability_scope_digest"],
                 row["permission_use_id"], row["reservation_id"],
                 row["recovery_id"],
+                row["containment_binding_version"],
+                row["containment_digest"],
+                row["containment_spec_json"],
+                row["containment_capability_json"],
                 row["payload_digest"], row["event_hash"], row["status"],
             )
             for row in connection.execute(
@@ -33217,15 +33738,6 @@ class SQLiteStateStore:
                 and body.get("slot_released") is True
             ):
                 continue
-            operation_attempts = connection.execute(
-                "SELECT attempt_id FROM effect_observations WHERE "
-                "repository_id = ? AND run_id = ? AND logical_effect_id = ?",
-                (
-                    repository_id,
-                    body["run_id"],
-                    body["logical_effect_id"],
-                ),
-            ).fetchall()
             operation_origin = connection.execute(
                 "SELECT * FROM operation_origins WHERE repository_id = ? AND "
                 "run_id = ?",
@@ -33236,21 +33748,40 @@ class SQLiteStateStore:
                 and operation_origin["origin_kind"]
                 == OperationOriginKind.EFFECT_ADOPTION.value
             )
-            if (not adoption_origin and len(operation_attempts) != 1) or (
-                adoption_origin and operation_attempts
-            ):
-                raise StorageIntegrityError(
-                    "final failure violates accounting closure: "
-                    "final effect observation is unavailable"
-                )
             settling_observation = connection.execute(
-                "SELECT validator_intent_id, observation_id FROM "
-                "validator_observations WHERE observation_id = ?",
+                "SELECT observation.validator_intent_id, "
+                "observation.observation_id, intent.parent_attempt_id, "
+                "intent.parent_observation_id FROM validator_observations AS "
+                "observation JOIN validator_intents AS intent ON "
+                "intent.validator_intent_id = observation.validator_intent_id "
+                "WHERE observation.observation_id = ?",
                 (body["observation_id"],),
             ).fetchone()
             if settling_observation is None:
                 raise StorageIntegrityError(
                     "final failure lost its validator observation"
+                )
+            parent_effect_observation = connection.execute(
+                "SELECT 1 FROM effect_observations AS observation JOIN events "
+                "AS event ON event.event_id = observation.event_id WHERE "
+                "observation.observation_id = ? AND observation.repository_id = ? "
+                "AND observation.run_id = ? AND observation.logical_effect_id = ? "
+                "AND observation.attempt_id = ? AND event.sequence < ?",
+                (
+                    settling_observation["parent_observation_id"],
+                    repository_id,
+                    body["run_id"],
+                    body["logical_effect_id"],
+                    settling_observation["parent_attempt_id"],
+                    body["sequence"],
+                ),
+            ).fetchone()
+            if (not adoption_origin and parent_effect_observation is None) or (
+                adoption_origin and parent_effect_observation is not None
+            ):
+                raise StorageIntegrityError(
+                    "final failure violates accounting closure: "
+                    "final effect observation is unavailable"
                 )
             closure_error = self._accounting_closure_error(
                 connection,
@@ -33259,7 +33790,8 @@ class SQLiteStateStore:
                 str(body["logical_effect_id"]),
                 str(
                     body["slot_attempt_id"]
-                    if adoption_origin else operation_attempts[0]["attempt_id"]
+                    if adoption_origin
+                    else settling_observation["parent_attempt_id"]
                 ),
                 settling_validator_intent_id=str(
                     settling_observation["validator_intent_id"]
@@ -33603,7 +34135,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 4:
+            if version != 5:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

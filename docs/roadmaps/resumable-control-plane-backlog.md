@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting and T28/F01 verified-effect adoption. The complete local delivery-control suite passes 391 tests, but slice evidence does not promote unaudited T/C/F rows. Cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption and cross-family F05/F06/F13/F20. The complete local delivery-control suite passes 413 tests, but slice evidence does not promote unaudited T/C/F rows. Filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -975,8 +975,45 @@ rejects capability rebinding.
 
 T28/F01 implementation is independently accepted, but their accumulated matrix
 rows remain `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the exact-head trace and
-final architecture/security/QA gates. Cross-family F05/F06/F13/F20 is next in
-the documented order. PR #99 remains draft and not merge-ready.
+final architecture/security/QA gates. At that checkpoint, cross-family
+F05/F06/F13/F20 was next in the documented order. PR #99 remained draft and
+not merge-ready.
+
+### 5.21 Cross-family F05/F06/F13/F20 checkpoint
+
+The reviewed cross-family slice makes every dispatch-capable storage boundary
+prove the complete independent freshness vector, including a new one-use
+synthetic source consumption. Exact replay is resolved before mutable freshness,
+while a stale copy cannot spend a still-unconsumed source grant or change any
+database byte. F06 exercises the single repository-wide outstanding-operation
+slot across items, runs, lifecycle states, uncertain billing and generation-
+bound same-effect retry before and after ownership transfer.
+
+F13 now routes proof-first contrary receipts against every relevant durable
+lifecycle state, preserving terminal states and forcing active nonterminal
+states into reconciliation with exact known or worst-case accounting. Tests
+assert the actual pre-receipt state, including a lawful T05 PAUSING state before
+adapter contact. F20 adds an exact typed validator-containment contract,
+capability binding, canonical output-size derivation and bounded output, pairwise
+disjoint roots, pure checker restrictions, strict schema/event recovery and
+crash/replay coverage. Legacy active validator intent without containment is
+nonlaunchable.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Two `REVISE` audits corrected the complete F05 mutation inventory, F06 state/generation matrix, F13 lifecycle/accounting matrix and F20 containment/recovery invariants; the third audit returned `APPROVE` before editing |
+| Focused regressions | The final three-test falsification set passed in 2.143 seconds, covering replay-before-freshness plus stale-copy non-mutation, the dispatch-boundary guard inventory and lawful PAUSING contrary-receipt recovery |
+| Complete delivery-control package | 413 tests passed in 67.555 seconds after final review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Three `REVISE` rounds closed caller-asserted output bounds, nested roots, optional recovery authority, exact schema/event checks, incomplete F05/F06/F13 matrices, stale source-use freshness and a mislabeled PAUSING fixture; final `APPROVE`, no remaining blocker or major |
+| T/C/F traceability | Adds independently accepted F05/F06/F13/F20 evidence across their implicated T/C routes; complete accumulated rows remain conservatively `UNVERIFIED` pending the final exact-head trace |
+| Files changed | `adapters.py`, `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py` and `test_storage.py`; this backlog/handoff and status READMEs record evidence separately |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
+
+Cross-family F05/F06/F13/F20 is independently accepted. Filesystem ownership,
+reparse-point and path-swap protection is next in documented order. PR #99
+remains draft and not merge-ready; no release or deployment is authorized.
 
 ## 6. Handoff contract
 

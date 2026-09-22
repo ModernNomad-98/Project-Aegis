@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 391-test package suite passes locally; all three stop findings, T13
+its full 413-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -644,8 +644,12 @@ terminal denial without authorizing advancement or reconciliation and preserves
 the database byte-for-byte. T28/F01 verified-effect adoption also has independent
 `APPROVE`: exact root/immediate provenance, current checks and source terms are
 bound without redispatch or reused charge, while contrary dependent evidence
-retains its typed integrity fence. Cross-family F05/F06/F13/F20 is next in the
-documented order. The PR
+retains its typed integrity fence. Cross-family F05/F06/F13/F20 also has
+independent `APPROVE`: complete-vector freshness covers one-use source
+consumption, the repository-wide slot is exercised across lifecycle/generation
+boundaries, contrary receipts follow exact durable states and validator
+containment is typed, bounded and strictly recovered. Filesystem ownership,
+reparse-point and path-swap protection is next in the documented order. The PR
 remains draft and not
 merge-ready while the exact
 T/C/F backlog and final review gates remain. Read the

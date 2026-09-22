@@ -203,7 +203,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 391 tests successfully, and
+controller. The complete local package suite ran 413 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -289,8 +289,13 @@ terms, consumes one adoption grant without redispatch or reused validation/
 charge, persists transitive dependencies, and conservatively fences dependents
 on contrary T23 evidence. Canonical relationship authority and source-history
 recovery fail closed on rebinding, stale lifecycle, use-window or use-limit
-violations. The cross-family F05/F06/F13/F20 work is next in documented order.
-The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
+violations. Cross-family F05/F06/F13/F20 now also has independent implementation
+`APPROVE`: complete-vector freshness guards new one-use source consumption,
+repository-wide slot tests cover lifecycle and generation boundaries, contrary
+receipts are recovered across exact durable states, and validator containment
+is typed, bounded, authority-bound and strictly reconstructed. Filesystem
+ownership/reparse/path-swap protection is next in documented order. The broader
+exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
 
