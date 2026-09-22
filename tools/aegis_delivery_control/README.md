@@ -203,7 +203,7 @@ difference fails closed.
 ## Current draft checkpoint
 
 The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 384 tests successfully, and
+controller. The complete local package suite ran 391 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -282,7 +282,14 @@ T22 terminal-restart reporting received independent implementation `APPROVE`
 after a write-capable auxiliary proof-ledger handle and an escaping structural
 JSON error were corrected. Its 11 focused tests cover terminal/nonterminal,
 freshness, corruption, trust, retained accounting/slot, concurrent snapshots
-and byte-preserving main/auxiliary reads. T28 with F01 is the next ordered item.
+and byte-preserving main/auxiliary reads. T28/F01 verified-effect adoption also
+received independent implementation `APPROVE`: it binds completed root and
+immediate provenance, the current plan/check set and exact synthetic source
+terms, consumes one adoption grant without redispatch or reused validation/
+charge, persists transitive dependencies, and conservatively fences dependents
+on contrary T23 evidence. Canonical relationship authority and source-history
+recovery fail closed on rebinding, stale lifecycle, use-window or use-limit
+violations. The cross-family F05/F06/F13/F20 work is next in documented order.
 The broader exact T/C/F backlog and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.

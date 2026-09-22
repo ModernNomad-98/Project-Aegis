@@ -6,9 +6,9 @@ Branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed implementation checkpoint: `39ad374a172122c14d06070f65c1e033da3b5c83`
+Latest pushed implementation checkpoint: `bbc96cffc31b8d1c82ba8877309d14674f133ff5`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, REVIEWED T05-T09/T13-T15, ORDERED T17 SLICES AND T22 `APPROVE`; T28 AND LATER BACKLOG OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - STOP GATE, REVIEWED T05-T09/T13-T15, ORDERED T17 SLICES, T22 AND T28/F01 `APPROVE`; CROSS-FAMILY AND FINAL GATES OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -995,7 +995,63 @@ remained an ancestor and live PR #99 remained open, draft and blocked.
 
 T22 is implemented, tested and independently accepted. C07 and F04b receive
 narrow accepted evidence but remain conservatively `UNVERIFIED` as complete
-families. T28 with F01 is next. PR #99 remains open, draft and blocked.
+families. The succeeding T28/F01 checkpoint is recorded below. PR #99 remains
+open, draft and blocked.
+
+### 7.20 T28 verified-effect adoption and F01 identity
+
+T28 now adopts a fully settled completed effect into a new accepted plan and
+validation-check set without contacting an execution adapter, repeating the
+effect, reusing validation results or charging it again. One dedicated synthetic
+adoption grant is consumed exactly once. The signed adoption identity binds the
+root attempt/observation/finalization, immediate execution-or-adoption edge,
+current check-set digest, accepted plan/effect and source ID/version/terms/scope.
+Readiness, source use, slot ownership, origin and transitive dependency edges are
+committed atomically and replayed from immutable history.
+
+F01 now persists canonical effect definitions plus explicitly authorized
+`REPEAT_OF`, `DIFFERENT_FROM` and `COMPENSATES` relationships. Their authority
+keys bind the new canonical material and defining plan, predecessor descriptor
+and defining history, relationship source terms and grant. Every relationship
+kind must have a settled, unfenced predecessor before T03. Exact lost-ack T01
+replay precedes mutable freshness, returns the original outcome and verifies the
+supplied capability against the recorded source-use event without spending it
+again.
+
+The v4 schema boundary verifies exact table DDL, foreign keys and canonical
+projections without healing deletion or surplus data. Recovery reduces the
+synthetic source journal sequentially, so registration must precede use, every
+capability must match its grant, time windows and use limits must hold, and a
+prior effective revocation/expiry/supersession/unknown state denies the use.
+Post-use expiry remains valid. T23 contrary evidence places every dependent
+adoption into durable reconciliation with a typed integrity fence. T13
+correction clears only authority-owned dependent fences; an authority fact ID
+collision cannot clear a contrary-receipt fence.
+
+The implementation review initially returned `REVISE` for under-bound
+adoption/relationship authority, incomplete source-history reduction, replay
+ordering and silent T23 fence deletion. Corrections retained the contrary fence,
+bound complete root/immediate/check/source materials and added sequential source
+verification. A second `REVISE` found missing adoption source terms and a
+cross-domain correction-owner collision. Complete source-term replay binding
+and provenance-scoped correction closed both. Final independent review returned
+`APPROVE` with no remaining blocker or major.
+
+The final focused set passed four tests. The complete delivery-control package
+passed 391 tests in 60.210 seconds. Repository validation found 184 valid skills
+with zero warnings, 8 script tests passed with 4 expected skips, all 91 gate
+self-test assertions passed, compileall passed and `git diff --check` exited 0
+with Windows line-ending notices only. Signed implementation commit
+`bbc96cffc31b8d1c82ba8877309d14674f133ff5` was pushed to the existing branch.
+Exact-head hosted checks were pending when this evidence commit was written.
+
+Changed implementation files are `authority.py`, `contracts.py`, `dispatch.py`,
+`storage.py`, `test_dispatch.py`, `test_storage.py` and `_legacy_schema.py`.
+Canonical design, approval register, BER, dependencies, CI, CLI, real authority/
+adapters, external systems and preserved artifact/cache paths were intentionally
+untouched. T28/F01 receive accepted slice evidence but remain conservatively
+`UNVERIFIED` as accumulated matrix rows pending exact-head trace. Cross-family
+F05/F06/F13/F20 is next; PR #99 remains open, draft and blocked.
 
 ## 8. Proven invocations
 
@@ -1130,6 +1186,11 @@ families. T28 with F01 is next. PR #99 remains open, draft and blocked.
 | Independent T22 implementation review | Initial `REVISE` found two MAJOR read-only auxiliary-ledger and structural-JSON failure gaps; corrected `APPROVE`, no remaining blocker or major |
 | `git diff --check` after T22 corrections | Exit 0; Windows line-ending notices only |
 | T22 commit, push and hosted checks | Signed implementation commit `39ad374a172122c14d06070f65c1e033da3b5c83` pushed; local and remote heads matched; `ba13394` remained an ancestor; exact-head `gate-guard`, `validate-skills` and `windows-offline-checks` passed; PR #99 remained OPEN/DRAFT/BLOCKED |
+| T28/F01 focused regressions | Root/immediate/check/source adoption-key changes, relationship material/history/source rebinding, occupied slot, spent one-use grant, v4 no-heal, source window/use-limit/revoke recovery, terminal settlement and T13/T23 collision ownership passed |
+| T28/F01 complete delivery-control package | `Ran 391 tests in 60.210s`; `OK` |
+| T28/F01 repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Independent T28/F01 implementation review | Correction rounds closed all authority-binding, sequential-source, replay and typed dependent-fence findings; final `APPROVE`, no remaining blocker or major |
+| T28/F01 implementation delivery | Signed implementation commit `bbc96cffc31b8d1c82ba8877309d14674f133ff5` pushed after remote head `8ac0c342b7648b4eb5b8697e260271480af64244` matched its parent; PR #99 remained OPEN/DRAFT at pre-push verification; hosted exact-head checks pending |
 
 The first handoff audit returned `REVISE`: one precedence blocker, three major
 evidence/inventory/backlog findings and two minor cleanup/index findings. Stage 3
@@ -1263,7 +1324,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T25 | UNVERIFIED | UNVERIFIED | UNVERIFIED | INTENT_ONLY/LAUNCHED/CONTACTED canonical-seal, exact proof-prefix clearance and operation-recovery slices independently accepted; full all-state/contradiction trace remains |
 | T26 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Applied-evidence closure and generation-2 terminal-settlement migration/replay slices accepted; full T26 trace remains |
 | T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Generation-2 parent binding, validator contact and recovery/replay slices independently accepted; full trace remains |
-| T28 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Later ordered backlog with F01 |
+| T28 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Verified-effect adoption slice independently accepted; accumulated exact-head trace remains |
 
 ### C01-C09 crash-boundary matrix
 
@@ -1287,7 +1348,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
-| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 identity/non-mutation boundary slice accepted; full family remains ordered with T28 |
+| F01 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T15 non-mutation plus canonical relationship/T28 adoption slices independently accepted; accumulated exact-head trace remains |
 | F02 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 proof-free denial, exact nonexecution proof and generation-bound same-effect retry slices accepted; complete family trace remains |
 | F03 | UNVERIFIED | UNVERIFIED | UNVERIFIED | T13 lifecycle/supersession/correction slice accepted; full family trace remains |
 | F04a | UNVERIFIED | UNVERIFIED | UNVERIFIED | T17 verified-receipt ancestry, conditional billing and canonical nonexecution zero-liability release slices accepted; complete family trace remains |
@@ -1323,7 +1384,7 @@ Current durable order after the accepted T17 work is:
 1. T15, T05, T06 and T09 complete and independently accepted; T07 local-nonexecution, T08 validation-pause and T14 core slices accepted with the complete transitions still UNVERIFIED pending T17/T24 and other source families.
 2. The ordered T17 validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and authenticated safe-retry slices are complete and independently accepted; the accumulated matrix row remains UNVERIFIED pending exact-head trace.
 3. T22 complete and independently accepted.
-4. T28 with F01.
+4. T28 with F01 complete and independently accepted; accumulated rows remain `UNVERIFIED` pending exact-head trace.
 5. Cross-family F05/F06/F13/F20.
 6. Documentation refresh.
 7. Full repository validation.
@@ -1413,7 +1474,7 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, the narrow T07
+- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, T28/F01, the narrow T07
   local-nonexecution slice, T08 validation-pause slice, T14 core/T09-source
   slices, and all ordered T17 validator-result, operation-uncertainty,
   verified-receipt, authoritative-nonexecution and safe-retry slices are
@@ -1444,7 +1505,8 @@ stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accept
 T09 and the narrow T17 validator-result/T14 T09-source slice are also
 independently accepted, as are the T17 operation-uncertainty foundation and
 verified-receipt route and the authoritative-nonexecution/safe-retry slice. The
-T22 terminal-restart report is also independently accepted. The next code change
-begins T28 with F01 only after its narrow plan independently passes review. Keep
+T22 terminal-restart report and T28/F01 verified-effect adoption are also
+independently accepted. The next code change begins the cross-family
+F05/F06/F13/F20 work only after its narrow plan independently passes review. Keep
 PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

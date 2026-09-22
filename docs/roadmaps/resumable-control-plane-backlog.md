@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work and T22 terminal-restart reporting. The complete local delivery-control suite passes 384 tests, but slice evidence does not promote unaudited T/C/F rows. T28/F01, cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, all ordered T17 work, T22 terminal-restart reporting and T28/F01 verified-effect adoption. The complete local delivery-control suite passes 391 tests, but slice evidence does not promote unaudited T/C/F rows. Cross-family F05/F06/F13/F20, filesystem ownership/reparse/path-swap protection and the final exact-head reviews remain blocking; do not promote to DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -929,8 +929,54 @@ hot journal.
 | Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
 | Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
 
-T22 is complete and independently accepted. T28 with F01 is next. PR #99
-remains draft and not merge-ready.
+T22 is complete and independently accepted. The succeeding T28/F01 checkpoint
+is recorded below. PR #99 remains draft and not merge-ready.
+
+### 5.20 T28 verified-effect adoption and F01 identity checkpoint
+
+The reviewed T28 slice adopts only an already completed, canonically identified
+effect into a new accepted plan and validation-check set. It performs no effect
+delivery, reuses no prior validation pass or charge, requires the repository-wide
+slot to be free, and consumes one dedicated synthetic adoption grant exactly
+once. The immutable adoption identity binds the complete root observation and
+finalization, immediate predecessor edge, current check set, source/version/
+terms/scope, plan and effect descriptor. Chained adoption provenance, readiness,
+authority use, dependencies, slot ownership and crash/replay recovery are all
+durable and independently reconstructed.
+
+F01 now also has canonical effect definitions and explicitly authorized
+`REPEAT_OF`, `DIFFERENT_FROM` and `COMPENSATES` edges. Relationship authority
+binds both effects' canonical descriptors, predecessor defining plan/history,
+the new defining plan and exact source terms. T03 denies an unsettled or fenced
+predecessor for every relationship kind. Late contrary T23 evidence retains a
+typed integrity fence on every dependent adoption; T13 correction clears only
+authority-owned dependent fences, even when an authority fact ID collides with
+an observation ID.
+
+The v4 foundation migration is atomic and strict: an existing v4 database is
+verified but never healed. Recovery sequentially proves every synthetic source
+use occurred after registration, inside its grant window, below its use limit
+and before any effective lifecycle denial. Exact lost-ack plan/adoption replay
+precedes mutable freshness, reuses the original outcome and authority use, and
+rejects capability rebinding.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T28/F01 plan was independently approved before editing; implementation review correction rounds closed authority binding, source-history, replay and typed-fence ownership findings |
+| Focused regressions | Root/immediate/check/source key rebinding, all relationship kinds, occupied slot, spent one-use grant, post-use expiry, adoption terminal settlement, v4 no-heal, source window/use-limit/revoke recovery and T13/T23 ID collision passed |
+| Complete delivery-control package | 391 tests passed in 60.210 seconds after final review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Final `APPROVE`; no remaining blocker or major after complete adoption source-term binding and provenance-scoped dependent-fence correction |
+| Commit/push | Signed implementation commit `bbc96cffc31b8d1c82ba8877309d14674f133ff5` pushed to the existing branch; hosted exact-head checks were pending when this durable record was written |
+| T/C/F traceability | Adds accepted T28/F01 slices plus narrow T01/T03/T13/T23/T26 and C06 evidence; complete accumulated rows remain conservatively `UNVERIFIED` pending exact-head trace |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` and `_legacy_schema.py`; this backlog/handoff and status READMEs record evidence separately |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
+
+T28/F01 implementation is independently accepted, but their accumulated matrix
+rows remain `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the exact-head trace and
+final architecture/security/QA gates. Cross-family F05/F06/F13/F20 is next in
+the documented order. PR #99 remains draft and not merge-ready.
 
 ## 6. Handoff contract
 
