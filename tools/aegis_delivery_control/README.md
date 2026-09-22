@@ -310,6 +310,18 @@ T/C/F trace and final reviews remain, so this checkpoint is
 not merge-ready and does not authorize real authority, external calls, provider
 integration, release, or deployment.
 
+The selected-check foundation is independently accepted. New plan acceptance
+uses authenticated v2 declarations for every check's dependencies and launch
+gates, binds a deterministic topological order, persists normalized projections
+and reconstructs them from event history. Legacy v1 plans fail closed at T27,
+dependency order is enforced at validator intent, and any declared launch gate
+currently denies before intent, permission use, budget reservation, redemption
+or adapter contact. The focused falsification first failed on the absent
+`check_order`; the corrected tests and complete 446-test package pass. Signed
+complete gate vectors, pre-claim launch-readiness decisions, T11 next-check
+routing, T16 unblocking, T17 refreshed cursors and atomic contact rechecks remain
+open. T11, T27, F11 and F17 therefore remain `UNVERIFIED`.
+
 ## Validation
 
 ```powershell

@@ -1033,6 +1033,34 @@ class SQLiteStateStore:
                 check_id TEXT NOT NULL,
                 PRIMARY KEY (plan_id, check_id)
             );
+            CREATE TABLE IF NOT EXISTS validation_check_bindings (
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                check_id TEXT NOT NULL,
+                check_order INTEGER NOT NULL CHECK (check_order >= 0),
+                PRIMARY KEY (plan_id, check_id),
+                UNIQUE (plan_id, check_order),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_requirements(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_dependencies (
+                plan_id TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                dependency_check_id TEXT NOT NULL,
+                PRIMARY KEY (plan_id, check_id, dependency_check_id),
+                CHECK (check_id <> dependency_check_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id),
+                FOREIGN KEY (plan_id, dependency_check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_launch_gates (
+                plan_id TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                gate_id TEXT NOT NULL,
+                PRIMARY KEY (plan_id, check_id, gate_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
             CREATE TABLE IF NOT EXISTS plan_dependencies (
                 plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
                 dependency_plan_id TEXT NOT NULL
@@ -4990,6 +5018,38 @@ class SQLiteStateStore:
 
     @staticmethod
     def _migrate_plan_binding_schema(connection: sqlite3.Connection) -> None:
+        connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS validation_check_bindings (
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                check_id TEXT NOT NULL,
+                check_order INTEGER NOT NULL CHECK (check_order >= 0),
+                PRIMARY KEY (plan_id, check_id),
+                UNIQUE (plan_id, check_order),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_requirements(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_dependencies (
+                plan_id TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                dependency_check_id TEXT NOT NULL,
+                PRIMARY KEY (plan_id, check_id, dependency_check_id),
+                CHECK (check_id <> dependency_check_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id),
+                FOREIGN KEY (plan_id, dependency_check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            CREATE TABLE IF NOT EXISTS validation_check_launch_gates (
+                plan_id TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                gate_id TEXT NOT NULL,
+                PRIMARY KEY (plan_id, check_id, gate_id),
+                FOREIGN KEY (plan_id, check_id)
+                    REFERENCES validation_check_bindings(plan_id, check_id)
+            );
+            """
+        )
         base_columns = (
             "plan_id", "command_id", "event_id", "repository_id", "run_id",
             "item_id", "logical_effect_id", "revision_digest",
@@ -6659,11 +6719,19 @@ class SQLiteStateStore:
 
     @classmethod
     def _accepted_plan_semantic_digest(
-        cls, request: PlanAcceptanceRequest
+        cls, request: PlanAcceptanceRequest, *, binding_version: int = 2
     ) -> str:
-        return cls._event_hash(
-            {
-                "domain": "AEGIS:T15:ACCEPTED_PLAN_SEMANTIC:v1",
+        check_dependencies = [
+            [check_id, list(dependency_ids)]
+            for check_id, dependency_ids
+            in request.canonical_check_dependencies()
+        ]
+        check_launch_gates = [
+            [check_id, list(gate_ids)]
+            for check_id, gate_ids in request.canonical_check_launch_gates()
+        ]
+        payload = {
+                "domain": f"AEGIS:T15:ACCEPTED_PLAN_SEMANTIC:v{binding_version}",
                 "repository_id": request.repository_id,
                 "run_id": request.run_id,
                 "item_id": request.item_id,
@@ -6694,12 +6762,22 @@ class SQLiteStateStore:
                     request.predecessor_logical_effect_id
                 ),
                 "relationship_grant_id": request.relationship_grant_id,
-            }
-        )
+        }
+        if binding_version == 2:
+            payload.update(
+                {
+                    "check_dependencies": check_dependencies,
+                    "check_launch_gates": check_launch_gates,
+                    "check_order": list(request.canonical_check_order()),
+                }
+            )
+        elif binding_version != 1:
+            raise ValueError("unsupported plan-acceptance binding version")
+        return cls._event_hash(payload)
 
     @classmethod
     def plan_acceptance_payload_digest(
-        cls, request: PlanAcceptanceRequest
+        cls, request: PlanAcceptanceRequest, *, binding_version: int = 2
     ) -> str:
         request.validate()
         payload = {
@@ -6707,6 +6785,17 @@ class SQLiteStateStore:
             "check_ids": sorted(request.check_ids),
             "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
             "dependency_plan_ids": sorted(request.dependency_plan_ids),
+            "check_dependency_ids": [
+                [check_id, list(dependency_ids)]
+                for check_id, dependency_ids
+                in request.canonical_check_dependencies()
+            ],
+            "check_launch_gate_ids": [
+                [check_id, list(gate_ids)]
+                for check_id, gate_ids
+                in request.canonical_check_launch_gates()
+            ],
+            "check_order": list(request.canonical_check_order()),
             "effect_semantic_inputs": [
                 list(item) for item in request.effect_semantic_inputs
             ],
@@ -6716,9 +6805,15 @@ class SQLiteStateStore:
                 else request.relationship_kind.value
             ),
         }
+        if binding_version == 1:
+            payload.pop("check_dependency_ids", None)
+            payload.pop("check_launch_gate_ids", None)
+            payload.pop("check_order", None)
+        elif binding_version != 2:
+            raise ValueError("unsupported plan-acceptance binding version")
         return cls._event_hash(
             {
-                "domain": "AEGIS:T01:PLAN_ACCEPTANCE_PAYLOAD:v1",
+                "domain": f"AEGIS:T01:PLAN_ACCEPTANCE_PAYLOAD:v{binding_version}",
                 "request": payload,
             }
         )
@@ -6750,10 +6845,10 @@ class SQLiteStateStore:
         finalization_policy_id: str,
         finalization_policy_version: str,
         finalization_issuer_fingerprint: str,
+        binding_version: int = 2,
     ) -> str:
-        return cls._event_hash(
-            {
-                "domain": "AEGIS:T15:COMPLETE_POLICY:v1",
+        payload = {
+                "domain": f"AEGIS:T15:COMPLETE_POLICY:v{binding_version}",
                 "permission_scope_digest": request.permission_scope_digest,
                 "budget_policy_digest": request.budget_policy_digest,
                 "check_ids": sorted(request.check_ids),
@@ -6769,8 +6864,26 @@ class SQLiteStateStore:
                 "finalization_issuer_fingerprint": finalization_issuer_fingerprint,
                 "plan_schema_version": request.plan_schema_version,
                 "reducer_version": request.reducer_version,
-            }
-        )
+        }
+        if binding_version == 2:
+            payload.update(
+                {
+                    "check_dependencies": [
+                        [check_id, list(dependency_ids)]
+                        for check_id, dependency_ids
+                        in request.canonical_check_dependencies()
+                    ],
+                    "check_launch_gates": [
+                        [check_id, list(gate_ids)]
+                        for check_id, gate_ids
+                        in request.canonical_check_launch_gates()
+                    ],
+                    "check_order": list(request.canonical_check_order()),
+                }
+            )
+        elif binding_version != 1:
+            raise ValueError("unsupported plan-acceptance binding version")
+        return cls._event_hash(payload)
 
     @staticmethod
     def _verify_operator_replay_issuer(
@@ -9920,7 +10033,7 @@ class SQLiteStateStore:
             ) != (request.item_id, request.revision_digest):
                 raise ValueError("readiness accepted plan binding is invalid")
             if binding_version == 1 and (
-                plan["plan_acceptance_binding_version"] != 1
+                plan["plan_acceptance_binding_version"] not in {1, 2}
                 or evidence is None
                 or evidence.acceptance_payload_digest
                 != plan["acceptance_payload_digest"]
@@ -11794,7 +11907,7 @@ class SQLiteStateStore:
             finalization_query, finalization_parameters
         ).fetchone()
         reasons: list[str] = []
-        if dependency["plan_acceptance_binding_version"] != 1:
+        if dependency["plan_acceptance_binding_version"] not in {1, 2}:
             reasons.append("UNAUTHENTICATED_PLAN")
         if lifecycle_state != LifecycleState.COMPLETED.value:
             reasons.append("NOT_COMPLETED")
@@ -11958,7 +12071,7 @@ class SQLiteStateStore:
                 "run_id = ? AND plan_id = ?",
                 (request.repository_id, request.run_id, request.plan_id),
             ).fetchone()
-            if plan is None or plan["plan_acceptance_binding_version"] != 1:
+            if plan is None or plan["plan_acceptance_binding_version"] not in {1, 2}:
                 raise DispatchDenied(
                     "readiness evidence requires an authenticated v6 plan"
                 )
@@ -12006,9 +12119,15 @@ class SQLiteStateStore:
     ) -> SyntheticPlanAcceptanceEvidence:
         if self._classification_authority is None:
             raise DispatchDenied("plan-acceptance verifier is unavailable")
-        if body.get("plan_acceptance_binding_version") != 1:
+        binding_version = body.get("plan_acceptance_binding_version")
+        if binding_version not in {1, 2}:
             raise DispatchDenied("plan acceptance is not authenticated")
-        expected_body_fields = set(PlanAcceptanceRequest.__dataclass_fields__) | {
+        request_fields = set(PlanAcceptanceRequest.__dataclass_fields__)
+        if binding_version == 1:
+            request_fields -= {
+                "check_dependency_ids", "check_launch_gate_ids",
+            }
+        expected_body_fields = request_fields | {
             "classification_issuer_fingerprint",
             "gate_set_digest",
             "finalization_policy_id",
@@ -12032,6 +12151,8 @@ class SQLiteStateStore:
             "sequence",
             "writer_epoch",
         }
+        if binding_version == 2:
+            expected_body_fields.add("check_order")
         if set(body) != expected_body_fields:
             raise DispatchDenied("plan-acceptance event schema is invalid")
         evidence_value = body.get("acceptance_evidence")
@@ -12048,14 +12169,27 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "plan-acceptance evidence is invalid"
             ) from error
-        request_values = {
-            key: body[key] for key in PlanAcceptanceRequest.__dataclass_fields__
-        }
+        request_values = {key: body[key] for key in request_fields}
         for tuple_field in (
             "check_ids", "aggregate_gate_ids", "dependency_plan_ids",
         ):
             request_values[tuple_field] = tuple(
                 request_values.get(tuple_field, ())
+            )
+        for nested_tuple_field in (
+            "check_dependency_ids", "check_launch_gate_ids",
+        ):
+            request_values[nested_tuple_field] = tuple(
+                (str(row[0]), tuple(row[1]))
+                for row in request_values.get(nested_tuple_field, ())
+            )
+        if binding_version == 1:
+            legacy_check_ids = tuple(request_values.get("check_ids", ()))
+            request_values["check_dependency_ids"] = tuple(
+                (check_id, ()) for check_id in legacy_check_ids
+            )
+            request_values["check_launch_gate_ids"] = tuple(
+                (check_id, ()) for check_id in legacy_check_ids
             )
         request_values["effect_semantic_inputs"] = tuple(
             tuple(item)
@@ -12072,7 +12206,13 @@ class SQLiteStateStore:
             raise DispatchDenied(
                 "plan-acceptance request binding is invalid"
             ) from error
-        payload_digest = self.plan_acceptance_payload_digest(request)
+        if binding_version == 2 and body.get("check_order") != list(
+            request.canonical_check_order()
+        ):
+            raise DispatchDenied("plan check order is rebound")
+        payload_digest = self.plan_acceptance_payload_digest(
+            request, binding_version=int(binding_version)
+        )
         evidence_digest = self._event_hash(evidence.__dict__)
         if (
             evidence.repository_id,
@@ -12780,6 +12920,17 @@ class SQLiteStateStore:
             "check_ids": sorted(request.check_ids),
             "aggregate_gate_ids": sorted(request.aggregate_gate_ids),
             "dependency_plan_ids": sorted(request.dependency_plan_ids),
+            "check_dependency_ids": [
+                [check_id, list(dependency_ids)]
+                for check_id, dependency_ids
+                in request.canonical_check_dependencies()
+            ],
+            "check_launch_gate_ids": [
+                [check_id, list(gate_ids)]
+                for check_id, gate_ids
+                in request.canonical_check_launch_gates()
+            ],
+            "check_order": list(request.canonical_check_order()),
             "effect_semantic_inputs": [
                 list(item) for item in request.effect_semantic_inputs
             ],
@@ -12953,8 +13104,10 @@ class SQLiteStateStore:
                     ).fetchone()
                     if dependency is None or (
                         dependency["repository_id"],
-                        dependency["plan_acceptance_binding_version"],
-                    ) != (request.repository_id, 1) or int(
+                    ) != (request.repository_id,) or (
+                        dependency["plan_acceptance_binding_version"]
+                        not in {1, 2}
+                    ) or int(
                         dependency["writer_epoch"]
                     ) >= writer_epoch:
                         raise DispatchDenied(
@@ -13210,7 +13363,7 @@ class SQLiteStateStore:
                     "failure_policy_version": SYNTHETIC_FAILURE_POLICY_VERSION,
                     "accepted_plan_semantic_digest": accepted_plan_semantic_digest,
                     "complete_policy_digest": complete_policy_digest,
-                    "plan_acceptance_binding_version": 1,
+                    "plan_acceptance_binding_version": 2,
                     "acceptance_payload_digest": acceptance_payload_digest,
                     "acceptance_evidence_digest": acceptance_evidence_digest,
                     "acceptance_evidence": acceptance_evidence.__dict__,
@@ -13278,7 +13431,7 @@ class SQLiteStateStore:
                         complete_policy_digest,
                         payload_digest,
                         event_hash, body_json,
-                        1, acceptance_payload_digest,
+                        2, acceptance_payload_digest,
                         acceptance_evidence_digest,
                         acceptance_evidence.issuer_fingerprint,
                     ),
@@ -13329,6 +13482,33 @@ class SQLiteStateStore:
                 connection.executemany(
                     "INSERT INTO validation_requirements VALUES (?, ?)",
                     ((request.plan_id, check_id) for check_id in sorted(request.check_ids)),
+                )
+                connection.executemany(
+                    "INSERT INTO validation_check_bindings VALUES (?, ?, ?)",
+                    (
+                        (request.plan_id, check_id, check_order)
+                        for check_order, check_id in enumerate(
+                            request.canonical_check_order()
+                        )
+                    ),
+                )
+                connection.executemany(
+                    "INSERT INTO validation_check_dependencies VALUES (?, ?, ?)",
+                    (
+                        (request.plan_id, check_id, dependency_check_id)
+                        for check_id, dependency_ids
+                        in request.canonical_check_dependencies()
+                        for dependency_check_id in dependency_ids
+                    ),
+                )
+                connection.executemany(
+                    "INSERT INTO validation_check_launch_gates VALUES (?, ?, ?)",
+                    (
+                        (request.plan_id, check_id, gate_id)
+                        for check_id, gate_ids
+                        in request.canonical_check_launch_gates()
+                        for gate_id in gate_ids
+                    ),
                 )
                 connection.executemany(
                     "INSERT INTO plan_dependencies VALUES (?, ?)",
@@ -13472,7 +13652,7 @@ class SQLiteStateStore:
                         "readiness evaluation does not bind the accepted plan"
                     )
                 if (
-                    plan["plan_acceptance_binding_version"] != 1
+                    plan["plan_acceptance_binding_version"] not in {1, 2}
                     or plan["acceptance_payload_digest"]
                     != readiness_evidence.acceptance_payload_digest
                 ):
@@ -23482,13 +23662,6 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "independent recovery freshness proof failed"
                     )
-                self._require_plan_issuer(
-                    connection,
-                    request.repository_id,
-                    request.run_id,
-                    authority,
-                )
-
                 prior = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -23516,6 +23689,44 @@ class SQLiteStateStore:
                         True,
                     )
 
+                preflight_run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
+                    (request.run_id, request.repository_id),
+                ).fetchone()
+                if preflight_run is None or preflight_run["item_id"] != request.item_id:
+                    raise DispatchDenied("validator intent does not bind the run")
+                preflight_plan = connection.execute(
+                    "SELECT plan_id, logical_effect_id, revision_digest, "
+                    "plan_acceptance_binding_version FROM validation_plans "
+                    "WHERE run_id = ?",
+                    (request.run_id,),
+                ).fetchone()
+                if preflight_plan is None or (
+                    preflight_plan["logical_effect_id"],
+                    preflight_plan["revision_digest"],
+                ) != (request.logical_effect_id, request.revision_digest):
+                    raise DispatchDenied(
+                        "validator intent does not bind an accepted validation plan"
+                    )
+                if preflight_plan["plan_acceptance_binding_version"] != 2:
+                    raise DispatchDenied(
+                        "accepted plan predates per-check launch bindings"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM validation_check_launch_gates WHERE "
+                    "plan_id = ? AND check_id = ? LIMIT 1",
+                    (preflight_plan["plan_id"], request.check_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "selected check launch-gate evidence is unavailable"
+                    )
+                self._require_plan_issuer(
+                    connection,
+                    request.repository_id,
+                    request.run_id,
+                    authority,
+                )
+
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "VALIDATOR",
                     capability.grant_id, "RUN_VALIDATOR",
@@ -23539,6 +23750,7 @@ class SQLiteStateStore:
                     raise DispatchDenied("T27 requires durable VALIDATING state")
                 plan = connection.execute(
                     "SELECT plan_id, logical_effect_id, revision_digest, "
+                    "plan_acceptance_binding_version, "
                     "aggregate_gate_ids_json, gate_set_digest, "
                     "finalization_policy_id, finalization_policy_version, "
                     "finalization_issuer_fingerprint FROM validation_plans "
@@ -23550,6 +23762,10 @@ class SQLiteStateStore:
                 ) != (request.logical_effect_id, request.revision_digest):
                     raise DispatchDenied(
                         "validator intent does not bind an accepted validation plan"
+                    )
+                if plan["plan_acceptance_binding_version"] != 2:
+                    raise DispatchDenied(
+                        "accepted plan predates per-check launch bindings"
                     )
                 if any(
                     plan[name] is None
@@ -23745,6 +23961,34 @@ class SQLiteStateStore:
                     (request.repository_id,),
                 ).fetchone():
                     raise DispatchDenied("another validator obligation is active")
+                ordered_checks = [
+                    str(row["check_id"])
+                    for row in connection.execute(
+                        "SELECT check_id FROM validation_check_bindings WHERE "
+                        "plan_id = ? ORDER BY check_order",
+                        (plan["plan_id"],),
+                    )
+                ]
+                if not ordered_checks:
+                    raise DispatchDenied(
+                        "accepted plan lost its per-check launch bindings"
+                    )
+                next_unresolved = next(
+                    (
+                        check_id for check_id in ordered_checks
+                        if (
+                            (application := self._latest_validation_application(
+                                connection, str(plan["plan_id"]), check_id
+                            )) is None
+                            or application["verdict"] != "PASS"
+                        )
+                    ),
+                    None,
+                )
+                if next_unresolved != request.check_id:
+                    raise DispatchDenied(
+                        "validator check is not the next declared dependency-ordered check"
+                    )
                 if connection.execute(
                     "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
                     "(reason_code <> 'FAILED_FINAL_APPLICATION' OR item_id = ? OR "
@@ -29118,7 +29362,9 @@ class SQLiteStateStore:
                 for key in PlanAcceptanceRequest.__dataclass_fields__
                 if key in body
             }
-            if body.get("plan_acceptance_binding_version") == 1:
+            if body.get("plan_acceptance_binding_version") == 2:
+                request_payload["check_order"] = body["check_order"]
+            if body.get("plan_acceptance_binding_version") in {1, 2}:
                 return self._event_hash(
                     {
                         "request": request_payload,
@@ -31233,6 +31479,28 @@ class SQLiteStateStore:
                         dependency_plan_ids=tuple(
                             body.get("dependency_plan_ids", ())
                         ),
+                        check_dependency_ids=tuple(
+                            (str(row[0]), tuple(row[1]))
+                            for row in body.get("check_dependency_ids", ())
+                        ) or (
+                            tuple(
+                                (str(check_id), ())
+                                for check_id in body["check_ids"]
+                            )
+                            if body.get("plan_acceptance_binding_version") == 1
+                            else ()
+                        ),
+                        check_launch_gate_ids=tuple(
+                            (str(row[0]), tuple(row[1]))
+                            for row in body.get("check_launch_gate_ids", ())
+                        ) or (
+                            tuple(
+                                (str(check_id), ())
+                                for check_id in body["check_ids"]
+                            )
+                            if body.get("plan_acceptance_binding_version") == 1
+                            else ()
+                        ),
                         source_tree_digest=body["source_tree_digest"],
                         item_definition_digest=body["item_definition_digest"],
                         plan_schema_version=body["plan_schema_version"],
@@ -31280,7 +31548,10 @@ class SQLiteStateStore:
                         ),
                     )
                     plan_request.validate()
-                    if body.get("plan_acceptance_binding_version") == 1:
+                    binding_version = body.get(
+                        "plan_acceptance_binding_version"
+                    )
+                    if binding_version in {1, 2}:
                         evidence = self._verified_plan_acceptance_evidence(
                             body
                         )
@@ -31309,7 +31580,9 @@ class SQLiteStateStore:
                                 dependency[
                                     "plan_acceptance_binding_version"
                                 ],
-                            ) != (repository_id, 1) or int(
+                            ) not in {
+                                (repository_id, 1), (repository_id, 2),
+                            } or int(
                                 dependency["writer_epoch"]
                             ) >= int(body["writer_epoch"]):
                                 raise ValueError(
@@ -31323,7 +31596,12 @@ class SQLiteStateStore:
                         "accepted plan binding is invalid"
                     ) from error
                 if body.get("accepted_plan_semantic_digest") != (
-                    self._accepted_plan_semantic_digest(plan_request)
+                    self._accepted_plan_semantic_digest(
+                        plan_request,
+                        binding_version=int(
+                            body.get("plan_acceptance_binding_version", 1)
+                        ),
+                    )
                 ):
                     raise StorageIntegrityError(
                         "accepted plan semantic digest diverges from its bindings"
@@ -31343,6 +31621,9 @@ class SQLiteStateStore:
                         finalization_issuer_fingerprint=body[
                             "finalization_issuer_fingerprint"
                         ],
+                        binding_version=int(
+                            body.get("plan_acceptance_binding_version", 1)
+                        ),
                     )
                 ):
                     raise StorageIntegrityError(
@@ -32018,6 +32299,69 @@ class SQLiteStateStore:
         if actual_requirements != expected_requirements:
             raise StorageIntegrityError(
                 "validation-requirement projection diverges from event history"
+            )
+        v2_plans = [
+            body for body in plans
+            if body.get("plan_acceptance_binding_version") == 2
+        ]
+        expected_check_bindings = {
+            (body["plan_id"], check_id, check_order)
+            for body in v2_plans
+            for check_order, check_id in enumerate(body["check_order"])
+        }
+        actual_check_bindings = {
+            (row["plan_id"], row["check_id"], int(row["check_order"]))
+            for row in connection.execute(
+                "SELECT binding.* FROM validation_check_bindings AS binding "
+                "JOIN validation_plans AS plan ON plan.plan_id = binding.plan_id "
+                "WHERE plan.repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_check_bindings != expected_check_bindings:
+            raise StorageIntegrityError(
+                "validation-check binding projection diverges from event history"
+            )
+        expected_check_dependencies = {
+            (body["plan_id"], check_id, dependency_check_id)
+            for body in v2_plans
+            for check_id, dependency_ids in body["check_dependency_ids"]
+            for dependency_check_id in dependency_ids
+        }
+        actual_check_dependencies = {
+            (
+                row["plan_id"], row["check_id"],
+                row["dependency_check_id"],
+            )
+            for row in connection.execute(
+                "SELECT dependency.* FROM validation_check_dependencies AS "
+                "dependency JOIN validation_plans AS plan ON plan.plan_id = "
+                "dependency.plan_id WHERE plan.repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_check_dependencies != expected_check_dependencies:
+            raise StorageIntegrityError(
+                "validation-check dependency projection diverges from event history"
+            )
+        expected_check_gates = {
+            (body["plan_id"], check_id, gate_id)
+            for body in v2_plans
+            for check_id, gate_ids in body["check_launch_gate_ids"]
+            for gate_id in gate_ids
+        }
+        actual_check_gates = {
+            (row["plan_id"], row["check_id"], row["gate_id"])
+            for row in connection.execute(
+                "SELECT gate.* FROM validation_check_launch_gates AS gate "
+                "JOIN validation_plans AS plan ON plan.plan_id = gate.plan_id "
+                "WHERE plan.repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_check_gates != expected_check_gates:
+            raise StorageIntegrityError(
+                "validation-check gate projection diverges from event history"
             )
         expected_dependencies = {
             (body["plan_id"], dependency_plan_id)

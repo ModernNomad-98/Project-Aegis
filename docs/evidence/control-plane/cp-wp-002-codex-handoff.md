@@ -1426,6 +1426,42 @@ known accounting, and persists a strict contact/reservation/settlement snapshot.
 Crash/replay, late adjustment/restart, tamper and cross-run reused-attempt tests
 pass. The initial alias finding was corrected and re-review returned `APPROVE`.
 
+### Stage 20 - selected-check v2 binding foundation
+
+The resumed session completed and independently accepted the first bounded part
+of the T11/T27/F11/F17 correction. `PlanAcceptanceRequest` now requires explicit
+per-check dependency and launch-gate declarations. Acceptance derives a
+deterministic topological order (lexical check ID only among currently eligible
+nodes), binds all three values into authenticated v2 payload, semantic and
+completion-policy digests, and persists normalized projections. Projection
+verification reconstructs those rows from event history. Authenticated v1
+history remains readable but T27 refuses it as predating per-check bindings.
+
+At runtime T27 selects only the first unresolved check in the bound order. Any
+declared launch gate currently fails closed before intent, permission use,
+reservation, redemption or contact. This deliberately prevents the foundation
+from creating an unsafe interim launch path while signed complete gate evidence
+is absent.
+
+| Evidence | Result |
+| --- | --- |
+| Cold-start preflight | Local, origin and draft PR #99 all matched `04f0bee85202d3493b6be7bf67db32bf914b59fc`; `ba13394` remained an ancestor; hosted `gate-guard`, `validate-skills` and `windows-offline-checks` were successful |
+| Plan audit | Three `REVISE` rounds corrected legacy inference, pre-claim/T16 semantics, complete gate vectors, T11 unknown routing and dependency-order deadlock; final `APPROVE`, no findings |
+| First focused falsification | Two-test run failed on missing `check_order` with `KeyError`; after implementation it passed |
+| Complete package | 446 tests passed in 69.851 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed |
+| Diff/compile | `git diff --check` exited 0 with Windows line-ending notices only; touched Python files compiled successfully |
+| Implementation review | Initial `REVISE` found inferred empty maps, batchwise topological ordering, premature authority checks and an unguarded declared-gate path; corrections plus runtime/no-mutation regressions received final `APPROVE`, no findings |
+| Files | `contracts.py`, `storage.py`, explicit test request factories and focused storage tests; status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, artifacts/caches, real authority/adapters and external systems |
+
+This checkpoint does not complete T11, T27, F11 or F17. The next increment must
+add authenticated append-only PASS/FAIL/UNKNOWN gate facts and complete launch
+snapshots, a no-capability pre-claim blocked decision, exact T16 resolution,
+T11 and T17 cursor routing, and atomic contact revalidation. A post-intent denial
+must retain the active obligation until T25 authoritative nonexecution settles
+source/control/accounting; T26 remains terminal-only.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1456,7 +1492,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle, uncontacted, contacted-unknown, settled-result and unresolved-result paths are asserted, but no bounded active validator cancel/drain path reaches T07/PAUSED; full row remains open |
 | T09 | YES | YES | YES | Exact current-head reconciliation fence, one-use authority, idempotent replay, stacked fence, no-adapter invariants and strict recovery independently accepted |
 | T10 | YES | YES | UNVERIFIED | Effect receipt intake verifies request/effect/source/control/usage binding, persists observation plus settlement atomically, routes unknowns to reconciliation and delegates contradictions to T23; C04/T06/T17 assertions; row-level review pending |
-| T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PASS application/reference/finalization behavior exists, but no per-check dependency/application-gate model can route an unmet next check to BLOCKED as required |
+| T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PASS application/reference/finalization behavior and accepted v2 per-check bindings exist, but T11 does not yet derive the next check's complete gate vector or route unmet/unknown readiness to its exact BLOCKED cursor |
 | T12 | YES | YES | UNVERIFIED | `_apply_validator_observation` FAIL path separates recoverable BLOCKED from atomic FAILED_FINAL fence/closure, with classification, accounting, replay and pending-check assertions; row-level review pending |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
 | T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, exact T07-local, clean T08, sequential T09 and operation-nonexecution resume sources are asserted, but the missing T07/T08 activity families prevent complete cursor/source coverage |
@@ -1472,7 +1508,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T24 | UNVERIFIED | UNVERIFIED | UNVERIFIED | RESULT/cessation intake exists, but no mandatory-terminal-policy model atomically records the required irreversible stop obligation/fence at intake |
 | T25 | YES | UNVERIFIED | UNVERIFIED | Typed all-path nonexecution seals and recovery exist for operation/validator intents, but the canonical before/after-handoff, every-state, terminal-contradiction and dependent-adoption matrix is not completely asserted |
 | T26 | YES | YES | UNVERIFIED | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; row-level review pending |
-| T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Validator intent enforces declaration/authority/budget/containment/recovery/slot/fences, but accepted plans and intents cannot bind or recheck selected-check dependencies/launch gates |
+| T27 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Accepted v2 plans bind topological per-check dependencies/gates and T27 enforces dependency order plus fail-closed legacy/declared-gate denial; signed complete launch snapshots, pre-claim decisions and atomic contact rechecks remain absent |
 | T28 | YES | YES | YES | Exact accepted validation-only adoption, separate authority consumption, free-slot check, no adapter contact, crash replay, contrary-fact fencing and source-history recovery independently accepted in the T28/F01 review |
 
 ### C01-C09 crash-boundary matrix
@@ -1508,13 +1544,13 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F08 | YES | YES | UNVERIFIED | Terminal late receipt with missing/invalid/known usage preserves terminal state, worst-case or prior known charge, slot and later absolute adjustment without reopen/double charge; row-level review pending |
 | F09 | UNVERIFIED | UNVERIFIED | UNVERIFIED | No-start/late-result/cessation/order slices exist, but the mandatory terminal-policy failure branch has no policy model or atomic stop-obligation/fence intake route |
 | F10 | YES | YES | UNVERIFIED | Empty check set denies; independent A/B application, FINALIZING cursor, aggregate-gate wait and distinct T16 finalization retain the slot and avoid reapplication; row-level review pending |
-| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Source/control settlement restores the pending validation cursor, but the missing selected-check gate/dependency model prevents the required fresh gate recheck before launch |
+| F11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Source/control settlement restores the pending validation cursor and v2 bindings exist, but post-T17 fresh signed launch evidence and exact cursor recheck remain absent |
 | F12 | YES | YES | UNVERIFIED | Validator non-launch routes to typed BLOCKED/VALIDATING recovery, pause resumes through BLOCKED, T02/accounting cannot bypass T16 and terminal remains unchanged; row-level review pending |
 | F13 | YES | YES | YES | Known/unknown proof-first contrary receipts across every nonterminal and terminal lifecycle class preserve prior proof, true/unknown liability, another slot owner and terminal state; independently accepted |
 | F14 | YES | YES | UNVERIFIED | Recoverable failure retains slot/blocker, explicit remediation permits one fresh T27 attempt, all bypass routes deny and later terminal closure requires complete settlement; row-level review pending |
 | F15 | YES | YES | UNVERIFIED | Result, cessation/cancellation and delayed result remain separate facts; terminal lifecycle does not reopen, contradictions fence and unknown cessation retains the slot; row-level review pending |
 | F16 | YES | YES | UNVERIFIED | UNKNOWN observation is retained once, later APPLY references it, denied/replayed applications are idempotent and finalization is distinct with no duplicate charge/slot release; row-level review pending |
-| F17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Authority/budget/containment/fence denials exist, but per-check dependency and launch-gate bindings do not; missing/stale selected-check prerequisite cases cannot be expressed or tested |
+| F17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Per-check dependency/gate bindings and fail-closed declared-gate denial now exist alongside authority/budget/containment/fence denials; authenticated PASS/FAIL/UNKNOWN facts, stale vectors, T16 unblock and post-intent change handling remain absent |
 | F18 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Final-failure slices exist, but canonical F18 also requires the missing proof-free T17 terminal-entry/permanent-fence path |
 | F19 | YES | UNVERIFIED | UNVERIFIED | Exact operation/validator all-path nonexecution and recovery exist, but the required before/after-handoff plus contrary proof in every lifecycle/dependent-adoption matrix is incomplete |
 | F20 | YES | YES | YES | Typed bounded validator containment, authority binding, pure checking, output/path/action limits and strict migration/recovery independently accepted |
@@ -1699,6 +1735,9 @@ path-swap protection is independently accepted on Windows; POSIX runtime remains
 corrected exact-head trace map has independent `APPROVE`. The local
 T01-T03/C01 trusted-readiness/dependency-provenance correction is independently
 approved but remains aggregate-`UNVERIFIED` until committed exact-head trace
-review. The next implementation gate is selected-check dependency/launch-gate
-binding across T11/T27/F11/F17. Keep PR #99 draft until every remaining backlog
+review. The selected-check v2 binding foundation is independently accepted,
+including topological dependency order, strict projections, v1 T27 refusal and
+declared-gate no-mutation denial. The next implementation gate is authenticated
+complete launch-readiness evidence and the remaining T11/T27/F11/F17 routes in
+Stage 20. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

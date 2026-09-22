@@ -127,6 +127,15 @@ def BudgetSettlementRequest(*args, **kwargs):
 
 def PlanAcceptanceRequest(*args, **kwargs):
     """Build a newly accepted synthetic plan with explicit immutable pins."""
+    check_ids = kwargs.get("check_ids", args[11] if len(args) > 11 else ())
+    kwargs.setdefault(
+        "check_dependency_ids",
+        tuple((check_id, ()) for check_id in check_ids),
+    )
+    kwargs.setdefault(
+        "check_launch_gate_ids",
+        tuple((check_id, ()) for check_id in check_ids),
+    )
     kwargs.setdefault("source_tree_digest", "source-tree-1")
     kwargs.setdefault("item_definition_digest", "item-definition-1")
     kwargs.setdefault("plan_schema_version", "plan-schema-1")
@@ -7126,15 +7135,27 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self,
         check_ids=("check-1", "check-2"),
         aggregate_gate_ids=None,
+        check_dependency_ids=None,
+        check_launch_gate_ids=None,
     ):
         if aggregate_gate_ids is None:
             aggregate_gate_ids = check_ids
+        if check_dependency_ids is None:
+            check_dependency_ids = tuple(
+                (check_id, ()) for check_id in check_ids
+            )
+        if check_launch_gate_ids is None:
+            check_launch_gate_ids = tuple(
+                (check_id, ()) for check_id in check_ids
+            )
         plan = self.store.accept_plan(
             PlanAcceptanceRequest(
                 "plan-1", "plan-command-1", "plan-event-1", "repo-1",
                 "run-1", "item-1", "effect-1", "revision-1",
                 "descriptor-digest", "scope-1", "budget-policy-digest",
                 check_ids, aggregate_gate_ids,
+                check_dependency_ids=check_dependency_ids,
+                check_launch_gate_ids=check_launch_gate_ids,
             ),
             expected_head="",
             writer_epoch=1,
@@ -7217,6 +7238,145 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         with self.assertRaisesRegex(StorageIntegrityError, "validation-requirement"):
             self.store.load_verified("repo-1")
+
+    def test_t01_v2_binds_topological_check_order_and_per_check_gates(self) -> None:
+        request = PlanAcceptanceRequest(
+            "plan-1", "plan-command-1", "plan-event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "revision-1", "descriptor-digest",
+            "scope-1", "budget-policy-digest",
+            ("a-dependent", "z-prerequisite"),
+            check_dependency_ids=(
+                ("a-dependent", ("z-prerequisite",)),
+                ("z-prerequisite", ()),
+            ),
+            check_launch_gate_ids=(
+                ("a-dependent", ("gate-a",)),
+                ("z-prerequisite", ("gate-z",)),
+            ),
+        )
+        accepted = self.store.accept_plan(
+            request, expected_head="", writer_epoch=1
+        )
+        self.oracle.allowed_head = accepted.event_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM validation_plans WHERE plan_id = ?",
+                    (request.plan_id,),
+                ).fetchone()[0]
+            )
+            self.assertEqual(
+                body["check_order"], ["z-prerequisite", "a-dependent"]
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT check_id, check_order FROM validation_check_bindings "
+                    "WHERE plan_id = ? ORDER BY check_order",
+                    (request.plan_id,),
+                ).fetchall(),
+                [("z-prerequisite", 0), ("a-dependent", 1)],
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT check_id, dependency_check_id FROM "
+                    "validation_check_dependencies WHERE plan_id = ?",
+                    (request.plan_id,),
+                ).fetchall(),
+                [("a-dependent", "z-prerequisite")],
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT check_id, gate_id FROM validation_check_launch_gates "
+                    "WHERE plan_id = ? ORDER BY check_id",
+                    (request.plan_id,),
+                ).fetchall(),
+                [("a-dependent", "gate-a"), ("z-prerequisite", "gate-z")],
+            )
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t01_v2_rejects_cyclic_or_incomplete_check_bindings(self) -> None:
+        common = (
+            "plan-1", "plan-command-1", "plan-event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "revision-1", "descriptor-digest",
+            "scope-1", "budget-policy-digest", ("check-a", "check-b"),
+        )
+        with self.assertRaisesRegex(ValueError, "cover every check"):
+            PlanAcceptanceRequest(
+                *common,
+                check_dependency_ids=(("check-a", ("check-b",)),),
+            ).validate()
+        with self.assertRaisesRegex(ValueError, "acyclic"):
+            PlanAcceptanceRequest(
+                *common,
+                check_dependency_ids=(
+                    ("check-a", ("check-b",)),
+                    ("check-b", ("check-a",)),
+                ),
+            ).validate()
+        ordered = PlanAcceptanceRequest(
+            "plan-2", "plan-command-2", "plan-event-2", "repo-1", "run-2",
+            "item-2", "effect-2", "revision-2", "descriptor-2", "scope-2",
+            "budget-2", ("z-independent", "b-after-a", "a-first"),
+            check_dependency_ids=(
+                ("a-first", ()),
+                ("b-after-a", ("a-first",)),
+                ("z-independent", ()),
+            ),
+        )
+        self.assertEqual(
+            ordered.canonical_check_order(),
+            ("a-first", "b-after-a", "z-independent"),
+        )
+
+    def test_t27_declared_launch_gate_fails_closed_without_intent_or_spend(
+        self,
+    ) -> None:
+        observation = self._record_effect_observation(
+            check_ids=("check-1",),
+            check_launch_gate_ids=(("check-1", ("gate-1",)),),
+        )
+        request, capability = self._validator_intent(
+            observation, check_id="check-1"
+        )
+        before = self.store.table_counts()
+        with self.assertRaisesRegex(DispatchDenied, "launch-gate evidence"):
+            self.store.commit_validator_intent(
+                request, capability, self.authority
+            )
+        after = self.store.table_counts()
+        for table in (
+            "validator_intents", "permission_uses", "budget_reservations",
+            "capability_redemptions", "events",
+        ):
+            self.assertEqual(after[table], before[table], table)
+
+    def test_t27_launches_dependency_order_not_lexical_check_order(self) -> None:
+        observation = self._record_effect_observation(
+            check_ids=("a-dependent", "z-prerequisite"),
+            check_dependency_ids=(
+                ("a-dependent", ("z-prerequisite",)),
+                ("z-prerequisite", ()),
+            ),
+        )
+        dependent, dependent_capability = self._validator_intent(
+            observation, suffix="a", check_id="a-dependent"
+        )
+        before = self.store.table_counts()
+        with self.assertRaisesRegex(DispatchDenied, "dependency-ordered"):
+            self.store.commit_validator_intent(
+                dependent, dependent_capability, self.authority
+            )
+        self.assertEqual(
+            self.store.table_counts()["validator_intents"],
+            before["validator_intents"],
+        )
+        prerequisite, prerequisite_capability = self._validator_intent(
+            observation, suffix="z", check_id="z-prerequisite"
+        )
+        committed = self.store.commit_validator_intent(
+            prerequisite, prerequisite_capability, self.authority
+        )
+        self.assertFalse(committed.replayed)
 
     def test_t01_plan_acceptance_is_atomic_across_acknowledgement_loss(self) -> None:
         request = PlanAcceptanceRequest(
@@ -8161,7 +8321,8 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "accepted_plan_semantic_digest", "complete_policy_digest",
                 "dependency_plan_ids", "plan_acceptance_binding_version",
                 "acceptance_payload_digest", "acceptance_evidence_digest",
-                "acceptance_evidence",
+                "acceptance_evidence", "check_dependency_ids",
+                "check_launch_gate_ids", "check_order",
             ):
                 body.pop(key)
             body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
@@ -8225,6 +8386,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     f"{column_name}"
                 )
             connection.execute("DROP TABLE plan_dependencies")
+            connection.execute("DROP TABLE validation_check_launch_gates")
+            connection.execute("DROP TABLE validation_check_dependencies")
+            connection.execute("DROP TABLE validation_check_bindings")
             connection.execute("PRAGMA user_version = 5")
             connection.commit()
         finally:
@@ -19135,7 +19299,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 stale_request, stale_capability, self.authority
             )
 
-        request, capability = self._validator_intent(observation, suffix="2")
+        request, capability = self._validator_intent(
+            observation, suffix="2", check_id="check-1"
+        )
         committed = self.store.commit_validator_intent(
             request, capability, self.authority
         )

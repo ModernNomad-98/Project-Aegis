@@ -392,6 +392,48 @@ class PlanAcceptanceRequest:
     relationship_terms_digest: str | None = None
     relationship_scope_digest: str | None = None
     dependency_plan_ids: tuple[str, ...] = ()
+    check_dependency_ids: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    check_launch_gate_ids: tuple[tuple[str, tuple[str, ...]], ...] = ()
+
+    def canonical_check_dependencies(
+        self,
+    ) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        declared = {check_id: tuple(dependencies) for check_id, dependencies in self.check_dependency_ids}
+        return tuple(
+            (check_id, tuple(sorted(declared.get(check_id, ()))))
+            for check_id in sorted(self.check_ids)
+        )
+
+    def canonical_check_launch_gates(
+        self,
+    ) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        declared = {check_id: tuple(gates) for check_id, gates in self.check_launch_gate_ids}
+        return tuple(
+            (check_id, tuple(sorted(declared.get(check_id, ()))))
+            for check_id in sorted(self.check_ids)
+        )
+
+    def canonical_check_order(self) -> tuple[str, ...]:
+        dependencies = {
+            check_id: set(dependency_ids)
+            for check_id, dependency_ids in self.canonical_check_dependencies()
+        }
+        remaining = set(dependencies)
+        ordered: list[str] = []
+        while remaining:
+            eligible = min(
+                check_id
+                for check_id in remaining
+                if dependencies[check_id].isdisjoint(remaining)
+            ) if any(
+                dependencies[check_id].isdisjoint(remaining)
+                for check_id in remaining
+            ) else None
+            if eligible is None:
+                raise ValueError("validation check dependency graph must be acyclic")
+            ordered.append(eligible)
+            remaining.remove(eligible)
+        return tuple(ordered)
 
     def validate(self) -> None:
         identifiers = (
@@ -437,6 +479,56 @@ class PlanAcceptanceRequest:
             raise ValueError("dependency plan identifiers must be unique")
         if self.plan_id in self.dependency_plan_ids:
             raise ValueError("accepted plan cannot depend on itself")
+        check_set = set(self.check_ids)
+        for field_name, declarations in (
+            ("dependency", self.check_dependency_ids),
+            ("launch-gate", self.check_launch_gate_ids),
+        ):
+            declared_checks: set[str] = set()
+            for declaration in declarations:
+                if (
+                    not isinstance(declaration, tuple)
+                    or len(declaration) != 2
+                    or not isinstance(declaration[0], str)
+                    or not declaration[0].strip()
+                    or not isinstance(declaration[1], tuple)
+                ):
+                    raise ValueError(
+                        f"validation check {field_name} declaration is malformed"
+                    )
+                check_id, values = declaration
+                if check_id not in check_set:
+                    raise ValueError(
+                        f"validation check {field_name} declaration targets an unknown check"
+                    )
+                if check_id in declared_checks:
+                    raise ValueError(
+                        f"validation check {field_name} declarations must be unique"
+                    )
+                declared_checks.add(check_id)
+                if any(
+                    not isinstance(value, str) or not value.strip()
+                    for value in values
+                ):
+                    raise ValueError(
+                        f"validation check {field_name} identifiers must be non-empty"
+                    )
+                if len(set(values)) != len(values):
+                    raise ValueError(
+                        f"validation check {field_name} identifiers must be unique"
+                    )
+                if field_name == "dependency":
+                    if check_id in values:
+                        raise ValueError("validation check cannot depend on itself")
+                    if any(value not in check_set for value in values):
+                        raise ValueError(
+                            "validation check dependency targets an unknown check"
+                        )
+            if declared_checks != check_set:
+                raise ValueError(
+                    f"validation check {field_name} declarations must cover every check"
+                )
+        self.canonical_check_order()
         if any(
             not gate_id or not gate_id.strip()
             for gate_id in self.aggregate_gate_ids

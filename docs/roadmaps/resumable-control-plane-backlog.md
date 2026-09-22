@@ -1103,6 +1103,37 @@ and confirmed exact aggregate counts of T 28/18/15/8, C 9/8/8/0 and F
 approval register, BER, dependencies, CI workflows, production/provider
 surfaces and preserved artifacts/caches remain untouched.
 
+### 5.24 Selected-check v2 binding foundation checkpoint
+
+The first selected-check increment is independently accepted without promoting
+T11, T27, F11 or F17. New accepted plans explicitly declare every check's
+dependency and launch-gate sets, derive a deterministic topological order with
+lexical tie-breaking, bind those values into authenticated v2 payload, semantic
+and completion-policy digests, and persist normalized projections. Recovery
+reconstructs the projections from authenticated event history; v1 plan history
+remains readable but fails closed at T27 rather than receiving invented empty
+bindings.
+
+T27 now selects only the first unresolved check in the bound topological order.
+A declared launch gate denies before validator intent, permission use, budget
+reservation, capability redemption or adapter contact until the signed launch-
+readiness increment exists. Focused tests cover the lexically earlier dependent
+case, newly eligible lexical ordering, incomplete/cyclic declarations,
+projection persistence, dependency-order launch and no-mutation gate denial.
+The complete local package passed 446 tests in 69.851 seconds. The first
+implementation review returned `REVISE` for inferred empty bindings, batchwise
+topological ordering, premature authority checks and unguarded declared gates;
+the corrected diff received `APPROVE` with no findings.
+Repository validation also passed: 184 skills with zero warnings, 8 script tests
+with 4 expected skips and all 91 gate self-test assertions.
+
+Still open in this same ordered gate: authenticated complete PASS/FAIL/UNKNOWN
+launch-gate facts and snapshots, the no-capability pre-claim decision, exact T16
+unblock, T11 next-check BLOCKED/VALIDATING routing, T17 post-event refresh and
+atomic contact recheck with T25 nonexecution settlement. PR #99 remains draft
+and not merge-ready. No real authority, adapter, provider, deployment or later
+work package is authorized by this foundation.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

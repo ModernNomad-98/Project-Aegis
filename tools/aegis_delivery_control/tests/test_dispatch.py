@@ -97,6 +97,15 @@ def BudgetSettlementRequest(*args, **kwargs):
 
 def PlanAcceptanceRequest(*args, **kwargs):
     """Build a newly accepted synthetic plan with explicit immutable pins."""
+    check_ids = kwargs.get("check_ids", args[11] if len(args) > 11 else ())
+    kwargs.setdefault(
+        "check_dependency_ids",
+        tuple((check_id, ()) for check_id in check_ids),
+    )
+    kwargs.setdefault(
+        "check_launch_gate_ids",
+        tuple((check_id, ()) for check_id in check_ids),
+    )
     kwargs.setdefault("source_tree_digest", "source-tree-1")
     kwargs.setdefault("item_definition_digest", "item-definition-1")
     kwargs.setdefault("plan_schema_version", "plan-schema-1")
