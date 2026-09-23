@@ -5,6 +5,12 @@ description: Design AND read A/B and controlled experiments honestly — a falsi
 
 # A/B Test Designer
 
+In this skill, **minimum detectable effect (MDE)** is the smallest effect the
+test is designed to detect, **confidence interval (CI)** is the estimated
+effect's uncertainty range, **sample-ratio mismatch (SRM)** is a material
+departure from the planned variant split, and **alpha (α)** is the pre-set
+significance level (false-positive probability under the null hypothesis).
+
 ## Purpose
 
 Most A/B tests are theater: a test stopped the day it hit significance, a
@@ -113,13 +119,17 @@ EXPERIMENT — <change under test>   [DESIGN | READOUT]
 Hypothesis:    <falsifiable, directional, tied to a decision>
 Primary metric: <ONE> (from funnel/event definitions)  Guardrails: <must-not-regress set>
 Unit:          user | account/cluster; sticky; contamination/spillover notes
-Power:         MDE=<practically meaningful>; baseline=<rate/var>; α=<>, power=<>;
-               required n=<>; DURATION=<derived, full weekly cycles>
+Power:         MDE=<practically meaningful minimum detectable effect>;
+               baseline=<rate/variance>; alpha (α)=<significance level>;
+               power=<target detection probability>; required sample size (n)=<>;
+               duration=<derived from traffic, full weekly cycles>
 Horizon:       fixed end date; peeking forbidden (or sequential method + correction stated)
 -- READOUT (if analyzing) --
-Result:        effect=<size> CI=[..]; statistical sig=<y/n>; practical sig vs MDE=<y/n>
+Result:        effect=<size>; confidence interval (CI)=[..];
+               statistically significant=<yes/no>; practically meaningful vs MDE=<yes/no>
 Guardrails:    <status>
-Validity:      SRM check; multiple-comparison handling; Simpson's/novelty checks
+Validity:      sample-ratio mismatch (SRM) check; multiple-comparison handling;
+               Simpson's paradox and novelty-effect checks
 Decision:      ship | kill | iterate — with residual uncertainty stated
 Boundaries:    safety rollout → feature-flag-rollout-strategist; metric def →
                funnel-definition-designer; schema → event-schema-architect
