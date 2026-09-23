@@ -20,7 +20,7 @@ earlier forecast update.
 | Work package | First recorded checkpoint (UTC) | Estimated active work | Actual active work | Review / CI | Owner waiting | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | BER-BKL-007 authorization (WP-2B-1A governance) | 2026-09-23 10:52 | 20–30 minutes remaining at checkpoint; earlier start was not timed | At least 5m14s observed wall time to PR #103 merge; earlier active time unknown | Independent review and all three Actions passed | None recorded | PR #103 merged at 10:57:14 UTC |
-| BER-BKL-007 implementation | 2026-09-23 10:57 | 3–5 hours active work after authorization merge | Active-only total unavailable; about 28 minutes observed wall time to first final-candidate CI | Independent audit passed after corrections; PR #104 Linux and Windows pass, protected-file guard fails under recorded narrow exception | Awaiting owner schema-shape decision | PR #104 open; BKL-007 not DONE |
+| BER-BKL-007 implementation | 2026-09-23 10:57 | 3–5 hours active work after authorization merge | Active-only total unavailable; about 28 minutes observed wall time to first final-candidate CI | Independent audit passed after corrections; original PR #104 Linux and Windows passed, protected-file guard failed under recorded narrow exception; revised head checks pending | Owner accepted schema shapes on 2026-09-23 | PR #104 conflict reconciled; BKL-007 becomes DONE only on merge |
 | Calibration replacement storage proposal | 2026-09-23 11:26 | 30–45 minutes active work | Exact active total unavailable; 12m50s observed wall time to merge at 11:38:50 | Independent review passed; final Actions green (Linux 1m24s, Windows 3m11s, guard 5s) | About 1 minute before owner chose A | PR #105 merged; choice A recorded |
 | Private input storage amendment (BER-DEC-010) | 2026-09-23 11:39 | 20–40 minutes active work to review and merge-ready PR | Exact active total unavailable; 8m21s observed wall time to merge at 11:47:21 | Independent audit passed after correction; final Actions guard 4s, Linux 1m18s, Windows 2m55s | None recorded | PR #106 merged |
 | Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | 33m20s observed wall time to public PR #107 merge; active-only total unavailable | Private PR #1 open; local contract/restore checks passed; public PR #107 independent audit and all Actions passed | Owner semantic review pending | Private packet PENDING; public checkpoint merged |
@@ -146,6 +146,13 @@ earlier forecast update.
   none; new packet ETA 1–2 active hours. Selected backlog 112–228 active
   hours, both optional helpers 128–268; full all-options backlog has no finite
   ETA while adoption quantities and decisions remain open.
+
+- **2026-09-23 owner schema decision — PR #104:** Peter Nguyen accepted the
+  recommendation to approve the tested schema shapes and merge the PR. The
+  earlier PR-specific guard exception remains recorded separately as
+  AEGIS-APR-005. A conflict with later main in this measurement log was
+  resolved by retaining the later main entries; BER code is unchanged from
+  the previously reviewed PR head. Revised exact-head checks remain pending.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.

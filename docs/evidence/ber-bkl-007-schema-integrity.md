@@ -1,6 +1,6 @@
 # BER-BKL-007 schema integrity review record
 
-Status: READY_FOR_OWNER_REVIEW. Governing package: WP-2B-1A / BER-DEC-009,
+Status: OWNER_ACCEPTED; DONE when PR #104 merges. Governing package: WP-2B-1A / BER-DEC-009,
 effective after governance [PR #103](https://github.com/ModernNomad-98/Project-Aegis/pull/103)
 merged at `f82a4bce770c173df6d4ddc6b920a7b35a6a63e7`.
 
@@ -37,6 +37,7 @@ change the pinned WP-2B-2 or WP-2B-3 version families.
 | Local Windows PowerShell Desktop acceptance | 113 checks, passed |
 | PowerShell Core acceptance | Unrun locally: `pwsh` is not installed; hosted Windows CI executes it |
 | GitHub Actions on PR #104 at `7a804aa` | Linux passed (1m23s); Windows passed (2m52s); `gate-guard` failed (5s) only on protected BER paths, as its log states |
+| Reconciled-main local BER suite | 997 tests passed, 14 expected skips, with checkout-scoped Git trust and the same execution mode used for the earlier process-control fixture; BER code unchanged from the audited head |
 
 The first full-suite errors did not establish a BER code failure. The rerun
 used process-local `GIT_CONFIG_COUNT` / `GIT_CONFIG_KEY_0=safe.directory` /
@@ -53,8 +54,9 @@ separate reviewed version decision. Budget ledger event lines are an
 unversioned historical format; this package validates the versioned checkpoint
 without changing the event stream.
 
-Final schema-shape acceptance remains Peter Nguyen's decision. BER-BKL-007 is
-not DONE merely because tests pass. No provider/model dispatch, measured
+Peter Nguyen accepted the recommendation to approve PR #104's tested final
+schema shapes and merge it on 2026-09-23. BER-BKL-007 becomes DONE on that
+merge, not merely because tests pass. No provider/model dispatch, measured
 calibration, live execution, historical evidence rewrite, dependency install
 or guard change occurred in this package. Model token and credit usage are
 unknown because the runtime did not expose them.
@@ -62,4 +64,5 @@ unknown because the runtime did not expose them.
 Peter Nguyen answered "Permit this narrow exception" for PR #104's documented
 guard failure on 2026-09-23 (AEGIS-APR-005). The final candidate must still
 have green Linux/Windows execution and test jobs and no audit blocker. This
-does not supply the separate final schema-shape acceptance.
+was separate from final schema-shape acceptance, which the owner subsequently
+provided on 2026-09-23.
