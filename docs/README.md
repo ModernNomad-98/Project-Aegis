@@ -54,6 +54,8 @@ integration is future work. Green offline CI does not close those gates.
 
 The [new-computer handoff](evidence/ber-recovery-2026-09-11/README.md) separates
 current setup from historical reproduction and records exactly what is missing.
+The [selected-host capability proposal](roadmaps/ber-selected-host-capability-decision.md)
+defines the next R4/R5 host choice and staged evidence gate.
 Original roadmap proposals and dated evidence remain useful history, rather
 than instructions to reopen completed PRs or reproduce the lost computer.
 
