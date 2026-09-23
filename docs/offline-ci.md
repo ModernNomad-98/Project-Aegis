@@ -1,12 +1,32 @@
 # Offline verification in GitHub Actions
 
+This guide is for contributors and reviewers checking a Project Aegis change.
+It explains what the automated **continuous integration (CI)** jobs prove, how
+to reproduce important checks locally, and how to interpret a failure or skip.
+The jobs test skills and the **Behavioral Eval Runner (BER)** with synthetic
+inputs; they do not run a live model evaluation.
+
+## A normal verification pass
+
+1. Run the [local checks](#local-reproduction) on the changed revision and
+   record the command, result and any skip.
+2. Open a pull request and wait for the Linux, Windows and protected-file
+   guard jobs on its exact head revision. A later push starts new checks; older
+   green results do not cover the new head.
+3. Read the job logs and retained evidence if a check fails. Fix a test or
+   environment failure and rerun the new candidate. A documented protected
+   path guard failure needs its own owner disposition under the
+   [merge policy](reconciliation/auto-merge-policy.md); it is not green.
+4. Close out only after independent review and all applicable execution jobs
+   have passed. A skipped capability remains unproven.
+
 The `validate-skills` workflow runs on every pull request targeting `main` and
 every push to `main`. Pull requests have no path filter. The existing required
 check names stay `validate-skills` and `gate-guard`; branch protection is unchanged.
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
-| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, PR-only DCO | Existing required check | 15 minutes |
+| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
 | `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
 
@@ -20,8 +40,9 @@ cannot retroactively prevent a merge.
 Both verification jobs use Python 3.14 and full Git history. Some BER fixtures
 verify historical authorization commits, so a shallow checkout is insufficient.
 `requirements-ci.txt` includes the pinned validator dependency and the pinned
-OpenAI SDK used by mocked transport tests. The validator's ordinary runtime
-dependency remains separately available in `requirements.txt`.
+OpenAI software development kit (SDK) used by mocked transport tests. The
+validator's ordinary runtime dependency remains separately available in
+`requirements.txt`.
 
 The environment precheck imports `openai`, `httpx2` and `yaml`, verifies the SDK's
 existing authorized version, and requires the reviewed Python minor. A missing
@@ -47,14 +68,16 @@ advisory findings that need triage.
 ## Evidence and failures
 
 `scripts/ci/record-check.py` runs the existing command once, streams its combined
-output, preserves raw log bytes and writes a JSON record containing the native
-exit code, elapsed time, checkout SHA, event/PR SHA, dirty state, Python/platform
+output, preserves raw log bytes and writes a JavaScript Object Notation (JSON)
+record containing the native exit code, elapsed time, checkout and pull-request
+revision hashes, dirty state, Python/platform
 and key package versions. It propagates failure and refuses to replace an earlier
 log or metadata record with the same label. It does not reinterpret a test runner's
 result or retry a command.
 
 Each verification job uploads its logs and records on success or failure, with a
-unique OS/run/attempt artifact name and **14-day retention**. Setup failures before
+unique operating-system/run/attempt artifact name and **14-day retention**.
+Setup failures before
 the recorder runs remain visible in native Actions logs. The upload action is
 pinned to the verified `actions/upload-artifact` v7.0.1 commit
 `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`; checkout and setup-python retain their
@@ -62,7 +85,8 @@ existing reviewed pins. See the action's
 [retention documentation](https://github.com/actions/upload-artifact#retention-period).
 
 Full test output retains skip reasons. Capability differences can change skip
-counts: the precheck records both POSIX no-follow materialization and atomic
+counts: the precheck records both Portable Operating System Interface (POSIX)
+no-follow materialization and atomic
 evidence-write capabilities rather than assuming either from the OS name.
 Windows may lack symlink privileges or distinct 8.3 aliases; Linux acceptance
 does not execute Windows file-lock behavior. Hosted results must be reported as
@@ -74,9 +98,19 @@ implementation and successful post-merge run. The retained
 successful recorded commands (nine Ubuntu, ten Windows), their raw logs and
 environment metadata. These are command records, not a count of individual tests.
 
+## Reading a failure
+
+| Finding | What it means for this revision |
+| --- | --- |
+| Environment precheck fails | The expected interpreter or pinned dependency is absent or changed; later skipped tests cannot be counted as passing coverage. |
+| Validator or test job fails | Read its recorded command, native exit code and raw log. Correct the cause and rerun checks on the new revision. |
+| Protected-file guard fails | A changed path needs deliberate manual review and merge. The guard is reporting its intended condition; it was not bypassed or made green. Follow the owner approval register and current merge policy. |
+| Capability test skips | That capability was not exercised on this host. Keep the skip in the closeout and seek another host or proof when required. |
+
 ## Protected files
 
-Following D60, the guard retains its original protected paths and includes the
+Following recorded [decision D60](reconciliation/step-0-reconciliation-v4.md),
+the guard retains its original protected paths and includes the
 new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptance
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
@@ -86,7 +120,8 @@ authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation
 inside protected paths also triggers the guard.
 
-The guard reads NUL-delimited paths and disables rename detection so renaming a
+The guard reads null-byte (NUL) delimited paths and disables rename detection
+so renaming a
 protected file out of the protected set still exposes its deletion. Regressions
 execute the actual workflow guard against synthetic Git repositories, including
 Unicode/newline filenames. These guard tests run on Linux, matching the guard job;
