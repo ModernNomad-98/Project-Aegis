@@ -9,11 +9,15 @@ The library does not itself build, deploy or operate an application.
 
 ## Start here
 
-1. **Choose a path.** If you have an idea, a broken application or a security
-   question, use the [guided paths](#start-here-pick-your-path). If you are
-   maintaining this library, begin with the [documentation index](docs/README.md).
-2. **Get the library.** Install Git, then clone this repository. The detailed
-   [setup guide](#getting-started) explains how to use it with Claude Code and
+1. **Choose your workspace.** For an application idea, bug or security question,
+   use the [guided paths](#start-here-pick-your-path) in your **own product
+   repository**. To maintain the Aegis library itself, work in this source
+   checkout and begin with the [documentation index](docs/README.md).
+2. **Get the skills.** Install Git, then clone this source repository to obtain
+   the files. For product work, [copy your chosen skills into your own
+   repository](#using-the-skills-in-your-own-project) before opening your coding
+   assistant there. Copy the startup files too if you want the Aegis startup
+   routing. The [setup guide](#getting-started) covers Claude Code and
    other Agent Skills tools.
 
    ```bash
@@ -21,10 +25,11 @@ The library does not itself build, deploy or operate an application.
    cd Project-Aegis
    ```
 
-3. **Describe your task to your coding assistant.** For example: "Review this
-   change for customer-data access problems and explain your evidence." The
-   assistant selects a relevant skill when its host supports skill discovery;
-   you can also name a skill explicitly. Read the
+3. **Describe your task in the right repository.** Open your product repository
+   for product work, or this source checkout for Aegis maintenance. For example:
+   "Review this change for customer-data access problems and explain your
+   evidence." The assistant selects a relevant skill when its host supports
+   skill discovery; you can also name a skill explicitly. Read the
    [skills catalog](docs/skills-catalog.md) to see the shipped roles.
 
 For an optional setup conversation, explicitly say **"Help me set up Aegis"**
@@ -346,7 +351,9 @@ directly in the conversation. This gives you the procedure and its discipline; i
 **not** give you the automatic trigger selection, the read-only subagents, or the CI
 validator — those are Claude Code features.
 
-**Using the skills in your own project.** Copy the `.claude/skills/<name>/` folders you want
+#### Using the skills in your own project
+
+Copy the `.claude/skills/<name>/` folders you want
 into your own repo's `.claude/skills/` — Claude Code discovers them there exactly the same
 way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder). To also reproduce this repo's startup routing, copy the repo-root `CLAUDE.md` and `AGENTS.md` into your repo root — `CLAUDE.md` is Claude Code's startup file and imports `AGENTS.md`.
 Literal copy commands, run from inside the cloned `Project-Aegis` folder — swap
