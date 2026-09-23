@@ -1,5 +1,24 @@
 # Documentation readability and component guide backlog
 
+## Start here — current reading
+
+As of 2026-09-23 after pull request (PR) #198, this remains the active
+repository-wide documentation acceptance backlog. The two component guides,
+root guide and documentation index have received bounded readability work;
+the [delivery batches](#documentation-batches) identify what was checked.
+The **491-file inventory and the ordered "start with" steps below are the
+original launch plan**, retained to show how this work began. Do not restart
+those delivered batches from that plan.
+
+The exact #198 tree contains **547 tracked Markdown files**. Earlier screens
+of skill entrypoints and references corrected particular pages; they did not
+accept every page against the checklist below. Continue the remaining
+page-by-page review and use the [forecast's current reading](aegis-backlog-forecast.md#start-here--current-reading)
+for the latest selected-work estimate. The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
+explain their shipped offline workflows and limits. This reading route grants
+no provider call, private-input use, real-host activation or deployment.
+
 Created 2026-09-23 from Peter Nguyen's request to explain what the Behavioral
 Eval Runner and delivery control plane are for, what their functions do, and
 to make **all repository documentation understandable to human developers and
