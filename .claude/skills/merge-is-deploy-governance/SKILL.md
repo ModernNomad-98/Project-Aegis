@@ -1,6 +1,6 @@
 ---
 name: merge-is-deploy-governance
-description: 'When the platform auto-deploys every merge to mainline, author the standing governance that makes merge==deploy safe: document that reality (including what does NOT auto-deploy); promote PR-time validation to the AUTHORITATIVE pre-production gate; reclassify post-merge validation as verification, never a gate; record the branch-protection config in-repo with WHO may change it (a human, never agents); state the accepted-risk exposure window; define rollback as revert-PR-then-auto-redeploy (squash repos: git revert <sha> — the commit is ORDINARY; -m 1 fits only true merge commits). Standing PIPELINE governance, not a per-release verdict. Use when merge deploys mainline, when post-merge checks are treated as a gate, when protection config lives only in the web UI, or after a surprise deploy-on-merge. Do NOT use to gate one release (release-readiness-reviewer), author rollback runbooks (rollback-runbook-author), define who may merge (agent-authorization-matrix), or design stages (ci-pipeline-architect).'
+description: 'When the platform auto-deploys every merge to mainline, author the standing governance that makes merge==deploy safe: document that reality (including what does NOT auto-deploy); promote PR-time validation to the AUTHORITATIVE pre-production gate; reclassify post-merge validation as verification, never a gate; record the branch-protection config in-repo with WHO may change it (a human, never agents); state the accepted-risk exposure window; define rollback as revert-PR-then-auto-redeploy (squash: git revert <sha>; true merge: choose a mainline parent for -m). Standing PIPELINE governance, not a per-release verdict. Use when merge deploys mainline, when post-merge checks are treated as a gate, when protection config lives only in the web UI, or after a surprise deploy-on-merge. Do NOT use to gate one release (release-readiness-reviewer), author rollback runbooks (rollback-runbook-author), define who may merge (agent-authorization-matrix), or design stages (ci-pipeline-architect).'
 ---
 
 # Merge-Is-Deploy Governance
@@ -107,8 +107,9 @@ honor applicable existing user grants without asking for the same grant again.
    revert rides the same authoritative gate (a revert PR with required
    checks) and the platform redeploys on its merge. Mechanics must match
    the merge strategy: **squash-merged changes revert as ordinary commits —
-   `git revert <sha>`; the `-m 1` flag applies only to true merge commits**
-   (using it on a squash commit fails). Note what revert does NOT undo
+   `git revert <sha>`**. A true merge commit needs an explicitly chosen
+   mainline parent with `-m <parent-number>`; that flag is unnecessary for
+   an ordinary squash commit. Note what revert does NOT undo
    (applied migrations, external side effects) and route the full runbook
    to `rollback-runbook-author`.
 7. **Deliver the governance draft + gap list:** dated draft and proposed repo path,
@@ -129,7 +130,8 @@ Branch protection (recorded <date>, source: <API|human-dictated>):
 Exposure window:    merge → verified deploy ≈ <duration>; blast radius <scope>;
                     accepted by <who> on <date>
 Rollback primitive: revert PR → gate → merge → auto-redeploy
-                    (squash repo: git revert <sha>; -m 1 only for true merge commits)
+                    (squash: git revert <commit>; true merge: inspect parents,
+                    then use -m <chosen-parent-number>)
                     does not undo: <migrations/external effects> → rollback-runbook-author
 Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/humans>
 ```
@@ -166,11 +168,12 @@ Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/h
   requirement dropped) silently rewrites the authoritative gate. The
   in-repo record + cadenced drift check is the countermeasure; reading via
   API needs admin scope — label human-dictated records as such.
-- **Squash-revert confusion:** `git revert -m 1 <sha>` on a squash-merged
-  commit errors out ("not a merge"); conversely reverting only one commit
-  of a true merge without `-m` fails too. Match the mechanics to the
-  strategy — a broken revert command in the rollback path is discovered at
-  the worst possible time.
+- **Squash-revert confusion:** a squash merge produces one ordinary commit;
+  use `git revert <sha>` for that commit. The `-m` option chooses the parent
+  to retain when reverting a true merge commit. Inspect the commit's parents
+  and choose the mainline deliberately; do not infer the needed command from
+  the pull request label alone. A broken revert command in the rollback path
+  is discovered at the worst possible time.
 - **Revert theater:** a revert PR undoes the code but not the applied
   migration or the external webhook registrations; stating what revert
   does NOT undo is what keeps the primitive honest.
