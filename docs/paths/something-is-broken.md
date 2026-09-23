@@ -35,8 +35,10 @@ prepares the next release's rollback plan; it does not execute a live rollback.
 
 ## After the diagnosis
 
-Whichever specialist takes it, the close is the same discipline: a root cause backed by
-evidence, a fix you can review, and proof the fix actually took — not a "should be fine
-now". If the diagnosis reveals the problem is bigger than a bug (a design gap, a security
-hole), the specialist names the skill that owns that follow-up; let it hand off rather
-than stretching the debugging session into a redesign.
+Whichever specialist takes it, close with the evidence-backed diagnosis and
+a clear next action. Some specialists only measure or design a response;
+their output is a plan or finding, not an applied fix. When an authorized
+fix is actually applied, verify its effect and record the result instead of
+assuming "should be fine now". If the diagnosis reveals a design gap or
+security hole, name the owning follow-up skill and hand it off instead of
+stretching a debugging session into a redesign.

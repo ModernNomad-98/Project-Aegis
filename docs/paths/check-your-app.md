@@ -86,15 +86,25 @@ to your app.
 7. **The go/no-go —
    [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md).**
    Yields an evidence-based GO (ready to ship) or NO-GO (blocked from shipping)
-   decision, built from what the
-   steps above actually found — not from anyone's assurance that it's probably fine. This
-   is the close of the path. A GO is an advisory readiness result, not release
+   decision. Give it the earlier findings **and** the exact proposed release
+   commit, continuous integration (CI) results on that commit, whether the
+   tests meaningfully cover this change, built-artifact provenance,
+   applicable migration review, a rollback plan and rehearsal
+   status, feature-flag defaults, documentation, monitoring and on-call
+   coverage, and required approvals. When the scope and evidence systems are
+   inspectable, a missing blocking item yields NO-GO with the evidence needed
+   to change that verdict. If the exact release scope cannot be pinned or
+   evidence systems are unreachable, report the unverifiable dimensions and
+   stop short of a verdict. An assurance that it is probably fine is not
+   evidence. This is the close of the path. A GO is an
+   advisory readiness result, not release
    authorization; a human approval or applicable standing grant still governs
    any launch.
 
 ## What this is — and isn't
 
 This is a guided order, not a guarantee. Each skill's own output is the evidence: what it
-found, what it fixed, what it left open. If a step reports findings you don't understand,
-ask Claude Code to explain them in plain words before moving on — an unexplained finding is
+found, what it proposed or fixed, and what it left open. If a step reports
+findings you don't understand,
+ask your agent tool to explain them in plain words before moving on — an unexplained finding is
 not a cleared one.
