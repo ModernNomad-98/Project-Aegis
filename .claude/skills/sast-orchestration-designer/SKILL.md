@@ -5,6 +5,13 @@ description: 'Design HOW a SAST suite is RUN over a repository — category-leve
 
 # SAST Orchestration Designer
 
+Terms used below: **SAST** means static application security testing;
+**SCA** means software composition analysis of dependencies; **CVE** is a
+Common Vulnerabilities and Exposures identifier; **CI** means continuous
+integration; and **PR** means pull request. **FP** and **TP** mean false
+positive and true positive. This skill designs how scanning runs; deciding
+whether a finding is TP or FP remains `static-analysis-reviewer`'s job.
+
 ## Purpose
 
 Static analysis is only as useful as the way it is run: a suite with no
@@ -106,13 +113,13 @@ false-positive, ranking, and the suppression VERDICT — belongs to
 ## Output Format
 
 ```
-SAST RUN DESIGN — <repo>
+SAST RUN DESIGN (STATIC APPLICATION SECURITY TESTING) — <repo>
 Coverage: <language/framework → SAST analyzer category; unsupported = stated GAP>
 Ruleset/config: <enabled rule classes, severity thresholds, custom rules; versioned in-repo>
 Baseline + diff: <baseline capture; PR gate = NEW-since-baseline; full-scan cadence; refresh/burn-down policy>
 Suppression (GOVERNED list, NOT silent mute):
   <entry = rule id + location + written rationale + owner + date + expiry/review>
-  — the FP/accepted VERDICT is static-analysis-reviewer's, not this skill's
+  — the false-positive/accepted verdict is static-analysis-reviewer's, not this skill's
 Scan strategy: <incremental (PR/changed-files) + full (cadence); CI latency-budget fit>
 CI integration: <stage placement; merge-blocking on NEW findings>  (pipeline → ci-pipeline-architect)
 Fail-closed: <scan error/timeout/skipped-language ⇒ gate FAILS / GAP surfaced; the proof it fires>
