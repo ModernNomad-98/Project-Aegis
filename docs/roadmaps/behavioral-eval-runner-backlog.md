@@ -721,6 +721,32 @@ the sole owner of actual advisory CI integration).
   (post-merge record appended, §14). Status updated here through this reviewed governance PR.
 - **Supersedes / superseded by:** None.
 
+### WP-2B-1A — Serialized evidence compatibility follow-up
+
+- **ID:** WP-2B-1A
+- **Title:** BER-BKL-007 external version validation and compatibility policy
+- **Phase:** 2B-1 follow-up
+- **Priority:** REQUIRED
+- **Status:** AUTHORIZED — BER-DEC-009 is effective only after the reviewed governance
+  PR carrying it is merged. Until then this is a proposed authorization, and
+  implementation must not begin.
+- **Scope:** Reject missing or unsupported serialized versions at WP-2B-1 external
+  record and evidence read boundaries; preserve legitimate internal constructor
+  defaults and distinct WP-2B-2/3 version families; add offline regressions and
+  a documented compatibility and reviewed-conversion policy. Update BER-BKL-007
+  with actual delivery evidence after review.
+- **Acceptance:** Exact external boundaries reject missing and unsupported
+  versions, including self-consistent evidence bundles. Existing supported evidence
+  remains readable without rewriting its original bytes or hashes. Applicable
+  offline checks and independent code review pass. Final shape acceptance remains
+  an owner review decision and must not be inferred from implementation tests.
+- **Authority and evidence:** BER-DEC-009 below; implementation branch
+  `feat/ber-bkl-007-schema-integrity` from the exact authorization merge commit;
+  closeout at `docs/evidence/ber-bkl-007-schema-integrity.md`.
+- **Explicit non-goals:** No provider calls, live execution, historical evidence
+  rewrite, new schema version, dependency addition, guard change or later-phase
+  authorization.
+
 ### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 
 - **ID:** WP-2B-2
@@ -1449,10 +1475,11 @@ authorization decisions in §13 remain unchanged.
 - **Why it matters:** The design deliberately specifies concepts, not final serialized
   shapes. Production schemas need exact field names, types, enum registries, and a
   migration policy so later schema versions never silently reinterpret stored evidence.
-- **Dependencies:** WP-2B-1 implementation is DONE; remaining policy work needs
-  a scoped follow-up covering version increments and reading older evidence.
-- **Trigger to begin:** Authorize the remaining migration-policy follow-up;
-  the schema implementation itself is already delivered.
+- **Dependencies:** WP-2B-1 implementation is DONE; the remaining policy and
+  external-version validation follow-up is WP-2B-1A under BER-DEC-009.
+- **Trigger to begin:** The reviewed governance PR carrying BER-DEC-009 is
+  merged; implementation then begins on its recorded branch. The original
+  schema implementation is already delivered.
 - **Expected deliverable:** Versioned JSON/YAML schemas for attempt records, case
   aggregates, run reports (three field groups), case/fixture manifests, materialization
   and execution profiles, and evidence manifests; a schema-migration policy (how
@@ -3125,6 +3152,46 @@ model call, and evidence artifact.
 - **Supersedes / superseded by:** None. BER-DEC-001 through BER-DEC-007 are unchanged.
 
 ---
+
+### BER-DEC-009
+
+- **Date / owner:** 2026-09-23 / Peter Nguyen.
+- **Decision and source:** The owner's current instruction, "Resolve all Project
+  Aegis backlogs and issues, iterating through failures until local checks,
+  independent audits, and GitHub Actions are green; commit, push, and merge the
+  approved PR when complete," directs continuation from the first task in
+  `aegis-efficient-execution-handoff-2026-09-23.md`. That first task is the
+  bounded BER-BKL-007 schema-integrity follow-up. This entry records that scope;
+  it does not claim advance acceptance of its final shapes or a measured result.
+- **Repository / package:** `ModernNomad-98/Project-Aegis` / WP-2B-1A only.
+- **Authorization condition:** Effective only after the reviewed governance PR
+  containing this entry is merged. The implementation branch is
+  `feat/ber-bkl-007-schema-integrity`, based on that exact merge commit and tree.
+- **Allowed changes:** `tools/behavioral_eval_runner/` external record loaders,
+  evidence verification, execution-profile reading and their offline tests;
+  a BER schema compatibility policy; this backlog's BKL-007 lifecycle entry;
+  and the closeout at `docs/evidence/ber-bkl-007-schema-integrity.md`. Require
+  explicit supported serialized versions, including self-consistent bundles.
+  Preserve internal construction defaults and independent version families.
+- **Budget and units:** Runner-generated provider calls 0, live sessions 0,
+  external spend USD $0, dependency installations 0. Implementation-session
+  model usage is separate and reported only if exposed by the runtime.
+- **Evidence handling:** Synthetic fixtures and offline test output only. Keep
+  transient test data in the OS temporary directory; commit only sanitized
+  commands, results, revision and review findings at the closeout path above.
+  No credential, production, sealed-holdout or historical evidence bytes enter
+  this package. Retain original bytes and hashes of any previously stored
+  evidence; conversion is separately reviewed and produces a new derivative.
+- **Stop conditions:** Stop if the required scope needs a new schema version,
+  altered WP-2B-2/3 contracts, provider access, dependency installation,
+  production data, a changed protected-file guard, or an unresolved security
+  or evidence-integrity finding. The current request requires green Actions;
+  a protected-file guard failure remains a merge blocker unless the owner
+  explicitly accepts the narrow exception proposed in the handoff.
+- **No additional authority:** This record does not authorize measured
+  calibration, holdout execution, live BER phases, deployment, or rewriting
+  historical evidence. BKL-007 closes only after code, policy and reviewed
+  acceptance are complete.
 
 ## 14. Continuation instructions for a brand-new session
 
