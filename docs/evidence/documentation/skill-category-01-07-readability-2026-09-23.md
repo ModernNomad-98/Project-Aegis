@@ -5,9 +5,8 @@
 This batch covers seven historical candidate pages, [categories 01–07](../../skills/),
 from the [original 300-skill roadmap](../../300-repeatable-software-saas-skills-roadmap.md).
 It started in an isolated worktree based on pull request (PR) #141's
-head. The exact edits are those seven pages and this note. The documentation
-readability backlog row is reserved for the coordinating maintainer after the
-separate category 08/09 pull request merges.
+head. The exact edits are those seven pages, this note, and one row in the
+[documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md).
 
 The prior full-documentation estimate remains **80–200 active hours**. This
 bounded batch was estimated at **2–4 active hours**, with a selected remaining
@@ -44,14 +43,17 @@ active-only labor or a revision to the full-sweep estimate.
   existing source status in the roadmap, catalog and README.
 - `python -B scripts/validate-skills.py` passed: 185 valid skills, zero
   warnings. All 25 local links across the eight scoped pages resolved; there
-  are no local anchors. `git diff --check` passed. Git status showed only the
-  eight authorized paths.
+  are no local anchors. `git diff --check` passed on the reviewed eight-path
+  content; the integrated ninth path is the backlog row linked above.
 - Independent read-only review at 18:44:02–18:45:14 Coordinated Universal Time
   (UTC; 1 minute 12 seconds) found one first-use gap: abbreviations in six
   headings or opening lines preceded their explanations. Those first uses were
   expanded. Follow-up review at 18:47:12–18:47:55 UTC found no blocker in
-  the corrected eight-path tree, including all 260 unchanged candidate rows
-  and 25 working local links.
+  the corrected eight-path content, including all 260 unchanged candidate rows
+  and 25 working local links. The ninth path is the linked backlog row added
+  after the preceding category-map pull request merged.
+  A final read-only check at 18:49:59–18:50:37 UTC found no blocker in the
+  rebased nine-path branch: 260 rows unchanged and 38 local links resolved.
   This batch does not complete the repository-wide documentation sweep.
 
 Work started at **2026-09-23 18:38:59 UTC**. The final local checkpoint was
