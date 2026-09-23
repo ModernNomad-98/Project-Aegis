@@ -1,9 +1,14 @@
 # AI governance & risk framework
 
-Detail for `ai-governance-risk-reviewer`. Companion method: NIST AI RMF 1.0
-(GOVERN/MAP/MEASURE/MANAGE). Regulatory tiering language mirrors the EU AI Act
-risk tiers. This is a mapping scaffold, NOT legal advice — flag items for
-counsel.
+Use this `ai-governance-risk-reviewer` reference to tier a feature's risk, set
+human oversight, and map applicable obligations to actual controls. The
+companion method is the National Institute of Standards and Technology (NIST)
+Artificial Intelligence Risk Management Framework (AI RMF) 1.0, with its
+GOVERN/MAP/MEASURE/MANAGE functions. Regulatory tiering language mirrors the
+European Union (EU) AI Act risk tiers. **PII** means personally identifiable
+information; **HITL** and **HOTL** mean human-in-the-loop and human-on-the-loop
+oversight, respectively. This is a mapping scaffold, NOT legal advice — flag
+items for counsel.
 
 ## Risk-tiering rubric
 

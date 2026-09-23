@@ -1,6 +1,11 @@
 # Agent Identity & Delegation Patterns (ASI03)
 
-Detail file for `agent-identity-privilege-reviewer`. Read on demand.
+Use this `agent-identity-privilege-reviewer` reference to compare identity
+models, trace delegation, and record concrete escalation paths. **ASI03** is
+the identity and privilege abuse category in the Open Worldwide Application
+Security Project (OWASP) Top 10 for Agentic Applications. **VM** means virtual
+machine, **OIDC** means OpenID Connect, **STS** means Security Token Service,
+and **A2A** means agent-to-agent.
 
 ## 1. Identity models, weakest to strongest
 
