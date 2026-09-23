@@ -106,3 +106,30 @@ generic skill guidance that would require asking for the same approval again.
   option A and proposed technical contract are summarized in this entry.
 - **Expiry / use limit:** Applies to the proposed CP-WP-002 implementation
   package; no calendar expiry stated.
+
+### AEGIS-APR-005: PR #104 protected-file guard exception
+
+- **Event:** GRANT
+- **Status at recording:** ACTIVE
+- **Date / Grantor:** 2026-09-23 / Peter Nguyen.
+- **Reason:** Resolve the explicit conflict between the 2026-09-23 all-green
+  Actions instruction and the guard's documented manual-review failure for
+  protected BER files in PR #104.
+- **Scope allowed:** The owner's exact answer was "Permit this narrow exception"
+  to the question: "For PR #104 only, may I use the pre-approved administrator
+  merge despite the documented protected-file gate-guard failure? Linux and
+  Windows verification passed, and the independent audit found no blocker.
+  The 2026-09-23 handoff says this narrow exception still needs your explicit
+  decision because your newer instruction requires all Actions green."
+  This permits an administrator merge of PR #104 when the sole failed check
+  on its final candidate is that documented guard condition, all execution
+  and test jobs pass, and independent audits have no unresolved blocker.
+- **Scope FORBIDDEN:** The grant does not excuse another failed check, waive
+  BER-BKL-007's separate final-shape owner acceptance, change the guard or
+  branch protection, or apply to another PR.
+- **Evidence:** The owner's direct answer in the Project Aegis conversation
+  on 2026-09-23, quoted above, after the exact PR #104 check results were
+  presented. The final PR revision and check results must be verified again
+  before use.
+- **Expiry / use limit:** PR #104 only; one merge at most. No calendar expiry
+  stated.

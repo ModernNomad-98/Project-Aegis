@@ -36,7 +36,7 @@ change the pinned WP-2B-2 or WP-2B-3 version families.
 | Independent read-only audit | Found checkpoint and nested-report gaps; fixes reviewed, no remaining blocker |
 | Local Windows PowerShell Desktop acceptance | 113 checks, passed |
 | PowerShell Core acceptance | Unrun locally: `pwsh` is not installed; hosted Windows CI executes it |
-| GitHub Actions | Pending implementation PR |
+| GitHub Actions on PR #104 at `7a804aa` | Linux passed (1m23s); Windows passed (2m52s); `gate-guard` failed (5s) only on protected BER paths, as its log states |
 
 The first full-suite errors did not establish a BER code failure. The rerun
 used process-local `GIT_CONFIG_COUNT` / `GIT_CONFIG_KEY_0=safe.directory` /
@@ -58,3 +58,8 @@ not DONE merely because tests pass. No provider/model dispatch, measured
 calibration, live execution, historical evidence rewrite, dependency install
 or guard change occurred in this package. Model token and credit usage are
 unknown because the runtime did not expose them.
+
+Peter Nguyen answered "Permit this narrow exception" for PR #104's documented
+guard failure on 2026-09-23 (AEGIS-APR-005). The final candidate must still
+have green Linux/Windows execution and test jobs and no audit blocker. This
+does not supply the separate final schema-shape acceptance.

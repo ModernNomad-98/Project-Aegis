@@ -34,6 +34,15 @@ reconstructed precision. A range is an estimate, not a delivery promise.
 - **2026-09-23 11:15 UTC — local acceptance:** Windows PowerShell Desktop
   acceptance passed all 113 checks. PowerShell Core is unavailable locally;
   the hosted Windows Actions job will provide that coverage.
+- **2026-09-23 11:20 UTC — PR #104 first candidate checks:** From the 10:57
+  implementation checkpoint to the hosted result, about 23 minutes elapsed.
+  Linux passed in 1m23s and Windows in 2m52s; the protected-file guard failed
+  in 5s on its documented manual-review condition. Engineering and local
+  verification overlapped, so exact active-only minutes are not available.
+  Owner waiting began for schema-shape acceptance and the guard exception.
+- **2026-09-23 11:21 UTC — partial owner decision:** Peter Nguyen permitted
+  the narrow PR #104 guard exception. Final schema-shape acceptance remains
+  pending. The decision is recorded as AEGIS-APR-005.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
