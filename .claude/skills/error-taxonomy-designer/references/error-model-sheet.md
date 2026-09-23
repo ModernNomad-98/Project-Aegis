@@ -1,6 +1,11 @@
 # Error Model Sheet
 
-Detail tables for `error-taxonomy-designer`. Read on demand.
+Use these `error-taxonomy-designer` tables to choose stable error codes, a
+caller-safe envelope, and one mapping boundary. **HTTP** means Hypertext
+Transfer Protocol, **SQL** means Structured Query Language, **ORM** means
+object-relational mapping, **IP** means Internet Protocol, and **PII** means
+personally identifiable information. **CLI** means command-line interface;
+**RPC** means remote procedure call.
 
 ## Category → status → retryable reference
 
