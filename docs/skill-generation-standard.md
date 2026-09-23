@@ -1,11 +1,69 @@
 # Skill Generation Standard
 
-This is the authoritative standard for authoring **skills** in the open Agent Skills format for this
-library (Claude Code is the reference surface). Every skill under `.claude/skills/` MUST conform. `scripts/validate-skills.py`
-enforces the machine-checkable subset of these rules; the rest are review conventions.
+This is the current, shipped authoring standard for **skills** in Project Aegis.
+A skill is a reusable instruction file that tells a coding assistant when and
+how to perform one job. This guide is for maintainers adding or revising a
+skill, and for reviewers checking that change. It uses the open Agent Skills
+format; Claude Code is the reference host. Every skill under `.claude/skills/`
+MUST conform. [`scripts/validate-skills.py`](../scripts/validate-skills.py)
+enforces the machine-checkable rules; human review checks behavior and judgment.
+Here, **MUST** marks a requirement rather than optional advice.
 
-The `.claude/skills/_template/` directory is the reference implementation of this
-standard and is exempt from validation (it is a template, not a shipped skill).
+The [skill template](../.claude/skills/_template/SKILL.md) is the reference
+starting point. It is exempt from validation because it is a template, not a
+shipped skill. This page states the **current contract**, not a proposal.
+The Task-Authorized Local Implementation (TALI) text in section 5 defines a
+conditional route; no existing skill or execution route becomes TALI-enabled
+merely because this standard contains it.
+
+## Read this guide by task
+
+| If you need to... | Start with... |
+| --- | --- |
+| Add a skill | The normal workflow below, then sections 1–4 and 6–8. |
+| Decide whether a skill can act automatically | Section 5, including its full exceptions and action table. |
+| Review portability and trigger quality | Section 2 for metadata, section 6 for evaluation cases, then human review. |
+| Check a claim about what ships today | The template, the skill's own files, and the validator; this guide alone does not prove host behavior. |
+
+Here, **frontmatter** is the short metadata block at the top of `SKILL.md`;
+**YAML** is its structured text format. **JSON** (JavaScript Object Notation) is
+the format used for evaluation-case files. **Evals** are example prompts with
+expected behavior; the validator checks their structure, not their outcomes.
+**CI** means continuous integration, the repository's automated checks on a
+pull request (PR). The `§` symbol means "section." **D49** records the
+Codex/Agent Skills portability discovery; **D50** records strict-YAML
+enforcement. These are dated IDs in the
+[decision record](reconciliation/step-0-reconciliation-v4.md), not separate
+invocation commands.
+
+## Normal authoring workflow
+
+1. **Choose one job and its trigger.** Check the [skills catalog](skills-catalog.md)
+   for overlap. Describe when the skill wins and when a nearby skill should win.
+2. **Copy the template** into `.claude/skills/<skill-name>/`. Keep the name,
+   directory, and catalog entry identical. Put the procedure in `SKILL.md` and
+   detailed lookup material under `references/` only when needed.
+3. **Choose invocation posture from behavior.** A read-only reporting skill can
+   normally be auto-invoked. A skill with side effects is manual-only unless
+   its exact behavior meets one of section 5's bounded exceptions. Record the
+   required marker and Stop Conditions where applicable; never infer write
+   authority from this example.
+4. **Write evaluation cases** for a normal request, an edge, a near miss, and
+   a refusal. Add `trigger-evals.json` when a neighboring skill might match.
+   Register the skill in both the catalog and `README.md`.
+5. **Run the validator, then review judgment.** Run
+   `python scripts/validate-skills.py` from the repository root. A pass proves
+   structural checks only. A reviewer still checks wording, collisions,
+   invocation posture and whether the example cases would detect a wrong turn.
+
+For example, imagine a read-only skill for finding the latest accepted
+architecture decision. A matching request is "Which decision governs job
+retries?"; its output is a dated summary with a link to the decision. "Write
+a new job-retry decision" belongs to a decision writer and becomes a
+near-miss eval. Its `SKILL.md` uses the nine headings in section 4. Because
+this example only reads and reports, it does not set the manual-only flag.
+Changing it to write a decision requires a fresh section-5 posture check.
+This example does not create or authorize a shipped skill.
 
 ---
 
@@ -47,10 +105,13 @@ standard and is exempt from validation (it is a template, not a shipped skill).
 ### Portability contract
 
 Aegis skills are consumed by more tools than Claude Code — the open Agent Skills
-format is read by Codex CLI, Cursor, Gemini CLI and others, and those consumers
-parse frontmatter with SPEC-STRICT YAML parsers and select skills from the
-description alone (decisions D49/D50). Claude Code being lenient is not license
-to author leniently: a skill only Claude Code can parse is not portable, and
+format is read by Codex CLI, Cursor, Gemini CLI and others. Those consumers
+may use strict YAML parsers, which reject malformed metadata rather than
+guessing what it meant, and may select skills from the description alone.
+[D49](reconciliation/step-0-reconciliation-v4.md) recorded the host-portability
+discovery; D50 in the same decision record added strict-YAML enforcement.
+Claude Code being lenient is not license to author leniently: a skill only
+Claude Code can parse is not portable, and
 before D50 exactly that shipped 67 times. The contract:
 
 - **Strict-YAML-valid, always.** If the description contains `: ` (colon-space)
@@ -97,8 +158,8 @@ lean and push detail outward:
 
 ## 4. Required sections
 
-Every `SKILL.md` body MUST contain these `##` sections, in this order (this is the v4
-standard — the validator enforces all nine):
+Every `SKILL.md` body MUST contain these `##` sections, in this order (the
+current version 4, or v4, standard; the validator enforces all nine):
 
 1. **Purpose** — one paragraph: what this skill produces and the value it delivers.
 2. **Use When** — concrete trigger conditions. Mirror the frontmatter `description`
@@ -125,8 +186,9 @@ headers must all be present.
 
 ## 5. Least privilege & side effects
 
-This section is the repository's adopted least-privilege and side-effect policy: the
-Project Aegis **TALI v3.2.3** direction — the owner-authorized, review-corrected successor to
+This section is the repository's adopted least-privilege and side-effect policy:
+Project Aegis **TALI v3.2.3** (a policy revision, not a host or software version),
+the owner-authorized, review-corrected successor to
 the independently reviewed **v3.2.2** design basis — host-neutral and behavior-based. **Adopting
 this wording defines the standard; it does NOT activate TALI for any existing shipped skill.**
 No shipped skill or execution route receives TALI authority merely because this policy is
@@ -145,6 +207,18 @@ the deterministic sequence below.
   step — EXCEPT under the currently approved bounded exceptions defined below. These are the
   exceptions approved as of this policy version. Any additional exception requires a separate owner
   decision, policy review, and repository change.
+
+### Choosing the relevant section
+
+This table is a reading aid; the full rules and action-by-context table below
+govern each operation.
+
+| Proposed behavior | Read next | Current status |
+| --- | --- | --- |
+| Read and report only | Default rule above | Normal read-only skill path. |
+| Create or append approved non-executable documentation or project state | Exception 1 | Available only within the stated content, path and approval bounds. |
+| Edit ordinary source or tests through a classified, approved route | Exception 2 and its action table | Conditional policy only; no shipped route is activated here. |
+| Install, call a network, mutate external state, deploy or spend | Manual-only and owning policy | The exceptions here do not grant these actions. |
 
 ### EXCEPTION 1 — Approved documentation/state write (self-contained rule)
 
@@ -430,7 +504,8 @@ representative trigger prompts and expected behaviors, with at least a happy pat
 edge case, a should-not-do case, and objective assertions. Skills whose trigger
 description overlaps another skill MUST also ship `evals/trigger-evals.json`.
 
-**Evals are a repo convention, validated structurally only (decision D3):** the validator
+**Evals are a repo convention, validated structurally only** (D3 in the
+[decision record](reconciliation/step-0-reconciliation-v4.md)): the validator
 checks that `evals/evals.json` exists and parses as JSON (and that `trigger-evals.json`
 parses when present). This check does not execute per-skill eval definitions;
 report them as present and well-formed, not as passing behavioral evaluations.
