@@ -5,6 +5,16 @@ description: Design the mobile and responsive viewport craft for a web UI — a 
 
 # Mobile Viewport Craft
 
+Viewport terms used below: `vh` is a Cascading Style Sheets (CSS)
+viewport-height unit; `svh` uses the **small** viewport with browser bars
+expanded; `lvh` uses the **large**
+viewport with those bars retracted; and `dvh` tracks the **dynamic** visible
+viewport as the bars change. Pick the unit for the surface's actual layout
+behavior rather than treating the three as interchangeable. The HyperText
+Markup Language (HTML) `inputmode` attribute hints which virtual keyboard to
+show; it does not
+validate input. `a11y` abbreviates accessibility.
+
 ## Purpose
 
 The desktop layout "works on mobile" until a real thumb hits it: taps
@@ -116,8 +126,10 @@ MOBILE VIEWPORT CRAFT — <surface(s)>
 Targets:      min-width=<n>; device/input classes; mobile-first stated
 Breakpoints:  <content-driven list + rationale>; container queries where component-scoped
 Touch:        min target ~44px + spacing; thumb-zone for primaries; hit-area = visual
-Viewport:     100vh → dvh/svh/lvh; safe-area-inset applied; fixed elements vs keyboard checked
-Input:        input types/inputmode; font-size ≥16px (no focus-zoom); focused field above keyboard
+Viewport:     <100vh browser-bar risk; 100svh | 100lvh | 100dvh chosen + why;
+              safe-area inset applied; fixed elements vs keyboard checked>
+Input:        <HTML input type + inputmode virtual-keyboard hint; font-size ≥16px
+              (no focus-zoom); focused field above keyboard>
 Hover/gesture: hover-only affordances → touch equivalents; custom gestures discoverable, no browser conflict
 Layout:       reflow-vs-hide per region; wide-table pattern chosen (cards|scroll+frozen|priority) w/ tradeoff;
               nav pattern; responsive media
