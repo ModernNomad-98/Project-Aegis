@@ -1,5 +1,14 @@
 # CP-WP-003A offline capability proof review
 
+> **Current reading, checked 2026-09-23:** Control-plane work package 003A
+> (CP-WP-003A) is **DONE** as an offline synthetic proof through
+> [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123).
+> Statements below that independent review or exact-head checks remain pending
+> describe the earlier draft. The [current CP backlog](../../roadmaps/resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery)
+> keeps real CP-WP-003 and CP-WP-004 **BLOCKED**: no real authority source,
+> selected host, evidence store or billing proof was delivered. The
+> [evidence index](../README.md) routes to the related design record.
+
 Date: 2026-09-23. Authority: AEGIS-APR-006, effective at grant merge
 `1af342712d27d5e6ea482b3f451106b4dccaf125`. Implementation branch:
 `feat/cp-wp-003a-offline-proofs`. Candidate commit and independent reviewer

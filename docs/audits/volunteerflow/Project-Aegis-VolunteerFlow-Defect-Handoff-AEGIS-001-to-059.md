@@ -1,5 +1,16 @@
 # Project Aegis VolunteerFlow Defect Handoff — AEGIS-001 through AEGIS-059
 
+> **Historical handoff reading, checked 2026-09-23:** This is the original
+> July 31 exploratory test and defect inventory, not a live count of unresolved
+> findings. Its AEGIS-numbered finding identifiers (IDs) and observed events
+> remain source evidence. The later
+> [completion crosswalk](../../evidence/backlog-status-reconciliation-2026-09-12.md)
+> records bounded status corrections, while the
+> [current skills catalog](../../skills-catalog.md) and source contracts show
+> what is shipped. Those sources do not establish one blanket disposition for
+> every AEGIS-001–059 item; check an individual finding before calling it open
+> or closed. This report grants no product implementation or test authority.
+
 - **Proposed filename:** `Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md`
 - **Report status:** Approved for export
 - **Test disposition:** Exploratory journey intentionally stopped
