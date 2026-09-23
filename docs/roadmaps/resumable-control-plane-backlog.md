@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, F04a reservation-boundary accounting, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and cross-platform filesystem protections. All 28/28 T, 9/9 C and 22/22 F rows have tested, independently accepted coverage, and the pinned Linux runtime evidence is verified. Final exact-head architecture/security/QA approval and hosted gates still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | DONE under AEGIS-APR-004: [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged 2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8`; standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | All 28/28 T, 9/9 C and 22/22 F rows have tested, independently accepted coverage. Final exact-head architecture/security/QA review, Windows and pinned Linux 543-test suites, and all three hosted jobs passed on head `8dfe237280f8837c6254e456767e405d44fbd148`. No real authority, external integration, provider call, release or deployment follows from this package |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1469,6 +1469,22 @@ suite passed 542 tests on 2026-09-23, including the new ordinary PAUSING T10,
 source-claim process-termination and terminal replay regressions. This row-level
 checkpoint does not itself claim the final architecture/security/QA reviews,
 hosted exact-head checks or merge; those remain the final CP-WP-002 gates.
+
+### 5.36 CP-WP-002 final closure — 2026-09-23
+
+The final exact-head architecture, security and QA reviews accepted the accumulated
+offline kernel after the F16 denial-event and T09 recovery corrections. Windows and
+pinned Linux each passed the complete 543-test control-plane suite; Linux had three
+expected platform skips. BER's 987-test offline suite (14 expected skips), the
+skill validator, contract-audit self-tests, BER self-check, and Scenario A Desktop
+acceptance were green locally. The DCO-signed head
+`8dfe237280f8837c6254e456767e405d44fbd148` passed `gate-guard`,
+`validate-skills`, and `windows-offline-checks` in hosted run `35846882128`.
+PR [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) was marked ready
+and merged on 2026-09-23 at
+`be552fb778ec50fd0cbe82eff9f1022235ec11d8`. This closes CP-WP-002 only:
+CP-WP-003, CP-WP-004, BER integration, real authority/adapters, provider calls,
+release and deployment remain separately gated.
 
 ## 6. Handoff contract
 

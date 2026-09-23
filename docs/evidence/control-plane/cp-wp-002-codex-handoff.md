@@ -1,23 +1,27 @@
 # CP-WP-002 Codex continuation handoff
 
-Date: 2026-09-22
+Original handoff date: 2026-09-22
+Closure date: 2026-09-23
 Repository: `ModernNomad-98/Project-Aegis` (Role A source library)
-Branch: `feat/cp-wp-002-offline-kernel`
+PR source branch: `feat/cp-wp-002-offline-kernel`
 Base: `main` at `497a4529b84ec223245e001213271a9266514f62`
 Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
-Latest pushed checkpoint: `a9dbeab2b2e28f2914df32dd55558a2d051517e6`
-Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - ALL TRANSITION/ACCEPTANCE ROWS ACCEPTED; CRASH/ROW REVIEWS AND POSIX RUNTIME EVIDENCE OPEN**
+Final reviewed head: `8dfe237280f8837c6254e456767e405d44fbd148`
+Merged PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
+Merge commit: `be552fb778ec50fd0cbe82eff9f1022235ec11d8` (2026-09-23 10:10 UTC)
+Status: **COMPLETE — MERGED OFFLINE KERNEL; NO REAL INTEGRATION OR DEPLOYMENT**
 
-This is the continuation authority and evidence record for the current
-CP-WP-002 work. It does not create authority. The current user instructions,
+This is the historical continuation and final evidence record for CP-WP-002.
+Earlier draft/next-step instructions below are dated checkpoints, not current
+entry criteria. It does not create authority. The current user instructions,
 [approval register](../../approvals/APPROVAL_REGISTER.md), and canonical
 [design](../../design/resumable-control-plane-v1.md) remain controlling sources.
 
-## 1. Cold-start preflight
+## 1. Historical cold-start preflight
 
-Run these checks before editing:
+These checks were required during the draft phase; they are not the post-merge
+entry point:
 
 ```powershell
 git fetch origin
@@ -1957,7 +1961,7 @@ owner before interpreting it more broadly.
 
 - All 28 transition, 9 crash-boundary and 22 acceptance-family rows are
   implemented, tested and independently accepted. Final exact-head
-  architecture/security/QA and hosted checks remain before merge.
+  architecture/security/QA and hosted checks passed before merge.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
@@ -1969,18 +1973,22 @@ owner before interpreting it more broadly.
 - The exact-head T01-T28/C01-C09/F01-F21 map is complete and independently
   approved. Historical intermediate `UNVERIFIED` entries remain dated evidence,
   not current status.
-- Windows and pinned Linux runtime package suites pass on the current working
-  tree; hosted checks still require the final pushed head.
-- Independent final architecture, security and QA approval of a merge-ready
-  accumulated checkpoint does not yet exist.
-- No merge, release, deployment, provider call, production-data operation,
-  external integration or real authority/adapter work was performed.
+- Windows and pinned Linux runtime package suites passed 543 tests each on
+  final head `8dfe237` (three expected Linux skips); `gate-guard`,
+  `validate-skills`, and `windows-offline-checks` passed in hosted run
+  `35846882128` on that exact head.
+- Independent final architecture, security and QA review approved the
+  accumulated checkpoint after the F16 denial-event correction.
+- PR #99 merged at `be552fb` on 2026-09-23. No release, deployment, provider
+  call, production-data operation, external integration or real
+  authority/adapter work was performed.
 
-## 15. Next entry criterion
+## 15. Final delivery state and later-package boundary
 
-Codex may continue only after each cold-start preflight matches this handoff.
-All 59 canonical rows and the Windows/Linux runtime package gates are accepted.
-The current gate is final exact-head architecture/security/QA review, followed
-by commit, push, hosted checks and the pre-approved administrator merge. No
-release, deployment, provider call, production data, real authority or real
-adapter work is authorized.
+CP-WP-002 is DONE and merged as PR #99. Its 59 canonical rows, exact-head
+reviews, Windows/Linux runtime package suites and hosted jobs passed. The
+earlier continuation instructions in this handoff describe historical
+checkpoints; they are not a reason to reopen the completed offline kernel.
+CP-WP-003 and later packages require their own authority and entry evidence.
+No release, deployment, provider call, production data, real authority or real
+adapter work is authorized by this closure.

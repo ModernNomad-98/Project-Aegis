@@ -617,12 +617,12 @@ Start with the [documentation index](docs/README.md), [changelog](CHANGELOG.md),
 [offline CI guide](docs/offline-ci.md) and source-specific
 [owner approval register](docs/approvals/APPROVAL_REGISTER.md). For BER work,
 use its [active backlog](docs/roadmaps/behavioral-eval-runner-backlog.md).
-The experimental offline delivery-control kernel is under active development;
+The offline delivery-control kernel is implemented for synthetic-only use;
 use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
-The CP-WP-002 offline merge candidate has complete synthetic row coverage:
-its exact 542-test package suite passes on Windows and Linux (three expected
+The merged CP-WP-002 offline kernel has complete synthetic row coverage:
+its exact 543-test package suite passes on Windows and Linux (three expected
 Linux platform skips); all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
@@ -669,7 +669,7 @@ permanent scoped fence and never authorize retry, success or completion. Its
 semantic-v7 migration, crash/replay and strict historical projection checks are
 locally green. Independent implementation review returned `APPROVE` after the
 accepted-plan issuer boundary and denial matrix were corrected. Final exact-head
-architecture, security, QA and hosted validation remain required before merge.
+architecture, security, QA and hosted validation passed before merge.
 T18/T19 now have independently accepted authentic
 every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
 independent `APPROVE`: canonical operation/validator nonexecution covers
@@ -687,10 +687,11 @@ usage below/equal/above the reservation settles exactly once, overruns fence,
 unknown liability remains blocked, and semantic-v10 migration preserves older
 valid histories without healing tamper. All 28 transition, 9 crash-boundary and
 22 acceptance-family rows now have tested, independently accepted coverage. The
-PR remains draft until final architecture/security/QA and hosted exact-head
-gates pass. Read the
-[Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
-continuing. No delivery integration or deployment is implemented or authorized.
+PR [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged on
+2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8` after exact-head
+reviews and all three hosted checks passed. The
+[Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) records
+the final evidence. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).
@@ -974,7 +975,7 @@ in trigger-evals:
 |---|---|---|
 | `skill-quality-reviewer` | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the full shipped corpus (colliding skills NAMED), duplication/extension (the LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. | auto + manual |
 | `library-diff-reviewer` | Reviews a whole library-changing PR end-to-end: fresh validator evidence pinned to the PR head, registration consistency (placement, post-merge voice, banked-candidate graduation, count arithmetic at every site), collision sweep against the shipped corpus AND in-batch siblings, diff coherence, per-skill quality via `skill-quality-reviewer` as the inner loop → one approve/request-changes verdict; performs no platform action (no merge, no auto-merge arming). | auto + manual |
-| `eval-runner-designer` | Designs how the eval corpus would actually EXECUTE — per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with JUDGE-ERROR honesty, UNRUN-default reporting, cost/sampling tiers, flake policy, advisory-first CI. Design/spec only: never claims a runner exists or that evals pass. | auto + manual |
+| `eval-runner-designer` | Designs how the eval corpus would actually EXECUTE — per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with `JUDGE_ERROR` honesty, UNRUN-default reporting, cost/sampling tiers, flake policy, advisory-first CI. Design/spec only: never claims a runner exists or that evals pass. | auto + manual |
 | `skill-usage-instrumenter` | Designs the usage-evidence layer: invocation signals (auto vs explicit, coarse enums — never prompt content or user identifiers), wrong-fire/correction events, never-fired lists over a stated window, evidence tiers, thresholds naming an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. | auto + manual |
 | `skill-deprecation-planner` | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record. Plan only; every stage is human-approved. | auto + manual |
 

@@ -237,9 +237,9 @@ JSON object containing exactly `repository_id`, `catalog_head`, and `run_heads`
 obtained independently of the database; any identity, inventory, or head
 difference fails closed.
 
-## Current draft checkpoint
+## Final merged checkpoint
 
-The 2026-09-23 checkpoint is a reviewed offline merge candidate, not a deployable
+The 2026-09-23 checkpoint is a reviewed and merged offline kernel, not a deployable
 controller. The complete package suite ran 543 tests successfully on Windows
 and 543 on Linux (three expected platform-specific skips), and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
@@ -359,8 +359,9 @@ ownership/reparse/path-swap protection also has independent implementation
 rebound probes pass, the stable lock identity is pinned, and unsafe sidecars and
 hardlinks fail closed. POSIX runtime is verified by the pinned Linux package
 suite. All 59 T/C/F rows are independently accepted; final exact-head reviews
-and hosted checks remain, so this checkpoint does not authorize real authority, external calls, provider
-integration, release, or deployment.
+and all three hosted checks passed on `8dfe237`, and PR #99 merged as
+`be552fb` on 2026-09-23. This checkpoint does not authorize real authority,
+external calls, provider integration, release, or deployment.
 
 The selected-check foundation is independently accepted. New plan acceptance
 uses authenticated v2 declarations for every check's dependencies and launch
@@ -379,7 +380,7 @@ strict projection recovery are covered, and the corrected increment received
 independent `APPROVE` with no findings. T11, T27, F11 and F17 and the proof-free
 T17/F18 branch are included in the independently accepted 28/9/22 canonical
 inventory. Final exact-head architecture, security, QA and hosted validation
-remain required before merge.
+passed before the PR #99 merge.
 
 ## Validation
 
