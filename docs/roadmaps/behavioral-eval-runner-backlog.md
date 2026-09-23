@@ -791,8 +791,17 @@ the sole owner of actual advisory CI integration).
 ### WP-2B-1B — Offline evidence-policy proof
 
 - **ID / phase / priority:** WP-2B-1B / 2B-1 follow-up / REQUIRED.
-- **Status:** AUTHORIZED only when the separate reviewed governance PR
-  containing BER-DEC-011 and AEGIS-APR-012 merges; until then, BLOCKED.
+- **Current status, checked 2026-09-23:** AUTHORIZED for the bounded offline
+  synthetic proof. The separate governance pull request #134 containing
+  BER-DEC-011 and AEGIS-APR-012 merged as
+  `7e8f0c1067ee0a2e963520bf735a4b7b907a991f`, satisfying the original
+  start condition. Pull request #131 had supplied the reviewed scope proposal;
+  it was not the grant merge. Implementation pull request #139 still needs its own
+  protected-file guard disposition before merge; this authorization does
+  not extend to a real host or provider call.
+- **Original start condition:** This work was BLOCKED until that reviewed
+  governance request merged. The condition is retained here to explain
+  the grant sequence, not as a current blocked status.
 - **Owner and repository:** Peter Nguyen / `ModernNomad-98/Project-Aegis`.
 - **Scope:** One synthetic-only proof of the selected 30-day complete-bundle
   evidence policy, limited to the seven paths and acceptance tests in the
