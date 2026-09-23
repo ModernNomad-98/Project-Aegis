@@ -3,6 +3,12 @@
 Lookup tables for building per-control evidence specs. Everything here is a
 design aid; the control catalog (`compliance-control-foundation`) decides
 WHAT needs evidence, and the audit window decides the period to cover.
+In the tables, **RLS** means row-level security, **IAM** means identity and
+access management, **API** means application programming interface, **CI**
+means continuous integration, and **SHA** means Secure Hash Algorithm (the
+digest identifying a commit). **UI** means user interface, **PR** means pull
+request, **DR** means disaster recovery, and **WORM** means write once, read
+many storage.
 
 ## Evidence types
 
