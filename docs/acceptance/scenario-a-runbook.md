@@ -49,7 +49,7 @@ can compare the guide with fixtures, skill evaluations, and audit records.
 
 ## What Scenario A is
 
-Scenario A is the **clean "simple MVP" flow** through the beginner front door
+Scenario A is the **clean "simple minimum viable product (MVP)" flow** through the beginner front door
 (`project-orchestrator`): one non-developer, one small maintenance-company/clinic MVP, one
 bounded first release, **no deadline and no delivery commitment**. It exercises the
 project-state journey from cold start to the start of design:
@@ -132,7 +132,7 @@ pwsh -NoProfile -File "scripts/acceptance/Invoke-ScenarioAEvidence.ps1" -KeepEvi
 Start Desktop acceptance from a native Windows PowerShell shell. A PowerShell
 Core → Python recorder → Desktop chain can inherit Core's module search path
 and prevent Desktop from resolving `Get-FileHash`. The hosted workflow uses
-`shell: powershell` for this step; see [offline CI](../offline-ci.md).
+`shell: powershell` for this step; see [offline continuous integration (CI)](../offline-ci.md).
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Invoke-ScenarioAEvidence.ps1" -KeepEvidence
@@ -180,9 +180,11 @@ The harness exits **0** on all-pass and **non-zero** on any failure.
   `Open questions`, and `Next recommended action` may be refreshed. Exact headings,
   section order, preamble, unknown sections and immutable scaffolding are protected;
   immutable sections may gain only valid appended records. The parser uses the flat
-  ATX project-state format and rejects ambiguous or unsupported structures, including
-  Setext headings, raw HTML blocks and unclosed fences/comments. This is a restricted
-  document grammar, not a general Markdown parser. See the
+  ATX project-state format (Markdown headings beginning with `#`) and rejects
+  ambiguous or unsupported structures, including Setext headings (headings
+  underlined with `=` or `-`), raw HyperText Markup Language (HTML) blocks
+  and unclosed fences/comments. This is a restricted document grammar,
+  not a general Markdown parser. See the
   [approval lifecycle grading guide](../approval-lifecycle-grading.md) for the
   related trusted-plan/evidence boundary.
 - **Manifest conformance (F1)** — a per-step hash mismatch (a fixture edited without updating the
