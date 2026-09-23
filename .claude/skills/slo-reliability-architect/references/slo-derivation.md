@@ -2,6 +2,15 @@
 
 Detail file for `slo-reliability-architect`. Loaded on demand.
 
+**Use:** Derive journey measures, targets, and error-budget policy through
+the [service-level objective workflow](../SKILL.md). SLI means service-level
+indicator (the measure); SLO means service-level objective (its target); SLA
+means service-level agreement (a contractual promise). `pXX` means a stated
+latency percentile, such as p95; API means application programming interface;
+CPU means central processing unit; and GC means garbage collection. An error
+budget is the allowed share of bad events over the stated
+window; `X` in the template is a value to calculate, not a default.
+
 ## SLI menu per journey type
 
 | Journey type | Primary SLIs | Definition notes |
