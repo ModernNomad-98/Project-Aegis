@@ -1,9 +1,51 @@
 # Scenario A — acceptance-evidence runbook
 
-This runbook explains how to produce and read the acceptance evidence for **Scenario A**
-of the beginner-flow `docs/project-state.md` discipline, and maps the Scenario A defects
-**AR-A-001 … AR-A-021** to the deterministic checks, skill evals, contract assertions, and
-acceptance-harness tests that cover them (matrix at the end).
+This runbook is for maintainers checking the beginner workflow in the shipped
+`project-orchestrator` skill. It explains how to produce and read offline
+acceptance evidence for **Scenario A**: a person describes a small product,
+accepts its specification, and reaches the start of design without authorizing
+a build. The [defect-to-test matrix](#defect-to-test-matrix--ar-a-001--ar-a-021)
+maps 21 recorded acceptance-review findings (`AR-A-001` through `AR-A-021`)
+to their checks.
+
+## Start here
+
+From the Project Aegis source-library root, with Git and Windows PowerShell
+5.1 installed, run the offline harness with synthetic fixtures:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Invoke-ScenarioAEvidence.ps1" -KeepEvidence
+```
+
+The final `PASS` line means the nine fixture versions met the deterministic
+checks. Find the printed `Evidence kept at` directory and read
+`evidence-log.txt`, then a pair such as `project-state.03.md` and
+`diff.02-to-03.txt` to see one recorded change. That directory is outside
+the source library and the disposable product repository. Remove it when you
+no longer need the retained synthetic evidence. For PowerShell 7, supported
+parameters, failure behavior, and the negative tests, use
+[How to run the harness](#how-to-run-the-harness) below.
+
+**Scope of this result:** the harness proves fixture and evidence invariants;
+it does not prove that a fresh AI-agent conversation follows the same path.
+The separate [fresh-session behavioral acceptance](#fresh-session-behavioral-acceptance-control-i--required)
+remains required before calling the findings behaviorally resolved. This
+runbook does not grant implementation, provider, or deployment authority.
+
+## Names used in the evidence
+
+| Name | Meaning in this runbook |
+| --- | --- |
+| `docs/project-state.md` | The consumer product's durable state file, replayed here in a disposable repository. |
+| `SS-001`, `SS-002` | State snapshots: the recorded current stage at cold start and at the start of design. |
+| `PS-001` through `PS-010` | Product-state decision-log records. For example, `PS-006` records the user's acceptance of the specification. |
+| `A-001` | The separate scope-agreement approval; it does not authorize a build. |
+| `AR-A-001` through `AR-A-021` | Scenario A acceptance-review findings indexed in the matrix below. |
+| `P0`/`P1`/`P2` | Defect priority, from highest to lower; `A` through `I` name the original acceptance controls. |
+| SHA-256 | The file digest used to pin accepted content and check archived evidence. |
+
+The detailed sequence and matrix below retain the exact IDs so maintainers
+can compare the guide with fixtures, skill evaluations, and audit records.
 
 ## What Scenario A is
 
