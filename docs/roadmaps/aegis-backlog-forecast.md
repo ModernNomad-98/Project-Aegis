@@ -417,6 +417,96 @@ Owner waits, GitHub queues, provider runs and host provisioning are excluded.
 Start the next five-merge counter after #135 and revise sooner if a completed
 audited implementation materially changes scope.
 
+## Five-merge checkpoint — 2026-09-23, after pull request #141
+
+Five requests merged after #135, in the order below. Each received an
+independent review and passed all three GitHub Actions on its final revision.
+The [execution measurement record](aegis-execution-metrics.md#checkpoint-after-pull-request-141--2026-09-23)
+compares each package's estimate with its observed interval. Times in this
+snapshot use Coordinated Universal Time (UTC). The source tree reviewed and
+merged for #141 contains **509 tracked Markdown files**, compared with 506
+after #135 and 491 in the original inventory. This checkpoint edits two
+existing records and adds no new Markdown file.
+
+| Merged pull request | Merge commit | GitHub merge event (`mergedAt`, UTC) | Observed wall interval | Delivered |
+| --- | --- | --- | ---: | --- |
+| [#136](https://github.com/ModernNomad-98/Project-Aegis/pull/136) | `50ac170dad99aa826fc8707431ab21403dfce858` | 17:51:29 | About 6m29s | Issue #101's agreed local evaluation shortlist recorded in its roadmap |
+| [#137](https://github.com/ModernNomad-98/Project-Aegis/pull/137) | `df64f776312cf2ae8f980ef1e5c81d74eb8a7cb9` | 17:56:56 | About 7m56s | Previous five-merge forecast |
+| [#138](https://github.com/ModernNomad-98/Project-Aegis/pull/138) | `41058f6f4f8a767da4495c42559472f7fa868ed9` | 18:11:25 | 13m06s | Offline setup routing guide, example and navigation |
+| [#140](https://github.com/ModernNomad-98/Project-Aegis/pull/140) | `1a2469ec6ec0e318c656102bec1c3fe513375cd2` | 18:24:35 | 13m38s | Three user guides corrected against their skill contracts |
+| [#141](https://github.com/ModernNomad-98/Project-Aegis/pull/141) | `9427bf57f7ef3e9fe585fa8cf108e601d6633335` | 18:36:31 | 10m55s | Setup routing plan reconciled with delivered packages 2 and 3 |
+
+The merge times above are GitHub pull-request `mergedAt` events, which can
+differ by one second from the merge commit object's timestamp. The starts for
+#136 and #137 were recorded only to the minute, so their
+intervals are approximate. These intervals overlap, include review and
+continuous integration, and do not measure active labor. Pull request #138
+needed a Developer Certificate of Origin (DCO) sign-off correction before
+its final green checks; that rework is included in its interval. Review,
+queue and rework time cannot be separated reliably from the captured data.
+Short documentation intervals do not establish implementation throughput or
+the time needed to review every remaining page.
+
+At this checkpoint, [pull request #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+is still open at `8928383f0838e2d99ee3a89c44b98b7aba7f1c9b`.
+Its offline evidence-policy candidate has passed local checks, independent
+adversarial review, and Linux and Windows Actions. The protected-file
+`gate-guard` check failed and a request-specific owner disposition remains
+pending. Its implementation is therefore not counted as merged delivery.
+The separate [approved offline grant](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof)
+does not grant that exception or real-host operation. Its eight-hour cap
+remains inside the existing evidence-policy estimate, not an additional row.
+
+Every selected row was reconsidered against the five merged requests and the
+remaining gates. No implementation row closed in this window. The
+[documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
+records bounded page progress; it does not establish full inventory coverage.
+Issue #101 packages 2 and 3 remain delivered within their approved offline
+scopes; the new plan explanation does not deliver packages 4 through 7.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Evidence and remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | No new semantic or owner label approval is evidenced by these merges |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | Offline candidate #139 remains open; real-host storage proof and operator controls also remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | The offline executor proposal still needs its implementation grant and code |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Labels, reviewed execution source and allowance, development results and a later holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | A named host and measured tool-path and execution-profile isolation remain |
+| Work package 2B-4 | 12–24 | 12–24 | Limited live execution still depends on calibration and host proof |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus execution follows package 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 8–16 | 8–16 | The synthetic increment already shipped; real source, freshness, containment, evidence and billing proof remain |
+| Control-plane work package 004 | 8–16 | 8–16 | A delivery target and package-003 prerequisite proof remain |
+| Issue #101 package 4 | 8–16 | 8–16 | #136 records the agreed shortlist and #141 clarifies the plan; pinned host, cases, budget, execution authority and comparative results remain |
+| Issue #101 package 7 | 6–12 | 6–12 | End-to-end release evaluation follows selected integration outcomes |
+| Repository-wide documentation readability | 80–200 | 80–200 | Three further readability batches improved bounded pages; most of the 509-file inventory still needs recorded review |
+| **Selected remaining total** | **175–394** | **175–394** | The non-documentation subtotal remains 95–194; the documentation estimate remains 80–200 |
+
+Every optional row was also reconsidered. No merge in this window selected
+either helper, additional hosts or products, a strategic skill batch, or a
+later architecture. The [strategic roadmap](product-agnostic-skill-and-agent-roadmap.md)
+and [skills catalog](../skills-catalog.md) remain inputs to selecting a bounded
+expansion package; an aspirational target does not define its effort.
+
+| Optional open work item | Previous active hours if selected | Revised active hours if selected | Remaining gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision |
+| Behavioral Eval Runner item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count |
+| Behavioral Eval Runner item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count |
+| Strategic skill expansion and framework coverage | Unbounded until a candidate batch is selected | Unbounded until a candidate batch is selected | Demand, coverage and explicit package selection |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Architecture and adoption decisions |
+
+The selected total remains **175–394 active hours**. Selecting both optional
+issue #101 helpers adds **16–40 hours**, for a bounded conditional total of
+**191–434 active hours**. The full all-options backlog has **no finite
+estimate** while optional quantities and strategic or architecture choices
+remain unbounded. Owner waits, GitHub queues, provider runs and host
+provisioning remain excluded. Start the next five-merge counter after #141;
+revisit sooner if an audited implementation or owner decision changes the
+remaining scope materially.
+
 **Historical baseline — recorded after pull request #106 on September 23,
 2026.** The paragraph and baseline tables below preserve estimates and pending
 decisions recorded then. They are not current work status or authorization.
