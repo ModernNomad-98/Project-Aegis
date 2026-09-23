@@ -1,6 +1,10 @@
 # Scoping Strategy Tradeoffs & Migration Patterns
 
-Supporting detail for `multi-tenant-data-architect`. Read on demand.
+Use this comparison with the [multi-tenant data architect](../SKILL.md) to
+choose per-store isolation and plan a tenant-scoping retrofit. **DB** means
+database, **ORM** means object-relational mapper, and **API** means application
+programming interface. The uppercase `DELETE` and `DROP` entries are database
+operations to plan and verify, not instructions to run from this reference.
 
 ## Scoping strategy tradeoff table (per store)
 

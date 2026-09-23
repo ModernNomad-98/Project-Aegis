@@ -1,7 +1,12 @@
 # Chatty Access Patterns — Catalog & Guards
 
-Pattern classes, fix templates, instrumentation options, and assertion
-patterns. ORM-agnostic: idioms are named by shape; map to your data
+Use these patterns with the [N+1 detector](../SKILL.md) to count repeated data
+access and choose a bounded fix and test guard. **N+1** means one parent query
+followed by one child query for each of N results. The parent skill is
+**manual-only**; this page alone does not authorize instrumentation or data
+access. **ORM** means object-relational mapper, **SQL** means Structured Query
+Language, **APM** means application performance monitoring, and **TTL** means
+time to live. The examples are ORM-agnostic: map each query shape to the data
 layer's spelling.
 
 ## Pattern classes and signatures

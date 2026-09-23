@@ -1,6 +1,12 @@
 # Manual Case Template & Step Rules
 
-Detail file for `manual-test-case-creator`. Loaded on demand.
+Use this template with the [manual test case creator](../SKILL.md) to give
+another tester exact setup, actions, expected results, and cleanup. **MC**
+identifies a manual case; **REQ** identifies the traced requirement. **P0**,
+**P1**, and **P2** rank case priority from highest to lowest; **CP** marks a
+screenshot checkpoint. **API** means application programming interface, **DB**
+means database, **URL** means Uniform Resource Locator (web address), and
+**PR** means pull request.
 
 ## Full case template
 

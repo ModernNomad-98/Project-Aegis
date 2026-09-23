@@ -1,7 +1,13 @@
 # Negative Test Matrix — surfaces, actors, operations, expected denials
 
-Progressive-disclosure detail for `multi-tenant-security-tester`. Use this to
-build the matrix and the fixtures. Every row is a test whose PASS = denial.
+Use this reference with the [multi-tenant security tester](../SKILL.md) to
+design a two-tenant negative-test matrix and synthetic fixtures. The parent
+skill is **manual-only**; reading this page does not invoke tests or authorize
+access to real tenant data. Every row is a test whose PASS = denial. **REST**
+means Representational State Transfer, **RPC** means remote procedure call,
+**IDOR** means insecure direct object reference, **AI** means artificial
+intelligence, **URL** means Uniform Resource Locator (web address), and **RLS**
+means row-level security.
 
 ## Two-tenant fixture recipe
 
