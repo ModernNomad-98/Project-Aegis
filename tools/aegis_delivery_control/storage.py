@@ -3791,6 +3791,21 @@ class SQLiteStateStore:
             < self._parse_source_utc(grant["expires_at"], field="expires_at")
         ):
             raise DispatchDenied("synthetic source grant is not currently effective")
+        source_state = connection.execute(
+            "SELECT head_sequence FROM synthetic_authority_source_state WHERE "
+            "repository_id = ?",
+            (capability.repository_id,),
+        ).fetchone()
+        if source_state is None:
+            raise StorageIntegrityError(
+                "synthetic authority source state is unavailable"
+            )
+        self._require_source_grant_effective_for_use(
+            connection,
+            capability,
+            evaluated,
+            before_source_sequence=int(source_state["head_sequence"]) + 1,
+        )
         use_count = int(
             connection.execute(
                 "SELECT COUNT(*) FROM synthetic_authority_uses WHERE grant_id = ?",
@@ -3837,6 +3852,77 @@ class SQLiteStateStore:
             source_event_id, sequence, event_hash, capability.consumer_kind,
             capability.consumer_key, False,
         )
+
+    @classmethod
+    def _require_source_grant_effective_for_use(
+        cls,
+        connection: sqlite3.Connection,
+        capability: SyntheticSourceCapability,
+        evaluated_at: datetime,
+        *,
+        before_source_sequence: int,
+    ) -> None:
+        """Apply the same exact source-lifecycle decision live and on recovery."""
+        rows = connection.execute(
+            "SELECT lifecycle.*, source.sequence AS source_sequence, "
+            "authority.event_hash AS authority_event_hash, "
+            "authority.corrected_event_hash AS authority_corrected_event_hash "
+            "FROM synthetic_authority_lifecycle_facts AS lifecycle JOIN "
+            "synthetic_authority_source_events AS source ON "
+            "source.source_event_id = lifecycle.source_event_id LEFT JOIN "
+            "authority_facts AS authority ON authority.fact_id = "
+            "lifecycle.fact_id WHERE lifecycle.repository_id = ? AND "
+            "lifecycle.issuer_fingerprint = ? AND lifecycle.grant_kind = ? "
+            "AND lifecycle.grant_id = ? AND lifecycle.logical_effect_id = ? "
+            "AND lifecycle.action = ? AND lifecycle.scope_digest = ? AND "
+            "source.sequence < ? ORDER BY source.sequence",
+            (
+                capability.repository_id, capability.issuer_fingerprint,
+                capability.grant_kind.value, capability.grant_id,
+                capability.logical_effect_id, capability.action,
+                capability.scope_digest, before_source_sequence,
+            ),
+        ).fetchall()
+        facts = {str(row["fact_id"]): row for row in rows}
+        effective_corrections: set[str] = set()
+        for row in rows:
+            if row["fact_kind"] != AuthorityFactKind.CORRECTION.value:
+                continue
+            correction_time = cls._parse_source_utc(
+                str(row["effective_at"]), field="effective_at"
+            )
+            if (
+                row["governed_order"] == GovernedOrder.UNKNOWN.value
+                or correction_time > evaluated_at
+            ):
+                continue
+            corrected_fact_id = str(row["corrected_fact_id"])
+            corrected = facts.get(corrected_fact_id)
+            if (
+                corrected is None
+                or row["authority_corrected_event_hash"]
+                != corrected["authority_event_hash"]
+            ):
+                raise StorageIntegrityError(
+                    "synthetic source lifecycle correction lost its exact fact"
+                )
+            effective_corrections.add(corrected_fact_id)
+        for row in rows:
+            if (
+                row["fact_kind"] == AuthorityFactKind.CORRECTION.value
+                or str(row["fact_id"]) in effective_corrections
+            ):
+                continue
+            effective_time = cls._parse_source_utc(
+                str(row["effective_at"]), field="effective_at"
+            )
+            if (
+                row["governed_order"] == GovernedOrder.UNKNOWN.value
+                or effective_time <= evaluated_at
+            ):
+                raise DispatchDenied(
+                    "synthetic source grant lifecycle denies this use"
+                )
 
     def consume_synthetic_source_for_test(
         self,
@@ -32093,6 +32179,13 @@ class SQLiteStateStore:
                     effective_at = self._parse_source_utc(
                         str(request.effective_at_utc), field="effective_at_utc"
                     )
+                    if (
+                        request.fact_kind is AuthorityFactKind.CORRECTION
+                        and effective_at > recorded_at
+                    ):
+                        raise DispatchDenied(
+                            "source authority correction is not yet effective"
+                        )
                 boundary = self._verify_authority_boundary(connection, request)
                 if source_grant_kind and boundary is not None:
                     boundary_time = self._parse_source_utc(
@@ -32453,20 +32546,21 @@ class SQLiteStateStore:
                 ):
                     source_run_id = request.run_id
                     if request.grant_kind == "ADOPTION":
-                        if request.governed_boundary_kind != "SOURCE_USE":
+                        if request.governed_boundary_kind == "SOURCE_USE":
+                            adopted = connection.execute(
+                                "SELECT run_id FROM effect_adoptions WHERE "
+                                "source_use_event_id = ? AND adoption_grant_id = ?",
+                                (request.governed_event_id, request.grant_id),
+                            ).fetchone()
+                            if adopted is None:
+                                raise DispatchDenied(
+                                    "source authority fact lost its adopted operation"
+                                )
+                            source_run_id = str(adopted["run_id"])
+                        elif request.governed_boundary_kind != "NO_ACTION":
                             raise DispatchDenied(
-                                "adoption authority fact lacks its source use"
+                                "adoption authority fact has an invalid boundary"
                             )
-                        adopted = connection.execute(
-                            "SELECT run_id FROM effect_adoptions WHERE "
-                            "source_use_event_id = ? AND adoption_grant_id = ?",
-                            (request.governed_event_id, request.grant_id),
-                        ).fetchone()
-                        if adopted is None:
-                            raise DispatchDenied(
-                                "source authority fact lost its adopted operation"
-                            )
-                        source_run_id = str(adopted["run_id"])
                     dependent_head = self._fence_dependent_adoptions(
                         connection,
                         repository_id=request.repository_id,
@@ -33780,29 +33874,12 @@ class SQLiteStateStore:
                             "synthetic source grant use limit was exceeded"
                         )
                     source_use_counts[grant.grant_id] = use_count
-                    effective_corrections = {
-                        fact.corrected_fact_id
-                        for fact in source_lifecycle.values()
-                        if fact.fact_kind is AuthorityFactKind.CORRECTION
-                        and self._parse_source_utc(
-                            fact.effective_at_utc, field="effective_at"
-                        ) <= use_time
-                    }
-                    for fact_id, fact in source_lifecycle.items():
-                        if (
-                            fact_id in effective_corrections
-                            or fact.fact_kind is AuthorityFactKind.CORRECTION
-                            or fact.grant_id != grant.grant_id
-                            or fact.action != grant.action
-                            or fact.scope_digest != grant.scope_digest
-                            or self._parse_source_utc(
-                                fact.effective_at_utc, field="effective_at"
-                            ) > use_time
-                        ):
-                            continue
-                        raise ValueError(
-                            "synthetic source grant was not effective at use"
-                        )
+                    self._require_source_grant_effective_for_use(
+                        connection,
+                        capability,
+                        use_time,
+                        before_source_sequence=int(row["sequence"]),
+                    )
                     if (
                         row["consumer_kind"] != capability.consumer_kind.value
                         or row["consumer_key"] != capability.consumer_key

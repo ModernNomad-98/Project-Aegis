@@ -334,8 +334,14 @@ violations. Cross-family F05/F06/F13/F20 now also has independent implementation
 `APPROVE`: complete-vector freshness guards new one-use source consumption,
 repository-wide slot tests cover lifecycle and generation boundaries, contrary
 receipts are recovered across exact durable states, and validator containment
-is typed, bounded, authority-bound and strictly reconstructed. Filesystem
-ownership/reparse/path-swap protection now also has independent implementation
+is typed, bounded, authority-bound and strictly reconstructed.
+F03 source-atomic authority now also has independent implementation `APPROVE`.
+Three independent host/manual consumers serialize at the source use limit;
+live dispatch and recovery share one effective-time lifecycle evaluator;
+pre-action adoption denials, exact corrections, persistent clock rollback and
+lost claim acknowledgements remain fail-closed. Exact replay returns only the
+original synthetic receipt and never creates adapter contact. Filesystem
+ownership/reparse/path-swap protection also has independent implementation
 `APPROVE`: Windows actual junction/replacement and same-volume known-folder
 rebound probes pass, the stable lock identity is pinned, and unsafe sidecars and
 hardlinks fail closed. POSIX runtime remains `UNVERIFIED`. The broader exact

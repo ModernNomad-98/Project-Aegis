@@ -1662,6 +1662,40 @@ then for the optional retained fence. Both were corrected; final review returned
 storage passed 393, dispatch passed 80 and the complete package passed 515.
 F02 is promoted to `YES/YES/YES`.
 
+### Stage 27 - F03 source-atomic one-use authority
+
+F03 now closes the other-host/controller/manual-consumer and recovery matrix.
+Three independent store connections start from identical verified source state;
+one HOST or MANUAL claim advances the authoritative source exactly once and
+both serialized losers reach the same grant-wide use-limit exhaustion decision.
+No loser-specific source event, use projection or adapter contact is created.
+
+Live consumption and strict recovery use the same exact lifecycle evaluator,
+bound to issuer, grant kind/ID, effect, action and scope. BEFORE, DURING,
+UNKNOWN and AFTER ordering, not-before/expiry, revocation, supersession,
+foreign consumption, source unavailability, exact correction timing and stacked
+facts are assertion-traced. ADOPTION `NO_ACTION` facts are admitted before use
+without fabricating an adoption row; SOURCE_USE facts retain exact post-use and
+dependent-provenance binding. Not-yet-effective corrections are rejected before
+mutation, preserving the current fence and effective-authority row until an
+already-effective exact correction clears only its owned protection.
+
+Rollback before source-use commit creates no claim. A lost acknowledgement after
+commit is recovered only by the original consumer identity and returns the same
+receipt; replay after later expiry/lifecycle change creates no new use, while a
+rebound identity fails. The persisted source clock floor rejects rollback after
+reopen. Wrong/forged bindings, unavailable grants and grant-window violations
+deny without mutation. Only synthetic adapter classes exist and no adapter is
+exported from the package boundary.
+
+Independent implementation review initially returned `REVISE` for premature
+future-correction clearance and a concurrency test short-circuited by freshness.
+The corrected implementation rejects future corrections and makes both race
+losers reach source exhaustion; final review returned `APPROVE` with no BLOCKER
+or MAJOR finding. Focused F03 tests passed 8/8. F03 is promoted to
+`YES/YES/YES`; the storage module passed 400 tests and the complete package
+passed 522 tests. F04a is the sole remaining acceptance-family coverage gap.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1735,7 +1769,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | --- | --- | --- | --- | --- |
 | F01 | YES | YES | YES | Canonical effect identity/relationship plus T28 adoption covers revisions/runs, aliases/descriptors, occupied slot, authority consumption/replay, contrary provenance and no-contact behavior; independently accepted |
 | F02 | YES | YES | YES | Proof-free dispositions cannot resend, alias, compensate or erase unknown history; the sole reviewed same-key successor is expiry/generation/authority bound, retains outcome/activity uncertainty and T06 pause, requires distinct T14 RESUME, survives crash/restart, and is independently accepted at Stage 26 |
-| F03 | YES | UNVERIFIED | UNVERIFIED | Source-atomic one-use claims, typed lifecycle facts, manual consumption and concurrent redemption exist; no durable assertion currently proves persisted clock rollback denial, and the complete other-host/manual/lost-claim interleaving matrix remains open |
+| F03 | YES | YES | YES | Three independent HOST/HOST/MANUAL consumers reach one source-atomic winner and two grant-exhaustion denials; exact lifecycle timing/corrections, persistent clock rollback, lost receipt replay, rebinding denial and synthetic-only isolation are assertion-traced and independently accepted at Stage 27 |
 | F04a | YES | UNVERIFIED | UNVERIFIED | Absolute settlement, worst-case accounting, nonexecution release and authoritative adjustment exist; the explicit below/equal/above-reservation plus no-known-bound-before-contact matrix is incomplete |
 | F04b | YES | YES | UNVERIFIED | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; row-level review pending |
 | F05 | YES | YES | YES | Complete-vector mutation inventory, effect/source rollback, incomplete/stale/unavailable anchors and stale one-use source denial independently accepted |
@@ -1777,10 +1811,10 @@ deferral recorded there is closed by Stage 23 above.
 All 28 transition rows now have implementation surfaces and T18/T19/T25 have
 complete independently accepted durable state matrices. All nine crash rows now have
 implementation and test coverage; C02-C09 retain their prior row-review status.
-All 22 F rows have implementation surfaces. Open F test-coverage rows are F03
-and F04a. These are gaps, not failures silently converted to
+All 22 F rows have implementation surfaces. The only open F test-coverage row is
+F04a. This is a gap, not a failure silently converted to
 acceptance. Current independently accepted counts are 28/28 transitions, 1/9
-crash boundaries and 20/22 acceptance rows; the other covered rows retain
+crash boundaries and 21/22 acceptance rows; the other covered rows retain
 explicit row-review work.
 
 | Evidence field | Exact value |
@@ -1813,7 +1847,7 @@ Current durable order after the independently approved exact-head trace map is:
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
 7. The Stage 23 committed-head trace closes the accumulated T01-T03/C01,
    T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 deferrals.
-8. Continue through the remaining exact coverage gaps in this order: F03 and
+8. Continue through the sole remaining exact acceptance-family coverage gap:
    F04a.
 9. After implementation gaps close, perform row review for every remaining
    implemented/tested-but-unaccepted matrix row.
@@ -1955,7 +1989,8 @@ no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
 replay/recheck and T25/T16 post-disable continuation. Aggregate
 T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
 F02's proof-free matrix and bounded same-effect successor now have final
-independent `APPROVE`. The current implementation gate is F03 source-atomic
-one-use claim interleavings, followed by F04a reservation-boundary accounting.
+independent `APPROVE`. F03 source-atomic one-use authority also has final
+independent `APPROVE`. The current implementation gate is F04a
+reservation-boundary accounting.
 Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

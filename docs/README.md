@@ -86,8 +86,10 @@ accepted: proof-free owner dispositions remain non-dispatching, and the only
 reviewed same-key successor retains outcome/activity uncertainty plus the exact
 T06 pause until distinct T14 RESUME authority clears it. T22 terminal-restart
 reporting is independently accepted with strictly read-only main/auxiliary
-verification and typed stale/unverified status. The remaining explicit coverage
-gaps are F03 and F04a.
+verification and typed stale/unverified status. F03 source-atomic one-use
+authority is independently accepted: host/manual races, lifecycle timing,
+correction ownership, clock rollback and lost-receipt replay are now directly
+asserted. The remaining explicit coverage gap is F04a.
 The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
 order and reconstructs projections strictly. The current increment adds signed

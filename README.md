@@ -677,8 +677,11 @@ states, accounting and replay boundaries, contradictory evidence, newer slot
 owners and atomic dependent-adoption fencing. F02 now also has independent
 `APPROVE`: proof-free choices remain non-dispatching, while the sole reviewed
 same-key successor retains unknown outcome/activity and its T06 pause until a
-distinct T14 RESUME grant clears exactly that fence. The remaining explicit
-coverage gaps are F03 and F04a.
+distinct T14 RESUME grant clears exactly that fence. F03 now has independent
+`APPROVE`: three concurrent host/manual consumers reach one authoritative
+winner, live and recovery lifecycle decisions share one exact evaluator,
+clock rollback and lost acknowledgements fail closed, and synthetic authority
+cannot enable a real adapter. The remaining explicit coverage gap is F04a.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA
 review gates remain. Read the

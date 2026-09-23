@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 26 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 20/22 F. F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. Stage 27 records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 21/22 F. F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1351,8 +1351,8 @@ BLOCKER or MAJOR finding. The reviewer passed the full 80-test dispatch module;
 the local storage module passed 382 tests. T25 and F19 are promoted to
 `YES/YES/YES`. Verifying and independently accepted transition coverage is now
 28/28 and acceptance-family coverage is 19/22. The next ordered gaps are F02,
-F03 and F04a; remaining row reviews, POSIX runtime and final exact-head reviews
-remain open, and PR #99 remains draft.
+F03 and F04a at that checkpoint; remaining row reviews, POSIX runtime and final
+exact-head reviews remain open, and PR #99 remains draft.
 
 ### 5.32 F02 bounded same-effect retry checkpoint
 
@@ -1383,7 +1383,37 @@ schema or history. Independent review returned `APPROVE` after correcting the
 pause/RESUME separation and making the retained T06 fence mandatory. The full
 storage and dispatch modules passed 393 and 80 tests; the complete package
 passed 515 tests. F02 is promoted to `YES/YES/YES`; the next ordered gaps are
-F03 and F04a. PR #99 remains draft pending those gaps and the later gates.
+F03 and F04a at that checkpoint. PR #99 remains draft pending the later gates.
+
+### 5.33 F03 source-atomic one-use authority checkpoint
+
+F03 is independently accepted. The synthetic trusted source now applies one
+shared exact lifecycle decision during live claim/consume and strict recovery,
+so revocation, expiry, supersession, foreign consumption, unavailable/unknown
+source status and correction timing cannot diverge across restart. Pre-action
+ADOPTION facts are admitted without fabricating an adoption use; post-use facts
+still bind the exact source receipt and dependent provenance. A correction must
+already be effective before it can clear its owned denial, and stacked facts
+remain independently effective.
+
+Three independent controller connections, representing two hosts and a manual
+consumer after identical verified reads, reach the authoritative use-limit
+decision concurrently: one source event wins and both losers are denied as
+exhausted, with no adapter contact. Persisted clock rollback, not-before/expiry,
+wrong or forged binding, unavailable grants, rollback before commit, lost
+acknowledgement after commit, rebound claim identity and replay after later
+expiry/lifecycle change all fail closed. Exact replay returns the original
+synthetic receipt without another use. The package continues to expose no real
+adapter or real authority path.
+
+Independent review initially returned `REVISE` for premature future-correction
+clearance and a race masked by stale freshness. Rejecting not-yet-effective
+corrections preserves the current fence/effective-authority projection, and a
+current-head race now proves both durable losers reach source exhaustion. Final
+review returned `APPROVE` with no BLOCKER or MAJOR finding. Eight focused tests,
+the 400-test storage module and the complete 522-test package passed. F03 is
+promoted to `YES/YES/YES`; F04a is the sole remaining acceptance-family gap. PR
+#99 remains draft pending F04a and the later row, POSIX and final review gates.
 
 ## 6. Handoff contract
 

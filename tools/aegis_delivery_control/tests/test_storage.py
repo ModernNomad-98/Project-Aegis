@@ -13,12 +13,15 @@ import sqlite3
 import shutil
 import tempfile
 import threading
+import time
 import unittest
 from unittest.mock import patch
 from pathlib import Path
 from typing import Mapping
 
 import tools.aegis_delivery_control.contracts as contract_types
+import tools.aegis_delivery_control.adapters as adapter_types
+import tools.aegis_delivery_control as delivery_control_package
 import tools.aegis_delivery_control.storage as storage_module
 from tools.aegis_delivery_control.authority import (
     SyntheticAuthority,
@@ -616,6 +619,108 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.capability = self.authority.claim(
             "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
         )
+
+    def _f03_source_fixture(
+        self,
+        suffix: str,
+        *,
+        clock: list[datetime] | None = None,
+        grant_kind: SyntheticGrantKind = SyntheticGrantKind.ADOPTION,
+        not_before: str = "2026-09-20T00:00:00.000000Z",
+        expires_at: str = "2026-09-22T00:00:00.000000Z",
+        use_limit: int = 1,
+    ):
+        path = Path(self.temporary_directory.name) / f"f03-{suffix}.sqlite3"
+        oracle = MutableFreshnessOracle()
+        current = (
+            clock
+            if clock is not None
+            else [datetime(2026, 9, 21, tzinfo=timezone.utc)]
+        )
+        store = SQLiteStateStore(
+            path, oracle, "repo-1", utc_now=lambda: current[0]
+        )
+        store._bind_classification_authority(self.authority)
+        run_id = f"f03-run-{suffix}"
+        item_id = f"f03-item-{suffix}"
+        effect_id = f"f03-effect-{suffix}"
+        plan = store.accept_plan(
+            PlanAcceptanceRequest(
+                f"f03-plan-{suffix}", f"f03-plan-command-{suffix}",
+                f"f03-plan-event-{suffix}", "repo-1", run_id, item_id,
+                effect_id, f"f03-revision-{suffix}",
+                f"f03-descriptor-{suffix}", f"f03-scope-{suffix}",
+                f"f03-budget-{suffix}", (f"f03-check-{suffix}",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        oracle.allowed_head = plan.event_hash
+        action = {
+            SyntheticGrantKind.ADOPTION: "ADOPT_VERIFIED_EFFECT",
+            SyntheticGrantKind.EFFECT_RELATIONSHIP: (
+                "DEFINE_EFFECT_RELATIONSHIP"
+            ),
+        }[grant_kind]
+        grant = self.authority.issue_source_grant(
+            grant_id=f"f03-grant-{suffix}", grant_kind=grant_kind,
+            action=action, repository_id="repo-1",
+            logical_effect_id=effect_id, source_id=f"f03-source-{suffix}",
+            source_version="1", terms_digest=f"f03-terms-{suffix}",
+            scope_digest=f"f03-scope-{suffix}",
+            binding_digest=f"f03-binding-{suffix}",
+            not_before=not_before, expires_at=expires_at,
+            use_limit=use_limit,
+        )
+        registered = store.register_synthetic_source_grant(
+            grant, self.authority
+        )
+        oracle.allowed_head = registered.event_hash
+        return {
+            "path": path, "oracle": oracle, "clock": current,
+            "store": store, "run_id": run_id, "item_id": item_id,
+            "effect_id": effect_id, "grant": grant,
+            "registered": registered,
+        }
+
+    def _f03_record_source_fact(
+        self,
+        fixture,
+        suffix: str,
+        fact_kind: AuthorityFactKind,
+        governed_order: GovernedOrder,
+        *,
+        governed_boundary_kind: str = "NO_ACTION",
+        governed_event_id: str | None = None,
+        governed_event_hash: str | None = None,
+        effective_at: str = "2026-09-20T00:00:00.000000Z",
+        successor_grant_id: str | None = None,
+        corrected_fact_id: str | None = None,
+        corrected_event_hash: str | None = None,
+    ):
+        grant = fixture["grant"]
+        request = AuthorityLifecycleFactRequest(
+            f"f03-fact-{suffix}", f"f03-fact-command-{suffix}",
+            f"f03-fact-event-{suffix}", "repo-1", fixture["run_id"],
+            fixture["item_id"], fixture["effect_id"],
+            grant.grant_kind.value, grant.grant_id, grant.action,
+            grant.scope_digest, fact_kind, governed_order,
+            governed_boundary_kind, governed_event_id, governed_event_hash,
+            successor_grant_id=successor_grant_id,
+            corrected_fact_id=corrected_fact_id,
+            corrected_event_hash=corrected_event_hash,
+            effective_at_utc=effective_at,
+        )
+        recorded = fixture["store"].record_authority_fact(
+            request,
+            self.authority.issue_authority_lifecycle_evidence(
+                f"f03-fact-proof-{suffix}", request
+            ),
+            self.authority,
+            expected_head=fixture["oracle"].allowed_head,
+            writer_epoch=10,
+        )
+        fixture["oracle"].allowed_head = recorded.event_hash
+        return request, recorded
 
     def test_t28_source_head_is_in_complete_freshness_vector(self) -> None:
         plan = self.store.accept_plan(
@@ -2270,12 +2375,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     source_event_id, event_hash, body_json,
                 ),
             )
-            store._consume_synthetic_source(
-                connection, capability(grant, "revoked-consumer"),
-                self.authority,
-                recorded_at="2026-09-21T00:00:02.000000Z",
-                expected_consumer_kind=SyntheticSourceConsumerKind.MANUAL,
-            )
+            with patch.object(
+                store, "_require_source_grant_effective_for_use"
+            ):
+                store._consume_synthetic_source(
+                    connection, capability(grant, "revoked-consumer"),
+                    self.authority,
+                    recorded_at="2026-09-21T00:00:02.000000Z",
+                    expected_consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                )
             connection.commit()
         finally:
             connection.close()
@@ -2283,6 +2391,532 @@ class SQLiteStateStoreTests(unittest.TestCase):
             StorageIntegrityError, "source projection is invalid"
         ):
             store.load_verified("repo-1", authority=self.authority)
+
+    def test_f03_three_consumers_race_one_authoritative_source_use(self) -> None:
+        fixture = self._f03_source_fixture("race")
+        class CurrentSerializedFreshness:
+            def verify(self, repository_id, catalog_head, run_heads):
+                return repository_id == "repo-1"
+
+        current_freshness = CurrentSerializedFreshness()
+        fixture["store"]._freshness_oracle = current_freshness
+        stores = [fixture["store"]]
+        for _ in range(2):
+            contender = SQLiteStateStore(
+                fixture["path"], current_freshness, "repo-1",
+                utc_now=lambda: fixture["clock"][0],
+            )
+            contender._bind_classification_authority(self.authority)
+            stores.append(contender)
+        for store in stores:
+            store.load_verified("repo-1", authority=self.authority)
+        capabilities = (
+            self.authority.issue_source_capability(
+                fixture["grant"],
+                consumer_kind=SyntheticSourceConsumerKind.HOST,
+                consumer_key="f03-race-host-1",
+                binding_digest=fixture["grant"].binding_digest,
+            ),
+            self.authority.issue_source_capability(
+                fixture["grant"],
+                consumer_kind=SyntheticSourceConsumerKind.HOST,
+                consumer_key="f03-race-host-2",
+                binding_digest=fixture["grant"].binding_digest,
+            ),
+            self.authority.issue_source_capability(
+                fixture["grant"],
+                consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                consumer_key="f03-race-manual",
+                binding_digest=fixture["grant"].binding_digest,
+            ),
+        )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            before_event_count = connection.execute(
+                "SELECT COUNT(*) FROM synthetic_authority_source_events"
+            ).fetchone()[0]
+            before_head = connection.execute(
+                "SELECT head_hash FROM synthetic_authority_source_state"
+            ).fetchone()[0]
+        barrier = threading.Barrier(3)
+
+        def contend(index: int):
+            barrier.wait()
+            for _ in range(1000):
+                try:
+                    return stores[index].consume_synthetic_source_for_test(
+                        capabilities[index], self.authority
+                    )
+                except DispatchDenied as error:
+                    if "writer lock is unavailable" not in str(error):
+                        return error
+                    time.sleep(0.001)
+            self.fail("source contender never reached the serialized decision")
+
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            results = tuple(executor.map(contend, range(3)))
+        winners = [result for result in results if not isinstance(result, Exception)]
+        losers = [result for result in results if isinstance(result, Exception)]
+        self.assertEqual((len(winners), len(losers)), (1, 2))
+        self.assertEqual(
+            {str(error) for error in losers},
+            {"synthetic source grant use limit is exhausted"},
+        )
+        winner = winners[0]
+        self.assertFalse(winner.replayed)
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            uses = connection.execute(
+                "SELECT consumer_kind, consumer_key, event_hash FROM "
+                "synthetic_authority_uses"
+            ).fetchall()
+            after_event_count = connection.execute(
+                "SELECT COUNT(*) FROM synthetic_authority_source_events"
+            ).fetchone()[0]
+            after_head = connection.execute(
+                "SELECT head_hash FROM synthetic_authority_source_state"
+            ).fetchone()[0]
+            contacts = connection.execute(
+                "SELECT COUNT(*) FROM adapter_contacts"
+            ).fetchone()[0]
+        self.assertEqual(len(uses), 1)
+        self.assertEqual(uses[0][2], winner.event_hash)
+        self.assertEqual(after_event_count, before_event_count + 1)
+        self.assertNotEqual(after_head, before_head)
+        self.assertEqual(after_head, winner.event_hash)
+        self.assertEqual(contacts, 0)
+        fixture["store"].load_verified("repo-1", authority=self.authority)
+
+    def test_f03_preaction_adoption_lifecycle_denials_are_source_atomic(
+        self,
+    ) -> None:
+        cases = (
+            (AuthorityFactKind.EXPIRED, GovernedOrder.BEFORE, None),
+            (AuthorityFactKind.REVOKED, GovernedOrder.BEFORE, None),
+            (
+                AuthorityFactKind.SUPERSEDED, GovernedOrder.BEFORE,
+                "f03-successor",
+            ),
+            (AuthorityFactKind.FOREIGN_CONSUMED, GovernedOrder.BEFORE, None),
+            (AuthorityFactKind.SOURCE_UNAVAILABLE, GovernedOrder.UNKNOWN, None),
+            (AuthorityFactKind.REVOKED, GovernedOrder.UNKNOWN, None),
+        )
+        for index, (fact_kind, order, successor) in enumerate(cases):
+            with self.subTest(fact_kind=fact_kind, order=order):
+                fixture = self._f03_source_fixture(f"preuse-{index}")
+                self._f03_record_source_fact(
+                    fixture, f"preuse-{index}", fact_kind, order,
+                    effective_at=(
+                        "2026-09-23T00:00:00.000000Z"
+                        if order is GovernedOrder.UNKNOWN
+                        else "2026-09-20T00:00:00.000000Z"
+                    ),
+                    successor_grant_id=successor,
+                )
+                self.assertEqual(
+                    fixture["store"].load_run_lifecycle(fixture["run_id"]),
+                    LifecycleState.BLOCKED,
+                )
+                capability = self.authority.issue_source_capability(
+                    fixture["grant"],
+                    consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                    consumer_key=f"f03-preuse-consumer-{index}",
+                    binding_digest=fixture["grant"].binding_digest,
+                )
+                with closing(sqlite3.connect(fixture["path"])) as connection:
+                    before = tuple(connection.iterdump())
+                with self.assertRaisesRegex(DispatchDenied, "lifecycle"):
+                    fixture["store"].consume_synthetic_source_for_test(
+                        capability, self.authority
+                    )
+                with closing(sqlite3.connect(fixture["path"])) as connection:
+                    self.assertEqual(tuple(connection.iterdump()), before)
+                fixture["store"].load_verified(
+                    "repo-1", authority=self.authority
+                )
+
+    def test_f03_source_time_order_and_exact_corrections(self) -> None:
+        future = self._f03_source_fixture(
+            "future-correction",
+            expires_at="2026-09-25T00:00:00.000000Z",
+            use_limit=2,
+        )
+        denial, denied = self._f03_record_source_fact(
+            future, "future-denial", AuthorityFactKind.REVOKED,
+            GovernedOrder.BEFORE,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "not yet effective"):
+            self._f03_record_source_fact(
+                future, "future-correction", AuthorityFactKind.CORRECTION,
+                GovernedOrder.BEFORE,
+                effective_at="2026-09-22T00:00:00.000000Z",
+                corrected_fact_id=denial.fact_id,
+                corrected_event_hash=denied.event_hash,
+            )
+        with closing(sqlite3.connect(future["path"])) as connection:
+            self.assertIsNotNone(connection.execute(
+                "SELECT 1 FROM dispatch_fences WHERE fence_id = ?",
+                (f"authority:{denial.fact_id}",),
+            ).fetchone())
+            self.assertEqual(
+                connection.execute(
+                    "SELECT originating_fact_id FROM effective_authority"
+                ).fetchone()[0],
+                denial.fact_id,
+            )
+        capability = self.authority.issue_source_capability(
+            future["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-future-correction-use",
+            binding_digest=future["grant"].binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "lifecycle"):
+            future["store"].consume_synthetic_source_for_test(
+                capability, self.authority
+            )
+        future["clock"][0] = datetime(
+            2026, 9, 23, tzinfo=timezone.utc
+        )
+        self._f03_record_source_fact(
+            future, "effective-correction", AuthorityFactKind.CORRECTION,
+            GovernedOrder.BEFORE,
+            effective_at="2026-09-22T00:00:00.000000Z",
+            corrected_fact_id=denial.fact_id,
+            corrected_event_hash=denied.event_hash,
+        )
+        with closing(sqlite3.connect(future["path"])) as connection:
+            self.assertIsNone(connection.execute(
+                "SELECT 1 FROM dispatch_fences WHERE fence_id = ?",
+                (f"authority:{denial.fact_id}",),
+            ).fetchone())
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM effective_authority"
+                ).fetchone()[0],
+                0,
+            )
+        corrected_use = future["store"].consume_synthetic_source_for_test(
+            capability, self.authority
+        )
+        self.assertFalse(corrected_use.replayed)
+        future["oracle"].allowed_head = corrected_use.event_hash
+        future["store"].load_verified("repo-1", authority=self.authority)
+
+        stacked = self._f03_source_fixture("stacked-correction")
+        first, first_recorded = self._f03_record_source_fact(
+            stacked, "stacked-first", AuthorityFactKind.REVOKED,
+            GovernedOrder.BEFORE,
+        )
+        second, second_recorded = self._f03_record_source_fact(
+            stacked, "stacked-second", AuthorityFactKind.EXPIRED,
+            GovernedOrder.BEFORE,
+        )
+        self._f03_record_source_fact(
+            stacked, "stacked-correct-first", AuthorityFactKind.CORRECTION,
+            GovernedOrder.BEFORE,
+            corrected_fact_id=first.fact_id,
+            corrected_event_hash=first_recorded.event_hash,
+        )
+        stacked_capability = self.authority.issue_source_capability(
+            stacked["grant"],
+            consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-stacked-use",
+            binding_digest=stacked["grant"].binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "lifecycle"):
+            stacked["store"].consume_synthetic_source_for_test(
+                stacked_capability, self.authority
+            )
+        self._f03_record_source_fact(
+            stacked, "stacked-correct-second", AuthorityFactKind.CORRECTION,
+            GovernedOrder.BEFORE,
+            corrected_fact_id=second.fact_id,
+            corrected_event_hash=second_recorded.event_hash,
+        )
+        final_use = stacked["store"].consume_synthetic_source_for_test(
+            stacked_capability, self.authority
+        )
+        self.assertFalse(final_use.replayed)
+        stacked["oracle"].allowed_head = final_use.event_hash
+        stacked["store"].load_verified("repo-1", authority=self.authority)
+
+    def test_f03_during_and_after_facts_preserve_only_governed_use(self) -> None:
+        during = self._f03_source_fixture(
+            "during", grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+            use_limit=2,
+        )
+        first_capability = self.authority.issue_source_capability(
+            during["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-during-first",
+            binding_digest=during["grant"].binding_digest,
+        )
+        first_use = during["store"].consume_synthetic_source_for_test(
+            first_capability, self.authority
+        )
+        during["oracle"].allowed_head = first_use.event_hash
+        with closing(sqlite3.connect(during["path"])) as connection:
+            first_time = connection.execute(
+                "SELECT recorded_at FROM synthetic_authority_uses WHERE "
+                "source_event_id = ?", (first_use.source_event_id,),
+            ).fetchone()[0]
+        self._f03_record_source_fact(
+            during, "during-fact", AuthorityFactKind.REVOKED,
+            GovernedOrder.DURING, governed_boundary_kind="SOURCE_USE",
+            governed_event_id=first_use.source_event_id,
+            governed_event_hash=first_use.event_hash,
+            effective_at=first_time,
+        )
+        replay = during["store"].consume_synthetic_source_for_test(
+            first_capability, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        second_capability = self.authority.issue_source_capability(
+            during["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-during-second",
+            binding_digest=during["grant"].binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "lifecycle"):
+            during["store"].consume_synthetic_source_for_test(
+                second_capability, self.authority
+            )
+        during["store"].load_verified("repo-1", authority=self.authority)
+
+        after = self._f03_source_fixture(
+            "after", grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+            expires_at="2026-09-25T00:00:00.000000Z", use_limit=3,
+        )
+        governed_capability = self.authority.issue_source_capability(
+            after["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-after-governed",
+            binding_digest=after["grant"].binding_digest,
+        )
+        governed = after["store"].consume_synthetic_source_for_test(
+            governed_capability, self.authority
+        )
+        after["oracle"].allowed_head = governed.event_hash
+        self._f03_record_source_fact(
+            after, "after-fact", AuthorityFactKind.EXPIRED,
+            GovernedOrder.AFTER, governed_boundary_kind="SOURCE_USE",
+            governed_event_id=governed.source_event_id,
+            governed_event_hash=governed.event_hash,
+            effective_at="2026-09-22T00:00:00.000000Z",
+        )
+        before_effective = self.authority.issue_source_capability(
+            after["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-after-before-effective",
+            binding_digest=after["grant"].binding_digest,
+        )
+        allowed = after["store"].consume_synthetic_source_for_test(
+            before_effective, self.authority
+        )
+        after["oracle"].allowed_head = allowed.event_hash
+        after["clock"][0] = datetime(2026, 9, 23, tzinfo=timezone.utc)
+        later = self.authority.issue_source_capability(
+            after["grant"], consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-after-later",
+            binding_digest=after["grant"].binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "lifecycle"):
+            after["store"].consume_synthetic_source_for_test(
+                later, self.authority
+            )
+        after["store"].load_verified("repo-1", authority=self.authority)
+
+    def test_f03_source_clock_rollback_persists_across_reopen(self) -> None:
+        clock = [datetime(2026, 9, 21, tzinfo=timezone.utc)]
+        fixture = self._f03_source_fixture("clock", clock=clock)
+        clock[0] = datetime(2026, 9, 20, 23, 59, tzinfo=timezone.utc)
+        reopened = SQLiteStateStore(
+            fixture["path"], fixture["oracle"], "repo-1",
+            utc_now=lambda: clock[0],
+        )
+        reopened._bind_classification_authority(self.authority)
+        capability = self.authority.issue_source_capability(
+            fixture["grant"], consumer_kind=SyntheticSourceConsumerKind.HOST,
+            consumer_key="f03-clock-host",
+            binding_digest=fixture["grant"].binding_digest,
+        )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            before = tuple(connection.iterdump())
+        with self.assertRaisesRegex(DispatchDenied, "clock moved backward"):
+            reopened.consume_synthetic_source_for_test(
+                capability, self.authority
+            )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            self.assertEqual(tuple(connection.iterdump()), before)
+        clock[0] = datetime(2026, 9, 21, 0, 1, tzinfo=timezone.utc)
+        receipt = reopened.consume_synthetic_source_for_test(
+            capability, self.authority
+        )
+        fixture["oracle"].allowed_head = receipt.event_hash
+        reopened.load_verified("repo-1", authority=self.authority)
+
+    def test_f03_lost_source_receipt_replays_exactly_once(self) -> None:
+        fixture = self._f03_source_fixture(
+            "lost", grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+            expires_at="2026-09-25T00:00:00.000000Z", use_limit=2,
+        )
+        rebound_grant = self.authority.issue_source_grant(
+            grant_id="f03-grant-lost-rebound",
+            grant_kind=SyntheticGrantKind.EFFECT_RELATIONSHIP,
+            action="DEFINE_EFFECT_RELATIONSHIP", repository_id="repo-1",
+            logical_effect_id=fixture["effect_id"],
+            source_id="f03-source-lost-rebound", source_version="1",
+            terms_digest="f03-terms-lost-rebound",
+            scope_digest=fixture["grant"].scope_digest,
+            binding_digest=fixture["grant"].binding_digest,
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-25T00:00:00.000000Z", use_limit=1,
+        )
+        rebound_registered = fixture["store"].register_synthetic_source_grant(
+            rebound_grant, self.authority
+        )
+        fixture["oracle"].allowed_head = rebound_registered.event_hash
+        capability = self.authority.issue_source_capability(
+            fixture["grant"], consumer_kind=SyntheticSourceConsumerKind.HOST,
+            consumer_key="f03-lost-host",
+            binding_digest=fixture["grant"].binding_digest,
+        )
+        with self.assertRaises(InjectedFailure):
+            fixture["store"].consume_synthetic_source_for_test(
+                capability, self.authority,
+                failure_hook=raise_at("after_source_use_writes_before_commit"),
+            )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM synthetic_authority_uses"
+                ).fetchone()[0],
+                0,
+            )
+        with self.assertRaises(InjectedFailure):
+            fixture["store"].consume_synthetic_source_for_test(
+                capability, self.authority,
+                failure_hook=raise_at(
+                    "after_source_use_commit_before_acknowledgement"
+                ),
+            )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            committed = connection.execute(
+                "SELECT source_event_id, event_hash FROM "
+                "synthetic_authority_uses"
+            ).fetchone()
+        exact = fixture["store"].consume_synthetic_source_for_test(
+            capability, self.authority
+        )
+        self.assertTrue(exact.replayed)
+        self.assertEqual(
+            (exact.source_event_id, exact.event_hash), tuple(committed)
+        )
+        fixture["oracle"].allowed_head = exact.event_hash
+        self._f03_record_source_fact(
+            fixture, "lost-after", AuthorityFactKind.EXPIRED,
+            GovernedOrder.AFTER, governed_boundary_kind="SOURCE_USE",
+            governed_event_id=exact.source_event_id,
+            governed_event_hash=exact.event_hash,
+            effective_at="2026-09-22T00:00:00.000000Z",
+        )
+        fixture["clock"][0] = datetime(2026, 9, 24, tzinfo=timezone.utc)
+        replay_after_expiry = (
+            fixture["store"].consume_synthetic_source_for_test(
+                capability, self.authority
+            )
+        )
+        self.assertTrue(replay_after_expiry.replayed)
+        rebound = self.authority.issue_source_capability(
+            rebound_grant, consumer_kind=SyntheticSourceConsumerKind.HOST,
+            consumer_key="f03-lost-host",
+            binding_digest=rebound_grant.binding_digest,
+        )
+        with self.assertRaisesRegex(StorageIntegrityError, "rebound"):
+            fixture["store"].consume_synthetic_source_for_test(
+                rebound, self.authority
+            )
+        with closing(sqlite3.connect(fixture["path"])) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM synthetic_authority_uses"
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM adapter_contacts"
+                ).fetchone()[0],
+                0,
+            )
+        fixture["store"].load_verified("repo-1", authority=self.authority)
+
+    def test_f03_invalid_source_bindings_and_synthetic_isolation_deny(self) -> None:
+        fixture = self._f03_source_fixture("invalid")
+        with self.assertRaisesRegex(DispatchDenied, "binding mismatch"):
+            self.authority.issue_source_capability(
+                fixture["grant"],
+                consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                consumer_key="f03-invalid-binding",
+                binding_digest="wrong-binding",
+            )
+        capability = self.authority.issue_source_capability(
+            fixture["grant"],
+            consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-forged",
+            binding_digest=fixture["grant"].binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "not issued here"):
+            fixture["store"].consume_synthetic_source_for_test(
+                replace(capability, issuer_mac="forged"), self.authority
+            )
+        absent = self.authority.issue_source_grant(
+            grant_id="f03-absent-grant", grant_kind=SyntheticGrantKind.ADOPTION,
+            action="ADOPT_VERIFIED_EFFECT", repository_id="repo-1",
+            logical_effect_id=fixture["effect_id"], source_id="f03-absent",
+            source_version="1", terms_digest="f03-absent-terms",
+            scope_digest=fixture["grant"].scope_digest,
+            binding_digest="f03-absent-binding",
+            not_before="2026-09-20T00:00:00.000000Z",
+            expires_at="2026-09-22T00:00:00.000000Z", use_limit=1,
+        )
+        absent_capability = self.authority.issue_source_capability(
+            absent, consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+            consumer_key="f03-absent", binding_digest=absent.binding_digest,
+        )
+        with self.assertRaisesRegex(DispatchDenied, "unavailable"):
+            fixture["store"].consume_synthetic_source_for_test(
+                absent_capability, self.authority
+            )
+        for suffix, not_before, expires_at, message in (
+            (
+                "not-before", "2026-09-22T00:00:00.000000Z",
+                "2026-09-23T00:00:00.000000Z", "not currently effective",
+            ),
+            (
+                "expired", "2026-09-19T00:00:00.000000Z",
+                "2026-09-20T00:00:00.000000Z", "not currently effective",
+            ),
+        ):
+            timed = self._f03_source_fixture(
+                suffix, not_before=not_before, expires_at=expires_at
+            )
+            timed_capability = self.authority.issue_source_capability(
+                timed["grant"],
+                consumer_kind=SyntheticSourceConsumerKind.MANUAL,
+                consumer_key=f"f03-{suffix}-consumer",
+                binding_digest=timed["grant"].binding_digest,
+            )
+            with self.assertRaisesRegex(DispatchDenied, message):
+                timed["store"].consume_synthetic_source_for_test(
+                    timed_capability, self.authority
+                )
+        adapter_classes = {
+            name
+            for name, value in vars(adapter_types).items()
+            if inspect.isclass(value) and name.endswith("Adapter")
+        }
+        self.assertEqual(
+            adapter_classes,
+            {"SyntheticExecutionAdapter", "SyntheticValidatorAdapter"},
+        )
+        self.assertNotIn("SyntheticSourceCapability", delivery_control_package.__all__)
+        self.assertFalse(
+            any(name.endswith("Adapter") for name in delivery_control_package.__all__)
+        )
 
     def test_f01_canonical_identity_and_approved_relationship_are_durable(
         self,
