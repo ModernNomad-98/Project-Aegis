@@ -20,7 +20,8 @@ earlier forecast update.
 | Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | 33m20s observed wall time to public PR #107 merge; active-only total unavailable | Private PR #1 open; local contract/restore checks passed; public PR #107 independent audit and all Actions passed | Owner semantic review pending | Private packet PENDING; public checkpoint merged |
 | Cross-stream owner decision packet | 2026-09-23 12:20 | 2–4 hours active work | 13m38s observed wall time to PR #108 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | BKL-009 owner selection pending after merge | PR #108 merged at 12:33:38 UTC; BKL-009 remains PARTIAL |
 | Issue #101 package 1 design | 2026-09-23 12:34 | 4–8 hours active work | 9m40s observed wall time to PR #109 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | No runtime authorization requested | PR #109 merged at 12:43:40 UTC; planning only |
-| CP-WP-003A offline proof scope proposal | 2026-09-23 12:44 | 2–4 hours active work | In progress | Pending | Owner authorization needed before code | Proposal only; CP-WP-003 BLOCKED |
+| CP-WP-003A offline proof scope proposal | 2026-09-23 12:44 | 2–4 hours active work | 8m58s observed wall time to PR #110 merge; active-only time unavailable | Independent read-only audit passed after terminology correction; all three Actions green | Owner authorization needed before code | PR #110 merged at 12:52:58 UTC; CP-WP-003 BLOCKED |
+| BER R4/R5 selected-host decision packet | 2026-09-23 12:53 | 2–4 hours active work | In progress | Pending | Host choice and later probe grant pending | Proposal only; no host probe or live dispatch |
 
 ## Progress checkpoints
 
@@ -91,6 +92,13 @@ earlier forecast update.
 - **2026-09-23 12:44 UTC — CP-WP-003A scope proposal started:** Estimated 2–4
   active hours to prepare synthetic capability-proof authorization; no code or
   real CP action is authorized by drafting it.
+- **2026-09-23 12:52:58 UTC — CP-WP-003A proposal merged:** PR #110 merged at
+  `75d1e6e662ed48f0ec9f6b04c4c52e6f39ead319` after independent audit,
+  correction and three green Actions. Observed wall time from 12:44 was
+  8m58s; active-only time is unavailable. This is merge 4 of 5 after #106.
+- **2026-09-23 12:53 UTC — BER selected-host decision packet started:**
+  Estimated 2–4 active hours to prepare the R4/R5 host choice and bounded
+  offline proof boundary. No host or provider probe is authorized by drafting.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
