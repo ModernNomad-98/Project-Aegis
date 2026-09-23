@@ -1,5 +1,29 @@
 # CP-WP-002 Codex continuation handoff
 
+## Reading key for this historical record
+
+**CP-WP-002** means control-plane work package 002, the bounded offline
+kernel delivery described here. Codex is the coding agent used for this
+handoff. A **PR** is a pull request, a reviewed proposed repository change;
+**UTC** is Coordinated Universal Time. **SHA** means Secure Hash Algorithm;
+the recorded Git hashes identify exact revisions. **API** means application
+programming interface;
+**HMAC** means hash-based message authentication code, used here to bind
+synthetic authority evidence; and **WAL** means SQLite write-ahead logging.
+`T01`–`T28` identify design transitions, `C01`–`C09` identify crash boundaries,
+and `F01`–`F21` identify acceptance families. Their detailed meanings live in
+the linked control-plane design.
+
+Source-line links in the later historical stop-review anchors refer to the
+**corrected-stop checkpoint** `5cd844bb65813efd798e41ab52ff9003ff23366f`.
+That immutable revision contains the cited lines; the same line numbers in
+today's source can describe different code. This checkpoint supports the
+historical review citations, while the final reviewed head and merge commit
+listed below remain the delivery identities. Follow the current
+[package guide](../../../tools/aegis_delivery_control/README.md) and
+[control-plane backlog](../../roadmaps/resumable-control-plane-backlog.md)
+for present behavior and remaining authority.
+
 Original handoff date: 2026-09-22
 Closure date: 2026-09-23
 Repository: `ModernNomad-98/Project-Aegis` (Role A source library)
@@ -1365,13 +1389,13 @@ while the slot exists.
 
 Review anchors:
 
-- [`contracts.py`](../../../tools/aegis_delivery_control/contracts.py#L493)
-- [`engine.py`](../../../tools/aegis_delivery_control/engine.py#L49)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4962)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L9079)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L9770)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L10260)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L12891)
+- [Terminal-settlement request](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/contracts.py#L493)
+- [T18 stop record](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/engine.py#L49)
+- [Stop transaction](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L4962)
+- [Validator observation](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L9079)
+- [Terminal settlement](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L9770)
+- [Slot release](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L10260)
+- [Settlement-history validation](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L12891)
 
 Resolution: T26 accepts a typed `VALIDATION_APPLICATION` reference to the exact
 already-applied observation/application and latest validator attempt. It preserves
@@ -1396,10 +1420,10 @@ later authoritative correction and terminal release.
 
 Review anchors:
 
-- [`engine.py`](../../../tools/aegis_delivery_control/engine.py#L51)
-- [`contracts.py`](../../../tools/aegis_delivery_control/contracts.py#L715)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L5317)
-- [canonical T20](../../design/resumable-control-plane-v1.md#L447)
+- [T20 escalation transition](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/engine.py#L51)
+- [Typed escalation request](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/contracts.py#L715)
+- [Escalation transaction](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L5317)
+- [Canonical T20 design row](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/docs/design/resumable-control-plane-v1.md#L447)
 
 Resolution: the plan audit reconciled the transient exclusion note against the
 canonical design and AEGIS-APR-004, selecting the canonical O route while
@@ -1418,11 +1442,11 @@ now classifies that bounded exposure atomically as
 
 Review anchors:
 
-- [`adapters.py`](../../../tools/aegis_delivery_control/adapters.py#L455)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L1831)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L4962)
-- [`storage.py`](../../../tools/aegis_delivery_control/storage.py#L6668)
-- [canonical T19](../../design/resumable-control-plane-v1.md#L446)
+- [Adapter contact claim](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/adapters.py#L455)
+- [Unresolved contact reservations](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L1818-L1832)
+- [Stop transaction](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L4962)
+- [Contact-claim storage](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/tools/aegis_delivery_control/storage.py#L6668)
+- [Canonical T19 design row](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/docs/design/resumable-control-plane-v1.md#L446)
 
 Resolution: T19 atomically converts exact contacted, unresolved reserved effect
 or validator liability to `UNKNOWN_WORST_CASE_CHARGED`, retains pre-contact and
@@ -1746,7 +1770,8 @@ transition registry entry.
 
 ### T01-T28 transition matrix
 
-Canonical rows: [design transition table](../../design/resumable-control-plane-v1.md#L420-L455).
+Canonical rows at the corrected-stop checkpoint:
+[design transition table](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/docs/design/resumable-control-plane-v1.md#L420-L455).
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
@@ -1781,7 +1806,8 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 
 ### C01-C09 crash-boundary matrix
 
-Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v1.md#L599-L607).
+Canonical rows at the corrected-stop checkpoint:
+[design crash boundaries](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/docs/design/resumable-control-plane-v1.md#L599-L607).
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
@@ -1797,7 +1823,8 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 
 ### F01-F21 acceptance-family matrix
 
-Canonical rows: [design acceptance families](../../design/resumable-control-plane-v1.md#L939-L960).
+Canonical rows at the corrected-stop checkpoint:
+[design acceptance families](https://github.com/ModernNomad-98/Project-Aegis/blob/5cd844bb65813efd798e41ab52ff9003ff23366f/docs/design/resumable-control-plane-v1.md#L939-L960).
 
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
