@@ -112,3 +112,13 @@ root. This decision accepts that storage direction; it does not itself create
 the repository or approve labels, provider calls, changed source pins or an
 execution allowance. Record the exact location and terms in a separately
 reviewed, merged BER-DEC amendment before publishing replacement inputs.
+
+## Implementation checkpoint — 2026-09-23
+
+BER-DEC-010 merged in PR #106 at
+`14e3f17c380dd26ddba1f27c7e041b6064509ba4`. The selected repository
+`ModernNomad-98/Project-Aegis-Calibration-Inputs` was then created. GitHub
+reported PRIVATE visibility, the owner account as its sole collaborator, and
+Actions disabled. These facts were verified before any input push; the
+repository is still empty at this checkpoint. Creation does not approve
+candidate labels or satisfy an execution gate.
