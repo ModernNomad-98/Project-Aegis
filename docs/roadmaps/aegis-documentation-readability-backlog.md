@@ -1,0 +1,85 @@
+# Documentation readability and component guide backlog
+
+Created 2026-09-23 from Peter Nguyen's request to explain what the Behavioral
+Eval Runner and delivery control plane are for, what their functions do, and
+to make **all repository documentation understandable to human developers and
+artificial intelligence (AI) agents**. Peter specifically identified the dense
+[Behavioral Eval Runner README](../../tools/behavioral_eval_runner/README.md).
+This is a required documentation quality item, not a claim that the current
+pages already meet it.
+
+## Purpose and scope
+
+Readers should be able to find a component, understand the problem it solves,
+follow a normal workflow, identify what each public entry point does, and see
+its current limits without decoding project shorthand or reading a chronological
+wall of implementation notes. Preserve exact technical facts and historical
+evidence, but give them a clear explanation and a suitable home.
+
+The tracked-file inventory found **491 Markdown files**, including **344 skill
+documentation files** and **84 under `docs/`**. The root README has 1,353
+lines; the Behavioral Eval Runner README
+has 233; the delivery control kernel README has 410. These counts describe
+review scope, not the number of defective files. The full sweep includes root
+guides, component guides, roadmaps, evidence, and skill documentation. Review
+the files in bounded batches so unrelated technical changes stay separate.
+
+## Required order of work
+
+1. **Explain the two components first.** Rewrite the Behavioral Eval Runner
+   and delivery control kernel READMEs around purpose, audience, examples,
+   supported use, key concepts, module/function map, commands, safety gates,
+   current delivery status, and limits. Explain how they relate to the Aegis
+   skills library. Keep historical transition details in linked design,
+   backlog or evidence records instead of making them the entry point.
+2. **Fix navigation.** Give the root README and documentation index a short,
+   accurate description of each component and links to the right starting
+   pages. A reader should not have to infer purpose from a package path.
+3. **Sweep the remaining documentation.** Review every Markdown file in a
+   recorded inventory. Prioritize active instructions and public guides, then
+   roadmaps/evidence and skill docs. Record the checked batch, findings,
+   changes and deliberately retained historical text. Do not rewrite an
+   immutable approval or evidence record merely to modernize its language;
+   add a linked, dated explanation where the original must remain intact.
+4. **Keep future pages readable.** Add a short writing standard to the
+   contribution guide and check new or changed documentation against it in
+   review. Automation may find obvious structural problems, but human review
+   must judge whether the explanation is understandable.
+
+## Acceptance for each page
+
+- Open with what the page or component is for and who should read it.
+- Define an abbreviation or coded identifier at first use. For example,
+  “Behavioral Eval Runner (BER)” and “work package (WP)” are explained before
+  later shorthand. Explain lifecycle/status codes in plain words or link to
+  a nearby glossary; do not assume a reader knows `CP-WP-003` (control-plane
+  work package 003), `OD-1` (owner decision 1), `T03` (transition 03), or
+  internal class names.
+- Use descriptive headings, short paragraphs, lists or tables for distinct
+  functions, and at least one concrete example where a component's purpose
+  would otherwise remain abstract. Explain what a function or command accepts,
+  produces, changes, and refuses when those details matter to safe use.
+- State shipped behavior separately from proposed or blocked behavior. A
+  synthetic test, passing check or approved design is not described as a
+  deployed integration or measured model result.
+- Keep navigation links current and check that every referenced file or
+  command exists. Preserve the technical contract while making the prose
+  approachable; do not remove a safety boundary for brevity.
+- Obtain a read-only review from someone who did not write the page. Ask the
+  reviewer to explain the component's purpose and normal use from the page
+  alone, and correct gaps before marking that batch complete.
+
+## Delivery and estimate
+
+Status: **OPEN**. Start with the two component READMEs and the root/index
+navigation, then continue through the full inventory in reviewable batches.
+Previously stated estimate for the narrower component-guide item was 4–8
+active hours; after the repository-wide clarification an interim estimate
+was 24–60. The inventory-based provisional estimate is **80–200 active hours**
+for the entire documentation sweep, excluding owner waiting and GitHub queue
+time. Re-estimate from actual batch measurements. Do not mark this item DONE
+after only the two component READMEs are improved.
+
+This documentation work does not authorize provider calls, deployment,
+private calibration input publication, approval changes or later-phase runtime
+implementation.

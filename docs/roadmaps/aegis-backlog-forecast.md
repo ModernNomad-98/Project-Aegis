@@ -150,4 +150,77 @@ the PR. The current bounded selected total is **112–228 active hours**;
 selecting both issue #101 helpers would make it **128–268**. The full optional
 adoption backlog has **no finite total ETA** yet because the number of extra
 hosts/products and the multi-judge/distributed decisions are unset. Never
-present one of the bounded totals as an all-options completion promise.
+present one of the bounded totals as an all-options completion promise. Those
+figures belong to the checkpoint before the one below.
+
+## Five-merge checkpoint — 2026-09-23, after PR #104
+
+Here, “PR” means pull request; “work package” means a bounded planned delivery;
+“POSIX host” means a Unix-like execution environment; and “owner decision 1”
+is the later human ratification of the Behavioral Eval Runner's measured
+calibration result. The numbered backlog identifiers link to their detailed
+requirements in the Behavioral Eval Runner and control-plane registers above.
+
+This snapshot preserves the earlier tables. The fifth merge after PR #111
+was PR #104; pull request numbers do not describe merge order. The owner also
+accepted the schema shape, selected the recommended evidence policy and
+disposable-POSIX-host direction, approved the bounded control-plane and setup
+scopes, and expanded the documentation requirement. These decisions change
+gates and scope; they do not establish an available host or approved labels.
+
+| Merged request | Merge commit | Observed wall time from first work checkpoint | Result |
+| --- | --- | --- | --- |
+| [#112](https://github.com/ModernNomad-98/Project-Aegis/pull/112) | `fa79092f1c0fb1984b75245d8bce6a41982e5419` | 9m13s | Previous five-merge forecast |
+| [#113](https://github.com/ModernNomad-98/Project-Aegis/pull/113) | `5a2452a0e0a6cec974d142e14a66641cd51f2c5d` | 11m21s | Issue #101 setup scope proposal |
+| [#114](https://github.com/ModernNomad-98/Project-Aegis/pull/114) | `d187849287e5047fc821f7a1070b0c59cc5b32b9` | 8m35s | Control-plane exact-file scope |
+| [#115](https://github.com/ModernNomad-98/Project-Aegis/pull/115) | `f3d3e07cd623a1cd69413d0d28e15b75df4c5a49` | 7m15s | Issue #101 offline advisory-contract scope |
+| [#104](https://github.com/ModernNomad-98/Project-Aegis/pull/104) | `c83a0601d9b7945ad407b6fa81bd2563ab501475` | 4h42m26s, including owner/main-drift wait | Version-integrity code and compatibility policy; owner accepted shapes |
+
+The five intervals overlap in calendar time: PR #104 waited while #112–#115
+were prepared and merged. Their sum is **not** an elapsed project duration or
+active-work measurement. Active-only, review and owner-wait durations were
+not fully instrumented. The short document PRs provide no reliable coding
+speed multiplier. PR #104's final local suite passed 997 tests with 14
+expected skips; its Linux and Windows jobs passed. Its protected-file guard
+failed only on the documented manual-review condition under the owner's
+PR-specific exception. No other failed check is treated as green.
+
+| Work item | Previous remaining active hours | New remaining active hours | Change or current gate |
+| --- | ---: | ---: | --- |
+| Behavioral Eval Runner backlog item 007 / work package 2B-1A | 1–2 | **0** | PR #104 merged after owner shape acceptance; delivered scope closed |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Private 160-case candidate remains pending semantic and label review |
+| Behavioral Eval Runner backlog item 009 evidence policy enforcement | 8–16 | 8–16 | Owner chose the 30-day complete-bundle policy; implementation and host-specific encryption proof remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Development driver lacks reviewed holdout support; offline scope proposal PR #116 is open |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Historical allowance, exact source, private labels, development result and later holdout freeze remain gates |
+| Selected-host capability proof (R4 tool-path isolation and R5 execution-profile isolation) | 12–24 | 12–24 | Disposable POSIX direction accepted; no named/provisioned host or selected-host proof exists |
+| Work package 2B-4 | 12–24 | 12–24 | Live Scenario A still follows calibration and host proof |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus phase remains dependent on 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain later-phase work |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain later-phase work |
+| Control-plane work package 003 | 12–24 | 12–24 | Owner approved the synthetic first-increment scope; separate merged exact grant is still required; real source and host proofs remain |
+| Control-plane work package 004 | 8–16 | 8–16 | No real delivery target selected and package 003 prerequisites remain |
+| Issue #101 package 2 | 6–12 | 6–12 | Owner approved Aegis-only setup scope; exact grant and implementation remain |
+| Issue #101 package 3 | 6–12 | 6–12 | Owner approved offline advisory contract scope; exact grant and implementation remain |
+| Issue #101 package 4 | 8–16 | 8–16 | Comparative evaluation still needs host, inputs and separate execution authority |
+| Issue #101 package 7 | 6–12 | 6–12 | End-to-end release review remains after selected integration outcomes |
+| Repository-wide documentation readability | Not counted | **80–200** | New owner requirement; 491 tracked Markdown files inventoried; component guides and navigation first, then recorded full sweep |
+| **Selected remaining total** | **112–228** | **191–426** | Each open item counted once; active work only |
+
+The earlier cross-stream decision packet and issue #101 package 1 remain
+closed as planning work. The new documentation estimate is deliberately wide:
+491 tracked Markdown files require a recorded review, and actual rewrite volume is
+unknown. Its earlier narrow 4–8-hour component estimate and interim 24–60-hour
+repository estimate are superseded by **80–200 hours** until the first audited
+documentation batches provide a better basis. The new total subtracts the
+closed 1–2-hour schema row and adds this 80–200-hour item. It does not count
+the still-open PR #116 proposal as completed implementation.
+
+The optional issue #101 local and online helpers remain **8–20 hours each**.
+If both are selected, the bounded selected-plus-both total becomes
+**207–466 active hours**. Signing and immutable storage, additional hosts or
+products, multi-judge arbitration, future control-plane architecture and
+other unselected adoption remain outside both totals. The full all-options
+backlog has no finite estimate. Owner waits, GitHub queue, provider run time
+and host provisioning are excluded from active-hour estimates. Re-estimate
+all open rows after the next five merged requests or sooner if a decision
+materially changes scope.
