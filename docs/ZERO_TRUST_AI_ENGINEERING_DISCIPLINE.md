@@ -1,88 +1,82 @@
 # Zero Trust AI Engineering Discipline
 
-> **Never trust, always verify — every step of the lifecycle.**
-> *Assume drift. Demand evidence. Track everything.*
+This guide is for developers and artificial intelligence (AI) agents using
+Project Aegis skills. It describes a working rule: check a claim against the
+current repository, approval record, test result or live system before acting
+on it. For example, before saying a pull request (PR) is ready, inspect its exact
+revision, its current checks and its approval boundary. A test result from an
+older revision does not prove the new one works.
 
-*The tagline deliberately mirrors the Zero Trust security motto "never trust, always
-verify," and the gloss's "assume drift" mirrors Zero Trust's companion principle "assume
-breach." The homage is intentional: this doctrine extends a proven security principle from
-network access to the whole engineering process.*
+The name borrows the security principle "never trust, always verify" and
+applies it to engineering claims throughout development.
 
----
+## What to do in a normal change
+
+1. **Track:** record the decision, scope and current state where another
+   contributor can find them.
+2. **Verify:** run or inspect the check on the exact version being changed;
+   record failures and skips as they occurred.
+3. **Govern:** confirm the action fits a current human grant and the delivery
+   gate before executing or merging.
+4. **Hand off:** leave enough file, command and evidence detail for the next
+   contributor to continue without guessing.
+
+The [approval register](approvals/APPROVAL_REGISTER.md), [offline verification
+guide](offline-ci.md) and [documentation index](README.md) are the starting
+points for applying these steps in this source repository.
 
 ## Core definition
 
-**Zero Trust AI Engineering Discipline (Zet-AI Engineering for short, pronounced
-"zet-eye") is the practice of applying the security principle "never trust, always verify"
-to the ENTIRE software development lifecycle** — every
-decision, code change, test result, completion claim, and piece of documentation is verified
-against concrete evidence rather than trusted from memory, assumption, or assertion,
-continuously at every step.
+**Zero Trust AI Engineering Discipline** (also called **Zet-AI Engineering**, pronounced
+"zet-eye") applies that verification rule to decisions, code, tests, completion
+claims and documentation across the software development lifecycle.
 
-Nothing is taken on faith because it was true earlier, because someone remembers it that way,
-or because a summary asserts it. The map is re-checked against the territory before it is
-used. Evidence is the currency; memory and assertion are not accepted as payment.
+Recheck earlier evidence when the underlying revision, environment, approval
+or source of truth may have changed. A summary points to evidence; it does
+not replace that evidence.
 
-## Distinction from classic Zero Trust
+## Relationship to security Zero Trust
 
-Classic **Zero Trust** is a network-security model: never trust a user or device by its
-network location; verify every access request explicitly; assume breach. It governs *access*.
-
-This doctrine borrows the same instinct but applies it to the development **process**, not to
-network access. Where classic Zero Trust asks *"is this actor allowed to access this?"*, this
-doctrine asks *"is this claim actually true, and where is the proof?"* One guards the
-perimeter of a system; the other guards the integrity of how the system gets built.
+Security Zero Trust verifies an access request instead of trusting a user's
+network location. This engineering discipline applies the same habit to a
+development claim: check whether the claim is true on the current revision
+and whether the action has authority. Security access controls still apply.
 
 ## The two failure modes it prevents
 
-- **DRIFT — the map and the territory diverge.** Documentation says one thing while the code
-  does another; decisions get re-litigated because no one is certain what was actually
-  decided. The recorded state and the real state quietly fall out of sync.
-- **ROT — silent decay.** Tests are quietly skipped, approvals are forgotten, finished work
-  is redone. Nothing announces the loss; the discipline just erodes one unchecked step at a
-  time.
+- **Drift:** a description stops matching reality. For example, a guide says
+  a command is supported after the code removes it.
+- **Rot:** a control stops being used. For example, a skipped test is later
+  reported as passing, or an expired approval is treated as current.
 
-**Shared root cause:** both come from trusting something without checking it. Drift is a
-trusted *description* going stale; rot is a trusted *guarantee* going stale. The fix for both
-is the same instinct — verify against evidence instead of trusting the last known state.
-
-This is where **"assume drift" mirrors "assume breach."** Just as Zero Trust assumes an
-attacker may already be inside the network and therefore verifies every access, this doctrine
-assumes the docs and the memory may already have gone stale and therefore verifies every
-claim. You do not wait for proof that the map is wrong before checking it; you assume it may
-be wrong and check by default.
+For both, inspect the current source and record the result. A previous green
+run or accurate guide may have become stale after a change.
 
 ## Why it matters most for AI-assisted development
 
-Human teams carry partial natural defenses against drift and rot: memory, gut-feel, the
-reflex of *"wait — didn't we decide X?"* A human notices when a claim smells wrong.
-
-AI assistants lack these defenses. An AI will confidently act on stale memory, claim
-done-when-not-done, and let documentation drift — not out of laziness, but because it
-genuinely cannot tell. It has no gut to check against. Absent an external evidence
-requirement, an AI's most confident output and its least reliable output look identical.
-
-So this discipline is the specific antidote to how AI assistants fail. It replaces the human
-gut-feel that AI does not have with **enforced evidence** — a structural requirement that
-every claim be checked against the real repository, the real test run, the real approval
-record, before it is trusted.
+An AI assistant can present an outdated summary or an unverified completion
+claim with confidence. Human memory can also be stale. Require a repository
+revision, test output, approval record or other relevant source for a claim
+that controls the next action. Record uncertainty when the source is missing.
 
 ## The concrete rules
 
-The discipline has six pillars — four outward-facing (**TRACK**, **VERIFY**, **GOVERN**,
-**HAND OFF**), governing the work, and two inward-facing (**CONSTRAIN**, **CURATE**),
-governing the AI's own operating environment. What the industry calls harness engineering,
-context engineering, and loop engineering falls out of the inward half — the harness is
-CONSTRAIN's subject, the context window is CURATE's, and the agentic loop splits between
-them (its bounds and stops are CONSTRAIN; its observe-and-validate step is CURATE): the
-industry's disciplines expressed in this doctrine's voice, not competitors to it.
+The six pillars group the rules below. **Track, Verify, Govern and Hand off**
+govern project work. **Constrain and Curate** govern the AI agent's execution
+environment, including its allowed tools, loop bounds, inputs and outputs.
 
-The doctrine is not abstract. The outward pillars' building blocks are the ten operational
-workflow patterns banked as pack **D12.8** in
-[`docs/reconciliation/step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md),
-extracted with HIGH-confidence evidence from a read-only audit documented in
-[`docs/research/aegis-workflow-extraction-report.md`](research/aegis-workflow-extraction-report.md).
-Each pattern is one rule of the discipline:
+The codes below point to historical records, not to a required reading order:
+
+| Code | Meaning in this guide |
+| --- | --- |
+| `P2`, `P13` and similar `P` numbers | Numbered workflow patterns in the [extraction report](research/aegis-workflow-extraction-report.md). These are pattern IDs here, not roadmap priority levels. |
+| `P-existing` | A skill that already existed when the numbered patterns were extracted. |
+| `D12.8`, `D12.4`, `D25`, `D42` | Numbered decision and delivery entries in the [reconciliation record](reconciliation/step-0-reconciliation-v4.md). `D12.8` is the operational workflow-pattern pack; `D12.4` is the documentation pack; `D25` and `D42` record later skill deliveries. |
+
+The ten numbered operational patterns were collected in decision pack `D12.8`
+from a [read-only workflow audit](research/aegis-workflow-extraction-report.md).
+Each skill name below can be found in the [skills catalog](skills-catalog.md);
+the sentence beside it explains the action it supports.
 
 ### TRACK — keep the record and the reality in sync
 
@@ -96,8 +90,9 @@ Each pattern is one rule of the discipline:
 
 ### VERIFY — prove it green before trusting it
 
-- **`local-ci-mirror-preflight` (P4)** — derive local equivalents of every PR-triggered CI
-  check and verify on clean mainline first, classifying each failure by cause.
+- **`local-ci-mirror-preflight` (P4)** — derive local equivalents of every
+  PR-triggered continuous integration (CI) check and verify on clean mainline
+  first, classifying each failure by cause.
 - **`risk-tiered-validation-selector` (P5)** — classify each change to a validation depth,
   failing closed to full validation when unsure, so cost lands where risk is.
 - **`sharded-validation-with-resume` (P6)** — run validation in named shards with persisted
@@ -115,13 +110,16 @@ to fail before it counts.*
   validation as the authoritative gate, record branch-protection config in-repo, and keep a
   revert-PR rollback path.
 - **`gated-deployment-prompt-template` (P11)** — a reusable operator prompt for risky
-  operations with stop conditions, backup-then-verify gating, and evidence-calibrated ETAs.
+  operations with stop conditions, backup-then-verify gating, and evidence-based
+  estimated completion times (ETAs).
 
 Those are the generic skill boundaries. In this source repository, the owner's
 [approval register](approvals/APPROVAL_REGISTER.md) records an explicit recurring
-administrator-merge grant that takes precedence over generic defaults. Human
-authority can be exercised through that standing delegation without repeated
-consent. It does not transfer to consumer repositories or authorize auto-merge arming.
+administrator-merge grant. Human authority can be exercised through that
+standing delegation without repeated consent. Later task-specific instructions
+and check requirements still apply; the grant does not turn a failed check
+green. It does not transfer to consumer repositories or authorize auto-merge
+arming.
 
 ### HAND OFF — transfer knowledge with evidence, before work begins
 
@@ -133,14 +131,13 @@ The doctrine's answer to documentation **rot** specifically is **`docs-retention
 retention category, reason-to-keep, superseded-by, and cleanup rule — so retiring a document
 becomes an approvable operation rather than something that never happens.
 
-The four pillars above govern **the work** from the outside — records, proof, gates,
-knowledge transfer. The two below govern **the AI's own operating environment** from the
-inside: the harness it runs in, the context it is fed, the loop it executes.
+The next two pillars govern the agent's operating environment: the tools and
+limits it runs under, the information it receives, and the output it returns.
 
 ### CONSTRAIN — build the operating environment so the AI cannot exceed its authority
 
-*The harness is the contract. An agent's authority should be a property of its environment,
-not of its obedience.*
+Enforce permissions in the system that accepts the action. Instructions to
+the agent alone do not create an access control.
 
 - **`agent-harness-architect` (shipped — D42)** — every model call passes ONE server-side
   choke point that verifies identity from credentials (never from payload) and walks a
@@ -153,12 +150,13 @@ not of its obedience.*
   check is retried once on identical input to classify flake vs deterministic; an empty
   result is a legitimate stop, never forced into output.
 - **`agent-authorization-matrix` (P-existing)** — the standing human-vs-agent authority
-  matrix is the policy this environment enforces; the harness is how that matrix becomes
-  physics instead of promise.
+  matrix names who may do each action; the execution environment must enforce
+  those decisions.
 
 ### CURATE — control what enters and leaves the context; an unverified input is an unverified output
 
-*The context window is a supply chain. Feed the model a curated diet, not access.*
+Choose and bound the information sent to a model. Keep a record of what was
+included and what was excluded when that affects the result.
 
 - **`model-context-designer` (shipped — D42)** — what enters the window is assembled
   server-side under hard caps and closed input schemas; secrets, personal data, and raw
@@ -169,35 +167,25 @@ not of its obedience.*
   logged as safety evidence and rejected, never silently repaired; where possible the
   contract is encoded in types so a non-compliant output is unrepresentable.
 - **`ai-evaluation-harness` (P-existing)** — the curated input diet and the output contract
-  are pinned by evals, so a prompt/model/retrieval change that degrades them fails a gate,
+  are pinned by evaluation cases, so a prompt/model/retrieval change that degrades them fails a gate,
   not a user.
 
-The industry is beginning to ship this inward half as product — an "agent control plane":
-a registry of every running agent, a distinct identity per agent, fleet-level
-observability, and governance over what agents may touch (Microsoft Agent 365 is the
-current market anchor for the category). This doctrine already specifies that surface
-vendor-neutrally. The agentic-security cluster owns the registry, identity, containment,
-and threat-defense side; CONSTRAIN and CURATE own the harness, context, and loop that make
-those controls physics rather than promise. A team that has internalized the inward
-pillars is not waiting for a vendor's control plane — it already operates one, expressed
-as discipline rather than product. Vendor packaging will keep changing; the surface it
-packages is the durable thing, and it is the one specified here.
+An agent control plane can implement these rules with an agent registry,
+separate identities, activity records and limits on tools or data. The
+security skills govern identity and containment; the Constrain and Curate
+skills govern execution and context. This page describes the discipline;
+deploying a particular control plane requires its own design and proof.
 
 ## Proof from this project's own history
 
-This library was itself built under this discipline, and its documented incidents are
-evidence **for** it, not against it. Every failure the project absorbed during its own
-construction traces to a single moment where the discipline was skipped:
+Project history includes cases where a verification step was missed:
 
 - an **ungoverned auto-merge** that fired without human sign-off;
 - **sessions acting on stale memory**, colliding on shared state;
 - a **build run in the wrong directory**, against an unverified repo.
 
-None of these were failures of effort. Each was a step trusted instead of verified. And each
-is now encoded as an **eval case in a shipped governance skill** — the ungoverned-auto-merge
-incident lives in `agent-authorization-matrix`'s evals; the stale-memory collisions and the
-empty-directory build are likewise captured as eval cases in the startup- and
-context-governance skills that halt and ask rather than trust.
-
-The library's own scars are the doctrine's field test. It does not preach a discipline it has
-not paid for.
+The ungoverned merge is represented by an evaluation case in
+`agent-authorization-matrix`. The stale-memory and wrong-directory cases are
+represented in startup and context-governance skill evaluations. These cases
+make the rule testable: check current authority, state and workspace before
+acting.
