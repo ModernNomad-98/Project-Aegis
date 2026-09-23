@@ -3,6 +3,16 @@
 Progressive-disclosure detail for `secrets-identity-hardener`. Operate on
 secret NAMES and LOCATIONS; never print secret values.
 
+**Use:** This reference supports the [manual-only secrets and identity
+workflow](../SKILL.md); reading it does not authorize rotation, live-account
+changes, or inspection of real secret values. API means application
+programming interface; URL means uniform resource locator; DB means database;
+CI means continuous integration; CRA means Create React App; KMS means key
+management service; RLS means row-level security; XSS means cross-site
+scripting; CSRF means cross-site request forgery; and BFG names the BFG
+Repo-Cleaner history-rewrite tool. Public-name prefixes
+are clues to review, while the built client artifact is the exposure proof.
+
 ## Environment-variable classification rubric
 
 | Class | Definition | May ship to client? | Example |
@@ -17,12 +27,14 @@ finding. Classification is per variable and written down.
 
 ## Client-bundle exposure checks (verify the ARTIFACT, not the convention)
 
-- **Vite:** only `VITE_`-prefixed vars are exposed. Check: grep the built
-  `dist/` for any server secret name/value pattern; assert absent. A server
-  secret must NOT carry the `VITE_` prefix.
-- **Next.js:** only `NEXT_PUBLIC_`-prefixed vars reach the browser. Check the
-  client chunks, not just `.env`.
-- **CRA:** `REACT_APP_` prefix. Same discipline.
+- **Vite:** `VITE_` is the default client-exposed environment prefix; inspect
+  `envPrefix`, `define`, plugins, and code paths for other injections. Check
+  the built `dist/` for server-secret name/value patterns; assert absent. A
+  server secret must NOT carry an exposed prefix.
+- **Next.js:** `NEXT_PUBLIC_` marks client-exposed environment variables;
+  inspect client bundles for other injected values too, not just `.env`.
+- **CRA:** `REACT_APP_` marks client-exposed variables; inspect the built
+  artifact for other injection paths with the same discipline.
 - **Generic:** build the client, then search the output bundle for known
   server-secret names; the proving test fails if found.
 

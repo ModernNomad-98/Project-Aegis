@@ -6,6 +6,16 @@ Postures: **log** (investigation), **ticket** (aggregated review), **alert**
 (human reacts now). Defaults below are starting points — justify against the
 system's own baseline before promoting anything to alert.
 
+**Use:** This starter coverage table supports the
+[security-logging-alerting-architect workflow](../SKILL.md); tune thresholds
+to measured event rates before paging anyone. IP means Internet Protocol
+address; MFA means multi-factor authentication; `authz` means authorization;
+IDOR means insecure direct object reference; RLS means row-level security;
+API means application programming interface; WAF means web application
+firewall; SSRF means server-side request forgery; and AI means artificial
+intelligence. `N` stands for a chosen count, and HTTP 403 denotes a forbidden
+request. The table's log, ticket, and alert postures remain separate.
+
 ## Event classes
 
 | Class | Example events | Detection-critical fields | Default posture |

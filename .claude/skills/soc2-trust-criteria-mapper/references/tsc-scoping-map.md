@@ -6,6 +6,15 @@ SOC 2 is an examination/attestation. CPA-firm-sourced (verify against the
 AICPA guide before citing): Type 1/Type 2 definitions; Security as the
 required common-criteria baseline.
 
+**Use:** Scope a proposed examination through the
+[SOC 2 Trust Services Criteria workflow](../SKILL.md). SOC 2 names the
+American Institute of Certified Public Accountants (AICPA) examination
+framework; TSC means Trust Services Criteria; and CPA means certified public
+accountant. `authz` means authorization; RLS means row-level security; SLA
+means service-level agreement; DR means disaster recovery; and NDA means
+non-disclosure agreement. Keep the verified-versus-CPA-firm-sourced distinction
+above when citing criteria or report-type claims.
+
 ## Category selection by commitment
 
 | Category | Include when the org has committed to… | Existing mechanisms to map (via compliance-control-foundation) |

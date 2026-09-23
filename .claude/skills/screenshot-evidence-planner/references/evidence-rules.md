@@ -2,6 +2,14 @@
 
 Detail file for `screenshot-evidence-planner`. Loaded on demand.
 
+**Use:** Apply these capture and storage rules through the
+[screenshot-evidence-planner workflow](../SKILL.md). `cp-id` is a checkpoint
+identifier; `CP-INV-03` and `MC-INVITE-004` are illustrative catalog and case
+identifiers, not universal codes. SHA means Secure Hash Algorithm and denotes
+a commit identifier here; PII means personally identifiable information; PR
+means pull request; and CI means continuous integration. M0–M3 are this
+page's storage-sensitivity classes, defined in the masking table below.
+
 ## Checkpoint selection catalog
 
 Evidence-worthy states (justify each against a consumer):
