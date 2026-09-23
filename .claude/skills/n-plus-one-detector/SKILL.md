@@ -13,8 +13,9 @@ the list renders, each row lazily touches a relation, and a 50-row page
 issues 51 queries — every one of them fast, the sum of them slow, and the
 whole thing invisible to single-query tooling because no single query is
 guilty. This skill detects chatty data-access patterns with evidence
-(query counts per request, logs, ORM instrumentation), designs the
-pattern-matched fix (eager loading, batching, joins, denormalization —
+(query counts per request, logs, and object-relational mapper (ORM)
+instrumentation), designs the pattern-matched fix (eager loading, batching,
+joins, denormalization —
 each with its price), and installs the regression guard: a query-count
 budget asserted in tests, because N+1s return the moment someone adds a
 field to a template. Latency that scales with result-set size is this
@@ -23,8 +24,8 @@ skill's signature symptom.
 ## Use When
 
 - Use when: a request, page, or job issues suspiciously many queries —
-  a query log, APM trace, or count shows tens-to-hundreds of similar
-  statements per operation.
+  a query log, application performance monitoring (APM) trace, or count
+  shows tens-to-hundreds of similar statements per operation.
 - Use when: latency scales with result-set size — 10 items fast, 100
   items 10× slower — the arithmetic signature of per-row access.
 - Use when: an ORM's lazy loading is suspected of firing inside loops,
@@ -74,10 +75,13 @@ skill's signature symptom.
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route requiring its own classification and
+activation under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **Confirm the pattern with counts, not vibes.** For the symptomatic
    operation, produce the evidence table: distinct statement shapes ×
