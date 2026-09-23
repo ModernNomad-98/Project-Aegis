@@ -2,18 +2,24 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
-**Who this is for:** you built something — maybe with AI writing most of the code — and you
+**Who this is for:** you built something — maybe with artificial intelligence
+(AI) writing most of the code — and you
 want to know if it's safe before real users and real data depend on it. You don't need to
 know what any of the skill names below mean; each one is a specialist that explains itself
 when it runs.
 
-**How to run it:** open your project in your agent tool (Claude Code, Codex CLI, or any Agent
+**How to run it:** open your project in your agent tool (Claude Code, Codex
+command-line interface (CLI), or any Agent
 Skills tool) and take the steps top to bottom. For most steps, asking for what the step
 describes in plain words is enough — the named skill selects itself. (Auto-selection quality
 varies by tool — see the README's [tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
-Two steps act on secrets, so they are deliberately never invoked
-automatically: they are marked **manual-only — name it explicitly**, and you start them by
-typing the skill's name.
+Start with: **"In this product repository, use the full-codebase-auditor skill
+to inventory what was built and list evidence-backed risks before we invite
+users."** Any **manual-only** step requires you to name its skill explicitly.
+For example: **"Use the secrets-identity-hardener skill to inspect credential
+exposure; report any approval needed before rotation."** If your app uses Vite,
+say: **"Use the vite-build-qa-engineer skill to check the production bundle
+for secret exposure."**
 
 Steps marked *"If…"* are conditional — skip them honestly when the condition doesn't apply
 to your app.
@@ -29,17 +35,20 @@ to your app.
 2. **Stop the urgent leaks —
    [`secrets-identity-hardener`](../../.claude/skills/secrets-identity-hardener/SKILL.md)**
    *(manual-only — name it explicitly: it acts on secrets, so it never auto-fires).*
-   Yields leaked and hardcoded credentials found, moved out of the code, and rotated — the
-   bleeding-now class closed before anything slower. Handoff: any identity findings feed the
-   isolation work in step 3.
+   Reports any leaked or hardcoded credentials and the needed containment.
+   Moving or rotating a credential requires the applicable human approval;
+   pending rotations stay visible, never reported as complete. Handoff: any
+   identity findings feed the isolation work in step 3.
 
-   *If your app is built with Vite:* also name
+   *If your app is built with Vite, a frontend build tool:* also name
    [`vite-build-qa-engineer`](../../.claude/skills/vite-build-qa-engineer/SKILL.md)
-   *(manual-only — name it explicitly)*. Yields proof the shipped browser bundle itself is
-   secret-free — what step 2 fixed in the source, this confirms in the artifact users
-   actually download.
+   *(manual-only — name it explicitly)*. Reports the inspected build and mode,
+   searched values and patterns, findings, and gaps in coverage. A result of
+   "none found by this method" does not prove the browser bundle is free of
+   every secret; source fixes and credential rotation may still be pending.
 
-3. ***If your app has multiple users or customers*** *(most SaaS apps do)* — prove they
+3. ***If your app has multiple users or customers*** *(most software-as-a-service
+   (SaaS) apps do)* — prove they
    can't see each other:
 
    - **Find every leak surface —
@@ -48,11 +57,13 @@ to your app.
      drive the two skills below.
    - **Audit and fix the database rules —
      [`rls-policy-auditor`](../../.claude/skills/rls-policy-auditor/SKILL.md).**
-     Yields the row-security audit with the fix delivered as a reviewable migration.
-   - **Make the fix un-regressable —
+     Yields a row-level security audit and negative-test plan. If a policy fix
+     is requested, it authors a reviewable migration for separate safety
+     review; it does not apply a live database change.
+   - **Check for covered regressions —
      [`multi-tenant-security-tester`](../../.claude/skills/multi-tenant-security-tester/SKILL.md).** **Manual-only.**
-     Yields the isolation findings turned into an executable negative test suite, so a
-     future change can't silently reopen the leak.
+     Turns isolation findings into negative tests. Run them after relevant
+     changes; they catch the cases they cover, not every possible leak.
 
 4. **Scan the whole repository —
    [`security-scan-orchestrator`](../../.claude/skills/security-scan-orchestrator/SKILL.md).**
@@ -64,9 +75,9 @@ to your app.
 
 5. **Check what happens when it fails —
    [`error-handling-security-reviewer`](../../.claude/skills/error-handling-security-reviewer/SKILL.md).**
-   Yields the fail-open paths — the catch-the-error-and-continue class AI-generated code
-   loves — each one closed or explicitly accepted. Handoff: open items go on the step-7
-   evidence list.
+   Reports fail-open paths — the catch-the-error-and-continue class of error —
+   with recommended fixes. The review does not apply a fix or accept a risk;
+   keep open findings on the step-7 evidence list for an authorized decision.
 
 6. ***If your app has AI features*** *(a chatbot, an assistant, anything that calls a
    model)*: branch to **[Add AI features safely](add-ai-safely.md)** and run that path,
@@ -74,7 +85,8 @@ to your app.
 
 7. **The go/no-go —
    [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md).**
-   Yields an evidence-based GO / CONDITIONAL-GO / NO-GO on shipping, built from what the
+   Yields an evidence-based GO (ready to ship) or NO-GO (blocked from shipping)
+   decision, built from what the
    steps above actually found — not from anyone's assurance that it's probably fine. This
    is the close of the path.
 

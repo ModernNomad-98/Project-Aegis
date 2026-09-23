@@ -4,10 +4,16 @@
 
 **Who this is for:** something in your app is wrong and you don't know why.
 
-**How to run it:** in your agent tool (Claude Code, Codex CLI, or any Agent Skills tool),
+**How to run it:** in your agent tool (Claude Code, Codex command-line
+interface (CLI), or any Agent Skills tool),
 describe the symptom in plain words — "users can see someone else's data", "tests fail only
-in CI". Advisory specialists can be selected automatically; specialists marked
+in continuous integration (CI), the automated checks on each change". For example,
+paste: **"In this product repository, users see an error when saving a job. Help
+me reproduce it, find the cause from evidence, and verify one fix."** Advisory
+specialists can be selected automatically; specialists marked
 **manual-only** require you to explicitly invoke them by name before execution.
+For an unknown cause, say: **"Use the systematic-debugger skill on this
+symptom; reproduce it before changing anything."**
 The table maps symptoms to owners. Auto-selection quality varies by tool; see
 the README's [tools section](../../README.md#using-aegis-with-codex-cli-and-other-agent-skills-tools).
 
@@ -19,8 +25,13 @@ the README's [tools section](../../README.md#using-aegis-with-codex-cli-and-othe
 | "I removed someone / revoked their access / they logged out — and the old access still works." Or: "they changed plans and still see the old tier." | [`authority-invalidation-architect`](../../.claude/skills/authority-invalidation-architect/SKILL.md) — finds every place the old access survives and proves the change actually took effect. |
 | "One query or page is slow." / "It gets slower as data grows." / "I don't know where the time goes." | [`query-plan-reader`](../../.claude/skills/query-plan-reader/SKILL.md) **manual-only** for the slow query · [`n-plus-one-detector`](../../.claude/skills/n-plus-one-detector/SKILL.md) **manual-only** for slows-with-more-data · [`frontend-perf-engineer`](../../.claude/skills/frontend-perf-engineer/SKILL.md) for a slow page · [`profiling-methodology-designer`](../../.claude/skills/profiling-methodology-designer/SKILL.md) when nobody knows where the time goes. |
 | "Tests fail randomly / only in CI." | [`flaky-test-detective`](../../.claude/skills/flaky-test-detective/SKILL.md) **manual-only** — separates flaky from genuinely broken, with the evidence. |
-| "Production is down right now." | [`incident-response-runbook`](../../.claude/skills/incident-response-runbook/SKILL.md) — drives the live incident. Then [`rollback-runbook-author`](../../.claude/skills/rollback-runbook-author/SKILL.md) *before* the next release, so next time there's a tested way back. |
+| "Production is down right now." | Alert the human on-call owner and follow your **existing** incident runbook. If the cause is unknown, explicitly invoke [`systematic-debugger`](../../.claude/skills/systematic-debugger/SKILL.md) **manual-only** for diagnosis within the responder's authority. |
 | "It fails and none of the above fits." | [`systematic-debugger`](../../.claude/skills/systematic-debugger/SKILL.md) **manual-only** — the general case: drives from symptom to root cause instead of guessing. |
+
+For a live outage, [`incident-response-runbook`](../../.claude/skills/incident-response-runbook/SKILL.md)
+is a skill for *authoring or improving* the procedure after the incident; it
+does not run the live response. [`rollback-runbook-author`](../../.claude/skills/rollback-runbook-author/SKILL.md)
+prepares the next release's rollback plan; it does not execute a live rollback.
 
 ## After the diagnosis
 
