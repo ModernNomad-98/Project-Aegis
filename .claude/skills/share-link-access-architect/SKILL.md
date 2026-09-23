@@ -5,6 +5,12 @@ description: 'Design guest/public share-link access for a multi-tenant SaaS — 
 
 # Share-Link Access Architect
 
+Terms used below: **RBAC** means role-based access control for members;
+**OTP** means one-time passcode; **PII** means personally identifiable
+information; **IP** means Internet Protocol address; and **CSPRNG** means
+cryptographically secure pseudorandom number generator. A guest share token
+is a narrow bearer capability, not a member role or a machine credential.
+
 ## Purpose
 
 Design **guest/public share-link access** — the "anyone with the link can
@@ -97,8 +103,9 @@ Token: <opaque, high-entropy source; carries-no-authority | signed+scoped;
 Per-link scope: <token → one resource(set) + one permission; stored
   server-side; no client-supplied scope; no view→edit escalation>
 Guest session: <ephemeral, link-scoped; NOT a membership/role; expires with link>
-Optional gating: <password/OTP; rate-limited; lockout on brute force>
-Enumeration/abuse defense: <entropy, per-token+IP rate limit, uniform
+Optional gating: <password/one-time passcode (OTP); rate-limited;
+  lockout on brute force>
+Enumeration/abuse defense: <entropy, per-token+IP-address rate limit, uniform
   invalid/expired/revoked response, creation cap>
 Tenant blast radius: <link exposes exactly the resource; no sibling/tenant reach>
 Audit: <creation / access / gate attempts / revocation → audit-log schema>
