@@ -4,6 +4,13 @@ Clause structure verified from the standard's own TOC (preview PDF, third
 edition 2022-10). Finer wording claims are verification items against the
 licensed text.
 
+**Reading key:** ISO is the International Organization for Standardization;
+IEC is the International Electrotechnical Commission; ISMS is an information
+security management system; Amd means amendment; TOC means table of contents;
+and SoA is the statement of applicability. SaaS means software as a service.
+The [parent skill](../SKILL.md) owns the design workflow. The clause structure
+below is a planning map; retain the licensed-text verification boundary above.
+
 ## Clause 4–10 artifact checklist
 
 | Clause | Theme | Artifacts to design | Common state |
