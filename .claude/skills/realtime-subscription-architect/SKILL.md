@@ -5,6 +5,13 @@ description: 'Design real-time client delivery for a multi-tenant SaaS — WebSo
 
 # Realtime Subscription Architect
 
+Terms used below: **SSE** means server-sent events, **DB** means database,
+**DLQ** means dead-letter queue, and **CDC** means change data capture. **TTL**
+means time to live for expiring presence state; **LB** means load balancer.
+**IDOR** means insecure direct object reference, and **OOM** means out of
+memory. These names do not change the per-tenant and per-user authorization
+checks required below.
+
 ## Purpose
 
 Real-time features fail in two directions: they leak — a client subscribes
@@ -118,19 +125,21 @@ question is server-to-server event flow it belongs to
 
 ```
 REALTIME DELIVERY DESIGN — <system/domain>
-Transport:      <WebSocket | SSE | DB-change subscription> + why
+Transport:      <WebSocket | server-sent events (SSE) |
+  database-change subscription> + why
 Channel taxonomy: <channel type — key format (server-derived) — audience>
 Leak boundary:  tenant AND <per-user/per-resource>; filter applied at <edge>
-Authz contract: authorize at SUBSCRIBE (policy source); re-check on
+Authorization contract: authorize at SUBSCRIBE (policy source); re-check on
   <authority-change trigger>; tear down forbidden subscriptions on <event>
-Fan-out:        <pub/sub backbone; source = internal backbone (consumed);
+Fan-out:        <publish/subscribe backbone; source = internal backbone (consumed);
   cross-node delivery; edge filter enforcing the leak boundary>
-Connection scaling: <per-conn cost; node limit; LB sticky/any-node; drain →
-  reconnect-and-resume handoff>  (drain review → horizontal-scalability-reviewer)
-Backpressure:   <per-conn buffer bound; overflow policy per channel type>
-Reconnect/replay: <snapshot vs cursor replay; resume window; dedup;
+Connection scaling: <per-connection cost; node limit;
+  load-balancer (LB) sticky/any-node; drain → reconnect-and-resume handoff>
+  (drain review → horizontal-scalability-reviewer)
+Backpressure:   <per-connection buffer bound; overflow policy per channel type>
+Reconnect/replay: <snapshot vs cursor replay; resume window; deduplication;
   reconnect backoff/jitter>
-Presence:       <heartbeat+TTL, soft-state, own authz> | n/a
+Presence:       <heartbeat + time to live (TTL), soft-state, own authorization> | not applicable
 Boundaries:     internal backbone → streaming-event-architect; API/webhooks →
   api-event-architect; offline sync → offline-first-sync-architect;
   notification UX → notification-webhook-ux-designer
