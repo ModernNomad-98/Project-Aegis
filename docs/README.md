@@ -29,6 +29,9 @@ The backlog links below show what remains proposed or blocked.
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
 - [Offline CI](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
+- [Scenario A acceptance runbook](acceptance/scenario-a-runbook.md): run and read
+  synthetic evidence for the beginner product-state workflow; behavioral
+  acceptance remains a separate gate.
 - [Owner approval register](approvals/APPROVAL_REGISTER.md): all current
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
