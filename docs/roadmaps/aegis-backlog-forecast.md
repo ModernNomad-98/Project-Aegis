@@ -1,5 +1,31 @@
 # Project Aegis backlog forecast
 
+## Start here — current reading
+
+This is a rolling **active-work estimate**, not a calendar promise or permission
+to start blocked work. At the latest recorded [five-merge checkpoint after pull
+request #146](#five-merge-checkpoint--2026-09-23-after-pull-request-146), the
+selected remaining work totals **175–394 active hours**, including **80–200
+active hours** for the repository-wide documentation readability sweep. That
+checkpoint was recorded on 2026-09-23; later work should be checked against
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-146--2026-09-23)
+and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
+before treating its totals as current.
+
+For requirements and remaining gates, use the owning [Behavioral Eval Runner
+(BER) backlog](behavioral-eval-runner-backlog.md), [control-plane (CP)
+backlog](resumable-control-plane-backlog.md), and [issue #101 setup routing
+plan](aegis-setup-routing-plan.md). The [execution handoff](aegis-efficient-execution-handoff-2026-09-23.md)
+routes work across those records. Optional helpers and unselected host or
+product scope are separate from the selected total; the full all-options
+backlog has no finite estimate.
+
+The **baseline after pull request #106** and the older cadence paragraphs and
+tables below are retained as historical snapshots. Their dated estimates,
+pending decisions, and statements about what will happen next describe their
+original checkpoints. Follow the latest checkpoint and the owning records for
+current status and authorization.
+
 Baseline: 2026-09-23, after PR #106. This is an active-work forecast for the
 remaining scope in the [execution handoff](aegis-efficient-execution-handoff-2026-09-23.md),
 the [BER backlog](behavioral-eval-runner-backlog.md), the
