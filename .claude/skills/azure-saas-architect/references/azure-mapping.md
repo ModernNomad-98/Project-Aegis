@@ -4,6 +4,16 @@ Detail file for `azure-saas-architect`. Loaded on demand. Service names are
 stable Azure primitives; anything SKU-, quota-, price-, or region-specific is
 a verification item against current Azure docs, never asserted from here.
 
+**Reading key:** The [parent skill's terms](../SKILL.md) define the identity,
+network, deployment, and security abbreviations used here. Additional terms:
+IdP means identity provider; HSM is hardware security module; L7 is network
+layer 7 (the application layer); DB is database; DTU is database transaction
+unit; vCore is virtual core; RU is request unit; SAS is shared access
+signature; and SCAN is Redis's cursor-based key iteration command. In the
+landing-zone sketch, MG means management group, `prod` production, `nonprod`
+nonproduction, and `env` environment. Verify current service availability and
+limits before using this mapping in a design.
+
 ## Capability → Azure service mapping
 
 | Capability | Default | Alternatives (when) |

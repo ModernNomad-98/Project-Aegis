@@ -4,6 +4,16 @@ Per-category threat shapes and abuse-case seeds. Use during Workflow step 4.
 Source framework: OWASP Top 10 for LLM Applications (2025), LLM01–LLM10.
 Anchoring decision: reconciliation doc D6.
 
+**Reading key:** OWASP is the Open Worldwide Application Security Project;
+LLM means large language model, and LLM01–LLM10 are the framework's numbered
+threat categories. AI means artificial intelligence; RAG means retrieval-
+augmented generation; PII means personally identifiable information; and RLHF
+means reinforcement learning from human feedback. HTML is HyperText Markup
+Language, XSS is cross-site scripting, SQL is Structured Query Language, API
+is application programming interface, ACL is access control list, and URL is
+uniform resource locator. D6 is the Phase 7 framework choice recorded in the
+[source reconciliation](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
+
 ## Applicability rubric
 
 A category is **in scope** when the system has the ingredient it abuses:
