@@ -265,3 +265,79 @@ full all-options backlog remains unbounded. The documentation estimate stays
 80–200 hours because most of the inventory remains unreviewed. The #117
 baseline counted 491 tracked Markdown files; the merged #126 tree contains
 501 tracked Markdown files, counted with `git ls-files`.
+
+## Checkpoint after pull request #141 — 2026-09-23
+
+This record closes the next five-merge interval after #135. The intervening
+checkpoints remain in the forecast: [after #130](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-130)
+and [after #135](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-135).
+Their associated requests retain individual estimates and closeout comments;
+this later summary does not reconstruct unavailable active-time measurements.
+Here, a pull request is a proposed repository change, and Coordinated
+Universal Time (UTC) is the time standard used for all timestamps below.
+
+| Pull request and bounded package | Prior estimate and package estimate | First work checkpoint (UTC) | GitHub merge event (`mergedAt`, UTC) | Observed wall time to merge |
+| --- | --- | --- | --- | ---: |
+| [#136 — evaluation shortlist](https://github.com/ModernNomad-98/Project-Aegis/pull/136) | Prior package-4 delivery: 8–16 active hours; this roadmap update: 30–60 active minutes | About 17:45 | 17:51:29 | About 6m29s |
+| [#137 — previous forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/137) | Previous and new forecast-package estimate: 1–2 active hours | About 17:49 | 17:56:56 | About 7m56s |
+| [#138 — offline setup guide](https://github.com/ModernNomad-98/Project-Aegis/pull/138) | Prior documentation sweep: 80–200 active hours; this batch: 1–3 active hours | 17:58:19 | 18:11:25 | 13m06s |
+| [#140 — three user guides](https://github.com/ModernNomad-98/Project-Aegis/pull/140) | Prior documentation sweep: 80–200 active hours; this batch: 1–3 active hours | 18:10:57 | 18:24:35 | 13m38s |
+| [#141 — setup routing plan](https://github.com/ModernNomad-98/Project-Aegis/pull/141) | Prior documentation sweep: 80–200 active hours; this batch: 1–3 active hours | 18:25:36 | 18:36:31 | 10m55s |
+
+All dates in that table are September 23, 2026. Merge times use GitHub pull
+request `mergedAt` events; the #136 and #141 commit-object timestamps are one
+second earlier. The first two starts are
+rounded checkpoints, so their derived durations are approximate. Every
+package began with a selected backlog estimate of **175–394 active hours**.
+Some intervals overlap; their sum would not measure project elapsed time or
+active effort. All five received independent
+review and their final Linux, Windows and protected-file checks passed.
+
+Pull request #138 initially failed because its commit lacked a Developer
+Certificate of Origin (DCO) sign-off. The signed replacement revision passed
+all checks before merge. Its 13m06s interval includes that correction,
+independent review and the repeated checks. Pull request #140 also required
+corrections after independent review found contract and readability claims
+that needed narrowing. Review, queue, rework and active effort were not
+separately instrumented. These short, bounded documentation packages cannot
+support a coding-rate multiplier or a repository-wide review-rate estimate.
+
+[Pull request #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+remains open at `8928383f0838e2d99ee3a89c44b98b7aba7f1c9b` in this snapshot.
+Its full evidence-policy estimate was **8–16 active hours** and its bounded
+offline increment was estimated at **4–8 hours**, capped at eight. The first
+captured file timestamp was **17:41:37 UTC** and the local completion
+checkpoint was **18:13:55 UTC**, a **32m18s observed wall interval**. Earlier
+preparation and active-only effort were not measured. Local checks and
+independent adversarial review passed after corrections; Linux and Windows
+Actions passed. The protected-file `gate-guard` check failed, and a separate
+owner disposition remains pending. No merge time, completed implementation
+row or completed real-host proof is claimed for that candidate.
+
+The [new every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141)
+reconsiders all 14 selected rows and all seven optional rows. The previous
+and revised selected totals are both **175–394 active hours**; selecting both
+optional issue #101 helpers gives **191–434 active hours**. Non-documentation
+work remains **95–194 hours**, and the full documentation sweep remains
+**80–200 hours**. The source tree for #141 contains **509 tracked Markdown
+files**, compared with 506 at the prior checkpoint. The full all-options
+backlog remains unbounded. Owner waits, GitHub queues, provider execution and
+host provisioning remain outside the active-work estimates.
+
+### Preparation time for this checkpoint
+
+This checkpoint had no estimate before preparation; its new estimate was
+**1–2 active hours**. Read-only preparation ran from **18:27:20 to 18:29:34
+UTC**, an observed **2m14s**. Editing these two records began at **18:37:29
+UTC**, after the fifth merge was confirmed. The earlier preparation overlaps
+other packages and is included only as a separately observed segment.
+Local validation and link checks completed at **18:42:52 UTC**, an observed
+**5m23s** from the editing start. The validator reported 185 valid skills and
+zero warnings; all eight new relative links and heading anchors resolved,
+the arithmetic checks passed, and prior snapshots were preserved exactly.
+Active-only effort is not instrumented. Independent read-only review from
+**18:43:59 to 18:45:17 UTC** (1m18s observed wall) found no blocker. The
+reviewer verified the five merges, all 14 selected and seven optional rows,
+the inventory, links and two-file scope. It prompted the explicit `mergedAt`
+clock label above. The eventual start-to-merge interval belongs in the pull
+request closeout record.
