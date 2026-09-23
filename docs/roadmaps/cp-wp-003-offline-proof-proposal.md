@@ -39,17 +39,26 @@ branch. Acceptance of this proposal PR alone does not grant that authority.
 | --- | --- |
 | Repository and base | `ModernNomad-98/Project-Aegis`, Role A; implementation branch starts at the exact merged grant commit. If main advances, reconcile changed normative CP files before code. |
 | Purpose | Define and falsify source, freshness, containment, owned-path, evidence and accounting capabilities using synthetic issuers, targets and temporary fixtures. Unknown/unavailable capabilities deny real dispatch. |
-| Allowed implementation | Python standard library only in `tools/aegis_delivery_control/`; new closed capability declarations and checked read-only probes; new synthetic adversarial authority-source and receipt/billing fakes; explicit fail-closed gate in the existing synthetic engine/dispatch path; tests and CP package README/backlog/evidence updates. Keep the public CLI synthetic-only. |
-| Suggested changed paths | `tools/aegis_delivery_control/{contracts,authority,adapters,dispatch,engine,evidence,owned_paths,storage}.py`, a new `capabilities.py`, package `README.md`, focused `tests/test_{authority_source,capabilities,dispatch,evidence,platform,recovery,storage}.py`, `docs/roadmaps/resumable-control-plane-backlog.md`, and one sanitized evidence file under `docs/evidence/control-plane/`. Exact file plan must be fixed in the merged grant before implementation; no BER, `.github`, requirements, startup or unrelated design file. |
-| Time and size | Proposed ceiling: 10 active implementation hours, excluding owner/CI wait; no more than 2,000 added code/test lines. Stop and re-scope if a proof needs more. These ceilings are for the proposed first increment; the backlog's 8–16-hour total CP-WP-003 forecast remains provisional. |
+| Allowed implementation | Python standard library only in the exact files below; closed capability declarations and checked read-only probes; synthetic adversarial authority-source and receipt/billing fakes; a fail-closed capability gate at the existing dispatch boundary; focused tests and CP package README/backlog/evidence updates. Keep the public CLI synthetic-only. |
+| Exact proposed implementation paths | `tools/aegis_delivery_control/capabilities.py` (new); `tools/aegis_delivery_control/authority.py`; `tools/aegis_delivery_control/adapters.py`; `tools/aegis_delivery_control/dispatch.py`; `tools/aegis_delivery_control/evidence.py`; `tools/aegis_delivery_control/owned_paths.py`; `tools/aegis_delivery_control/README.md`; `tools/aegis_delivery_control/tests/test_capabilities.py` (new); `tools/aegis_delivery_control/tests/test_dispatch.py`; `tools/aegis_delivery_control/tests/test_platform.py`; `tools/aegis_delivery_control/tests/test_recovery.py`; `docs/roadmaps/resumable-control-plane-backlog.md`; `docs/evidence/control-plane/cp-wp-003a-review.md` (new). The separate merged grant must repeat this list exactly before implementation. No other path is authorized by this proposal. |
+| Time and size | Proposed ceiling: 10 active implementation hours, excluding owner/CI wait; no more than 2,000 added code/test lines. Stop and re-scope if a proof needs more. These ceilings are for the proposed first increment; the backlog's revised 12–24-hour total CP-WP-003 forecast remains provisional. |
 | Spend and data | USD $0 task-controlled spend; no dependency install, credential, production/customer data, sealed holdout, external provider call, deployment or real mutation. Existing approved Codex session and repository CI only. |
 | Delivery | One focused DCO-signed PR, explicit-path staging, local Windows and pinned Linux CP suite plus applicable BER regressions when a shared contract changes, independent architecture/security/QA review, exact-head hosted checks, owner-approved merge under existing AEGIS-APR-002. No automatic phase advance. |
 
-The broad suggested file list is a review ceiling, not authority to edit all
-of them. A merged authorization must first select the minimal exact list and
-define the test fixture location. If no safe synthetic probe can represent a
-source requirement, record `UNPROVEN` and keep the gate shut; do not replace
-the source with a mock and call the real guarantee verified.
+The proposed fixture location is temporary directories created by the existing
+Python tests under the operating system's temporary root. No fixture bytes go
+into the repository or the unrelated local `artifacts/` directories. The
+implementation may edit only the paths in the exact list after the owner grants
+this scope and the grant is merged. `contracts.py`, `engine.py`, `storage.py`,
+the CLI, dependencies, CI, BER, startup and the local design draft stay outside
+this first increment. If a required invariant needs one of those files, or the
+10-hour/2,000-line ceiling cannot cover the negative proofs, stop and seek a
+revised reviewed scope before touching it. The existing synthetic dispatch
+behavior must remain usable; the new capability gate denies any unproven
+real-target route rather than treating a synthetic pass as real readiness.
+If no safe synthetic probe can represent a source requirement, record
+`UNPROVEN` and keep the gate shut; do not replace the source with a mock and
+call the real guarantee verified.
 
 ### Required negative proofs
 
