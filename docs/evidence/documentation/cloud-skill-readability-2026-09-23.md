@@ -41,9 +41,10 @@ reviewed for impact and are unchanged.
 - `python -B scripts/validate-skills.py`: **185 valid skills, 0 warnings**.
 - Existing AWS and Azure `evals.json` and `trigger-evals.json`: inspected;
   their trigger and behavior expectations still apply to the edited text.
-- Both relative links resolve to the intended skill files. The changed-path
-  scope is exactly the three listed files, and `git diff --check` passes;
-  the new record also has no trailing whitespace.
+- Both relative links resolve to the intended skill files. The writer's local
+  scope was the three listed files; the final branch also adds one row to the
+  documentation readability backlog. `git diff --check` passes, and the new
+  record has no trailing whitespace.
 - Independent read-only review reported no blocker at
   **2026-09-23 19:38:46 UTC**, before the Developer Certificate of Origin
   (DCO) signed commit. No remote push or pull request is part of this writer
