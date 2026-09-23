@@ -25,115 +25,6 @@ The next checkpoint is the fifth merge after #111 (PR #116 if no other PR
 numbers intervene). Also update the forecast earlier when an owner decision
 materially changes scope.
 
-## Five-merge checkpoint — 2026-09-23, after pull request #121
-
-This snapshot keeps the previous estimate visible above. Five pull requests
-merged after #104, in merge order. Times are observed wall intervals from the
-first recorded work checkpoint; they are lower bounds when work began earlier.
-They overlap and cannot be added to estimate active labor or project duration.
-
-| Merged pull request | Merge commit | Observed wall interval | Delivered |
-| --- | --- | ---: | --- |
-| [#117](https://github.com/ModernNomad-98/Project-Aegis/pull/117) | `a7c0724c86cce3f59b4dacfe0db7502ac148b49a` | 12m43s | Documentation inventory and forecast checkpoint |
-| [#116](https://github.com/ModernNomad-98/Project-Aegis/pull/116) | `2755fb6b59c64290a4cef2e4f9bcac204699fe76` | 39m21s | Offline holdout executor proposal only; implementation still needs a grant |
-| [#118](https://github.com/ModernNomad-98/Project-Aegis/pull/118) | `1af342712d27d5e6ea482b3f451106b4dccaf125` | 10m42s | Exact grants for the control-plane synthetic proof and issue #101 packages 2 and 3; evidence-policy choice only |
-| [#120](https://github.com/ModernNomad-98/Project-Aegis/pull/120) | `2c119b22d6a6da437bcb17e513438cde8f4b5f13` | 6m59s | Root guide first screen and contribution writing standard |
-| [#121](https://github.com/ModernNomad-98/Project-Aegis/pull/121) | `34241baf5fd1911f3d7d07915adc3bacd272d4b2` | At least 10m39s | Issue #101 package-3 offline advisory contract; no host hook or provider call |
-
-The observed intervals are short mainly because three packages were
-documentation/governance changes. Active-only time was not instrumented.
-Pull request #121's first checkpoint came after implementation began. Local
-checks, independent review and all three GitHub Actions passed for its exact
-head. Pull requests #119 and #122 and the in-progress control-plane and setup
-package-2 candidates are not merged at this checkpoint; their work is not
-counted as delivered. The component-guide guard exception for #119 awaits a
-separate owner disposition.
-
-| Open work item | Previous remaining active hours | New remaining active hours | Evidence and remaining gate |
-| --- | ---: | ---: | --- |
-| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Private 160-case candidate still needs semantic and label review; no verified completion |
-| Behavioral Eval Runner backlog item 009 evidence policy enforcement | 8–16 | 8–16 | #118 recorded the 30-day complete-bundle choice, but implementation authority and host storage proof remain |
-| Work package 2B-3 execution support | 8–16 | 8–16 | #116 prepared an offline holdout design; implementation grant and tests remain |
-| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Private labels, source/allowance, development evidence and a later holdout freeze remain |
-| Selected-host capability proof (R4 tool-path and R5 execution-profile isolation) | 12–24 | 12–24 | A disposable Portable Operating System Interface host direction is chosen; a named host and its proof are not |
-| Work package 2B-4 | 12–24 | 12–24 | Limited live suite depends on calibration and host proof |
-| Work package 2B-5 | 8–16 | 8–16 | Generic corpus execution follows 2B-4 |
-| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
-| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
-| Control-plane work package 003 | 12–24 | 12–24 | The synthetic first increment is under independent review; real authority, evidence and host proofs remain |
-| Control-plane work package 004 | 8–16 | 8–16 | No selected delivery target; package 003 is a prerequisite |
-| Issue #101 package 2 | 6–12 | 6–12 | Conversational setup candidate is under independent review, not merged |
-| Issue #101 package 3 | 6–12 | **0** | #121 merged its approved offline advisory scope; a real host remains package 4 scope |
-| Issue #101 package 4 | 8–16 | 8–16 | Comparative evaluation needs a selected host, inputs and separate authority |
-| Issue #101 package 7 | 6–12 | 6–12 | End-to-end release review remains after integration selection |
-| Repository-wide documentation readability | 80–200 | 80–200 | #120 improved the entry point; #119 and #122 are open. The 491-file review is still broad, so the range is unchanged pending audited batches |
-| **Selected remaining total** | **191–426** | **185–414** | Package 3's 6–12 hours closed; each other open row was reconsidered and retains its range |
-
-The conditional local and online issue #101 helpers remain **8–20 active
-hours each**. If both are selected, the bounded selected-plus-both total is
-**201–454 active hours**. The all-options backlog still has no finite total:
-extra hosts/products and later architecture choices have no selected quantity.
-These are active-work estimates, not calendar promises. Owner decisions,
-GitHub queues, provider runs and host provisioning are excluded. The next
-five-merge review starts after #121; update sooner if an owner decision changes
-scope or a completed audited batch provides meaningful new timing evidence.
-
-The available timed PRs are sparse: #103 has only a late 10:52 UTC checkpoint
-and at least 5m14s to merge; #105 took 12m50s observed wall time from its first
-checkpoint to merge; #106 took 8m21s. PRs #100/#102 have no comparable active
-measurement in this log. The ranges below are scope estimates, **not** a
-statistical extrapolation from those short governance PRs. PR #104 has local
-tests and two execution jobs green but awaits the owner's schema-shape decision.
-
-## Remaining selected work — baseline estimate
-
-| Work item | Scope counted once | Remaining active hours | Gate / confidence |
-| --- | --- | ---: | --- |
-| BER-BKL-007 / WP-2B-1A | Finish PR #104 after the owner shape decision; close its lifecycle | 1–2 | Owner decision pending; medium |
-| WP-2B-3 candidate inputs | New 160-item packet, guide, private versioned inputs, semantic review and hashes | 4–8 | Started; owner labels later; low |
-| Cross-stream owner-decision packet | BKL-009 handling, replacement source/accounting, host/CP and issue #101 decisions | 3–6 | Decisions may add scope; low |
-| WP-2B-3 execution support | Approved pins, missing holdout execution path, offline tests and readiness | 8–16 | Requires label/source/allowance decisions; low |
-| WP-2B-3 measurement / OD-1 packet | Development evidence, holdout freeze and one holdout, result review | 4–10 | Provider and owner gates; low |
-| R4/R5 selected-host proof | Isolation/profile capability evidence; includes BKL-003 live claim scope | 8–16 | Host selection pending; low |
-| WP-2B-4 | Limited Scenario A live suite after separate authorization | 12–24 | WP-2B-3 and host gates; low |
-| WP-2B-5 | Generic corpus execution | 8–16 | WP-2B-4 gate; low |
-| WP-2B-6 | Scheduling, cost, quarantine and cadence; includes BKL-011 operations and BKL-012 | 8–16 | Prior phase; low |
-| WP-2B-7 | Advisory CI/operator workflow; includes BKL-013 | 4–8 | Protected workflow review; low |
-| CP-WP-003 | Authority, evidence and execution capability proofs | 8–16 | Separate authorization; low |
-| CP-WP-004 | One selected delivery integration | 8–16 | CP-WP-003 and selected target; low |
-| Issue #101 package 1 | Design, candidate screening and durable planning | 4–8 | Planning/authority first; low |
-| Issue #101 package 2 | Conversational setup and Aegis-only completion | 6–12 | Design; low |
-| Issue #101 package 3 | Compatibility checks and offline adapter contract | 6–12 | Design; low |
-| Issue #101 package 4 | Bounded comparative evaluation and selection gate | 8–16 | Separate evaluation authority; low |
-| Issue #101 package 7 | End-to-end evaluation and release readiness | 6–12 | Selected integration outcome; low |
-| **Total selected remaining work** | **Each package counted once** | **106–214** | **Active hours; owner/CI/provider waits excluded** |
-
-BER-BKL-001/002/004/006/008 and WP-2B-0/1/2 are delivered within their
-recorded scopes. Remaining real-host R3/R4/R5 proof is counted at the live
-gate. BKL-005 and the calibration half of BKL-011 are counted in WP-2B-3;
-BKL-011's ongoing operations half is counted in WP-2B-6; BKL-009 is counted
-in the decision packet and later operator work; R1/2/3 in their owning phase. This mapping
-prevents a supporting backlog record from being estimated as a second build.
-The current BER-BKL-007 row is a *remaining* estimate; its earlier 3–5-hour
-initial estimate and partial execution remain in the PR history.
-
-## Conditional and unselected scope
-
-| Work item | Active hours if selected | Current disposition |
-| --- | ---: | --- |
-| Issue #101 package 5, local helper | 8–20 | Conditional on package 4 selection |
-| Issue #101 package 6, online helper | 8–20 | Conditional on package 4 selection and provider authority |
-| BER-BKL-010 signing/immutable storage | 4–12 | Adoption decision pending |
-| BER-BKL-014 additional host adapters | 8–20 per host | Host selection pending |
-| BER-BKL-015 optional operations products | 8–24 per product | Product selection pending |
-| Multi-judge arbitration and CP-FUT-001 | Not bounded | Separate architecture/adoption decisions |
-
-If **both** #101 helpers are selected, the currently bounded active total
-becomes **122–254 hours**. The optional BER/CP rows are not included in either
-total because their quantity or adoption is undecided. A fixed “all backlog”
-calendar ETA would hide those decisions and owner/provider waits; the next
-five-merge review must revisit them explicitly.
-
 ## Five-merge checkpoint — 2026-09-23, after PR #111
 
 This snapshot preserves the baseline above. Five PRs merged after #106:
@@ -277,3 +168,177 @@ backlog has no finite estimate. Owner waits, GitHub queue, provider run time
 and host provisioning are excluded from active-hour estimates. Re-estimate
 all open rows after the next five merged requests or sooner if a decision
 materially changes scope.
+
+## Five-merge checkpoint — 2026-09-23, after pull request #121
+
+This snapshot keeps the previous estimate visible above. Five pull requests
+merged after #104, in merge order. Times are observed wall intervals from the
+first recorded work checkpoint; they are lower bounds when work began earlier.
+They overlap and cannot be added to estimate active labor or project duration.
+
+| Merged pull request | Merge commit | Observed wall interval | Delivered |
+| --- | --- | ---: | --- |
+| [#117](https://github.com/ModernNomad-98/Project-Aegis/pull/117) | `a7c0724c86cce3f59b4dacfe0db7502ac148b49a` | 12m43s | Documentation inventory and forecast checkpoint |
+| [#116](https://github.com/ModernNomad-98/Project-Aegis/pull/116) | `2755fb6b59c64290a4cef2e4f9bcac204699fe76` | 39m21s | Offline holdout executor proposal only; implementation still needs a grant |
+| [#118](https://github.com/ModernNomad-98/Project-Aegis/pull/118) | `1af342712d27d5e6ea482b3f451106b4dccaf125` | 10m42s | Exact grants for the control-plane synthetic proof and issue #101 packages 2 and 3; evidence-policy choice only |
+| [#120](https://github.com/ModernNomad-98/Project-Aegis/pull/120) | `2c119b22d6a6da437bcb17e513438cde8f4b5f13` | 6m59s | Root guide first screen and contribution writing standard |
+| [#121](https://github.com/ModernNomad-98/Project-Aegis/pull/121) | `34241baf5fd1911f3d7d07915adc3bacd272d4b2` | At least 10m39s | Issue #101 package-3 offline advisory contract; no host hook or provider call |
+
+The observed intervals are short mainly because three packages were
+documentation/governance changes. Active-only time was not instrumented.
+Pull request #121's first checkpoint came after implementation began. Local
+checks, independent review and all three GitHub Actions passed for its exact
+head. Pull requests #119 and #122 and the in-progress control-plane and setup
+package-2 candidates are not merged at this checkpoint; their work is not
+counted as delivered. The component-guide guard exception for #119 awaits a
+separate owner disposition.
+
+| Open work item | Previous remaining active hours | New remaining active hours | Evidence and remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Private 160-case candidate still needs semantic and label review; no verified completion |
+| Behavioral Eval Runner backlog item 009 evidence policy enforcement | 8–16 | 8–16 | #118 recorded the 30-day complete-bundle choice, but implementation authority and host storage proof remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | #116 prepared an offline holdout design; implementation grant and tests remain |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Private labels, source/allowance, development evidence and a later holdout freeze remain |
+| Selected-host capability proof (R4 tool-path and R5 execution-profile isolation) | 12–24 | 12–24 | A disposable Portable Operating System Interface host direction is chosen; a named host and its proof are not |
+| Work package 2B-4 | 12–24 | 12–24 | Limited live suite depends on calibration and host proof |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus execution follows 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 12–24 | 12–24 | The synthetic first increment is under independent review; real authority, evidence and host proofs remain |
+| Control-plane work package 004 | 8–16 | 8–16 | No selected delivery target; package 003 is a prerequisite |
+| Issue #101 package 2 | 6–12 | 6–12 | Conversational setup candidate is under independent review, not merged |
+| Issue #101 package 3 | 6–12 | **0** | #121 merged its approved offline advisory scope; a real host remains package 4 scope |
+| Issue #101 package 4 | 8–16 | 8–16 | Comparative evaluation needs a selected host, inputs and separate authority |
+| Issue #101 package 7 | 6–12 | 6–12 | End-to-end release review remains after integration selection |
+| Repository-wide documentation readability | 80–200 | 80–200 | #120 improved the entry point; #119 and #122 are open. The 491-file review is still broad, so the range is unchanged pending audited batches |
+| **Selected remaining total** | **191–426** | **185–414** | Package 3's 6–12 hours closed; each other open row was reconsidered and retains its range |
+
+The conditional local and online issue #101 helpers remain **8–20 active
+hours each**. If both are selected, the bounded selected-plus-both total is
+**201–454 active hours**. The all-options backlog still has no finite total:
+extra hosts/products and later architecture choices have no selected quantity.
+These are active-work estimates, not calendar promises. Owner decisions,
+GitHub queues, provider runs and host provisioning are excluded. The next
+five-merge review starts after #121; update sooner if an owner decision changes
+scope or a completed audited batch provides meaningful new timing evidence.
+
+## Five-merge checkpoint — 2026-09-23, after pull request #126
+
+This snapshot follows the #121 checkpoint above. Five pull requests merged
+after #121, in merge order. The observed intervals are wall time from each
+first recorded checkpoint; they include review, GitHub queue or parallel work
+where present. They are not measured active labor or an additive project
+duration.
+
+| Merged pull request | Merge commit | Observed wall interval | Delivered |
+| --- | --- | ---: | --- |
+| [#123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) | `c965595c3c388c94f15174d45fc3d2fa8fd073b4` | 19m29s | Control-plane work package 003A: synthetic negative proofs only |
+| [#122](https://github.com/ModernNomad-98/Project-Aegis/pull/122) | `b2c6db2fdf90eee20aa4de52d184076b7e447f4e` | At least 11m25s | Three active maintainer guides; editing began before timing started |
+| [#124](https://github.com/ModernNomad-98/Project-Aegis/pull/124) | `d598390f4b7bb367ce79dd1276157f91ae36556b` | About 19m59s | Issue #101 package 2: manual Aegis-only Windows setup |
+| [#125](https://github.com/ModernNomad-98/Project-Aegis/pull/125) | `ad8c1cef62527464aff2e698b58b094a790b058f` | 13m27s | Previous every-item forecast; its interval overlaps other PR work |
+| [#126](https://github.com/ModernNomad-98/Project-Aegis/pull/126) | `709668594d43cb5cad8ce3dff14c574866228b07` | 14m46s | Two active technical guides and a dated review record |
+
+PRs #123 and #124 passed independent audits and all three exact-head GitHub
+Actions after correcting review findings. The documentation PRs also passed
+independent audits and exact-head Actions. Active-only time was not
+instrumented; none of these short intervals is a measured implementation
+rate. Pull requests #119, #127 and #128 are open at this checkpoint, so their
+changes are not counted as delivered. The protected-file guard on #119 is
+failed and awaits a PR-specific owner disposition, even though its Linux and
+Windows execution jobs passed on the earlier head; the rebased head is being
+checked separately.
+
+| Selected open work item | Previous remaining active hours | New remaining active hours | Re-estimation evidence and remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Private candidate still needs semantic and label review; no completed freeze |
+| Behavioral Eval Runner backlog item 009 evidence policy enforcement | 8–16 | 8–16 | Thirty-day complete-bundle choice exists; implementation grant and host storage proof do not |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Offline design proposal merged earlier; executor implementation still awaits authority |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Private labels, source/allowance, development result and later holdout freeze remain |
+| Selected-host capability proof (R4 tool-path and R5 execution-profile isolation) | 12–24 | 12–24 | Disposable-host direction exists, but no named/provisioned host proof |
+| Work package 2B-4 | 12–24 | 12–24 | Limited live suite follows calibration and host proof |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus execution follows 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 12–24 | **8–16** | #123 delivered the bounded synthetic falsifiers; real source, freshness, host, evidence and billing proofs still need separate authority. This is a scope-based residual estimate, not extrapolation from its short wall interval |
+| Control-plane work package 004 | 8–16 | 8–16 | No selected delivery target; package 003 remains prerequisite |
+| Issue #101 package 2 | 6–12 | **0** | #124 merged its approved manual Aegis-only Windows scope; helper and other-host work remains separate |
+| Issue #101 package 4 | 8–16 | 8–16 | Comparative evaluation needs selected host, inputs and execution authority |
+| Issue #101 package 7 | 6–12 | 6–12 | End-to-end release review follows integration selection |
+| Repository-wide documentation readability | 80–200 | 80–200 | #122 and #126 improved five guides. The original #117 inventory had 491 tracked Markdown files; this #126 tree has 501. #119, #127 and #128 are unmerged. Broad range retained pending larger audited coverage |
+| **Selected remaining total** | **185–414** | **175–394** | Closed package 2's 6–12 hours and reduced package 003 by 4–8 hours; all other rows reconsidered |
+
+The following optional rows were also reconsidered. Their ranges do not enter
+the selected total until the owner chooses their scope and quantity.
+
+| Optional open work item | Previous active hours if selected | New active hours if selected | Current gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner backlog item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision pending |
+| Behavioral Eval Runner backlog item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count unselected |
+| Behavioral Eval Runner backlog item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count unselected |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Separate architecture and adoption decisions |
+
+If both issue #101 helpers are selected, the bounded selected-plus-both total
+is **191–434 active hours**, down from **201–454**. The all-options backlog
+still has **no finite total ETA** because optional host/product counts and
+architecture choices remain open. These are active-work ranges; owner waits,
+GitHub queues, provider runs and host provisioning are excluded. Start the
+next five-merge counter after #126. Update earlier if a decision or audited
+completion materially changes scope.
+
+The available timed PRs are sparse: #103 has only a late 10:52 UTC checkpoint
+and at least 5m14s to merge; #105 took 12m50s observed wall time from its first
+checkpoint to merge; #106 took 8m21s. PRs #100/#102 have no comparable active
+measurement in this log. The ranges below are scope estimates, **not** a
+statistical extrapolation from those short governance PRs. PR #104 has local
+tests and two execution jobs green but awaits the owner's schema-shape decision.
+
+## Remaining selected work — baseline estimate
+
+| Work item | Scope counted once | Remaining active hours | Gate / confidence |
+| --- | --- | ---: | --- |
+| BER-BKL-007 / WP-2B-1A | Finish PR #104 after the owner shape decision; close its lifecycle | 1–2 | Owner decision pending; medium |
+| WP-2B-3 candidate inputs | New 160-item packet, guide, private versioned inputs, semantic review and hashes | 4–8 | Started; owner labels later; low |
+| Cross-stream owner-decision packet | BKL-009 handling, replacement source/accounting, host/CP and issue #101 decisions | 3–6 | Decisions may add scope; low |
+| WP-2B-3 execution support | Approved pins, missing holdout execution path, offline tests and readiness | 8–16 | Requires label/source/allowance decisions; low |
+| WP-2B-3 measurement / OD-1 packet | Development evidence, holdout freeze and one holdout, result review | 4–10 | Provider and owner gates; low |
+| R4/R5 selected-host proof | Isolation/profile capability evidence; includes BKL-003 live claim scope | 8–16 | Host selection pending; low |
+| WP-2B-4 | Limited Scenario A live suite after separate authorization | 12–24 | WP-2B-3 and host gates; low |
+| WP-2B-5 | Generic corpus execution | 8–16 | WP-2B-4 gate; low |
+| WP-2B-6 | Scheduling, cost, quarantine and cadence; includes BKL-011 operations and BKL-012 | 8–16 | Prior phase; low |
+| WP-2B-7 | Advisory CI/operator workflow; includes BKL-013 | 4–8 | Protected workflow review; low |
+| CP-WP-003 | Authority, evidence and execution capability proofs | 8–16 | Separate authorization; low |
+| CP-WP-004 | One selected delivery integration | 8–16 | CP-WP-003 and selected target; low |
+| Issue #101 package 1 | Design, candidate screening and durable planning | 4–8 | Planning/authority first; low |
+| Issue #101 package 2 | Conversational setup and Aegis-only completion | 6–12 | Design; low |
+| Issue #101 package 3 | Compatibility checks and offline adapter contract | 6–12 | Design; low |
+| Issue #101 package 4 | Bounded comparative evaluation and selection gate | 8–16 | Separate evaluation authority; low |
+| Issue #101 package 7 | End-to-end evaluation and release readiness | 6–12 | Selected integration outcome; low |
+| **Total selected remaining work** | **Each package counted once** | **106–214** | **Active hours; owner/CI/provider waits excluded** |
+
+BER-BKL-001/002/004/006/008 and WP-2B-0/1/2 are delivered within their
+recorded scopes. Remaining real-host R3/R4/R5 proof is counted at the live
+gate. BKL-005 and the calibration half of BKL-011 are counted in WP-2B-3;
+BKL-011's ongoing operations half is counted in WP-2B-6; BKL-009 is counted
+in the decision packet and later operator work; R1/2/3 in their owning phase. This mapping
+prevents a supporting backlog record from being estimated as a second build.
+The current BER-BKL-007 row is a *remaining* estimate; its earlier 3–5-hour
+initial estimate and partial execution remain in the PR history.
+
+## Conditional and unselected scope
+
+| Work item | Active hours if selected | Current disposition |
+| --- | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | Conditional on package 4 selection |
+| Issue #101 package 6, online helper | 8–20 | Conditional on package 4 selection and provider authority |
+| BER-BKL-010 signing/immutable storage | 4–12 | Adoption decision pending |
+| BER-BKL-014 additional host adapters | 8–20 per host | Host selection pending |
+| BER-BKL-015 optional operations products | 8–24 per product | Product selection pending |
+| Multi-judge arbitration and CP-FUT-001 | Not bounded | Separate architecture/adoption decisions |
+
+If **both** #101 helpers are selected, the currently bounded active total
+becomes **122–254 hours**. The optional BER/CP rows are not included in either
+total because their quantity or adoption is undecided. A fixed “all backlog”
+calendar ETA would hide those decisions and owner/provider waits; the next
+five-merge review must revisit them explicitly.
