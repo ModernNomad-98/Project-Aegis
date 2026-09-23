@@ -1,11 +1,20 @@
 # Conversational setup and optional routing — issue #101
 
 Prepared 2026-09-23. Canonical planning home for [issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101).
-Package 1 is design and candidate screening only. Package 2 delivers a
+For maintainers planning the next package, start with the [current delivery
+boundary](#component-map-shipped-seams-and-future-work), the [agreed local
+comparison](#agreed-first-local-comparison-for-package-4), and the
+[evaluation protocol](#predeclared-evaluation-protocol-for-package-4). Product
+users invoke the manual [`aegis-setup`](../../.claude/skills/aegis-setup/SKILL.md)
+skill for the four-choice conversation; this plan grants no execution authority.
+
+Package 1 delivered design and candidate screening. Package 2 delivers a
 manual-only four-choice setup conversation and tested Windows PowerShell
-Aegis-only saved selection. Optional helpers remain unavailable. There is no
-host hook, model, installation, credential, paid evaluation, or savings claim.
-Later packages need their own bounded scope and authority. The [BER](behavioral-eval-runner-backlog.md) and
+Aegis-only saved selection. Optional helpers remain unavailable. No optional
+helper model or host hook is installed, connected or evaluated, and there is
+no paid evaluation or measured savings claim.
+Later packages need their own bounded scope and authority. The
+[Behavioral Eval Runner (BER)](behavioral-eval-runner-backlog.md) and
 [delivery control](resumable-control-plane-backlog.md) registers remain separate.
 The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
 defines the implementation scope approved in AEGIS-APR-007; the proposal alone
@@ -27,18 +36,22 @@ and fallback verification.
 | 2026-09-23, owner local-evaluation shortlist in issue #101 | Evaluate Laya and Mapika/Decider 0.8B first on ordinary central processing units (CPUs); compare OpenJev as an optional wrapper around the same Decider checkpoint | Governing package-4 research order, not an installed helper, production selection or execution grant |
 | 2026-09-23, this package 1 design | Keep the baseline usable without an add-on; use a single advisory contract and separate setup/host/adapter responsibilities | Proposed implementation architecture, subject to review and package 2/3 authority |
 
-## Current source boundary and forces
+## Historical source snapshot and design forces
 
-Inspected at public `main` after PR #108 (`2b13be9fac1169bf8f6cd0cfcbe4da0c5b8bf926`).
+This is the package-1 snapshot, inspected at public `main` after
+pull request (PR) #108
+(`2b13be9fac1169bf8f6cd0cfcbe4da0c5b8bf926`), before packages 2 and 3.
 `AGENTS.md` and `CLAUDE.md` route the host to installed skill files; the
 library's seven `.claude/agents/` definitions are read-only specialists. The
 current host/implementing assistant owns execution. `docs/skills-catalog.md`
 lists shipped skill identities, while each `SKILL.md` declares its trigger and
 invocation posture. Consumer repositories copy the startup files and skills;
-the source library does not own their application data. The existing setup is
-README-guided copying. There is no issue #101 setup state, host invocation,
-decision adapter, or measured routing baseline in this repository. A skill
-description or an available MCP endpoint alone cannot prove host use.
+the source library does not own their application data. Setup was then
+README-guided copying. At that snapshot there was no issue #101 setup state,
+host invocation, decision adapter, or measured routing baseline. A skill
+description or a Model Context Protocol (MCP) endpoint alone cannot prove
+host use. The [current package boundaries](#component-map-shipped-seams-and-future-work)
+below supersede this snapshot for delivery status.
 
 Ranked design forces: (1) preserve eligibility, manual-only invocation and
 required reviews; (2) work in the existing assistant, including a direct
@@ -46,39 +59,44 @@ Aegis-only finish; (3) measure complete-task quality and tokens before a
 helper recommendation; (4) minimize installation and data exposure; (5)
 support change, disablement and recovery without stale verified claims.
 
-## Proposed component and data ownership
+## Component map: shipped seams and future work
+
+The first two rows and the offline contract are shipped. Other rows describe
+future host integration or conditional helpers; none grants new authority.
 
 | Component | Responsibility and allowed dependency | Owned state |
 | --- | --- | --- |
-| Proposed `aegis-setup` skill | Own plain-language choice flow, Help me choose and status explanation; call a package-2 state API only after the user selects; never install/connect on selection alone | No credential or provider state |
-| Setup state service (package 2) | Validate schema, scope and state transition; atomically write a per-user, per-project record. Aegis-only can finish with no provider probe | User choice, project identity, selection timestamp, `selected/configured/verified/unavailable`, evidence version and last verification time; no secret |
-| Host bridge (package 3/4 proof) | On one pinned host/version, gather approved task context and installed catalog metadata, derive eligible agent/skill IDs, invoke the optional router and consume only validated output | Ephemeral request/result and measured telemetry; no authority grants |
-| Eligibility and policy gate | Apply host permissions, explicit user skill choices, manual-only flags, required specialists/reviews and stage rules before dispatch, and recheck after a suggestion | Current host and catalog policy, not model output |
-| Provider-neutral decision adapter (package 3) | Accept a bounded, minimized request; return known IDs or abstain with typed errors and timeout; do not dispatch work | Adapter-specific configuration, separated from model identity and local/hosted location |
-| Optional local/online provider (packages 4–6) | Compute a recommendation only after explicit setup and evaluation authority | Model weights local or provider-side; online credential in host secret storage, never chat or tracked state |
-| Evidence and evaluator (packages 4/7) | Freeze reviewed cases and report paired host workflows, costs, failures and claims | Versioned sanitized protocol/results; any sensitive test input in separately approved private storage |
+| Shipped `aegis-setup` skill (package 2) | Show four choices; save only an explicit Aegis-only choice on tested Windows PowerShell; never install or connect a helper | No credential or provider state |
+| Shipped state writer (package 2) | Validate and atomically save one user's Aegis-only selection for one checkout | `selected` record and `unselected` missing status; no helper verification or secret |
+| Future host bridge (package 4) | On a pinned host/version, derive eligible agent/skill identifiers (IDs), invoke optional advice and recheck it before dispatch | Ephemeral request/result and measured telemetry; no authority grants |
+| Future eligibility and policy gate | Apply host permissions, explicit choices, manual-only flags, required specialists/reviews and stage rules before dispatch and after advice | Current host and catalog policy, not model output |
+| Shipped offline advisory contract (package 3) | Validate bounded synthetic offers and recommendations or abstentions with typed failures; fake adapter has no host hook or dispatch | In-memory request/result only; no provider configuration or credential |
+| Conditional local/online providers (packages 5/6, after package 4) | Compute advice only after selection, host proof and separate integration authority | Future local weights or hosted service; credentials must remain outside chat and tracked state |
+| Future evidence and evaluator (packages 4/7) | Freeze reviewed cases and report paired host workflows, costs, failures and claims | Versioned sanitized protocol/results; any sensitive test input in separately approved private storage |
 
-The setup state service owns writes. The host bridge may read its selected
-configuration but must reverify a changed catalog, provider, machine or host
-version before claiming `verified`. A missing record means Aegis only with
-`unselected` status, not an invented prior choice. The proposed state is local
-to one user and one project on one host. Package 2 must choose and test exact
-Windows and other supported paths, project identity, permissions, migration,
-atomic writes and recovery; syncing or committing preferences requires a
-separate decision. A fresh machine shows the choice as unavailable until
-reconfigured. Credential references may be stored, never credential values.
+The package-2 writer owns the only setup write: an Aegis-only selection for one
+user and checkout on tested Windows PowerShell 5.1. A missing record means
+`unselected` and ordinary Aegis behavior, including on a fresh machine; a
+moved checkout gets a different key. Other operating systems have no verified
+saved-state support. The writer stores no credential reference, helper choice,
+or `configured`, `verified` or `unavailable` helper state. A future host must
+reverify any changed catalog, provider, machine or host version before it can
+claim helper verification. Syncing preferences needs a separate decision.
 
-The request contract contains a bounded task synopsis, stage/context IDs,
-current eligible agent IDs and role summaries, eligible skill IDs and short
-descriptions, and policy/catalog versions. It excludes arbitrary repository
-files, secrets, raw conversations and unrelated project data. Outbound online
-fields and destination must be shown to the user before connection. The result
-is a subset of offered IDs, optional calibrated score with model-specific
-meaning, and `abstain/escalate`. Unknown IDs, omitted required specialists,
-malformed output, timeout, stale version or ineligible suggestion are rejected
-and fall back within existing authority. The model cannot authorize a write,
-choose a new coding model, waive a review, or convert a read-only agent to a
-writer. Local failure never changes the processing destination to online.
+The package-3 [offline contract](../../tools/aegis_setup/README.md) accepts a
+versioned, bounded one-line task synopsis, stage, offered agent/skill IDs and
+descriptions, mandatory and explicit selections, and policy/catalog versions.
+It has no context-ID or raw-file field. Its structural checks cannot prove
+that free-text synopsis content contains no secret or copied conversation;
+a future host must curate that text. A recommendation is a subset of offered
+IDs that preserves mandatory and explicit selections. The optional score is
+**uncalibrated**. The typed outcomes are `recommend`, `abstain`, `timeout`,
+`invalid` and `unavailable`; invalid or failed advice contains no selections.
+Its compatibility checker uses synthetic supplied facts and proves no real
+host support. A future host must still enforce eligibility, approvals and
+dispatch, show online fields and destination before any connection, and prove
+fallback under separate package-4 authority. Local failure must never switch
+processing to an online service silently.
 
 ### Setup and invocation boundary
 
@@ -89,24 +107,39 @@ not infer setup from a vague request. If a host cannot establish an explicit
 invocation, it may show the choices in ordinary conversation and request the
 named skill before writing state. It explains all four choices first. Aegis only saves
 the selection and finishes immediately. Exploring a helper retains a visible
-route back to Aegis only. Read-only compatibility checks may follow explicit
-local interest; installation or online connection needs the user's exact
-choice, host support and its own authority. `selected` describes intent,
-`configured` proves dependencies/credentials are present, `verified` requires
-actual host invocation and result consumption, and `unavailable` records a
-failed or unsupported condition. Changing or disabling a helper returns to
-ordinary Aegis behavior and invalidates stale verification.
+route back to Aegis only. Package 3 checks synthetic catalog facts only;
+real read-only compatibility checks would follow explicit local interest and
+separate host proof. Installation or online connection needs the user's exact
+choice, host support and its own authority. `selected` describes intent and
+is the only state package 2 saves. Proposed future `configured` would
+prove dependencies/credentials are present; `verified` would require actual
+host invocation and result consumption; `unavailable` would record a failed
+or unsupported helper. Changing or disabling a future helper must return to
+ordinary Aegis behavior and invalidate stale verification.
 
 The proposed host integration is an explicit pre-dispatch hook in a selected,
 versioned coding-assistant surface. Package 4 must prove that the host invokes
 it, applies eligibility, consumes or rejects a result, records fallback, and
 exposes enough telemetry to measure main/subagent tokens. If no supported host
 hook is proven, only the conversational Aegis-only path may be called working.
-An SDK feature does not imply equivalent CLI/editor behavior.
+Software development kit (SDK) support does not imply equivalent command-line
+interface (CLI) or editor behavior.
 
 ## Candidate discovery and screen
 
-Read the live issue's [source-based audit](https://github.com/ModernNomad-98/Project-Aegis/issues/101) and linked primary project sources on 2026-09-23. This is a discovery screen, not a model benchmark or shortlist freeze. API shape, README claims, hardware estimates and author benchmarks do not establish Aegis task accuracy. Before package 4, pin an exact repository/checkpoint/license/dependency version and verify each claimed runtime on the chosen host. Re-screen source currency before installing.
+This table preserves the broader package-1 discovery screen. The
+[agreed first local comparison](#agreed-first-local-comparison-for-package-4)
+below is narrower; the other rows remain alternatives or controls, not a
+commitment to test every candidate. Read the live issue's
+[source-based audit](https://github.com/ModernNomad-98/Project-Aegis/issues/101)
+and linked primary project sources before changing the shortlist. An
+application programming interface (API) shape, README claim, hardware estimate
+or author benchmark does not establish Aegis task accuracy. Before package 4,
+pin exact source, checkpoint, license and dependencies; verify each claimed
+runtime on the chosen host and re-screen source currency before installing.
+In the table, natural-language inference (NLI) is a text-classification method,
+large language model (LLM) names a model class, and user experience (UX)
+describes interaction design.
 
 | Candidate class | Discovery disposition | Required resolution before a bounded test |
 | --- | --- | --- |
@@ -142,7 +175,8 @@ maintenance and latency costs. Do not count the
 wrapper as an independent model or make it a fifth user-facing setup choice.
 
 The local baseline must work without a dedicated graphics processing unit
-(GPU) or CUDA accelerator. Measure cold and warm response time and peak memory
+(GPU) or NVIDIA's Compute Unified Device Architecture (CUDA) accelerator.
+Measure cold and warm response time and peak memory
 while normal development tools are running. Machines with **8 and 16 gigabytes
 (GB)** of memory are proposed evaluation profiles, not verified minimum
 requirements. A failed installation or unusable response time leaves Aegis
@@ -202,7 +236,7 @@ sampling/uncertainty method, hardware, time and spend caps before results are
 seen. Changing them after holdout requires a new version and review. A severe
 safety failure stops selection even if average token count improves.
 
-## Options, ADR draft and migration
+## Historical options and architecture decision record (ADR) draft
 
 | Option | Delivery/cost | Operability and failure | Reversibility |
 | --- | --- | --- | --- |
@@ -210,18 +244,19 @@ safety failure stops selection even if average token count improves.
 | Provider-neutral optional advisory hook (proposed) | More contract and host-proof work; compare local/online without separate setup designs | Validation, data minimization and fallback need explicit ownership | Disable helper without changing Aegis skills |
 | Provider-specific setup first | Quicker single demo, but couples onboarding and claims to an untested candidate | Stale provider/host assumptions can report false verified state | Migration and user trust cost higher |
 
-**ADR draft:** Choose Aegis-only setup as the first shippable increment and
-design one optional advisory contract for later evaluated helpers. Preserve
-host-owned eligibility/dispatch and separate model from deployment location.
-Consequence: local/online setup remains unavailable until host proof and
-candidate selection, but users can complete setup without dependencies.
-Revisit if the chosen host cannot expose a safe pre-dispatch hook or meaningful
-complete-task telemetry. This is a design proposal, not provider selection.
+**Historical ADR draft:** Aegis-only setup was selected as the first shippable
+increment, followed by one optional advisory contract. Packages 2 and 3 now
+deliver those two seams. Host-owned eligibility and dispatch, and the
+separation of model from deployment location, remain required. Local and
+online helpers remain unavailable until host proof, evaluation and a later
+selection. Revisit the design if a selected host cannot expose a safe
+pre-dispatch hook or meaningful complete-task telemetry. This draft does not
+select a provider.
 
-Incremental sequence: (1) package 1 planning and review; (2) package 2
-setup conversation, saved state and Aegis-only completion with unavailable
-helper status; (3) package 3 offline contract and mocked error paths; (4)
-package 4 host proof and predeclared comparison under separate authority;
-(5) conditional local/online integration only for selected profiles; (6)
-package 7 full evaluation and release review. Stop at each package boundary
-when its authority, evidence or acceptance is missing.
+Delivery sequence: (1) package 1 planning — **delivered**; (2) package 2
+conversation and Windows Aegis-only saved selection — **delivered**; (3)
+package 3 offline contract and fake adapter — **delivered**; (4) package 4
+host proof and predeclared comparison — **pending separate authority**;
+(5) packages 5 and 6 local/online integrations — **conditional on package 4**;
+(6) package 7 full evaluation and release review — **pending**. Stop at each
+remaining boundary when its authority, evidence or acceptance is missing.
