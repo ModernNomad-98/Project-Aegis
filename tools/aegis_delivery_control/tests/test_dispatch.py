@@ -278,6 +278,23 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_unproven_target_denied_before_any_intent_or_contact(self) -> None:
+        authority = SyntheticAuthority(b"u" * 32)
+        store = MagicMock()
+        store.is_canonical = True
+        target = MagicMock()
+        target.is_canonical_for.return_value = True
+        coordinator = SyntheticDispatchCoordinator(
+            store, TransitionEngine(), authority, target
+        )
+        with self.assertRaisesRegex(DispatchDenied, "synthetic dispatch boundary"):
+            coordinator.dispatch(
+                MagicMock(), MagicMock(), MagicMock(),
+                expected_head="head-1", writer_epoch=1,
+            )
+        store.commit_intent.assert_not_called()
+        target.is_canonical_for.assert_not_called()
+
     def test_t28_coordinator_mediates_adoption_without_adapter_contact(
         self,
     ) -> None:

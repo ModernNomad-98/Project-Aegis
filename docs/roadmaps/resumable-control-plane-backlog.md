@@ -177,9 +177,15 @@ permission for runtime work.
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
 
 The [CP-WP-003A offline capability-proof proposal](cp-wp-003-offline-proof-proposal.md)
-is a reviewable scope for a first synthetic-only increment. It grants no
-implementation authority and does not change CP-WP-003's BLOCKED status or
-CP-WP-002's accepted scope.
+was authorized by AEGIS-APR-006 at merge commit
+`1af342712d27d5e6ea482b3f451106b4dccaf125`. Its first increment is an
+offline falsification harness and a fail-closed dispatch boundary. Synthetic
+source races, stale-checkpoint, containment, owned-path, evidence and
+receipt/liability probes are recorded in the
+[003A review](../evidence/control-plane/cp-wp-003a-review.md). CP-WP-003 remains
+**BLOCKED**: no real source, independent anchor/current-source ledger, selected
+host containment, evidence policy, or billing authority has been selected and
+verified. CP-WP-004 and any real dispatch remain blocked separately.
 
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.

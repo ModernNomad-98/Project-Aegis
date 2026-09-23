@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Mapping
 
+from .contracts import DispatchDenied
+
 
 def canonical_bytes(record: Mapping[str, object]) -> bytes:
     return json.dumps(
@@ -25,3 +27,37 @@ def write_new_evidence(path: Path, record: Mapping[str, object]) -> str:
         stream.write(payload)
         stream.flush()
     return hashlib.sha256(payload).hexdigest()
+
+
+def verify_synthetic_evidence(
+    original: bytes, *, expected_hash: str, expected_binding: str,
+    expected_writer: str, expected_stage: str,
+) -> dict[str, object]:
+    """Verify original bytes and a complete, non-sensitive synthetic envelope."""
+    def sensitive(value: object) -> bool:
+        if isinstance(value, dict):
+            return any(
+                str(key).casefold() in {"credential", "secret", "token", "customer_data"}
+                or sensitive(child) for key, child in value.items()
+            )
+        if isinstance(value, list):
+            return any(sensitive(child) for child in value)
+        return False
+
+    try:
+        record = json.loads(original.decode("ascii"))
+        if not isinstance(record, dict) or canonical_bytes(record) != original:
+            raise ValueError("noncanonical evidence")
+        if (set(record) != {"version", "binding", "writer", "stage", "payload"}
+                or type(record["version"]) is not int or record["version"] != 1
+                or record["binding"] != expected_binding
+                or record["writer"] != expected_writer
+                or record["stage"] != expected_stage
+                or not isinstance(record["payload"], dict)
+                or sensitive(record["payload"])):
+            raise ValueError("unverifiable or sensitive evidence")
+        if hashlib.sha256(original).hexdigest() != expected_hash:
+            raise ValueError("evidence hash mismatch")
+    except (UnicodeError, json.JSONDecodeError, TypeError, ValueError) as error:
+        raise DispatchDenied("synthetic evidence verification failed") from error
+    return record
