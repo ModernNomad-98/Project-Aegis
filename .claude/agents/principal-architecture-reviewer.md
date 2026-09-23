@@ -13,7 +13,8 @@ Focus your review on:
 - **Coupling** — hidden dependencies, leaky abstractions, circular references.
 - **Data flow** — ownership of state, source-of-truth clarity, consistency model.
 - **Extensibility** — will the next likely change be cheap or require rework?
-- **Scalability** — bottlenecks, hot paths, N+1 patterns, statefulness that blocks scale.
+- **Scalability** — bottlenecks, hot paths, N+1 repeated lookups (one initial
+  request plus one per item), and statefulness that blocks scale.
 - **Simplicity** — is there a materially simpler design that meets the same requirements?
 
 Method: read the relevant files and trace the primary paths before judging. Ground

@@ -1,14 +1,34 @@
 # Project Aegis — Construction History
 
 Curated construction history of Project Aegis: the original phase narrative through
-**D47**, followed by dated delivery updates. The
+**decision 47 (D47)**, followed by dated delivery updates. The
 complete authoritative record is the dated decision log in `docs/reconciliation/` —
-[`step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md). For what Project
+[`step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md),
+its version 4 (v4) reconciliation. For what Project
 Aegis *is* and how to start, see the [README](../README.md).
 
 See the [changelog](../CHANGELOG.md) for recent deliveries and the
 [documentation index](README.md) for current continuation. The original phase
 narrative below preserves the state and sequence at each historical checkpoint.
+
+**Reading key for the original narrative:** `D` plus a number names a decision
+in the linked log; a decimal suffix, such as `D12.8`, names a subentry. The
+shorthand below includes artificial intelligence (AI), software development
+lifecycle (SDLC), software as a service (SaaS), row-level security (RLS),
+quality assurance (QA), end-to-end (E2E), and large language model (LLM).
+Framework names are the Open Worldwide Application Security Project (OWASP),
+International Organization for Standardization (ISO), System and Organization
+Controls 2 (SOC 2), and National Institute of Standards and Technology (NIST);
+RMF means risk management framework. Later passages use product management
+(PM), individual contributor (IC), Google Cloud Platform (GCP), static and
+dynamic application security testing (SAST and DAST), and information
+architecture (IA). Counts in the original narrative are dated milestones;
+use the [current skills catalog](skills-catalog.md) for today's shipped count.
+`ASI08` and `ASI10` are OWASP Agentic Security Initiative categories 08 and 10;
+`A09` and `A10` are OWASP web-application Top 10 categories 09 and 10. Later
+delivery updates use
+Behavioral Eval Runner (BER), pull request (PR), continuous integration (CI),
+owner decision 1 (OD-1), and work package 2B-4 (WP-2B-4).
 
 ## Original construction through D47
 
