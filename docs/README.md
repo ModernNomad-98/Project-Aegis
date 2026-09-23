@@ -18,6 +18,8 @@ their original context; use the active registers below to determine current work
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
+- [Efficient execution plan and new-chat handoff](roadmaps/aegis-efficient-execution-handoff-2026-09-23.md):
+  September 23 backlog sequence, model policy, verified state and continuation task.
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
   [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
