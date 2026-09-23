@@ -201,3 +201,27 @@ earlier forecast update.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
+
+## Checkpoint after pull request #121 — 2026-09-23
+
+The following merged requests complete the five-merge cadence after #104.
+Each request's body or closeout comment carries its own item estimate and
+progress. These intervals are wall time from the first captured checkpoint,
+not measured active labor, and some work began before that checkpoint.
+
+| Pull request | Merge time (Coordinated Universal Time) | Observed wall interval | Progress |
+| --- | --- | ---: | --- |
+| [#117](https://github.com/ModernNomad-98/Project-Aegis/pull/117) | 15:52:43 | 12m43s | Documentation inventory and prior forecast |
+| [#116](https://github.com/ModernNomad-98/Project-Aegis/pull/116) | 16:00:21 | 39m21s | Offline holdout executor proposal only |
+| [#118](https://github.com/ModernNomad-98/Project-Aegis/pull/118) | 16:11:42 | 10m42s | Three exact implementation grants and one evidence-policy choice |
+| [#120](https://github.com/ModernNomad-98/Project-Aegis/pull/120) | 16:29:59 | 6m59s | Root documentation entry point and writing standard |
+| [#121](https://github.com/ModernNomad-98/Project-Aegis/pull/121) | 16:42:21 | At least 10m39s | Offline advisory routing contract; one independent review finding corrected |
+
+Every open row was reconsidered in the [dated forecast snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-121).
+The prior selected total was **191–426 active hours**; the revised selected
+total is **185–414 active hours**, solely because issue #101 package 3 closed
+its 6–12-hour remaining row. The conditional total with both optional issue
+#101 helpers moved from **207–466** to **201–454 active hours**. The
+repository-wide documentation estimate remains 80–200 active hours until
+audited batches give meaningful evidence. Owner waits, GitHub queue time,
+provider runs and host provisioning remain outside these active-hour ranges.
