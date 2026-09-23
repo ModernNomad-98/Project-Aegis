@@ -9,6 +9,12 @@ authority. The [BER](behavioral-eval-runner-backlog.md) and
 The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
 sets out the next Aegis-only implementation decision without granting it.
 
+Package 3's approved offline advisory contract is implemented in
+[`tools/aegis_setup`](../../tools/aegis_setup/README.md). It validates bounded
+synthetic offers and responses but has no host hook, provider call, dispatch
+authority or real compatibility proof. Package 4 still owns host integration
+and fallback verification.
+
 ## Dated product decisions
 
 | Date | Decision | Status |

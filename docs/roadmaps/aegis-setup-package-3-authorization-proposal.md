@@ -1,7 +1,10 @@
 # Issue #101 package 3 — offline advisory-contract scope
 
 Prepared 2026-09-23 from public `main` at
-`d187849287e5047fc821f7a1070b0c59cc5b32b9`. **Proposal only.**
+`d187849287e5047fc821f7a1070b0c59cc5b32b9`. **Historical proposal.**
+The owner approved this bounded scope in AEGIS-APR-008, effective at merge
+`1af342712d27d5e6ea482b3f451106b4dccaf125`. The implementation evidence
+is in [the package-3 review](../evidence/setup/issue-101-package-3-review.md).
 The [live issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101)
 and [package-1 design](aegis-setup-routing-plan.md) define the feature. The
 [package-2 proposal](aegis-setup-package-2-authorization-proposal.md) covers
@@ -54,9 +57,12 @@ reusable. No implementation begins merely because this proposal merges.
 ## Contract acceptance
 
 - The request has a closed version and strict byte/item bounds. It contains
-  only a short task synopsis and the offered IDs/descriptions needed for this
-  decision. Raw conversation, repository files, secrets and arbitrary tool
-  output are rejected. Identifier and version comparisons are exact.
+  only a short, one-line task synopsis and the offered IDs/descriptions needed
+  for this decision. No fields for raw conversation, repository files or
+  arbitrary tool output are accepted. The parser rejects common URL, path and
+  secret-marker shapes, but cannot establish that free text contains no
+  sensitive data. A future host must curate the synopsis before sending it
+  to any adapter. Identifier and version comparisons are exact.
 - The host supplies eligibility and mandatory sets before a helper is called.
   A helper may rank or abstain among offered IDs; it cannot add an ID, remove a
   mandatory specialist/skill, select a manual-only skill without explicit user
