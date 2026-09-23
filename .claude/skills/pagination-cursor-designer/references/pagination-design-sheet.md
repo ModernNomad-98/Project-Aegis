@@ -2,6 +2,14 @@
 
 Detail tables for `pagination-cursor-designer`. Read on demand.
 
+**Use:** These tables support the [pagination-cursor-designer workflow](../SKILL.md)
+when choosing and specifying a paging contract. `O(...)` describes how cost
+grows with input size; `id` is a unique identifier; SQL is Structured Query
+Language; JSON is JavaScript Object Notation; and `base64url` is URL-safe
+Base64 encoding. UI means user interface and URL means uniform resource
+locator. The encoded cursor is a format sketch; the authenticated server
+context still supplies tenant and permission scope.
+
 ## Cursor (keyset) vs offset — decision table
 
 | Dimension | Offset / limit | Cursor / keyset |

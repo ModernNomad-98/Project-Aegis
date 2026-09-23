@@ -2,6 +2,12 @@
 
 Detail for `onboarding-doc-designer`. Read on demand.
 
+**Use:** This worksheet supports the [onboarding-doc-designer workflow](../SKILL.md)
+for a new teammate's first day, week, and month. Its milestones are a template
+to adapt, not a claim that a particular repository is already set up. API
+means application programming interface; PR means pull request. Diátaxis is
+a documentation organization method; `diataxis-doc-organizer` owns that map.
+
 ## Day-1 / Week-1 / Month-1 milestone template
 
 | Milestone | Target |
