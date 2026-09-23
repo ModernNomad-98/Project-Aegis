@@ -749,6 +749,40 @@ the sole owner of actual advisory CI integration).
   rewrite, new schema version, dependency addition, guard change or later-phase
   authorization.
 
+### WP-2B-1B — Offline evidence-policy proof
+
+- **ID / phase / priority:** WP-2B-1B / 2B-1 follow-up / REQUIRED.
+- **Status:** AUTHORIZED only when the separate reviewed governance PR
+  containing BER-DEC-011 and AEGIS-APR-012 merges; until then, BLOCKED.
+- **Owner and repository:** Peter Nguyen / `ModernNomad-98/Project-Aegis`.
+- **Scope:** One synthetic-only proof of the selected 30-day complete-bundle
+  evidence policy, limited to the seven paths and acceptance tests in the
+  [merged scope proposal](ber-bkl-009a-offline-policy-scope-proposal.md).
+  BER-BKL-009 is the included child backlog item; it remains partially
+  delivered after this increment.
+- **Branch and base:** `feat/ber-bkl-009a-offline-policy`, created directly
+  from the exact merge commit of the separate governance PR containing
+  BER-DEC-011. No implementation branch may begin before that merge.
+- **Budget and evidence:** At most 8 active implementation hours, 1,000 added
+  code/test lines, and zero task-controlled external spend. The only tracked
+  closeout is the reviewed, sanitized
+  `docs/evidence/ber-bkl-009a-offline-review.md`; it records the exact source
+  revision, commands, pass/fail results, independent review and remaining
+  gates. Synthetic test fixtures may use owned temporary directories; tests
+  check hashes and expected failure states before fixture teardown. No real
+  evidence root, credentials, private input or provider output may enter the
+  workspace or PR. Preserve any failed or incomplete policy bundle for review;
+  the implementation must not include runtime deletion or cleanup.
+- **Stop and acceptance:** Stop if a published schema or accepted-byte change
+  is needed, any stated bound would be exceeded, a synthetic bundle cannot
+  prove its first trusted creation time, or a test/review finds a safety
+  failure. Require focused and full offline tests, independent review, skill
+  validation and exact-head Linux/Windows Actions. A failed protected-file
+  guard needs a separate owner decision before implementation PR merge.
+- **Non-goals:** No real host, access-control or encryption claim, cleanup
+  authority, provider/model call, private input, live execution or later
+  phase advance. BER-DEC-011 is the governing authorization.
+
 ### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 
 - **ID:** WP-2B-2
@@ -1561,9 +1595,10 @@ authorization decisions in §13 remain unchanged.
   here is not established by those scoped terms. Remaining work is the final
   policy, owner parameters and operator integration, including the recorded
   GitHub recovery direction; do not rebuild the existing writer.
-  A [2026-09-23 decision proposal](ber-bkl-009-evidence-policy-decision.md)
-  maps current artifact classes and recommends concrete parameters; it is not
-  owner acceptance or implementation authority.
+  The owner selected the [30-day complete-bundle policy](ber-bkl-009-evidence-policy-decision.md)
+  in APR-009. BER-DEC-011 authorizes only the bounded offline synthetic proof
+  after its separate reviewed governance merge. Real-host access, encryption,
+  privacy and operator cleanup remain unimplemented and separately gated.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
@@ -3267,6 +3302,60 @@ model call, and evidence artifact.
   call, changed model, new spend, WP-2B-4, live Scenario A, OD-1 ratification,
   or public publication of hidden inputs. It does not alter the original
   BER-DEC-008 execution-evidence controls or thresholds.
+
+### BER-DEC-011: Bounded offline evidence-policy proof
+
+- **Date / owner / source:** 2026-09-23 / Peter Nguyen. The owner answered
+  "A. Approve bounded offline proof (recommended)" to the option-A question
+  about the exact [BER-BKL-009A proposal](ber-bkl-009a-offline-policy-scope-proposal.md)
+  merged in [PR #131](https://github.com/ModernNomad-98/Project-Aegis/pull/131)
+  at `e783f0f772700d30e203390b31e56c25187a1bc6`. Owner approval is
+  transcribed in [APR-012](../approvals/APPROVAL_REGISTER.md).
+- **Decision and effective condition:** Authorize one offline, synthetic-only
+  first increment of the selected 30-day complete-bundle policy under
+  governing work package WP-2B-1B (§7). This
+  authorization becomes effective only when this separate reviewed decision
+  and approval-register change merges. Start the implementation branch at
+  that exact merge commit; do not use a pre-grant implementation branch.
+- **Repository / branch:** `ModernNomad-98/Project-Aegis` /
+  `feat/ber-bkl-009a-offline-policy` from this grant's exact merge commit.
+- **Exact implementation paths:** `tools/behavioral_eval_runner/evidence_policy.py`
+  (new), `tools/behavioral_eval_runner/evidence.py`,
+  `tools/behavioral_eval_runner/tests/test_evidence_policy.py` (new),
+  `tools/behavioral_eval_runner/tests/test_evidence.py`,
+  `tools/behavioral_eval_runner/README.md`,
+  `docs/roadmaps/behavioral-eval-runner-backlog.md`, and
+  `docs/evidence/ber-bkl-009a-offline-review.md` (new). The merged proposal
+  defines what each path may do and the synthetic acceptance checks.
+- **Limits and stop conditions:** At most 8 active implementation hours,
+  1,000 added code/test lines, and zero task-controlled external spend. The
+  policy path must use a trusted writer-stamped first creation time, reject
+  caller-supplied time and empty input without a separately approved record,
+  require a bound classification decision, and verify one UTC deadline across
+  the input, report and detached marker. If this needs a new published field,
+  changed field meaning or accepted-byte shape, stop for a separate versioned
+  schema decision. Existing serialized evidence and legacy verification must
+  remain compatible. Preserve failed and incomplete runs. Stop before
+  exceeding any bound or changing the selected policy.
+- **Evidence handling:** The only tracked closeout is the sanitized
+  `docs/evidence/ber-bkl-009a-offline-review.md`, with exact revision,
+  commands, results, independent audit and remaining gates. Use owned
+  synthetic temporary test fixtures only; verify them before test teardown.
+  Failed and incomplete policy bundles remain preserved for review, and
+  runtime cleanup/deletion is outside scope. No real evidence root, private
+  input, provider output or credential may be collected or published.
+- **Forbidden:** No real host, credential, private calibration input, sealed
+  holdout, customer data, provider call, external evidence root, deletion,
+  publication or service principal. This entry does not prove access-control
+  lists, encryption or recovery-key custody; those need separate host
+  selection and evidence. It does not authorize a future protected-file guard
+  exception, later BER phase, live execution, or another reader.
+- **Delivery and review:** One signed implementation PR with focused and full
+  offline regression tests, skill validation, independent architecture and
+  security review, and exact-head Linux and Windows Actions. A failed
+  protected-file guard needs a separate explicit owner disposition before
+  that PR can merge. BER-BKL-009 stays partially delivered until its later
+  host, privacy and operator controls are implemented and evidenced.
 
 ## 14. Continuation instructions for a brand-new session
 
