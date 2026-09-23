@@ -5,6 +5,14 @@ description: Design data-quality monitoring for production pipelines and stores 
 
 # Data Quality Monitor Designer
 
+Terms used below: a **service-level agreement (SLA)** is the stated
+per-dataset quality commitment in this design; a **service-level objective
+(SLO)** is a journey-level target owned by `slo-reliability-architect`.
+**DLQ** means dead-letter queue, **DAG** means directed acyclic graph (the
+pipeline's task graph), **PII** means personally identifiable information,
+and **LLM** means large language model. The data SLA feeds a relevant journey
+SLO; this skill does not set that journey target.
+
 ## Purpose
 
 Systems monitor their services and stay blind to their data: the pipeline
@@ -116,18 +124,20 @@ quarantine-policy template:
 ## Output Format
 
 ```
-DATA QUALITY MONITOR SPEC — <scope>
-Datasets ranked: <N, by blast radius; coverage tier per dataset>
+DATA QUALITY MONITOR SPEC (SPECIFICATION) — <scope>
+Datasets ranked: <count, by blast radius; coverage tier per dataset>
 Per-dataset card:
   <dataset>: consumers=<top consumers/decisions>
   checks: <dimension → check, placement (ingest|transform|serving),
            severity, action (block|quarantine|alert-and-pass)>
-  SLA: freshness=<deadline> completeness=<floor> validity=<floor> (window=<w>)
+  Data-quality SLA (service-level agreement): freshness=<deadline>
+    completeness=<floor> validity=<floor> (measurement window=<duration>)
   incident: owner=<role> first-diagnostic=<evidence the check emits>
-Quarantine policy: <location, provenance fields, owner, drain SLA>
-Tenant dimension: <per-tenant checks where aggregate masks single-tenant failure | n/a + why>
+Quarantine policy: <location, provenance fields, owner, drain SLA deadline>
+Tenant dimension: <per-tenant checks where aggregate masks single-tenant failure | not applicable + why>
 Handoffs: alert/dashboard wiring → observability-operator;
-          journey SLO targets → slo-reliability-architect (consumed, not set here)
+          journey service-level objective (SLO) targets → slo-reliability-architect
+          (consumed, not set here)
 Residual: <datasets/dimensions deliberately not covered yet>
 ```
 

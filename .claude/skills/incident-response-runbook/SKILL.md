@@ -5,6 +5,13 @@ description: 'Author incident response runbooks a responder who didn''t write th
 
 # Incident Response Runbook
 
+Terms used below: **SEV1–SEV4** are incident severity levels, with SEV1 the
+highest urgency; **IC** means incident commander; a **service-level indicator
+(SLI)** is the measured signal used to verify recovery; a **service-level
+objective (SLO)** is its target; and a **service-level agreement (SLA)** is
+the applicable customer commitment. The actual thresholds, response cadence,
+and notification obligations must come from the product's recorded sources.
+
 ## Purpose
 
 Produce the incident machinery a team runs when production breaks: severity
@@ -115,9 +122,10 @@ write this, did not ship the change, and is reading it at 3am.
 
 ```
 INCIDENT RESPONSE RUNBOOK — <scope/system>
-Severity ladder: <SEV1–4 — one-minute criteria — examples — default
-  response (paging, comms cadence, IC assignment) — ambiguity-up rule>
-Roles: <IC / comms / ops — responsibilities — small-org collapse rule —
+Severity ladder: <SEV1 (highest) through SEV4 — one-minute criteria — examples —
+  default response (paging, communications cadence, incident commander assignment)
+  — ambiguity-up rule>
+Roles: <incident commander (IC) / communications / operations — responsibilities —
   escalation triggers>
 Triage (per alert family): <page → dashboard → first three questions →
   decision point — diagnosis handoff to systematic-debugger>
@@ -126,7 +134,8 @@ Containment actions: <action — when to use — authority (alone vs
 Comms: <templates per audience (internal/status/customer) × severity —
   cadence — tenant-aware disclosure rules — security-incident legal gate>
 Evidence capture: <timeline habit, snapshot list, storage location>
-Resolution & stand-down: <SLI verification, monitoring window, stand-down
+Resolution & stand-down: <service-level indicator (SLI) verification,
+  monitoring window, stand-down
   comms, postmortem scheduling rule>
 Postmortem procedure: <blameless structure — finding dispositions
   (regression test / alert fix / runbook fix / architecture / accepted
