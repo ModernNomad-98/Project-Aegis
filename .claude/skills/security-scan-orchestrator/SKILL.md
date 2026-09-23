@@ -5,6 +5,14 @@ description: 'Orchestrate a whole-repo security scan and aggregate it into ONE p
 
 # Security Scan Orchestrator
 
+Terms used below: **SAST** means static application security testing;
+**SCA** means software composition analysis of dependencies; **IaC** means
+infrastructure as code; **CVE** is a Common Vulnerabilities and Exposures
+identifier; **CI** means continuous integration; and **PR** means pull
+request. **TP/FP** mean true/false positive, which this skill does not decide.
+In the report's severity scale, **CRIT** means critical and **MED** means
+medium. A scanner that cannot run is a coverage gap, never a clean result.
+
 ## Purpose
 
 A scan suite that runs but never gets aggregated is a pile of siloed reports
@@ -105,9 +113,11 @@ and that human act on.
 ```
 WHOLE-REPO SECURITY SCAN REPORT — <repo @ ref>
 Scope: <in-scope>            Excluded: <path — reason>
-Suite (category → tool-agnostic): SAST | dependency/SCA | secret | IaC/config
+Suite (category → tool-agnostic): static application security testing (SAST) |
+  dependency analysis (SCA) | secret | infrastructure-as-code (IaC)/config
 Coverage: <category → ran | FAILED | not-applicable; version; ruleset; ref>
 Findings (normalized, deduped — NOT triaged):
+  Severity key: CRIT=critical | HIGH=high | MED=medium | LOW=low
   [CRIT|HIGH|MED|LOW] <category>/<rule> @ <file:line>
     provenance: <tool+version+ruleset>   fingerprint: <hash>
 Duplicates collapsed (cross-tool): <n>
