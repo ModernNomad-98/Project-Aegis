@@ -56,10 +56,14 @@ function Read-AegisSelection {
         $rawNames = @([regex]::Matches($raw, '"([A-Za-z_]+)"\s*:') | ForEach-Object { $_.Groups[1].Value.ToLowerInvariant() })
         if ($rawNames.Count -ne 8 -or @($rawNames | Select-Object -Unique).Count -ne 8) { throw 'Ambiguous record fields.' }
         $record = ConvertFrom-Json -InputObject $raw -ErrorAction Stop
+        if ($raw -cne (ConvertTo-Json -InputObject $record -Compress -Depth 2)) {
+            throw 'Noncanonical or ambiguous record encoding.'
+        }
         $names = @($record.PSObject.Properties.Name | Sort-Object)
         $expected = @('choice','evidence_version','project_key','schema_version','selected_at_utc','setup_completed_at_utc','state','updated_at_utc' | Sort-Object)
         if (@(Compare-Object $names $expected -CaseSensitive).Count -ne 0) { throw 'Unexpected record fields.' }
-        if ($record.schema_version -ne 1 -or $record.project_key -cne $location.Key -or
+        if (($record.schema_version -isnot [int] -and $record.schema_version -isnot [long]) -or
+            $record.schema_version -ne 1 -or $record.project_key -cne $location.Key -or
             $record.choice -cne 'aegis-only' -or $record.state -cne 'selected' -or
             $record.evidence_version -cne 'package-2') { throw 'Unknown schema or unsupported choice/state.' }
         foreach ($field in @('selected_at_utc','updated_at_utc','setup_completed_at_utc')) {

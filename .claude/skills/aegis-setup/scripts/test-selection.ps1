@@ -50,9 +50,15 @@ try {
     $repaired = Save-AegisOnlySelection $moved $state -Repair
     Assert-Selection ($repaired.Status -eq 'selected') 'explicit repair restores Aegis-only selection'
     Expect-Error { Save-AegisOnlySelection $moved $state -Repair } 'valid record cannot be repaired'
-    $duplicate = [IO.File]::ReadAllText($movedSelection.Path).TrimEnd('}') + ',"choice":"aegis-only"}'
+    $canonicalRecord = [IO.File]::ReadAllText($movedSelection.Path)
+    [IO.File]::WriteAllText($movedSelection.Path, $canonicalRecord.Replace('"schema_version":1', '"schema_version":"1"'))
+    Expect-Error { Read-AegisSelection $moved $state } 'string schema version rejected'
+    $duplicate = $canonicalRecord.TrimEnd('}') + ',"choice":"aegis-only"}'
     [IO.File]::WriteAllText($movedSelection.Path, $duplicate)
     Expect-Error { Read-AegisSelection $moved $state } 'duplicate JSON field rejected'
+    $escapedDuplicate = $canonicalRecord.TrimEnd('}') + ',"\u0063hoice":"aegis-only"}'
+    [IO.File]::WriteAllText($repaired.Path, $escapedDuplicate)
+    Expect-Error { Read-AegisSelection $moved $state } 'escaped duplicate JSON field rejected'
     Expect-Error { Get-AegisSelectionPath $moved (Join-Path $moved 'state') } 'state under checkout rejected'
     Write-Output "PASS: $checks selection assertions"
 } finally {

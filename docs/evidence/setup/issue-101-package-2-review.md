@@ -27,7 +27,7 @@ this package. The package-3 offline advisory contract is separate.
 
 ## Verification
 
-- Windows PowerShell 5.1: `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/aegis-setup/scripts/test-selection.ps1` exits 0 with `PASS: 19 selection assertions`. Synthetic temporary directories cover fresh selection, later read, overwrite, original/completion timestamps, failed write preserving a prior record, concurrent lock rejection, moved checkout, unsupported version, corrupt and duplicate JSON, explicit repair, and checkout-local state rejection.
+- Windows PowerShell 5.1: `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/aegis-setup/scripts/test-selection.ps1` exits 0 with `PASS: 21 selection assertions`. Synthetic temporary directories cover fresh selection, later read, overwrite, original/completion timestamps, failed write preserving a prior record, concurrent lock rejection, moved checkout, unsupported version, corrupt and duplicate JSON (including escaped duplicate keys), strict schema-version type, explicit repair, and checkout-local state rejection.
 - `python scripts/validate-skills.py` exits 0 with `OK: 185 skill(s) valid, 0 warning(s)`. It checks structure, not behavioral evals.
 - `evals/evals.json` and `evals/trigger-evals.json` are manual review prompts for four-choice wording and nearby skill routing. Independent conversation/authority review is required before merge.
 
