@@ -348,6 +348,75 @@ These are active-work estimates; owner decisions, GitHub queues, provider runs
 and host provisioning are excluded. Start the next five-merge counter after
 #130 and revise sooner if an audited completion changes scope.
 
+## Five-merge checkpoint — 2026-09-23, after pull request #135
+
+Five requests merged after #130, in merge order. All three exact-head GitHub
+Actions passed for each, and each had an independent read-only audit. Their
+intervals overlap and include review and queue time; active-only effort was
+not separately measured. PR #131 proposed a bounded policy proof; #134
+recorded the owner's grant, effective on its merge. Neither delivers the
+implementation. The source tree at this checkpoint tracks **506 Markdown
+files**, compared with 503 after #130 and 491 in the original inventory.
+
+| Merged request | Merge commit | Observed wall interval | Delivered |
+| --- | --- | ---: | --- |
+| [#131](https://github.com/ModernNomad-98/Project-Aegis/pull/131) | `e783f0f772700d30e203390b31e56c25187a1bc6` | 12m24s | Bounded Behavioral Eval Runner evidence-policy proposal |
+| [#132](https://github.com/ModernNomad-98/Project-Aegis/pull/132) | `f259fc9e0c3b9717a477c9208183d8c0aaefcc09` | 7m16s | Previous five-merge forecast |
+| [#133](https://github.com/ModernNomad-98/Project-Aegis/pull/133) | `524e82e809f7f03f3f170bf28d713ddf59d93ef3` | 10m00s | Scenario A runbook and navigation |
+| [#134](https://github.com/ModernNomad-98/Project-Aegis/pull/134) | `7e8f0c1067ee0a2e963520bf735a4b7b907a991f` | 10m03s | Owner-approved offline evidence-policy work package 2B-1B |
+| [#135](https://github.com/ModernNomad-98/Project-Aegis/pull/135) | `1c2d1a647b5a9e937467396a8aea831cb296ea0e` | 11m25s | Root README routing and documentation batch ledger |
+
+Every selected row was reconsidered. PR #133 and #135 make bounded pages
+readable, but they do not close the remaining repository-wide sweep. The
+policy work package starts at #134's merge commit and remains in progress;
+its eight-hour first-increment cap belongs within the existing 8–16-hour
+evidence-policy row. GitHub issue #101 was reopened after package 3 had
+closed the whole issue prematurely; packages 4 and 7 remain open in both the
+issue and this estimate.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Evidence and remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Semantic and owner label review remain |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | Offline proof is authorized but not delivered; real-host and operator controls remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Executor implementation grant and code remain |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Labels, source, allowance, results and holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | No named host or completed isolation proof |
+| Work package 2B-4 | 12–24 | 12–24 | Calibration and host prerequisites remain |
+| Work package 2B-5 | 8–16 | 8–16 | Corpus execution remains |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof remain |
+| Control-plane work package 004 | 8–16 | 8–16 | Delivery target and prerequisite proof remain |
+| Issue #101 package 4 | 8–16 | 8–16 | Selected-host integration and comparative evaluation remain |
+| Issue #101 package 7 | 6–12 | 6–12 | Release review remains |
+| Repository-wide documentation readability | 80–200 | 80–200 | More pages are reviewed, but the full 506-page inventory remains open |
+| **Selected remaining total** | **175–394** | **175–394** | No selected implementation row closed; non-documentation subtotal remains 95–194 |
+
+Optional work was also reconsidered. [Strategic skill expansion and framework
+coverage](product-agnostic-skill-and-agent-roadmap.md) is now visible as an
+optional backlog row. The [current catalog](../skills-catalog.md) and demand
+evidence must define a bounded candidate batch before it receives an ETA;
+subtracting the present skill count from an aspirational roadmap target would
+invent work that has not been selected.
+
+| Optional open work item | Previous active hours if selected | Revised active hours if selected | Remaining gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision |
+| Behavioral Eval Runner item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count |
+| Behavioral Eval Runner item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count |
+| Strategic skill expansion and framework coverage | Previously unlisted | Unbounded until a candidate batch is selected | Demand, coverage and explicit package selection |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Architecture and adoption decisions |
+
+The selected total remains **175–394 active hours**; selecting both optional
+issue #101 helpers would make the bounded total **191–434 active hours**. The
+all-options backlog still has **no finite ETA** because optional host and
+product quantities, strategic expansion and later architecture are undecided.
+Owner waits, GitHub queues, provider runs and host provisioning are excluded.
+Start the next five-merge counter after #135 and revise sooner if a completed
+audited implementation materially changes scope.
+
 **Historical baseline — recorded after pull request #106 on September 23,
 2026.** The paragraph and baseline tables below preserve estimates and pending
 decisions recorded then. They are not current work status or authorization.
