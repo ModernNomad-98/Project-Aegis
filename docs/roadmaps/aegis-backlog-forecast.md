@@ -4,11 +4,11 @@
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. At the latest recorded [five-merge checkpoint after pull
-request #181](#five-merge-checkpoint--2026-09-23-after-pull-request-181), the
+request #186](#five-merge-checkpoint--2026-09-23-after-pull-request-186), the
 selected remaining work totals **175–394 active hours**, including **80–200
 active hours** for the repository-wide documentation readability sweep. That
 checkpoint was recorded on 2026-09-23; later work should be checked against
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-181--2026-09-23)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-186--2026-09-23)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -1264,6 +1264,103 @@ remain open. Owner waits, GitHub queues, provider execution and host
 provisioning are outside the active-hour estimates. Restart the five-merge
 counter after #181, and revise sooner if verified delivery or an owner
 decision materially changes remaining scope.
+
+## Five-merge checkpoint — 2026-09-23, after pull request #186
+
+Five requests merged after #181, in order #185, #182, #183, #184 and #186.
+The reviewed base is the exact #186 merge
+`d5b007b0a3cc2bd43806a16970f19c84be9a86b0`. These requests delivered
+the preceding forecast, a documentation ledger update and three groups of
+reading improvements. No selected implementation item, owner-decision gate
+or selected-host prerequisite closed. The [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-186--2026-09-23)
+record the original estimates, start times and GitHub merge events.
+
+| Merge, commit and delivered scope | Previous estimate | New package estimate | First audit/preparation to merge event |
+| --- | ---: | ---: | ---: |
+| [#185](https://github.com/ModernNomad-98/Project-Aegis/pull/185), `7cb14fd6801031de28d5b11d759005cb089ef877`: prior five-merge forecast | 1–2 h | 1–2 h | 13m38s |
+| [#182](https://github.com/ModernNomad-98/Project-Aegis/pull/182), `e43708bfaf7bf134260769d58b17980c59f9aa94`: documentation ledger through the completed skill and reference screens | None recorded for this integration | 1–3 h | 50m36s |
+| [#183](https://github.com/ModernNomad-98/Project-Aegis/pull/183), `fabdafa532f9760d558d8bcd3b7237742d480895`: three roadmap and audit reading keys | 4–8 h wider screen | 1–3 h bounded correction | 23m22s |
+| [#184](https://github.com/ModernNomad-98/Project-Aegis/pull/184), `8a69909ec8889f40a2822b7d78b0c4ad3eb7d660`: evidence index and seven dated status banners | 2–4 h evidence inventory | 4–8 h bounded correction | 13m53s |
+| [#186](https://github.com/ModernNomad-98/Project-Aegis/pull/186), `d5b007b0a3cc2bd43806a16970f19c84be9a86b0`: five candidate and hosted-evidence reading notes | 2–4 h evidence inventory | 2–4 h five-page correction | 9m27s |
+
+Here **h**, **m** and **s** mean hours, minutes and seconds. The earlier
+estimates for #183–#186 describe preceding or differently bounded screens.
+All package intervals overlap and include preparation, review, integration,
+checks and waits. Active effort was not instrumented; these observed wall
+intervals cannot be summed as labor or used as a documentation or coding rate.
+The cycle runs from #182's first preparation at 20:59:26 to #186's merge event
+at 21:57:03 Coordinated Universal Time (UTC): **57m37s observed wall time**.
+There was no single published active-work estimate for the combined cycle.
+
+The exact #186 tree contains **543 tracked Markdown files**, compared with
+540 after #181. The ledger added no file; #183 added one dated evidence note,
+#184 added the evidence index and #186 added one dated evidence note.
+The [documentation ledger](aegis-documentation-readability-backlog.md#documentation-batches)
+now records the completed screens through #173 and the separate owning-skill
+corrections. Those screens covered **186 skill entrypoint paths** (185 shipped
+skills and one template), with 28 corrected pages, and **156 reference paths**,
+with 49 corrected pages. This cycle records that earlier progress; it does not
+claim a second pass or new acceptance of those pages.
+
+The [three-page evidence note](../evidence/documentation/remaining-active-docs-readability-2026-09-23.md),
+[evidence index](../evidence/README.md) and
+[five-page follow-up note](../evidence/documentation/evidence-followup-current-reading-2026-09-23.md)
+describe this cycle's bounded reading corrections. Original audit findings,
+candidate identities, platform skips and failed hosted-run records remain
+historical evidence. Full page acceptance and the wider documentation sweep
+remain unfinished, including pages outside these selected groups.
+
+All five final pull-request revisions passed their Linux, Windows and
+protected-file checks, and all five main-branch runs passed. The last main
+run, [#186 verification 35925522295](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35925522295),
+was confirmed successful at the exact merge before this draft froze.
+
+All **14 selected** and **seven optional** open rows were reconsidered.
+Ledger integration and dated reading notes reduce known navigation work,
+but no measured active-work rate or remaining-page acceptance inventory
+supports narrowing the 80–200-hour documentation estimate. No selected
+implementation row closed, and no optional package or quantity was selected.
+The previous and revised selected totals remain **175–394 active hours**:
+**95–194** for non-documentation work and **80–200** for documentation.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Remaining gate after #186 |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Owner semantic review and approved private labels remain |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | Pull request #139 remains unmerged pending its own guard disposition; real-host enforcement and operator controls remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | The exact offline executor implementation grant and code remain |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Labels, reviewed source and allowance, development results and holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured tool-path/profile isolation remain |
+| Work package 2B-4 | 12–24 | 12–24 | Limited live execution awaits calibration and selected-host proof |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus execution follows package 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof remain |
+| Control-plane work package 004 | 8–16 | 8–16 | Selected delivery target and package-003 prerequisites remain |
+| Issue #101 package 4 | 8–16 | 8–16 | Pinned host, cases, budget, execution authority and comparative results remain |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation follows selected integration outcomes |
+| Repository-wide documentation readability | 80–200 | 80–200 | Ledger integration through #173 is delivered; full page acceptance and the wider evidence/documentation inventory remain |
+| **Selected remaining total** | **175–394** | **175–394** | Non-documentation **95–194** plus documentation **80–200** |
+
+All seven optional rows retain their ranges and gates. [Strategic expansion](product-agnostic-skill-and-agent-roadmap.md)
+still requires a bounded candidate batch informed by the [skills catalog](../skills-catalog.md).
+
+| Optional open work item | Previous active hours if selected | Revised active hours if selected | Remaining gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision |
+| Behavioral Eval Runner item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count |
+| Behavioral Eval Runner item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count |
+| Strategic skill expansion and framework coverage | Unbounded until a candidate batch is selected | Unbounded until a candidate batch is selected | Demand, coverage and package selection |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Architecture and adoption decisions |
+
+Selecting both optional issue #101 helpers adds **16–40 active hours**,
+giving **191–434 active hours**. The full all-options backlog remains
+unbounded. Owner waits, GitHub queues, provider execution and host provisioning
+are outside the active-hour estimates. This checkpoint grants no new
+implementation or execution authority. Restart the five-merge counter after
+#186, and revise sooner if verified delivery or an owner decision materially
+changes remaining scope.
 
 **Historical baseline — recorded after pull request #106 on September 23,
 2026.** The paragraph and baseline tables below preserve estimates and pending
