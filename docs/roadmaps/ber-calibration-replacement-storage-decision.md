@@ -1,7 +1,8 @@
 # BER replacement calibration input storage — owner decision proposal
 
-Prepared: 2026-09-23. Status: PROPOSAL, not an authorization or dataset
-approval. Governing package: WP-2B-3 / BER-DEC-008. This proposal implements
+Prepared: 2026-09-23. Status: OWNER STORAGE CHOICE RECORDED; BER-DEC amendment
+pending. This is not dataset approval or execution authority. Governing package:
+WP-2B-3 / BER-DEC-008. This proposal implements
 the [replacement preparation plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md)
 only after Peter Nguyen makes the changed storage decision and its BER-DEC
 amendment is reviewed and merged. It makes no provider request and does not
@@ -99,3 +100,15 @@ preflight and later holdout freeze. This proposal supplies none of those gates.
 
 No choice here approves candidate labels, a provider call, a new allowance,
 an installation, or the final OD-1 result.
+
+## Owner disposition — 2026-09-23
+
+Peter Nguyen selected option A in direct response to the PR #105 storage
+question: **"Use the private GitHub input repository (recommended)"**. The
+question named the public source repository, 120 holdout cases and proposed
+labels, private GitHub input repository with owner-only initial access and
+durable versioned inputs, and continued 30-day external execution-evidence
+root. This decision accepts that storage direction; it does not itself create
+the repository or approve labels, provider calls, changed source pins or an
+execution allowance. Record the exact location and terms in a separately
+reviewed, merged BER-DEC amendment before publishing replacement inputs.
