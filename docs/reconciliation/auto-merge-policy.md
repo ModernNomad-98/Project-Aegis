@@ -1,5 +1,11 @@
 # Auto-Merge Policy
 
+This page describes who may merge a pull request (PR) and how the project's
+continuous integration (CI) checks affect that decision. `AEGIS-APR-002` is
+entry 002 in the owner approval register; `gate-guard` is the CI job that
+flags protected-file changes for manual review. The dated `D34` code below
+names a decision in the reconciliation record.
+
 ## Current policy — recorded 2026-09-12
 
 Human authority governs merges. For `ModernNomad-98/Project-Aegis`, the owner
@@ -15,6 +21,22 @@ An intentional protected-file `gate-guard` failure requires explicit review of
 the affected enforcement surfaces. The owner's grant covers administrator
 merges, including the recorded guard/review bypass; do not weaken checks or
 change repository settings to make a change mergeable. Auto-merge is not armed.
+
+**Current reading, 2026-09-23:** The owner's later all-green GitHub Actions
+instruction makes a PR-specific decision necessary before merging a reviewed
+PR whose only failed check is the protected-file guard. The standing
+administrator grant authorizes the merge mechanism for otherwise authorized
+work; it does not itself decide a new failed-check exception. Require the
+final reviewed revision, passing Linux and Windows jobs, an independent audit
+without blockers, and the owner's exact-PR exception. Approval entries
+[AEGIS-APR-005](../approvals/APPROVAL_REGISTER.md#aegis-apr-005-pr-104-protected-file-guard-exception)
+and [AEGIS-APR-010](../approvals/APPROVAL_REGISTER.md#aegis-apr-010-pr-119-protected-file-guard-exception)
+applied only to PRs #104 and #119. The later offline Behavioral Eval Runner
+grant [AEGIS-APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof)
+expressly does not waive a future guard failure. Keep the guard and branch
+settings intact. When all checks are green, authorized work may use the
+standing administrator grant without another merge-mechanism request.
+
 See [offline CI](../offline-ci.md) for current job names, protected paths and
 post-merge verification, and [CONTRIBUTING](../../CONTRIBUTING.md) for delivery rules.
 
