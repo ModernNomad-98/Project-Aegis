@@ -1,8 +1,25 @@
-# Frontend & UX Engineering
+# Frontend and user experience (UX) engineering
 
 Frontend skills for routes, components, state, accessibility, security, and usability.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: UX means user experience; UI means user interface; URL
+means web address; HTML means HyperText Markup Language; PWA means progressive
+web app; XSS means cross-site scripting; QA means quality assurance; E2E means
+end-to-end testing; auth means authentication; env vars are environment
+variables.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -27,9 +44,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 179 | Visual Regression Readiness | P2 | Identify stable screens and states suitable for screenshots or visual diff testing. |
 | 180 | Frontend QA Harness Design | P1 | Design component, route, URL-state, accessibility, and E2E coverage for frontend changes. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use

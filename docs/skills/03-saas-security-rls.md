@@ -1,8 +1,32 @@
-# SaaS Security, Multi-Tenancy & RLS
+# Software as a service (SaaS) security and row-level security (RLS)
 
 Security skills for tenant isolation, RLS, authorization, secrets, storage, and auditability.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: SaaS means software as a service; RLS means row-level
+security; MFA means multifactor authentication; SSO means single sign-on; CSRF
+means cross-site request forgery; XSS means cross-site scripting; SQL means
+Structured Query Language; URL means web address; API means application
+programming interface; IP means Internet Protocol address; CSP means Content
+Security Policy; HTTP means Hypertext Transfer Protocol; HSTS means HTTP
+Strict Transport Security; CI means continuous integration; PII means
+personally identifiable information. `SECURITY DEFINER` is a PostgreSQL
+function privilege mode; `tenant_id` and `owner_id` are record identifiers.
+SELECT, INSERT, UPDATE and DELETE are database read, create, change and
+removal operations; RPC means remote procedure call; auth means
+authentication.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -47,9 +71,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 129 | Privacy-by-Design Review | P1 | Minimize data collection, define purpose, restrict access, support deletion, and document retention. |
 | 130 | Security Drift Detection | P0 | Compare code, policies, tests, and docs to catch weakened or undocumented security behavior. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use
