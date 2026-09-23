@@ -51,7 +51,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Corrects the command: squash-merged changes land as ORDINARY commits, so the revert is git revert <sha> — the -m 1 flag applies only to true merge commits and FAILS on squash commits.",
+          "Corrects the recommended command: squash-merged changes land as ordinary commits, so use git revert <sha>. The -m option selects a mainline parent for a true merge and is unnecessary for a squash commit; do not claim that -m 1 must fail on an ordinary commit.",
           "Defines the primitive as revert-PR-then-auto-redeploy with the revert PR passing the same required checks — the gate is not bypassed for rollbacks.",
           "States what revert does not undo (applied migrations, external effects) and routes the executable runbook to rollback-runbook-author."
         ]
