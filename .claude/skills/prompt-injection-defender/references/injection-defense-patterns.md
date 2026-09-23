@@ -1,6 +1,12 @@
 # Prompt-injection defense patterns
 
-Detail for `prompt-injection-defender`. OWASP LLM01 (2025).
+Use these patterns with the [prompt injection defender](../SKILL.md) to design
+trust separation, an enforced action boundary, and negative tests. The parent
+skill is **manual-only** because it edits code or prompts; reading this page
+does not invoke it. **OWASP** means Open Worldwide Application Security
+Project; **LLM01** is its 2025 large language model prompt-injection risk code.
+**AI** means artificial intelligence, **API** means application programming
+interface, and **PDF** means Portable Document Format.
 
 ## Trust-zone model
 
@@ -75,8 +81,10 @@ boundary):
 - **Delimiter escape:** untrusted content containing your closing tag to break
   out of its block.
 
-Hand the encoded suite to `ai-evaluation-harness`; wire confirmed live hits to
-`incident-response-runbook`.
+Hand the encoded suite to `ai-evaluation-harness`. For confirmed live hits,
+notify the human incident owner and follow the current approved incident
+runbook. `incident-response-runbook` authors or updates that procedure; it is
+not the live response route.
 
 ## Fallback / degraded modes
 

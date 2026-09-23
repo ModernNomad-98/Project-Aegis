@@ -1,8 +1,10 @@
 # RLS Audit Checklist — per command, failure modes, negative tests
 
-Progressive-disclosure detail for `rls-policy-auditor`. Postgres-oriented but
-the reasoning transfers to any policy-based row security. Audit each table's
-four commands separately; RLS enabled is not RLS enforced.
+Use this [RLS policy auditor](../SKILL.md) checklist to inspect each table's
+four commands and design wrong-tenant negative tests. **RLS** means row-level
+security; **JWT** means JSON Web Token; **API** means application programming
+interface. This is Postgres-oriented, but the reasoning transfers to any
+policy-based row security. RLS enabled is not RLS enforced.
 
 ## Per-command audit questions
 
@@ -54,6 +56,12 @@ four commands separately; RLS enabled is not RLS enforced.
 
 Express each as a session that sets the caller context, then attempts a
 forbidden action, with the expected result. Include a positive control.
+The SQL below is an illustrative plan for **synthetic fixtures in an isolated,
+disposable non-production database**. It includes write statements to expose
+policy failures. Do not paste it into a live or customer database. Run each
+adapted case in a transaction that is rolled back, and verify the fixture is
+unchanged afterward. Skip execution if triggers or external effects cannot be
+isolated or reversed. This skill delivers the plan, not live execution.
 
 ```sql
 -- SELECT isolation
