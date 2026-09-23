@@ -260,11 +260,12 @@ generic skill guidance that would require asking for the same approval again.
   the detached marker. Expiration makes cleanup eligible for owner review;
   failures and incomplete runs remain preserved until resolved and reviewed.
   The owner and required runner/verifier components are the intended readers;
-  the current Windows work package 2B-3 root keeps owner plus operating-system
-  SYSTEM access and verified BitLocker encryption. A different selected host
-  requires its own verified mechanism and access decision. Private versioned
-  calibration inputs remain in the separate owner-only repository until an
-  owner-reviewed deletion; public Git holds only reviewed sanitized records.
+  the current Windows work package 2B-3 root requires owner plus operating-system
+  SYSTEM access and host-verified BitLocker encryption before use. A different
+  selected host requires its own verified mechanism and access decision.
+  Private versioned calibration inputs remain in the separate owner-only
+  repository until an owner-reviewed deletion; public Git holds only reviewed
+  sanitized records.
 - **Boundary:** The proposal's reader matrix, redaction, publication and
   marker-gated cleanup controls are the policy target. Current metadata and
   operating-system enforcement are incomplete. Behavioral Eval Runner backlog
