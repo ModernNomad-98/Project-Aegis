@@ -88,7 +88,9 @@ to your app.
    Yields an evidence-based GO (ready to ship) or NO-GO (blocked from shipping)
    decision, built from what the
    steps above actually found — not from anyone's assurance that it's probably fine. This
-   is the close of the path.
+   is the close of the path. A GO is an advisory readiness result, not release
+   authorization; a human approval or applicable standing grant still governs
+   any launch.
 
 ## What this is — and isn't
 
