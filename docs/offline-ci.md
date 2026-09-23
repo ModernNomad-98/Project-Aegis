@@ -10,7 +10,7 @@ inputs; they do not run a live model evaluation.
 
 1. Run the [local checks](#local-reproduction) on the changed revision and
    record the command, result and any skip.
-2. Open a pull request and wait for the Linux, Windows and protected-file
+2. Open a pull request (PR) and wait for the Linux, Windows and protected-file
    guard jobs on its exact head revision. A later push starts new checks; older
    green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
@@ -76,7 +76,7 @@ log or metadata record with the same label. It does not reinterpret a test runne
 result or retry a command.
 
 Each verification job uploads its logs and records on success or failure, with a
-unique operating-system/run/attempt artifact name and **14-day retention**.
+unique operating-system (OS)/run/attempt artifact name and **14-day retention**.
 Setup failures before
 the recorder runs remain visible in native Actions logs. The upload action is
 pinned to the verified `actions/upload-artifact` v7.0.1 commit

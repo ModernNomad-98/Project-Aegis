@@ -1,7 +1,10 @@
 # Closeout Report Template
 
-Copy this structure verbatim. Every section appears in every report — write
-"None." rather than deleting a section. Section 2 is never optional.
+Use all eight headings in this order. Replace the guidance and angle-bracket
+placeholders with the report's actual content; do not copy those instructions
+into the final report. Every section appears in every report. If nothing was
+intentionally omitted, write exactly "None." in section 2. Section 2 is never
+optional. **PR** means pull request; **CI** means continuous integration.
 
 ---
 
@@ -15,7 +18,8 @@ What changed and why, in a few sentences. Written against the original request.
 > skipped, delivered partially, or downgraded — each with its reason. If truly
 > nothing was omitted, write exactly: **None.**
 
-- <item> — <reason it was skipped / reduced> — <where it's tracked, if anywhere>
+<!-- If something was omitted, add one bullet per omission with its reason
+     and tracking location. Otherwise write exactly "None." and no bullet. -->
 
 ## 3. Files touched
 

@@ -1,12 +1,15 @@
 # Historical evidence reading correction
 
-Date: 2026-09-23. A read-only screen of shared-contract and Behavioral Eval
+Date: 2026-09-23. This note helps maintainers read the September 12
+shared-contract and Behavioral Eval Runner recovery evidence. A read-only
+screen of shared-contract and Behavioral Eval
 Runner recovery evidence began at approximately 23:20 Coordinated Universal
 Time (UTC), recorded to minute precision. The previous repository-wide
 documentation estimate was **80–200 active hours**. This bounded screen and
 correction was estimated at **2–4 active hours**; the selected backlog total
-at work start was **175–394 active hours**. The pull request will record
-observed first-work-to-merge wall time separately.
+at work start was **175–394 active hours**. [Pull request #205](https://github.com/ModernNomad-98/Project-Aegis/pull/205#issuecomment-5804656266)
+records its observed first-work-to-merge wall time separately from that
+active-work estimate.
 
 The [corrected verification record](../shared-contracts-closeout-2026-09-12/corrected-verification.md)
 already identified its candidate revision, and now explains that its hosted

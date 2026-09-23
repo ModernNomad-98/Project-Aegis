@@ -19,6 +19,16 @@ the five capability-evidence gates. Continuous integration (CI) checks source;
 its Linux run is not proof on a selected host. `NON-LIVE` means recorded or
 synthetic input only; `NON_BASELINE` means a result cannot qualify for the
 measured baseline. POSIX names a Unix-like operating-system interface.
+Later technical terms: **MCP** means Model Context Protocol; **OS** means
+operating system; **DCO** means Developer Certificate of Origin, the commit
+sign-off check; **SDK** means software development kit; **API** means
+application programming interface; **JSON** means JavaScript Object Notation;
+**YAML** is a human-readable structured data format ("YAML Ain't Markup
+Language"); and **UTC** means Coordinated Universal Time. These expansions
+explain existing records and do not change their gates or decisions.
+References such as `§20a-S13/S20` name numbered design-correction
+supersessions in [section 20a of the merged design](../design/behavioral-eval-runner-v1.md);
+`S13/S20` points to two such corrections, not a new work package.
 
 | Work or evidence gate | Current disposition | What remains |
 | --- | --- | --- |
@@ -37,7 +47,12 @@ register](../approvals/APPROVAL_REGISTER.md) for later lifecycle events.
 The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 estimates remaining work but grants no authority.
 
-## Original register and dated checkpoints
+## Durable register and dated checkpoints
+
+The work-package and backlog-item records below carry current status where
+explicitly updated; dated delivery checkpoints and the append-only governance
+log preserve their original history. Read each record's status with the
+first-screen map and later owner approvals before acting.
 
 Prepared: 2026-08-10.
 Purpose: the durable, repository-resident continuation and deferred-work register for the
@@ -745,9 +760,11 @@ the sole owner of actual advisory CI integration).
   represent unproven capabilities as unavailable/unknown and keep every live-dispatch
   path disabled. Unit tests may prove runner-owned control logic; they do not prove
   host/provider enforcement or containment.
-- **Owner decision required:** WP-2B-1 authorization is recorded by BER-DEC-006. Final
-  schema-shape acceptance (BER-BKL-007) and OD-3 risk-class ratification remain owner
-  decisions at implementation review. No later phase is authorized.
+- **Owner decision required:** WP-2B-1 authorization was recorded by
+  BER-DEC-006. Final schema-shape acceptance (BER-BKL-007) was fulfilled by
+  Peter Nguyen's PR #104 decision on 2026-09-23. OD-3 risk-class
+  ratification remains open for its later promotion gate. No later phase is
+  authorized by these earlier decisions.
 - **Explicit non-goals:** No semantic judging in production; no Scenario A live suite; no
   generic corpus execution; no CI integration; no relaxation of any 2B-0 evidence
   boundary.
@@ -894,11 +911,13 @@ the sole owner of actual advisory CI integration).
   reproducible from the same transcript. Non-live constraint: WP-2B-2 passes only when its
   code and tests keep every live-dispatch path disabled and represent measured calibration
   and R1/R2/R4/R5 as unproven.
-- **Owner decision required:** Phase authorization (BER-DEC-007). Assertion-classification
-  sign-off (D9 authority, Peter Nguyen) applies to the Scenario-A-scoped grading contracts
-  authorized by the successor §4 — the coherent-topic grading contract and the other
-  Scenario A assertions that cannot be mechanically graded — at implementation review. No
-  later phase is authorized; OD-1 is not ratified here.
+- **Owner decision required:** Phase authorization (BER-DEC-007) and the
+  Scenario-A-scoped assertion-classification sign-off (D9 authority, Peter
+  Nguyen) were fulfilled for this package at implementation review; the
+  final PR #85 body is the sign-off evidence cited below. The sign-off covers
+  the coherent-topic grading contract and other Scenario A assertions that
+  cannot be mechanically graded under successor §4. It authorizes no later
+  phase and does not ratify OD-1.
 - **Explicit non-goals:** No runner-generated, grading-stack-generated, or
   test-harness-generated model/provider dispatch; no actual judge/provider call; no measured
   judge calibration (owned by the redefined WP-2B-3 gate); no OD-1 ratification; no
@@ -1295,7 +1314,7 @@ authorization decisions in §13 remain unchanged.
   metrics (accounted-for vs actually graded) keep the honesty property the coverage
   metrics exist for.
 - **Dependencies:** SATISFIED — WP-2B-1 report contracts merged in PR #83.
-  BER-BKL-007's remaining migration-policy work does not reopen these metrics.
+  BER-BKL-007's later completed migration policy did not reopen these metrics.
 - **Trigger to begin:** CLOSED — implementation delivered; OD-2 remains a later gate.
 - **Expected deliverable:** Two explicitly named metrics in the run report schema — an
   assertion-accounting coverage (every selected assertion has a recorded disposition) and
@@ -1340,8 +1359,9 @@ authorization decisions in §13 remain unchanged.
 - **Why it matters:** Schema identifiers become machine keys (§13 versioned schemas).
   Prose/identifier drift (`JUDGE-ERROR` vs `JUDGE_ERROR` and any similar pair) produces
   parsers and reports that disagree about the same concept.
-- **Dependencies:** WP-2B-1 schema work (BER-BKL-007).
-- **Trigger to begin:** WP-2B-1 AUTHORIZED.
+- **Dependencies:** Fulfilled: WP-2B-1 schema work and BER-BKL-007 are DONE.
+- **Trigger to begin:** Historical trigger fulfilled when WP-2B-1 became
+  AUTHORIZED; the naming sweep is now DONE.
 - **Expected deliverable:** A naming-normalization sweep over the runner's schemas, code,
   and docs as they are authored: one canonical spelling per identifier (the design's
   underscore enum forms), a recorded mapping for any variance found, and a lint/test
@@ -1559,11 +1579,12 @@ authorization decisions in §13 remain unchanged.
 - **Why it matters:** The design deliberately specifies concepts, not final serialized
   shapes. Production schemas need exact field names, types, enum registries, and a
   migration policy so later schema versions never silently reinterpret stored evidence.
-- **Dependencies:** WP-2B-1 implementation is DONE; the remaining policy and
-  external-version validation follow-up is WP-2B-1A under BER-DEC-009.
-- **Trigger to begin:** The reviewed governance PR carrying BER-DEC-009 is
-  merged; implementation then begins on its recorded branch. The original
-  schema implementation is already delivered.
+- **Dependencies:** Fulfilled: WP-2B-1 implementation and the WP-2B-1A
+  compatibility-policy/external-version follow-up are DONE under BER-DEC-009
+  and PR #104. Later schema changes require their own reviewed scope.
+- **Trigger to begin:** Historical trigger fulfilled. The reviewed governance
+  PR carrying BER-DEC-009 merged before the WP-2B-1A implementation branch;
+  PR #104 later delivered that follow-up.
 - **Expected deliverable:** Versioned JSON/YAML schemas for attempt records, case
   aggregates, run reports (three field groups), case/fixture manifests, materialization
   and execution profiles, and evidence manifests; a schema-migration policy (how
@@ -1640,9 +1661,10 @@ authorization decisions in §13 remain unchanged.
 - **Priority:** REQUIRED
 - **Status:** BACKLOG — PARTIALLY DELIVERED. The evidence writer and scoped
   WP-2B-1/WP-2B-3 handling terms exist; the complete production policy requested
-  here is not established by those scoped terms. Remaining work is the final
-  policy, owner parameters and operator integration, including the recorded
-  GitHub recovery direction; do not rebuild the existing writer.
+  here is not established by those scoped terms. Remaining work is the
+  selected policy's implementation, host-specific proof and operator
+  integration, including the recorded GitHub recovery direction; do not
+  rebuild the existing writer.
   The owner selected the [30-day complete-bundle policy](ber-bkl-009-evidence-policy-decision.md)
   in APR-009. BER-DEC-011 authorizes only the bounded offline synthetic proof
   after its separate reviewed governance merge. Real-host access, encryption,
@@ -1653,15 +1675,16 @@ authorization decisions in §13 remain unchanged.
   deletion/expiration procedure; redaction before judge exposure or external sharing);
   §20 D6; owner backlog-creation directive of 2026-08-10.
 - **Why it matters:** External never means ungoverned. The design requires the classes
-  and procedures to exist but deliberately does not fix the exact periods, access
-  groups, or encryption mechanism — those are owner decisions that must be recorded
-  before evidence accumulates at scale. Phase split: WP-2B-0 runs under the minimum
+  and procedures to exist but did not fix the exact periods, access groups,
+  or encryption mechanism at design time. APR-009 later selected the 30-day
+  complete-bundle target and intended readers; selected-host enforcement
+  still needs verification. Phase split: WP-2B-0 runs under the minimum
   temporary spike-evidence-handling terms fixed in its authorization (§2 of this file) —
   mandatory before any probe or model call; this item delivers the final
   production-grade policy in 2B-1, and the spike terms never substitute for it.
-- **Dependencies:** The WP-2B-1 evidence writer is delivered. The complete production
-  policy and owner parameters remain separate from that implementation and the
-  temporary/scoped terms in BER-DEC-006/008.
+- **Dependencies:** The WP-2B-1 evidence writer is delivered. The selected
+  production policy's enforcement and host-specific proof remain separate
+  from that implementation and the temporary scoped terms in BER-DEC-006/008.
 - **Trigger to begin:** Prepare the remaining policy and operator integration under
   a scoped follow-up; preserve the existing writer and recorded scope limitations.
 - **Expected deliverable:** A written evidence-governance policy fixing: retention
@@ -1674,9 +1697,13 @@ authorization decisions in §13 remain unchanged.
   retained; raw transcripts remain external and never auto-committed (D6); the policy is
   reviewable in the repository; and the final policy explicitly reviews the WP-2B-0
   spike-evidence-handling terms and absorbs or retires them.
-- **Owner decision required:** The exact retention periods, access groups, and encryption
-  mechanism (owner-decision register §9, unnumbered item; deliberately not invented in
-  the design or here).
+- **Owner decision required:** [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection)
+  selected the 30-calendar-day complete-bundle target, intended owner and
+  required-component readers, and the Windows owner/SYSTEM and BitLocker
+  target. It did not verify that any host enforces those controls. A different
+  selected host needs its own reviewed access and encryption decision;
+  implementation, cleanup and any changed reader or retention rule need
+  their applicable separate scope and approval.
 - **Explicit non-goals:** No cryptographic signing or immutable external store (that is
   BER-BKL-010 / OD-4); no committing of raw transcripts.
 - **Related design sections:** §13 (evidence-bundle contract; access/retention/
@@ -1962,11 +1989,16 @@ superseded by the later authorization note and §14.
 
 ### Required owner decisions without a design OD number
 
-- **Exact evidence retention periods, access groups, and encryption mechanism.** Design
-  §13 requires retention classes with defined periods, access control, and
-  encryption-at-rest where sensitivity requires, but deliberately fixes none of the
-  parameters. The owner sets them before evidence accumulates at scale. No OD number
-  exists in the design for this item and none is invented here. Tracked by: BER-BKL-009.
+- **Evidence retention, readers and selected-host enforcement.** Design §13
+  required concrete retention, access and encryption choices but originally
+  fixed no parameters. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection)
+  later selected the 30-calendar-day complete-bundle target, intended
+  owner/required-component readers and a Windows owner/SYSTEM and BitLocker
+  target. It did not verify host enforcement or authorize cleanup.
+  Host-specific access/encryption proof, any different-host choice and the
+  separately scoped implementation remain open. No owner-decision (OD)
+  number exists in the original design for this item and none is invented
+  here. Tracked by: BER-BKL-009.
 - **Stronger evidence authenticity mechanism, if adopted.** The concrete mechanism choice
   under OD-4 (signing key custody, immutable store, or both), if the owner adopts one.
   Tracked by: BER-BKL-010.
