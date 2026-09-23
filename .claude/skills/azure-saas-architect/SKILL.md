@@ -16,6 +16,20 @@ way Azure documents them, name services and capabilities — and leave SKU
 tiers, quotas, regional availability, and prices as verification items
 against current Azure docs, never asserted from memory.
 
+Terms used below: **SaaS** means software as a service, **IaC** infrastructure
+as code, **CI/CD** continuous integration and continuous delivery, and **SKU**
+stock keeping unit (an offered service tier or configuration). For identity,
+**ID** means identity, **OIDC** OpenID Connect, and **RBAC** role-based access
+control. For network and compute, **VNet** means virtual network, **WAF** web
+application firewall, **CDN** content delivery network, **AKS** Azure Kubernetes
+Service, and **SQL** Structured Query Language. Security terms are **CSPM**
+(cloud security posture management), **CWPP** (cloud workload protection
+platform), **SIEM** (security information and event management), **SOAR**
+(security orchestration, automation and response), and **CASB** (cloud access
+security broker). **GA** means general availability and **L7** means layer 7
+(the application layer) of the network model. These terms identify what
+to evaluate; they do not verify a current Azure offering, limit or price.
+
 ## Use When
 
 - Use when: a cloud decision landed on Azure and the logical architecture
@@ -146,8 +160,8 @@ Data (per store): <store — service — tenant-isolation mechanism — why it f
 Compute (per workload): <workload — service — rationale incl. operational bill>
 Messaging: <needs → Service Bus / Event Grid / Event Hubs, tenant context propagation>
 Observability & secrets: <Monitor/App Insights/Log Analytics wiring, Key Vault layout, rotation>
-CI/CD & security posture: <OIDC deploy path, Azure Policy guardrails, Defender for Cloud plans, Sentinel (if D&R practice), CASB / ID Protection placements>
-IaC strategy: <tool, state/environment layout, module conventions>
+Delivery pipeline and security controls: <OIDC deploy path, Azure Policy guardrails, Defender for Cloud plans, Sentinel (if detection-and-response practice), CASB / ID Protection placements>
+Infrastructure-as-code strategy: <tool, state/environment layout, module conventions>
 Cost controls: <budgets, views, attribution feed, top-3 cost risks>
 Verification items: <each SKU/limit/region/price-dependent claim → verify against current Azure docs>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
