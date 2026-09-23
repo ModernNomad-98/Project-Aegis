@@ -17,6 +17,25 @@ attribution — and leave instance types, quotas, regional availability, and
 prices as verification items against current AWS docs, never asserted from
 memory.
 
+Terms used below: **AWS** is Amazon Web Services, **SaaS** is software as a
+service, **IaC** is infrastructure as code, and **CI/CD** is continuous
+integration and continuous delivery. For accounts and identity, **OU** means
+organizational unit, **SCP** service control policy, **IAM** Identity and Access
+Management, **IdP** identity provider, and **OIDC** OpenID Connect. For network
+controls, **VPC** means virtual private cloud, **ALB** Application Load
+Balancer, **WAF** web application firewall, **CDN** content delivery network,
+and **NAT** network address translation. Data and compute names are **RDS**
+(Relational Database Service), **S3** (Simple Storage Service), **ECS** (Elastic
+Container Service), and **EKS** (Elastic Kubernetes Service); **SQS** (Simple
+Queue Service) and **SNS** (Simple Notification Service) are messaging services.
+**KMS** means Key Management Service and **CDK** Cloud Development Kit. Security
+terms are **PII** (personally identifiable information), **CSPM** (cloud
+security posture management), **SOC** (security operations center), **SIEM**
+(security information and event management), and **OCSF** (Open Cybersecurity
+Schema Framework). **EC2** and **ECR** name Elastic Compute Cloud and Elastic
+Container Registry. These names explain the output fields; they do not select
+services or assert their availability in a region.
+
 ## Use When
 
 - Use when: a cloud decision landed on AWS and the logical architecture
@@ -141,8 +160,8 @@ Data (per store): <store — service — tenant-isolation mechanism — why it f
 Compute (per workload): <workload — service — rationale incl. operational bill>
 Messaging: <needs → SQS / SNS / EventBridge, tenant context propagation>
 Observability & secrets: <CloudWatch/X-Ray/CloudTrail wiring, Secrets Manager + KMS layout>
-Security posture & CI/CD: <Security Hub (CSPM/threat split), GuardDuty, Inspector/Macie/Detective/Access Analyzer placements, SCPs/Config, OIDC deploy path>
-IaC strategy: <tool, state/environment layout, module conventions>
+Security controls and delivery pipeline: <Security Hub (CSPM/threat split), GuardDuty, Inspector/Macie/Detective/Access Analyzer placements, SCPs/Config, OIDC deploy path>
+Infrastructure-as-code strategy: <tool, state/environment layout, module conventions>
 Cost controls: <budgets, views, attribution feed, top-3 cost risks>
 Verification items: <each quota/type/region/price-dependent claim → verify against current AWS docs>
 Assumptions & open questions: <each with risk-if-wrong / who answers>

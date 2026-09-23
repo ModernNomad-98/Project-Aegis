@@ -381,3 +381,57 @@ was still pending. Editing started after that merge, about **19:11 UTC**.
 The eventual start-to-merge interval belongs in the forecast pull request's
 closeout comment. The preparation and editing intervals overlap other work;
 they must not be summed as active labor.
+
+## Checkpoint after pull request #151 — 2026-09-23
+
+Five requests merged after #146, in order #148, #147, #149, #150 and #151.
+The merge clock is GitHub's pull-request `mergedAt` event. All times below
+are September 23, 2026, in Coordinated Universal Time (UTC). The previous
+estimate and the estimate for each bounded package are recorded beside its
+observed start-to-merge interval.
+
+| Pull request and bounded package | Previous and new estimates | First work checkpoint (UTC) | Merge event (UTC) | Observed wall time |
+| --- | --- | --- | --- | ---: |
+| [#148 — previous forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/148) | Previous and new: 1–2 active hours | 19:05:59, first preparation | 19:21:11 | 15m12s |
+| [#147 — Behavioral Eval Runner backlog guide](https://github.com/ModernNomad-98/Project-Aegis/pull/147) | Previous and new: 2–4 active hours | 19:05:27 | 19:21:59 | 16m32s |
+| [#149 — execution handoff](https://github.com/ModernNomad-98/Project-Aegis/pull/149) | Previous page estimate: none; new: 1–3 active hours | 19:18:33 | 19:29:36 | 11m03s |
+| [#150 — control-plane design](https://github.com/ModernNomad-98/Project-Aegis/pull/150) | Previous page estimate: none; new: 2–4 active hours | About 19:18 | 19:36:02 | About 18m02s |
+| [#151 — forecast navigation](https://github.com/ModernNomad-98/Project-Aegis/pull/151) | Previous page estimate: none; new: 1–3 active hours | 19:26:04 | 19:42:13 | 16m09s |
+
+Every package started with a selected backlog estimate of **175–394 active
+hours**. The documentation sweep was estimated at **80–200 active hours**.
+All five final revisions passed independent review and all three GitHub
+Actions. Their intervals overlap and include review, integration and checks;
+active effort, waiting and rework were not separately measured. In particular,
+#148 began with preparation overlapping other work and #150's rounded start
+cannot support an exact duration. The intervals must not be summed as active
+labor or treated as an implementation or full-inventory review rate.
+
+The [new every-item snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-151)
+reconsiders all **14 selected rows and seven optional rows**. Previous and
+revised selected totals are both **175–394 active hours**, comprising
+**95–194** for non-documentation work and **80–200** for documentation.
+Both optional issue #101 helpers would add **16–40 hours**, giving
+**191–434 active hours**. The full all-options backlog remains unbounded.
+The merged #151 tree contains **517 tracked Markdown files**, up from 513
+after #146. These four readability batches and the prior forecast close no
+selected implementation row. The offline policy candidate in pull request
+#139 remains open; real-host, owner-label and provider gates remain separate.
+Owner waits, GitHub queues, provider execution and host provisioning remain
+outside the active-hour estimates.
+
+### Preparation and editing time for this checkpoint
+
+Previous and new checkpoint estimates are both **1–2 active hours**; the
+selected backlog estimate at start is **175–394 active hours**. Read-only
+preparation ran from **19:38:57 to 19:40:21 UTC**, an observed **1m24s**.
+Editing began at **2026-09-23 19:45:33 UTC**, after the fifth merge was
+confirmed and an isolated worktree was created. Active-only effort is not
+instrumented. Local checks completed at **19:46:40 UTC**, an observed
+**1m07s** from the editing start: 185 skills valid with zero warnings, all
+31 relative links and heading anchors across the two records resolved,
+all row counts and arithmetic checked, and the whitespace check passed.
+Prior snapshots remain intact; only the current first-screen navigation
+links were updated. Independent read-only review completed at **19:47:46
+UTC** with no blocker. GitHub Actions on the exact committed revision and
+the eventual start-to-merge interval remain pull request closeout gates.
