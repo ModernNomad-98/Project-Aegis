@@ -640,7 +640,7 @@ def _derive_nonexecution_route(
     if (contradiction or uncertainty) and current_state not in terminal_states:
         resulting_state = LifecycleState.RECONCILIATION_REQUIRED
         continuation_cursor = recovery_cursor
-    elif current_attempt and (
+    elif current_attempt and current_state not in terminal_states and (
         current_state is LifecycleState.PAUSED or external_pause_active
     ):
         resulting_state = LifecycleState.PAUSED
@@ -6425,7 +6425,8 @@ class SQLiteStateStore:
         provenance_kind: str,
     ) -> str | None:
         if provenance_kind not in {
-            "AUTHORITY", "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+            "AUTHORITY", "CONTRARY_RECEIPT", "NONEXECUTION",
+            "TERMINAL_POLICY",
         }:
             raise ValueError("dependent adoption provenance kind is invalid")
         dependent_rows = connection.execute(
@@ -6443,7 +6444,7 @@ class SQLiteStateStore:
         for offset, dependent in enumerate(dependent_rows, start=1):
             current_state = LifecycleState(str(dependent["lifecycle_state"]))
             if provenance_kind in {
-                "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+                "CONTRARY_RECEIPT", "NONEXECUTION", "TERMINAL_POLICY"
             } and current_state not in {
                 LifecycleState.COMPLETED,
                 LifecycleState.FAILED_FINAL,
@@ -6519,6 +6520,9 @@ class SQLiteStateStore:
                             "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
                         ),
                         "AUTHORITY": "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED",
+                        "NONEXECUTION": (
+                            "DEPENDENT_ADOPTION_CONTRARY_NONEXECUTION"
+                        ),
                         "TERMINAL_POLICY": (
                             "DEPENDENT_ADOPTION_TERMINAL_POLICY"
                         ),
@@ -25164,12 +25168,6 @@ class SQLiteStateStore:
                     connection, self._repository_id
                 )
                 self._verify_projections(connection, self._repository_id)
-                if not self._freshness_oracle.verify(
-                    self._repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 reservation = connection.execute(
                     "SELECT * FROM budget_reservations WHERE reservation_id = ? "
                     "AND repository_id = ? AND run_id = ? AND item_id = ? "
@@ -25212,6 +25210,13 @@ class SQLiteStateStore:
                         replayed=True,
                     )
 
+                if not self._freshness_oracle.verify(
+                    self._repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+
                 if reservation["settlement_head_hash"] != request.expected_previous_hash:
                     raise DispatchDenied("stale budget settlement predecessor")
                 current_disposition = BudgetDisposition(reservation["disposition"])
@@ -25230,22 +25235,6 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "budget reservation was already released in its history"
                     )
-                try:
-                    held_units, charged_units, uncertainty = (
-                        _derive_settlement_accounting(
-                            current_disposition,
-                            int(reservation["charged_units"]),
-                            int(reservation["worst_case_units"]),
-                            request.disposition,
-                            request.actual_units,
-                            request.additional_liability,
-                            request.non_dispatch_proven,
-                            request.zero_liability_proven,
-                        )
-                    )
-                except ValueError as error:
-                    raise DispatchDenied(str(error)) from error
-                additional_unknown_liability = request.additional_liability
                 nonexecution_contradiction = False
                 nonexecution_path: dict[str, object] | None = None
                 if request.non_dispatch_proven:
@@ -25292,8 +25281,24 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "contradictory nonexecution proof cannot release liability"
                         )
+                try:
+                    held_units, charged_units, uncertainty = (
+                        _derive_settlement_accounting(
+                            current_disposition,
+                            int(reservation["charged_units"]),
+                            int(reservation["worst_case_units"]),
+                            request.disposition,
+                            request.actual_units,
+                            request.additional_liability,
+                            request.non_dispatch_proven,
+                            request.zero_liability_proven,
+                        )
+                    )
+                except ValueError as error:
+                    raise DispatchDenied(str(error)) from error
+                additional_unknown_liability = request.additional_liability
                 late_release_contradiction = (
-                    historical_release
+                    current_disposition is BudgetDisposition.RELEASED
                     and request.disposition is not BudgetDisposition.RELEASED
                 )
                 resolved_additional_liability_fence_id = None
@@ -25839,9 +25844,24 @@ class SQLiteStateStore:
                         "WHERE run_id = ?",
                         (sequence, settlement_hash, reservation["run_id"]),
                     )
+                dependent_head = None
+                if nonexecution_contradiction:
+                    dependent_head = self._fence_dependent_adoptions(
+                        connection,
+                        repository_id=str(reservation["repository_id"]),
+                        source_run_id=str(reservation["run_id"]),
+                        originating_event_id=request.settlement_event_id,
+                        originating_event_hash=settlement_hash,
+                        writer_epoch_floor=writer_epoch,
+                        correction_owner_id=request.settlement_event_id,
+                        provenance_kind="NONEXECUTION",
+                    )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
-                    (settlement_hash, reservation["repository_id"]),
+                    (
+                        dependent_head or settlement_hash,
+                        reservation["repository_id"],
+                    ),
                 )
                 if failure_hook is not None:
                     failure_hook("after_settlement_writes_before_commit")
@@ -39743,11 +39763,27 @@ class SQLiteStateStore:
             ]
             if uncertainty_ids != expected_uncertainty_ids or (
                 event_body.get("non_dispatch_proven") is not True
-                or event_body.get("zero_liability_proven") is not True
                 or event_body.get("all_obligations_settled") is not True
                 or event_body.get("release_slot") is not False
                 or event_body.get("contradiction") is not False
                 or event_body.get("uncertainty") is not False
+                or not (
+                    (
+                        event_body.get("zero_liability_proven") is True
+                        and event_body.get("disposition")
+                        == BudgetDisposition.RELEASED.value
+                        and event_body.get("charged_units") == 0
+                    )
+                    or (
+                        event_body.get("zero_liability_proven") is False
+                        and event_body.get("disposition") in {
+                            BudgetDisposition.CONSUMED.value,
+                            BudgetDisposition.ADJUSTED.value,
+                        }
+                        and event_body.get("actual_units")
+                        == event_body.get("charged_units")
+                    )
+                )
             ):
                 raise StorageIntegrityError(
                     "proven-nonexecution action is not an exact safe-retry proof"
@@ -40166,6 +40202,9 @@ class SQLiteStateStore:
                             "DEPENDENT_ADOPTION_CONTRARY_RECEIPT"
                         ),
                         "AUTHORITY": "DEPENDENT_ADOPTION_AUTHORITY_DISPUTED",
+                        "NONEXECUTION": (
+                            "DEPENDENT_ADOPTION_CONTRARY_NONEXECUTION"
+                        ),
                         "TERMINAL_POLICY": (
                             "DEPENDENT_ADOPTION_TERMINAL_POLICY"
                         ),
@@ -40910,7 +40949,8 @@ class SQLiteStateStore:
                 if event_kind == "DEPENDENT_ADOPTION_FENCED":
                     provenance_kind = body.get("provenance_kind")
                     if provenance_kind in {
-                        "CONTRARY_RECEIPT", "TERMINAL_POLICY"
+                        "CONTRARY_RECEIPT", "NONEXECUTION",
+                        "TERMINAL_POLICY",
                     }:
                         expected_dependent_state = (
                             predecessor_state

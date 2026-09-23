@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 478-test package suite passes locally; all three stop findings, T13
+its full 504-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -669,7 +669,13 @@ semantic-v7 migration, crash/replay and strict historical projection checks are
 locally green. Independent implementation review returned `APPROVE` after the
 accepted-plan issuer boundary and denial matrix were corrected; committed
 exact-head evidence remains required before aggregate promotion. The remaining
-canonical gaps stay open.
+canonical gaps stay open. T18/T19 now have independently accepted authentic
+every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
+independent `APPROVE`: canonical operation/validator nonexecution covers
+before/after handoff, authentic paused/pausing/reconciliation and terminal
+states, accounting and replay boundaries, contradictory evidence, newer slot
+owners and atomic dependent-adoption fencing. The remaining explicit coverage
+gaps are F02, F03 and F04a.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA
 review gates remain. Read the

@@ -1572,9 +1572,10 @@ The prior independent implementation reviews for every scoped tranche ended
 `APPROVE` with no remaining BLOCKER or MAJOR finding. Accordingly these rows now
 record `YES/YES/YES`; this is an accumulated evidence promotion, not new runtime
 behavior. The subsequent Stage 24 trace also promotes T18/T19 after their
-every-nonterminal-state stop matrices were independently accepted. Remaining
-risk-ranked coverage gaps are T25/F19 before/after-handoff contradiction matrices, F02
-proof-bound disposition matrix, F03 clock/host/manual interleavings and F04a
+every-nonterminal-state stop matrices were independently accepted. Stage 25
+also promotes T25/F19 after its contradiction matrix was independently accepted.
+Remaining risk-ranked coverage gaps are F02 proof-bound disposition matrix,
+F03 clock/host/manual interleavings and F04a
 reservation-boundary accounting. POSIX runtime and final exact-head
 architecture/security/QA review remain separate release gates.
 
@@ -1608,6 +1609,32 @@ acceptance (113 tests), compileall and `git diff --check` also passed. The first
 BER attempt was sandbox-limited by Git ownership and process-tree termination;
 the unchanged escalated run passed. PowerShell Core remains assigned to hosted
 Windows because `pwsh` is unavailable locally.
+
+### Stage 25 - T25/F19 authoritative nonexecution matrix
+
+The T25/F19 checkpoint classifies contradiction before accounting clearance or
+slot release and accepts only issuer-authenticated canonical all-path seals.
+Operation and validator fixtures cover intent-only, launched and contacted
+paths; zero, known nonzero, unknown and missing accounting; first-use freshness;
+exact replay before freshness; and precommit rollback plus committed lost-
+acknowledgement replay. Contradictory effect/result facts preserve both records,
+true charges, unresolved exposure, the current slot and any newer slot owner.
+
+Authentic durable fixtures ingest T25 from PAUSING, PAUSED,
+RECONCILIATION_REQUIRED, COMPLETED, FAILED_FINAL and STOPPED, with current and
+historical operation/validator attempts. Nonterminal contradictions route to
+reconciliation and terminal lifecycle stays fixed. A T25 contradiction now
+atomically emits `NONEXECUTION` provenance fences for every T28 dependent;
+recovery reconstructs the dependent projection and scoped
+`DEPENDENT_ADOPTION_CONTRARY_NONEXECUTION` fence. The source COMPLETED state and
+newer slot owners remain unchanged while nonterminal dependents reconcile.
+
+Independent read-only review returned `APPROVE` after one blocker and two
+lifecycle-coverage revise rounds were corrected, with no remaining BLOCKER or
+MAJOR finding. The reviewer independently passed the full 80-test dispatch
+module and focused lifecycle/recovery probes. The local full dispatch and
+storage modules passed 80 and 382 tests respectively before the remaining
+repository gates. T25 and F19 are therefore promoted to `YES/YES/YES`.
 
 ## 10. Backlog state
 
@@ -1653,7 +1680,7 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |
 | T23 | YES | YES | UNVERIFIED | Late/contrary receipt intake preserves terminal state, true/unknown accounting, other slot owners and dependent retry/adoption fences across every lifecycle class; `test_f13_*`, stop/T26 ordering and retry-invalidation assertions; row-level review pending |
 | T24 | YES | YES | YES | RESULT/cessation intake derives signed per-check terminal policy, atomically retains observation/accounting and records exact late-FAIL obligation/fence without application; crash/replay/terminal-fixed behavior is assertion-traced and independently accepted |
-| T25 | YES | UNVERIFIED | UNVERIFIED | Typed all-path nonexecution seals and recovery exist for operation/validator intents, but the canonical before/after-handoff, every-state, terminal-contradiction and dependent-adoption matrix is not completely asserted |
+| T25 | YES | YES | YES | Canonical all-path operation/validator nonexecution is assertion-traced before/after handoff across authentic paused, pausing, reconciliation, terminal and historical states; contradiction classification precedes release, preserves charges/other slot owners, atomically fences T28 dependents, and survives crash/replay/strict recovery; independently accepted at Stage 25 |
 | T26 | YES | YES | UNVERIFIED | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; row-level review pending |
 | T27 | YES | YES | YES | Signed complete dependency/gate snapshots, no-capability pre-claim decisions, atomic claim+intent, exact recovery consumption, dependency order and contact-time guard rechecks are assertion-traced and independently accepted |
 | T28 | YES | YES | YES | Exact accepted validation-only adoption, separate authority consumption, free-slot check, no adapter contact, crash replay, contrary-fact fencing and source-history recovery independently accepted in the T28/F01 review |
@@ -1699,7 +1726,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F16 | YES | YES | UNVERIFIED | UNKNOWN observation is retained once, later APPLY references it, denied/replayed applications are idempotent and finalization is distinct with no duplicate charge/slot release; row-level review pending |
 | F17 | YES | YES | YES | Authenticated PASS/FAIL/UNKNOWN facts, complete selected-check vectors, stale/missing denial, exact T16 unblock, authority/budget/containment/fence denial and post-intent contact recheck are assertion-traced and independently accepted |
 | F18 | YES | YES | YES | Final failure retains/release obligations correctly, and proof-free T17 terminal entry atomically records its permanent fence while preserving unknown obligations for later T23/T26 closure; crash/replay traced and independently accepted |
-| F19 | YES | UNVERIFIED | UNVERIFIED | Exact operation/validator all-path nonexecution and recovery exist, but the required before/after-handoff plus contrary proof in every lifecycle/dependent-adoption matrix is incomplete |
+| F19 | YES | YES | YES | Exact authoritative operation/validator nonexecution covers before/after handoff, independent control cost, unknown/missing billing, authentic every-state contrary proof, historical progress, terminal invariance, dependent-adoption fencing, newer-slot preservation and crash/replay/recovery; independently accepted at Stage 25 |
 | F20 | YES | YES | YES | Typed bounded validator containment, authority binding, pure checking, output/path/action limits and strict migration/recovery independently accepted |
 | F21 | YES | YES | UNVERIFIED | Exact generated uncertainty fences clear only by bound receipt/nonexecution/accounting proof; stacked/newer/cross-attempt fences survive and crash/retry-initiation ordering is asserted; row-level review pending |
 
@@ -1721,12 +1748,11 @@ after exact replay, terminal-fixed intake, complete stop binding and the
 one-result-per-validator-attempt invariant were corrected. The committed-head
 deferral recorded there is closed by Stage 23 above.
 
-All 28 transition rows now have implementation surfaces. T18/T19 retain
-incomplete durable every-nonterminal-state tests, and T25 retains incomplete
-canonical before/after-handoff test coverage. All nine crash rows now have
+All 28 transition rows now have implementation surfaces and T18/T19/T25 have
+complete independently accepted durable state matrices. All nine crash rows now have
 implementation and test coverage; C02-C09 retain their prior row-review status.
 All 22 F rows have implementation surfaces. Open F test-coverage rows are F02,
-F03, F04a and F19. These are gaps, not failures silently converted to
+F03 and F04a. These are gaps, not failures silently converted to
 acceptance. Current independently accepted counts are 18/28 transitions, 1/9
 crash boundaries and 10/22 acceptance rows; the other covered rows retain
 explicit row-review work.
@@ -1761,8 +1787,8 @@ Current durable order after the independently approved exact-head trace map is:
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
 7. The Stage 23 committed-head trace closes the accumulated T01-T03/C01,
    T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 deferrals.
-8. Continue through the remaining exact coverage gaps in this order: T18/T19,
-   T25/F19, F02, F03 and F04a.
+8. Continue through the remaining exact coverage gaps in this order: F02, F03
+   and F04a.
 9. After implementation gaps close, perform row review for every remaining
    implemented/tested-but-unaccepted matrix row.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.

@@ -32,6 +32,7 @@ from tools.aegis_delivery_control.authority import (
 )
 from tools.aegis_delivery_control.contracts import (
     ApplicationReceipt,
+    ActiveValidationPauseRequest,
     BudgetDisposition,
     BudgetSettlementRequest as BudgetSettlementContract,
     BindingMismatchKind,
@@ -40,6 +41,7 @@ from tools.aegis_delivery_control.contracts import (
     DispatchDenied,
     EffectAdoptionReceipt,
     EffectObservationCommand,
+    EffectObservationRequest,
     FinalizeOperationRequest,
     InjectedFailure,
     IntentRequest,
@@ -5205,6 +5207,60 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertEqual(verified.returncode, 0, verified.stderr)
             self.assertTrue(json.loads(verified.stdout)["verified"])
 
+    def test_t25_effect_nonexecution_settles_known_control_cost_without_release(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            (
+                authority, _capability, store, adapter, _intent, _effect,
+                _committed, _launch, attestation,
+            ) = self._prepare_t25_effect(Path(temporary_directory))
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            request = BudgetSettlementRequest(
+                "known-control-cost-nonexecution", "reservation-1", "",
+                BudgetDisposition.CONSUMED, 1,
+                "known-source-control-cost", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True, all_obligations_settled=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            settled = store._settle_budget(
+                request,
+                authority.issue_settlement_proof(
+                    "known-control-cost-proof", request
+                ),
+                authority,
+            )
+            self.assertEqual(settled.charged_units, 1)
+            self.assertFalse(settled.uncertainty)
+            self.assertFalse(settled.slot_released)
+            self.assertEqual(
+                store.load_run_lifecycle("run-1"), LifecycleState.BLOCKED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                reservation = connection.execute(
+                    "SELECT held_units, charged_units, uncertainty, disposition "
+                    "FROM budget_reservations WHERE reservation_id = "
+                    "'reservation-1'"
+                ).fetchone()
+                action = connection.execute(
+                    "SELECT path_class FROM proven_nonexecution_actions WHERE "
+                    "settlement_event_id = ?",
+                    (request.settlement_event_id,),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT run_id, attempt_id, generation FROM outstanding_slot"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(
+                reservation,
+                (0, 1, 0, BudgetDisposition.CONSUMED.value),
+            )
+            self.assertEqual(action, ("LAUNCHED",))
+            self.assertEqual(slot, ("run-1", "attempt-1", 1))
+            store.load_verified("repo-1")
+
     def test_t25_seal_rejects_forgery_target_confusion_rebinding_and_tamper(
         self,
     ) -> None:
@@ -5346,6 +5402,36 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.commit()
             finally:
                 connection.close()
+            laundering = BudgetSettlementRequest(
+                "contradictory-release-before-classification",
+                "reservation-1", "", BudgetDisposition.RELEASED, None,
+                "contradictory-release-evidence", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True, zero_liability_proven=True,
+                release_slot=True, all_obligations_settled=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                before_laundering = tuple(connection.iterdump())
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                DispatchDenied, "cannot release liability"
+            ):
+                store._settle_budget(
+                    laundering,
+                    authority.issue_settlement_proof(
+                        "contradictory-release-before-proof", laundering
+                    ),
+                    authority,
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                self.assertEqual(
+                    tuple(connection.iterdump()), before_laundering
+                )
+            finally:
+                connection.close()
             contradiction = BudgetSettlementRequest(
                 "contradictory-nonexecution", "reservation-1", "",
                 BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
@@ -5353,13 +5439,37 @@ class MediatedDispatchTests(unittest.TestCase):
                 non_dispatch_proven=True,
                 nonexecution_seal_id=sealed.seal_id,
             )
-            settled = store._settle_budget(
-                contradiction,
-                authority.issue_settlement_proof(
-                    "contradictory-nonexecution-proof", contradiction
-                ),
-                authority,
+            contradiction_proof = authority.issue_settlement_proof(
+                "contradictory-nonexecution-proof", contradiction
             )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                before_failure = tuple(connection.iterdump())
+            finally:
+                connection.close()
+            with self.assertRaises(InjectedFailure):
+                store._settle_budget(
+                    contradiction, contradiction_proof, authority,
+                    failure_hook=raise_at(
+                        "after_settlement_writes_before_commit"
+                    ),
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                self.assertEqual(tuple(connection.iterdump()), before_failure)
+            finally:
+                connection.close()
+            with self.assertRaises(InjectedFailure):
+                store._settle_budget(
+                    contradiction, contradiction_proof, authority,
+                    failure_hook=raise_at(
+                        "after_settlement_commit_before_acknowledgement"
+                    ),
+                )
+            settled = store._settle_budget(
+                contradiction, contradiction_proof, authority,
+            )
+            self.assertTrue(settled.replayed)
             self.assertTrue(settled.uncertainty)
             self.assertFalse(settled.slot_released)
             self.assertEqual(
@@ -5397,6 +5507,883 @@ class MediatedDispatchTests(unittest.TestCase):
                     ),
                     authority,
                 )
+
+    def test_t25_validator_result_rejects_release_then_retains_contradiction(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            (
+                authority, store, _dispatch, adapter, intent, capability,
+                committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=False
+            )
+            attestation = authority.issue_nonexecution_attestation(
+                "validator-contradiction-attestation",
+                "validator-contradiction-seal", "VALIDATOR",
+                adapter._target_digest("repo-1"), capability.claim_id,
+                "VALIDATOR:validator-intent-t08", committed.event_hash,
+                "validator-reservation-t08", "repo-1", "run-1", "item-1",
+                "effect-1", "validator-attempt-1",
+            )
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                containment_digest = connection.execute(
+                    "SELECT containment_digest FROM validator_intents WHERE "
+                    "validator_intent_id = 'validator-intent-t08'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            connection = sqlite3.connect(adapter._ledger_path)
+            try:
+                connection.execute(
+                    "INSERT INTO synthetic_validator_results VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?)",
+                    (
+                        capability.claim_id, "contradictory-validator-result",
+                        "repo-1", "effect-1", "revision-1", "check-1",
+                        "input-1", "validator-attempt-1",
+                        "contradictory-result-digest", "PASS", 1,
+                        containment_digest,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            accounting = BudgetSettlementRequest(
+                "validator-result-accounting", "validator-reservation-t08",
+                "", BudgetDisposition.CONSUMED, 1,
+                "contradictory-validator-result", "VALIDATOR_USAGE_REPORTED",
+                attempt_id="validator-attempt-1",
+            )
+            accounted = store._settle_budget(
+                accounting,
+                authority.issue_settlement_proof(
+                    "validator-result-accounting-proof", accounting
+                ),
+                authority,
+            )
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, adapter
+            )
+            observed = validation.intake_result(
+                ValidatorObservationCommand(
+                    "contradictory-validator-observation",
+                    "contradictory-validator-observe-command",
+                    "contradictory-validator-observe-event",
+                    "repo-1", "run-1", "item-1", "validator-intent-t08",
+                    accounting.settlement_event_id, accounted.settlement_hash,
+                )
+            )
+            laundering = BudgetSettlementRequest(
+                "validator-contradictory-release",
+                "validator-reservation-t08", accounted.settlement_hash,
+                BudgetDisposition.RELEASED, None,
+                "validator-contradictory-release-evidence",
+                "NONDISPATCH_PROVEN", non_dispatch_proven=True,
+                zero_liability_proven=True, all_obligations_settled=True,
+                attempt_id="validator-attempt-1",
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                before_laundering = tuple(connection.iterdump())
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                DispatchDenied, "cannot release liability"
+            ):
+                store._settle_budget(
+                    laundering,
+                    authority.issue_settlement_proof(
+                        "validator-contradictory-release-proof", laundering
+                    ),
+                    authority,
+                )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                self.assertEqual(
+                    tuple(connection.iterdump()), before_laundering
+                )
+            finally:
+                connection.close()
+            contrary = replace(
+                laundering,
+                settlement_event_id="validator-contradiction-recorded",
+                disposition=BudgetDisposition.ADJUSTED,
+                actual_units=1,
+                zero_liability_proven=False,
+                all_obligations_settled=False,
+            )
+            retained = store._settle_budget(
+                contrary,
+                authority.issue_settlement_proof(
+                    "validator-contradiction-recorded-proof", contrary
+                ),
+                authority,
+            )
+            self.assertEqual(retained.charged_units, 1)
+            self.assertFalse(retained.slot_released)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                result = connection.execute(
+                    "SELECT observation_id, verdict FROM validator_observations "
+                    "WHERE validator_intent_id = 'validator-intent-t08'"
+                ).fetchone()
+                reservation = connection.execute(
+                    "SELECT charged_units, disposition FROM budget_reservations "
+                    "WHERE reservation_id = 'validator-reservation-t08'"
+                ).fetchone()
+                fence = connection.execute(
+                    "SELECT reason_code FROM dispatch_fences WHERE fence_id = ?",
+                    ("nonexecution-contradiction:validator-contradiction-recorded",),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT run_id, attempt_id, generation FROM outstanding_slot"
+                ).fetchone()
+                run = connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(result, (observed.observation_id, "PASS"))
+            self.assertEqual(
+                reservation, (1, BudgetDisposition.ADJUSTED.value)
+            )
+            self.assertEqual(fence, ("NONEXECUTION_CONTRADICTION",))
+            self.assertEqual(slot, ("run-1", "attempt-1", 1))
+            self.assertEqual(
+                run,
+                (
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                    LifecycleState.VALIDATING.value,
+                ),
+            )
+            store.load_verified("repo-1")
+
+    def test_t25_contradiction_preserves_authentic_stopped_lifecycle(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            (
+                authority, capability, store, adapter, intent, _effect,
+                _committed, _launch, attestation,
+            ) = self._prepare_t25_effect(Path(temporary_directory))
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            connection = sqlite3.connect(adapter._ledger_path)
+            try:
+                connection.execute(
+                    "INSERT INTO synthetic_effects VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
+                    (
+                        capability.claim_id, "stopped-contrary-receipt",
+                        "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                        intent.effect_descriptor_digest, 1,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            stop_grant = SyntheticOperatorGrant(
+                "t25-stop-grant", "repo-1", "run-1", "STOP_IMMEDIATE",
+                "t25-stop-scope",
+            )
+            authority.register_operator(stop_grant)
+            stopped = store.stop(
+                StopRequest(
+                    "t25-stop", "t25-stop-command", "t25-stop-event",
+                    "repo-1", "run-1", StopMode.IMMEDIATE,
+                    "T25_TERMINAL_INVARIANCE",
+                ),
+                authority.claim_operator(*stop_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(stopped.resulting_state, LifecycleState.STOPPED)
+            contradiction = BudgetSettlementRequest(
+                "stopped-contradictory-nonexecution", "reservation-1", "",
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+                "stopped-contradictory-evidence", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            settled = store._settle_budget(
+                contradiction,
+                authority.issue_settlement_proof(
+                    "stopped-contradictory-proof", contradiction
+                ),
+                authority,
+            )
+            self.assertTrue(settled.uncertainty)
+            self.assertEqual(
+                store.load_run_lifecycle("run-1"), LifecycleState.STOPPED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                body = json.loads(connection.execute(
+                    "SELECT body_json FROM budget_settlements WHERE "
+                    "settlement_event_id = ?",
+                    (contradiction.settlement_event_id,),
+                ).fetchone()[0])
+            finally:
+                connection.close()
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (LifecycleState.STOPPED.value, LifecycleState.STOPPED.value),
+            )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t25_contradiction_routes_authentic_pausing_lifecycle(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            (
+                authority, capability, store, adapter, intent, _effect,
+                committed, _launch, attestation,
+            ) = self._prepare_t25_effect(Path(temporary_directory))
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            connection = sqlite3.connect(adapter._ledger_path)
+            try:
+                connection.execute(
+                    "INSERT INTO synthetic_effects VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
+                    (
+                        capability.claim_id, "pausing-contrary-receipt",
+                        "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
+                        intent.effect_descriptor_digest, 1,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            pause_grant = SyntheticOperatorGrant(
+                "t25-pause-grant", "repo-1", "run-1", "PAUSE",
+                "t25-pause-scope",
+            )
+            authority.register_operator(pause_grant)
+            paused = store.pause_local_execution(
+                PauseLocalExecutionRequest(
+                    "t25-pause", "t25-pause-command", "t25-pause-event",
+                    "t25-pause-fence", "repo-1", "run-1", "item-1",
+                    "effect-1", "attempt-1", committed.event_id,
+                    committed.event_hash, 1, "T25_PAUSING_FIXTURE",
+                ),
+                authority.claim_operator(*pause_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(paused.resulting_state, LifecycleState.PAUSING)
+            contradiction = BudgetSettlementRequest(
+                "pausing-contradictory-nonexecution", "reservation-1", "",
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+                "pausing-contradictory-evidence", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            store._settle_budget(
+                contradiction,
+                authority.issue_settlement_proof(
+                    "pausing-contradictory-proof", contradiction
+                ),
+                authority,
+            )
+            self.assertEqual(
+                store.load_run_lifecycle("run-1"),
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                body = json.loads(connection.execute(
+                    "SELECT body_json FROM budget_settlements WHERE "
+                    "settlement_event_id = ?",
+                    (contradiction.settlement_event_id,),
+                ).fetchone()[0])
+            finally:
+                connection.close()
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (
+                    LifecycleState.PAUSING.value,
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                ),
+            )
+            store.load_verified("repo-1", authority=authority)
+
+    def test_t25_validator_contradiction_authentic_lifecycle_matrix(self) -> None:
+        def prepare(root: Path, verdict: str):
+            root.mkdir(parents=True, exist_ok=True)
+            (
+                authority, store, _dispatch, adapter, intent, capability,
+                committed,
+            ) = self._prepare_t08_active_validator(
+                root, contact=True, result=False
+            )
+            attestation = authority.issue_nonexecution_attestation(
+                "matrix-validator-attestation", "matrix-validator-seal",
+                "VALIDATOR", adapter._target_digest("repo-1"),
+                capability.claim_id, "VALIDATOR:validator-intent-t08",
+                committed.event_hash, "validator-reservation-t08", "repo-1",
+                "run-1", "item-1", "effect-1", "validator-attempt-1",
+            )
+            seal = adapter.seal_nonexecution(attestation, authority)
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                containment_digest = connection.execute(
+                    "SELECT containment_digest FROM validator_intents WHERE "
+                    "validator_intent_id = 'validator-intent-t08'"
+                ).fetchone()[0]
+            with closing(sqlite3.connect(adapter._ledger_path)) as connection:
+                connection.execute(
+                    "INSERT INTO synthetic_validator_results VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?)",
+                    (
+                        capability.claim_id, "matrix-validator-result",
+                        "repo-1", "effect-1", "revision-1", "check-1",
+                        "input-1", "validator-attempt-1",
+                        "matrix-result-digest", verdict, 1,
+                        containment_digest,
+                    ),
+                )
+                connection.commit()
+            return authority, store, adapter, intent, capability, committed, seal
+
+        def account_and_intake(authority, store, adapter):
+            accounting = BudgetSettlementRequest(
+                "matrix-validator-accounting", "validator-reservation-t08", "",
+                BudgetDisposition.CONSUMED, 1, "matrix-validator-result",
+                "VALIDATOR_USAGE_REPORTED", attempt_id="validator-attempt-1",
+            )
+            accounted = store._settle_budget(
+                accounting,
+                authority.issue_settlement_proof(
+                    "matrix-validator-accounting-proof", accounting
+                ),
+                authority,
+            )
+            observation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, adapter
+            ).intake_result(
+                ValidatorObservationCommand(
+                    "matrix-validator-observation",
+                    "matrix-validator-observe-command",
+                    "matrix-validator-observe-event", "repo-1", "run-1",
+                    "item-1", "validator-intent-t08",
+                    accounting.settlement_event_id,
+                    accounted.settlement_hash,
+                )
+            )
+            return accounted, observation
+
+        def contradict(authority, store, seal, suffix: str):
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                reservation = connection.execute(
+                    "SELECT disposition, settlement_head_hash FROM "
+                    "budget_reservations WHERE reservation_id = "
+                    "'validator-reservation-t08'"
+                ).fetchone()
+            disposition = BudgetDisposition(str(reservation[0]))
+            request = BudgetSettlementRequest(
+                f"matrix-{suffix}-contradiction",
+                "validator-reservation-t08", reservation[1],
+                (
+                    BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+                    if disposition is BudgetDisposition.RESERVED
+                    else BudgetDisposition.ADJUSTED
+                ),
+                None if disposition is BudgetDisposition.RESERVED else 1,
+                f"matrix-{suffix}-contrary-evidence", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True,
+                attempt_id="validator-attempt-1",
+                nonexecution_seal_id=seal.seal_id,
+            )
+            receipt = store._settle_budget(
+                request,
+                authority.issue_settlement_proof(
+                    f"matrix-{suffix}-contradiction-proof", request
+                ),
+                authority,
+            )
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                body = json.loads(connection.execute(
+                    "SELECT body_json FROM budget_settlements WHERE "
+                    "settlement_event_id = ?", (request.settlement_event_id,),
+                ).fetchone()[0])
+            store.load_verified("repo-1", authority=authority)
+            return receipt, body
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "pausing"
+            authority, store, _adapter, _intent, capability, committed, seal = (
+                prepare(root, "PASS")
+            )
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                connection.row_factory = sqlite3.Row
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE source_id = "
+                    "'VALIDATOR:validator-intent-t08'"
+                ).fetchone()
+                intent_row = connection.execute(
+                    "SELECT * FROM validator_intents WHERE "
+                    "validator_intent_id = 'validator-intent-t08'"
+                ).fetchone()
+            pause_request = ActiveValidationPauseRequest(
+                "matrix-active-pause", "matrix-active-pause-command",
+                "matrix-active-pause-request", "matrix-active-pause-checkpoint",
+                "matrix-active-pause-fence", "repo-1", "run-1", "item-1",
+                "effect-1", "plan:run-1", "revision-1",
+                "validator-intent-t08", "validator-event-t08",
+                intent_row["event_hash"], "validator-attempt-1", "check-1",
+                contact["contact_id"], contact["event_id"],
+                contact["event_hash"], contact["target_digest"],
+                "validator-reservation-t08", "", "attempt-1", 1,
+                run["head_hash"], run["head_hash"],
+                run["continuation_cursor"], "T25_MATRIX_ACTIVE_PAUSE",
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "matrix-active-pause-grant", "repo-1", "run-1", "PAUSE",
+                "matrix-active-pause-scope",
+            )
+            authority.register_operator(pause_grant)
+            pause_capability = authority.claim_operator(
+                *pause_grant.__dict__.values()
+            )
+            activity = authority.issue_validator_activity_attestation(
+                "matrix-active-activity", pause_request,
+                capability.containment_digest,
+            )
+            paused = store.pause_active_validation(
+                pause_request, pause_capability, activity, authority
+            )
+            self.assertEqual(paused.resulting_state, LifecycleState.PAUSING)
+            _, body = contradict(authority, store, seal, "pausing-validator")
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (
+                    LifecycleState.PAUSING.value,
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                ),
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            authority, store, _adapter, _intent, _capability, _committed, seal = (
+                prepare(Path(directory) / "reconciliation", "PASS")
+            )
+            pause_request = self._t08_pause_request(
+                store, suffix="matrix-reconciliation"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "matrix-reconciliation-grant", "repo-1", "run-1", "PAUSE",
+                "matrix-reconciliation-scope",
+            )
+            authority.register_operator(pause_grant)
+            paused = store.pause_validation(
+                pause_request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(
+                paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+            )
+            _, body = contradict(authority, store, seal, "recon-validator")
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                ),
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            authority, store, adapter, _intent, capability, committed, seal = (
+                prepare(Path(directory) / "paused", "PASS")
+            )
+            with closing(sqlite3.connect(adapter._ledger_path)) as connection:
+                seal_row = connection.execute(
+                    "SELECT * FROM synthetic_nonexecution_seals WHERE "
+                    "seal_id = ?", (seal.seal_id,),
+                ).fetchone()
+                connection.execute(
+                    "DELETE FROM synthetic_nonexecution_seals WHERE seal_id = ?",
+                    (seal.seal_id,),
+                )
+                connection.commit()
+            accounted, observation = account_and_intake(
+                authority, store, adapter
+            )
+            cessation_attestation = authority.issue_validator_cessation_attestation(
+                "matrix-paused-cessation-attestation",
+                "matrix-paused-cessation", adapter._target_digest("repo-1"),
+                capability.claim_id, "VALIDATOR:validator-intent-t08",
+                committed.event_hash, "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", "check-1", "validator-attempt-1",
+            )
+            cessation_seal = adapter.seal_cessation(
+                cessation_attestation, authority
+            )
+            cessation = store.record_validator_cessation(
+                ValidatorCessationRequest(
+                    "matrix-paused-cessation",
+                    "matrix-paused-cessation-command",
+                    "matrix-paused-cessation-event", "repo-1", "run-1",
+                    "item-1", "effect-1", "validator-intent-t08",
+                    "validator-attempt-1", "revision-1", "check-1",
+                    cessation_seal.cessation_hash,
+                ),
+                authority,
+            )
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                uncertainty_ids = tuple(
+                    row[0] for row in connection.execute(
+                        "SELECT uncertainty_id FROM uncertainty_instances "
+                        "WHERE origin_event_id = ? ORDER BY uncertainty_id",
+                        (observation.event_id,),
+                    )
+                )
+            reconciled = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, adapter
+            ).reconcile_result(
+                ReconcileValidatorResultRequest(
+                    "matrix-paused-reconciliation",
+                    "matrix-paused-reconciliation-command",
+                    "matrix-paused-reconciliation-event", "repo-1", "run-1",
+                    "item-1", "effect-1", "plan:run-1", "revision-1",
+                    observation.observation_id, observation.event_hash,
+                    cessation.cessation_id, cessation.event_id,
+                    cessation.event_hash, "matrix-validator-accounting",
+                    accounted.settlement_hash, uncertainty_ids, "attempt-1", 1,
+                    cessation.event_hash, None,
+                )
+            )
+            self.assertEqual(
+                reconciled.resulting_state, LifecycleState.VALIDATING
+            )
+            pause_request = self._t08_pause_request(
+                store, suffix="matrix-paused"
+            )
+            pause_grant = SyntheticOperatorGrant(
+                "matrix-paused-grant", "repo-1", "run-1", "PAUSE",
+                "matrix-paused-scope",
+            )
+            authority.register_operator(pause_grant)
+            paused_request = store.pause_validation(
+                pause_request,
+                authority.claim_operator(*pause_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(
+                paused_request.resulting_state,
+                LifecycleState.PAUSED,
+            )
+            with closing(sqlite3.connect(adapter._ledger_path)) as connection:
+                connection.execute(
+                    "INSERT INTO synthetic_nonexecution_seals VALUES ("
+                    + ", ".join("?" for _ in seal_row) + ")",
+                    seal_row,
+                )
+                connection.commit()
+            _, body = contradict(authority, store, seal, "paused-validator")
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (
+                    LifecycleState.PAUSED.value,
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                ),
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            authority, store, _adapter, _intent, _capability, _committed, seal = (
+                prepare(Path(directory) / "stopped", "PASS")
+            )
+            stop_grant = SyntheticOperatorGrant(
+                "matrix-validator-stop-grant", "repo-1", "run-1",
+                "STOP_IMMEDIATE", "matrix-validator-stop-scope",
+            )
+            authority.register_operator(stop_grant)
+            stopped = store.stop(
+                StopRequest(
+                    "matrix-validator-stop", "matrix-validator-stop-command",
+                    "matrix-validator-stop-event", "repo-1", "run-1",
+                    StopMode.IMMEDIATE, "T25_MATRIX_STOP",
+                ),
+                authority.claim_operator(*stop_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(stopped.resulting_state, LifecycleState.STOPPED)
+            _, body = contradict(authority, store, seal, "stopped-validator")
+            self.assertEqual(
+                (body["lifecycle_from"], body["lifecycle_to"]),
+                (LifecycleState.STOPPED.value, LifecycleState.STOPPED.value),
+            )
+
+        for terminal, verdict in (
+            (LifecycleState.COMPLETED, "PASS"),
+            (LifecycleState.FAILED_FINAL, "FAIL"),
+        ):
+            with self.subTest(terminal=terminal.value), tempfile.TemporaryDirectory() as directory:
+                authority, store, adapter, _intent, capability, committed, seal = (
+                    prepare(Path(directory) / terminal.value.lower(), verdict)
+                )
+                with closing(sqlite3.connect(adapter._ledger_path)) as connection:
+                    seal_row = connection.execute(
+                        "SELECT * FROM synthetic_nonexecution_seals WHERE "
+                        "seal_id = ?", (seal.seal_id,),
+                    ).fetchone()
+                    connection.execute(
+                        "DELETE FROM synthetic_nonexecution_seals WHERE "
+                        "seal_id = ?", (seal.seal_id,),
+                    )
+                    connection.commit()
+                accounted, observation = account_and_intake(
+                    authority, store, adapter
+                )
+                cessation_attestation = (
+                    authority.issue_validator_cessation_attestation(
+                        "matrix-terminal-cessation-attestation",
+                        "matrix-terminal-cessation",
+                        adapter._target_digest("repo-1"), capability.claim_id,
+                        "VALIDATOR:validator-intent-t08", committed.event_hash,
+                        "repo-1", "run-1", "item-1", "effect-1",
+                        "revision-1", "check-1", "validator-attempt-1",
+                    )
+                )
+                cessation_seal = adapter.seal_cessation(
+                    cessation_attestation, authority
+                )
+                cessation = store.record_validator_cessation(
+                    ValidatorCessationRequest(
+                        "matrix-terminal-cessation",
+                        "matrix-terminal-cessation-command",
+                        "matrix-terminal-cessation-event", "repo-1", "run-1",
+                        "item-1", "effect-1", "validator-intent-t08",
+                        "validator-attempt-1", "revision-1", "check-1",
+                        cessation_seal.cessation_hash,
+                    ),
+                    authority,
+                )
+                with closing(sqlite3.connect(store._database_path)) as connection:
+                    uncertainty_ids = tuple(
+                        row[0] for row in connection.execute(
+                            "SELECT uncertainty_id FROM uncertainty_instances "
+                            "WHERE origin_event_id = ? ORDER BY uncertainty_id",
+                            (observation.event_id,),
+                        )
+                    )
+                reconciled = SyntheticValidationCoordinator(
+                    store, TransitionEngine(), authority, adapter
+                ).reconcile_result(
+                    ReconcileValidatorResultRequest(
+                        "matrix-terminal-reconciliation",
+                        "matrix-terminal-reconciliation-command",
+                        "matrix-terminal-reconciliation-event", "repo-1",
+                        "run-1", "item-1", "effect-1", "plan:run-1",
+                        "revision-1", observation.observation_id,
+                        observation.event_hash, cessation.cessation_id,
+                        cessation.event_id, cessation.event_hash,
+                        "matrix-validator-accounting",
+                        accounted.settlement_hash, uncertainty_ids,
+                        "attempt-1", 1, cessation.event_hash, None,
+                    )
+                )
+                self.assertEqual(
+                    reconciled.resulting_state, LifecycleState.VALIDATING
+                )
+                validation = SyntheticValidationCoordinator(
+                    store, TransitionEngine(), authority, adapter
+                )
+                application = ValidationApplicationRequest(
+                    f"matrix-{terminal.value.lower()}-application",
+                    f"matrix-{terminal.value.lower()}-apply-command",
+                    f"matrix-{terminal.value.lower()}-apply-event",
+                    "repo-1", "run-1", "item-1", "effect-1", "revision-1",
+                    "check-1", "validator-attempt-1",
+                    observation.observation_id,
+                )
+                if terminal is LifecycleState.FAILED_FINAL:
+                    classification = authority.issue_classification(
+                        "matrix-final-classification", "repo-1", "run-1",
+                        "item-1", "effect-1", "revision-1", "check-1",
+                        "validator-attempt-1", observation.observation_id,
+                        observation.event_hash, "matrix-result-digest",
+                        verdict="FAIL", policy_id="failure-policy",
+                        policy_version="1", classification="FINAL",
+                    )
+                    applied = validation.apply_result(
+                        application, classification=classification
+                    )
+                else:
+                    applied = validation.apply_result(application)
+                if terminal is LifecycleState.COMPLETED:
+                    with closing(sqlite3.connect(store._database_path)) as connection:
+                        plan_hash = connection.execute(
+                            "SELECT event_hash FROM validation_plans WHERE "
+                            "plan_id = 'plan:run-1'"
+                        ).fetchone()[0]
+                    finalization_key = store.finalization_key(
+                        "repo-1", "run-1", "item-1", "effect-1",
+                        "plan:run-1", "revision-1",
+                    )
+                    finalization_request = FinalizeOperationRequest(
+                        "matrix-finalization", "matrix-finalize-command",
+                        "matrix-finalize-event", "repo-1", "run-1", "item-1",
+                        "effect-1", "plan:run-1", "revision-1", "attempt-1", 1,
+                    )
+                    finalization_attestation = (
+                        authority.issue_finalization_attestation(
+                            "matrix-finalization-attestation", "repo-1",
+                            "run-1", "item-1", "effect-1", "plan:run-1",
+                            plan_hash, "revision-1", applied.event_hash,
+                            finalization_key,
+                            store._event_hash({"aggregate_gate_ids": []}),
+                            "attempt-1", 1,
+                        )
+                    )
+                    applied = store._finalize_operation(
+                        finalization_request, finalization_attestation, authority
+                    )
+                self.assertEqual(applied.resulting_state, terminal)
+                with closing(sqlite3.connect(adapter._ledger_path)) as connection:
+                    connection.execute(
+                        "INSERT INTO synthetic_nonexecution_seals VALUES ("
+                        + ", ".join("?" for _ in seal_row) + ")",
+                        seal_row,
+                    )
+                    connection.commit()
+                _, body = contradict(
+                    authority, store, seal,
+                    terminal.value.lower() + "-validator",
+                )
+                self.assertEqual(
+                    (body["lifecycle_from"], body["lifecycle_to"]),
+                    (terminal.value, terminal.value),
+                )
+
+    def test_t25_late_contrary_proof_preserves_new_slot_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            (
+                authority, capability, store, adapter, intent, _effect,
+                _committed, _launch, attestation,
+            ) = self._prepare_t25_effect(Path(temporary_directory))
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            release = BudgetSettlementRequest(
+                "original-release", "reservation-1", "",
+                BudgetDisposition.RELEASED, None, "original-nonexecution",
+                "NONDISPATCH_PROVEN", non_dispatch_proven=True,
+                zero_liability_proven=True, release_slot=True,
+                all_obligations_settled=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            released = store._settle_budget(
+                release,
+                authority.issue_settlement_proof("original-release-proof", release),
+                authority,
+            )
+            second_grant = SyntheticGrant(
+                "grant-2", "repo-1", "effect-2", "attempt-2", "scope-1"
+            )
+            authority.register(second_grant)
+            second_capability = authority.claim(*second_grant.__dict__.values())
+            second_intent = IntentRequest(
+                "repo-1", "run-2", "item-2", "command-2", "event-2",
+                "effect-2", "payload-2", "attempt-2", "permission-2",
+                "reservation-2", "budget-2", 1, 2, 5,
+            )
+            second_plan = self._accept_operation_plan(
+                store, second_intent, expected_head=released.settlement_hash,
+                writer_epoch=4,
+            )
+            second = store.commit_intent(
+                second_intent, second_capability, authority,
+                expected_head=second_plan.event_hash, writer_epoch=5,
+            )
+            late_accounting = BudgetSettlementRequest(
+                "late-original-accounting", "reservation-1",
+                released.settlement_hash, BudgetDisposition.ADJUSTED, 1,
+                "late-original-receipt", "LATE_USAGE_REPORTED",
+            )
+            adjusted = store._settle_budget(
+                late_accounting,
+                authority.issue_settlement_proof(
+                    "late-original-accounting-proof", late_accounting
+                ),
+                authority,
+            )
+            observation = EffectObservationRequest(
+                "late-original-observation", "late-original-observe-command",
+                "late-original-observe-event", "repo-1", "run-1", "item-1",
+                "effect-1", "attempt-1", "late-original-receipt",
+                capability.claim_id, intent.effect_descriptor_digest, 1,
+                late_accounting.settlement_event_id, adjusted.settlement_hash,
+            )
+            evidence_request = SourceControlEvidenceRequest(
+                observation.repository_id, observation.run_id,
+                observation.item_id, observation.logical_effect_id,
+                observation.attempt_id, observation.source_claim_id,
+                observation.source_receipt_id, observation.payload_digest,
+                observation.usage_units, True,
+                SourceControlClassification.KNOWN,
+            )
+            evidence = authority.issue_source_control_evidence(
+                "late-original-source-control", evidence_request
+            )
+            store._record_effect_observation(
+                replace(
+                    observation,
+                    source_control_classification=(
+                        SourceControlClassification.KNOWN.value
+                    ),
+                    source_control_evidence_id=evidence.evidence_id,
+                    source_control_evidence_digest=evidence.request_digest,
+                    source_control_issuer_fingerprint=evidence.issuer_fingerprint,
+                    source_control_issuer_mac=evidence.issuer_mac,
+                ),
+                authority=authority,
+            )
+            contrary = BudgetSettlementRequest(
+                "late-original-contradiction", "reservation-1",
+                adjusted.settlement_hash, BudgetDisposition.ADJUSTED, 1,
+                "late-original-receipt", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True,
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            retained = store._settle_budget(
+                contrary,
+                authority.issue_settlement_proof(
+                    "late-original-contradiction-proof", contrary
+                ),
+                authority,
+            )
+            self.assertFalse(retained.slot_released)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                slot = connection.execute(
+                    "SELECT run_id, logical_effect_id, attempt_id, generation "
+                    "FROM outstanding_slot"
+                ).fetchone()
+                original = connection.execute(
+                    "SELECT charged_units, disposition FROM budget_reservations "
+                    "WHERE reservation_id = 'reservation-1'"
+                ).fetchone()
+                fence_reasons = {
+                    row[0] for row in connection.execute(
+                        "SELECT reason_code FROM dispatch_fences WHERE "
+                        "originating_event_id = ?",
+                        (contrary.settlement_event_id,),
+                    )
+                }
+            finally:
+                connection.close()
+            self.assertEqual(slot, ("run-2", "effect-2", "attempt-2", 1))
+            self.assertEqual(
+                original, (1, BudgetDisposition.ADJUSTED.value)
+            )
+            self.assertEqual(
+                fence_reasons,
+                {"NONEXECUTION_CONTRADICTION"},
+            )
+            self.assertFalse(second.replayed)
+            self.assertEqual(
+                store.load_run_lifecycle("run-2"), LifecycleState.RUNNING
+            )
+            store.load_verified("repo-1")
 
     def test_t27_process_crash_after_intent_before_contact_denies_redispatch(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -5690,6 +6677,66 @@ class MediatedDispatchTests(unittest.TestCase):
                 connection.close()
             self.assertEqual(status, "SETTLED")
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
+            store.load_verified("repo-1")
+
+    def test_t25_contacted_validator_all_path_nonexecution_settles_without_parent_release(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            (
+                authority, store, _dispatch, adapter, _intent, capability,
+                committed,
+            ) = self._prepare_t08_active_validator(
+                Path(temporary_directory), contact=True, result=False
+            )
+            attestation = authority.issue_nonexecution_attestation(
+                "contacted-validator-nonexecution-attestation",
+                "contacted-validator-nonexecution-seal", "VALIDATOR",
+                adapter._target_digest("repo-1"), capability.claim_id,
+                "VALIDATOR:validator-intent-t08", committed.event_hash,
+                "validator-reservation-t08", "repo-1", "run-1", "item-1",
+                "effect-1", "validator-attempt-1",
+            )
+            sealed = adapter.seal_nonexecution(attestation, authority)
+            request = BudgetSettlementRequest(
+                "contacted-validator-nonexecution",
+                "validator-reservation-t08", "",
+                BudgetDisposition.RELEASED, None,
+                "contacted-validator-all-path-proof", "NONDISPATCH_PROVEN",
+                non_dispatch_proven=True, zero_liability_proven=True,
+                all_obligations_settled=True,
+                attempt_id="validator-attempt-1",
+                nonexecution_seal_id=sealed.seal_id,
+            )
+            settled = store._settle_budget(
+                request,
+                authority.issue_settlement_proof(
+                    "contacted-validator-nonexecution-proof", request
+                ),
+                authority,
+            )
+            self.assertFalse(settled.slot_released)
+            self.assertEqual(
+                store.load_run_lifecycle("run-1"), LifecycleState.BLOCKED
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                status = connection.execute(
+                    "SELECT status FROM validator_intents WHERE "
+                    "validator_intent_id = 'validator-intent-t08'"
+                ).fetchone()[0]
+                slot = connection.execute(
+                    "SELECT run_id, attempt_id, generation FROM outstanding_slot"
+                ).fetchone()
+                contact_count = connection.execute(
+                    "SELECT COUNT(*) FROM adapter_contacts WHERE contact_kind = "
+                    "'VALIDATOR'"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            self.assertEqual(status, "SETTLED")
+            self.assertEqual(slot, ("run-1", "attempt-1", 1))
+            self.assertEqual(contact_count, 1)
             store.load_verified("repo-1")
 
     def test_effect_binding_denial_precedes_durable_intent(self) -> None:
