@@ -4,9 +4,9 @@ Date: 2026-09-23. This bounded correction followed an independent read-only
 screen of three roadmap pages; the setup routing plan needed no new edit.
 The broader documentation item previously carried **80–200 active hours**;
 this correction's new estimate was **1–3 active hours**. The selected backlog
-total at work start was **175–394 active hours**. Preparation began after
-the #199 merge at 22:56:09 Coordinated Universal Time (UTC); the eventual
-pull request records its first-work-to-merge wall time separately.
+total at work start was **175–394 active hours**. Preparation began at about
+23:00 Coordinated Universal Time (UTC), recorded to minute precision. The
+eventual pull request records its first-work-to-merge wall time separately.
 
 The [Behavioral Eval Runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md)
 now gives work package 2B-1B's effective offline status at the detailed
