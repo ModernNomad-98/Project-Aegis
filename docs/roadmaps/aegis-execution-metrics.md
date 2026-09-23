@@ -2,9 +2,9 @@
 
 ## Start here — current measurements
 
-The latest [five-merge checkpoint after pull request #191](#checkpoint-after-pull-request-191--2026-09-23)
+The latest [five-merge checkpoint after pull request #196](#checkpoint-after-pull-request-196--2026-09-23)
 reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-191).
+forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-196).
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -1006,3 +1006,66 @@ checked; the 544-file Markdown count verified; and `git diff --check`
 passed. Historical snapshots remain intact, with only current first-screen
 navigation changed. Independent read-only review and the eventual
 pull-request closeout remain pending at this draft checkpoint.
+
+## Checkpoint after pull request #196 — 2026-09-23
+
+Five requests merged after #191, in order #194, #192, #193, #195 and #196.
+All times below are September 23, 2026, in Coordinated Universal Time (UTC).
+**h**, **m** and **s** mean hours, minutes and seconds. Merge endpoints are
+GitHub pull-request `mergedAt` events; the first-work timestamps come from
+the pull-request bodies and merge-time comments. The exact #196 merge is
+`437e73a7967d908b30fe9d919365ec2cf2ed035b`.
+
+| Pull request and bounded package | Previous estimate | New package estimate (original ETA) | First work (UTC) | Merge event (UTC) | Observed wall time |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| [#194 — preceding forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/194) | 1–2 h | 1–2 h | 22:17:50 | 22:27:42 | 9m52s |
+| [#192 — category and application path](https://github.com/ModernNomad-98/Project-Aegis/pull/192) | 2–4 h screen | 1–3 h correction | 22:16:34 | 22:28:10 | 11m36s |
+| [#193 — historical runner design and roadmap](https://github.com/ModernNomad-98/Project-Aegis/pull/193) | 2–4 h screen | 1–3 h correction | 22:16:19 | 22:29:03 | 12m44s |
+| [#195 — stable forecast links](https://github.com/ModernNomad-98/Project-Aegis/pull/195) | 2–4 h screen | 1–2 h correction | 22:24:37 | 22:34:17 | 9m40s |
+| [#196 — control-plane verification guide](https://github.com/ModernNomad-98/Project-Aegis/pull/196) | 2–4 h screen | 1–3 h correction | 22:24:45 | 22:35:54 | 11m09s |
+| **Five-merge cycle** | No single combined active-work estimate | Separately scoped estimates above | **22:16:19**, earliest work | **22:35:54**, fifth merge | **19m35s** |
+
+The intervals overlap, and the previous screen estimates cover different
+scope from the correction estimates. They include editing, independent audit,
+GitHub checks and queue time. Active effort and waits were not separately
+instrumented. Do not sum these intervals as labor or extrapolate them into a
+full documentation-sweep rate. Every package began with a selected-backlog
+estimate of **175–394 active hours**.
+
+The exact #196 tree has **547 tracked Markdown files**, compared with 544
+after #191. Three dated evidence notes were added by #193, #195 and #196.
+The category and path guidance, historical runner design, stable forecast
+routes and control-plane verification guide were corrected; the wider
+documentation acceptance inventory remains open. None of the five PRs
+closed a selected implementation or provider/host gate.
+
+All five final PR heads passed Linux, Windows and protected-file checks
+before their merges. Their exact-main runs also succeeded: #194
+[35928468606](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35928468606),
+#192 [35928508247](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35928508247),
+#193 [35928586186](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35928586186),
+#195 [35929071102](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35929071102),
+and #196 [35929217637](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35929217637).
+
+The [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-196)
+reassesses all **14 selected** and **seven optional** open rows. The selected
+remaining total stays **175–394 active hours**: **95–194** non-documentation
+plus **80–200** documentation. Both optional issue #101 helpers would add
+**16–40 hours**, for a bounded **191–434** selected-plus-both total. The
+all-options backlog has no finite estimate. The separate protected-path
+decision for #139 and any future exception for #197 are outside these five
+merges.
+
+### Preparation and editing time for this checkpoint
+
+Previous and new forecast-package estimates are both **1–2 active hours**;
+the selected backlog estimate at start is **175–394 active hours**.
+Read-only preparation began at **22:35:25 UTC**. Editing began after the
+#196 merge in an isolated worktree based on that exact commit. Active-only
+effort is not instrumented. Draft review completed at **22:41:54 UTC**,
+**6m29s observed wall time** after preparation began. The independent
+read-only audit checked all 21 open rows, arithmetic, five merge identities
+and intervals, 547 tracked Markdown files, 103 local links and anchors,
+historical preservation and section order. `python -B scripts/validate-skills.py`
+reported 185 valid skills with zero warnings; `git diff --check` passed.
+The forecast pull request records its final first-work-to-merge interval.
