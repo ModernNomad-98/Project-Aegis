@@ -5,6 +5,16 @@ description: Design the accessibility verification harness — WCAG-oriented cov
 
 # Accessibility Test Harness
 
+Terms used below: **WCAG** means Web Content Accessibility Guidelines;
+**E2E** means end-to-end testing; **CI** means continuous integration;
+**a11y** abbreviates accessibility; **EN 301 549** is the European standard
+for accessibility of information and communication technology; **ADA** means
+Americans with Disabilities Act; **ARIA** means Accessible Rich Internet
+Applications; **SR** means screen reader; **AT** means assistive technology;
+and **VPAT** means Voluntary Product Accessibility Template. These names
+identify standards, tools, or artifacts; the target obligation and level still
+come from the product's requirements in the workflow below.
+
 ## Purpose
 
 Produce the harness that verifies accessibility instead of asserting it:
@@ -92,16 +102,17 @@ manually.
 ## Output Format
 
 ```
-A11Y HARNESS — <scope>
-Standard: <WCAG version/level + obligation source>
+A11Y HARNESS (ACCESSIBILITY TEST HARNESS) — <scope>
+Standard: <Web Content Accessibility Guidelines (WCAG) version/level + obligation source>
 Scope: <journeys, routes, components>
 Automated tier:
-  <layer (component/E2E/CI-lint/contrast) → tool/config → violation policy
-   (baseline + ratchet) → CI placement>
+  <layer (component/end-to-end/continuous-integration lint/contrast) →
+   tool/configuration → violation policy (baseline + ratchet) →
+   continuous-integration placement>
 Manual tier:
   <checklist id> — <keyboard|screen-reader|zoom|contrast-judgment> —
-  steps/expected/WCAG ref — cadence
-AT matrix: <screen reader × browser combos committed>
+  steps/expected/WCAG criterion reference — cadence
+AT matrix (assistive technology): <screen reader × browser combinations committed>
 Split rationale: <what automation covers vs cannot — explicit>
 Severity rubric: <blocker→cosmetic with a11y-specific definitions>
 Evidence: <per evidence-planner rules; finding format with WCAG citation>
