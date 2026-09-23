@@ -1,6 +1,6 @@
 # Behavioral Eval Runner: resume on a new computer
 
-## Current continuation — updated 2026-09-12
+## Recovery continuation snapshot — 2026-09-12
 
 Start new development from `main`. PR #88's engineering corrections, PR #90's
 shared contracts and PR #91's permanent offline CI are merged. The
@@ -58,8 +58,12 @@ follow-up passed 127 relevant tests without skips, as recorded in the
 not extend that exact-revision review to a new live-execution identity.
 
 The [durable backlog](../../roadmaps/behavioral-eval-runner-backlog.md) remains
-the continuation authority. WP-2B-3 is not DONE; OD-1 is OPEN and WP-2B-4 is
-BLOCKED. This handoff does not authorize calibration, a budget reset or a merge.
+the continuation authority. At this historical checkpoint, work package
+(WP) 2B-3, the measured judge-calibration package, was not done; owner
+decision (OD) 1, the later human ratification of calibration results, was
+open; and work package 2B-4, the limited live Scenario A suite, was blocked.
+Consult the backlog for current status. This handoff does not authorize
+calibration, a budget reset or a merge.
 
 ### Reproduce the historical dependency environment
 

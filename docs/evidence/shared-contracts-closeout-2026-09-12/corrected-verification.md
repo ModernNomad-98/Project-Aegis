@@ -6,8 +6,13 @@
 > [shared-contract closeout](README.md) records its delivery and main
 > verification. Preserve the candidate test counts and platform skips as
 > observed; they do not establish live Behavioral Eval Runner (BER) execution.
+> The separately planned hosted continuous integration (CI) coverage later
+> shipped in [PR #91](../offline-ci-2026-09-12/DELIVERY.md). The future-tense
+> submission plan below describes the September 12 candidate checkpoint.
 
-The corrected implementation is
+In the table, **POSIX** means the Unix-like test environment; **SDK** means
+software development kit; and **DCO** means Developer Certificate of Origin,
+the commit sign-off check. The corrected implementation is
 `4d6d292168d8a6fb47b7593870409d61707bdd7a`, tree
 `facb8ed563fd722e2e5bfdf918e64bc8c1854969`. Both platform runs used this exact
 committed revision; the Windows worktree stayed clean throughout the run.
@@ -31,8 +36,9 @@ eight commands and raw logs, each exiting zero. The
 record all five commands passing in the same unprivileged, network-disabled
 container as the initial run. The eight SDK-dependent cases execute on Windows;
 platform and missing-dependency skips remain explicit. No actual provider request
-or live model evaluation was performed. Hosted Python 3.14 BER and PowerShell Core
-acceptance coverage remain part of the separate CI follow-up.
+or live model evaluation was performed. At this candidate checkpoint, hosted
+Python 3.14 BER and PowerShell Core acceptance coverage belonged to the
+separate CI follow-up, later delivered in PR #91.
 
 The [GitHub review findings](logs/github-first-review-review-comments.json) and
 [review metadata](logs/github-first-review-pr.json) preserve the two P2 findings
@@ -40,8 +46,9 @@ on initial submitted revision `e9b8ec0`. Both fixes and their independently
 reviewed evidence are described in [github-review-fixes.md](github-review-fixes.md).
 The initial 985-case logs remain preserved and are superseded by this full run.
 
-After the evidence commit, submission checks rerun the validator, audit tests,
-runner self-check, DCO and cumulative whitespace check; verify all committed log
+The then-planned submission checks after the evidence commit would rerun the
+validator, audit tests, runner self-check, DCO and cumulative whitespace
+check; verify all committed log
 hashes; and prove `git diff --quiet 4d6d292..HEAD -- .
 ':!docs/evidence/shared-contracts-closeout-2026-09-12'` succeeds. The final SHA and
 hosted check results are recorded on PR #90 rather than recursively committed
