@@ -1,5 +1,15 @@
 # Aegis Workflow Extraction Report
 
+> **Historical research — current reading, 2026-09-23.** This report compares
+> two anonymized source repositories observed on 2026-07-07 to explain why
+> workflow-discipline skills were proposed. `Repo A` and `Repo B` below are
+> labels for those separate repositories, not Project Aegis checkout roles or
+> repositories to access. Their placeholder paths are deliberately
+> non-actionable. The original audit and candidate findings remain below as
+> dated evidence; they are not current work instructions or approvals. For
+> shipped skills, use the [catalog](../skills-catalog.md); for Aegis owner
+> authority, use the [approval register](../approvals/APPROVAL_REGISTER.md).
+
 **Date:** 2026-07-07
 **Mode:** Read-only audit. No file in either source repository was created, modified, staged, committed, pushed, branched, or tagged. This report is the session's only output.
 
