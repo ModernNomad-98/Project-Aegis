@@ -33,17 +33,7 @@ def verify_synthetic_evidence(
     original: bytes, *, expected_hash: str, expected_binding: str,
     expected_writer: str, expected_stage: str,
 ) -> dict[str, object]:
-    """Verify original bytes and a complete, non-sensitive synthetic envelope."""
-    def sensitive(value: object) -> bool:
-        if isinstance(value, dict):
-            return any(
-                str(key).casefold() in {"credential", "secret", "token", "customer_data"}
-                or sensitive(child) for key, child in value.items()
-            )
-        if isinstance(value, list):
-            return any(sensitive(child) for child in value)
-        return False
-
+    """Verify original bytes and the one closed synthetic fixture payload."""
     try:
         record = json.loads(original.decode("ascii"))
         if not isinstance(record, dict) or canonical_bytes(record) != original:
@@ -53,8 +43,7 @@ def verify_synthetic_evidence(
                 or record["binding"] != expected_binding
                 or record["writer"] != expected_writer
                 or record["stage"] != expected_stage
-                or not isinstance(record["payload"], dict)
-                or sensitive(record["payload"])):
+                or record["payload"] != {"receipt": "synthetic"}):
             raise ValueError("unverifiable or sensitive evidence")
         if hashlib.sha256(original).hexdigest() != expected_hash:
             raise ValueError("evidence hash mismatch")

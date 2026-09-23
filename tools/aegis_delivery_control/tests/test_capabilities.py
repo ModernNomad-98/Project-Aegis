@@ -112,6 +112,7 @@ class CapabilityProofTests(unittest.TestCase):
                 (canonical_bytes({**record, "version": 2}), arguments),
                 (canonical_bytes({**record, "payload": {"token": "secret"}}), arguments),
                 (canonical_bytes({**record, "payload": {"nested": [{"secret": "x"}]}}), arguments),
+                (canonical_bytes({**record, "payload": {"password": "synthetic-secret"}}), arguments),
             ]
             for payload, kwargs in cases:
                 with self.subTest(payload=payload, kwargs=kwargs):

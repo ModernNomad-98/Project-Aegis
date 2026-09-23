@@ -49,12 +49,14 @@ class PlatformContractTests(unittest.TestCase):
             leaf.write_bytes(b"second")
             with self.assertRaises(PathCapabilityUnavailable):
                 probe_owned_path_identity(leaf, expected=expected, trusted_root=root)
+            replacement_identity = prepare_owned_file(
+                leaf, create=False, trusted_root=root
+            )
             os.link(leaf, root / "alias.sqlite3")
             with self.assertRaisesRegex(PathCapabilityUnavailable, "single-link"):
                 probe_owned_path_identity(
                     leaf,
-                    expected=prepare_owned_file(root / "old.sqlite3", create=False,
-                                                trusted_root=root),
+                    expected=replacement_identity,
                     trusted_root=root,
                 )
 
