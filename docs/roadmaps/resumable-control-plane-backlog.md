@@ -176,6 +176,11 @@ permission for runtime work.
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
 
+The [CP-WP-003A offline capability-proof proposal](cp-wp-003-offline-proof-proposal.md)
+is a reviewable scope for a first synthetic-only increment. It grants no
+implementation authority and does not change CP-WP-003's BLOCKED status or
+CP-WP-002's accepted scope.
+
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.
 
