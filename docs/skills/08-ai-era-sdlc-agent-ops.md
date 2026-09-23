@@ -1,8 +1,21 @@
 # AI-Era SDLC & Agent Operating Discipline
 
-Skills that make AI-assisted development controlled, traceable, reviewable, and safe.
+This is the original 20-candidate map for making artificial intelligence (AI)
+assisted development controlled, traceable, reviewable, and safe. It is a
+historical planning list, not an inventory of installed skills. Some candidates
+now ship as executable workflows, sometimes combined under different names;
+others remain planned. For current status, use the [implemented Phase 1](../skills-catalog.md#skills-phase-1--operating-discipline-pack)
+and [Phase 1.5](../skills-catalog.md#skills-phase-15--ai-sdlc-governance-completion)
+catalog entries and the [reconciled backlog](../skills-catalog.md#backlog-by-phase-reconciled).
+Open a shipped entry's `.claude/skills/<name>/SKILL.md` before using it; a
+candidate number does not grant authority or identify an installed skill.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+Here, **SDLC** means software development life cycle, **CI** means continuous
+integration, and **PR** means pull request. **P0** and **P1** are the original
+[priority tiers](../skills-catalog.md#priority-definitions): P0 names foundation
+and core disciplines; P1 names high-value work building on P0. Neither tier
+states delivery status or permission to act. The numbered rows below preserve
+the candidate names, priorities and intended uses from the original roadmap.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -27,9 +40,11 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 279 | Agent Memory Governance | P1 | Update persistent project memory only when confirmed facts change and avoid storing secrets. |
 | 280 | Agent Governance Audit | P1 | Audit whether AI-assisted changes followed planning, approval, validation, security, and closeout discipline. |
 
-## Skill implementation standard
+## Original implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This checklist described what each candidate workflow was expected to include.
+For skills created or revised now, follow the current
+[skill generation standard](../skill-generation-standard.md).
 
 - Purpose
 - When to use

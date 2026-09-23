@@ -1,8 +1,23 @@
 # AI Software Engineering & LLM Systems
 
-Skills for AI routers, prompt contracts, safety, evals, RAG, redaction, cost controls, and autonomy.
+This is the original 20-candidate map for artificial intelligence (AI)
+engineering: model routing, prompt contracts, safety, evaluation, retrieval,
+redaction, cost controls and autonomy. It is a historical planning list, not an
+inventory of installed skills. Some candidates now ship as executable workflows,
+sometimes combined under different names; others remain planned. For current
+status, use the [implemented Phase 7 catalog entries](../skills-catalog.md#skills-phase-7--ai-security--llm-systems-pack)
+and [reconciled backlog](../skills-catalog.md#backlog-by-phase-reconciled).
+Open a shipped entry's `.claude/skills/<name>/SKILL.md` before using it; a
+candidate number does not grant authority or identify an installed skill.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+Here, **LLM** means large language model, **RAG** means retrieval-augmented
+generation, **PII** means personally identifiable information, and **ID**
+means identifier. **P0** and
+**P1** are the original [priority tiers](../skills-catalog.md#priority-definitions):
+P0 names foundation and core disciplines; P1 names high-value work building on
+P0. Neither tier states delivery status or permission to act. The numbered
+rows below preserve the candidate names, priorities and intended uses from the
+original roadmap.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -27,9 +42,11 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 299 | AI Feature Kill Switch | P1 | Disable provider, model, tenant, or feature behavior quickly during incidents or cost spikes. |
 | 300 | AI Safety Review Checklist | P0 | Review data leakage, prompt injection, unsafe writes, hallucination, tool misuse, and cost blowups. |
 
-## Skill implementation standard
+## Original implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This checklist described what each candidate workflow was expected to include.
+For skills created or revised now, follow the current
+[skill generation standard](../skill-generation-standard.md).
 
 - Purpose
 - When to use
