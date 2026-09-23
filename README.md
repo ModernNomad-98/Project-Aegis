@@ -681,7 +681,11 @@ distinct T14 RESUME grant clears exactly that fence. F03 now has independent
 `APPROVE`: three concurrent host/manual consumers reach one authoritative
 winner, live and recovery lifecycle decisions share one exact evaluator,
 clock rollback and lost acknowledgements fail closed, and synthetic authority
-cannot enable a real adapter. The remaining explicit coverage gap is F04a.
+cannot enable a real adapter. F04a now also has independent `APPROVE`: known
+usage below/equal/above the reservation settles exactly once, overruns fence,
+unknown liability remains blocked, and semantic-v10 migration preserves older
+valid histories without healing tamper. All 22 acceptance-family rows now have
+tested, independently accepted coverage; remaining row-level reviews still apply.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA
 review gates remain. Read the

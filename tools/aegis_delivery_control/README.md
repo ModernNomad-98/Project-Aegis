@@ -340,7 +340,18 @@ Three independent host/manual consumers serialize at the source use limit;
 live dispatch and recovery share one effective-time lifecycle evaluator;
 pre-action adoption denials, exact corrections, persistent clock rollback and
 lost claim acknowledgements remain fail-closed. Exact replay returns only the
-original synthetic receipt and never creates adapter contact. Filesystem
+original synthetic receipt and never creates adapter contact.
+
+F04a durable accounting also has independent implementation `APPROVE`. Known
+actual usage is settled absolutely below, at and above the original reservation;
+an overrun records a durable breach without rejecting or understating the bill.
+Unknown billing charges the declared worst case and retains the slot; only exact
+non-dispatch plus zero-liability proof releases it. Operation and validator
+intents reject a missing bound before any durable intent or contact. Semantic
+version 10 migrates valid v9 breach projections atomically after strict no-
+healing verification.
+
+Filesystem
 ownership/reparse/path-swap protection also has independent implementation
 `APPROVE`: Windows actual junction/replacement and same-volume known-folder
 rebound probes pass, the stable lock identity is pinned, and unsafe sidecars and

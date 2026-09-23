@@ -89,7 +89,11 @@ reporting is independently accepted with strictly read-only main/auxiliary
 verification and typed stale/unverified status. F03 source-atomic one-use
 authority is independently accepted: host/manual races, lifecycle timing,
 correction ownership, clock rollback and lost-receipt replay are now directly
-asserted. The remaining explicit coverage gap is F04a.
+asserted. F04a reservation-boundary accounting is also independently accepted,
+including exact known usage, durable overrun fences, unknown-liability retention,
+pre-contact bound denial and strict semantic-v10 migration. All 22 acceptance-
+family rows now have tested, independently accepted coverage; remaining row-
+level reviews and final gates stay open.
 The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
 order and reconstructs projections strictly. The current increment adds signed

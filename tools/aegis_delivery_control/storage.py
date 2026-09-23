@@ -539,6 +539,25 @@ def _derive_settlement_accounting(
     return 0, actual_units, False
 
 
+def _is_budget_breach(
+    disposition: BudgetDisposition,
+    charged_units: int,
+    reserved_units: int,
+    cap_units: int,
+) -> bool:
+    """Return whether one settlement records a durable budget overrun.
+
+    Unknown accounting is an exposure rather than authoritative actual usage, so
+    it crosses the reservation threshold only when it also exceeds the cap.
+    Known absolute usage breaches the original reservation as required by 5.4.
+    """
+
+    return charged_units > cap_units or (
+        disposition in {BudgetDisposition.CONSUMED, BudgetDisposition.ADJUSTED}
+        and charged_units > reserved_units
+    )
+
+
 def _derive_effect_observation_route(
     current_state: LifecycleState,
     usage_units: int | None,
@@ -987,7 +1006,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -1008,7 +1027,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8, 9} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -2088,6 +2107,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_safe_same_effect_retry_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_budget_overrun_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -2165,7 +2187,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5, 6, 7, 8, 9}:
+            if version not in {3, 4, 5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -2194,11 +2216,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5, 6, 7, 8, 9} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6, 7, 8, 9, 10} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5, 6, 7, 8, 9}:
+            if version in {4, 5, 6, 7, 8, 9, 10}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2670,7 +2692,7 @@ class SQLiteStateStore:
             if version == 3:
                 connection.execute("PRAGMA user_version = 4")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                4, 5, 6, 7, 8, 9,
+                4, 5, 6, 7, 8, 9, 10,
             }:
                 raise StorageIntegrityError(
                     "T28 foundation migration did not reach version 4"
@@ -2719,7 +2741,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5, 6, 7, 8, 9}:
+            if version not in {4, 5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2973,7 +2995,7 @@ class SQLiteStateStore:
         )
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {5, 6, 7, 8, 9}:
+            if version not in {5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "trusted-readiness semantic version is unsupported"
                 )
@@ -3033,7 +3055,7 @@ class SQLiteStateStore:
                     )
                 connection.execute("PRAGMA user_version = 6")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                6, 7, 8, 9,
+                6, 7, 8, 9, 10,
             }:
                 raise StorageIntegrityError(
                     "trusted-readiness migration did not reach version 6"
@@ -3187,7 +3209,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {6, 7, 8, 9}:
+            if version not in {6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "proof-free disposition semantic version is unsupported"
                 )
@@ -3231,7 +3253,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "proof-free disposition schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {7, 8, 9}:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                7, 8, 9, 10,
+            }:
                 raise StorageIntegrityError(
                     "proof-free disposition migration did not reach version 7"
                 )
@@ -3322,7 +3346,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {7, 8, 9}:
+            if version not in {7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "validation pause drain semantic version is unsupported"
                 )
@@ -3376,7 +3400,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "validation pause drain schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {8, 9}:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                8, 9, 10,
+            }:
                 raise StorageIntegrityError(
                     "validation pause drain migration did not reach version 8"
                 )
@@ -3483,7 +3509,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {8, 9}:
+            if version not in {8, 9, 10}:
                 raise StorageIntegrityError(
                     "safe-retry semantic version is unsupported"
                 )
@@ -3533,7 +3559,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "safe-retry schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 9:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                9, 10,
+            }:
                 raise StorageIntegrityError(
                     "safe-retry migration did not reach version 9"
                 )
@@ -3541,6 +3569,256 @@ class SQLiteStateStore:
                 connection.commit()
                 if failure_hook is not None and version == 8:
                     failure_hook("after_safe_retry_migration_commit_before_acknowledgement")
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_budget_overrun_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        """Upgrade v9 breach projections from cap-only to reservation-aware."""
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {9, 10}:
+                raise StorageIntegrityError(
+                    "budget-overrun semantic version is unsupported"
+                )
+            if version == 10:
+                if manage_transaction:
+                    connection.commit()
+                return
+            origin_events = connection.execute(
+                "SELECT event_id, event_hash, event_kind, repository_id, "
+                "run_id, item_id, body_json FROM events "
+                "WHERE event_kind IN ('INTENT_COMMITTED', "
+                "'VALIDATOR_INTENT_COMMITTED')"
+            ).fetchall()
+            expected_reservations: dict[str, tuple[object, ...]] = {}
+            for event in origin_events:
+                try:
+                    body = json.loads(str(event["body_json"]))
+                except json.JSONDecodeError as error:
+                    raise StorageIntegrityError(
+                        "legacy budget reservation origin is invalid"
+                    ) from error
+                validator = event["event_kind"] == "VALIDATOR_INTENT_COMMITTED"
+                try:
+                    reservation_id = str(body["reservation_id"])
+                    expected = (
+                        body["repository_id"], body["logical_effect_id"],
+                        (
+                            body["validator_attempt_id"]
+                            if validator else body["attempt_id"]
+                        ),
+                        body["budget_policy_digest"],
+                        (
+                            body["reserved_units"]
+                            if validator else body["budget_reserved_units"]
+                        ),
+                        (
+                            body["worst_case_units"]
+                            if validator else body["budget_worst_case_units"]
+                        ),
+                        (
+                            body["cap_units"]
+                            if validator else body["budget_cap_units"]
+                        ),
+                        body["run_id"], body["item_id"],
+                    )
+                except (KeyError, TypeError) as error:
+                    raise StorageIntegrityError(
+                        "legacy budget reservation origin is invalid"
+                    ) from error
+                if (
+                    event["event_id"] != body.get("event_id")
+                    or event["event_kind"] != body.get("event_kind")
+                    or event["repository_id"] != body.get("repository_id")
+                    or event["run_id"] != body.get("run_id")
+                    or event["item_id"] != body.get("item_id")
+                    or SQLiteStateStore._event_hash(body) != event["event_hash"]
+                    or reservation_id in expected_reservations
+                ):
+                    raise StorageIntegrityError(
+                        "legacy budget reservation origin is invalid"
+                    )
+                expected_reservations[reservation_id] = expected
+            actual_reservations = {
+                str(row["reservation_id"]): (
+                    row["repository_id"], row["logical_effect_id"],
+                    row["attempt_id"], row["policy_digest"],
+                    row["reserved_units"], row["worst_case_units"],
+                    row["cap_units"], row["run_id"], row["item_id"],
+                )
+                for row in connection.execute(
+                    "SELECT * FROM budget_reservations"
+                )
+            }
+            if actual_reservations != expected_reservations:
+                raise StorageIntegrityError(
+                    "legacy budget reservation projection diverges"
+                )
+
+            settlement_ids = {
+                str(row["settlement_event_id"])
+                for row in connection.execute(
+                    "SELECT settlement_event_id FROM budget_settlements"
+                )
+            }
+            settlement_event_ids = {
+                str(row["event_id"])
+                for row in connection.execute(
+                    "SELECT event_id FROM events WHERE event_kind IN "
+                    "('BUDGET_SETTLED', 'NONDISPATCH_PROVEN')"
+                )
+            }
+            if settlement_ids != settlement_event_ids:
+                raise StorageIntegrityError(
+                    "legacy budget settlement projection is incomplete"
+                )
+            rows = connection.execute(
+                "SELECT settlement.settlement_event_id, "
+                "settlement.reservation_id, settlement.settlement_hash, "
+                "settlement.disposition, settlement.charged_units, "
+                "settlement.body_json AS settlement_body_json, "
+                "event.event_id, event.event_hash, "
+                "event.body_json AS event_body_json, "
+                "event.repository_id AS event_repository_id, "
+                "event.run_id AS event_run_id, "
+                "event.item_id AS event_item_id, "
+                "event.event_kind AS source_event_kind, "
+                "reservation.repository_id, reservation.reserved_units, "
+                "reservation.cap_units, reservation.run_id AS reservation_run_id, "
+                "reservation.item_id AS reservation_item_id, "
+                "reservation.logical_effect_id AS reservation_effect_id, "
+                "reservation.attempt_id AS reservation_attempt_id FROM "
+                "budget_settlements AS settlement "
+                "JOIN events AS event ON event.event_id = "
+                "settlement.settlement_event_id JOIN budget_reservations AS "
+                "reservation ON reservation.reservation_id = "
+                "settlement.reservation_id ORDER BY event.writer_epoch, "
+                "event.sequence"
+            ).fetchall()
+            if len(rows) != len(settlement_ids):
+                raise StorageIntegrityError(
+                    "legacy budget settlement linkage is incomplete"
+                )
+            old_expected: dict[str, tuple[str, None, None, str, str]] = {}
+            new_expected: dict[str, tuple[str, None, None, str, str]] = {}
+            for row in rows:
+                try:
+                    body = json.loads(str(row["settlement_body_json"]))
+                    disposition = BudgetDisposition(str(row["disposition"]))
+                except (json.JSONDecodeError, ValueError) as error:
+                    raise StorageIntegrityError(
+                        "legacy budget settlement is invalid"
+                    ) from error
+                settlement_id = str(row["settlement_event_id"])
+                reservation_id = str(row["reservation_id"])
+                settlement_hash = str(row["settlement_hash"])
+                if (
+                    row["event_id"] != settlement_id
+                    or row["event_hash"] != settlement_hash
+                    or row["event_body_json"] != row["settlement_body_json"]
+                    or SQLiteStateStore._event_hash(body) != settlement_hash
+                    or body.get("settlement_event_id") != settlement_id
+                    or body.get("reservation_id") != reservation_id
+                    or body.get("disposition") != disposition.value
+                    or body.get("charged_units") != int(row["charged_units"])
+                    or row["event_repository_id"] != row["repository_id"]
+                    or body.get("repository_id") != row["repository_id"]
+                    or row["event_run_id"] != body.get("run_id")
+                    or row["event_item_id"] != body.get("item_id")
+                    or row["source_event_kind"] != body.get("event_kind")
+                    or body.get("run_id") != row["reservation_run_id"]
+                    or body.get("item_id") != row["reservation_item_id"]
+                    or body.get("logical_effect_id")
+                    != row["reservation_effect_id"]
+                    or body.get("attempt_id") != row["reservation_attempt_id"]
+                ):
+                    raise StorageIntegrityError(
+                        "legacy budget settlement linkage is invalid"
+                    )
+                fence_id = f"budget-breach:{settlement_id}"
+                fence = (
+                    str(row["repository_id"]), None, None,
+                    "BUDGET_CAP_EXCEEDED", settlement_id,
+                )
+                charged_units = int(row["charged_units"])
+                if charged_units > int(row["cap_units"]):
+                    old_expected[fence_id] = fence
+                if _is_budget_breach(
+                    disposition,
+                    charged_units,
+                    int(row["reserved_units"]),
+                    int(row["cap_units"]),
+                ):
+                    new_expected[fence_id] = fence
+
+            actual = {
+                str(row["fence_id"]): (
+                    str(row["repository_id"]), row["item_id"],
+                    row["logical_effect_id"], str(row["reason_code"]),
+                    str(row["originating_event_id"]),
+                )
+                for row in connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id LIKE "
+                    "'budget-breach:%' OR reason_code = 'BUDGET_CAP_EXCEEDED'"
+                )
+            }
+            expected = old_expected if version == 9 else new_expected
+            if actual != expected:
+                raise StorageIntegrityError(
+                    "budget-overrun projection diverges before migration"
+                )
+            if version == 9:
+                for fence_id in sorted(set(new_expected) - set(old_expected)):
+                    repository_id, _, _, reason_code, originating_event_id = (
+                        new_expected[fence_id]
+                    )
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
+                        (
+                            fence_id, repository_id, reason_code,
+                            originating_event_id,
+                        ),
+                    )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_budget_overrun_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 10")
+                actual = {
+                    str(row["fence_id"]): (
+                        str(row["repository_id"]), row["item_id"],
+                        row["logical_effect_id"], str(row["reason_code"]),
+                        str(row["originating_event_id"]),
+                    )
+                    for row in connection.execute(
+                        "SELECT * FROM dispatch_fences WHERE fence_id LIKE "
+                        "'budget-breach:%' OR reason_code = "
+                        "'BUDGET_CAP_EXCEEDED'"
+                    )
+                }
+            if actual != new_expected or int(connection.execute(
+                "PRAGMA user_version"
+            ).fetchone()[0]) != 10:
+                raise StorageIntegrityError(
+                    "budget-overrun migration did not reach version 10"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 9:
+                    failure_hook(
+                        "after_budget_overrun_migration_commit_before_acknowledgement"
+                    )
         except BaseException:
             if manage_transaction and connection.in_transaction:
                 connection.rollback()
@@ -4000,7 +4278,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}:
+            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -4008,7 +4286,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5, 6, 7, 8, 9}:
+            if version in {2, 3, 4, 5, 6, 7, 8, 9, 10}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -4060,7 +4338,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5, 6, 7, 8, 9}:
+                if version in {3, 4, 5, 6, 7, 8, 9, 10}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -4125,7 +4403,7 @@ class SQLiteStateStore:
                                     "proven-nonexecution resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version == 9:
+                if version in {9, 10}:
                     safe_retry_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'safe_same_effect_retry_actions'"
@@ -4334,7 +4612,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5, 6, 7, 8, 9,
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -4406,7 +4684,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5, 6, 7, 8, 9}:
+            if version not in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -4447,7 +4725,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5, 6, 7, 8, 9,
+                2, 3, 4, 5, 6, 7, 8, 9, 10,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -4650,7 +4928,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5, 6, 7, 8, 9}:
+            if version not in {2, 3, 4, 5, 6, 7, 8, 9, 10}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -5004,7 +5282,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5, 6, 7, 8, 9,
+                3, 4, 5, 6, 7, 8, 9, 10,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -10484,10 +10762,13 @@ class SQLiteStateStore:
         recoverable_applications: set[str] = set()
         settlement_dispositions: dict[str, BudgetDisposition] = {}
         active_additional_liability: dict[str, str] = {}
-        reservation_caps = {
-            str(row["reservation_id"]): int(row["cap_units"])
+        reservation_limits = {
+            str(row["reservation_id"]): (
+                int(row["reserved_units"]), int(row["cap_units"])
+            )
             for row in connection.execute(
-                "SELECT reservation_id, cap_units FROM budget_reservations "
+                "SELECT reservation_id, reserved_units, cap_units FROM "
+                "budget_reservations "
                 "WHERE repository_id = ?",
                 (repository_id,),
             )
@@ -10580,8 +10861,12 @@ class SQLiteStateStore:
                 ):
                     active_fences.pop(prior_additional, None)
                     active_additional_liability.pop(reservation_id, None)
-                if int(body["charged_units"]) > reservation_caps.get(
-                    reservation_id, int(body["charged_units"])
+                reservation_limit = reservation_limits.get(reservation_id)
+                if reservation_limit is not None and _is_budget_breach(
+                    current,
+                    int(body["charged_units"]),
+                    reservation_limit[0],
+                    reservation_limit[1],
                 ):
                     active_fences[f"budget-breach:{settlement_id}"] = (
                         "BLOCKER", "BUDGET_CAP_EXCEEDED"
@@ -13255,7 +13540,8 @@ class SQLiteStateStore:
                 if event_kind in {"BUDGET_SETTLED", "NONDISPATCH_PROVEN"}:
                     reservation_id = str(body["reservation_id"])
                     reservation = connection.execute(
-                        "SELECT cap_units FROM budget_reservations WHERE "
+                        "SELECT reserved_units, cap_units FROM "
+                        "budget_reservations WHERE "
                         "reservation_id = ? AND repository_id = ?",
                         (reservation_id, repository_id),
                     ).fetchone()
@@ -13281,7 +13567,12 @@ class SQLiteStateStore:
                             None,
                         )
                     settlement_id = str(body["settlement_event_id"])
-                    if int(body["charged_units"]) > int(reservation["cap_units"]):
+                    if _is_budget_breach(
+                        disposition,
+                        int(body["charged_units"]),
+                        int(reservation["reserved_units"]),
+                        int(reservation["cap_units"]),
+                    ):
                         active_fences[f"budget-breach:{settlement_id}"] = (
                             None, None
                         )
@@ -26889,7 +27180,12 @@ class SQLiteStateStore:
                             settlement_hash, resulting_state.value, body_json,
                         ),
                     )
-                if charged_units > int(reservation["cap_units"]):
+                if _is_budget_breach(
+                    request.disposition,
+                    charged_units,
+                    int(reservation["reserved_units"]),
+                    int(reservation["cap_units"]),
+                ):
                     connection.execute(
                         "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
                         (
@@ -27440,7 +27736,12 @@ class SQLiteStateStore:
                                 request.settlement_event_id,
                             ),
                         )
-                    if charged_units > int(reservation["cap_units"]):
+                    if _is_budget_breach(
+                        disposition,
+                        charged_units,
+                        int(reservation["reserved_units"]),
+                        int(reservation["cap_units"]),
+                    ):
                         connection.execute(
                             "INSERT INTO dispatch_fences VALUES (?, ?, NULL, NULL, ?, ?)",
                             (
@@ -42179,7 +42480,12 @@ class SQLiteStateStore:
                 slot_released_ever = slot_released_ever or bool(
                     body["release_slot"]
                 )
-                if int(row["charged_units"]) > int(reservation["cap_units"]):
+                if _is_budget_breach(
+                    next_disposition,
+                    int(row["charged_units"]),
+                    int(reservation["reserved_units"]),
+                    int(reservation["cap_units"]),
+                ):
                     expected_fences[f"budget-breach:{settlement_id}"] = (
                         None, None, "BUDGET_CAP_EXCEEDED",
                         settlement_id,
@@ -43404,7 +43710,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 9:
+            if version != 10:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

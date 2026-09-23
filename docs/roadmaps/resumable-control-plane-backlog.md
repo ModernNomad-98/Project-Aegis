@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. Stage 27 records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 21/22 F. F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, F04a reservation-boundary accounting, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. Stage 28 records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 22/22 F. Remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1414,6 +1414,41 @@ review returned `APPROVE` with no BLOCKER or MAJOR finding. Eight focused tests,
 the 400-test storage module and the complete 522-test package passed. F03 is
 promoted to `YES/YES/YES`; F04a is the sole remaining acceptance-family gap. PR
 #99 remains draft pending F04a and the later row, POSIX and final review gates.
+
+### 5.34 F04a reservation-boundary accounting checkpoint
+
+F04a is independently accepted. Authoritative actual usage below, equal to and
+above the original reservation is recorded as one absolute charge and replays
+without duplicate settlement. Known `A > R` records a durable breach fence even
+when still below the outer cap; usage above the cap is retained rather than
+rejected. A later authoritative lower adjustment replaces the current absolute
+charge but cannot erase the historical overrun fence.
+
+Missing dispatch/billing telemetry charges the declared worst case and retains
+uncertainty, the repository slot and other-item/run denial. Proven nonexecution
+with a known control cost consumes that cost; full release still requires both
+exact non-dispatch and zero-liability proof. Operation and validator requests
+with missing, string or boolean worst-case bounds deny before durable intent,
+redemption, launch or contact, while a known zero synthetic bound remains valid.
+
+Semantic version 10 atomically upgrades valid v9 histories. Before adding a
+newly required historical `A > R` fence, migration reconstructs exact immutable
+operation/validator reservation origins, event metadata, reservation and
+settlement projections, and every breach fence. Reservation/settlement/event
+retargeting, missing rows, changed R/cap/charge and wrong-ID reason-coded fences
+all deny without version advance or healing. Precommit rollback and postcommit
+lost acknowledgement are covered; v10 reopen is idempotent and strict recovery
+reconstructs the same breach set.
+
+The revised plan received independent `APPROVE` after adding semantic migration
+and validator-bound coverage. Implementation review twice returned `REVISE` for
+incomplete pre-migration linkage; exact origin and settlement metadata plus the
+expanded tamper matrix closed both findings. Final review returned `APPROVE`
+with no BLOCKER or MAJOR finding. Six new F04a tests and the reused release,
+unknown-liability, adjustment and slot clauses pass; the storage module passed
+406 tests and the complete package passed 528 tests. F04a is promoted to
+`YES/YES/YES`, bringing acceptance-family coverage to 22/22. PR #99 remains
+draft pending remaining row reviews, POSIX evidence and final exact-head reviews.
 
 ## 6. Handoff contract
 

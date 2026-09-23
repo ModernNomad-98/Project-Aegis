@@ -1067,7 +1067,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 9)
+            self.assertEqual(version, 10)
             self.assertEqual(action_count, 0)
             with self.assertRaisesRegex(
                 StorageIntegrityError, "readiness event semantics"
@@ -1114,7 +1114,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 9
+                    connection.execute("PRAGMA user_version").fetchone()[0], 10
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -1141,7 +1141,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 10")
+                connection.execute("PRAGMA user_version = 11")
                 connection.commit()
             finally:
                 connection.close()

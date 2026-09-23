@@ -1358,6 +1358,48 @@ class SQLiteStateStoreTests(unittest.TestCase):
             expected_head=settled.settlement_hash,
         )
 
+    def test_f04a_proven_nonexecution_with_known_control_cost_consumes_cost(
+        self,
+    ) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        target_path = self.database_path.parent / "synthetic-target.sqlite3"
+        adapter = SyntheticExecutionAdapter(target_path)
+        adapter._canonical_repository_id = "repo-1"
+        adapter._canonical_ledger_path = Path(
+            adapter._path_identity.canonical_path
+        )
+        attestation = self.authority.issue_nonexecution_attestation(
+            "f04a-cost-attestation", "f04a-cost-seal", "EFFECT",
+            adapter._target_digest("repo-1"), self.capability.claim_id,
+            f"EFFECT-INTENT:{committed.command_id}", committed.event_hash,
+            "reservation-1", "repo-1", "run-1", "item-1", "effect-1",
+            "attempt-1",
+        )
+        seal = adapter.seal_nonexecution(attestation, self.authority)
+        request = BudgetSettlementRequest(
+            "f04a-cost-settlement", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 1, "f04a-control-cost",
+            "NONDISPATCH_CONTROL_COST", non_dispatch_proven=True,
+            zero_liability_proven=False, release_slot=False,
+            all_obligations_settled=False,
+            nonexecution_seal_id=seal.seal_id,
+        )
+        receipt = self.store._settle_budget(
+            request,
+            self.authority.issue_settlement_proof("f04a-cost-proof", request),
+            self.authority,
+        )
+        self.oracle.allowed_head = receipt.settlement_hash
+        self.assertEqual(receipt.charged_units, 1)
+        self.assertFalse(receipt.uncertainty)
+        self.assertFalse(receipt.slot_released)
+        self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        self.store.load_verified("repo-1", authority=self.authority)
+
     def test_t28_adopts_completed_effect_without_delivery_or_reused_charge(
         self,
     ) -> None:
@@ -6015,6 +6057,163 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertTrue(receipt.uncertainty)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
 
+    def test_f04a_known_usage_below_equal_and_above_reservation_is_exact_once(
+        self,
+    ) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        baseline = self.database_path.parent / "f04a-known-baseline.sqlite3"
+        shutil.copy2(self.database_path, baseline)
+
+        for actual_units, breached in ((2, False), (3, False), (4, True), (11, True)):
+            with self.subTest(actual_units=actual_units):
+                path = self.database_path.parent / (
+                    f"f04a-known-{actual_units}.sqlite3"
+                )
+                shutil.copy2(baseline, path)
+                branch = SQLiteStateStore(path, self.oracle, "repo-1")
+                request = BudgetSettlementRequest(
+                    f"f04a-settlement-{actual_units}", "reservation-1", "",
+                    BudgetDisposition.CONSUMED, actual_units,
+                    f"f04a-usage-{actual_units}", "USAGE_REPORTED",
+                )
+                proof = self.authority.issue_settlement_proof(
+                    f"f04a-proof-{actual_units}", request
+                )
+                receipt = branch._settle_budget(
+                    request, proof, self.authority
+                )
+                self.assertEqual(receipt.charged_units, actual_units)
+                self.assertFalse(receipt.uncertainty)
+                replay = branch._settle_budget(
+                    request, proof, self.authority
+                )
+                self.assertTrue(replay.replayed)
+                self.assertEqual(replay.charged_units, actual_units)
+                with closing(sqlite3.connect(path)) as connection:
+                    self.assertEqual(
+                        connection.execute(
+                            "SELECT COUNT(*) FROM budget_settlements"
+                        ).fetchone()[0],
+                        1,
+                    )
+                    self.assertEqual(
+                        connection.execute(
+                            "SELECT COUNT(*) FROM dispatch_fences WHERE "
+                            "fence_id LIKE 'budget-breach:%'"
+                        ).fetchone()[0],
+                        int(breached),
+                    )
+                self.oracle.allowed_head = receipt.settlement_hash
+                branch.load_verified("repo-1", authority=self.authority)
+                self.oracle.allowed_head = committed.event_hash
+
+    def test_f04a_lower_adjustment_retains_historical_overrun_fence(self) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        overrun = BudgetSettlementRequest(
+            "f04a-overrun", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 4, "f04a-overrun-evidence",
+            "USAGE_REPORTED",
+        )
+        first = self.store._settle_budget(
+            overrun,
+            self.authority.issue_settlement_proof("f04a-overrun-proof", overrun),
+            self.authority,
+        )
+        self.oracle.allowed_head = first.settlement_hash
+        adjustment = BudgetSettlementRequest(
+            "f04a-adjustment", "reservation-1", first.settlement_hash,
+            BudgetDisposition.ADJUSTED, 2, "f04a-adjustment-evidence",
+            "AUTHORITATIVE_USAGE_CORRECTION",
+        )
+        second = self.store._settle_budget(
+            adjustment,
+            self.authority.issue_settlement_proof(
+                "f04a-adjustment-proof", adjustment
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = second.settlement_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(connection.execute(
+                "SELECT charged_units FROM budget_reservations WHERE "
+                "reservation_id = 'reservation-1'"
+            ).fetchone()[0], 2)
+            self.assertEqual(connection.execute(
+                "SELECT fence_id FROM dispatch_fences WHERE fence_id = "
+                "'budget-breach:f04a-overrun'"
+            ).fetchone()[0], "budget-breach:f04a-overrun")
+        reopened = SQLiteStateStore(
+            self.database_path, self.oracle, "repo-1"
+        )
+        reopened.load_verified("repo-1", authority=self.authority)
+
+    def test_f04a_operation_requires_known_bound_before_intent(self) -> None:
+        request = self.request()
+        before = self.store.table_counts()
+        for invalid in (None, "5", True):
+            with self.subTest(worst_case_units=invalid), self.assertRaisesRegex(
+                ValueError, "budget units must be non-negative integers"
+            ):
+                self.store.commit_intent(
+                    replace(request, worst_case_units=invalid),
+                    self.capability,
+                    self.authority,
+                    expected_head="",
+                    writer_epoch=1,
+                )
+            self.assertEqual(self.store.table_counts(), before)
+
+        zero = replace(
+            request, reserved_units=0, worst_case_units=0, cap_units=10
+        )
+        committed = self._commit_planned_intent(
+            zero, self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.assertTrue(committed.event_hash)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM adapter_contacts"
+            ).fetchone()[0], 0)
+
+    def test_f04a_validator_requires_known_bound_before_intent(self) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        request, capability = self._validator_intent(observation)
+        before = self.store.table_counts()
+        for invalid in (None, "2", True):
+            with self.subTest(worst_case_units=invalid), self.assertRaisesRegex(
+                ValueError, "validator budget units must be non-negative integers"
+            ):
+                ProductionSQLiteStateStore.commit_validator_intent(
+                    self.store,
+                    replace(request, worst_case_units=invalid),
+                    capability,
+                    self.authority,
+                )
+            self.assertEqual(self.store.table_counts(), before)
+
+        zero = replace(
+            request, reserved_units=0, worst_case_units=0, cap_units=10
+        )
+        committed = self.store.commit_validator_intent(
+            zero, capability, self.authority
+        )
+        self.assertTrue(committed.event_hash)
+        counts = self.store.table_counts()
+        self.assertEqual(counts["validator_intents"], 1)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM adapter_contacts"
+            ).fetchone()[0], 0)
+
     def test_recovery_derives_settlement_charges_instead_of_trusting_event(
         self,
     ) -> None:
@@ -7650,7 +7849,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 9)
+        self.assertEqual(semantic_version, 10)
         migrated.load_verified("repo-1", authority=self.authority)
 
     def test_validation_pause_drain_schema_version_is_eight(self) -> None:
@@ -7661,7 +7860,169 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(semantic_version, 9)
+        self.assertEqual(semantic_version, 10)
+
+    def test_f04a_v9_budget_overrun_migration_is_atomic_and_no_healing(
+        self,
+    ) -> None:
+        committed = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = committed.event_hash
+        overrun = BudgetSettlementRequest(
+            "f04a-v9-overrun", "reservation-1", "",
+            BudgetDisposition.CONSUMED, 4, "f04a-v9-evidence",
+            "USAGE_REPORTED",
+        )
+        settled = self.store._settle_budget(
+            overrun,
+            self.authority.issue_settlement_proof("f04a-v9-proof", overrun),
+            self.authority,
+        )
+        self.oracle.allowed_head = settled.settlement_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            connection.execute(
+                "DELETE FROM dispatch_fences WHERE fence_id = "
+                "'budget-breach:f04a-v9-overrun'"
+            )
+            connection.execute("PRAGMA user_version = 9")
+            connection.commit()
+        baseline = self.database_path.parent / "f04a-v9-baseline.sqlite3"
+        shutil.copy2(self.database_path, baseline)
+
+        migrated_path = self.database_path.parent / "f04a-v10-migrated.sqlite3"
+        shutil.copy2(baseline, migrated_path)
+        migrated = SQLiteStateStore(migrated_path, self.oracle, "repo-1")
+        with closing(sqlite3.connect(migrated_path)) as connection:
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 10
+            )
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
+                "'budget-breach:f04a-v9-overrun'"
+            ).fetchone()[0], 1)
+        migrated.load_verified("repo-1", authority=self.authority)
+
+        precommit_path = self.database_path.parent / "f04a-v9-precommit.sqlite3"
+        shutil.copy2(baseline, precommit_path)
+        connection = sqlite3.connect(precommit_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            with self.assertRaises(InjectedFailure):
+                SQLiteStateStore._migrate_budget_overrun_version(
+                    connection,
+                    failure_hook=raise_at(
+                        "after_budget_overrun_migration_writes_before_commit"
+                    ),
+                )
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 9
+            )
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id LIKE "
+                "'budget-breach:%'"
+            ).fetchone()[0], 0)
+        finally:
+            connection.close()
+
+        lost_ack_path = self.database_path.parent / "f04a-v9-lost-ack.sqlite3"
+        shutil.copy2(baseline, lost_ack_path)
+        connection = sqlite3.connect(lost_ack_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            with self.assertRaises(InjectedFailure):
+                SQLiteStateStore._migrate_budget_overrun_version(
+                    connection,
+                    failure_hook=raise_at(
+                        "after_budget_overrun_migration_commit_before_acknowledgement"
+                    ),
+                )
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 10
+            )
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id LIKE "
+                "'budget-breach:%'"
+            ).fetchone()[0], 1)
+        finally:
+            connection.close()
+        reopened = SQLiteStateStore(lost_ack_path, self.oracle, "repo-1")
+        reopened.load_verified("repo-1", authority=self.authority)
+
+        tamper_cases = (
+            (
+                "settlement-charge",
+                "UPDATE budget_settlements SET charged_units = 2 WHERE "
+                "settlement_event_id = 'f04a-v9-overrun'",
+                "legacy budget settlement linkage",
+            ),
+            (
+                "reservation-r",
+                "UPDATE budget_reservations SET reserved_units = 4 WHERE "
+                "reservation_id = 'reservation-1'",
+                "legacy budget reservation projection",
+            ),
+            (
+                "reservation-cap",
+                "UPDATE budget_reservations SET cap_units = 11 WHERE "
+                "reservation_id = 'reservation-1'",
+                "legacy budget reservation projection",
+            ),
+            (
+                "missing-settlement",
+                "DELETE FROM budget_settlements WHERE settlement_event_id = "
+                "'f04a-v9-overrun'",
+                "legacy budget settlement projection",
+            ),
+            (
+                "retargeted-settlement",
+                "UPDATE budget_settlements SET reservation_id = 'other' WHERE "
+                "settlement_event_id = 'f04a-v9-overrun'",
+                "legacy budget settlement linkage",
+            ),
+            (
+                "retargeted-origin-event",
+                "UPDATE events SET item_id = 'other-item' WHERE event_kind = "
+                "'INTENT_COMMITTED'",
+                "legacy budget reservation origin",
+            ),
+            (
+                "retargeted-settlement-event",
+                "UPDATE events SET item_id = 'other-item' WHERE event_id = "
+                "'f04a-v9-overrun'",
+                "legacy budget settlement linkage",
+            ),
+            (
+                "wrong-fence-id",
+                "INSERT INTO dispatch_fences VALUES ("
+                "'wrong-id', 'repo-1', NULL, NULL, "
+                "'BUDGET_CAP_EXCEEDED', 'f04a-v9-overrun')",
+                "budget-overrun projection diverges",
+            ),
+        )
+        for label, mutation, message in tamper_cases:
+            with self.subTest(label=label):
+                tampered_path = self.database_path.parent / (
+                    f"f04a-v9-tampered-{label}.sqlite3"
+                )
+                shutil.copy2(baseline, tampered_path)
+                with closing(sqlite3.connect(tampered_path)) as connection:
+                    connection.execute(mutation)
+                    connection.commit()
+                with self.assertRaisesRegex(StorageIntegrityError, message):
+                    SQLiteStateStore(tampered_path, self.oracle, "repo-1")
+                with closing(sqlite3.connect(tampered_path)) as connection:
+                    self.assertEqual(
+                        connection.execute(
+                            "PRAGMA user_version"
+                        ).fetchone()[0],
+                        9,
+                    )
+                    self.assertEqual(connection.execute(
+                        "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id "
+                        "LIKE 'budget-breach:%'"
+                    ).fetchone()[0], 0)
 
     def test_t08_v7_validation_pause_drain_schema_migrates_atomically(self) -> None:
         connection = sqlite3.connect(self.database_path)
@@ -7693,7 +8054,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         connection = sqlite3.connect(self.database_path)
         try:
             self.assertEqual(
-                connection.execute("PRAGMA user_version").fetchone()[0], 9
+                connection.execute("PRAGMA user_version").fetchone()[0], 10
             )
         finally:
             connection.close()
@@ -7832,7 +8193,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         connection = sqlite3.connect(self.database_path)
         try:
             self.assertEqual(
-                connection.execute("PRAGMA user_version").fetchone()[0], 9
+                connection.execute("PRAGMA user_version").fetchone()[0], 10
             )
             self.assertIsNotNone(connection.execute(
                 "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
@@ -12191,7 +12552,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         migrated.load_verified("repo-1", authority=self.authority)
-        self.assertEqual(migrated_state, (9, 1, 4, 0))
+        self.assertEqual(migrated_state, (10, 1, 4, 0))
 
         late_observation = self._record_signed_effect_observation(
             EffectObservationRequest(
@@ -17559,7 +17920,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             self.store.settle_validation_pause(settlement_request)
         adjustment_request = BudgetSettlementRequest(
             "validator-adjustment-interrupt", "validator-reservation-1",
-            accounting.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            accounting.settlement_hash, BudgetDisposition.ADJUSTED, 1,
             "validator-adjustment-evidence-interrupt",
             "VALIDATOR_USAGE_RECONCILED",
         )
@@ -24357,7 +24718,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             version = connection.execute("PRAGMA user_version").fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(version, 9)
+        self.assertEqual(version, 10)
         self.assertEqual(migrated, (None, None, None, None))
         legacy_commit = CommitReceipt(
             committed.command_id, committed.event_id, committed.sequence,

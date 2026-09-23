@@ -8,7 +8,7 @@ Implementation checkpoint: `ba133941a5ae897b6202fa9788b183da28b3f12a`
 First handoff checkpoint: `8456a369b64dc3f6ef87e4423a8e877ed0525316`
 Latest pushed checkpoint: `a9dbeab2b2e28f2914df32dd55558a2d051517e6`
 Draft PR: [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
-Status: **IN PROGRESS - NOT MERGE-READY - AUTHENTICATED SELECTED-CHECK LAUNCH `APPROVE`; CANONICAL ROW GAPS AND POSIX RUNTIME EVIDENCE OPEN**
+Status: **IN PROGRESS - NOT MERGE-READY - ALL TRANSITION/ACCEPTANCE ROWS ACCEPTED; CRASH/ROW REVIEWS AND POSIX RUNTIME EVIDENCE OPEN**
 
 This is the continuation authority and evidence record for the current
 CP-WP-002 work. It does not create authority. The current user instructions,
@@ -1696,6 +1696,36 @@ or MAJOR finding. Focused F03 tests passed 8/8. F03 is promoted to
 `YES/YES/YES`; the storage module passed 400 tests and the complete package
 passed 522 tests. F04a is the sole remaining acceptance-family coverage gap.
 
+### Stage 28 - F04a reservation-boundary accounting
+
+F04a is independently accepted. Authoritative actual usage below, equal to and
+above the original reservation settles once as an absolute charge. Known
+`A > R` records a durable breach even below the outer cap; above-cap usage is
+retained rather than rejected. Later authoritative adjustment replaces the
+current charge but cannot erase the historical breach fence.
+
+Unknown dispatch or billing charges the declared worst case, retains uncertainty
+and the repository slot, and blocks another item/run. Proven nonexecution with a
+known control cost consumes that cost. Release requires both exact non-dispatch
+and zero-liability proof. Missing, string and boolean worst-case bounds deny
+operation and validator intents before any durable intent, redemption, launch or
+contact; a known zero synthetic bound remains admissible.
+
+Semantic version 10 upgrades valid v9 state atomically. The migration verifies
+authenticated operation/validator origin events, event row metadata, exact
+reservation and settlement projections and every breach fence before adding a
+new historical `A > R` fence. R/cap/charge tamper, missing or retargeted rows,
+origin/settlement event retargeting and wrong-ID reason-coded fences all deny
+without healing or version advance. Precommit rollback, postcommit lost
+acknowledgement, idempotent v10 reopen and strict recovery are asserted.
+
+The revised plan received independent `APPROVE` after adding migration and
+validator-bound coverage. Two implementation `REVISE` rounds tightened complete
+pre-migration linkage; final review returned `APPROVE` with no BLOCKER or MAJOR
+finding. Six new F04a tests plus reused canonical clause tests pass. The storage
+module passed 406 tests and the complete package passed 528 tests. F04a is
+promoted to `YES/YES/YES`; acceptance-family coverage is now 22/22.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1770,7 +1800,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F01 | YES | YES | YES | Canonical effect identity/relationship plus T28 adoption covers revisions/runs, aliases/descriptors, occupied slot, authority consumption/replay, contrary provenance and no-contact behavior; independently accepted |
 | F02 | YES | YES | YES | Proof-free dispositions cannot resend, alias, compensate or erase unknown history; the sole reviewed same-key successor is expiry/generation/authority bound, retains outcome/activity uncertainty and T06 pause, requires distinct T14 RESUME, survives crash/restart, and is independently accepted at Stage 26 |
 | F03 | YES | YES | YES | Three independent HOST/HOST/MANUAL consumers reach one source-atomic winner and two grant-exhaustion denials; exact lifecycle timing/corrections, persistent clock rollback, lost receipt replay, rebinding denial and synthetic-only isolation are assertion-traced and independently accepted at Stage 27 |
-| F04a | YES | UNVERIFIED | UNVERIFIED | Absolute settlement, worst-case accounting, nonexecution release and authoritative adjustment exist; the explicit below/equal/above-reservation plus no-known-bound-before-contact matrix is incomplete |
+| F04a | YES | YES | YES | Exact below/equal/above-reservation actuals, durable breach fencing, known/unknown nonexecution cost, two-proof release, absolute adjustment, pre-contact operation/validator bound denial and strict v9-to-v10 migration are assertion-traced and independently accepted at Stage 28 |
 | F04b | YES | YES | UNVERIFIED | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; row-level review pending |
 | F05 | YES | YES | YES | Complete-vector mutation inventory, effect/source rollback, incomplete/stale/unavailable anchors and stale one-use source denial independently accepted |
 | F06 | YES | YES | YES | Repository-wide lifecycle/accounting slot matrix, other item/run denial, crash/restart retention, terminal settlement and generation-bound same-effect retry independently accepted |
@@ -1811,11 +1841,10 @@ deferral recorded there is closed by Stage 23 above.
 All 28 transition rows now have implementation surfaces and T18/T19/T25 have
 complete independently accepted durable state matrices. All nine crash rows now have
 implementation and test coverage; C02-C09 retain their prior row-review status.
-All 22 F rows have implementation surfaces. The only open F test-coverage row is
-F04a. This is a gap, not a failure silently converted to
-acceptance. Current independently accepted counts are 28/28 transitions, 1/9
-crash boundaries and 21/22 acceptance rows; the other covered rows retain
-explicit row-review work.
+All 22 F rows have implementation surfaces and tested, independently accepted
+coverage. Current independently accepted counts are 28/28 transitions, 1/9
+crash boundaries and 22/22 acceptance rows; already-tested crash and other rows
+that have not received their own row review retain explicit `UNVERIFIED` status.
 
 | Evidence field | Exact value |
 | --- | --- |
@@ -1847,9 +1876,8 @@ Current durable order after the independently approved exact-head trace map is:
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
 7. The Stage 23 committed-head trace closes the accumulated T01-T03/C01,
    T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 deferrals.
-8. Continue through the sole remaining exact acceptance-family coverage gap:
-   F04a.
-9. After implementation gaps close, perform row review for every remaining
+8. F04a reservation-boundary accounting - complete; independent `APPROVE`.
+9. Perform row review for every remaining
    implemented/tested-but-unaccepted matrix row.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
 11. Commit and push only reviewed checkpoints. Keep PR #99 draft and do not merge until every canonical row and final gate is independently accepted.
@@ -1990,7 +2018,9 @@ replay/recheck and T25/T16 post-disable continuation. Aggregate
 T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
 F02's proof-free matrix and bounded same-effect successor now have final
 independent `APPROVE`. F03 source-atomic one-use authority also has final
-independent `APPROVE`. The current implementation gate is F04a
-reservation-boundary accounting.
+independent `APPROVE`. F04a reservation-boundary accounting has final
+independent `APPROVE`, completing tested and accepted F-row coverage. The
+current gate is row review for every remaining implemented/tested-but-unaccepted
+T/C/F entry, followed by POSIX runtime and final exact-head reviews.
 Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.
