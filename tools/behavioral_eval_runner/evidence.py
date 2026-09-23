@@ -50,6 +50,27 @@ _RETENTION_DAYS = {
 }
 
 
+def _require_supported_version(document: Mapping[str, Any], where: str) -> None:
+    """External evidence must state a supported version; hashes alone are insufficient."""
+    if document.get("schema_version") != SCHEMA_VERSION:
+        raise EvidenceIntegrityError(
+            f"{where} has missing or unsupported schema_version"
+        )
+
+
+def _require_report_record_versions(report: Mapping[str, Any]) -> None:
+    for name in ("attempts", "aggregates"):
+        records = report.get(name, [])
+        if not isinstance(records, list):
+            raise EvidenceIntegrityError(f"final report {name} must be a list")
+        for index, record in enumerate(records):
+            if not isinstance(record, Mapping):
+                raise EvidenceIntegrityError(
+                    f"final report {name}[{index}] must be an object"
+                )
+            _require_supported_version(record, f"final report {name}[{index}]")
+
+
 def _utc_now_iso() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -577,6 +598,7 @@ def verify_input_evidence(root: str) -> str:
 
 def _verify_input_evidence_full(root: str) -> tuple[str, dict[str, str]]:
     manifest, manifest_bytes = _load_json_bytes(root, INPUT_MANIFEST_NAME)
+    _require_supported_version(manifest, "input manifest")
     if manifest.get("manifest_kind") != "input_evidence":
         raise EvidenceIntegrityError("wrong manifest kind for input evidence")
     verified = _verify_manifest_artifacts(root, manifest)
@@ -595,6 +617,7 @@ def verify_final_bundle(root: str) -> dict[str, str]:
         raise EvidenceIntegrityError("input manifest has no run_id")
 
     manifest, manifest_bytes = _load_json_bytes(root, FINAL_MANIFEST_NAME)
+    _require_supported_version(manifest, "final manifest")
     if manifest.get("manifest_kind") != "final_evidence":
         raise EvidenceIntegrityError("wrong manifest kind for final evidence")
     if manifest.get("run_id") != run_id:
@@ -603,6 +626,7 @@ def verify_final_bundle(root: str) -> dict[str, str]:
     manifest_sha = sha256_hex(manifest_bytes)
 
     marker, marker_bytes = _load_json_bytes(root, MARKER_NAME)
+    _require_supported_version(marker, "finalization marker")
     if marker.get("marker_kind") != "detached_finalization_marker":
         raise EvidenceIntegrityError("missing detached finalization marker")
     if marker.get("run_id") != run_id:
@@ -615,6 +639,10 @@ def verify_final_bundle(root: str) -> dict[str, str]:
     _check_no_self_hash(marker_bytes, marker_sha, MARKER_NAME)
 
     report, report_bytes = _load_json_bytes(root, FINAL_REPORT_NAME)
+    _require_supported_version(report, "final report")
+    _require_report_record_versions(report)
+    if not isinstance(report.get("runner_version"), str) or not report["runner_version"]:
+        raise EvidenceIntegrityError("final report has no runner_version")
     report_sha = sha256_hex(report_bytes)
     if marker.get("final_report_sha256") != report_sha:
         raise EvidenceIntegrityError(

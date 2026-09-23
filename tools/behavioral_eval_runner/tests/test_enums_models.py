@@ -22,6 +22,7 @@ from tools.behavioral_eval_runner.errors import SchemaValidationError, UnknownEn
 from tools.behavioral_eval_runner.models import (
     AggregateRecord,
     AttemptRecord,
+    CaseManifestRecord,
     CostUsage,
     default_unselected_aggregate,
     planned_unrun_attempt,
@@ -129,6 +130,37 @@ class TestAttemptRecord(unittest.TestCase):
         self.assertEqual(
             AttemptRecord.from_dict(attempt.to_dict()).to_dict(), attempt.to_dict()
         )
+
+    def test_serialized_attempt_requires_supported_version(self) -> None:
+        payload = planned_unrun_attempt("run-1", make_case_uid(), 1).to_dict()
+        for version in (None, "future-wp2b1"):
+            changed = dict(payload)
+            if version is None:
+                del changed["schema_version"]
+            else:
+                changed["schema_version"] = version
+            with self.assertRaises(SchemaValidationError):
+                AttemptRecord.from_dict(changed)
+
+
+class TestSerializedRecordVersions(unittest.TestCase):
+    def test_aggregate_and_case_manifest_require_supported_version(self) -> None:
+        from tools.behavioral_eval_runner.tests.helpers import make_case
+
+        records = (
+            (AggregateRecord, default_unselected_aggregate(make_case_uid()).to_dict()),
+            (CaseManifestRecord, make_case().to_dict()),
+        )
+        for loader, payload in records:
+            for version in (None, "future-wp2b1"):
+                changed = dict(payload)
+                if version is None:
+                    del changed["schema_version"]
+                else:
+                    changed["schema_version"] = version
+                with self.subTest(loader=loader.__name__, version=version):
+                    with self.assertRaises(SchemaValidationError):
+                        loader.from_dict(changed)
 
 
 class TestAggregateRecord(unittest.TestCase):

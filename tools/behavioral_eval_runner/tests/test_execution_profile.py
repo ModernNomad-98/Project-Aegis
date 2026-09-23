@@ -77,6 +77,18 @@ class TestBaselineEligibility(unittest.TestCase):
         with self.assertRaises(ProfileError):
             ExecutionProfile.from_dict(payload)
 
+    def test_serialized_profile_requires_supported_version(self) -> None:
+        payload = synthetic_isolated_profile().to_dict(include_derived=False)
+        for version in (None, "future-wp2b1"):
+            changed = dict(payload)
+            if version is None:
+                del changed["schema_version"]
+            else:
+                changed["schema_version"] = version
+            with self.subTest(version=version):
+                with self.assertRaises(ProfileError):
+                    ExecutionProfile.from_dict(changed)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

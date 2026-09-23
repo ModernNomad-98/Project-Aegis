@@ -446,6 +446,10 @@ class BudgetLedger:
             "checkpoint_kind"
         ) != "budget-ledger-checkpoint":
             raise LedgerIntegrityError("ledger checkpoint has the wrong kind")
+        if checkpoint.get("schema_version") != SCHEMA_VERSION:
+            raise LedgerIntegrityError(
+                "ledger checkpoint has missing or unsupported schema_version"
+            )
         if checkpoint.get("caps_sha256") != sha256_hex_of_text(
             canonical_json(caps.to_dict())
         ):
