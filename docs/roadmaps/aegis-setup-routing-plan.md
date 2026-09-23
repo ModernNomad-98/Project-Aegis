@@ -6,6 +6,8 @@ host hook, model, installation, credential, paid evaluation, or savings claim
 is delivered by this plan. Later packages need their own bounded scope and
 authority. The [BER](behavioral-eval-runner-backlog.md) and
 [delivery control](resumable-control-plane-backlog.md) registers remain separate.
+The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
+sets out the next Aegis-only implementation decision without granting it.
 
 ## Dated product decisions
 
@@ -71,8 +73,12 @@ writer. Local failure never changes the processing destination to online.
 
 ### Setup and invocation boundary
 
-The setup skill should trigger on explicit setup/change/help requests, not on
-every engineering task. It explains all four choices first. Aegis only saves
+The setup skill is side-effecting and must be manual-only. The explicit
+phrases "Help me set up Aegis" and "Help me change my Aegis setup" name the
+setup task; a supported host may treat them as human invocations, but must
+not infer setup from a vague request. If a host cannot establish an explicit
+invocation, it may show the choices in ordinary conversation and request the
+named skill before writing state. It explains all four choices first. Aegis only saves
 the selection and finishes immediately. Exploring a helper retains a visible
 route back to Aegis only. Read-only compatibility checks may follow explicit
 local interest; installation or online connection needs the user's exact
