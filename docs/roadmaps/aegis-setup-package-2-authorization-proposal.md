@@ -1,5 +1,16 @@
 # Issue #101 package 2 — conversational setup and Aegis-only scope
 
+> **Current status, 2026-09-23:** Package 2 shipped in
+> [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)
+> under [owner approval AEGIS-APR-007](../approvals/APPROVAL_REGISTER.md#aegis-apr-007-issue-101-conversational-setup-aegis-only-completion).
+> The [setup plan](aegis-setup-routing-plan.md) and
+> [delivery review](../evidence/setup/issue-101-package-2-review.md) describe
+> the tested Windows PowerShell Aegis-only selection. The proposal below records
+> the pre-implementation scope and keeps its original status wording as history.
+> Helper routes and saved selection on other operating systems remain unavailable.
+
+**Historical authorization proposal follows.**
+
 Prepared 2026-09-23 from public `main` at
 `fa79092f1c0fb1984b75245d8bce6a41982e5419`. **Proposal only.**
 The [live issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101)
