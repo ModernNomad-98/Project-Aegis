@@ -1,5 +1,18 @@
 # 300 Repeatable Claude Skills Roadmap
 
+**Reading key:** D12 is decision 12 in the
+[reconciliation log](reconciliation/step-0-reconciliation-v4.md); its 300+
+target is a candidate backlog, not a shipped count. Software as a service
+(SaaS), row-level security (RLS), quality assurance (QA), user experience
+(UX), development operations (DevOps), software development life cycle
+(SDLC), artificial intelligence (AI), application programming interface
+(API), and large language model (LLM) are category terms below. P0 marks
+foundation and core skills; P1 marks high-value follow-on skills. Command
+query responsibility segregation (CQRS) separates write and read models;
+identifiers (IDs) distinguish records or requests. The
+[skills catalog](skills-catalog.md#priority-definitions) defines priority
+tiers and identifies shipped entries.
+
 This is the original strategic capability map, not a shipped-skill inventory or
 a command to build every candidate. The D12 standing rule treats it as a 300+
 target backlog, with work selected by demand and framework coverage. Current
