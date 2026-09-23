@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of 2026-09-23 after pull request (PR) #198, this remains the active
+As of 2026-09-23 after pull request (PR) #205, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,7 +10,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The exact #198 tree contains **547 tracked Markdown files**. Earlier screens
+The exact #205 tree contains **553 tracked Markdown files**. Earlier screens
 of skill entrypoints and references corrected particular pages; they did not
 accept every page against the checklist below. Continue the remaining
 page-by-page review and use the [forecast's current reading](aegis-backlog-forecast.md#start-here--current-reading)
@@ -104,6 +104,93 @@ private calibration input publication, approval changes or later-phase runtime
 implementation.
 
 ## Documentation batches
+
+### Progress accounting after pull request #205
+
+The exact #205 merge is `6051ab0ad4a3ccd1e1a67d315ba9a8b2c72cc31b`.
+Its **553 tracked Markdown files** are 62 more than the original 491-file
+inventory. The additional files are mostly dated evidence and tracking pages,
+so a count of merged documentation requests alone is not a remaining-work
+estimate. A deduplicated read of the delivered sorted skill screens and 61
+readability/correction requests through #205 gives this inventory:
+
+| Disjoint set | Pages | Evidence already recorded | Remaining acceptance work |
+| --- | ---: | --- | --- |
+| Skill entrypoints and references | 342 | Sorted screens and 83 targeted corrections | Apply the full page checklist; record each result |
+| Corrected primary pages outside those skill paths | 83 | Bounded guide, roadmap, governance and evidence corrections | Apply the full page checklist; large records may take longer |
+| Dated evidence notes and tracking pages | 55 | Written with the completed correction batches | Confirm current links, scope and readable first use |
+| Other reader-facing pages and templates | 29 | No recorded sorted screen in those batches | Read and correct each full page |
+| Synthetic fixture Markdown | 44 | Kept as test input | Classify and check that explanatory entrypoints are readable; do not rewrite fixtures merely for prose style |
+| **Tracked total** | **553** | **342 + 83 + 55 + 29 + 44** | **Full-page acceptance status still needs recording** |
+
+The 61 requests touched 221 distinct Markdown paths: 166 primary pages,
+52 dated notes and three tracking records. Of the primary paths, 83 were
+already in the 342 sorted skill paths, leaving the 83 outside-skill row above.
+The 29 other reader-facing paths include four skill asset templates; they are
+not treated as synthetic fixtures. **No per-page full-checklist acceptance
+result was recorded for these batches.** This is a measurement gap, not a
+claim that zero pages are satisfactory. The correction work is retained;
+the next review should build on it.
+
+For a reproducible count, take tracked `.md` paths from the exact #205 tree,
+then union the changed Markdown paths in these merged readability/correction
+requests. Count each path once and intersect with the current tree:
+
+```text
+119 120 122 126 127 128 133 135 138 140 141 142 144 145 146
+147 149 150 151 152 154 155 156 157 158 159 160 161 163 164
+165 166 167 168 169 171 172 173 175 176 178 179 181 182 183
+184 186 187 188 190 191 192 193 195 196 199 200 201 202 203 205
+```
+
+The source for each request is its first-parent merge diff, including any
+squash commit carrying its request number. The sorted skill screens supply
+the 342 skill paths; the 44 fixture paths are under `scripts/`, except the
+reader-facing `scripts/tests/fixtures/README.md`.
+
+The **80–200 active-hour documentation estimate** remains a broad provisional
+remaining-work range. It fell neither automatically with a request count nor
+from a short residual-screen model: the latter could undercount full-page
+review of long records. Before revising the range, measure a representative
+batch of eight to ten pages across short skills, medium guides, large
+roadmaps/evidence and templates. Record each page's actual active review and
+correction time when available, independent reviewer result, and source
+revision. Recalculate remaining effort by page type and include integration,
+new-page and rework allowances. Keep active time distinct from PR wall time,
+GitHub queue and owner wait. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
+holds the selected-backlog total until that measurement supports a change.
+
+### Remaining-page review in larger batches
+
+Use the repository's tracked Markdown inventory as the denominator. For each
+batch, record the exact source revision, assigned paths, page-level result,
+reviewer, correction pull request and observed time. A page has a **full-page
+acceptance** result only when an independent reader checked all criteria in
+[Acceptance for each page](#acceptance-for-each-page) on that revision. A
+targeted correction or a sorted terminology screen is useful progress, but
+must retain its narrower label until this check is done.
+
+To reduce repeated integration and hosted-check waits, group roughly 10–20
+related pages in one pull request when their owners and authority boundaries
+are compatible. Give up to three read-only agents disjoint page sets for
+parallel review when the estimated elapsed-time saving exceeds 20 percent,
+including coordination and final audit. One coordinator owns edits, shared
+terms, the page ledger, conflict resolution and the final pull request.
+Additional writers need separate worktrees and nonoverlapping files.
+
+For each page, the review record must say **accepted**, **corrected and
+accepted**, **needs a named follow-up**, or **classified as a synthetic
+fixture**. Record the reason and an owning follow-up for anything not accepted.
+Check local links and commands, run the skill validator and relevant offline
+checks, obtain an independent whole-batch audit, and require the applicable
+GitHub Actions before merging. Estimate the next batch from its own page mix;
+report the previous ETA, new ETA, selected-backlog total and observed
+first-work-to-merge wall time. Recalculate the remaining-page estimate after
+each batch and the whole backlog every five merged pull requests.
+
+This batching procedure is a work plan. It does not mark earlier screens as
+full-page acceptance or grant provider, private-input, real-host or deployment
+authority.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |

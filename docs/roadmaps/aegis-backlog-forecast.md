@@ -8,6 +8,7 @@ request #202](#five-merge-checkpoint--2026-09-23-after-pull-request-202), the
 selected remaining work totals **175–394 active hours**, including **80–200
 active hours** for the repository-wide documentation readability sweep. That
 checkpoint was recorded on 2026-09-23; later work should be checked against
+the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
 the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-202--2026-09-23)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
@@ -1621,6 +1622,26 @@ architecture choices are unset. Owner wait, GitHub queue, provider execution
 and host provisioning are outside active-hour estimates. Restart the
 five-merge counter after #202, and revise sooner if a verified scope change or
 owner decision changes the remaining work.
+
+## Documentation estimate audit — 2026-09-23, after pull request #205
+
+The [documentation progress accounting](aegis-documentation-readability-backlog.md#progress-accounting-after-pull-request-205)
+reconciles **553 tracked Markdown files** at the exact #205 merge. It
+distinguishes 342 sorted skill screens, 83 corrected primary pages outside
+those skill paths, 55 dated notes/tracking pages, 29 other reader-facing
+pages and 44 synthetic fixtures. Those are disjoint file sets, not 553
+completed full-page reviews. The repository had 491 tracked Markdown files
+when the original 80–200-hour documentation estimate was made.
+
+The selected remaining estimate stays **175–394 active hours**, including
+**80–200 documentation hours**, pending a timed full-page sample across page
+types. This is a conservative provisional range, not a conclusion that no
+documentation work was done: 61 readability/correction requests changed 221
+distinct Markdown paths, while 62 more Markdown files entered the inventory.
+The shorter candidate residual model assumed minutes per long roadmap or
+backlog page and was rejected as insufficient for full-page acceptance.
+Re-estimate after the measured sample; keep the normal five-merge checkpoint.
+No implementation or approval gate changes in this interim accounting.
 
 **Historical baseline — recorded after pull request #106 on September 23,
 2026.** The paragraph and baseline tables below preserve estimates and pending
