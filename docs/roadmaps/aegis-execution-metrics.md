@@ -341,3 +341,43 @@ reviewer verified the five merges, all 14 selected and seven optional rows,
 the inventory, links and two-file scope. It prompted the explicit `mergedAt`
 clock label above. The eventual start-to-merge interval belongs in the pull
 request closeout record.
+
+## Checkpoint after pull request #146 — 2026-09-23
+
+Five requests merged after #141, in order #142, #143, #144, #145 and #146.
+Their original active-hour estimates and observed start-to-merge wall times
+are shown side by side below. The merge-event times come from GitHub pull
+request `mergedAt` fields in Coordinated Universal Time (UTC). The intervals
+overlap, and active-only work was not instrumented. They include review,
+continuous integration and any rework.
+Pull request #146 required a reviewed merge-conflict resolution after #145
+added an adjacent documentation-ledger row; its interval includes a second
+complete set of exact-head Actions.
+
+| Pull request and bounded package | Original ETA | Merge event (UTC) | Observed wall time |
+| --- | ---: | --- | ---: |
+| [#142 — skill category maps 08–09](https://github.com/ModernNomad-98/Project-Aegis/pull/142) | 1–3 active hours | 18:44:39 | 15m47s |
+| [#143 — prior forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/143) | 1–2 active hours | 18:52:10 | 24m50s from first preparation; 14m41s from edit start |
+| [#144 — skill category maps 01–07](https://github.com/ModernNomad-98/Project-Aegis/pull/144) | 2–4 active hours, revised from 1–3 | 18:55:43 | 16m44s |
+| [#145 — control-plane backlog guide](https://github.com/ModernNomad-98/Project-Aegis/pull/145) | 2–4 active hours | 19:04:34 | About 8m34s; start recorded only to the minute |
+| [#146 — current owner-decision index](https://github.com/ModernNomad-98/Project-Aegis/pull/146) | 1–3 active hours | 19:11:10 | 14m16s |
+
+Every selected and optional item was re-estimated in the
+[new forecast snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-146).
+The selected total remains **175–394 active hours**, including **80–200**
+for repository-wide documentation and **95–194** for other selected work.
+Selecting both optional issue #101 helpers would give **191–434 active
+hours**; the all-options scope remains unbounded. The merged #146 tree has
+**513 tracked Markdown files**, compared with 509 at #141. These bounded
+documentation batches closed no selected implementation row. PR #139's
+evidence-policy candidate was still open at this checkpoint and has not
+reduced its row. Owner waits, GitHub queues, provider execution and host
+provisioning remain outside active-hour estimates.
+
+Preparation for this checkpoint had a prior and new package estimate of
+**1–2 active hours**. Independent read-only forecast preparation ran from
+**19:05:59 to 19:07:45 UTC** (1m46s observed wall), while the fifth merge
+was still pending. Editing started after that merge, about **19:11 UTC**.
+The eventual start-to-merge interval belongs in the forecast pull request's
+closeout comment. The preparation and editing intervals overlap other work;
+they must not be summed as active labor.
