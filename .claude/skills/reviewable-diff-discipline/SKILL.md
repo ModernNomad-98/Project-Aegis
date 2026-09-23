@@ -1,6 +1,6 @@
 ---
 name: reviewable-diff-discipline
-description: "MANUAL-ONLY; never auto-invoke. Keep a change small, scoped, and reviewable while implementing it — one intent per branch or PR, no drive-by edits, no opportunistic refactors, no generated noise or secrets staged. Stages only the intended files by explicit path and verifies the staged set matches the declared intent before commit. Use when implementing any code change, preparing a commit or PR, or when a working diff has grown beyond its stated purpose."
+description: "MANUAL-ONLY; never auto-invoke. Keep a change small, scoped, and reviewable while implementing it — one intent per branch or pull request (PR), no drive-by edits, no opportunistic refactors, no generated noise or secrets staged. Stages only the intended files by explicit path and verifies the staged set matches the declared intent before commit. Use when implementing any code change, preparing a commit or PR, or when a working diff has grown beyond its stated purpose."
 disable-model-invocation: true
 ---
 

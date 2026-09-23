@@ -2,6 +2,21 @@
 
 ## Start here — current measurements
 
+This page is for maintainers and coding agents tracking Project Aegis work.
+**ETA** means estimated time to complete a work item; **PR** means pull
+request; **CI** means continuous integration; and **UTC** means Coordinated
+Universal Time. Codes such as **BER-BKL-007** (Behavioral Eval Runner backlog
+item 007), **WP-2B-1A** (work package 2B-1A), and **OD-1** (owner decision 1)
+identify records in the [runner backlog](behavioral-eval-runner-backlog.md),
+where their scope and gates are explained. The codes are identifiers, not
+independent permission to start work. **CP-WP-003A** means control-plane
+work package 003A; its scope is in the [control-plane backlog](resumable-control-plane-backlog.md).
+**AEGIS-APR-005** means Project Aegis approval-register entry 005; read the
+[owner approval register](../approvals/APPROVAL_REGISTER.md) for its exact
+grant and later lifecycle events. The shorter `BKL-009` in older entries
+means the same runner backlog item as `BER-BKL-009`, the evidence-policy
+work; it is not a separate package.
+
 The latest [five-merge checkpoint after pull request #202](#checkpoint-after-pull-request-202--2026-09-23)
 reconsiders every open work item and links the [current remaining-work
 forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-202).
