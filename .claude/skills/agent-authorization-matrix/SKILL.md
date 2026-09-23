@@ -1,6 +1,6 @@
 ---
 name: agent-authorization-matrix
-description: MANUAL-ONLY; never auto-invoke. Define the standing authorization matrix for AI agents — which actions an agent may take autonomously (read, plan, edit, test, commit, push feature branches, open PRs) and which ALWAYS require a named human decision (merging to protected branches, arming auto-merge — never agent-armed, deploys, releases, production data, secrets, history rewrites) — in a deny-by-default action × context matrix with approval scope/expiry semantics; the policy human-approval-boundary enforces at runtime. Invoke explicitly when deciding what an agent may do without asking, when granting or revoking authority, after an autonomy incident (e.g. a PR merged with no human review because auto-merge was armed), or to write a repo's agent-permissions policy. Proposal-first, artifacts edited after approval; the matrix steers every future agent run. Do NOT use for end-user or tenant roles and permissions (authorization-matrix-designer) or to halt an imminent risky step mid-task (human-approval-boundary).
+description: MANUAL-ONLY; never auto-invoke. Define a deny-by-default authorization matrix for AI agents across actions and contexts. Protected-branch merge requires an explicit human decision, which may be a still-active, scoped standing grant; green checks alone are never approval. Arming auto-merge is forbidden to agents by default and is a separate action from merging. Deploys, releases, production data, secrets, and history rewrites require their own decisions. Invoke explicitly to design or revise agent authority, after an autonomy incident, or to write an agent-permissions policy. Proposal-first; edit governance artifacts after approval. Do not use for end-user permissions (authorization-matrix-designer) or an in-flight stop (human-approval-boundary).
 disable-model-invocation: true
 ---
 
@@ -66,8 +66,11 @@ later one, merging a security-relevant PR with zero human review.
    listed is APPROVAL-REQUIRED by definition.
 4. **Apply the non-negotiable floor** (weakening any of these requires an
    explicit, recorded human decision in the artifact itself):
-   - Merging to a protected branch: APPROVAL-REQUIRED, always. The agent's
-     terminal action is open-PR-and-STOP.
+   - Merging to a protected branch: APPROVAL-REQUIRED, always. Without an
+     applicable explicit human decision, the terminal action is open PR and
+     stop. A scoped, still-active durable human grant can satisfy this cell;
+     verify repository identity, grant history, action scope, and later owner
+     instructions before relying on it. Do not infer approval from green CI.
    - Arming auto-merge: FORBIDDEN for agents. Arming is merge authority
      exercised early — it outlives the session and fires on future green CI.
      Agents also RE-CHECK for armed auto-merge on their PRs after every push
@@ -98,9 +101,10 @@ Status:     AWAITING APPROVAL | APPLIED (approved by <human>, <date>)
 ## Validation Checklist
 
 - [ ] Deny-by-default holds: unlisted action = APPROVAL-REQUIRED.
-- [ ] Merge-to-protected, arm-auto-merge, deploy, prod-data, secrets, and
-      history-rewrite cells are human-gated or forbidden — no exceptions
-      without a recorded human decision inside the artifact.
+- [ ] Merge-to-protected, arm-auto-merge, deploy, production-data, secrets,
+      and history-rewrite cells are approval-required or forbidden. Any
+      exception has an explicit human decision recorded in the applicable
+      repository, with scope and later instructions checked.
 - [ ] Every AUTONOMOUS cell has a rationale; none granted by omission.
 - [ ] Approval semantics (scope, durability, expiry, recording) are defined.
 - [ ] No governance file edited before explicit approval.
@@ -113,9 +117,11 @@ Status:     AWAITING APPROVAL | APPLIED (approved by <human>, <date>)
   The incident that motivated this skill merged a security PR to main exactly
   that way. Arming is therefore treated as the merge decision itself.
 - CI green is validation, not authorization. A matrix cell must never read
-  "AUTONOMOUS if checks pass" for merge-class actions.
+  "AUTONOMOUS if checks pass" for merge-class actions. A grant for the merge
+  method does not automatically waive a later all-checks-green instruction.
 - Approval of a plan is not approval of the merge; approval on staging is not
-  approval on production. Durable approvals apply no wider than their wording.
+  approval on production. Durable approvals apply no wider than their wording
+  and do not transfer to another repository when skills are copied.
 - A "commit" that a pipeline auto-deploys is a deploy. Classify cells by what
   the action TRIGGERS, not what the git verb is called.
 - A matrix agents can silently edit is self-granted authority; store it where
@@ -127,10 +133,11 @@ Status:     AWAITING APPROVAL | APPLIED (approved by <human>, <date>)
 
 - Proposal complete → full stop until explicit human approval. Applying an
   unapproved authorization matrix is this skill's defining failure.
-- Asked to grant agents autonomous merge, deploy, or auto-merge-arming
-  authority → halt and route through `human-approval-boundary`; such a grant
-  happens only as an explicit, recorded human decision written into the
-  artifact with the accepted risk.
+- Asked to grant agents merge, deploy, or auto-merge-arming authority without
+  an applicable explicit human decision → halt and route through
+  `human-approval-boundary`. A standing human grant can satisfy a particular
+  approval-required action; it does not silently change another action or a
+  later owner constraint. Record new grants with their accepted risk.
 - An armed auto-merge or standing permission is discovered that no recorded
   human decision explains → halt, disarm/flag, and report before continuing.
 - The matrix's storage location cannot be protected from silent agent edits →

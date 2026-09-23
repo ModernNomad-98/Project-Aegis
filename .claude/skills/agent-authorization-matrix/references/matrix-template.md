@@ -31,7 +31,7 @@ Unlisted action = **R** by definition (deny-by-default).
 | Edit / test | A | A | R | R | F |
 | Commit / push | A | A | R | — | — |
 | Open PR / comment | — | A | — | — | — |
-| Merge | — | R | **R — named human, always** | R | R |
+| Merge | — | R | **R — explicit human decision required** | R | R |
 | Arm auto-merge | — | **F (agents)** | **F (agents)** | F | F |
 | Tag / release / deploy | F | F | R | R | R |
 | Prod data / secrets / history rewrite | R | R | R | R | R |
@@ -39,6 +39,18 @@ Unlisted action = **R** by definition (deny-by-default).
 
 Every **A** cell in a real matrix carries a one-line rationale; every deviation
 from this floor carries the approving human's name and date inside the artifact.
+**R** means an applicable explicit human decision is required. A recorded,
+still-active durable grant can satisfy it for the named repository and scope;
+it does not change the default matrix or transfer with copied skill files.
+Check later owner instructions and grant lifecycle before acting. A green
+continuous-integration result verifies code; it does not grant merge authority.
+
+**Project Aegis source example:** Its owner recorded AEGIS-APR-002, a standing
+administrator-merge grant for that source repository. It can satisfy the
+approval-required merge cell there after its status and scope are verified.
+The owner's later instruction that all GitHub Actions checks be green still
+applies; the merge grant alone does not waive a failed protected-file guard.
+This example is not a grant to a repository that copied these skills.
 
 ## Approval semantics
 
@@ -63,5 +75,7 @@ in the floor exist because of this:
    treat an armed state with no recorded human decision as a hazard: disarm
    (`gh pr merge --disable-auto <n>`), then flag.
 
-The agent's terminal action on any PR into a protected branch is
-**open-PR-and-STOP**.
+Without an applicable explicit human merge decision, the agent's terminal
+action on a pull request into a protected branch is **open PR and stop**.
+Permission to merge is separate from permission to arm auto-merge or to bypass
+a failed required check. Apply each decision only to its stated scope.

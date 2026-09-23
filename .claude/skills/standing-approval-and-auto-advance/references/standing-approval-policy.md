@@ -14,11 +14,13 @@ Reviewed by: human-agent-trust-reviewer pass on <date> (recommended)
 
 ## 1. Hard floor (never covered by this policy)
 
-The following remain human-only regardless of anything below, per
-agent-authorization-matrix:
+The following require an applicable explicit human decision under
+`agent-authorization-matrix`:
 - merging to protected branches
-- arming auto-merge (any strategy)
 - deploys/releases, production data, secrets, git history rewrites
+Arming auto-merge is forbidden to agents by default and requires its own
+separate, explicit recorded decision before any change to that rule. An
+approval to merge does not also approve arming auto-merge.
 An agent finding auto-merge already armed treats it as a hazard:
 disarm (`gh pr merge --disable-auto <n>`) and flag — never let it ride.
 
@@ -28,17 +30,19 @@ Within phases approved under §4, the agent may, without re-asking:
 - commit to branches matching <branch-pattern>
 - push those branches; open PRs against <base>
 - monitor CI; fix red checks; re-push
-- pull/rebase after a HUMAN merges
+- pull/rebase after an authorized merge
 Covered change classes: <classes, e.g. docs-only, qa-test-only, …>
 Everything not named here is not covered.
 
 ## 3. Merge profile (explicit choice)
 
-[ ] open-PR-and-STOP (DEFAULT — the agent's terminal action is an open PR)
-[ ] opt-in autonomous merge: ONLY lawful if the authorization matrix was
-    human-amended to delegate a NAMED non-protected surface; scope: <surface>;
-    opt-out phrase (§5) suspends it instantly.
-Unchecked = default. The profile choice is itself a register entry.
+[ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
+[ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
+    repository, exact action, scope, expiry, later instructions>. This choice
+    does not arm GitHub auto-merge. The opt-out phrase (§5) suspends it.
+Unchecked = default. The profile choice and its human authority are recorded.
+An owner grant in one source repository does not travel with copied skills to
+a consumer repository. Recheck the current instruction and grant history.
 
 ## 4. Phase-advance rule
 
@@ -68,7 +72,7 @@ The agent never re-requests review, argues, or routes around a reviewer.
 ## 8. Rationale (do not delete)
 
 The governance elements above — named scope, opt-out, restated approval,
-reviewer-block, human-only merge floor — are what separate this policy from
+reviewer block, and explicit human authority for merge — separate this policy from
 the ungoverned-auto-merge incident (a prior session armed auto-merge; a
 security PR merged to main with zero human review — encoded as eval cases in
 agent-authorization-matrix). Remove an element and this policy becomes that
@@ -110,4 +114,5 @@ Collect before designing, from recent sessions/PRs:
 - **Merge profile inherited from a template default** — the whole point is
   that a human selects it, eyes open, recorded.
 - **Treating this policy as the authority source** — it is downstream of the
-  matrix; on any conflict the matrix wins and the policy is defective.
+  matrix and any separate applicable human grants. The default matrix floor
+  remains when no grant covers the action; later owner constraints also apply.
