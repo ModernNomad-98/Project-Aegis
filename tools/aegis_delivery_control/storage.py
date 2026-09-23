@@ -21967,12 +21967,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -22008,6 +22002,12 @@ class SQLiteStateStore:
                         )
                     connection.rollback()
                     return self._stop_receipt(prior, replayed=True)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "OPERATOR",
                     capability.grant_id, capability.action,

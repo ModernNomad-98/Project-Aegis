@@ -14020,6 +14020,466 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
         self.store.load_verified("repo-1")
 
+    def test_t18_t19_committed_stop_replays_before_freshness_denial(self) -> None:
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        for mode in (StopMode.GRACEFUL, StopMode.IMMEDIATE):
+            with self.subTest(mode=mode.value):
+                suffix = f"stale-replay-{mode.value.lower()}"
+                path = self.database_path.with_name(f"{suffix}.sqlite3")
+                shutil.copy2(self.database_path, path)
+                oracle = MutableFreshnessOracle()
+                oracle.allowed_head = plan.event_hash
+                branch = SQLiteStateStore(path, oracle, "repo-1")
+                branch._bind_classification_authority(self.authority)
+                request = self._stop_request(mode, suffix)
+                capability = self._stop_capability(mode, suffix)
+                oracle.allowed_head = "deliberately-stale-before-first-use"
+                with closing(sqlite3.connect(path)) as connection:
+                    before_stale = tuple(connection.iterdump())
+                with self.assertRaisesRegex(DispatchDenied, "freshness"):
+                    branch.stop(request, capability, self.authority)
+                with closing(sqlite3.connect(path)) as connection:
+                    self.assertEqual(tuple(connection.iterdump()), before_stale)
+                oracle.allowed_head = plan.event_hash
+                with self.assertRaises(InjectedFailure):
+                    branch.stop(
+                        request, capability, self.authority,
+                        failure_hook=raise_at(
+                            "after_stop_commit_before_acknowledgement"
+                        ),
+                    )
+                with closing(sqlite3.connect(path)) as connection:
+                    committed_hash = connection.execute(
+                        "SELECT event_hash FROM stop_actions WHERE stop_id = ?",
+                        (request.stop_id,),
+                    ).fetchone()[0]
+                    before = tuple(connection.iterdump())
+                oracle.allowed_head = "deliberately-stale"
+                replay = branch.stop(request, capability, self.authority)
+                self.assertTrue(replay.replayed)
+                self.assertEqual(replay.event_hash, committed_hash)
+                self.assertEqual(replay.resulting_state, LifecycleState.STOPPED)
+                with closing(sqlite3.connect(path)) as connection:
+                    self.assertEqual(tuple(connection.iterdump()), before)
+
+    def test_t18_t19_stop_every_nonterminal_state_preserves_obligations(
+        self,
+    ) -> None:
+        def fresh_fixture(state: LifecycleState) -> tuple[Path, str]:
+            suffix = state.value.lower()
+            self.database_path = Path(self.temporary_directory.name) / (
+                f"stop-source-{suffix}.sqlite3"
+            )
+            self.oracle = MutableFreshnessOracle()
+            self.store = SQLiteStateStore(
+                self.database_path, self.oracle, "repo-1",
+                utc_now=lambda: datetime(2026, 9, 21, tzinfo=timezone.utc),
+            )
+            self.authority = SyntheticAuthority()
+            self.store._bind_classification_authority(self.authority)
+            self.authority.register(
+                SyntheticGrant(
+                    "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+                )
+            )
+            self.capability = self.authority.claim(
+                "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+            )
+            if state in {LifecycleState.PLANNED, LifecycleState.BLOCKED}:
+                accepted = self.store.accept_plan(
+                    PlanAcceptanceRequest(
+                        "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                        "run-1", "item-1", "effect-1", "revision-1",
+                        "descriptor-digest", "scope-1", "budget-policy-digest",
+                        ("check-1",),
+                    ),
+                    expected_head="", writer_epoch=1,
+                )
+                self.oracle.allowed_head = accepted.event_hash
+                readiness = self.store.evaluate_readiness(
+                    ReadinessEvaluationRequest(
+                        "readiness-1", "readiness-command-1",
+                        "readiness-event-1", "repo-1", "run-1", "item-1",
+                        "plan-1", "revision-1", accepted.event_hash, None,
+                        "inputs-evidence-1", state is LifecycleState.PLANNED,
+                    )
+                )
+                self.oracle.allowed_head = readiness.event_hash
+            elif state is LifecycleState.RUNNING:
+                running = self._running_operation()
+                self.oracle.allowed_head = running.event_hash
+            elif state is LifecycleState.PAUSING:
+                running = self._running_operation()
+                paused = self.store.pause_local_execution(
+                    self._local_pause_request(running, suffix=suffix),
+                    self._pause_capability(suffix), self.authority,
+                )
+                self.oracle.allowed_head = paused.event_hash
+            elif state is LifecycleState.PAUSED:
+                accepted = self.store.accept_plan(
+                    PlanAcceptanceRequest(
+                        "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                        "run-1", "item-1", "effect-1", "revision-1",
+                        "descriptor-digest", "scope-1", "budget-policy-digest",
+                        ("check-1",),
+                    ),
+                    expected_head="", writer_epoch=1,
+                )
+                self.oracle.allowed_head = accepted.event_hash
+                paused = self.store.pause_before_dispatch(
+                    self._pause_request(suffix), self._pause_capability(suffix),
+                    self.authority,
+                )
+                self.oracle.allowed_head = paused.event_hash
+            elif state is LifecycleState.VALIDATING:
+                observed = self._record_effect_observation(check_ids=("check-1",))
+                self.oracle.allowed_head = observed.event_hash
+            elif state is LifecycleState.RECONCILIATION_REQUIRED:
+                _, _, _, pause_request = self._contacted_operation(suffix)
+                paused = self.store.pause_external_mutation(
+                    pause_request, self._pause_capability(suffix), self.authority
+                )
+                self.oracle.allowed_head = paused.event_hash
+            else:
+                self.fail(f"missing nonterminal fixture for {state.value}")
+            self.assertEqual(self.store.load_run_lifecycle("run-1"), state)
+            self.store.load_verified("repo-1", authority=self.authority)
+            return self.database_path, self.oracle.allowed_head
+
+        states = (
+            LifecycleState.PLANNED,
+            LifecycleState.BLOCKED,
+            LifecycleState.RUNNING,
+            LifecycleState.PAUSING,
+            LifecycleState.PAUSED,
+            LifecycleState.VALIDATING,
+            LifecycleState.RECONCILIATION_REQUIRED,
+        )
+        for state in states:
+            source, source_head = fresh_fixture(state)
+            with closing(sqlite3.connect(source)) as connection:
+                source_run = connection.execute(
+                    "SELECT continuation_cursor FROM runs WHERE run_id = 'run-1'"
+                ).fetchone()
+                source_slot = connection.execute(
+                    "SELECT run_id, logical_effect_id, attempt_id, generation "
+                    "FROM outstanding_slot"
+                ).fetchone()
+                source_reservations = connection.execute(
+                    "SELECT reservation_id, held_units, charged_units, "
+                    "uncertainty, disposition FROM budget_reservations "
+                    "ORDER BY reservation_id"
+                ).fetchall()
+                obligation_tables = (
+                    "capability_redemptions", "permission_uses",
+                    "operation_launches", "adapter_contacts",
+                    "effect_observations", "validator_intents",
+                    "validator_observations", "uncertainty_instances",
+                    "uncertainty_resolutions",
+                )
+                source_obligations = {
+                    table: connection.execute(
+                        f"SELECT * FROM {table} ORDER BY rowid"
+                    ).fetchall()
+                    for table in obligation_tables
+                }
+                source_fences = connection.execute(
+                    "SELECT * FROM dispatch_fences ORDER BY rowid"
+                ).fetchall()
+            for mode in (StopMode.GRACEFUL, StopMode.IMMEDIATE):
+                with self.subTest(state=state.value, mode=mode.value):
+                    suffix = f"matrix-{state.value.lower()}-{mode.value.lower()}"
+                    path = Path(self.temporary_directory.name) / f"{suffix}.sqlite3"
+                    shutil.copy2(source, path)
+                    oracle = MutableFreshnessOracle()
+                    oracle.allowed_head = source_head
+                    branch = SQLiteStateStore(
+                        path, oracle, "repo-1",
+                        utc_now=lambda: datetime(
+                            2026, 9, 21, tzinfo=timezone.utc
+                        ),
+                    )
+                    branch._bind_classification_authority(self.authority)
+                    request = self._stop_request(mode, suffix)
+                    capability = self._stop_capability(mode, suffix)
+                    stopped = branch.stop(request, capability, self.authority)
+                    oracle.allowed_head = stopped.event_hash
+                    self.assertEqual(stopped.resulting_state, LifecycleState.STOPPED)
+                    with closing(sqlite3.connect(path)) as connection:
+                        body = json.loads(connection.execute(
+                            "SELECT body_json FROM stop_actions WHERE stop_id = ?",
+                            (request.stop_id,),
+                        ).fetchone()[0])
+                        fence = connection.execute(
+                            "SELECT reason_code, item_id, logical_effect_id FROM "
+                            "dispatch_fences WHERE fence_id = ?",
+                            (body["fence_id"],),
+                        ).fetchone()
+                        retained_slot = connection.execute(
+                            "SELECT run_id, logical_effect_id, attempt_id, "
+                            "generation FROM outstanding_slot"
+                        ).fetchone()
+                        reservations = connection.execute(
+                            "SELECT reservation_id, held_units, charged_units, "
+                            "uncertainty, disposition FROM budget_reservations "
+                            "ORDER BY reservation_id"
+                        ).fetchall()
+                        obligations = {
+                            table: connection.execute(
+                                f"SELECT * FROM {table} ORDER BY rowid"
+                            ).fetchall()
+                            for table in obligation_tables
+                        }
+                        retained_fences = connection.execute(
+                            "SELECT * FROM dispatch_fences WHERE reason_code "
+                            "<> 'STOPPED_RUN' ORDER BY rowid"
+                        ).fetchall()
+                    self.assertEqual(body["lifecycle_from"], state.value)
+                    self.assertEqual(
+                        body["retained_continuation_cursor"], source_run[0]
+                    )
+                    self.assertEqual(
+                        fence, ("STOPPED_RUN", "item-1", "effect-1")
+                    )
+                    self.assertEqual(retained_slot, source_slot)
+                    self.assertEqual(obligations, source_obligations)
+                    self.assertEqual(retained_fences, source_fences)
+                    if (
+                        state is LifecycleState.RECONCILIATION_REQUIRED
+                        and mode is StopMode.IMMEDIATE
+                    ):
+                        self.assertEqual(
+                            reservations,
+                            [("reservation-1", 0, 5, 1,
+                              BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value)],
+                        )
+                    else:
+                        self.assertEqual(reservations, source_reservations)
+                    counts = branch.table_counts()
+                    replay = branch.stop(request, capability, self.authority)
+                    self.assertTrue(replay.replayed)
+                    self.assertEqual(replay.event_hash, stopped.event_hash)
+                    self.assertEqual(branch.table_counts(), counts)
+                    branch.load_verified("repo-1", authority=self.authority)
+
+    def test_t18_t19_stop_blocks_prepared_validator_contact_without_mutation(
+        self,
+    ) -> None:
+        intent, capability, committed, _adapter, _request = (
+            self._prepared_validator_execution()
+        )
+        stopped = self.store.stop(
+            self._stop_request(StopMode.IMMEDIATE, "validator-contact"),
+            self._stop_capability(StopMode.IMMEDIATE, "validator-contact"),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            before = tuple(connection.iterdump())
+        with self.assertRaisesRegex(DispatchDenied, "STOPPED|VALIDATING"):
+            self.store._contact_committed_validator(
+                intent, capability, committed,
+                self.store._adapter_target_digest("repo-1", "VALIDATOR"),
+                self.authority,
+                containment_digest=capability.containment_digest,
+                containment_verifier=lambda: capability.containment_digest,
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(tuple(connection.iterdump()), before)
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM adapter_contacts WHERE contact_kind = "
+                "'VALIDATOR'"
+            ).fetchone()[0], 0)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t18_t19_stop_blocks_prepared_operation_contact_without_mutation(
+        self,
+    ) -> None:
+        committed = self._running_operation()
+        launched = self.store.claim_operation_launch(self.request(), committed)
+        self.oracle.allowed_head = launched.event_hash
+        source = Path(self.temporary_directory.name) / "prepared-operation.sqlite3"
+        shutil.copy2(self.database_path, source)
+        for mode in (StopMode.GRACEFUL, StopMode.IMMEDIATE):
+            with self.subTest(mode=mode.value):
+                suffix = f"prepared-operation-{mode.value.lower()}"
+                path = Path(self.temporary_directory.name) / f"{suffix}.sqlite3"
+                shutil.copy2(source, path)
+                oracle = MutableFreshnessOracle()
+                oracle.allowed_head = launched.event_hash
+                branch = SQLiteStateStore(path, oracle, "repo-1")
+                branch._bind_classification_authority(self.authority)
+                stopped = branch.stop(
+                    self._stop_request(mode, suffix),
+                    self._stop_capability(mode, suffix), self.authority,
+                )
+                oracle.allowed_head = stopped.event_hash
+                with closing(sqlite3.connect(path)) as connection:
+                    before = tuple(connection.iterdump())
+                with self.assertRaisesRegex(DispatchDenied, "STOPPED|RUNNING"):
+                    branch._contact_claimed_operation(
+                        self.request(), self.capability, committed, launched,
+                        branch._adapter_target_digest("repo-1", "EFFECT"),
+                    )
+                with closing(sqlite3.connect(path)) as connection:
+                    self.assertEqual(tuple(connection.iterdump()), before)
+                    self.assertEqual(connection.execute(
+                        "SELECT COUNT(*) FROM operation_launches"
+                    ).fetchone()[0], 1)
+                    self.assertEqual(connection.execute(
+                        "SELECT COUNT(*) FROM adapter_contacts WHERE "
+                        "contact_kind = 'EFFECT'"
+                    ).fetchone()[0], 0)
+                branch.load_verified("repo-1", authority=self.authority)
+
+    def test_t18_t19_pausing_and_reconciliation_stop_crash_replay_matrix(
+        self,
+    ) -> None:
+        for state in (
+            LifecycleState.PAUSING,
+            LifecycleState.RECONCILIATION_REQUIRED,
+        ):
+            for mode in (StopMode.GRACEFUL, StopMode.IMMEDIATE):
+                with self.subTest(state=state.value, mode=mode.value):
+                    suffix = f"crash-{state.value.lower()}-{mode.value.lower()}"
+                    self.database_path = Path(self.temporary_directory.name) / (
+                        f"{suffix}.sqlite3"
+                    )
+                    self.oracle = MutableFreshnessOracle()
+                    self.store = SQLiteStateStore(
+                        self.database_path, self.oracle, "repo-1",
+                        utc_now=lambda: datetime(
+                            2026, 9, 21, tzinfo=timezone.utc
+                        ),
+                    )
+                    self.authority = SyntheticAuthority()
+                    self.store._bind_classification_authority(self.authority)
+                    self.authority.register(SyntheticGrant(
+                        "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+                    ))
+                    self.capability = self.authority.claim(
+                        "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
+                    )
+                    if state is LifecycleState.PAUSING:
+                        running = self._running_operation()
+                        prepared = self.store.pause_local_execution(
+                            self._local_pause_request(running, suffix=suffix),
+                            self._pause_capability(suffix), self.authority,
+                        )
+                    else:
+                        _, _, _, pause_request = self._contacted_operation(suffix)
+                        prepared = self.store.pause_external_mutation(
+                            pause_request, self._pause_capability(suffix),
+                            self.authority,
+                        )
+                    self.oracle.allowed_head = prepared.event_hash
+                    request = self._stop_request(mode, suffix)
+                    capability = self._stop_capability(mode, suffix)
+                    with closing(sqlite3.connect(self.database_path)) as connection:
+                        before = tuple(connection.iterdump())
+                    with self.assertRaises(InjectedFailure):
+                        self.store.stop(
+                            request, capability, self.authority,
+                            failure_hook=raise_at(
+                                "after_stop_writes_before_commit"
+                            ),
+                        )
+                    with closing(sqlite3.connect(self.database_path)) as connection:
+                        self.assertEqual(tuple(connection.iterdump()), before)
+                    with self.assertRaises(InjectedFailure):
+                        self.store.stop(
+                            request, capability, self.authority,
+                            failure_hook=raise_at(
+                                "after_stop_commit_before_acknowledgement"
+                            ),
+                        )
+                    with closing(sqlite3.connect(self.database_path)) as connection:
+                        stop_hash = connection.execute(
+                            "SELECT event_hash FROM stop_actions WHERE stop_id = ?",
+                            (request.stop_id,),
+                        ).fetchone()[0]
+                    self.oracle.allowed_head = stop_hash
+                    counts = self.store.table_counts()
+                    replay = self.store.stop(
+                        request, capability, self.authority
+                    )
+                    self.assertTrue(replay.replayed)
+                    self.assertEqual(replay.event_hash, stop_hash)
+                    self.assertEqual(self.store.table_counts(), counts)
+                    self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t18_t19_contacted_active_validator_pausing_accounting_matrix(
+        self,
+    ) -> None:
+        pause_request, pause_capability, activity = (
+            self._active_validation_pause_fixture("stop-matrix")
+        )
+        paused = self.store.pause_active_validation(
+            pause_request, pause_capability, activity, self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        self.assertEqual(paused.resulting_state, LifecycleState.PAUSING)
+        source = Path(self.temporary_directory.name) / (
+            "active-validator-pausing.sqlite3"
+        )
+        shutil.copy2(self.database_path, source)
+        with closing(sqlite3.connect(source)) as connection:
+            before = connection.execute(
+                "SELECT reservation_id, held_units, charged_units, uncertainty, "
+                "disposition, settlement_head_hash FROM budget_reservations "
+                "ORDER BY reservation_id"
+            ).fetchall()
+            source_slot = connection.execute(
+                "SELECT run_id, logical_effect_id, attempt_id, generation "
+                "FROM outstanding_slot"
+            ).fetchone()
+        for mode in (StopMode.GRACEFUL, StopMode.IMMEDIATE):
+            with self.subTest(mode=mode.value):
+                suffix = f"active-validator-{mode.value.lower()}"
+                path = Path(self.temporary_directory.name) / f"{suffix}.sqlite3"
+                shutil.copy2(source, path)
+                oracle = MutableFreshnessOracle()
+                oracle.allowed_head = paused.event_hash
+                branch = SQLiteStateStore(path, oracle, "repo-1")
+                branch._bind_classification_authority(self.authority)
+                stopped = branch.stop(
+                    self._stop_request(mode, suffix),
+                    self._stop_capability(mode, suffix), self.authority,
+                )
+                oracle.allowed_head = stopped.event_hash
+                with closing(sqlite3.connect(path)) as connection:
+                    after = connection.execute(
+                        "SELECT reservation_id, held_units, charged_units, "
+                        "uncertainty, disposition, settlement_head_hash FROM "
+                        "budget_reservations ORDER BY reservation_id"
+                    ).fetchall()
+                    retained_slot = connection.execute(
+                        "SELECT run_id, logical_effect_id, attempt_id, generation "
+                        "FROM outstanding_slot"
+                    ).fetchone()
+                self.assertEqual(retained_slot, source_slot)
+                if mode is StopMode.GRACEFUL:
+                    self.assertEqual(after, before)
+                else:
+                    self.assertEqual(after[0], before[0])
+                    self.assertEqual(
+                        after[1][0:5],
+                        (
+                            "validator-reservation-1", 0, 2, 1,
+                            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                        ),
+                    )
+                branch.load_verified("repo-1", authority=self.authority)
+
     def test_t19_alternate_identity_replay_authenticates_capability(self) -> None:
         plan = self.store.accept_plan(
             PlanAcceptanceRequest(
@@ -16526,6 +16986,37 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.store.load_verified("repo-1")
 
+    def test_r_stop_03_graceful_stop_retains_contacted_effect_reserve(
+        self,
+    ) -> None:
+        _, _, _, _ = self._contacted_operation("graceful-accounting")
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            before = connection.execute(
+                "SELECT reservation_id, held_units, charged_units, uncertainty, "
+                "disposition, settlement_head_hash FROM budget_reservations"
+            ).fetchall()
+        stopped = self.store.stop(
+            self._stop_request(StopMode.GRACEFUL, "effect-graceful"),
+            self._stop_capability(StopMode.GRACEFUL, "effect-graceful"),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            after = connection.execute(
+                "SELECT reservation_id, held_units, charged_units, uncertainty, "
+                "disposition, settlement_head_hash FROM budget_reservations"
+            ).fetchall()
+        self.assertEqual(after, before)
+        self.assertEqual(
+            after,
+            [("reservation-1", 3, 0, 0, BudgetDisposition.RESERVED.value, "")],
+        )
+        self.store.load_verified("repo-1", authority=self.authority)
+
     def test_r_stop_03_precontact_stop_retains_reserve(self) -> None:
         request = self.request()
         committed = self._commit_planned_intent(
@@ -16582,11 +17073,15 @@ class SQLiteStateStoreTests(unittest.TestCase):
             "after_stop_unknown_settlement_before_stop_recorded",
             "after_stop_writes_before_commit",
         ):
+            with closing(sqlite3.connect(self.database_path)) as connection:
+                before = tuple(connection.iterdump())
             with self.assertRaises(InjectedFailure):
                 self.store.stop(
                     stop_request, capability, self.authority,
                     failure_hook=raise_at(point),
                 )
+            with closing(sqlite3.connect(self.database_path)) as connection:
+                self.assertEqual(tuple(connection.iterdump()), before)
             self.assertEqual(self.store.table_counts()["stop_actions"], 0)
             self.assertEqual(self.store.table_counts()["budget_settlements"], 0)
         with self.assertRaises(InjectedFailure):
@@ -16721,6 +17216,50 @@ class SQLiteStateStoreTests(unittest.TestCase):
             body["uncertainty_snapshot"][0]["contact_kind"], "VALIDATOR"
         )
         self.store.load_verified("repo-1")
+
+    def test_r_stop_03_graceful_validator_contact_retains_exact_accounting(
+        self,
+    ) -> None:
+        observation = self._record_effect_observation(check_ids=("check-1",))
+        request, capability = self._validator_intent(observation)
+        committed = self.store.commit_validator_intent(
+            request, capability, self.authority
+        )
+        self.oracle.allowed_head = committed.event_hash
+        self.store._contact_committed_validator(
+            request, capability, committed,
+            self.store._adapter_target_digest("repo-1", "VALIDATOR"),
+            self.authority,
+        )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            before = connection.execute(
+                "SELECT reservation_id, held_units, charged_units, uncertainty, "
+                "disposition, settlement_head_hash FROM budget_reservations "
+                "ORDER BY reservation_id"
+            ).fetchall()
+        stopped = self.store.stop(
+            self._stop_request(StopMode.GRACEFUL, "validator-graceful"),
+            self._stop_capability(StopMode.GRACEFUL, "validator-graceful"),
+            self.authority,
+        )
+        self.oracle.allowed_head = stopped.event_hash
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            after = connection.execute(
+                "SELECT reservation_id, held_units, charged_units, uncertainty, "
+                "disposition, settlement_head_hash FROM budget_reservations "
+                "ORDER BY reservation_id"
+            ).fetchall()
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM stop_actions WHERE stop_id = ?",
+                ("stop-validator-graceful",),
+            ).fetchone()[0])
+        self.assertEqual(after, before)
+        self.assertNotIn("uncertainty_snapshot", body)
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def test_r_stop_03_late_authoritative_usage_adjusts_without_reopen(self) -> None:
         request = self.request()
