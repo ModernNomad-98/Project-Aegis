@@ -29,7 +29,8 @@ earlier forecast update.
 | CP-WP-003A offline proof scope proposal | 2026-09-23 12:44 | 2–4 hours active work | 8m58s observed wall time to PR #110 merge; active-only time unavailable | Independent read-only audit passed after terminology correction; all three Actions green | Owner authorization needed before code | PR #110 merged at 12:52:58 UTC; CP-WP-003 BLOCKED |
 | BER R4/R5 selected-host decision packet | 2026-09-23 12:53 | 2–4 hours active work | 8m19s observed wall time to PR #111 merge; active-only time unavailable | Independent read-only audit passed after CI/host distinction correction; all three Actions green | Host choice and later probe grant pending | PR #111 merged at 13:01:19 UTC; no host probe or live dispatch |
 | Five-merge backlog re-estimate | 2026-09-23 13:02 | 1–2 hours active work; no earlier item estimate | 9m13s observed wall time to PR #112 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | None needed for arithmetic; owner choices remain gates for execution | PR #112 merged at 13:11:13 UTC; selected total 112–228 h; all optional adoption unbounded |
-| Issue #101 package-2 authorization proposal | 2026-09-23 13:12 | Prior package-2 delivery ETA 6–12 h; new scope-packet ETA 1–2 h active | In progress | Pending | Exact owner implementation grant pending | Selected backlog total 112–228 h; both helpers 128–268 h; all options unbounded |
+| Issue #101 package-2 authorization proposal | 2026-09-23 13:12 | Prior package-2 delivery ETA 6–12 h; new scope-packet ETA 1–2 h active | 11m21s observed wall time to PR #113 merge; active-only unavailable | Independent audit and all three Actions passed | Exact owner implementation grant pending | PR #113 merged at 13:23:21 UTC; selected total 112–228 h; both helpers 128–268 h; all options unbounded |
+| CP-WP-003A exact-file authorization packet | 2026-09-23 13:24 | Prior CP-WP-003 delivery ETA 12–24 h; prior separate packet ETA none; new packet ETA 1–2 h active | In progress | Pending | Owner implementation grant pending | Selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
 
 ## Progress checkpoints
 
@@ -125,6 +126,15 @@ earlier forecast update.
   ETA 6–12 active hours, no prior scope-packet ETA; new scope-packet ETA
   1–2 active hours. Current bounded selected total 112–228 active hours,
   both-helper conditional total 128–268, full all-options backlog unbounded.
+- **2026-09-23 13:23:21 UTC — issue #101 package-2 scope merged:** PR #113 merged
+  at `5a2452a0e0a6cec974d142e14a66641cd51f2c5d` after independent audit
+  and three green Actions. Observed wall time from 13:12 was 11m21s; active-only
+  time is unavailable. This is merge 2 of five after #111. Owner authorization
+  for implementation remains pending.
+- **2026-09-23 13:24 UTC — CP-WP-003A exact-file packet started:** Prior
+  CP-WP-003 delivery ETA 12–24 active hours; prior separate packet ETA none;
+  new packet ETA 1–2 active hours. Selected backlog 112–228 active hours,
+  both optional helpers 128–268; full all-options backlog has no finite ETA.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
