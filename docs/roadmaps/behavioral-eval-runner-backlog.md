@@ -3193,6 +3193,76 @@ model call, and evidence artifact.
   historical evidence. BKL-007 closes only after code, policy and reviewed
   acceptance are complete.
 
+### BER-DEC-010
+
+- **Date / owner / source:** 2026-09-23 / Peter Nguyen. In response to the
+  [reviewed storage proposal](ber-calibration-replacement-storage-decision.md)
+  in PR #105, the owner chose: "Use the private GitHub input repository
+  (recommended)". PR #105 merged at
+  `c6fa54ac0fd42342976c6e89a70fd02b390783b0`. The answer chooses storage;
+  it does not approve candidate labels or provider execution. The bounded
+  offline preparation grant below implements the owner's current instruction
+  to continue the approved backlog and the reviewed replacement plan; it is
+  not inferred from the storage answer alone.
+- **Decision and effective condition:** For replacement WP-2B-3 calibration
+  *inputs*, amend the input-location and input-retention portions of
+  BER-DEC-008 decisions 24–25 and grant the bounded offline candidate-preparation
+  branch/base below. This amendment is effective
+  only after its own reviewed governance PR is merged. Preserve BER-DEC-008's
+  original record, all other decisions, and the separate execution-evidence
+  root and 30-day controls. BER-DEC-008's measured-execution implementation
+  branch and original source baseline remain unchanged; this preparation branch
+  is not a substitute for them.
+- **Input repository:** Use a separate private GitHub repository under the
+  owner account, provisionally
+  `ModernNomad-98/Project-Aegis-Calibration-Inputs`. Confirm name availability,
+  private visibility and owner-only initial access before creation and before
+  the first input push. If the name is unavailable, stop for an exact-location
+  owner decision; do not substitute another repository. Do not grant an app,
+  collaborator or Actions job access without a separate recorded decision.
+- **Versioned input contract:** Store replacement inputs under
+  `replacement/<version>/`: `candidate-dataset.json`, `split-map.json`,
+  `labeling-guide.md`, `quality-report.json`, `hash-manifest.json`, and only
+  after explicit owner approval, `owner-label-approval.json`. Create a new
+  version directory for each revision and preserve earlier bytes and SHA-256
+  hashes. Keep this input history until an owner-reviewed deletion decision.
+  Before use, restore from an exact private commit and verify file hashes
+  against the approved manifest. Git history alone does not approve labels.
+- **Public and execution evidence:** Keep holdout transcripts, candidate
+  labels and any deterministic regeneration material out of the public Aegis
+  repository, public PRs, CI artifacts, judge requests and development tuning.
+  The public repository may hold non-revealing construction source, validation
+  code, sanitized reports and opaque hashes/pins. Provider requests, responses,
+  usage/cost ledgers, credentials and unsanitized run evidence stay outside Git
+  under BER-DEC-008's exact external root and its ACL, encryption, ownership,
+  30-day retention and cleanup rules. The private input repository is not an
+  execution-evidence sink.
+- **Authorized preparation and baseline:** After this amendment merges, prepare
+  the replacement candidate packet and private input repository under the
+  [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md).
+  Start `feat/ber-wp2b3-replacement-candidates` directly from this amendment's
+  exact merge commit and record its SHA/tree in the packet. This is a separate
+  offline preparation branch only, not the BER-DEC-008 measured-execution branch.
+  Any later execution source revision or implementation-branch change requires
+  separate owner-reviewed authorization before a provider request.
+  Preparation permits synthetic, offline creation and validation
+  only: provider calls 0, live sessions 0, external spend USD $0, dependency
+  installations 0. No renewed provider allowance follows from this entry.
+- **Review and stop gates:** Candidate labels remain PENDING until Peter
+  Nguyen approves the exact dataset, guide, split map and hashes. Preserve the
+  sole-human-labeler terms without claiming independent labels. Before any
+  measured development or holdout stage, verify private visibility, exact
+  input commit, approved hashes, and absence of public or judge-envelope
+  holdout exposure. Stop on unavailable private location, changed access,
+  failed hash/restore, exposure, missing owner label approval, unresolved
+  historical accounting/source pin, or unmet BER-DEC-008 preflight. Return
+  any exposed holdout to the owner for a new disposition. The later holdout
+  freeze and OD-1 ratification remain separate owner gates.
+- **No additional authority:** This amendment does not authorize a provider
+  call, changed model, new spend, WP-2B-4, live Scenario A, OD-1 ratification,
+  or public publication of hidden inputs. It does not alter the original
+  BER-DEC-008 execution-evidence controls or thresholds.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
