@@ -8,6 +8,15 @@ controls"); Annex B normative guidance; Annex C/D informative. Finer wording
 = verification items against the licensed text. **Annex A counts are never
 stated** — public sources conflict.
 
+**Reading key:** AIMS is an artificial intelligence management system; AI is
+artificial intelligence. ISO is the International Organization for
+Standardization and IEC the International Electrotechnical Commission. JTC
+means joint technical committee, SC subcommittee, TOC table of contents, and
+PDF portable document format. SoA is the statement of applicability; ISMS is
+an information security management system; SDLC is software development life
+cycle; and ML is machine learning. The [parent skill](../SKILL.md) owns the
+design workflow. The clause map does not replace the licensed-text check above.
+
 ## The three assessments (the standard's distinctive machinery)
 
 | Assessment | Clause (plan / operate) | Object | Register/artifact |
