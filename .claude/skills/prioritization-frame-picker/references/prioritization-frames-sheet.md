@@ -2,6 +2,14 @@
 
 Detail for `prioritization-frame-picker`. Read on demand.
 
+**Use:** Select a frame with the [prioritization-frame-picker
+workflow](../SKILL.md) before scoring candidate work. RICE means Reach,
+Impact, Confidence, Effort; WSJF means weighted shortest job first; ICE
+means Impact, Confidence, Ease; and MoSCoW means Must, Should, Could, Won't.
+Kano names a satisfaction-classification model. `S/M/L` are small, medium,
+and large estimate buckets. The frames support judgment; they do not grant
+automatic priority over required work.
+
 ## Framework selection guide
 
 | Frame | Fits when | Inputs needed | Limits |

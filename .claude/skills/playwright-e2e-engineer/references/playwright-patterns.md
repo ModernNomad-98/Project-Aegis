@@ -2,6 +2,15 @@
 
 Detail file for `playwright-e2e-engineer`. Loaded on demand.
 
+**Use:** This reference supports the [manual-only Playwright skill](../SKILL.md)
+when explicitly invoked; reading it does not authorize running browser tests
+or touching a real application. E2E means end-to-end; `a11y` means
+accessibility; CSS means Cascading Style Sheets; XML means Extensible Markup
+Language, and XPath is an XML path query language; API means application
+programming interface; UI means user
+interface; CI means continuous integration; and `ts` denotes TypeScript
+in the sample file names.
+
 ## Locator ladder (stop at the first rung that works)
 
 1. `page.getByRole('button', { name: 'Save invoice' })` — role + accessible

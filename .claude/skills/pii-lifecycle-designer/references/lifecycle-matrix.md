@@ -3,6 +3,14 @@
 Classification, data-map, deletion-semantics, and DSR templates backing
 the workflow. All examples use placeholders — never live values.
 
+**Use:** These templates support the [personal-data lifecycle design
+workflow](../SKILL.md), from classification through erasure evidence. PII
+means personally identifiable information; DSR means data subject request;
+IP means Internet Protocol address; TTL means time to live; FK means foreign
+key; ML means machine learning; API means application programming interface;
+CI means continuous integration; and SLA means service-level agreement.
+The table rows are examples for classification, not legal retention advice.
+
 ## Classification table (template rows)
 
 | Class | Field examples | Handling floor | Retention class | Allowed stores |

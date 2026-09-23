@@ -4,6 +4,15 @@ The mechanism table, freshness tiers, classification worksheet, and
 stop-doing enforcement options. `SKILL.md` owns the workflow; this file
 owns the tables.
 
+**Use:** Apply these decision tables with the
+[owning split workflow](../SKILL.md) after measuring the actual workloads.
+OLTP means online transaction processing; OLAP means online analytical
+processing; CDC means change data capture; BI means business intelligence;
+TTL means time to live; CI means continuous integration; IO means input/output;
+and `p99` is 99th-percentile latency. `current-txn` means the current
+transaction, while `top-N` means the N highest-ranked workloads by the stated
+measure.
+
 ## Mechanism decision table
 
 | Mechanism | Freshness delivered | Cost to adopt | Right for | Wrong for | Caveats |

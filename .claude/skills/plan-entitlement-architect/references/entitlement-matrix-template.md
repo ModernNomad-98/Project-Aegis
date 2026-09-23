@@ -2,6 +2,13 @@
 
 Supporting detail for `plan-entitlement-architect`. Read on demand.
 
+**Use:** Adapt the matrix through the [plan-entitlement-architect
+workflow](../SKILL.md), which owns resolution, transitions, and enforcement.
+API means application programming interface; UI means user interface; SSO
+means single sign-on; `gb` means gigabytes; and `T-7`/`T-1` mean seven days
+and one day before the transition. The plan names and limits below are
+template values, not a shipped product's entitlements.
+
 ## Entitlement naming and typing
 
 `<domain>.<noun>[.<qualifier>]` — e.g. `projects.max`, `api.access`,

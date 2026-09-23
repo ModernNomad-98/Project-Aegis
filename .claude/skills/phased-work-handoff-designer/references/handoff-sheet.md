@@ -2,6 +2,12 @@
 
 Detail for `phased-work-handoff-designer`. Read on demand.
 
+**Use:** Fill this template through the [phased-work-handoff-designer
+workflow](../SKILL.md) when a stage hands work to the next agent or team.
+`D-id` means stable decision identifier; `S1` means stage 1; and `N` is a
+stage number. The command output below is illustrative historical sample
+text, not current library validation evidence.
+
 ## Handoff template (per stage)
 
 ```
