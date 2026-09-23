@@ -752,8 +752,9 @@ the sole owner of actual advisory CI integration).
 ### WP-2B-1B — Offline evidence-policy proof
 
 - **ID / phase / priority:** WP-2B-1B / 2B-1 follow-up / REQUIRED.
-- **Status:** AUTHORIZED only when the separate reviewed governance PR
-  containing BER-DEC-011 and AEGIS-APR-012 merges; until then, BLOCKED.
+- **Status:** AUTHORIZED by the reviewed governance [PR #134](https://github.com/ModernNomad-98/Project-Aegis/pull/134),
+  merged at `7e8f0c1067ee0a2e963520bf735a4b7b907a991f`. Implementation
+  review and exact-head checks remain open.
 - **Owner and repository:** Peter Nguyen / `ModernNomad-98/Project-Aegis`.
 - **Scope:** One synthetic-only proof of the selected 30-day complete-bundle
   evidence policy, limited to the seven paths and acceptance tests in the
@@ -782,6 +783,13 @@ the sole owner of actual advisory CI integration).
 - **Non-goals:** No real host, access-control or encryption claim, cleanup
   authority, provider/model call, private input, live execution or later
   phase advance. BER-DEC-011 is the governing authorization.
+
+**2026-09-23 implementation checkpoint:** The opt-in synthetic policy proof is
+under review on `feat/ber-bkl-009a-offline-policy`. Its ordinary, hash-listed
+policy receipts hold one 30-day bundle review deadline while legacy
+per-artifact expiration metadata keeps its original meaning. BER-BKL-009
+remains PARTIALLY DELIVERED; this checkpoint does not authorize a real host,
+privacy release, provider call, or cleanup.
 
 ### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 

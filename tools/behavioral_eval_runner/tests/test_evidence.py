@@ -14,6 +14,7 @@ from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
 from tools.behavioral_eval_runner.errors import CircularEvidenceError, EvidenceError, EvidenceIntegrityError
 from tools.behavioral_eval_runner.evidence import (
     _POSIX_EVIDENCE_ATOMIC,
+    ArtifactMetadata,
     EvidenceArtifact,
     EvidenceWriter,
     FINAL_MANIFEST_NAME,
@@ -103,6 +104,39 @@ class _BundleCase(unittest.TestCase):
 
 
 class TestStageA(_BundleCase):
+    def test_legacy_serialized_hashes_match_pre_policy_writer(self) -> None:
+        """Golden bytes captured from the exact pre-policy grant base."""
+        fixed = "2030-01-01T00:00:00Z"
+        writer = EvidenceWriter(self.root, "legacy-regression")
+        stage_a = writer.finalize_input_evidence([
+            EvidenceArtifact("input.txt", b"synthetic", ArtifactMetadata(created_at=fixed))
+        ])
+        report = {
+            "report_kind": "behavioral_eval_run_report",
+            "schema_version": SCHEMA_VERSION,
+            "runner_version": RUNNER_VERSION,
+            "run_id": "legacy-regression",
+            "run_evidence_binding": {
+                "input_evidence_manifest_sha256": stage_a.input_evidence_manifest_sha256
+            },
+            "aggregates": [],
+        }
+        writer.finalize_final_bundle(
+            report,
+            [EvidenceArtifact("output.txt", b"synthetic output", ArtifactMetadata(created_at=fixed))],
+            stage_a.input_evidence_manifest_sha256,
+            "OFFLINE",
+            finalized_at=fixed,
+        )
+        expected = {
+            INPUT_MANIFEST_NAME: "d6e8783139dfccbccc54ce9bca9be21a6a88dc7bc2f5c19301f87fe57535b2b8",
+            FINAL_MANIFEST_NAME: "303e9256803ed21fec7a31d654c6c615533e1392e18feaec8ac19237339cdcbe",
+            MARKER_NAME: "988457c4f55b557c249d3a25f0acdf05d84530afacb49e67fbb0cfcee7d95970",
+        }
+        for name, pinned_sha in expected.items():
+            with self.subTest(name=name), open(os.path.join(self.root, name), "rb") as handle:
+                self.assertEqual(sha256_hex(handle.read()), pinned_sha)
+
     def test_input_manifest_requires_supported_version(self) -> None:
         self.writer.finalize_input_evidence(_artifacts())
         for version in (None, "future-wp2b1"):
