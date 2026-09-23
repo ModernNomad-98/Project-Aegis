@@ -1,6 +1,12 @@
-# A11y Checklists & Split Table
+# Accessibility (a11y) Checklists & Split Table
 
-Detail file for `accessibility-test-harness`. Loaded on demand.
+Use this `accessibility-test-harness` reference to divide automated checks from
+human judgment, then run the keyboard and screen-reader passes. In this file,
+**E2E** means end-to-end testing, **ARIA** means Accessible Rich Internet
+Applications, **CI** means continuous integration, **SR** means screen reader,
+and **WCAG** means Web Content Accessibility Guidelines. Numbered criteria below
+refer to WCAG. **AT** means assistive technology; **NVDA** (NonVisual Desktop
+Access) and **JAWS** (Job Access With Speech) are screen readers.
 
 ## Automated vs manual split (core table)
 
