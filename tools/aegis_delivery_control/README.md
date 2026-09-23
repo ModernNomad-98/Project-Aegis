@@ -5,6 +5,13 @@ deterministic transition authority, a repository-scoped SQLite state owner,
 durable effect/use/budget/slot invariants, and a durable synthetic target
 fixture. It is not a delivery integration.
 
+CP-WP-003A adds offline negative capability probes in `capabilities.py` and
+tests. The dispatch coordinators reject a lookalike authority or target before
+committing an intent. Passing synthetic source, freshness, containment,
+owned-path, evidence or accounting probes does not authorize a real route;
+`require_real_dispatch` always denies it. A selected source and host, independent
+freshness proof, actual evidence and billing policy remain open CP-WP-003 gates.
+
 ## Boundary
 
 - Only `SyntheticAuthority`, `SyntheticExecutionAdapter` and

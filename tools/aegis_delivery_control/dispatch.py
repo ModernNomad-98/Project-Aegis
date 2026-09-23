@@ -38,6 +38,7 @@ from .authority import (
     SyntheticValidatorCapability,
     SyntheticValidatorActivityAttestation,
 )
+from .capabilities import require_synthetic_dispatch, require_synthetic_validation
 from .contracts import (
     ApplicationReceipt,
     ActiveValidationPauseRequest,
@@ -660,6 +661,7 @@ class SyntheticDispatchCoordinator:
         usage_units: int | None = 0,
         lose_receipt: bool = False,
     ) -> SyntheticDispatchReceipt:
+        require_synthetic_dispatch(self._authority, self._adapter)
         if not self._adapter.is_canonical_for(intent.repository_id):
             raise DispatchDenied(
                 "synthetic target is not the canonical repository root"
@@ -902,6 +904,7 @@ class SyntheticValidationCoordinator:
         lose_result: bool = False,
     ) -> SyntheticValidationReceipt:
         """Launch from an unclaimed grant and a durable READY snapshot."""
+        require_synthetic_validation(self._authority, self._adapter)
         if not self._adapter.is_canonical_for(intent.repository_id):
             raise DispatchDenied(
                 "synthetic validator is not the canonical repository root"

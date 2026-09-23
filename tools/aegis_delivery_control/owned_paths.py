@@ -924,3 +924,18 @@ def prepare_owned_file(
         return capability.identity
     finally:
         capability.close()
+
+
+def probe_owned_path_identity(
+    path: Path, *, expected: PathIdentity, trusted_root: Path,
+) -> PathIdentity:
+    """Read-only offline identity probe; not an open-time real-I/O guarantee."""
+    capability = CheckedPathCapability(
+        path, create=False, read_only=True, expected=expected,
+        trusted_root=trusted_root,
+    )
+    try:
+        capability.assert_current()
+        return capability.identity
+    finally:
+        capability.close()

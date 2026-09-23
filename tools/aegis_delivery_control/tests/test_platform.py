@@ -25,6 +25,7 @@ from tools.aegis_delivery_control.owned_paths import (
     PathCapabilityUnavailable,
     connect_checked,
     prepare_owned_file,
+    probe_owned_path_identity,
 )
 from tools.aegis_delivery_control.storage import (
     RepositoryWriterLock,
@@ -34,6 +35,31 @@ from tools.aegis_delivery_control.storage import (
 
 
 class PlatformContractTests(unittest.TestCase):
+    def test_offline_owned_path_probe_denies_swap_and_hardlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            leaf = root / "synthetic.sqlite3"
+            leaf.write_bytes(b"first")
+            expected = prepare_owned_file(leaf, create=False, trusted_root=root)
+            self.assertEqual(
+                probe_owned_path_identity(leaf, expected=expected, trusted_root=root),
+                expected,
+            )
+            leaf.rename(root / "old.sqlite3")
+            leaf.write_bytes(b"second")
+            with self.assertRaises(PathCapabilityUnavailable):
+                probe_owned_path_identity(leaf, expected=expected, trusted_root=root)
+            replacement_identity = prepare_owned_file(
+                leaf, create=False, trusted_root=root
+            )
+            os.link(leaf, root / "alias.sqlite3")
+            with self.assertRaisesRegex(PathCapabilityUnavailable, "single-link"):
+                probe_owned_path_identity(
+                    leaf,
+                    expected=replacement_identity,
+                    trusted_root=root,
+                )
+
     def test_posix_traversal_requires_no_follow_and_directory_flags(self) -> None:
         for flag in ("O_NOFOLLOW", "O_DIRECTORY"):
             with self.subTest(flag=flag):
