@@ -1,6 +1,12 @@
 # BER-BKL-009 — final evidence handling decision proposal
 
 Prepared 2026-09-23. **Proposal only; BER-BKL-009 remains PARTIALLY DELIVERED.**
+The owner subsequently selected the recommended 30-day complete-bundle
+policy in [approval APR-009](../approvals/APPROVAL_REGISTER.md). That is a
+policy choice, not an implementation grant. The separately reviewable
+[offline first-increment proposal](ber-bkl-009a-offline-policy-scope-proposal.md)
+defines one possible next authorization; no code or cleanup follows from
+merging either proposal alone.
 The [backlog entry](behavioral-eval-runner-backlog.md#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy)
 requires owner-set periods, access groups and encryption mechanism, then policy
 enforcement and an operator procedure. The existing two-stage evidence writer
