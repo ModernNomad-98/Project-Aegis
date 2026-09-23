@@ -365,6 +365,32 @@ class ProvenNonexecutionIntentRequest(IntentRequest):
 
 
 @dataclass(frozen=True)
+class SafeSameEffectRetryIntentRequest(IntentRequest):
+    recovery_authorization_id: str
+    prior_attempt_id: str
+    expected_source_generation: int
+    expected_target_generation: int
+
+    def validate(self) -> None:
+        super().validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.recovery_authorization_id, self.prior_attempt_id)
+        ):
+            raise ValueError("safe-retry intent bindings must be non-empty")
+        if self.prior_attempt_id == self.attempt_id:
+            raise ValueError("safe retry requires a successor attempt")
+        if (
+            type(self.expected_source_generation) is not int
+            or type(self.expected_target_generation) is not int
+            or self.expected_source_generation <= 0
+            or self.expected_target_generation
+            != self.expected_source_generation + 1
+        ):
+            raise ValueError("safe-retry generations must advance exactly once")
+
+
+@dataclass(frozen=True)
 class PlanAcceptanceRequest:
     plan_id: str
     command_id: str
@@ -2683,6 +2709,90 @@ class RecoverProvenNonexecutionRequest:
             raise ValueError(
                 "proven-nonexecution recovery generations must advance once"
             )
+
+
+@dataclass(frozen=True)
+class AuthorizeSafeSameEffectRetryRequest:
+    recovery_id: str
+    authorization_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    prior_attempt_id: str
+    successor_attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    original_effect_key: str
+    outcome_uncertainty_id: str
+    outcome_fence_id: str
+    source_control_uncertainty_id: str
+    source_control_fence_id: str
+    source_control_settlement_id: str
+    retained_pause_fence_id: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    retry_contract_id: str
+    reviewed_approval_id: str
+    retry_contract_digest: str
+    target_idempotency_expires_at_utc: str
+    concurrent_old_attempts_safe: bool
+    original_key_lookup_complete: bool
+    mutation_paths_digest: str
+    mutation_paths_complete: bool
+    continuation_cursor: str | None
+    expected_slot_generation: int
+    target_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+
+    def validate(self) -> None:
+        scalar_values = tuple(
+            value
+            for name, value in self.__dict__.items()
+            if name not in {
+                "resolved_uncertainty_ids",
+                "continuation_cursor",
+                "concurrent_old_attempts_safe",
+                "original_key_lookup_complete",
+                "mutation_paths_complete",
+                "expected_slot_generation",
+                "target_slot_generation",
+            }
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError("safe-retry bindings must be non-empty")
+        if self.prior_attempt_id == self.successor_attempt_id:
+            raise ValueError("safe retry requires a successor attempt")
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "safe retry requires sorted distinct covered uncertainty IDs"
+            )
+        if (
+            self.concurrent_old_attempts_safe is not True
+            or self.original_key_lookup_complete is not True
+            or self.mutation_paths_complete is not True
+        ):
+            raise ValueError("safe-retry contract guarantees must be explicit")
+        if (
+            type(self.expected_slot_generation) is not int
+            or type(self.target_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+            or self.target_slot_generation != self.expected_slot_generation + 1
+        ):
+            raise ValueError("safe-retry generations must advance once")
 
 
 @dataclass(frozen=True)

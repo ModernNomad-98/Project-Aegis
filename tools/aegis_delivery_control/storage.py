@@ -29,6 +29,8 @@ from .authority import (
     SyntheticFinalizationAttestation,
     SyntheticNonexecutionAttestation,
     SyntheticOperationNonexecutionResumeEvidence,
+    SyntheticSafeSameEffectRetryEvidence,
+    SyntheticSafeRetrySourceControlEvidence,
     SyntheticOperationReadinessEvidence,
     SyntheticOperatorCapability,
     SyntheticProofFreeDispositionEvidence,
@@ -54,6 +56,7 @@ from .authority import (
 from .contracts import (
     ApplicationReceipt,
     ActiveValidationPauseRequest,
+    AuthorizeSafeSameEffectRetryRequest,
     AuthorityFactKind,
     AuthorityLifecycleFactRequest,
     BindingMismatchKind,
@@ -98,6 +101,7 @@ from .contracts import (
     ResumeOperationNonexecutionRequest,
     ResumeRequest,
     ProvenNonexecutionIntentRequest,
+    SafeSameEffectRetryIntentRequest,
     SettlementReceipt,
     SettledValidationPauseRecoveryRequest,
     SourceControlClassification,
@@ -983,7 +987,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -1004,7 +1008,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8, 9} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -2081,6 +2085,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_validation_pause_drain_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_safe_same_effect_retry_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -2158,7 +2165,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5, 6, 7, 8}:
+            if version not in {3, 4, 5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -2187,11 +2194,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5, 6, 7, 8} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6, 7, 8, 9} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5, 6, 7, 8}:
+            if version in {4, 5, 6, 7, 8, 9}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2663,7 +2670,7 @@ class SQLiteStateStore:
             if version == 3:
                 connection.execute("PRAGMA user_version = 4")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                4, 5, 6, 7, 8,
+                4, 5, 6, 7, 8, 9,
             }:
                 raise StorageIntegrityError(
                     "T28 foundation migration did not reach version 4"
@@ -2712,7 +2719,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5, 6, 7, 8}:
+            if version not in {4, 5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2966,7 +2973,7 @@ class SQLiteStateStore:
         )
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {5, 6, 7, 8}:
+            if version not in {5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "trusted-readiness semantic version is unsupported"
                 )
@@ -3026,7 +3033,7 @@ class SQLiteStateStore:
                     )
                 connection.execute("PRAGMA user_version = 6")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                6, 7, 8,
+                6, 7, 8, 9,
             }:
                 raise StorageIntegrityError(
                     "trusted-readiness migration did not reach version 6"
@@ -3180,7 +3187,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {6, 7, 8}:
+            if version not in {6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "proof-free disposition semantic version is unsupported"
                 )
@@ -3224,7 +3231,7 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "proof-free disposition schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {7, 8}:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {7, 8, 9}:
                 raise StorageIntegrityError(
                     "proof-free disposition migration did not reach version 7"
                 )
@@ -3315,7 +3322,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {7, 8}:
+            if version not in {7, 8, 9}:
                 raise StorageIntegrityError(
                     "validation pause drain semantic version is unsupported"
                 )
@@ -3369,7 +3376,7 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "validation pause drain schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 8:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {8, 9}:
                 raise StorageIntegrityError(
                     "validation pause drain migration did not reach version 8"
                 )
@@ -3379,6 +3386,161 @@ class SQLiteStateStore:
                     failure_hook(
                         "after_validation_pause_drain_migration_commit_before_acknowledgement"
                     )
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_safe_same_effect_retry_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        table_sql = {
+            "safe_same_effect_retry_actions": """
+                CREATE TABLE safe_same_effect_retry_actions (
+                    recovery_id TEXT PRIMARY KEY,
+                    authorization_id TEXT NOT NULL UNIQUE,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    prior_attempt_id TEXT NOT NULL,
+                    successor_attempt_id TEXT NOT NULL,
+                    source_generation INTEGER NOT NULL CHECK (source_generation > 0),
+                    target_generation INTEGER NOT NULL CHECK (target_generation > 1),
+                    plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                    revision_digest TEXT NOT NULL,
+                    effect_descriptor_digest TEXT NOT NULL,
+                    original_effect_key TEXT NOT NULL,
+                    outcome_uncertainty_id TEXT NOT NULL UNIQUE REFERENCES uncertainty_instances(uncertainty_id),
+                    outcome_fence_id TEXT NOT NULL UNIQUE REFERENCES dispatch_fences(fence_id),
+                    source_control_uncertainty_id TEXT NOT NULL UNIQUE REFERENCES uncertainty_instances(uncertainty_id),
+                    source_control_fence_id TEXT NOT NULL UNIQUE,
+                    source_control_settlement_id TEXT NOT NULL UNIQUE,
+                    retained_pause_fence_id TEXT NOT NULL,
+                    resolved_uncertainty_ids_json TEXT NOT NULL,
+                    retry_contract_id TEXT NOT NULL UNIQUE,
+                    reviewed_approval_id TEXT NOT NULL UNIQUE,
+                    retry_contract_digest TEXT NOT NULL,
+                    target_idempotency_expires_at_utc TEXT NOT NULL,
+                    concurrent_old_attempts_safe INTEGER NOT NULL CHECK (concurrent_old_attempts_safe = 1),
+                    original_key_lookup_complete INTEGER NOT NULL CHECK (original_key_lookup_complete = 1),
+                    mutation_paths_digest TEXT NOT NULL,
+                    mutation_paths_complete INTEGER NOT NULL CHECK (mutation_paths_complete = 1),
+                    continuation_cursor TEXT,
+                    expected_catalog_head TEXT NOT NULL,
+                    expected_run_head TEXT NOT NULL,
+                    capability_claim_id TEXT NOT NULL UNIQUE,
+                    capability_grant_id TEXT NOT NULL,
+                    capability_scope_digest TEXT NOT NULL,
+                    capability_issuer_fingerprint TEXT NOT NULL,
+                    capability_issuer_mac TEXT NOT NULL,
+                    evidence_proof_id TEXT NOT NULL UNIQUE,
+                    evidence_request_digest TEXT NOT NULL,
+                    evidence_issuer_fingerprint TEXT NOT NULL,
+                    evidence_issuer_mac TEXT NOT NULL,
+                    source_control_proof_id TEXT NOT NULL UNIQUE,
+                    source_control_request_digest TEXT NOT NULL,
+                    source_control_issuer_fingerprint TEXT NOT NULL,
+                    source_control_issuer_mac TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSED'),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "safe_same_effect_retry_authorizations": """
+                CREATE TABLE safe_same_effect_retry_authorizations (
+                    authorization_id TEXT PRIMARY KEY,
+                    recovery_id TEXT NOT NULL UNIQUE REFERENCES safe_same_effect_retry_actions(recovery_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    prior_attempt_id TEXT NOT NULL,
+                    successor_attempt_id TEXT NOT NULL,
+                    source_generation INTEGER NOT NULL CHECK (source_generation > 0),
+                    target_generation INTEGER NOT NULL CHECK (target_generation > 1),
+                    outcome_uncertainty_id TEXT NOT NULL,
+                    outcome_fence_id TEXT NOT NULL,
+                    covered_activity_uncertainty_ids_json TEXT NOT NULL,
+                    status TEXT NOT NULL CHECK (status IN ('AVAILABLE', 'CONSUMED', 'DISABLED')),
+                    consuming_event_id TEXT REFERENCES events(event_id),
+                    disabling_event_id TEXT REFERENCES events(event_id),
+                    body_json TEXT NOT NULL
+                )
+            """,
+        }
+        canonical = lambda sql: "".join(sql.upper().split()).replace(
+            "IFNOTEXISTS", ""
+        ).rstrip(";")
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {8, 9}:
+                raise StorageIntegrityError(
+                    "safe-retry semantic version is unsupported"
+                )
+            existing = {
+                str(row["name"]): str(row["sql"])
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                    "AND name IN (?, ?)", tuple(table_sql)
+                )
+            }
+            if version == 8:
+                if existing:
+                    raise StorageIntegrityError(
+                        "safe-retry schema is partially migrated"
+                    )
+                for row in connection.execute(
+                    "SELECT body_json FROM events WHERE event_kind = "
+                    "'RECONCILIATION_RECORDED'"
+                ):
+                    try:
+                        if json.loads(str(row["body_json"])).get("route") == (
+                            "SAFE_SAME_EFFECT_RETRY"
+                        ):
+                            raise StorageIntegrityError(
+                                "safe-retry history predates its projection"
+                            )
+                    except json.JSONDecodeError as error:
+                        raise StorageIntegrityError(
+                            "safe-retry history is not valid JSON"
+                        ) from error
+                for sql in table_sql.values():
+                    connection.execute(sql)
+                if failure_hook is not None:
+                    failure_hook("after_safe_retry_migration_writes_before_commit")
+                connection.execute("PRAGMA user_version = 9")
+                existing = {
+                    str(row["name"]): str(row["sql"])
+                    for row in connection.execute(
+                        "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                        "AND name IN (?, ?)", tuple(table_sql)
+                    )
+                }
+            if set(existing) != set(table_sql) or any(
+                canonical(existing[name]) != canonical(sql)
+                for name, sql in table_sql.items()
+            ):
+                raise StorageIntegrityError(
+                    "safe-retry schema is missing or incompatible"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 9:
+                raise StorageIntegrityError(
+                    "safe-retry migration did not reach version 9"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 8:
+                    failure_hook("after_safe_retry_migration_commit_before_acknowledgement")
         except BaseException:
             if manage_transaction and connection.in_transaction:
                 connection.rollback()
@@ -3752,7 +3914,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8}:
+            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -3760,7 +3922,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5, 6, 7, 8}:
+            if version in {2, 3, 4, 5, 6, 7, 8, 9}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -3812,7 +3974,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5, 6, 7, 8}:
+                if version in {3, 4, 5, 6, 7, 8, 9}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -3877,6 +4039,70 @@ class SQLiteStateStore:
                                     "proven-nonexecution resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
+                if version == 9:
+                    safe_retry_table = connection.execute(
+                        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                        "name = 'safe_same_effect_retry_actions'"
+                    ).fetchone()
+                    if safe_retry_table is None:
+                        raise StorageIntegrityError(
+                            "safe-retry resolution projection is missing"
+                        )
+                    for action in connection.execute(
+                        "SELECT action.*, event.body_json AS event_body, "
+                        "event.event_hash AS source_event_hash FROM "
+                        "safe_same_effect_retry_actions AS action JOIN events "
+                        "AS event ON event.event_id = action.event_id"
+                    ):
+                        uncertainty_id = str(
+                            action["source_control_uncertainty_id"]
+                        )
+                        if uncertainty_id not in expected:
+                            raise StorageIntegrityError(
+                                "safe retry resolved an unknown source-control "
+                                "uncertainty"
+                            )
+                        resolution_body = json.dumps(
+                            {
+                                "event_id": action["event_id"],
+                                "proof_event_hash": action["source_event_hash"],
+                                "proof_event_id": action["event_id"],
+                                "proof_kind": (
+                                    "ORDERED_SOURCE_CONTROL_SETTLEMENT"
+                                ),
+                                "reconciliation_id": action["recovery_id"],
+                                "schema_version": 1,
+                                "uncertainty_id": uncertainty_id,
+                            },
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                        resolution = connection.execute(
+                            "SELECT * FROM uncertainty_resolutions WHERE "
+                            "uncertainty_id = ? AND reconciliation_id = ? AND "
+                            "event_id = ? AND proof_kind = "
+                            "'ORDERED_SOURCE_CONTROL_SETTLEMENT' AND "
+                            "proof_event_id = ? AND proof_event_hash = ? AND "
+                            "body_json = ?",
+                            (
+                                uncertainty_id, action["recovery_id"],
+                                action["event_id"], action["event_id"],
+                                action["source_event_hash"], resolution_body,
+                            ),
+                        ).fetchone()
+                        if (
+                            action["body_json"] != action["event_body"]
+                            or action["event_hash"]
+                            != action["source_event_hash"]
+                            or SQLiteStateStore._event_hash(
+                                json.loads(str(action["event_body"]))
+                            ) != action["source_event_hash"]
+                            or resolution is None
+                        ):
+                            raise StorageIntegrityError(
+                                "safe-retry source-control resolution is invalid"
+                            )
+                        resolved_operation_ids.add(uncertainty_id)
             source_ids = {
                 str(row["event_id"])
                 for row in connection.execute(
@@ -4022,7 +4248,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5, 6, 7, 8,
+                1, 2, 3, 4, 5, 6, 7, 8, 9,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -4094,7 +4320,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5, 6, 7, 8}:
+            if version not in {1, 2, 3, 4, 5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -4135,7 +4361,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5, 6, 7, 8,
+                2, 3, 4, 5, 6, 7, 8, 9,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -4338,7 +4564,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5, 6, 7, 8}:
+            if version not in {2, 3, 4, 5, 6, 7, 8, 9}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -4692,7 +4918,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5, 6, 7, 8,
+                3, 4, 5, 6, 7, 8, 9,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -6106,7 +6332,9 @@ class SQLiteStateStore:
             "worst_case_units": body.get("budget_worst_case_units"),
             "cap_units": body.get("budget_cap_units"),
         }
-        if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+        if body.get("intent_kind") in {
+            "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+        }:
             fields.update(
                 {
                     "recovery_authorization_id": body.get(
@@ -8881,6 +9109,19 @@ class SQLiteStateStore:
                         request.logical_effect_id, request.attempt_id,
                     ),
                 ).fetchone()
+                if authorization is None:
+                    authorization = connection.execute(
+                        "SELECT * FROM safe_same_effect_retry_authorizations "
+                        "WHERE authorization_id = ? AND repository_id = ? "
+                        "AND run_id = ? AND item_id = ? AND "
+                        "logical_effect_id = ? AND prior_attempt_id = ?",
+                        (
+                            body["invalidated_retry_authorization_id"],
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            request.attempt_id,
+                        ),
+                    ).fetchone()
                 prior_status = body["invalidated_retry_prior_status"]
                 if authorization is None or prior_status not in {
                     "AVAILABLE", "CONSUMED",
@@ -9404,6 +9645,103 @@ class SQLiteStateStore:
         ) as error:
             raise StorageIntegrityError(
                 "proof-free disposition semantics are invalid"
+            ) from error
+
+    def _validate_safe_same_effect_retry_event(
+        self,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            AuthorizeSafeSameEffectRetryRequest.__dataclass_fields__
+        ) | {
+            "route", "retry_binding_version", "capability_evidence",
+            "evidence", "source_control_evidence", "event_kind",
+            "transition_id", "lifecycle_from",
+            "lifecycle_to", "source_continuation_cursor",
+            "continuation_cursor", "payload_digest", "previous_event_hash",
+            "schema_version", "sequence", "writer_epoch",
+        }
+        try:
+            if (
+                set(body) != expected_fields
+                or body["schema_version"] != 1
+                or body["retry_binding_version"] != 1
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+                or not isinstance(body["resolved_uncertainty_ids"], list)
+                or not isinstance(body["capability_evidence"], dict)
+                or not isinstance(body["evidence"], dict)
+                or not isinstance(body["source_control_evidence"], dict)
+            ):
+                raise ValueError("safe-retry event schema is invalid")
+            values = {
+                field: body[field]
+                for field in AuthorizeSafeSameEffectRetryRequest.__dataclass_fields__
+            }
+            values["resolved_uncertainty_ids"] = tuple(
+                values["resolved_uncertainty_ids"]
+            )
+            request = AuthorizeSafeSameEffectRetryRequest(**values)
+            request.validate()
+            capability = SyntheticOperatorCapability(
+                **cast(dict[str, object], body["capability_evidence"])
+            )
+            evidence = SyntheticSafeSameEffectRetryEvidence(
+                **cast(dict[str, object], body["evidence"])
+            )
+            source_control_evidence = SyntheticSafeRetrySourceControlEvidence(
+                **cast(dict[str, object], body["source_control_evidence"])
+            )
+            if self._classification_authority is None:
+                raise ValueError("safe-retry authority is not bound")
+            self._classification_authority.verify_operator_issued(capability)
+            self._classification_authority.verify_safe_same_effect_retry_evidence(
+                evidence, request
+            )
+            self._classification_authority.verify_safe_retry_source_control_evidence(
+                source_control_evidence, request
+            )
+            payload = {
+                **request.__dict__,
+                "route": "SAFE_SAME_EFFECT_RETRY",
+                "retry_binding_version": 1,
+                "capability_evidence": dict(capability.__dict__),
+                "evidence": dict(evidence.__dict__),
+                "source_control_evidence": dict(
+                    source_control_evidence.__dict__
+                ),
+            }
+            if (
+                self._event_hash(payload) != body["payload_digest"]
+                or predecessor_state
+                is not LifecycleState.RECONCILIATION_REQUIRED
+                or predecessor_cursor != request.continuation_cursor
+                or body["previous_event_hash"] != request.expected_run_head
+                or body["lifecycle_from"]
+                != LifecycleState.RECONCILIATION_REQUIRED.value
+                or body["lifecycle_to"] != LifecycleState.PAUSED.value
+                or body["source_continuation_cursor"]
+                != request.continuation_cursor
+                or body["continuation_cursor"] is not None
+                or body["event_kind"] != "RECONCILIATION_RECORDED"
+                or body["transition_id"] != "T17"
+                or body["route"] != "SAFE_SAME_EFFECT_RETRY"
+                or (
+                    capability.repository_id, capability.run_id,
+                    capability.action,
+                ) != (
+                    request.repository_id, request.run_id,
+                    "AUTHORIZE_SAFE_SAME_EFFECT_RETRY",
+                )
+            ):
+                raise ValueError("safe-retry event binding is invalid")
+        except (KeyError, TypeError, ValueError, DispatchDenied) as error:
+            raise StorageIntegrityError(
+                "safe-retry evidence or event binding is invalid"
             ) from error
 
     def _validate_validator_reconciliation_event(
@@ -12899,7 +13237,9 @@ class SQLiteStateStore:
                     )
                     if reservation is None or tuple(reservation) != expected_reservation:
                         raise ValueError("operation slot reservation is unavailable")
-                    if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+                    if body.get("intent_kind") in {
+                        "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+                    }:
                         expected_prior_slot = (
                             str(body["run_id"]),
                             str(body["logical_effect_id"]),
@@ -12939,6 +13279,12 @@ class SQLiteStateStore:
                         str(body["logical_effect_id"]),
                         str(body["slot_attempt_id"]),
                         int(body["slot_generation"]),
+                    )
+                elif event_kind == "RECONCILIATION_RECORDED" and (
+                    body.get("route") == "SAFE_SAME_EFFECT_RETRY"
+                ):
+                    active_fences.pop(
+                        str(body["source_control_fence_id"]), None
                     )
                 elif event_kind == "VALIDATOR_INTENT_COMMITTED":
                     reservation = connection.execute(
@@ -13070,13 +13416,46 @@ class SQLiteStateStore:
                 connection, request.repository_id, writer_epoch
             )
         )
+        safe_retry_rows = connection.execute(
+            "SELECT authorization.source_generation, "
+            "authorization.target_generation, authorization.outcome_fence_id, "
+            "authorization.covered_activity_uncertainty_ids_json "
+            "FROM safe_same_effect_retry_authorizations AS authorization JOIN "
+            "safe_same_effect_retry_actions AS recovery ON "
+            "recovery.recovery_id = authorization.recovery_id JOIN events AS "
+            "recovery_event ON recovery_event.event_id = recovery.event_id "
+            "LEFT JOIN events AS consuming_event ON consuming_event.event_id = "
+            "authorization.consuming_event_id LEFT JOIN events AS disabling_event "
+            "ON disabling_event.event_id = authorization.disabling_event_id WHERE "
+            "authorization.repository_id = ? AND authorization.run_id = ? AND "
+            "authorization.item_id = ? AND authorization.logical_effect_id = ? "
+            "AND recovery_event.writer_epoch < ? AND (consuming_event.writer_epoch "
+            "IS NULL OR consuming_event.writer_epoch > ?) AND (disabling_event."
+            "writer_epoch IS NULL OR disabling_event.writer_epoch > ?) AND "
+            "recovery.plan_id = ?",
+            (request.repository_id, request.run_id, request.item_id,
+             plan["logical_effect_id"], writer_epoch, writer_epoch,
+             writer_epoch, plan["plan_id"]),
+        ).fetchall()
+        safe_fence_ids = {
+            str(row["outcome_fence_id"]) for row in safe_retry_rows
+        }
+        for row in safe_retry_rows:
+            safe_fence_ids.update(
+                str(value)
+                for value in json.loads(
+                    str(row["covered_activity_uncertainty_ids_json"])
+                )
+            )
         if any(
+            fence_id not in safe_fence_ids
+            and
             (item_id is None or item_id == request.item_id)
             and (
                 logical_effect_id is None
                 or logical_effect_id == plan["logical_effect_id"]
             )
-            for item_id, logical_effect_id in fences.values()
+            for fence_id, (item_id, logical_effect_id) in fences.items()
         ):
             blockers.add("DISPATCH_FENCE_PRESENT")
         if active_slot is not None:
@@ -13111,6 +13490,7 @@ class SQLiteStateStore:
                     plan["plan_id"],
                 ),
             ).fetchall()
+            retry = list(retry) + list(safe_retry_rows)
             owned_retry_slot = len(retry) == 1 and (
                 active_slot[0], active_slot[1], active_slot[3]
             ) == (
@@ -20221,6 +20601,8 @@ class SQLiteStateStore:
                     ),
                 ).fetchone()
                 source_is_validation = False
+                source_is_safe_retry = False
+                safe_retry_allowed_fence_ids: set[str] = set()
                 if source is None:
                     source = connection.execute(
                         "SELECT * FROM validation_pause_actions WHERE "
@@ -20235,6 +20617,55 @@ class SQLiteStateStore:
                         ),
                     ).fetchone()
                     source_is_validation = source is not None
+                if source is None:
+                    source = connection.execute(
+                        "SELECT recovery.*, pause.event_id AS pause_event_id, "
+                        "authorization.status AS authorization_status FROM "
+                        "safe_same_effect_retry_actions AS recovery JOIN "
+                        "safe_same_effect_retry_authorizations AS authorization "
+                        "ON authorization.recovery_id = recovery.recovery_id JOIN "
+                        "external_pause_actions AS pause ON pause.pause_id = ? "
+                        "AND pause.fence_id = recovery.retained_pause_fence_id "
+                        "WHERE recovery.event_id = ? AND recovery.repository_id = ? "
+                        "AND recovery.run_id = ? AND recovery.item_id = ? AND "
+                        "recovery.logical_effect_id = ? AND recovery.resulting_state "
+                        "= 'PAUSED' AND authorization.status = 'AVAILABLE'",
+                        (
+                            request.source_pause_id,
+                            request.source_pause_settled_event_id,
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                        ),
+                    ).fetchone()
+                    source_is_safe_retry = source is not None
+                    if source_is_safe_retry:
+                        safe_retry_allowed_fence_ids.add(
+                            str(source["outcome_fence_id"])
+                        )
+                        for uncertainty_id in json.loads(str(
+                            source["resolved_uncertainty_ids_json"]
+                        )):
+                            uncertainty = connection.execute(
+                                "SELECT fence_id FROM uncertainty_instances "
+                                "WHERE uncertainty_id = ? AND repository_id = ? "
+                                "AND run_id = ? AND item_id = ? AND "
+                                "logical_effect_id = ? AND attempt_id = ? AND "
+                                "uncertainty_kind = 'ACTIVITY'",
+                                (
+                                    uncertainty_id, request.repository_id,
+                                    request.run_id, request.item_id,
+                                    request.logical_effect_id,
+                                    source["prior_attempt_id"],
+                                ),
+                            ).fetchone()
+                            if uncertainty is None:
+                                raise StorageIntegrityError(
+                                    "safe-retry resume lost covered activity "
+                                    "uncertainty"
+                                )
+                            safe_retry_allowed_fence_ids.add(
+                                str(uncertainty["fence_id"])
+                            )
                 source_event_hash = (
                     None
                     if source is None
@@ -20246,18 +20677,23 @@ class SQLiteStateStore:
                 source_preserved_lifecycle = (
                     LifecycleState.VALIDATING.value
                     if source_is_validation
+                    else LifecycleState.PLANNED.value
+                    if source_is_safe_retry
                     else (
                         None if source is None
                         else source["preserved_lifecycle"]
                     )
                 )
                 source_preserved_cursor = (
-                    None if source is None else source[
+                    None if source is None or source_is_safe_retry else source[
                         "preserved_continuation_cursor"
                     ]
                 )
                 source_originating_event_id = (
-                    None if source is None else source["request_event_id"]
+                    None if source is None else (
+                        source["pause_event_id"]
+                        if source_is_safe_retry else source["request_event_id"]
+                    )
                 )
                 if source is None or (
                     source_event_hash, source_preserved_lifecycle,
@@ -20292,14 +20728,15 @@ class SQLiteStateStore:
                         connection, request.repository_id, request.run_id
                     )
                 )
+                unresolved_contacts = self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id
+                )
                 if (
                     validator_checkpoint is not None
                     and validator_checkpoint["checkpoint_kind"]
                     != "ELIGIBLE_RESULT_SETTLED"
                 ) or (
-                    self._unresolved_contact_reservations(
-                        connection, request.repository_id, request.run_id
-                    )
+                    unresolved_contacts and not source_is_safe_retry
                 ):
                     raise DispatchDenied(
                         "resume requires T17 for unresolved owned activity"
@@ -20319,16 +20756,19 @@ class SQLiteStateStore:
                         for code in readiness_body.get("blocker_codes", ())
                         if code != "DISPATCH_FENCE_PRESENT"
                     )
-                other_fence = connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                scoped_fences = connection.execute(
+                    "SELECT fence_id FROM dispatch_fences WHERE repository_id = ? AND "
                     "fence_id <> ? AND (item_id IS NULL OR item_id = ?) AND "
-                    "(logical_effect_id IS NULL OR logical_effect_id = ?) LIMIT 1",
+                    "(logical_effect_id IS NULL OR logical_effect_id = ?)",
                     (
                         request.repository_id, request.pause_fence_id,
                         request.item_id, request.logical_effect_id,
                     ),
-                ).fetchone()
-                if other_fence is not None:
+                ).fetchall()
+                if any(
+                    str(row["fence_id"]) not in safe_retry_allowed_fence_ids
+                    for row in scoped_fences
+                ):
                     blocker_codes.add("NON_PAUSE_FENCE_PRESENT")
                 slot = connection.execute(
                     "SELECT * FROM outstanding_slot WHERE repository_id = ?",
@@ -21208,6 +21648,516 @@ class SQLiteStateStore:
         return ControlReceipt(
             request.resume_id, request.command_id, request.event_id, sequence,
             event_hash, resulting_state, False,
+        )
+
+    def _require_safe_retry_protection_current(
+        self, expires_at_utc: object
+    ) -> None:
+        try:
+            expires = datetime.fromisoformat(
+                str(expires_at_utc).replace("Z", "+00:00")
+            )
+        except ValueError as error:
+            raise DispatchDenied("safe-retry expiry is malformed") from error
+        if expires.tzinfo is None or expires <= self._utc_now():
+            raise DispatchDenied("safe-retry protection is expired")
+
+    def _safe_retry_dispatch_fence_ids(
+        self,
+        connection: sqlite3.Connection,
+        request: SafeSameEffectRetryIntentRequest,
+        *,
+        consuming_event_id: str,
+    ) -> set[str]:
+        authorization = connection.execute(
+            "SELECT authorization.*, recovery.target_idempotency_expires_at_utc "
+            "FROM safe_same_effect_retry_authorizations AS authorization JOIN "
+            "safe_same_effect_retry_actions AS recovery ON recovery.recovery_id "
+            "= authorization.recovery_id WHERE authorization.authorization_id "
+            "= ?", (request.recovery_authorization_id,),
+        ).fetchone()
+        if authorization is None or (
+            authorization["repository_id"], authorization["run_id"],
+            authorization["item_id"], authorization["logical_effect_id"],
+            authorization["prior_attempt_id"],
+            authorization["successor_attempt_id"],
+            int(authorization["source_generation"]),
+            int(authorization["target_generation"]), authorization["status"],
+            authorization["consuming_event_id"],
+        ) != (
+            request.repository_id, request.run_id, request.item_id,
+            request.logical_effect_id, request.prior_attempt_id,
+            request.attempt_id, request.expected_source_generation,
+            request.expected_target_generation, "CONSUMED", consuming_event_id,
+        ):
+            raise DispatchDenied(
+                "safe retry lacks its exact consumed authorization"
+            )
+        self._require_safe_retry_protection_current(
+            authorization["target_idempotency_expires_at_utc"]
+        )
+        activity_ids = tuple(json.loads(str(
+            authorization["covered_activity_uncertainty_ids_json"]
+        )))
+        if not activity_ids:
+            raise StorageIntegrityError(
+                "safe retry lost its covered activity uncertainty"
+            )
+        unresolved = {
+            str(row["uncertainty_id"]): str(row["fence_id"])
+            for row in connection.execute(
+                "SELECT instance.uncertainty_id, instance.fence_id FROM "
+                "uncertainty_instances AS instance LEFT JOIN "
+                "uncertainty_resolutions AS resolution ON "
+                "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                "instance.repository_id = ? AND instance.run_id = ? AND "
+                "instance.item_id = ? AND instance.logical_effect_id = ? AND "
+                "instance.attempt_id = ? AND instance.check_id IS NULL AND "
+                "instance.uncertainty_kind = 'ACTIVITY' AND "
+                "resolution.uncertainty_id IS NULL",
+                (request.repository_id, request.run_id, request.item_id,
+                 request.logical_effect_id, request.prior_attempt_id),
+            )
+        }
+        if set(activity_ids) != set(unresolved):
+            raise DispatchDenied(
+                "safe retry activity uncertainty changed after review"
+            )
+        return {str(authorization["outcome_fence_id"]), *unresolved.values()}
+
+    def authorize_safe_same_effect_retry(
+        self,
+        request: AuthorizeSafeSameEffectRetryRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticSafeSameEffectRetryEvidence,
+        source_control_evidence: SyntheticSafeRetrySourceControlEvidence,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("safe retry targets another repository")
+        if (capability.repository_id, capability.run_id, capability.action) != (
+            request.repository_id, request.run_id,
+            "AUTHORIZE_SAFE_SAME_EFFECT_RETRY",
+        ):
+            raise DispatchDenied("operator capability does not bind safe retry")
+        payload = {
+            **request.__dict__,
+            "route": "SAFE_SAME_EFFECT_RETRY",
+            "retry_binding_version": 1,
+            "capability_evidence": dict(capability.__dict__),
+            "evidence": dict(evidence.__dict__),
+            "source_control_evidence": dict(source_control_evidence.__dict__),
+        }
+        payload_digest = self._event_hash(payload)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_safe_same_effect_retry_evidence(
+                        evidence, request
+                    )
+                    authority.verify_safe_retry_source_control_evidence(
+                        source_control_evidence, request
+                    )
+                    prior = connection.execute(
+                        "SELECT * FROM safe_same_effect_retry_actions WHERE "
+                        "command_id = ?", (request.command_id,),
+                    ).fetchone()
+                    if (
+                        prior is None
+                        or prior_command["payload_digest"] != payload_digest
+                        or prior["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "safe-retry command identity was reused"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["recovery_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]), LifecycleState.PAUSED, True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent safe-retry freshness failed")
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                authority.verify_operator_for_action(capability)
+                authority.verify_safe_same_effect_retry_evidence(evidence, request)
+                authority.verify_safe_retry_source_control_evidence(
+                    source_control_evidence, request
+                )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?", (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "safe-retry operator grant was already redeemed"
+                    )
+                if (
+                    catalog_head != request.expected_catalog_head
+                    or run_heads.get(request.run_id) != request.expected_run_head
+                ):
+                    raise DispatchDenied("safe-retry head is stale")
+                self._require_safe_retry_protection_current(
+                    request.target_idempotency_expires_at_utc
+                )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ?",
+                    (request.repository_id, request.run_id, request.plan_id),
+                ).fetchone()
+                if run is None or plan is None:
+                    raise DispatchDenied("safe retry lost its run or plan")
+                if (
+                    run["item_id"], run["lifecycle_state"],
+                    run["continuation_cursor"], run["head_hash"],
+                ) != (
+                    request.item_id, LifecycleState.RECONCILIATION_REQUIRED.value,
+                    request.continuation_cursor, request.expected_run_head,
+                ):
+                    raise DispatchDenied("safe retry does not bind the run")
+                if (
+                    plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"], plan["effect_descriptor_digest"],
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.revision_digest, request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied("safe retry does not bind the plan")
+                effect = connection.execute(
+                    "SELECT effect_key, descriptor_digest FROM effects WHERE "
+                    "repository_id = ? AND logical_effect_id = ?",
+                    (request.repository_id, request.logical_effect_id),
+                ).fetchone()
+                if effect is None or (
+                    effect["effect_key"], effect["descriptor_digest"]
+                ) != (
+                    request.original_effect_key,
+                    request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied("safe retry requires the original effect key")
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.prior_attempt_id, request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("safe retry does not bind the retained slot")
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (request.repository_id, request.run_id,
+                     request.logical_effect_id, request.prior_attempt_id),
+                ).fetchone()
+                if reservation is None or int(reservation["uncertainty"]) != 0 or (
+                    reservation["disposition"]
+                    not in {BudgetDisposition.CONSUMED.value,
+                            BudgetDisposition.ADJUSTED.value,
+                            BudgetDisposition.RELEASED.value}
+                ):
+                    raise DispatchDenied("safe retry requires settled billing")
+                unresolved = connection.execute(
+                    "SELECT instance.* FROM uncertainty_instances AS instance "
+                    "LEFT JOIN uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND resolution.uncertainty_id IS NULL",
+                    (request.repository_id, request.run_id, request.item_id,
+                     request.logical_effect_id, request.prior_attempt_id),
+                ).fetchall()
+                outcome_rows = [
+                    row for row in unresolved
+                    if row["uncertainty_kind"] == "OUTCOME"
+                ]
+                covered_rows = [
+                    row for row in unresolved
+                    if row["uncertainty_kind"] == "ACTIVITY"
+                ]
+                source_control_rows = [
+                    row for row in unresolved
+                    if row["uncertainty_kind"] == "SOURCE_CONTROL"
+                ]
+                if len(outcome_rows) != 1 or (
+                    outcome_rows[0]["uncertainty_id"],
+                    outcome_rows[0]["fence_id"],
+                ) != (
+                    request.outcome_uncertainty_id,
+                    request.outcome_fence_id,
+                ) or len(source_control_rows) != 1 or (
+                    source_control_rows[0]["uncertainty_id"],
+                    source_control_rows[0]["fence_id"],
+                ) != (
+                    request.source_control_uncertainty_id,
+                    request.source_control_fence_id,
+                ) or len(unresolved) != 2 + len(covered_rows) or tuple(sorted(
+                    str(row["uncertainty_id"]) for row in covered_rows
+                )) != request.resolved_uncertainty_ids:
+                    raise DispatchDenied(
+                        "safe retry contract does not cover the exact activity set"
+                    )
+                applicable_fences = connection.execute(
+                    "SELECT fence_id FROM dispatch_fences WHERE repository_id = ? "
+                    "AND ((item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?)",
+                    (request.repository_id, request.item_id,
+                     request.logical_effect_id),
+                ).fetchall()
+                allowed_fence_ids = {request.outcome_fence_id} | {
+                    str(row["fence_id"]) for row in covered_rows
+                }
+                allowed_fence_ids.add(request.source_control_fence_id)
+                pause_source = connection.execute(
+                    "SELECT 1 FROM external_pause_actions AS pause JOIN "
+                    "dispatch_fences AS fence ON fence.fence_id = pause.fence_id "
+                    "WHERE pause.fence_id = ? AND pause.repository_id = ? AND "
+                    "pause.run_id = ? AND pause.item_id = ? AND "
+                    "pause.logical_effect_id = ? AND pause.attempt_id = ? AND "
+                    "fence.repository_id = pause.repository_id AND "
+                    "fence.originating_event_id = pause.event_id",
+                    (request.retained_pause_fence_id, request.repository_id,
+                     request.run_id, request.item_id,
+                     request.logical_effect_id, request.prior_attempt_id),
+                ).fetchone()
+                if pause_source is None:
+                    raise DispatchDenied(
+                        "safe retry pause settlement source is invalid"
+                    )
+                allowed_fence_ids.add(request.retained_pause_fence_id)
+                if {str(row["fence_id"]) for row in applicable_fences} != (
+                    allowed_fence_ids
+                ):
+                    raise DispatchDenied("safe retry has another active fence")
+                if connection.execute(
+                    "SELECT 1 FROM effect_observations WHERE repository_id = ? "
+                    "AND run_id = ? AND logical_effect_id = ? AND attempt_id = ?",
+                    (request.repository_id, request.run_id,
+                     request.logical_effect_id, request.prior_attempt_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied("safe retry is contradicted by a receipt")
+                if connection.execute(
+                    "SELECT 1 FROM safe_same_effect_retry_actions WHERE "
+                    "recovery_id = ? OR authorization_id = ? OR event_id = ?",
+                    (request.recovery_id, request.authorization_id,
+                     request.event_id),
+                ).fetchone() is not None:
+                    raise StorageIntegrityError("safe-retry identity was reused")
+                TransitionEngine().authorize(
+                    "T17", LifecycleState.RECONCILIATION_REQUIRED,
+                    LifecycleState.PAUSED, TRANSITIONS["T17"].required_guards,
+                )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                body = {
+                    **payload, "event_kind": "RECONCILIATION_RECORDED",
+                    "transition_id": "T17",
+                    "lifecycle_from": LifecycleState.RECONCILIATION_REQUIRED.value,
+                    "lifecycle_to": LifecycleState.PAUSED.value,
+                    "source_continuation_cursor": request.continuation_cursor,
+                    "continuation_cursor": None, "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "schema_version": 1, "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RECONCILIATION_RECORDED', ?, ?, ?)",
+                    (request.event_id, request.repository_id, request.run_id,
+                     request.item_id, sequence, request.command_id, writer_epoch,
+                     request.expected_run_head, event_hash, body_json),
+                )
+                source_control_row = source_control_rows[0]
+                resolution_body = json.dumps(
+                    {
+                        "event_id": request.event_id,
+                        "proof_event_hash": event_hash,
+                        "proof_event_id": request.event_id,
+                        "proof_kind": "ORDERED_SOURCE_CONTROL_SETTLEMENT",
+                        "reconciliation_id": request.recovery_id,
+                        "schema_version": 1,
+                        "uncertainty_id": source_control_row["uncertainty_id"],
+                    }, sort_keys=True, separators=(",", ":"),
+                )
+                connection.execute(
+                    "INSERT INTO uncertainty_resolutions VALUES "
+                    "(?, ?, ?, 'ORDERED_SOURCE_CONTROL_SETTLEMENT', ?, ?, ?)",
+                    (source_control_row["uncertainty_id"], request.recovery_id,
+                     request.event_id, request.event_id,
+                     event_hash, resolution_body),
+                )
+                connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ?",
+                    (source_control_row["fence_id"],),
+                )
+                extra_values = (
+                    capability.claim_id, capability.grant_id,
+                    capability.scope_digest, authority.issuer_fingerprint,
+                    capability.issuer_mac, evidence.proof_id,
+                    evidence.request_digest, evidence.issuer_fingerprint,
+                    evidence.issuer_mac, source_control_evidence.proof_id,
+                    source_control_evidence.request_digest,
+                    source_control_evidence.issuer_fingerprint,
+                    source_control_evidence.issuer_mac,
+                    payload_digest, event_hash,
+                    LifecycleState.PAUSED.value, body_json,
+                )
+                stored_columns = (
+                    "recovery_id", "authorization_id", "command_id", "event_id",
+                    "repository_id", "run_id", "item_id", "logical_effect_id",
+                    "prior_attempt_id", "successor_attempt_id", "plan_id",
+                    "revision_digest", "effect_descriptor_digest",
+                    "original_effect_key", "outcome_uncertainty_id",
+                    "outcome_fence_id", "source_control_uncertainty_id",
+                    "source_control_fence_id", "source_control_settlement_id",
+                    "retained_pause_fence_id",
+                    "resolved_uncertainty_ids_json",
+                    "retry_contract_id",
+                    "reviewed_approval_id", "retry_contract_digest",
+                    "target_idempotency_expires_at_utc",
+                    "concurrent_old_attempts_safe", "original_key_lookup_complete",
+                    "mutation_paths_digest", "mutation_paths_complete",
+                    "continuation_cursor", "source_generation", "target_generation",
+                    "expected_catalog_head", "expected_run_head",
+                )
+                ordered_request_values = (
+                    request.recovery_id, request.authorization_id,
+                    request.command_id, request.event_id, request.repository_id,
+                    request.run_id, request.item_id, request.logical_effect_id,
+                    request.prior_attempt_id, request.successor_attempt_id,
+                    request.plan_id, request.revision_digest,
+                    request.effect_descriptor_digest, request.original_effect_key,
+                    request.outcome_uncertainty_id, request.outcome_fence_id,
+                    request.source_control_uncertainty_id,
+                    request.source_control_fence_id,
+                    request.source_control_settlement_id,
+                    request.retained_pause_fence_id,
+                    json.dumps(request.resolved_uncertainty_ids),
+                    request.retry_contract_id, request.reviewed_approval_id,
+                    request.retry_contract_digest,
+                    request.target_idempotency_expires_at_utc,
+                    request.concurrent_old_attempts_safe,
+                    request.original_key_lookup_complete,
+                    request.mutation_paths_digest, request.mutation_paths_complete,
+                    request.continuation_cursor, request.expected_slot_generation,
+                    request.target_slot_generation, request.expected_catalog_head,
+                    request.expected_run_head,
+                )
+                insert_columns = stored_columns + (
+                    "capability_claim_id", "capability_grant_id",
+                    "capability_scope_digest", "capability_issuer_fingerprint",
+                    "capability_issuer_mac", "evidence_proof_id",
+                    "evidence_request_digest", "evidence_issuer_fingerprint",
+                    "evidence_issuer_mac", "source_control_proof_id",
+                    "source_control_request_digest",
+                    "source_control_issuer_fingerprint",
+                    "source_control_issuer_mac", "payload_digest", "event_hash",
+                    "resulting_state", "body_json",
+                )
+                connection.execute(
+                    "INSERT INTO safe_same_effect_retry_actions ("
+                    + ",".join(insert_columns) + ") VALUES ("
+                    + ",".join("?" for _ in insert_columns) + ")",
+                    ordered_request_values + extra_values,
+                )
+                authorization_body = json.dumps({
+                    "authorization_id": request.authorization_id,
+                    "recovery_id": request.recovery_id,
+                    "repository_id": request.repository_id,
+                    "run_id": request.run_id, "item_id": request.item_id,
+                    "logical_effect_id": request.logical_effect_id,
+                    "prior_attempt_id": request.prior_attempt_id,
+                    "successor_attempt_id": request.successor_attempt_id,
+                    "source_generation": request.expected_slot_generation,
+                    "target_generation": request.target_slot_generation,
+                    "outcome_uncertainty_id": request.outcome_uncertainty_id,
+                    "outcome_fence_id": request.outcome_fence_id,
+                    "covered_activity_uncertainty_ids": list(
+                        request.resolved_uncertainty_ids
+                    ),
+                    "status": "AVAILABLE",
+                }, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO safe_same_effect_retry_authorizations VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'AVAILABLE', NULL, "
+                    "NULL, ?)",
+                    (request.authorization_id, request.recovery_id,
+                     request.repository_id, request.run_id, request.item_id,
+                     request.logical_effect_id, request.prior_attempt_id,
+                     request.successor_attempt_id,
+                     request.expected_slot_generation,
+                     request.target_slot_generation,
+                     request.outcome_uncertainty_id, request.outcome_fence_id,
+                     json.dumps(request.resolved_uncertainty_ids),
+                     authorization_body),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'AUTHORIZE_SAFE_SAME_EFFECT_RETRY', ?, ?)",
+                    (capability.claim_id, request.repository_id,
+                     capability.grant_id, request.command_id, request.run_id,
+                     capability.scope_digest, authority.issuer_fingerprint),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (request.command_id, payload_digest, request.event_id,
+                     sequence, event_hash),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSED', "
+                    "continuation_cursor = NULL, head_sequence = ?, head_hash = ? "
+                    "WHERE run_id = ?", (sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = ?", (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_safe_retry_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_safe_retry_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.recovery_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.PAUSED, False,
         )
 
     def recover_proven_nonexecution(
@@ -22937,6 +23887,10 @@ class SQLiteStateStore:
         recovered_nonexecution = isinstance(
             request, ProvenNonexecutionIntentRequest
         )
+        safe_same_effect_retry = isinstance(
+            request, SafeSameEffectRetryIntentRequest
+        )
+        recovered_retry = recovered_nonexecution or safe_same_effect_retry
         if request.repository_id != self._repository_id:
             raise DispatchDenied("intent targets a different repository")
         capability_binding = (
@@ -23120,19 +24074,37 @@ class SQLiteStateStore:
                 )
 
                 recovery_authorization = None
-                if recovered_nonexecution:
-                    assert isinstance(request, ProvenNonexecutionIntentRequest)
-                    recovery_authorization = connection.execute(
-                        "SELECT authorization.*, recovery.plan_id, "
-                        "recovery.revision_digest, "
-                        "recovery.effect_descriptor_digest, "
-                        "recovery.event_id AS recovery_event_id FROM "
-                        "operation_retry_authorizations AS authorization JOIN "
-                        "operation_recovery_actions AS recovery ON "
-                        "recovery.recovery_id = authorization.recovery_id "
-                        "WHERE authorization.authorization_id = ?",
-                        (request.recovery_authorization_id,),
-                    ).fetchone()
+                if recovered_retry:
+                    assert isinstance(
+                        request,
+                        (ProvenNonexecutionIntentRequest,
+                         SafeSameEffectRetryIntentRequest),
+                    )
+                    if safe_same_effect_retry:
+                        recovery_authorization = connection.execute(
+                            "SELECT authorization.*, recovery.plan_id, "
+                            "recovery.revision_digest, "
+                            "recovery.effect_descriptor_digest, "
+                            "recovery.target_idempotency_expires_at_utc, "
+                            "recovery.event_id AS recovery_event_id FROM "
+                            "safe_same_effect_retry_authorizations AS authorization "
+                            "JOIN safe_same_effect_retry_actions AS recovery ON "
+                            "recovery.recovery_id = authorization.recovery_id "
+                            "WHERE authorization.authorization_id = ?",
+                            (request.recovery_authorization_id,),
+                        ).fetchone()
+                    else:
+                        recovery_authorization = connection.execute(
+                            "SELECT authorization.*, recovery.plan_id, "
+                            "recovery.revision_digest, "
+                            "recovery.effect_descriptor_digest, "
+                            "recovery.event_id AS recovery_event_id FROM "
+                            "operation_retry_authorizations AS authorization JOIN "
+                            "operation_recovery_actions AS recovery ON "
+                            "recovery.recovery_id = authorization.recovery_id "
+                            "WHERE authorization.authorization_id = ?",
+                            (request.recovery_authorization_id,),
+                        ).fetchone()
                     slot = connection.execute(
                         "SELECT * FROM outstanding_slot WHERE repository_id = ?",
                         (request.repository_id,),
@@ -23186,18 +24158,49 @@ class SQLiteStateStore:
                         raise DispatchDenied(
                             "recovered intent is contradicted by a receipt"
                         )
+                    if safe_same_effect_retry:
+                        self._require_safe_retry_protection_current(
+                            recovery_authorization[
+                                "target_idempotency_expires_at_utc"
+                            ]
+                        )
                 elif connection.execute(
                     "SELECT 1 FROM outstanding_slot"
                 ).fetchone():
                     raise DispatchDenied(
                         "another operation owns the repository slot"
                     )
-                if connection.execute(
+                active_fences = connection.execute(
                     "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
                     "(item_id IS NULL AND logical_effect_id IS NULL) OR "
-                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    "item_id = ? OR logical_effect_id = ?)",
                     (request.repository_id, request.item_id, request.logical_effect_id),
-                ).fetchone():
+                ).fetchall()
+                if safe_same_effect_retry:
+                    allowed_fences = {
+                        str(recovery_authorization["outcome_fence_id"]),
+                        *(
+                            str(value) for value in json.loads(str(
+                                recovery_authorization[
+                                    "covered_activity_uncertainty_ids_json"
+                                ]
+                            ))
+                        ),
+                    }
+                    fence_ids = {
+                        str(row["fence_id"])
+                        for row in connection.execute(
+                            "SELECT fence_id FROM dispatch_fences WHERE "
+                            "repository_id = ? AND ((item_id IS NULL AND "
+                            "logical_effect_id IS NULL) OR item_id = ? OR "
+                            "logical_effect_id = ?)",
+                            (request.repository_id, request.item_id,
+                             request.logical_effect_id),
+                        )
+                    }
+                    if fence_ids != allowed_fences:
+                        raise DispatchDenied("safe retry has another active fence")
+                elif active_fences:
                     raise DispatchDenied("repository has an active dispatch fence")
 
                 plan_body = json.loads(str(plan["body_json"]))
@@ -23278,11 +24281,11 @@ class SQLiteStateStore:
                 if existing_effect is not None:
                     if existing_effect["descriptor_digest"] != request.effect_descriptor_digest:
                         raise StorageIntegrityError("logical effect changed descriptor")
-                    if not recovered_nonexecution:
+                    if not recovered_retry:
                         raise DispatchDenied(
                             "logical effect already has durable history"
                         )
-                elif recovered_nonexecution:
+                elif recovered_retry:
                     raise StorageIntegrityError(
                         "recovered logical effect lost its durable history"
                     )
@@ -23347,13 +24350,21 @@ class SQLiteStateStore:
                         ],
                     }
                 )
-                if recovered_nonexecution:
-                    assert isinstance(request, ProvenNonexecutionIntentRequest)
+                if recovered_retry:
+                    assert isinstance(
+                        request,
+                        (ProvenNonexecutionIntentRequest,
+                         SafeSameEffectRetryIntentRequest),
+                    )
                     assert recovery_authorization is not None
                     body.update(
                         {
                             "intent_binding_version": 4,
-                            "intent_kind": "PROVEN_NONEXECUTION_RETRY",
+                            "intent_kind": (
+                                "SAFE_SAME_EFFECT_RETRY"
+                                if safe_same_effect_retry
+                                else "PROVEN_NONEXECUTION_RETRY"
+                            ),
                             "recovery_authorization_id": (
                                 request.recovery_authorization_id
                             ),
@@ -23378,7 +24389,7 @@ class SQLiteStateStore:
                     )
                 event_hash = self._event_hash(body)
                 body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
-                if not recovered_nonexecution:
+                if not recovered_retry:
                     connection.execute(
                         "INSERT INTO effects VALUES (?, ?, ?, ?)",
                         (
@@ -23456,8 +24467,12 @@ class SQLiteStateStore:
                         request.attempt_id,
                     ),
                 )
-                if recovered_nonexecution:
-                    assert isinstance(request, ProvenNonexecutionIntentRequest)
+                if recovered_retry:
+                    assert isinstance(
+                        request,
+                        (ProvenNonexecutionIntentRequest,
+                         SafeSameEffectRetryIntentRequest),
+                    )
                     assert recovery_authorization is not None
                     if connection.execute(
                         "UPDATE outstanding_slot SET attempt_id = ?, "
@@ -23486,8 +24501,13 @@ class SQLiteStateStore:
                         },
                         sort_keys=True, separators=(",", ":"),
                     )
+                    authorization_table = (
+                        "safe_same_effect_retry_authorizations"
+                        if safe_same_effect_retry
+                        else "operation_retry_authorizations"
+                    )
                     if connection.execute(
-                        "UPDATE operation_retry_authorizations SET status = "
+                        f"UPDATE {authorization_table} SET status = "
                         "'CONSUMED', consuming_event_id = ?, body_json = ? "
                         "WHERE authorization_id = ? AND status = 'AVAILABLE'",
                         (
@@ -23545,6 +24565,10 @@ class SQLiteStateStore:
                 if failure_hook is not None:
                     failure_hook("after_intent_writes_before_commit")
                 connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_intent_commit_before_acknowledgement"
+                    )
             except BaseException:
                 connection.rollback()
                 raise
@@ -23567,7 +24591,10 @@ class SQLiteStateStore:
         request.validate()
         expected_slot_generation = (
             request.expected_target_generation
-            if isinstance(request, ProvenNonexecutionIntentRequest)
+            if isinstance(
+                request,
+                (ProvenNonexecutionIntentRequest, SafeSameEffectRetryIntentRequest),
+            )
             else 1
         )
         if request.repository_id != self._repository_id:
@@ -23683,15 +24710,24 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "operation launch requires an unsettled reservation"
                     )
-                if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? "
+                applicable_fence_ids = {
+                    str(row["fence_id"])
+                    for row in connection.execute(
+                    "SELECT fence_id FROM dispatch_fences WHERE repository_id = ? "
                     "AND ((item_id IS NULL AND logical_effect_id IS NULL) OR "
-                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    "item_id = ? OR logical_effect_id = ?)",
                     (
                         request.repository_id, request.item_id,
                         request.logical_effect_id,
                     ),
-                ).fetchone() is not None:
+                )}
+                allowed_fence_ids: set[str] = set()
+                if isinstance(request, SafeSameEffectRetryIntentRequest):
+                    allowed_fence_ids = self._safe_retry_dispatch_fence_ids(
+                        connection, request,
+                        consuming_event_id=commit.event_id,
+                    )
+                if applicable_fence_ids != allowed_fence_ids:
                     raise DispatchDenied(
                         "operation launch has an active dispatch fence"
                     )
@@ -23727,7 +24763,11 @@ class SQLiteStateStore:
                     "sequence": sequence,
                     "writer_epoch": writer_epoch,
                 }
-                if isinstance(request, ProvenNonexecutionIntentRequest):
+                if isinstance(
+                    request,
+                    (ProvenNonexecutionIntentRequest,
+                     SafeSameEffectRetryIntentRequest),
+                ):
                     body.update(
                         {
                             "launch_binding_version": 2,
@@ -23788,7 +24828,10 @@ class SQLiteStateStore:
     ) -> None:
         expected_slot_generation = (
             request.expected_target_generation
-            if isinstance(request, ProvenNonexecutionIntentRequest)
+            if isinstance(
+                request,
+                (ProvenNonexecutionIntentRequest, SafeSameEffectRetryIntentRequest),
+            )
             else 1
         )
         with self._writer_lock(), closing(
@@ -23892,15 +24935,24 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "adapter contact requires an unsettled reservation"
                     )
-                if connection.execute(
-                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
+                applicable_fence_ids = {
+                    str(row["fence_id"])
+                    for row in connection.execute(
+                    "SELECT fence_id FROM dispatch_fences WHERE repository_id = ? AND ("
                     "(item_id IS NULL AND logical_effect_id IS NULL) OR "
-                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    "item_id = ? OR logical_effect_id = ?)",
                     (
                         request.repository_id, request.item_id,
                         request.logical_effect_id,
                     ),
-                ).fetchone() is not None:
+                )}
+                allowed_fence_ids: set[str] = set()
+                if isinstance(request, SafeSameEffectRetryIntentRequest):
+                    allowed_fence_ids = self._safe_retry_dispatch_fence_ids(
+                        connection, request,
+                        consuming_event_id=commit.event_id,
+                    )
+                if applicable_fence_ids != allowed_fence_ids:
                     raise DispatchDenied("adapter contact has an active dispatch fence")
                 self._claim_adapter_contact(
                     connection,
@@ -23914,12 +24966,20 @@ class SQLiteStateStore:
                     target_digest=target_digest,
                     slot_generation=(
                         expected_slot_generation
-                        if isinstance(request, ProvenNonexecutionIntentRequest)
+                        if isinstance(
+                            request,
+                            (ProvenNonexecutionIntentRequest,
+                             SafeSameEffectRetryIntentRequest),
+                        )
                         else None
                     ),
                     recovery_authorization_id=(
                         request.recovery_authorization_id
-                        if isinstance(request, ProvenNonexecutionIntentRequest)
+                        if isinstance(
+                            request,
+                            (ProvenNonexecutionIntentRequest,
+                             SafeSameEffectRetryIntentRequest),
+                        )
                         else None
                     ),
                 )
@@ -24826,7 +25886,9 @@ class SQLiteStateStore:
                     )
                 return 1, None
             if (
-                body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY"
+                body.get("intent_kind") not in {
+                    "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+                }
                 or body.get("intent_binding_version") not in {2, 4}
                 or type(body.get("expected_source_generation")) is not int
                 or type(body.get("expected_target_generation")) is not int
@@ -24841,10 +25903,19 @@ class SQLiteStateStore:
                 or not body["prior_attempt_id"]
             ):
                 raise ValueError("recovered operation intent is malformed")
+            safe_retry = body.get("intent_kind") == "SAFE_SAME_EFFECT_RETRY"
+            authorization_table = (
+                "safe_same_effect_retry_authorizations"
+                if safe_retry else "operation_retry_authorizations"
+            )
+            recovery_table = (
+                "safe_same_effect_retry_actions"
+                if safe_retry else "operation_recovery_actions"
+            )
             authorization = connection.execute(
-                "SELECT authorization.*, recovery.event_id AS "
-                "recovery_event_id FROM operation_retry_authorizations AS "
-                "authorization JOIN operation_recovery_actions AS recovery "
+                f"SELECT authorization.*, recovery.event_id AS "
+                f"recovery_event_id FROM {authorization_table} AS "
+                f"authorization JOIN {recovery_table} AS recovery "
                 "ON recovery.recovery_id = authorization.recovery_id WHERE "
                 "authorization.authorization_id = ?",
                 (body["recovery_authorization_id"],),
@@ -26013,6 +27084,19 @@ class SQLiteStateStore:
                         request.logical_effect_id, request.attempt_id,
                     ),
                 ).fetchone()
+                retry_authorization_table = "operation_retry_authorizations"
+                if retry_authorization is None:
+                    retry_authorization = connection.execute(
+                        "SELECT * FROM safe_same_effect_retry_authorizations "
+                        "WHERE repository_id = ? AND run_id = ? AND item_id = ? "
+                        "AND logical_effect_id = ? AND prior_attempt_id = ? AND "
+                        "status IN ('AVAILABLE', 'CONSUMED')",
+                        (request.repository_id, request.run_id, request.item_id,
+                         request.logical_effect_id, request.attempt_id),
+                    ).fetchone()
+                    retry_authorization_table = (
+                        "safe_same_effect_retry_authorizations"
+                    )
                 self._require_plan_issuer(
                     connection,
                     request.repository_id,
@@ -26494,7 +27578,7 @@ class SQLiteStateStore:
                         sort_keys=True, separators=(",", ":"),
                     )
                     if connection.execute(
-                        "UPDATE operation_retry_authorizations SET status = "
+                        f"UPDATE {retry_authorization_table} SET status = "
                         "'DISABLED', disabling_event_id = ?, body_json = ? "
                         "WHERE authorization_id = ? AND status = ?",
                         (
@@ -33709,7 +34793,9 @@ class SQLiteStateStore:
             "acceptance_evidence_digest",
         }
         for intent_body in intents:
-            if intent_body.get("intent_kind") != "PROVEN_NONEXECUTION_RETRY":
+            if intent_body.get("intent_kind") not in {
+                "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+            }:
                 continue
             binding_version = intent_body.get("intent_binding_version")
             expected_fields = (
@@ -33800,13 +34886,24 @@ class SQLiteStateStore:
                 self._verify_intent_readiness_successor_vector(
                     connection, intent_body, readiness, evidence
                 )
+            safe_retry = intent_body.get("intent_kind") == (
+                "SAFE_SAME_EFFECT_RETRY"
+            )
+            authorization_table = (
+                "safe_same_effect_retry_authorizations"
+                if safe_retry else "operation_retry_authorizations"
+            )
+            recovery_table = (
+                "safe_same_effect_retry_actions"
+                if safe_retry else "operation_recovery_actions"
+            )
             authorization = connection.execute(
                 "SELECT authorization.*, recovery.event_id AS "
                 "recovery_event_id, recovery.plan_id, "
                 "recovery.revision_digest, "
                 "recovery.effect_descriptor_digest, event.sequence AS "
-                "recovery_sequence FROM operation_retry_authorizations AS "
-                "authorization JOIN operation_recovery_actions AS recovery "
+                f"recovery_sequence FROM {authorization_table} AS "
+                f"authorization JOIN {recovery_table} AS recovery "
                 "ON recovery.recovery_id = authorization.recovery_id JOIN "
                 "events AS event ON event.event_id = recovery.event_id WHERE "
                 "authorization.authorization_id = ?",
@@ -33861,11 +34958,20 @@ class SQLiteStateStore:
                     int(intent_body["writer_epoch"]),
                 )
             )
-            if historical_fences or historical_slot != (
+            permitted_historical_fences: set[str] = set()
+            if set(historical_fences) != permitted_historical_fences:
+                raise StorageIntegrityError(
+                    "recovered intent bypassed a historical fence"
+                )
+            if historical_slot != (
                 intent_body["run_id"], intent_body["logical_effect_id"],
                 intent_body["prior_attempt_id"],
                 intent_body["expected_source_generation"],
-            ) or connection.execute(
+            ):
+                raise StorageIntegrityError(
+                    "recovered intent lost its historical source slot"
+                )
+            if connection.execute(
                 "SELECT 1 FROM effect_observations AS observation JOIN events "
                 "AS event ON event.event_id = observation.event_id WHERE "
                 "observation.repository_id = ? AND observation.run_id = ? "
@@ -33878,7 +34984,7 @@ class SQLiteStateStore:
                 ),
             ).fetchone() is not None:
                 raise StorageIntegrityError(
-                    "recovered intent bypassed a historical prohibition"
+                    "recovered intent bypassed a historical observation"
                 )
         for launch_body in launches:
             intent_body = intents_by_event.get(launch_body["intent_event_id"])
@@ -33897,7 +35003,9 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "operation launch diverges from its durable intent"
                 )
-            if intent_body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY":
+            if intent_body.get("intent_kind") in {
+                "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+            }:
                 if (
                     launch_body.get("launch_binding_version") != 2
                     or launch_body.get("recovery_authorization_id")
@@ -34006,9 +35114,9 @@ class SQLiteStateStore:
             if launch_body is None:
                 continue
             intent_body = intents_by_event.get(launch_body["intent_event_id"])
-            if intent_body is not None and intent_body.get("intent_kind") == (
-                "PROVEN_NONEXECUTION_RETRY"
-            ) and (
+            if intent_body is not None and intent_body.get("intent_kind") in {
+                "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+            } and (
                 contact_body.get("contact_binding_version") != 2
                 or contact_body.get("recovery_authorization_id")
                 != intent_body["recovery_authorization_id"]
@@ -34619,11 +35727,10 @@ class SQLiteStateStore:
         def intent_request_from_body(
             body: Mapping[str, object],
         ) -> IntentRequest:
-            request_type = (
-                ProvenNonexecutionIntentRequest
-                if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
-                else IntentRequest
-            )
+            request_type = {
+                "PROVEN_NONEXECUTION_RETRY": ProvenNonexecutionIntentRequest,
+                "SAFE_SAME_EFFECT_RETRY": SafeSameEffectRetryIntentRequest,
+            }.get(body.get("intent_kind"), IntentRequest)
             reconstructed = request_type(
                 **self._durable_intent_fields(body)
             )
@@ -35091,14 +36198,28 @@ class SQLiteStateStore:
             body for body in reconciliations
             if body.get("route") == "OWNER_NONDISPATCHING_DISPOSITION"
         ]
+        safe_retry_reconciliations = [
+            body for body in reconciliations
+            if body.get("route") == "SAFE_SAME_EFFECT_RETRY"
+        ]
         if len(reconciliations) != (
             len(validator_reconciliations)
             + len(verified_receipt_reconciliations)
             + len(proof_free_dispositions)
+            + len(safe_retry_reconciliations)
         ):
             raise StorageIntegrityError(
                 "reconciliation history contains an unknown route"
             )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in safe_retry_reconciliations
+            }
+        )
         reconciliation_resume_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND "
             "event_kind = 'RECONCILIATION_PAUSE_RESUMED'",
@@ -36185,6 +37306,8 @@ class SQLiteStateStore:
                     ),
                 ).fetchone()
                 source_is_validation = False
+                source_is_safe_retry = False
+                safe_retry_allowed_fence_ids: set[str] = set()
                 if source is None:
                     source = connection.execute(
                         "SELECT * FROM validation_pause_actions WHERE "
@@ -36199,16 +37322,78 @@ class SQLiteStateStore:
                         ),
                     ).fetchone()
                     source_is_validation = source is not None
+                if source is None:
+                    source = connection.execute(
+                        "SELECT recovery.*, pause.event_id AS pause_event_id, "
+                        "authorization.consuming_event_id, "
+                        "authorization.disabling_event_id FROM "
+                        "safe_same_effect_retry_actions AS recovery JOIN "
+                        "safe_same_effect_retry_authorizations AS authorization "
+                        "ON authorization.recovery_id = recovery.recovery_id JOIN "
+                        "external_pause_actions AS pause ON pause.pause_id = ? "
+                        "AND pause.fence_id = recovery.retained_pause_fence_id "
+                        "LEFT JOIN events AS consuming_event ON "
+                        "consuming_event.event_id = authorization.consuming_event_id "
+                        "LEFT JOIN events AS disabling_event ON "
+                        "disabling_event.event_id = authorization.disabling_event_id "
+                        "WHERE recovery.event_id = ? AND recovery.event_hash = ? "
+                        "AND recovery.repository_id = ? AND recovery.run_id = ? "
+                        "AND recovery.item_id = ? AND recovery.logical_effect_id = ? "
+                        "AND recovery.resulting_state = 'PAUSED' AND "
+                        "(consuming_event.writer_epoch IS NULL OR "
+                        "consuming_event.writer_epoch > ?) AND "
+                        "(disabling_event.writer_epoch IS NULL OR "
+                        "disabling_event.writer_epoch > ?)",
+                        (
+                            request.source_pause_id,
+                            request.source_pause_settled_event_id,
+                            request.source_pause_settled_event_hash,
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            int(body["writer_epoch"]), int(body["writer_epoch"]),
+                        ),
+                    ).fetchone()
+                    source_is_safe_retry = source is not None
+                    if source_is_safe_retry:
+                        safe_retry_allowed_fence_ids.add(
+                            str(source["outcome_fence_id"])
+                        )
+                        for uncertainty_id in json.loads(str(
+                            source["resolved_uncertainty_ids_json"]
+                        )):
+                            uncertainty = connection.execute(
+                                "SELECT fence_id FROM uncertainty_instances "
+                                "WHERE uncertainty_id = ? AND repository_id = ? "
+                                "AND run_id = ? AND item_id = ? AND "
+                                "logical_effect_id = ? AND attempt_id = ? AND "
+                                "uncertainty_kind = 'ACTIVITY'",
+                                (
+                                    uncertainty_id, request.repository_id,
+                                    request.run_id, request.item_id,
+                                    request.logical_effect_id,
+                                    source["prior_attempt_id"],
+                                ),
+                            ).fetchone()
+                            if uncertainty is None:
+                                raise DispatchDenied(
+                                    "safe-retry resume lost covered activity "
+                                    "uncertainty"
+                                )
+                            safe_retry_allowed_fence_ids.add(
+                                str(uncertainty["fence_id"])
+                            )
                 source_preserved_lifecycle = (
                     LifecycleState.VALIDATING.value
                     if source_is_validation
+                    else LifecycleState.PLANNED.value
+                    if source_is_safe_retry
                     else (
                         None if source is None
                         else source["preserved_lifecycle"]
                     )
                 )
                 source_cursor = (
-                    None if source is None else source[
+                    None if source is None or source_is_safe_retry else source[
                         "preserved_continuation_cursor"
                     ]
                 )
@@ -36242,7 +37427,10 @@ class SQLiteStateStore:
                     raise DispatchDenied("resume source pause fence was inactive")
                 blockers: set[str] = set()
                 for fence_id, scope in historical_fences.items():
-                    if fence_id == request.pause_fence_id:
+                    if (
+                        fence_id == request.pause_fence_id
+                        or fence_id in safe_retry_allowed_fence_ids
+                    ):
                         continue
                     if (
                         scope[0] is None or scope[0] == request.item_id
@@ -36303,14 +37491,15 @@ class SQLiteStateStore:
                         before_writer_epoch=int(body["writer_epoch"]),
                     )
                 )
+                unresolved_contacts = self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id,
+                    before_sequence=int(body["sequence"]),
+                )
                 if (
                     validator_checkpoint is not None
                     and validator_checkpoint["checkpoint_kind"]
                     != "ELIGIBLE_RESULT_SETTLED"
-                ) or self._unresolved_contact_reservations(
-                    connection, request.repository_id, request.run_id,
-                    before_sequence=int(body["sequence"]),
-                ):
+                ) or (unresolved_contacts and not source_is_safe_retry):
                     raise DispatchDenied(
                         "resume history bypassed unresolved owned activity"
                     )
@@ -37995,7 +39184,9 @@ class SQLiteStateStore:
         recovered_intents_by_authorization = {
             body["recovery_authorization_id"]: body
             for body in intents
-            if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
+            if body.get("intent_kind") in {
+                "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+            }
         }
         retry_invalidations_by_authorization = {
             body["invalidated_retry_authorization_id"]: body
@@ -38078,6 +39269,81 @@ class SQLiteStateStore:
         if actual_retry_authorizations != expected_retry_authorizations:
             raise StorageIntegrityError(
                 "operation retry authorization projection diverges from history"
+            )
+        safe_intents_by_authorization = {
+            body["recovery_authorization_id"]: body
+            for body in intents
+            if body.get("intent_kind") == "SAFE_SAME_EFFECT_RETRY"
+        }
+        expected_safe_authorizations = {}
+        for body in safe_retry_reconciliations:
+            authorization_body = {
+                "authorization_id": body["authorization_id"],
+                "recovery_id": body["recovery_id"],
+                "repository_id": body["repository_id"],
+                "run_id": body["run_id"], "item_id": body["item_id"],
+                "logical_effect_id": body["logical_effect_id"],
+                "prior_attempt_id": body["prior_attempt_id"],
+                "successor_attempt_id": body["successor_attempt_id"],
+                "source_generation": body["expected_slot_generation"],
+                "target_generation": body["target_slot_generation"],
+                "outcome_uncertainty_id": body["outcome_uncertainty_id"],
+                "outcome_fence_id": body["outcome_fence_id"],
+                "covered_activity_uncertainty_ids": body[
+                    "resolved_uncertainty_ids"
+                ],
+                "status": "AVAILABLE",
+            }
+            consuming = safe_intents_by_authorization.get(body["authorization_id"])
+            status = "AVAILABLE"
+            consuming_event_id = None
+            if consuming is not None:
+                status = "CONSUMED"
+                consuming_event_id = consuming["event_id"]
+                authorization_body.update(
+                    status=status, consuming_event_id=consuming_event_id
+                )
+            disabling = retry_invalidations_by_authorization.get(
+                body["authorization_id"]
+            )
+            disabling_event_id = None
+            if disabling is not None:
+                status = "DISABLED"
+                disabling_event_id = disabling["event_id"]
+                authorization_body.update(
+                    status=status, disabling_event_id=disabling_event_id
+                )
+            expected_safe_authorizations[body["authorization_id"]] = (
+                body["recovery_id"], body["run_id"], body["item_id"],
+                body["logical_effect_id"], body["prior_attempt_id"],
+                body["successor_attempt_id"], body["expected_slot_generation"],
+                body["target_slot_generation"], body["outcome_uncertainty_id"],
+                body["outcome_fence_id"],
+                json.dumps(body["resolved_uncertainty_ids"]),
+                status, consuming_event_id,
+                disabling_event_id, json.dumps(
+                    authorization_body, sort_keys=True, separators=(",", ":")
+                ),
+            )
+        actual_safe_authorizations = {
+            row["authorization_id"]: (
+                row["recovery_id"], row["run_id"], row["item_id"],
+                row["logical_effect_id"], row["prior_attempt_id"],
+                row["successor_attempt_id"], int(row["source_generation"]),
+                int(row["target_generation"]), row["outcome_uncertainty_id"],
+                row["outcome_fence_id"],
+                row["covered_activity_uncertainty_ids_json"], row["status"],
+                row["consuming_event_id"], row["disabling_event_id"],
+                row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM safe_same_effect_retry_authorizations WHERE "
+                "repository_id = ?", (repository_id,)
+            )
+        }
+        if actual_safe_authorizations != expected_safe_authorizations:
+            raise StorageIntegrityError(
+                "safe-retry authorization projection diverges from history"
             )
         expected_controls: dict[str, tuple[object, ...]] = {}
         for body in pauses:
@@ -38911,6 +40177,18 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in operation_recoveries
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"],
+                    "AUTHORIZE_SAFE_SAME_EFFECT_RETRY",
+                    body["capability_evidence"]["scope_digest"],
+                    body["evidence"]["issuer_fingerprint"],
+                )
+                for body in safe_retry_reconciliations
             }
         )
         expected_operator_redemptions.update(
@@ -39823,6 +41101,37 @@ class SQLiteStateStore:
                         separators=(",", ":"),
                     ),
                 )
+        for body in safe_retry_reconciliations:
+            uncertainty_id = body["source_control_uncertainty_id"]
+            if uncertainty_id not in expected_uncertainties:
+                raise StorageIntegrityError(
+                    "safe retry settles an unknown source-control uncertainty"
+                )
+            if expected_uncertainties[uncertainty_id][1] != "SOURCE_CONTROL":
+                raise StorageIntegrityError(
+                    "safe retry source-control settlement changed kind"
+                )
+            if uncertainty_id in expected_resolutions:
+                raise StorageIntegrityError(
+                    "safe retry settles source control more than once"
+                )
+            resolution_body = {
+                "event_id": body["event_id"],
+                "proof_event_hash": self._event_hash(body),
+                "proof_event_id": body["event_id"],
+                "proof_kind": "ORDERED_SOURCE_CONTROL_SETTLEMENT",
+                "reconciliation_id": body["recovery_id"],
+                "schema_version": 1,
+                "uncertainty_id": uncertainty_id,
+            }
+            expected_resolutions[uncertainty_id] = (
+                body["recovery_id"], body["event_id"],
+                "ORDERED_SOURCE_CONTROL_SETTLEMENT",
+                body["event_id"],
+                self._event_hash(body), json.dumps(
+                    resolution_body, sort_keys=True, separators=(",", ":")
+                ),
+            )
         actual_resolutions = {
             row["uncertainty_id"]: (
                 row["reconciliation_id"], row["event_id"],
@@ -39915,6 +41224,91 @@ class SQLiteStateStore:
         if actual_proof_free_actions != expected_proof_free_actions:
             raise StorageIntegrityError(
                 "proof-free disposition projection diverges from event history"
+            )
+        expected_safe_retry_actions = {
+            body["recovery_id"]: (
+                body["authorization_id"], body["command_id"], body["event_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["prior_attempt_id"], body["successor_attempt_id"],
+                body["expected_slot_generation"], body["target_slot_generation"],
+                body["plan_id"], body["revision_digest"],
+                body["effect_descriptor_digest"], body["original_effect_key"],
+                body["outcome_uncertainty_id"], body["outcome_fence_id"],
+                body["source_control_uncertainty_id"],
+                body["source_control_fence_id"],
+                body["source_control_settlement_id"],
+                body["retained_pause_fence_id"],
+                json.dumps(body["resolved_uncertainty_ids"]),
+                body["retry_contract_id"], body["reviewed_approval_id"],
+                body["retry_contract_digest"],
+                body["target_idempotency_expires_at_utc"],
+                int(body["concurrent_old_attempts_safe"]),
+                int(body["original_key_lookup_complete"]),
+                body["mutation_paths_digest"],
+                int(body["mutation_paths_complete"]),
+                body["continuation_cursor"], body["expected_catalog_head"],
+                body["expected_run_head"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["evidence"]["issuer_fingerprint"],
+                body["capability_evidence"]["issuer_mac"],
+                body["evidence"]["proof_id"],
+                body["evidence"]["request_digest"],
+                body["evidence"]["issuer_fingerprint"],
+                body["evidence"]["issuer_mac"],
+                body["source_control_evidence"]["proof_id"],
+                body["source_control_evidence"]["request_digest"],
+                body["source_control_evidence"]["issuer_fingerprint"],
+                body["source_control_evidence"]["issuer_mac"],
+                body["payload_digest"],
+                self._event_hash(body), body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in safe_retry_reconciliations
+        }
+        actual_safe_retry_actions = {
+            row["recovery_id"]: (
+                row["authorization_id"], row["command_id"], row["event_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["prior_attempt_id"], row["successor_attempt_id"],
+                int(row["source_generation"]), int(row["target_generation"]),
+                row["plan_id"], row["revision_digest"],
+                row["effect_descriptor_digest"], row["original_effect_key"],
+                row["outcome_uncertainty_id"], row["outcome_fence_id"],
+                row["source_control_uncertainty_id"],
+                row["source_control_fence_id"],
+                row["source_control_settlement_id"],
+                row["retained_pause_fence_id"],
+                row["resolved_uncertainty_ids_json"],
+                row["retry_contract_id"], row["reviewed_approval_id"],
+                row["retry_contract_digest"],
+                row["target_idempotency_expires_at_utc"],
+                int(row["concurrent_old_attempts_safe"]),
+                int(row["original_key_lookup_complete"]),
+                row["mutation_paths_digest"], int(row["mutation_paths_complete"]),
+                row["continuation_cursor"], row["expected_catalog_head"],
+                row["expected_run_head"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["capability_issuer_fingerprint"],
+                row["capability_issuer_mac"], row["evidence_proof_id"],
+                row["evidence_request_digest"],
+                row["evidence_issuer_fingerprint"], row["evidence_issuer_mac"],
+                row["source_control_proof_id"],
+                row["source_control_request_digest"],
+                row["source_control_issuer_fingerprint"],
+                row["source_control_issuer_mac"],
+                row["payload_digest"], row["event_hash"],
+                row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM safe_same_effect_retry_actions WHERE "
+                "repository_id = ?", (repository_id,)
+            )
+        }
+        if actual_safe_retry_actions != expected_safe_retry_actions:
+            raise StorageIntegrityError(
+                "safe-retry action projection diverges from event history"
             )
 
         expected_validator_cessations = {
@@ -40386,7 +41780,9 @@ class SQLiteStateStore:
                 body["logical_effect_id"], body["prior_attempt_id"],
             )
             for body in intents
-            if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY"
+            if body.get("intent_kind") in {
+                "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+            }
         }
         validation_released_effects = {
             body["logical_effect_id"]
@@ -40807,6 +42203,21 @@ class SQLiteStateStore:
                     "WHERE pause_id = ? AND resulting_state = 'PAUSED'",
                     (body["source_pause_id"],),
                 ).fetchone()
+            if source_action is None:
+                source_action = connection.execute(
+                    "SELECT pause.event_id AS request_event_id FROM "
+                    "external_pause_actions AS pause JOIN "
+                    "safe_same_effect_retry_actions AS recovery ON "
+                    "recovery.retained_pause_fence_id = pause.fence_id "
+                    "WHERE pause.pause_id = ? AND recovery.event_id = ? AND "
+                    "recovery.event_hash = ? AND recovery.resulting_state = "
+                    "'PAUSED'",
+                    (
+                        body["source_pause_id"],
+                        body["source_pause_settled_event_id"],
+                        body["source_pause_settled_event_hash"],
+                    ),
+                ).fetchone()
             if (
                 source_fence is None
                 or source_action is None
@@ -40860,6 +42271,23 @@ class SQLiteStateStore:
                     "validation resume source pause fence diverges from history"
                 )
             del expected_fences[body["pause_fence_id"]]
+
+        for body in safe_retry_reconciliations:
+            pause_fence_id = body["retained_pause_fence_id"]
+            resumed_pause = any(
+                resume["pause_fence_id"] == pause_fence_id
+                and resume["source_pause_settled_event_id"] == body["event_id"]
+                and resume["source_pause_settled_event_hash"]
+                == self._event_hash(body)
+                for resume in resumes
+            )
+            if (
+                pause_fence_id not in expected_fences
+                and not resumed_pause
+            ):
+                raise StorageIntegrityError(
+                    "safe retry lost its retained pause fence"
+                )
 
         actual_fences = {
             row["fence_id"]: (
@@ -41042,6 +42470,10 @@ class SQLiteStateStore:
                     self._validate_proof_free_disposition_event(
                         connection, body, predecessor_state,
                         expected_cursors.get(run_id),
+                    )
+                elif body.get("route") == "SAFE_SAME_EFFECT_RETRY":
+                    self._validate_safe_same_effect_retry_event(
+                        body, predecessor_state, expected_cursors.get(run_id)
                     )
                 else:
                     raise StorageIntegrityError(
@@ -41691,7 +43123,9 @@ class SQLiteStateStore:
             reservation = slot_obligations[0]
             expected_generation = 1
             for body in intents:
-                if body.get("intent_kind") == "PROVEN_NONEXECUTION_RETRY" and (
+                if body.get("intent_kind") in {
+                    "PROVEN_NONEXECUTION_RETRY", "SAFE_SAME_EFFECT_RETRY"
+                } and (
                     body["repository_id"], body["run_id"],
                     body["logical_effect_id"], body["attempt_id"],
                 ) == (
@@ -41754,6 +43188,8 @@ class SQLiteStateStore:
             "operation_nonexecution_resume_actions",
             "operation_recovery_actions",
             "operation_retry_authorizations",
+            "safe_same_effect_retry_actions",
+            "safe_same_effect_retry_authorizations",
             "validation_pause_actions",
             "active_validation_pause_actions",
             "validation_pause_settlements",
@@ -41891,7 +43327,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 8:
+            if version != 9:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

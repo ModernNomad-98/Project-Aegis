@@ -1636,6 +1636,32 @@ module and focused lifecycle/recovery probes. The local full dispatch and
 storage modules passed 80 and 382 tests respectively before the remaining
 repository gates. T25 and F19 are therefore promoted to `YES/YES/YES`.
 
+### Stage 26 - F02 bounded same-effect retry
+
+F02 now has a closed non-dispatching proof-free matrix and one narrowly bounded
+retry exception. REPORT_ONLY, STOPPED and FAILED_FINAL preserve unknown outcome,
+accounting, slot and fences and cannot resend, alias, compensate under a new ID
+or manufacture success/nonexecution. Late original receipts retain terminal
+lifecycle and evidence.
+
+The retry route binds signed reviewed-contract and independent source-control
+evidence to the original effect key, one successor generation, complete
+mutation paths, concurrent-old-attempt safety, settled billing, expiry and the
+exact uncertainty set. It resolves only source control, retains outcome and
+activity uncertainty, and requires a nonempty active T06 pause fence. T17 ends
+PAUSED; a separate effective one-use T14 RESUME grant clears only that fence.
+Forged, revoked and consumed grants deny. Stacked/new fences remain and route
+to BLOCKED. Expiry is rechecked at intent, launch and contact; the authorization
+is consumed once and a late original receipt disables it.
+
+Semantic version 9 and strict restart recovery validate the source-control
+resolution, retry action, authorization, retained pause and later resume. The
+independent reviewer initially returned `REVISE` for a pause-boundary bypass and
+then for the optional retained fence. Both were corrected; final review returned
+`APPROVE` with no BLOCKER or MAJOR finding. Focused review tests passed 3/3,
+storage passed 393, dispatch passed 80 and the complete package passed 515.
+F02 is promoted to `YES/YES/YES`.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1708,7 +1734,7 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
 | F01 | YES | YES | YES | Canonical effect identity/relationship plus T28 adoption covers revisions/runs, aliases/descriptors, occupied slot, authority consumption/replay, contrary provenance and no-contact behavior; independently accepted |
-| F02 | YES | UNVERIFIED | UNVERIFIED | Proof-bound same-key recovery and one-attempt retry exist, but an explicit matrix proving risk-acceptance, assume-failed, stop/report and new-ID compensation cannot resend or erase history is not complete |
+| F02 | YES | YES | YES | Proof-free dispositions cannot resend, alias, compensate or erase unknown history; the sole reviewed same-key successor is expiry/generation/authority bound, retains outcome/activity uncertainty and T06 pause, requires distinct T14 RESUME, survives crash/restart, and is independently accepted at Stage 26 |
 | F03 | YES | UNVERIFIED | UNVERIFIED | Source-atomic one-use claims, typed lifecycle facts, manual consumption and concurrent redemption exist; no durable assertion currently proves persisted clock rollback denial, and the complete other-host/manual/lost-claim interleaving matrix remains open |
 | F04a | YES | UNVERIFIED | UNVERIFIED | Absolute settlement, worst-case accounting, nonexecution release and authoritative adjustment exist; the explicit below/equal/above-reservation plus no-known-bound-before-contact matrix is incomplete |
 | F04b | YES | YES | UNVERIFIED | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; row-level review pending |
@@ -1751,10 +1777,10 @@ deferral recorded there is closed by Stage 23 above.
 All 28 transition rows now have implementation surfaces and T18/T19/T25 have
 complete independently accepted durable state matrices. All nine crash rows now have
 implementation and test coverage; C02-C09 retain their prior row-review status.
-All 22 F rows have implementation surfaces. Open F test-coverage rows are F02,
-F03 and F04a. These are gaps, not failures silently converted to
-acceptance. Current independently accepted counts are 18/28 transitions, 1/9
-crash boundaries and 10/22 acceptance rows; the other covered rows retain
+All 22 F rows have implementation surfaces. Open F test-coverage rows are F03
+and F04a. These are gaps, not failures silently converted to
+acceptance. Current independently accepted counts are 28/28 transitions, 1/9
+crash boundaries and 20/22 acceptance rows; the other covered rows retain
 explicit row-review work.
 
 | Evidence field | Exact value |
@@ -1787,8 +1813,8 @@ Current durable order after the independently approved exact-head trace map is:
 6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
 7. The Stage 23 committed-head trace closes the accumulated T01-T03/C01,
    T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 deferrals.
-8. Continue through the remaining exact coverage gaps in this order: F02, F03
-   and F04a.
+8. Continue through the remaining exact coverage gaps in this order: F03 and
+   F04a.
 9. After implementation gaps close, perform row review for every remaining
    implemented/tested-but-unaccepted matrix row.
 10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
@@ -1928,8 +1954,8 @@ projections, signed PASS/FAIL/UNKNOWN facts and complete snapshots, universal
 no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
 replay/recheck and T25/T16 post-disable continuation. Aggregate
 T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
-The current implementation gate is T17/F18 proof-free terminal entry; its local
-code and tests have independent `APPROVE`, while exact-head evidence remains
-pending. Continue with the remaining order in Section 10 only after that
-gate closes. Keep PR #99 draft until every remaining backlog
+F02's proof-free matrix and bounded same-effect successor now have final
+independent `APPROVE`. The current implementation gate is F03 source-atomic
+one-use claim interleavings, followed by F04a reservation-boundary accounting.
+Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

@@ -674,8 +674,11 @@ every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
 independent `APPROVE`: canonical operation/validator nonexecution covers
 before/after handoff, authentic paused/pausing/reconciliation and terminal
 states, accounting and replay boundaries, contradictory evidence, newer slot
-owners and atomic dependent-adoption fencing. The remaining explicit coverage
-gaps are F02, F03 and F04a.
+owners and atomic dependent-adoption fencing. F02 now also has independent
+`APPROVE`: proof-free choices remain non-dispatching, while the sole reviewed
+same-key successor retains unknown outcome/activity and its T06 pause until a
+distinct T14 RESUME grant clears exactly that fence. The remaining explicit
+coverage gaps are F03 and F04a.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA
 review gates remain. Read the

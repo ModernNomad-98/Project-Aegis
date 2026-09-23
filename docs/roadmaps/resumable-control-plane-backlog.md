@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 25 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 19/22 F. F02, F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 26 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 20/22 F. F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1353,6 +1353,37 @@ the local storage module passed 382 tests. T25 and F19 are promoted to
 28/28 and acceptance-family coverage is 19/22. The next ordered gaps are F02,
 F03 and F04a; remaining row reviews, POSIX runtime and final exact-head reviews
 remain open, and PR #99 remains draft.
+
+### 5.32 F02 bounded same-effect retry checkpoint
+
+F02 is independently accepted. Proof-free REPORT_ONLY, STOPPED and
+FAILED_FINAL dispositions remain non-dispatching, cannot certify success or
+nonexecution, cannot erase uncertainty, and cannot be repackaged as a resend,
+alias or new-ID compensation. A late authoritative receipt remains admissible
+without reopening terminal lifecycle.
+
+The sole retry exception is a separately authenticated, reviewed same-effect
+contract for one successor generation and the original effect key. It requires
+complete mutation-path review, concurrent-old-attempt safety, settled billing,
+an unexpired target idempotency window, exact outcome/activity/source-control
+uncertainty, and a mandatory active T06 pause fence. Authorization atomically
+settles only the ordered source-control uncertainty, retains outcome/activity
+uncertainty and fences, retains the T06 pause, and records PAUSED. A distinct
+one-use T14 RESUME grant must clear that exact pause before T03 can consume the
+retry authorization; forged, revoked, consumed or missing authority denies,
+and any stacked/new fence survives and prevents a PLANNED route.
+
+Expiry is rechecked at authorization, intent, launch and contact. The retry
+authorization is generation-bound, consumed once at intent, and cannot be
+rebound after rollback, lost acknowledgement or replay. A late original
+receipt disables the authorization without erasing evidence. Semantic version
+9, restart migration and strict recovery verify the action, resolution,
+authorization, retained pause and subsequent resume without healing malformed
+schema or history. Independent review returned `APPROVE` after correcting the
+pause/RESUME separation and making the retained T06 fence mandatory. The full
+storage and dispatch modules passed 393 and 80 tests; the complete package
+passed 515 tests. F02 is promoted to `YES/YES/YES`; the next ordered gaps are
+F03 and F04a. PR #99 remains draft pending those gaps and the later gates.
 
 ## 6. Handoff contract
 

@@ -26,6 +26,8 @@ from .authority import (
     SyntheticSettledValidationResumeEvidence,
     SyntheticSettledValidationPauseRecoveryAttestation,
     SyntheticOperationNonexecutionResumeEvidence,
+    SyntheticSafeSameEffectRetryEvidence,
+    SyntheticSafeRetrySourceControlEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
     SyntheticSourceControlEvidence,
@@ -39,6 +41,7 @@ from .authority import (
 from .contracts import (
     ApplicationReceipt,
     ActiveValidationPauseRequest,
+    AuthorizeSafeSameEffectRetryRequest,
     AuthorityLifecycleFactRequest,
     BindingMismatchRequest,
     CommitReceipt,
@@ -492,6 +495,21 @@ class SyntheticDispatchCoordinator:
             capability,
             self._authority,
             authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def authorize_safe_same_effect_retry(
+        self,
+        request: AuthorizeSafeSameEffectRetryRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticSafeSameEffectRetryEvidence,
+        source_control_evidence: SyntheticSafeRetrySourceControlEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        return self._store.authorize_safe_same_effect_retry(
+            request, capability, evidence, source_control_evidence,
+            self._authority,
             failure_hook=failure_hook,
         )
 

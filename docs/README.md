@@ -63,7 +63,7 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
 CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) but is
-still an unaccepted draft checkpoint. The full local package suite passed 467
+still an unaccepted draft checkpoint. The full local package suite passed 515
 tests on 2026-09-22; all three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
@@ -78,13 +78,16 @@ migration and exact-set recovery, also received independent `APPROVE`.
 The T17 verified-receipt route now also has independent `APPROVE`: it binds a
 typed query/time/source/response lookup, exact receipt/plan/slot/head facts and
 complete settlement ancestry, then clears its exact uncertainty set atomically
-with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. The remaining
+with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. The
 T17 authoritative-nonexecution and authenticated safe-retry slice also has
 independent `APPROVE`, including all-path seal binding, generation-bound retry,
-stacked-pause replay and proof-prefix-safe migration. T22 terminal-restart
-reporting is now independently accepted with strictly read-only main/auxiliary
-verification and typed stale/unverified status. T28 with F01 is next in the
-documented order.
+stacked-pause replay and proof-prefix-safe migration. F02 is now independently
+accepted: proof-free owner dispositions remain non-dispatching, and the only
+reviewed same-key successor retains outcome/activity uncertainty plus the exact
+T06 pause until distinct T14 RESUME authority clears it. T22 terminal-restart
+reporting is independently accepted with strictly read-only main/auxiliary
+verification and typed stale/unverified status. The remaining explicit coverage
+gaps are F03 and F04a.
 The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
 order and reconstructs projections strictly. The current increment adds signed

@@ -13,6 +13,7 @@ from enum import Enum
 
 from .contracts import (
     ActiveValidationPauseRequest,
+    AuthorizeSafeSameEffectRetryRequest,
     AuthorityLifecycleFactRequest,
     BindingMismatchRequest,
     BudgetSettlementRequest,
@@ -445,6 +446,22 @@ class SyntheticOperationReadinessEvidence:
     predecessor_head_vector: tuple[tuple[str, str], ...]
     predecessor_catalog_head: str
     observed_at: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticSafeSameEffectRetryEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticSafeRetrySourceControlEvidence:
+    proof_id: str
+    request_digest: str
     issuer_fingerprint: str
     issuer_mac: str
 
@@ -1433,6 +1450,107 @@ class SyntheticAuthority:
             )
 
     @staticmethod
+    def _safe_same_effect_retry_digest(
+        request: AuthorizeSafeSameEffectRetryRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                request.__dict__, ensure_ascii=True,
+                separators=(",", ":"), sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_safe_same_effect_retry_evidence(
+        self,
+        proof_id: str,
+        request: AuthorizeSafeSameEffectRetryRequest,
+    ) -> SyntheticSafeSameEffectRetryEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError("safe-retry proof ID must be non-empty")
+        request_digest = self._safe_same_effect_retry_digest(request)
+        return SyntheticSafeSameEffectRetryEvidence(
+            proof_id, request_digest, self.issuer_fingerprint,
+            self._mac(
+                "SAFE_SAME_EFFECT_RETRY_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_safe_same_effect_retry_evidence(
+        self,
+        evidence: SyntheticSafeSameEffectRetryEvidence,
+        request: AuthorizeSafeSameEffectRetryRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied("safe-retry evidence is malformed")
+        request_digest = self._safe_same_effect_retry_digest(request)
+        expected_mac = self._mac(
+            "SAFE_SAME_EFFECT_RETRY_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied("safe-retry evidence was not issued here")
+
+    def issue_safe_retry_source_control_evidence(
+        self,
+        proof_id: str,
+        request: AuthorizeSafeSameEffectRetryRequest,
+    ) -> SyntheticSafeRetrySourceControlEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError("safe-retry source-control proof ID must be non-empty")
+        request_digest = self._safe_same_effect_retry_digest(request)
+        return SyntheticSafeRetrySourceControlEvidence(
+            proof_id, request_digest, self.issuer_fingerprint,
+            self._mac(
+                "SAFE_RETRY_SOURCE_CONTROL_EVIDENCE",
+                proof_id=proof_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_safe_retry_source_control_evidence(
+        self,
+        evidence: SyntheticSafeRetrySourceControlEvidence,
+        request: AuthorizeSafeSameEffectRetryRequest,
+    ) -> None:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in evidence.__dict__.values()
+        ):
+            raise DispatchDenied("safe-retry source-control evidence is malformed")
+        request_digest = self._safe_same_effect_retry_digest(request)
+        expected_mac = self._mac(
+            "SAFE_RETRY_SOURCE_CONTROL_EVIDENCE",
+            proof_id=evidence.proof_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied(
+                "safe-retry source-control evidence was not issued here"
+            )
+
+    @staticmethod
     def _reconciliation_resume_request_digest(
         request: ReconciliationPauseResumeRequest,
     ) -> str:
@@ -1944,7 +2062,8 @@ class SyntheticAuthority:
             raise ValueError("synthetic operator grant fields must be non-empty")
         if grant.action not in {
             "PAUSE", "RESUME", "STOP_GRACEFUL", "STOP_IMMEDIATE",
-            "STOP_ESCALATE", "RECOVER_OPERATION", "DISPOSE_REPORT_ONLY",
+            "STOP_ESCALATE", "RECOVER_OPERATION",
+            "AUTHORIZE_SAFE_SAME_EFFECT_RETRY", "DISPOSE_REPORT_ONLY",
             "DISPOSE_STOPPED", "DISPOSE_FAILED_FINAL",
         }:
             raise ValueError("unsupported synthetic operator action")
