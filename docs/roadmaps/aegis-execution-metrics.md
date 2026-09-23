@@ -238,3 +238,30 @@ its 6–12-hour remaining row. The conditional total with both optional issue
 repository-wide documentation estimate remains 80–200 active hours until
 audited batches give meaningful evidence. Owner waits, GitHub queue time,
 provider runs and host provisioning remain outside these active-hour ranges.
+
+## Checkpoint after pull request #126 — 2026-09-23
+
+Five further requests merged after #121. Each pull request's own body or
+closeout comment records its estimate, progress and final observed duration.
+The intervals below overlap and include waiting or concurrent work; active
+labor was not separately instrumented.
+
+| Pull request | Merge time (Coordinated Universal Time) | Observed wall interval | Progress |
+| --- | --- | ---: | --- |
+| [#123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) | 16:49:28 | 19m29s | Synthetic control-plane capability falsifiers; real route still denied |
+| [#122](https://github.com/ModernNomad-98/Project-Aegis/pull/122) | 16:50:19 | At least 11m25s | Three active maintainer guides |
+| [#124](https://github.com/ModernNomad-98/Project-Aegis/pull/124) | 16:54:59 | About 19m59s | Manual Aegis-only Windows setup; helper paths unavailable |
+| [#125](https://github.com/ModernNomad-98/Project-Aegis/pull/125) | 16:55:48 | 13m27s | Previous five-merge forecast |
+| [#126](https://github.com/ModernNomad-98/Project-Aegis/pull/126) | 17:05:32 | 14m46s | Two technical guides and review record |
+
+The [new every-item snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-126)
+reduces the selected remaining estimate from **185–414** to **175–394 active
+hours**: issue #101 package 2 closed its 6–12-hour row, and the delivered
+synthetic control-plane increment narrows package 003 from 12–24 to 8–16
+hours. This reduction is based on completed scope, not a rate extrapolated
+from short wall intervals. If both optional issue #101 helpers are chosen,
+the bounded total moves from **201–454** to **191–434 active hours**. The
+full all-options backlog remains unbounded. The documentation estimate stays
+80–200 hours because most of the inventory remains unreviewed. The #117
+baseline counted 491 tracked Markdown files; the merged #126 tree contains
+501 tracked Markdown files, counted with `git ls-files`.
