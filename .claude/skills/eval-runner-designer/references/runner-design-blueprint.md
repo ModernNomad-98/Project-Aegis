@@ -32,12 +32,12 @@ Judge rules:
   answer beyond the rubric.
 - Judge model: ⟨choose⟩ — document family and version; changing the judge
   re-baselines all semantic results.
-- Judge failure (malformed verdict, refusal, timeout) → state JUDGE-ERROR.
+- Judge failure (malformed verdict, refusal, timeout) → state `JUDGE_ERROR`.
   Never mapped to case PASS or FAIL; counted separately in corpus metrics.
 
 ## Report schema
 
-Per case: `case_id`, `skill`, `type`, `state ∈ {PASS, FAIL, ERROR, JUDGE-ERROR, QUARANTINED, UNRUN}`,
+Per case: `case_id`, `skill`, `type`, `state ∈ {PASS, FAIL, ERROR, JUDGE_ERROR, QUARANTINED, UNRUN}`,
 `repeats_run`, `wins`, `what_fired_instead` (should-not-trigger only),
 `evidence_ref` (transcript pointer).
 

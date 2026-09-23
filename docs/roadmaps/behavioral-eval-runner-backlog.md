@@ -1215,9 +1215,11 @@ authorization decisions in §13 remain unchanged.
   `JUDGE_ERROR`)
 - **Phase:** 2B-1
 - **Priority:** IMPORTANT
-- **Status:** BACKLOG - the runner already uses closed enum/schema names; a
-  completed standalone naming sweep and disposition of residual differences are
-  not established. Keep this verification task open rather than inventing closure.
+- **Status:** DONE - a standalone 2026-09-23 sweep found no noncanonical
+  serialized runner/schema spelling. The residual `JUDGE-ERROR` prose in the root
+  README, skills catalog and `eval-runner-designer` skill/reference/eval was
+  normalized to the canonical `JUDGE_ERROR`; the two examples in this backlog
+  remain intentionally quoted as the finding being resolved.
 - **Source / evidence:** Deferred normalization finding from the PR #78 review cycle,
   carried into this register by the owner's backlog-creation directive of 2026-08-10.
   Verification note (2026-08-10): the merged design at blob `94ba583…` uses the
@@ -1243,8 +1245,14 @@ authorization decisions in §13 remain unchanged.
 - **Explicit non-goals:** No modification of the merged design in this task or under this
   item; no semantic changes disguised as renames.
 - **Related design sections:** §10, §13 (versioned enums and schemas).
-- **Completion evidence:** Merged WP-2B-1 PR(s) showing the canonical identifiers and any
-  guard; status updated here through a reviewed PR.
+- **Completion evidence:** The runner's `AttemptState`, `AggregateBlocker`,
+  attempt/aggregate schemas and calibration report all use `JUDGE_ERROR`.
+  `test_enums_models.py`, `test_grading_schemas.py` and the CLI schema checks
+  guard the affected executable `JUDGE_ERROR` enum/schema values. The 2026-09-23 naming sweep mapped
+  `JUDGE-ERROR` → `JUDGE_ERROR` in the remaining published skill prose and eval
+  assertions; no runtime/schema rename or merged-design edit was needed. A
+  separate prose linter was not added for this one documentation-only variant;
+  the exact source sweep and reviewed correction are its disposition.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-003 — Activation-observability evidence and claim-scope implementation

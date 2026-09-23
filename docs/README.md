@@ -62,9 +62,11 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [work-package register](roadmaps/resumable-control-plane-backlog.md) and the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
-CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) and is
-at its final merge-readiness gates. The exact package suite passed 542 tests on
-Windows and 542 on Linux (three expected platform skips) on 2026-09-23; all
+CP-WP-002 is DONE under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md):
+[PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged on
+2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8` after its final
+exact-head reviews and all three hosted checks passed. The exact package suite
+passed 543 tests on Windows and 543 on Linux (three expected platform skips); all
 three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
@@ -94,18 +96,16 @@ asserted. F04a reservation-boundary accounting is also independently accepted,
 including exact known usage, durable overrun fences, unknown-liability retention,
 pre-contact bound denial and strict semantic-v10 migration. All 22 acceptance-
 family rows now have tested, independently accepted coverage. All 28 transition,
-9 crash-boundary and 22 acceptance-family rows are independently accepted; only
-the final exact-head architecture/security/QA and hosted gates remain open.
+9 crash-boundary and 22 acceptance-family rows are independently accepted; the
+final exact-head architecture/security/QA and hosted gates also passed.
 The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
 order and reconstructs projections strictly. The current increment adds signed
 monotonic gate facts and complete launch snapshots, universal no-preclaim T27,
 atomic T11 next-check routing, exact T16 route recovery and contact-time stale
 launch disablement with T25/T16 continuation. T11, T27, F11 and F17 are included
-in the independently accepted 28/9/22 canonical inventory. Final exact-head
-architecture, security, QA and hosted validation still block merge, so the
-passing suite is not a completion or merge claim.
-Continue only from the
-[Codex handoff](evidence/control-plane/cp-wp-002-codex-handoff.md). No deployment,
+in the independently accepted 28/9/22 canonical inventory. The
+[Codex handoff](evidence/control-plane/cp-wp-002-codex-handoff.md) is the final
+CP-WP-002 evidence record. No deployment,
 provider call, production data, real authority or real execution adapter is
 authorized.

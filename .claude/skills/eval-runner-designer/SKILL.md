@@ -85,7 +85,7 @@ skill never implies otherwise.
    scripted checks. Semantic (the response "refuses the shortcut", "names
    the colliding skill") — a rubric-guided LLM judge, with the rubric
    derived from the assertion text, a judge independent of the session under
-   test, and judge errors reported as JUDGE-ERROR, never converted into
+   test, and judge errors reported as `JUDGE_ERROR`, never converted into
    case failures or passes.
 4. **Design the report.** Per-case PASS / FAIL / ERROR / UNRUN; per-skill
    rollup; corpus health metrics (trigger accuracy, discrimination wins,
@@ -120,7 +120,7 @@ EVAL RUNNER DESIGN — <library / repo>
 Corpus:         <N skills, M evals.json cases, K trigger-evals cases; case types found>
 Convention:     structural-only today (<where that is recorded>); this design changes no convention
 Execution:      <per case type: session setup, pass condition, isolation rule>
-Judging:        <deterministic checks | LLM-judge rubric source, judge independence, JUDGE-ERROR handling>
+Judging:        <deterministic checks | LLM-judge rubric source, judge independence, JUDGE_ERROR handling>
 Reporting:      <per-case states incl. UNRUN default; per-skill rollup; corpus metrics>
 Cost & sampling:<full-run cost model; tiers (PR / cadence / full); spend cap + kill switch>
 Flake policy:   <repeats N, quorum rule, quarantine visibility>

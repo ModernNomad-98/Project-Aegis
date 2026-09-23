@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "eval-runner-designer",
-  "description": "Behavior cases for the eval-runner design: complete execution semantics per corpus case type, judge independence with JUDGE-ERROR honesty, budget-constrained sampling, and the defining refusal — a design is never converted into a claim that evals pass.",
+  "description": "Behavior cases for the eval-runner design: complete execution semantics per corpus case type, judge independence with JUDGE_ERROR honesty, budget-constrained sampling, and the defining refusal — a design is never converted into a claim that evals pass.",
   "cases": [
     {
       "id": "positive-design-runner-for-structural-only-corpus",
@@ -12,7 +12,7 @@
         "assertions": [
           "Inventories the actual corpus first (case types, assertion styles, trigger-evals fields) and designs for what is written — including the refusal-as-should_trigger convention — rather than an imagined schema.",
           "Defines execution semantics per case type with the fresh-session isolation rule, and pairwise scoring for trigger-evals discrimination cases (expected_skill wins AND each should_not_trigger neighbor stays silent).",
-          "Splits judging into deterministic checks and a rubric-guided independent LLM judge, with JUDGE-ERROR as its own state that never leaks into pass/fail.",
+          "Splits judging into deterministic checks and a rubric-guided independent LLM judge, with JUDGE_ERROR as its own state that never leaks into pass/fail.",
           "Delivers the Output Format design block including cost arithmetic with tiers, a flake policy (repeats, quorum, visible quarantine), advisory-first CI posture with the structural validator kept required, and the verbatim non-claims section.",
           "Builds nothing and runs nothing; implementation is named as a separate, separately-approved task."
         ]
