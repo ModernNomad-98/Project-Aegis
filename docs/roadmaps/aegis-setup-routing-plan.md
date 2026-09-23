@@ -24,6 +24,7 @@ and fallback verification.
 | 2026-09-23, original proposal | Make setup conversational in the user's existing coding assistant; explore GLiClass as local and Jev as online assistance | Historical proposal, not a selected implementation |
 | 2026-09-23, owner forward correction in issue #101 | Offer Aegis only, Aegis plus a local helper, Aegis plus an online helper, and Help me choose; GLiClass/Jev are candidates | Governing product choice |
 | 2026-09-23, owner routing clarification in issue #101 | Use Jev-style structured decisions to assign bounded work to eligible agents with suitable skills and measure complete-task token use | Governing evaluation objective; no vendor chosen |
+| 2026-09-23, owner local-evaluation shortlist in issue #101 | Evaluate Laya and Mapika/Decider 0.8B first on ordinary central processing units (CPUs); compare OpenJev as an optional wrapper around the same Decider checkpoint | Governing package-4 research order, not an installed helper, production selection or execution grant |
 | 2026-09-23, this package 1 design | Keep the baseline usable without an add-on; use a single advisory contract and separate setup/host/adapter responsibilities | Proposed implementation architecture, subject to review and package 2/3 authority |
 
 ## Current source boundary and forces
@@ -125,6 +126,34 @@ from project-provided benchmark claims. A deployment location is a separate
 choice from the model; an open checkpoint can be local or hosted only if that
 actual offering and terms are verified.
 
+### Agreed first local comparison for package 4
+
+[Issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101)
+records a narrower first evaluation order than the historical discovery table
+above. Compare **Laya** and **Mapika/Decider 0.8B** with Aegis-only behavior
+and simple eligible-agent rules on a CPU. For Laya, start with its English
+checkpoint for short agent classification and compare its typed-decisions
+checkpoint on development cases before choosing one. For Decider, start with
+the 0.8B checkpoint; larger variants are outside this first comparison.
+OpenJev is optional integration around that same Decider checkpoint: measure
+direct `Aegis → Decider` against `Aegis → OpenJev → Decider`, including the
+wrapper's setup, response validation, credential and destination checks,
+maintenance and latency costs. Do not count the
+wrapper as an independent model or make it a fifth user-facing setup choice.
+
+The local baseline must work without a dedicated graphics processing unit
+(GPU) or CUDA accelerator. Measure cold and warm response time and peak memory
+while normal development tools are running. Machines with **8 and 16 gigabytes
+(GB)** of memory are proposed evaluation profiles, not verified minimum
+requirements. A failed installation or unusable response time leaves Aegis
+only available; it never silently switches a user's work to an online service.
+No local helper is currently installed, selected for production or authorized
+for a live evaluation by this planning record. Pin versions, license,
+dependencies, host, cases, budgets and evidence in a separate reviewed
+package-4 authorization before executing the comparison. Preserve the wider
+discovery table as alternatives and screening history, without committing to
+prototype every listed candidate.
+
 ## Predeclared evaluation protocol for package 4
 
 1. **Freeze before test.** Choose one host/version and two target machine
@@ -132,8 +161,9 @@ actual offering and terms are verified.
    configurations. Record license, maintenance, availability, exact model,
    runtime, quantization and data destination. Exclude candidates that cannot
    be run under the approved budget or cannot meet the required data boundary;
-   publish the reasons. The short list is a later reviewed artifact, not this
-   document's candidate list.
+   publish the reasons. The agreed first research shortlist is above; the
+   exact runnable configuration and any changed shortlist require a later
+   reviewed, version-pinned package-4 authorization.
 2. **Reviewed cases.** Build development and sealed holdout partitions from
    real Aegis task/skill/agent-capability scenarios. Include simple, ambiguous,
    multi-skill, security-sensitive, explicit/manual-only, no-match, injection,
