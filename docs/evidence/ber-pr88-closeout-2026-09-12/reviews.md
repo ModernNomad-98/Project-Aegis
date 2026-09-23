@@ -1,5 +1,12 @@
 # Independent read-only reviews — 2026-09-12
 
+> **Current reading, checked 2026-09-23:** These reviews cover the exact
+> candidate commit and tree identified below. Pull request (PR) #88 later
+> merged with its scoped corrections; the [delivery closeout](README.md)
+> records the submitted revision and main verification. This candidate
+> approval is independent engineering evidence, not a GitHub approving review
+> or authority for measured calibration. Preserve the reviewer findings below.
+
 Reviewed commit: `5863fb1ef2fa95f653e7983b74cea16caa95555b`.
 Reviewed tree: `88f04538a9fcfad9e13117c7d8d3afb28dbadfe7`.
 

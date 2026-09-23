@@ -1,5 +1,13 @@
 # Phase 0/1 independent-review corrections
 
+> **Current reading, checked 2026-09-23:** The requested changes below refer
+> to this dated Behavioral Eval Runner (BER) review candidate. The scoped
+> corrections were later integrated and pull request (PR) #88 merged; see the
+> [delivery closeout](ber-pr88-closeout-2026-09-12/README.md). The
+> [current BER backlog](../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> owns remaining calibration and live-execution gates. Keep this review's
+> original findings and candidate test result as historical evidence.
+
 2026-09-10. Independent read-only review of local commit
 `40bfabc91b60d46f201a575911d0f2a9edac2a2e` (tree
 `a9e12ad61aafb0434bf36e256553fdf634c58053`) requested changes. The reviewer
