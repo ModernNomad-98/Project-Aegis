@@ -1,5 +1,15 @@
 # Principal Claude Skills and Agents Architecture Findings
 
+> **Historical research — current reading, 2026-09-23.** The
+> "implementation-ready" description and "current repo" findings below
+> describe the former `nguyenpv1980-wq/Claude-Skills` repository in July 2026.
+> They are not a current inventory or instruction to regenerate Project Aegis.
+> Preserve the original source coverage and chat-memory limitation. Read
+> [AGENTS.md](../../AGENTS.md) for workspace role, the
+> [skills catalog](../skills-catalog.md) for shipped entries, and the
+> [skill authoring standard](../skill-generation-standard.md) for current
+> contracts.
+
 Prepared: 2026-07-06
 Repository: `nguyenpv1980-wq/Claude-Skills`
 Role lens: Senior Principal Claude / AI Architect
