@@ -22,8 +22,8 @@ candidate row, identifier, name, priority or usage description was changed.
 This edit does not install a skill, prove host behavior, change authorization
 or mark either 20-item category fully delivered.
 
-The only edited paths are the two category pages and this dated record. The
-shared documentation backlog row will be added in a separate integration step.
+The edited paths are the two category pages, this dated record, and one row in
+the [documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md).
 The full repository documentation sweep remains open.
 
 ## Checks and remaining review
@@ -38,8 +38,9 @@ The full repository documentation sweep remains open.
   (UTC; 3 minutes 58 seconds)
   confirmed the catalog mapping, all 40 unchanged rows, links and delivery
   limits. It found missing explanations for identifier (ID) on page 09 and AI,
-  P0/P1 and UTC
-  in this standalone note; these were corrected. Final re-review is pending.
+  P0/P1 and UTC in this standalone note; these were corrected. The independent
+  18:38:38–18:39:10 UTC re-review found no blocker in the four-path branch,
+  including 40 unchanged candidate rows and working catalog anchors.
 
 Work began at **2026-09-23 18:28:52 UTC**; the
 first checks passed by **18:29:46 UTC**, an observed wall interval of **54
