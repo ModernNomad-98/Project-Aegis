@@ -4,8 +4,20 @@ Reference for `superadmin-observability-console-designer`. Generalized from
 three independent production multi-tenant implementations that converged on
 the same security core; product-agnostic by construction. Sections: the
 read-security model (1), the panel menu (2), the server-shaped read model
-(3), the DB/query-performance panel spec (4), posture-as-verification (5),
+(3), the database/query-performance panel spec (4), posture-as-verification (5),
 honest-gap typing (6).
+
+## Terms used here
+
+- **UI / API / DB / SQL:** user interface, application programming interface,
+  database, and Structured Query Language.
+- **RLS / OLTP:** row-level security (database policies that restrict rows a
+  caller can access) and online transaction processing (the product's live
+  operational database workload).
+- **IA / ETL:** information architecture (how panels are grouped and found)
+  and extract-transform-load (the pipeline that prepares source data).
+- **AI / QA / SLO:** artificial intelligence, quality assurance, and service
+  level objective (a measurable reliability target).
 
 ## 1. The cross-tenant read-security model
 

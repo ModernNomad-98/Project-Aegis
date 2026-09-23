@@ -1,8 +1,27 @@
 # Supply-Chain Checklist — CI/CD paths, triage, pinning, provenance
 
-Progressive-disclosure detail for `supply-chain-security-reviewer`. SLSA-style
-framing: care about provenance (where artifacts came from) and integrity (that
-they weren't tampered), not just CVE counts.
+Progressive-disclosure detail for `supply-chain-security-reviewer`.
+Supply-chain assurance asks where artifacts came from and whether they were
+tampered with, alongside vulnerability counts.
+
+## Terms used here
+
+- **SLSA / CVE:** Supply-chain Levels for Software Artifacts (a supply-chain
+  assurance framework) and Common Vulnerabilities and Exposures (published
+  vulnerability identifiers).
+- **CI/CD / PR / SHA:** continuous integration and continuous delivery, pull
+  request, and Secure Hash Algorithm (the commit digest used for pinning).
+- **TP / SAST / RCE:** true positive, static application security testing,
+  and remote code execution.
+- **AI / ML / RAG:** artificial intelligence, machine learning, and
+  retrieval-augmented generation (answering with retrieved source material).
+- **OWASP / ASI04 / ASI07:** Open Worldwide Application Security Project and
+  its agentic threat identifiers used below; `ASI04` concerns agentic supply
+  chains and `ASI07` concerns inter-agent communication.
+- **MCP / A2A:** Model Context Protocol (a tool-integration protocol) and
+  agent-to-agent communication.
+- **OS / authn:** operating system and authentication (checking a caller's
+  identity).
 
 ## Reachability triage rubric (for scanner output)
 
