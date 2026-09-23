@@ -122,3 +122,9 @@ reported PRIVATE visibility, the owner account as its sole collaborator, and
 Actions disabled. These facts were verified before any input push; the
 repository is still empty at this checkpoint. Creation does not approve
 candidate labels or satisfy an execution gate.
+
+At the later candidate checkpoint, the private repository remained PRIVATE,
+owner-only and Actions-disabled. A PENDING 160-case packet was pushed on a
+review branch and opened as private PR #1; its public-safe identities and
+remaining gates are recorded in the
+[sanitized candidate summary](../evidence/ber-replacement-candidate-1-summary.md).

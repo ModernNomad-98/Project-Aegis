@@ -17,7 +17,7 @@ earlier forecast update.
 | BER-BKL-007 implementation | 2026-09-23 10:57 | 3–5 hours active work after authorization merge | Active-only total unavailable; about 28 minutes observed wall time to first final-candidate CI | Independent audit passed after corrections; PR #104 Linux and Windows pass, protected-file guard fails under recorded narrow exception | Awaiting owner schema-shape decision | PR #104 open; BKL-007 not DONE |
 | Calibration replacement storage proposal | 2026-09-23 11:26 | 30–45 minutes active work | Exact active total unavailable; 12m50s observed wall time to merge at 11:38:50 | Independent review passed; final Actions green (Linux 1m24s, Windows 3m11s, guard 5s) | About 1 minute before owner chose A | PR #105 merged; choice A recorded |
 | Private input storage amendment (BER-DEC-010) | 2026-09-23 11:39 | 20–40 minutes active work to review and merge-ready PR | Exact active total unavailable; 8m21s observed wall time to merge at 11:47:21 | Independent audit passed after correction; final Actions guard 4s, Linux 1m18s, Windows 2m55s | None recorded | PR #106 merged |
-| Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | In progress | Pending | None recorded | Private repository created and verified; branch from exact BER-DEC-010 merge |
+| Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | About 26 minutes observed wall time to first private review candidate at 12:13; active-only total unavailable | Private PR #1 opened; local contract/restore checks passed; owner semantic review pending | Owner review begins after candidate PR | Private packet PENDING; public sanitized summary in progress |
 
 ## Progress checkpoints
 
@@ -59,6 +59,13 @@ earlier forecast update.
   in that repository. No calibration input was pushed. Candidate branch
   `feat/ber-wp2b3-replacement-candidates` starts at the exact BER-DEC-010
   merge commit. Estimate: 4–8 active hours.
+- **2026-09-23 12:13 UTC — first private candidate:** 160 synthetic PENDING
+  records were built and validated offline. The exact packet was committed to
+  the owner-only private repository at `6beba11e83e5e8a1655f33302e40959ecc6067e5`
+  and private PR #1 opened. Composition and manifest restoration passed; no
+  provider call or human label approval occurred. Approximately 26 minutes
+  elapsed since the candidate work checkpoint, including the requested
+  five-merge forecast baseline work; active-only time was not measured.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
