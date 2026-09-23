@@ -3,12 +3,13 @@
 Prepared 2026-09-23. Canonical planning home for [issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101).
 Package 1 is design and candidate screening only. Package 2 delivers a
 manual-only four-choice setup conversation and tested Windows PowerShell
-Aegis-only saved selection. Optional helpers remain unavailable; this is no
+Aegis-only saved selection. Optional helpers remain unavailable. There is no
 host hook, model, installation, credential, paid evaluation, or savings claim.
 Later packages need their own bounded scope and authority. The [BER](behavioral-eval-runner-backlog.md) and
 [delivery control](resumable-control-plane-backlog.md) registers remain separate.
 The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
-sets out the next Aegis-only implementation decision without granting it.
+defines the implementation scope approved in AEGIS-APR-007; the proposal alone
+does not grant runtime authority.
 
 Package 3's approved offline advisory contract is implemented in
 [`tools/aegis_setup`](../../tools/aegis_setup/README.md). It validates bounded
