@@ -482,10 +482,12 @@ entry in the reconciliation doc.
   [Subagents (read-only reviewers)](#subagents-read-only-reviewers).
 - **The planning record**
   ([`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md))
-  — the dated decisions in §5 are the project's immutable decision log; the
-  D12/D14 candidate scopes recorded there are banked-but-not-built future
-  work (the D12.8 pack graduated from banked to built with D21; the D13
-  library-meta scope completed with D22).
+  — its dated §5 entries form the project's immutable decision log. A `D`
+  code means a decision: D12 and D14 are decisions 12 and 14; D12.8 is the
+  eighth subentry of decision 12. Those candidate scopes were initially banked.
+  Later decisions
+  D21 and D22 recorded delivery of the D12.8 operational pack and completion
+  of the D13 library-meta scope, respectively.
 - **The doctrine**
   ([docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md))
   and **the operating rules** ([CONTRIBUTING.md](CONTRIBUTING.md)) — why the system
@@ -612,98 +614,43 @@ keeps a human as the approval gate on anything irreversible. See
     conversation and tested Windows PowerShell Aegis-only saved selection.
     Local and online helpers remain unavailable. *e.g.* `aegis-setup`.
 
-## Canonical reading order (for maintainers)
+## Maintainer reading routes
 
-Start with the [documentation index](docs/README.md), [changelog](CHANGELOG.md),
-[offline CI guide](docs/offline-ci.md) and source-specific
-[owner approval register](docs/approvals/APPROVAL_REGISTER.md). For BER work,
+For current work, start with the [documentation index](docs/README.md),
+[skills catalog](docs/skills-catalog.md), and
+[skill authoring standard](docs/skill-generation-standard.md). The
+[changelog](CHANGELOG.md), [offline CI guide](docs/offline-ci.md), and
+source-specific [owner approval register](docs/approvals/APPROVAL_REGISTER.md)
+provide release, verification, and authority context. For Behavioral Eval
+Runner (BER) work,
 use its [active backlog](docs/roadmaps/behavioral-eval-runner-backlog.md).
-The offline delivery-control kernel is implemented for synthetic-only use;
-use its [implementation guide](tools/aegis_delivery_control/README.md) for
-current guarantees and limitations, and its
+The delivery-control kernel is implemented for synthetic-only use. Use its
+[implementation guide](tools/aegis_delivery_control/README.md) for current
+guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
-The merged CP-WP-002 offline kernel has complete synthetic row coverage:
-its exact 543-test package suite passes on Windows and Linux (three expected
-Linux platform skips); all three stop findings, T13
-authority lifecycle intake, T15 binding-mismatch handling, the T14
-PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
-external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
-local-nonexecution settlement and its BLOCKED-only T14 recovery route, plus the
-narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
-route, T09's exact-head reconciliation pause fence, and the narrow T17
-validator-result/T14 exact-T09-resume slice also have independent `APPROVE`.
-The T17 operation-uncertainty foundation—typed source/control evidence,
-conditional uncertainty categories, atomic semantic migration and exact-set
-recovery—also has independent `APPROVE`. The T17 verified-receipt route—typed
-query/time/source/response proof, full settlement ancestry, atomic exact-set
-clearance, typed routing, crash/replay and recovery—also has independent
-`APPROVE`. The remaining T17 authoritative-nonexecution and authenticated
-safe-retry slice also has independent `APPROVE`: exact all-path seals, typed
-operation recovery, one-use generation-bound retry, crash/replay and strict
-prefix migration preserve later uncertainty and stacked pauses. T22 read-only
-terminal restart reporting also has independent `APPROVE`; it reports verified
-terminal denial without authorizing advancement or reconciliation and preserves
-the database byte-for-byte. T28/F01 verified-effect adoption also has independent
-`APPROVE`: exact root/immediate provenance, current checks and source terms are
-bound without redispatch or reused charge, while contrary dependent evidence
-retains its typed integrity fence. Cross-family F05/F06/F13/F20 also has
-independent `APPROVE`: complete-vector freshness covers one-use source
-consumption, the repository-wide slot is exercised across lifecycle/generation
-boundaries, contrary receipts follow exact durable states and validator
-containment is typed, bounded and strictly recovered. Filesystem ownership,
-reparse-point and path-swap protection now also has independent `APPROVE` on
-Windows: checked OS-known-folder and descendant handles, stable lock identity,
-sidecar/hardlink denial and actual junction/replacement probes fail closed.
-POSIX runtime evidence is verified by the pinned Linux package suite.
-The selected-check foundation has independently accepted v2 per-check
-dependency/launch-gate declarations, deterministic topological order and strict
-projection recovery. The current increment adds authenticated monotonic gate
-facts, signed complete READY snapshots, universal no-preclaim T27 commit,
-atomic T11 next-check routing, exact T16 launch-route recovery, and contact-time
-stale-prerequisite disablement with T25/T16 continuation; the corrected
-increment received independent `APPROVE`, and its complete rows are included in
-the accepted 28/9/22 canonical inventory. The T17/F18 proof-free owner
-disposition route is now implemented locally: separately authenticated one-use
-REPORT_ONLY, STOPPED and FAILED_FINAL commands preserve the unknown outcome,
-accounting, slot, cursor and exact uncertainty set; terminal choices add a
-permanent scoped fence and never authorize retry, success or completion. Its
-semantic-v7 migration, crash/replay and strict historical projection checks are
-locally green. Independent implementation review returned `APPROVE` after the
-accepted-plan issuer boundary and denial matrix were corrected. Final exact-head
-architecture, security, QA and hosted validation passed before merge.
-T18/T19 now have independently accepted authentic
-every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
-independent `APPROVE`: canonical operation/validator nonexecution covers
-before/after handoff, authentic paused/pausing/reconciliation and terminal
-states, accounting and replay boundaries, contradictory evidence, newer slot
-owners and atomic dependent-adoption fencing. F02 now also has independent
-`APPROVE`: proof-free choices remain non-dispatching, while the sole reviewed
-same-key successor retains unknown outcome/activity and its T06 pause until a
-distinct T14 RESUME grant clears exactly that fence. F03 now has independent
-`APPROVE`: three concurrent host/manual consumers reach one authoritative
-winner, live and recovery lifecycle decisions share one exact evaluator,
-clock rollback and lost acknowledgements fail closed, and synthetic authority
-cannot enable a real adapter. F04a now also has independent `APPROVE`: known
-usage below/equal/above the reservation settles exactly once, overruns fence,
-unknown liability remains blocked, and semantic-v10 migration preserves older
-valid histories without healing tamper. All 28 transition, 9 crash-boundary and
-22 acceptance-family rows now have tested, independently accepted coverage. The
-PR [#99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged on
-2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8` after exact-head
-reviews and all three hosted checks passed. The
-[Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) records
-the final evidence. No delivery integration or deployment is implemented or authorized.
-The construction and authoring references below explain the library's design:
+Control-plane work package 002 (CP-WP-002) delivered that kernel in
+[pull request #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99).
+On its reviewed final head, the 543-test package suites passed on Windows and
+Linux (three expected Linux skips). All 28 transition, 9 crash-boundary, and
+22 acceptance-family rows had independently accepted coverage. The
+[review handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md)
+records the exact test and review history. No real delivery integration or
+deployment is implemented or authorized.
 
-1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).
-2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — canonical architecture audit.
-3. [`docs/prompts/claude-skills-master-generation-prompts-v4.md`](docs/prompts/claude-skills-master-generation-prompts-v4.md) — canonical master + phase prompts.
-4. [`docs/300-repeatable-software-saas-skills-roadmap.md`](docs/300-repeatable-software-saas-skills-roadmap.md) — the strategic backlog / capability map (the original 300; per the D12 standing rule a 300+ target backlog — ship on demand and framework coverage, not count).
-5. [`docs/skills/`](docs/skills/) — category-level backlogs.
-6. [`docs/skills-catalog.md`](docs/skills-catalog.md) — implemented vs. backlog, priorities, skills-vs-agents.
-7. [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) — the authoring standard the validator enforces.
+The version 4 (v4) references below record the library's construction
+history. Here, "canonical" describes that earlier planning context; the
+generation prompts are not current work orders. For current status and authoring, use the
+index, catalog, and standard linked above.
 
-**Historical / reference inputs** (superseded by the v4 pair + reconciliation; retained for provenance):
+1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — how the former generation plans were reconciled.
+2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — architecture audit of the former `nguyenpv1980-wq/Claude-Skills` repository.
+3. [`docs/prompts/claude-skills-master-generation-prompts-v4.md`](docs/prompts/claude-skills-master-generation-prompts-v4.md) — historical master and phase prompts.
+4. [`docs/300-repeatable-software-saas-skills-roadmap.md`](docs/300-repeatable-software-saas-skills-roadmap.md) — the strategic capability map; under decision 12 (D12), the original 300+ target is a backlog, not a count cap.
+
+For category-level construction backlogs, see [`docs/skills/`](docs/skills/).
+
+**Earlier reference inputs** (superseded by the v4 pair and reconciliation at
+the time; retained for provenance):
 
 - [`docs/prompts/senior-principal-claude-skills-execution-plan.md`](docs/prompts/senior-principal-claude-skills-execution-plan.md) — earlier combined execution plan (now historical).
 - `docs/research/claude-skills-principal-architecture-findings.md`
@@ -712,10 +659,12 @@ The construction and authoring references below explain the library's design:
 - `docs/roadmaps/product-agnostic-skill-and-agent-roadmap.md`
 - `docs/150-claude-skills-roadmap.md` (superseded by the original 300-skill roadmap — per the D12 standing rule a 300+ target backlog, not a cap)
 
-## Reconciled phase plan (single source of truth)
+## Reconciled phase plan (historical v4)
 
-The v4 phase structure is canonical. See [the reconciliation doc](docs/reconciliation/step-0-reconciliation-v4.md) §3
-for the per-phase skill lists and how the older execution-plan names merge in.
+The v4 phase structure was canonical for the earlier construction plan. See
+[the reconciliation doc](docs/reconciliation/step-0-reconciliation-v4.md) §3
+for its per-phase skill lists and how older execution-plan names merged in.
+For current shipped skills, use the [catalog](docs/skills-catalog.md).
 
 | Phase | Pack | Priority | Status |
 |---:|---|---|---|
