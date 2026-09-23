@@ -34,7 +34,7 @@ governance log](#13-append-only-governance-log). Use the [status
 vocabulary](#3-status-vocabulary) before interpreting `DONE`, `AUTHORIZED`,
 `BLOCKED` or `BACKLOG`; consult the [owner approval
 register](../approvals/APPROVAL_REGISTER.md) for later lifecycle events.
-The [current forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141)
+The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 estimates remaining work but grants no authority.
 
 ## Original register and dated checkpoints

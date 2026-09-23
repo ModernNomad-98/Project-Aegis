@@ -4,7 +4,7 @@
 > sequence under [Original decision packet](#original-decision-packet-after-pr-107)
 > preserve the proposal prepared after #107. They are not today's queue. Use
 > the index below with the [approval register](../approvals/APPROVAL_REGISTER.md),
-> [current forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141),
+> [current forecast](aegis-backlog-forecast.md#start-here--current-reading),
 > and owning backlogs before
 > acting. This page grants no implementation, host or provider authority.
 
@@ -32,7 +32,7 @@ repository checks, not a selected-host proof. A source SHA is a commit hash;
 | CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
 | Issue #101 setup and routing | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only setup ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped within bounded scopes. The [setup plan](aegis-setup-routing-plan.md) keeps package 4 host proof and comparison pending separate authority, packages 5/6 conditional, and package 7 pending. No optional helper is selected. |
 
-The [latest five-merge forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141)
+The [latest five-merge forecast](aegis-backlog-forecast.md#start-here--current-reading)
 keeps the selected
 remaining work at **175–394 active hours**. It is a scope estimate, not
 permission to start a gated package. The independent gates in the original
