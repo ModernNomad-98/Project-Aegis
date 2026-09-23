@@ -1,9 +1,38 @@
 # Product-Agnostic Claude Skills and Agents Roadmap
 
 > Historical proposal, prepared 2026-07-06. The
-> [v4 reconciliation](../reconciliation/step-0-reconciliation-v4.md) supersedes
+> [version 4 (v4) reconciliation](../reconciliation/step-0-reconciliation-v4.md) supersedes
 > its implementation plan. Use the [current catalog](../skills-catalog.md) for
 > shipped skill and agent names; the proposal tables below remain unchanged.
+
+## Reading key for the historical proposal
+
+The priorities and technical abbreviations below describe the **July 2026
+proposal**, not the current delivery order. Use the linked current catalog
+for shipped status.
+
+- **Priority:** `P0`, `P1` and `P2` mean the proposal's first, next and later
+  priority tiers. They do not authorize work.
+- **Product and design:** SaaS means software as a service; OS means operating
+  system; API means application programming interface; DB means database;
+  DDD means domain-driven design; ADR means architecture decision record.
+- **Testing and delivery:** QA means quality assurance; E2E means end-to-end;
+  PR means pull request; CI/CD means continuous integration and continuous
+  delivery; SDLC means software development life cycle.
+- **Reliability and interface:** SLI means service-level indicator; SLO means
+  service-level objective; RTO and RPO mean recovery time and recovery point
+  objectives; DR means disaster recovery; UI and UX mean user interface and
+  user experience.
+- **Cloud and security:** AWS means Amazon Web Services; IaC means
+  infrastructure as code; CDK means Cloud Development Kit; IAM means identity
+  and access management; RLS means row-level security; ACL means access
+  control list; SBOM means software bill of materials; SAST means static
+  application security testing; SARIF means Static Analysis Results
+  Interchange Format. *Auth* means authentication (proving identity), while
+  *authz* means authorization (checking permission).
+- **Artificial intelligence (AI):** RAG means retrieval-augmented generation.
+  An *eval* is an evaluation test. AppSec means application security. DevOps
+  means development and operations working together on delivery and support.
 
 Prepared: 2026-07-06
 Purpose: define a reusable, product-agnostic roadmap for Claude Code Skills and project subagents.
