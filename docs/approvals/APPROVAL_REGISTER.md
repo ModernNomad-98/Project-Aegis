@@ -295,3 +295,39 @@ generic skill guidance that would require asking for the same approval again.
   PR #108 evidence-policy recommendation and decision options.
 - **Expiry / use limit:** No calendar expiry or one-use limit stated. This is
   a policy selection; any replacement requires a later recorded owner choice.
+
+### AEGIS-APR-010: PR #119 protected-file guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by the lifecycle event below.
+- **Date / Grantor:** 2026-09-23 / Peter Nguyen.
+- **Reason:** Resolve the documented protected-file guard failure on the
+  Behavioral Eval Runner documentation change in PR #119.
+- **Scope allowed:** The owner's exact answer was "Permit a PR #119-only
+  administrator merge with this documented guard failure (recommended)" to
+  the question: "PR #119 is independently reviewed and mergeable at `985209c`.
+  Linux and Windows passed; `gate-guard` failed solely because it protects the
+  Behavioral Eval Runner README that this PR rewrites. The handoff's prior
+  exception covered PR #104 only, while your newer rule requires green
+  Actions. Which disposition do you approve for PR #119?" The approval
+  permits the administrator merge of this reviewed revision despite that
+  specific failed guard check.
+- **Scope FORBIDDEN:** It does not apply to another pull request or any other
+  failed check, and does not alter branch protection or the guard itself.
+- **Evidence:** Direct owner reply in the Project Aegis conversation on
+  2026-09-23, quoted above; the exact revision and check results are recorded
+  in [PR #119](https://github.com/ModernNomad-98/Project-Aegis/pull/119#issuecomment-5799428285).
+- **Expiry / use limit:** PR #119 only, one merge. No calendar expiry stated.
+
+### AEGIS-APR-011: Consumption of PR #119 guard exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-010.
+- **Status at recording:** AEGIS-APR-010 has no remaining use.
+- **Effective at:** 2026-09-23 17:18:03 UTC.
+- **Recorded at / By:** 2026-09-23 / Project Aegis agent, transcribing the
+  completed merge.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #119](https://github.com/ModernNomad-98/Project-Aegis/pull/119)
+  merged as `d2053b61fa80738d9dd2c669980652914bb5c872`. Its final timing and
+  check disposition are in [the completion comment](https://github.com/ModernNomad-98/Project-Aegis/pull/119#issuecomment-5799438319).
