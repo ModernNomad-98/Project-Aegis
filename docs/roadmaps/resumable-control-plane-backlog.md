@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, T05–T09/T13–T15, ordered T17 work, T22 terminal-restart reporting, T28/F01 verified-effect adoption, cross-family F05/F06/F13/F20 and Windows filesystem ownership/reparse/path-swap protection. The independently approved exact-head status map records 18/28 T rows, 8/9 C rows and 18/22 F rows implemented; trusted readiness, selected-check gates and the remaining named matrix gaps still block DONE. POSIX runtime evidence and final exact-head architecture/security/QA approval also remain blocking |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 23 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested coverage at 25/28 T, 9/9 C and 18/22 F. T18/T19, T25/F19, F02, F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1276,6 +1276,27 @@ checks also passed locally. PowerShell Core acceptance remains assigned to the
 hosted Windows lane because `pwsh` is absent locally. Aggregate T07/T08/T14
 status remains `UNVERIFIED` until committed-head trace refresh; PR #99 remains
 draft.
+
+### 5.29 Committed-head accumulated trace checkpoint
+
+The 16-row accumulated trace was refreshed against committed head
+`15cfdc50c5ae24ad1f5ac88ce623aa489ac6575a` by reading the canonical contracts,
+runtime routes and behavioral assertions. It promotes T01-T03/C01,
+T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 to
+`YES/YES/YES`. The cited tests assert lifecycle, cursor, slot, accounting,
+authority, fence, crash/replay and recovery outcomes; none is counted merely
+because it executes a route. Prior independent implementation reviews for each
+promoted tranche ended `APPROVE` with no remaining BLOCKER or MAJOR finding.
+
+The resulting inventory has implementation surfaces for 28/28 transitions,
+9/9 crash boundaries and 22/22 acceptance-family rows. Verifying test coverage
+is 25/28 transitions, 9/9 crash boundaries and 18/22 acceptance rows. The next
+ordered gaps are T18/T19 every-nonterminal-state stop matrices, T25/F19
+before/after-handoff and contradiction matrices, F02 proof-bound disposition
+coverage, F03 clock/host/manual claim interleavings and F04a reservation-boundary
+accounting. Rows outside the narrow refresh retain their prior independent-review
+status. POSIX runtime and final architecture/security/QA gates remain open, and
+PR #99 remains draft.
 
 ## 6. Handoff contract
 
