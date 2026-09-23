@@ -31,7 +31,8 @@ earlier forecast update.
 | Five-merge backlog re-estimate | 2026-09-23 13:02 | 1–2 hours active work; no earlier item estimate | 9m13s observed wall time to PR #112 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | None needed for arithmetic; owner choices remain gates for execution | PR #112 merged at 13:11:13 UTC; selected total 112–228 h; all optional adoption unbounded |
 | Issue #101 package-2 authorization proposal | 2026-09-23 13:12 | Prior package-2 delivery ETA 6–12 h; new scope-packet ETA 1–2 h active | 11m21s observed wall time to PR #113 merge; active-only unavailable | Independent audit and all three Actions passed | Exact owner implementation grant pending | PR #113 merged at 13:23:21 UTC; selected total 112–228 h; both helpers 128–268 h; all options unbounded |
 | CP-WP-003A exact-file authorization packet | 2026-09-23 13:24 | Prior CP-WP-003 delivery ETA 12–24 h; prior separate packet ETA none; new packet ETA 1–2 h active | 8m35s observed wall time to PR #114 merge; active-only unavailable | Independent audit and all three Actions passed | Owner implementation grant pending | PR #114 merged at 13:32:35 UTC; selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
-| Issue #101 package-3 offline-contract scope packet | 2026-09-23 13:33 | Prior package-3 delivery ETA 6–12 h; prior separate packet ETA none; new packet ETA 1–2 h active | In progress | Pending | Owner implementation grant pending | Selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
+| Issue #101 package-3 offline-contract scope packet | 2026-09-23 13:33 | Prior package-3 delivery ETA 6–12 h; prior separate packet ETA none; new packet ETA 1–2 h active | 7m15s observed wall time to PR #115 merge; active-only unavailable | Independent audit and all three Actions passed | Owner implementation grant pending | PR #115 merged at 13:40:15 UTC; selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
+| BER WP-2B-3 holdout execution-support scope packet | 2026-09-23 15:21 | Prior execution-support delivery ETA 8–16 h; prior separate packet ETA none; new packet ETA 1–2 h active | In progress | Pending | Offline-branch grant, later exact execution-source amendment and input-label review pending | Selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
 
 ## Progress checkpoints
 
@@ -146,6 +147,15 @@ earlier forecast update.
   none; new packet ETA 1–2 active hours. Selected backlog 112–228 active
   hours, both optional helpers 128–268; full all-options backlog has no finite
   ETA while adoption quantities and decisions remain open.
+- **2026-09-23 13:40:15 UTC — issue #101 package-3 scope merged:** PR #115
+  merged at `f3d3e07cd623a1cd69413d0d28e15b75df4c5a49` after independent
+  review and all three Actions. Observed wall time from 13:33 was 7m15s;
+  active-only time is unavailable. This is merge 4 of five after #111.
+- **2026-09-23 15:21 UTC — BER WP-2B-3 holdout scope checkpoint:** Prior
+  execution-support delivery ETA 8–16 active hours; prior separate packet ETA
+  none; new packet ETA 1–2 active hours. The selected remaining backlog
+  estimate is 112–228 active hours, or 128–268 if both optional helpers are
+  selected. The full all-options backlog has no finite ETA.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
