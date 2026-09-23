@@ -5,6 +5,12 @@ description: Write full manual test cases executable by ANOTHER tester with zero
 
 # Manual Test Case Creator
 
+In the case template, `MC-<area>-<###>` is a stable manual-case identifier
+with an area name and sequence number. `P0`, `P1`, and `P2` rank cases from
+highest to lowest priority. `CP-1` is the first screenshot checkpoint; each
+checkpoint names what the image must show and what sensitive fields to mask
+under `screenshot-evidence-planner`'s rules.
+
 ## Purpose
 
 Produce manual test cases that transfer: a tester who has never seen the
@@ -78,12 +84,14 @@ library), not a live session.
 MANUAL TEST CASES — <feature/scope>
 Coverage summary: <requirement/risk → case ids (happy/negative/boundary)>
 Case:
-  ID: <MC-###>  Trace: <requirement/plan item>  Priority: <P0-P2>
+  ID: MC-<area>-<###>  Trace: <requirement/plan item>
+  Priority: <P0 | P1 | P2> (P0 highest)
   Role/persona: <exact>   Environment: <exact>
   Preconditions: <starting state + how to reach it>
   Test data: <exact values / seed reference>
   Steps:
-    1. <one action> → Expected: <one observable result> [📸 CP-1: <what+mask>]
+    1. <one action> → Expected: <one observable result>
+       [Screenshot checkpoint CP-1: <what must be visible; fields to mask>]
     2. ...
   Pass/fail criteria: <verdict rule>
   Cleanup: <restore-neutral steps>

@@ -5,6 +5,15 @@ description: 'Review the security of agent-to-agent and agent-to-MCP-server comm
 
 # Inter-Agent Communications Reviewer
 
+Terms used below: **OWASP** means Open Worldwide Application Security Project;
+**ASI07** is its Agentic Top 10 category *Insecure Inter-Agent Communication*;
+**MCP** means Model Context Protocol; **A2A** means Agent2Agent; **SSE** means
+server-sent events; **TLS** means Transport Layer Security; and **ACL** means
+access-control list. In the review template,
+`authn` means authentication, `e2e` means end-to-end, `ts` means timestamp,
+`confid.` means confidentiality, and a `nonce` is a value used once to help
+reject replay. These terms do not make an authenticated message trusted input.
+
 ## Purpose
 
 Review the message layer of a multi-agent or MCP-connected system (ASI07):
@@ -106,10 +115,14 @@ message exchange.
 INTER-AGENT COMMS REVIEW — <system>
 Topology: <edges: sender → receiver, transport, enforced-by>
 Per-edge posture:
-  <edge> | authn: <mechanism, mutual?> | integrity: <e2e?> | replay: <nonce/ts/idempotency> | confid.: <in-transit/at-rest>
+  <edge> | authentication: <mechanism, mutual?> |
+  integrity: <end-to-end message protection?> |
+  replay: <nonce/timestamp/idempotency> |
+  confidentiality: <in-transit/at-rest>
 Findings (severity-ranked):
-  [SEV] <edge/layer> — Attack path: <spoof|tamper|replay|eavesdrop → receiver effect>
-    Fix: <mutual authn | pin identity | sign e2e | nonce+expiry | encrypt | ACL topology>
+  [severity] <edge/layer> — Attack path: <spoof|tamper|replay|eavesdrop → receiver effect>
+    Fix: <mutual authentication | pin identity | sign end-to-end |
+      nonce+expiry | encrypt | access-control-list (ACL) topology>
 Receiver content handling: <message-as-data enforcement; re-task/approval assertions rejected>
 Spoofed-result handling: <tool results treated as untrusted → agent-tool-safety-guard>
 Red-team cases: <spoof/tamper/replay → expected SAFE outcome> (→ ai-evaluation-harness)
