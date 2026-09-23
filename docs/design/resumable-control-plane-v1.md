@@ -1,16 +1,16 @@
 # Resumable Aegis delivery control plane — v1 contract
 
-Status: DESIGN PROPOSAL FOR OWNER REVIEW; CP-WP-001 documentation only.
-Owner: Peter Nguyen. Repository: ModernNomad-98/Project-Aegis.
-Inspected base: `57e6928d2849aa5377daf52c723b85736292585d` (2026-09-12).
+Current status (2026-09-23): control-plane work package (CP-WP) 001 design,
+CP-WP-002 offline kernel and CP-WP-003A synthetic proofs shipped; real CP-WP-003 and CP-WP-004 blocked.
+Owner: Peter Nguyen. Original design base: `57e6928d2849aa5377daf52c723b85736292585d`.
 
-This document specifies future behavior; no controller, runtime schema, policy,
-adapter or execution authority is delivered. MUST and MUST NOT express proposed
-acceptance requirements, not instructions to execute them. Approval to author or
-merge this document does not authorize implementation or any delivery action.
+This document defines proposed state and recovery requirements for the Aegis
+delivery control plane. MUST and MUST NOT are acceptance rules, not authority
+for implementation. No real delivery action, provider call, or deployment is granted.
 
-Continuation: [separate backlog](../roadmaps/resumable-control-plane-backlog.md).
-Verification: [CP-WP-001 evidence](../evidence/control-plane/cp-wp-001-review.md).
+Codes: CP = control plane; WP = work package; T = transition; C = crash boundary;
+F = negative acceptance family; BER = Behavioral Eval Runner.
+Read: [current status](../roadmaps/resumable-control-plane-backlog.md), [offline commands](../../tools/aegis_delivery_control/README.md), [owner grants](../approvals/APPROVAL_REGISTER.md), [original review](../evidence/control-plane/cp-wp-001-review.md).
 
 ## 1. Purpose, boundaries and authority
 
