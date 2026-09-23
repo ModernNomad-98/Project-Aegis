@@ -1,7 +1,16 @@
-# BER WP-2B-3 holdout execution-support scope
+# Behavioral Eval Runner holdout execution support: work package 2B-3
+
+This document proposes the allowed files, behavior, tests, and decision gates
+for building an offline holdout execution path. It helps reviewers decide what
+the implementation may do. It does not approve reading private cases or calling
+the model provider. In this document, **Behavioral Eval Runner (BER)** is the
+evaluation tool, **WP-2B-3** is its numbered calibration work package, and
+**BER-DEC-008** and **BER-DEC-010** are entries in the linked decision log.
 
 Prepared 2026-09-23 from public `main` at
-`f3d3e07cd623a1cd69413d0d28e15b75df4c5a49`. **Proposal only.**
+`f3d3e07cd623a1cd69413d0d28e15b75df4c5a49`. This is the drafting
+baseline; the proposal was reconciled with later `main` before merge.
+**Proposal only.**
 WP-2B-3 remains AUTHORIZED under BER-DEC-008 but incomplete. Its surviving
 `calibration_development_driver.py` is explicitly development-only; the
 [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md)

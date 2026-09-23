@@ -727,9 +727,11 @@ the sole owner of actual advisory CI integration).
 - **Title:** BER-BKL-007 external version validation and compatibility policy
 - **Phase:** 2B-1 follow-up
 - **Priority:** REQUIRED
-- **Status:** AUTHORIZED — BER-DEC-009 is effective only after the reviewed governance
-  PR carrying it is merged. Until then this is a proposed authorization, and
-  implementation must not begin.
+- **Status:** DONE on PR #104 merge. BER-DEC-009 became effective when
+  governance PR #103 merged. Peter Nguyen accepted PR #104's final shapes on
+  2026-09-23; local checks and independent audit passed. The protected-file
+  guard's documented manual-review failure has the PR-specific AEGIS-APR-005
+  exception. No later BER phase is authorized by this follow-up.
 - **Scope:** Reject missing or unsupported serialized versions at WP-2B-1 external
   record and evidence read boundaries; preserve legitimate internal constructor
   defaults and distinct WP-2B-2/3 version families; add offline regressions and
@@ -738,8 +740,8 @@ the sole owner of actual advisory CI integration).
 - **Acceptance:** Exact external boundaries reject missing and unsupported
   versions, including self-consistent evidence bundles. Existing supported evidence
   remains readable without rewriting its original bytes or hashes. Applicable
-  offline checks and independent code review pass. Final shape acceptance remains
-  an owner review decision and must not be inferred from implementation tests.
+  offline checks and independent code review pass. Peter Nguyen supplied final
+  shape acceptance on 2026-09-23 after reviewing the decision options.
 - **Authority and evidence:** BER-DEC-009 below; implementation branch
   `feat/ber-bkl-007-schema-integrity` from the exact authorization merge commit;
   closeout at `docs/evidence/ber-bkl-007-schema-integrity.md`.
@@ -1464,10 +1466,10 @@ authorization decisions in §13 remain unchanged.
 - **Title:** Final production JSON/YAML schemas and schema-migration policy
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG — PARTIALLY DELIVERED. PR #83 shipped versioned schemas,
-  closed enums and validating runtime records. The explicit schema-migration /
-  compatibility policy required by this entry has not been located; do not
-  schedule the existing schema implementation again or mark the whole entry DONE.
+- **Status:** DONE on PR #104 merge — PR #83 shipped versioned schemas,
+  closed enums and validating runtime records. WP-2B-1A adds strict
+  external-version validation and the compatibility policy. Peter Nguyen
+  accepted the final shapes on 2026-09-23. No measured or live phase is implied.
 - **Source / evidence:** Merged design §13 (every report carries `schema_version` /
   `runner_version`; versioned blocker/reason enums; canonical identities) and §5b ("the
   exact field names may be refined at build time into a better coherent schema, but every
@@ -1488,18 +1490,18 @@ authorization decisions in §13 remain unchanged.
 - **Acceptance criteria:** Every §5b concept and every §13 field group remains addressed;
   dropping a concept is treated as reopening the "all-cases-runnable" fiction and is
   refused; enum sets are closed and versioned; report-schema tests enforce the shapes.
-- **Owner decision required:** Acceptance of the final shapes at WP-2B-1 review (none
-  earlier).
+- **Owner decision required:** Fulfilled on 2026-09-23: Peter Nguyen approved
+  the recommendation to accept PR #104's tested shapes and merge it.
 - **Explicit non-goals:** No change to the merged design's concepts; no free-text reason
   codes; no unversioned enums.
 - **Related design sections:** §5b, §10, §13, §18 (report-schema tests).
-- **Completion evidence:** Partial: [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83),
+- **Completion evidence:** [PR #83](https://github.com/ModernNomad-98/Project-Aegis/pull/83),
   [schemas](../../tools/behavioral_eval_runner/schemas/),
   [runtime records](../../tools/behavioral_eval_runner/models.py) and
   [model tests](../../tools/behavioral_eval_runner/tests/test_enums_models.py).
-  Rejecting unsupported versions is implemented; that alone does not document
-  a migration/compatibility policy. Full closure still requires that policy
-  and its reviewed acceptance.
+  WP-2B-1A adds the [compatibility policy](../behavioral-eval-runner-schema-compatibility.md)
+  and external-boundary regressions in PR #104. Its merge makes the owner-
+  accepted closure effective. Historical evidence is never silently upgraded.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-008 — Machine-generated corpus census

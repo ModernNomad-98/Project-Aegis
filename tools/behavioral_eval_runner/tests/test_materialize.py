@@ -8,9 +8,11 @@ import os
 import subprocess
 import tempfile
 import unittest
+from dataclasses import replace
 from unittest import mock
 
 from tools.behavioral_eval_runner import AUTHORIZATION_MERGE_SHA
+from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
 from tools.behavioral_eval_runner.enums import ClaimScope, MaterializationProfile, WorkspaceRole
 from tools.behavioral_eval_runner.errors import (
     PathEscapeError,
@@ -110,6 +112,25 @@ class TestSyntheticMaterialization(unittest.TestCase):
         self.assertEqual(record.product_fixture_manifest["files"], [])
         self.assertTrue(os.path.isdir(os.path.join(self.dest, "product_fixture")))
         self.assertTrue(verify_materialization_manifests(self.dest, record)["verified"])
+
+    def test_self_consistent_unknown_manifest_version_is_rejected(self) -> None:
+        record = materialize(_request(self.dest))
+        updates = {"schema_version": "future-wp2b1"}
+        for name, manifest_attr, hash_attr in (
+            ("control_plane_manifest.json", "control_plane_manifest", "control_plane_manifest_sha256"),
+            ("runtime_surface_manifest.json", "runtime_surface_manifest", "runtime_surface_manifest_sha256"),
+            ("product_fixture_manifest.json", "product_fixture_manifest", "product_fixture_manifest_sha256"),
+        ):
+            manifest = dict(getattr(record, manifest_attr))
+            manifest["schema_version"] = "future-wp2b1"
+            content = canonical_bytes(manifest)
+            with open(record.manifest_paths[name], "wb") as fh:
+                fh.write(content)
+            updates[manifest_attr] = manifest
+            updates[hash_attr] = sha256_hex(content)
+        forged = replace(record, **updates)
+        with self.assertRaises(MaterializationError):
+            verify_materialization_manifests(self.dest, forged)
 
     def test_empty_control_plane_materializes_and_verifies(self) -> None:
         record = materialize(MaterializationRequest(
