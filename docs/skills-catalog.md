@@ -1,10 +1,62 @@
 # Project Aegis — Skills & Agents Catalog
 
+This reference helps **developers and AI coding agents** find shipped Aegis
+skills and read-only review agents, then distinguish them from planned work.
+Use [Implemented](#implemented) for shipped entries and
+[Backlog by phase](#backlog-by-phase-reconciled) for work that remains. A row
+describes a capability; the matching `.claude/skills/<name>/SKILL.md` contains
+the actual instructions and trigger.
+
+## Find and use an entry
+
+1. Read [Skills vs. Agents](#skills-vs-agents) if you need to choose between a
+   procedure and a separate reviewer. Otherwise jump to [Implemented](#implemented)
+   and search this page for a task phrase or skill name. Phase and D-pack
+   headings group related entries.
+2. Open the named skill's `SKILL.md` under `.claude/skills/`; read its trigger,
+   limits and workflow before using it. A `MANUAL-ONLY` skill requires explicit
+   human invocation. An AI agent must also follow [AGENTS.md](../AGENTS.md)
+   and the current task's authority; a catalog listing grants none.
+3. For a capability without an implemented entry, check the
+   [reconciled backlog](#backlog-by-phase-reconciled) and its linked
+   [category roadmap](#capability-map-300-target-backlog). For skill authoring
+   rules, use the [skill generation standard](skill-generation-standard.md).
+
+**Jump to:** [implemented entries](#implemented) ·
+[backlog by phase](#backlog-by-phase-reconciled) ·
+[300+ capability map](#capability-map-300-target-backlog) ·
+[evals and validation](#evals--validation-note) ·
+[priority tiers](#priority-definitions).
+
+### Labels used here
+
+| Label | Meaning in this catalog |
+| --- | --- |
+| `D4`, `D12.4`, and similar | Decision or pack IDs in the [reconciliation record](reconciliation/step-0-reconciliation-v4.md); history and grouping labels, not skill names. |
+| `#262` and similar | Numbered candidates in a linked `docs/skills/` category roadmap. Check the linked source for status; the number alone does not mean it shipped. |
+| `cat 08`, `Phase 5` | Category roadmap number and delivery phase. A phase can contain shipped first-pass skills and remaining expansion work. |
+| `P0`, `P1`, `P2` | [Priority tiers](#priority-definitions), not permission levels. |
+| `Model-invocable?`, `MANUAL-ONLY` | Whether the host may select the skill or a human must explicitly invoke it; see the [skill standard](skill-generation-standard.md). |
+| `evals`, `trigger-evals` | Structural test-case files; their presence does not prove live behavior passed. See [validation](#evals--validation-note). |
+
+Abbreviations in headings and entries: **AI** = artificial intelligence;
+**SDLC** = software development life cycle; **SaaS** = software as a service;
+**RLS** = row-level security; **QA** = quality assurance; **E2E** = end to end;
+**LLM** = large language model; **PM** = product management; **IC** = individual
+contributor; **ADR** = architecture decision record. OWASP, ISO, SOC 2 and NIST
+name external framework families; follow the linked source sections for the
+exact version or control set used by a catalog entry.
+
+### Scope and source of this reference
+
 Single source of truth for what skills and subagents exist, what is planned, and how the two
 differ. The backlog below is derived from the **reconciled phase lists**
 ([`docs/reconciliation/step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md) §3)
 and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate-skills.py`
 checks that every *implemented* skill is listed here and in `README.md`.
+
+<details>
+<summary>Delivery status and construction history through D47 (expand)</summary>
 
 > **Status:** Phase 0 (foundation), Phase 1 (the 8-skill operating-discipline pack,
 > decision D4), Phase 1.5 (the 4-skill AI-SDLC governance completion, roadmap
@@ -89,6 +141,8 @@ shared-contract repairs, PR #91's permanent offline CI and PR #93's persistent
 owner grants are merged. Skill totals are unchanged. See the
 [changelog](../CHANGELOG.md) and [documentation index](README.md) for evidence
 and remaining measured-calibration work.
+
+</details>
 
 The approval/merge descriptions below are reusable skill defaults. For work on
 this source repository, consult its [owner approval register](approvals/APPROVAL_REGISTER.md):
