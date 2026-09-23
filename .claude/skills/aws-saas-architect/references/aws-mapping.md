@@ -5,6 +5,15 @@ stable AWS primitives; anything quota-, instance-type-, price-, or
 region-specific is a verification item against current AWS docs, never
 asserted from here.
 
+**Reading key:** AWS means Amazon Web Services. The [parent skill's terms](../SKILL.md)
+define the account, identity, network, compute, and security abbreviations used
+here. Additional terms: SSM is AWS Systems Manager; DLQ is dead-letter queue;
+L7 is network layer 7 (the application layer); RLS is row-level security; KV
+is key-value; DB is database; TS is TypeScript; and GB is gigabyte. In the
+account sketch, OU means organizational unit, `acct` account, `prod`
+production, `nonprod` nonproduction, and `env` environment. Verify current
+service availability and limits before using this mapping in a design.
+
 ## Capability → AWS service mapping
 
 | Capability | Default | Alternatives (when) |
