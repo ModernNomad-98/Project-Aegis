@@ -1,233 +1,140 @@
-# Behavioral Eval Runner — offline core, grading, and calibration controls
+# Behavioral Eval Runner
 
-The NON-LIVE control plane and minimum guardrails of the Project Aegis
-Behavioral Eval Runner, authorized by **BER-DEC-006**
-(authorization PR #82, squash merge `fc98ee6bf59bb516064be62ed8c5dc8861c92697`),
-implementing the 2B-1 row of
-[`docs/design/behavioral-eval-runner-v1.md`](../../docs/design/behavioral-eval-runner-v1.md) §19 —
-plus the NON-LIVE **WP-2B-2 Scenario A Grading Stack**, authorized by
-**BER-DEC-007** (authorization PR #84, squash merge
-`1145cb75d79bc6ab13876438527235c93320278b`), implementing the v1.1
-fast-track successor
-([`docs/design/behavioral-eval-runner-v1-fast-track-successor.md`](../../docs/design/behavioral-eval-runner-v1-fast-track-successor.md)) §3–§4.
+The **Behavioral Eval Runner** is Project Aegis's evaluation harness. It helps
+maintainers find out whether an Aegis skill or agent behaves as intended on a
+test case. The skills library tells an assistant how to work; this runner
+inventories test cases, prepares reproducible inputs, grades recorded behavior,
+and reports coverage and uncertainty. It is maintainer infrastructure, not an
+application feature installed with the skills.
 
-WP-2B-3 adds gated calibration controls and a dedicated development driver
-under **BER-DEC-008**. The reviewed engineering scope shipped in
-[PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88);
-shared approval-grader corrections followed in
-[PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90).
-Measured calibration is unfinished. The original approved input
-bytes are unavailable on this computer and in GitHub. See the
-[replacement preparation plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
-and [PR #88 closeout record](../../docs/evidence/ber-pr88-closeout-2026-09-12/README.md).
+**Current state:** General runner and Scenario A grading commands operate on
+offline or recorded synthetic data. They do not start a live assistant or
+send a model request. A separate gated calibration development driver exists,
+but measured calibration has not started: replacement labels still need owner
+review. No live Scenario A or general corpus run is available. The
+[active backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) records
+current gates; the [design](../../docs/design/behavioral-eval-runner-v1.md)
+contains the complete contract.
 
-## Hard boundaries (Outcome B)
+## A normal offline workflow
 
-- **0 model/provider dispatches, 0 live Claude Code sessions, USD $0 spend.**
-  These are the results of the recorded offline verification. The generic
-  Claude Code adapter and judge provider deny with `LIVE_DISPATCH_DISABLED`.
-  A separate calibration development driver has a gated live path, described
-  below; no live execution or measured acceptance is claimed.
-- **R1–R5 are NOT technically solved here.** Real-host activation observation
-  (R1), judge calibration (R2, BLOCKED; OD-1 OPEN), cost observability (R3),
-  containment (R4), and execution-profile isolation (R5) all remain
-  UNAVAILABLE/UNKNOWN and are reported that way.
-- **No live Scenario A or generic eval execution.** The offline core uses the
-  Python standard library. The dedicated calibration transport requires the
-  separately pinned SDK. [Offline CI](../../docs/offline-ci.md), delivered in
-  PR #91, installs it and requires an environment precheck before running the
-  BER suite on Linux and Windows. Minimal local environments without the SDK
-  skip its configuration tests and must report that gap.
-- Census-proposed risk classes are **PROPOSED / NOT OWNER-RATIFIED** (OD-3).
-- **WP-2B-2 grading stack is NON-LIVE:** deterministic graders grade RECORDED
-  synthetic evidence only; its generic semantic judge denies live dispatch.
-  Its calibration harness uses deterministic mocks and MOCK/UNRATIFIED
-  thresholds. WP-2B-3 adds the separate gated transport below, tested with
-  fakes and synthetic inputs. **No measured calibration; OD-1 OPEN; R2
-  BLOCKED; WP-2B-3 engineering delivered, measured acceptance unfinished;
-  WP-2B-4 BLOCKED.**
+1. **Inventory cases.** `census` reads a pinned Git revision and counts skill
+   and trigger test cases. A pinned revision makes results reproducible.
+2. **Prepare inputs.** `materialize` copies approved Git objects into separate
+   test surfaces and writes hash manifests. `preflight` checks prerequisites;
+   missing setup is reported as missing setup, not a behavioral failure.
+3. **Plan and grade.** `schedule` makes a deterministic queue. For Scenario A,
+   `grade-fixture` compares a trusted grading plan with recorded observations.
+   A semantic assertion that needs a model cannot silently pass a deterministic
+   grader.
+4. **Verify and report.** `verify-evidence` checks the input and final bundles.
+   Aggregation and reporting preserve unrun, uncertain and blocked outcomes.
 
-## What is here
-
-| Module | Delivers |
-| --- | --- |
-| `enums.py`, `models.py`, `schemas/` | Versioned closed enum sets and strict records (`attempt_state` incl. honest `UNRUN` default; `aggregate_verdict` + `aggregate_blocker`; coverage metrics) |
-| `canonical.py`, `identity.py` | Canonical JSON + SHA-256; globally unique `case_uid`/`assertion_uid`/attempt identities |
-| `census.py` | Implementation-time corpus census from the pinned Git snapshot (design §3 items a–k) |
-| `runtime_surface.py` | Fail-closed runtime-file classification (`runtime_required` / `control_plane_only` / `ambiguous_needs_owner_review`) |
-| `pathsafe.py` | Shared strict relative-path validation (traversal / drive / ADS / device-name / trailing-dot) and reparse-safe joins used by the materializer and evidence writer |
-| `materialize.py` | Immutable Git-object materializer: two separated surfaces + product fixture, three hashed manifests, full-shipped-corpus rule, partial-install scoping. Git calls resolve the binary, disable remote protocols and system/global config, require hex SHAs, and pass `--end-of-options` |
-| `preflight.py` | Capability/fixture preflight — missing setup never becomes behavioral FAIL |
-| `execution_profile.py` | §5e profile representation; real host honestly UNAVAILABLE/UNKNOWN; baseline-eligibility marking |
-| `containment.py`, `process_control.py` | Fail-closed containment interfaces, mock/synthetic test boundary, timeout + process-tree emergency kill |
-| `budget.py`, `scheduler.py` | Pre-dispatch reservation ledger (hash-chained + checkpoint-anchored, restart-safe, empty/uncapped-dimension denial, atomic reconcile with drift fail-safe, enforced wall-clock deadline, kill switch) + deterministic risk-aware, prefix-exhaustion-safe scheduler with typed reverse edges |
-| `aggregation.py` | Immutable attempts, N/quorum truth table, blocker precedence, orthogonal quarantine |
-| `evidence.py` | Two-stage finalization with detached marker; fail-closed integrity verification |
-| `reporting.py` | Deterministic reports with complete coverage metrics and no-unearned-PASS enforcement |
-| `adapters/` | Host-adapter interface + the non-live Claude Code adapter |
-| `cli.py` | `census`, `validate-record`, `materialize`, `preflight`, `schedule`, `aggregate-fixture`, `verify-evidence`, `capabilities`, `version`, `self-check`, plus the offline WP-2B-2 commands `validate-grading-contract`, `grade-fixture`, `build-judge-envelope`, `validate-judge-verdict`, `mock-calibration`, `grading-capabilities` — no live-run command exists |
-| `graders/` (WP-2B-2) | Scenario A control A–Q classification contract with structured required-oracle sets (`contract.py`); TRUSTED hash-bound grading plans, mechanically separated from observed evidence (`plan.py`); typed hash-bound results carrying closed oracle identities and separate plan/evidence input hashes (`records.py`); deterministic graders over recorded synthetic evidence: state/transitions (`state_machine.py`), approval boundaries with ID+target-bound approvals (`approval.py`), plan-scoped prohibited mutations + fail-closed zero-commit (`mutation.py`), append-only/ordering gates with duplicate-header fail-closed extraction (`append_only.py`), run-local preview-vs-created hashing (`hashing.py`; never fixture pins), typed target/invocation-mode activation (`activation.py`), role/stage/questionnaire/capture oracles + the control dispatcher enforcing the COMPLETE required oracle set per control (`controls.py`; composite/semantic controls never PASS deterministically; incomplete/duplicate/foreign result sets are ERROR) |
-| `judge/` (WP-2B-2) | NON-LIVE judge scaffold: pinned-identity interface with a deny-all provider placeholder (`interface.py`), versioned injection-resistant system policy (`policy.py`), delimited base64 untrusted-data envelope built only from stage-A-verified artifacts and carrying the TRUSTED contract-derived control context (`envelope.py`), the exact coherent-topic rubric contract (`rubric.py`), recorded-fixture mock client that verifies the envelope bytes hash-bind the request before any lookup (`mock.py`), schema-validated verdicts with fail-closed `JUDGE_ERROR` and full request↔envelope binding via `dispatch_mock_judgment`/`parse_judge_output` (`verdict.py`), deterministic/mock calibration harness with MOCK/UNRATIFIED thresholds and drift invalidation (`calibration.py`). The `build-judge-envelope` CLI emits repository-safe metadata only — no raw envelope content is printed or persisted |
-| `fixtures/scenario_a/` (WP-2B-2) | Recorded SYNTHETIC good/bad grading fixtures, the injection-defense suite, mock verdicts, and the synthetic/mock calibration dataset |
-
-Note on the final bundle: the stage-A input manifest is bound through the
-final report's `run_evidence_binding.input_evidence_manifest_sha256`; the
-final manifest lists the final artifacts (including the final report) and
-never lists itself or the detached marker.
-
-## Usage (offline, deterministic)
+For example, these safe commands report the installed version and available
+capabilities, then check offline invariants. They do not run a case or contact
+a model provider:
 
 ```bash
 python -m tools.behavioral_eval_runner version
 python -m tools.behavioral_eval_runner capabilities
 python -m tools.behavioral_eval_runner self-check
-python -m tools.behavioral_eval_runner census --repo . --ref <sha> --out census.json --canonical
 ```
 
-Replace `<sha>` with the full commit SHA to inspect. The optional
-`--verify-baseline` flag checks the historical census baseline (882 behavioral
-cases and 858 trigger cases), not an arbitrary current revision. Use it only
-when reproducing that pinned historical corpus; later additions can legitimately
-change census totals without changing those baseline constants.
+To inventory a source revision, use a full Git commit identifier. This example
+pins the 2026-09-23 owner-grant merge; use another full identifier for another
+revision:
 
-## WP-2B-3 Stage A1 — measured-calibration controls (BER-DEC-008; OFFLINE)
+```bash
+python -m tools.behavioral_eval_runner census --repo . --ref 1af342712d27d5e6ea482b3f451106b4dccaf125 --out census.json --canonical
+```
 
-Authorized by **BER-DEC-008** (authorization PR #87, squash merge
-`1c3e4931329179d9a3f9cc9ec1bb93020378c043`): the OFFLINE implementation of
-the Measured Judge Calibration controls. **Stage A1 makes ZERO
-provider/model/metadata calls, accesses ZERO credentials, and spends
-USD $0** — every element below is exercised with fakes only.
+The optional `--verify-baseline` flag checks one pinned historical census (882
+behavioral cases and 858 trigger cases). A later revision may legitimately
+have different counts. Run each command with `--help` for required file shapes
+and options.
 
-| Module | Delivers |
+## What each part does
+
+| Area | Purpose and result |
 | --- | --- |
-| `judge/calibration_errors.py` | Typed WP-2B-3 failure taxonomy with the closed BER-DEC-008 stop-reason set |
-| `judge/calibration_io.py` | Checked evidence paths and regular-file identity, delayed truncation, and cooperative cross-process locks; Windows parent-directory races remain an operational limitation |
-| `judge/calibration_credential.py` | Process-scoped consume-once credential handle (redacted repr; missing ⇒ STOP; never exercised with a real secret in Stage A1) |
-| `judge/calibration_transport.py` | Pinned provider terms (OpenAI Responses API, exact snapshot `gpt-5.5-2026-04-23`, SDK `openai==3.0.0` with recorded wheel/sdist SHA-256); lazy-import client factory with SDK retries pinned to ZERO, connect 15 s / total 300 s, exact `https://api.openai.com/v1`, `trust_env=False`, proxy/TLS/base-URL environment fail-closed; the CLOSED request-kwargs set (no tools/functions/search/code/conversation state; `store:false`; `background:false`; reasoning medium; default sampling); strict structured-output verdict schema; conservative 8,000-input-token gate |
-| `judge/calibration_ledger.py` | Append-only hash-chained accounting in integer nano-USD; pre-dispatch reservations enforcing 200 judgment attempts / 1 metadata request / 201 total, USD $175 total and single-day ceilings (stop BEFORE any cap; worst permitted token path USD $158), per-judgment 2-attempt maximum, missing-usage-telemetry ⇒ recorded worst-case charge + STOP; 90 min / 4 h / 6 h active-execution deadlines with OWNER_WAIT excluded |
-| `judge/calibration_dataset.py` | The SYNTHETIC CANDIDATE dataset contract (160 items; 16 per semantic-bearing control A,B,C,D,G,H,I,J,N,O; 40 dev 2P/2F; 120 sealed holdout 6P/6F; ≥40 CRITICAL expected-FAIL; ≥40 adversarial with ≥20/≥20; overlap reported); split-map hashing; holdout access impossible without the owner freeze; the label-free `CalibrationItemContent` judge-facing projection (expected labels structurally unrepresentable) |
-| `judge/calibration_envelope.py` | Calibration envelopes of the EXACT WP-2B-2 shape (same version/policy/trusted control context), bound through the existing `validate_request_envelope_binding`; label-bearing inputs rejected |
-| `judge/calibration_gates.py` | The hard Stage-A1 gate: OWNER_LABEL_APPROVAL=PENDING mechanically blocks every dispatch; gate-issued-only authorization objects; the decision-35 holdout freeze artifact contract (cap frozen in [8,192, 25,000]) |
-| `judge/calibration_provider.py` | The calibration-only judge client (constructible ONLY with a gate-issued authorization): one runner-owned transport retry maximum (attempts uniquely ledgered and linked; semantic FAIL / malformed / refusal / incomplete NEVER retry); returned-model mismatch ⇒ STOP; incomplete ⇒ `JUDGE_ERROR`, never parsed; concurrency 1; the single authorized metadata request surface (capped at exactly one; not called in Stage A1) |
-| `schemas/calibration-*.schema.json` | Candidate-dataset, owner-approval, and ledger-entry schema mirrors (`1.0.0-wp2b3`) |
-| CLI | `validate-calibration-dataset` and `calibration-status` (repository-safe hashes/counts/status only) plus six new self-check items |
+| `census.py`, `materialize.py`, `preflight.py`, `runtime_surface.py` | Count cases from a pinned revision, copy required files, classify runtime files, and report missing or ambiguous prerequisites before grading. |
+| `models.py`, `enums.py`, `schemas/`, `identity.py`, `canonical.py` | Define versioned record shapes, stable identities and canonical hashes. Reject invalid or unexpected fields. |
+| `pathsafe.py`, `execution_profile.py`, `containment.py`, `process_control.py` | Keep paths within intended roots, describe host capabilities honestly, and expose process-control interfaces. Synthetic tests do not prove real-host containment. |
+| `budget.py`, `scheduler.py` | Reserve bounded work before dispatch and build a deterministic queue. Unknown costs, absent caps or deadline violations close the gate. |
+| `aggregation.py`, `reporting.py`, `evidence.py` | Combine attempts without an unearned pass, report coverage, and write and verify a two-stage evidence chain. |
+| `graders/`, `judge/` | Grade recorded Scenario A controls against trusted plans. Deterministic graders cannot decide semantic assertions; the generic judge provider denies live dispatch. |
+| `cli.py` | Expose offline inventory, preparation, grading, evidence and status commands. There is no general live-run command. |
 
-The generic denial boundary is UNCHANGED: `DisabledJudgeProvider` still
-denies every dispatch with `LIVE_DISPATCH_DISABLED`, no Scenario A or
-generic-corpus execution path exists, and the runtime "openai" fragment is
-allowlisted for exactly the named calibration adapter modules. The candidate
-160-item dataset, labeling guide, and owner label-review packet were kept
-under the original external evidence root and are now unavailable; their
-recorded hashes cannot reconstruct the files. **Development calibration
-has NOT started, the sealed holdout is NOT opened, OD-1 remains OPEN, and
-WP-2B-4 remains BLOCKED.** Replacement preparation uses the project's GitHub
-repository for reproducible source and review evidence, as the owner directed.
+The command-line interface also offers `validate-record`, `aggregate-fixture`,
+`validate-grading-contract`, `build-judge-envelope`,
+`validate-judge-verdict`, `mock-calibration`, `grading-capabilities`,
+`validate-calibration-dataset`, and `calibration-status`. These commands check
+records, combine recorded attempts, check grading inputs and outputs, exercise
+mock calibration, report capabilities, validate synthetic candidate data, and
+report authorization status. The envelope command prints repository-safe
+metadata rather than private raw content.
 
-## WP-2B-3 Stage A2 — dedicated DEVELOPMENT driver (BER-DEC-008; OFFLINE)
+## Calibration is a separate gated workflow
 
-`judge/calibration_development_driver.py` is the narrowly scoped Stage A2
-DEVELOPMENT execution driver — WP-2B-3 / BER-DEC-008 / DEVELOPMENT stage /
-historically approved dataset `1.0.0-wp2b3-candidate.2` / `gpt-5.5-2026-04-23`
-ONLY. It is deliberately **not** part of the generic CLI (which still has no
-live-run command); its module-executable surface defaults to the offline
-`--describe` contract report:
+**Work package 2B-3** is the numbered effort to measure the semantic judge's
+quality. Decision identifiers such as `BER-DEC-008` refer to owner decisions
+in the [runner backlog and decision record](../../docs/roadmaps/behavioral-eval-runner-backlog.md).
+Offline-tested dataset, request, accounting, credential and authorization
+controls live under `judge/calibration_*.py`. The current
+`calibration_development_driver.py` is development-only. Its default
+description command reports the contract without sending a request:
 
 ```bash
 python -m tools.behavioral_eval_runner.judge.calibration_development_driver --describe
 ```
 
-What it enforces on top of the Stage A1 machinery it composes:
+The original approved input bytes are unavailable here. Replacement inputs
+are versioned in an owner-only private repository; proposed labels still
+await human review. Hidden holdout transcripts and labels must stay out of
+this public repository and judge requests. See the
+[replacement plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
+and [offline holdout support proposal](../../docs/roadmaps/ber-wp2b3-holdout-execution-scope.md).
+That proposal does not complete a holdout driver or authorize a live run.
 
-- ONE canonical ledger (`runs/wp2b3-development-ledger-v1.jsonl`) and ONE
-  canonical run manifest (`runs/wp2b3-development-run-manifest-v1.json`),
-  derived exclusively from the ownership-marker-verified evidence root — no
-  caller-selected paths; wrongly-marked roots are refused.
-- GENESIS exactly once, with recoverable initialization across the pending
-  manifest window. Existing execution history cannot be reset; later
-  segments reopen the same hash-chained file and must re-prove every
-  manifest binding (audited head/tree, approval hash, artifact hashes,
-  model, SDK, caps) before resuming.
-- A durably verified DEVELOPMENT active segment is required before ANY
-  external interaction, so the 90-minute/6-hour deadlines govern the single
-  metadata probe, every judgment attempt, and the one runner-owned retry.
-- Exactly the 40 DEVELOPMENT items in sorted item-id order (20/20 gold
-  balance asserted); sealed-holdout items are structurally unreachable.
-- Restart-safe, never retry-until-green: terminal outcomes are never
-  redispatched; orphans and crashed-open segments block resume fail-closed;
-  OWNER_WAIT (with the one-time repository-safe result summary) only after
-  all 40 terminal outcomes.
-- Consume-once process-scoped credential wiring; live execution requires
-  the exact audited head/tree; the live path was NEVER exercised — Stage A2
-  preflight tests use fakes, dummy sentinels, and temp roots only, and the
-  REAL canonical ledger does not exist.
+Before any provider request, the owner-approved dataset and exact source
+revision, historical usage and remaining allowance, evidence root, host,
+credential custody and model terms must pass the recorded gate. Development
+would use only its 40 development cases. The 120 holdout cases stay sealed
+until the owner reviews development results and freezes the output cap. An
+offline test cannot approve labels, establish spending allowance or ratify a
+measured result.
 
-Current readiness: **BLOCKED — approved input bytes unavailable.** The
-2026-08-14 approval of the original hash-bound dataset is historical
-([summary §9](../../docs/evidence/behavioral-eval-runner-wp-2b-3-summary.md)).
-It cannot authorize replacement bytes. The production status command checks
-the full dataset identity and approval-file digest; unrelated or altered
-artifacts remain PENDING. Development execution is **NOT STARTED**. Follow
-the replacement plan for reproducible inputs, label review, new pins and the
-remaining execution gates; merging the controls does not complete those steps.
+## Terms and limits
 
-### First-live execution-gate corrections (audit of `ca19b919…`; OFFLINE)
+- **Offline** here means the general commands use local records and fakes.
+  Installing dependencies is a separate networked setup step.
+- **Scenario A** is the first control family in the design. Its controls are
+  labeled A through Q; those letters identify tests, not success grades.
+- **Stage A** is the hash-verified input bundle. **Stage B** is the final
+  report and verification bundle. A detached marker binds finalization.
+- **PASS**, **FAIL**, **UNRUN** and **JUDGE_ERROR** are result states. An unrun
+  case or a judge error is neither a behavioral failure nor a pass.
+- **SHA-256** is the hash algorithm that binds file and record bytes. A
+  matching hash proves integrity against a pinned value, not owner approval.
+- Real-host activation, cost observation, containment and execution-profile
+  isolation still require separate evidence. Consult `capabilities` before
+  making a claim about them.
 
-The following is historical evidence from the original input set. It does
-not establish that those files are available or reverified on this computer.
+## Tests and further reading
 
-The independent exact-head audit returned REQUEST CHANGES with four
-consolidated pre-provider blocker families, corrected RED→GREEN (summary
-§10): **(A)** judge-visible request ids are now deterministic label-opaque
-digests (`wp2b3-r-<32-hex>`; no item id, split, label, or position leaks),
-and the strict structured-output schema is request-specific — every
-trusted binding field (request id, control, rubric trio, judge identity,
-manifest hash, schema version) is pinned to its one authorized value and
-`evidence_refs` is closed to the envelope's actual untrusted-data keys, so
-a real model can satisfy every runtime equality check from
-provider-visible content alone (all 40 real development items re-verified
-at 4,742–5,400 proven input tokens against the 8,000 ceiling);
-**(B)** every durable ledger event append now completes a
-write → flush → `os.fsync` barrier before control returns — above all the
-write-ahead `ATTEMPT_STARTED` before any transport use; **(C)** durable
-append-only run states: judgments require a durable `METADATA_OK` success
-for the exact snapshot (a bare metadata count never suffices, and the
-single authorized request is never repeated); every fail-closed stop
-(model/auth/telemetry/cap/metadata/unclassified/deadline) persists
-`RUN_STOPPED`, which no restart can silently resume; the owner-controlled
-pause persists `RUN_PAUSED` and resumes lawfully; `OWNER_WAIT` is durable
-across processes; metadata exceptions record `billing_unknown`, never
-known-zero; **(D)** the development summary now carries complete
-per-judgment input/output/reasoning token distributions (count, min, max,
-mean, median, deterministic nearest-rank p95, sorted values) over
-telemetry-bearing attempts for the owner's holdout `max_output_tokens`
-freeze.
-
-## Tests
-
-Use an isolated Python 3.14 environment, full Git history and temporary storage
-outside the checkout. Install the pinned CI dependencies before running tests:
+The [offline continuous-integration guide](../../docs/offline-ci.md) gives the
+pinned Python environment and prerequisites. Its runner suite command is:
 
 ```bash
-python -m pip install -r requirements-ci.txt
-python scripts/ci/check-environment.py
 python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py" -v
 ```
 
-All tests are deterministic and offline: mocks, synthetic fixtures, local
-Git and process-control subprocesses, and temp directories under the
-process-local TMP/TEMP. The test phase makes no network or model calls and
-installs no packages; dependency installation is a separate networked setup step.
-The WP-2B-3 SDK-configuration tests run with mocked transport in the pinned
-environment. Both hosted CI jobs require that environment, so missing SDK
-coverage cannot silently pass. Local environments without it must retain their
-explicit skips. See the [CI guide](../../docs/offline-ci.md) for the complete
-command set, PowerShell acceptance coverage and remaining platform gaps.
-
-Run local Git and process-tree fixtures as the checkout owner in a context
-that permits synthetic child termination. Restricted-agent sandbox failures
-do not establish a production defect or prove that sandbox containment works.
-Windows fixtures canonicalize temporary paths where the record contract
-requires them; a separate round-trip test exercises actual 8.3 destination
-aliases. POSIX no-follow directory races have separate platform tests.
-Set `PYTHONDONTWRITEBYTECODE=1` to keep test subprocesses from creating caches
-in the checkout. Retain skips and the exact tested commit with the results.
+Tests use synthetic fixtures, local Git and temporary directories. Some need
+permission to create and stop synthetic child processes. Record platform
+skips and the exact tested revision. The
+[Scenario A design](../../docs/design/behavioral-eval-runner-v1-fast-track-successor.md),
+[work package 2B-3 evidence summary](../../docs/evidence/behavioral-eval-runner-wp-2b-3-summary.md),
+[recovery record](../../docs/evidence/ber-pr88-closeout-2026-09-12/README.md)
+and [backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) preserve
+the transport and ledger limits, thresholds, decisions, historical corrections
+and remaining work.
