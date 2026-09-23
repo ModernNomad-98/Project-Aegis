@@ -5,6 +5,20 @@ description: 'Run ONE parameterized compliance gap audit — current state vs th
 
 # Compliance Gap Auditor
 
+Terms used below: **ISO** is short for the International Organization for
+Standardization; **SOC 2** is an American Institute of Certified Public
+Accountants (AICPA) service-organization controls examination and report;
+**CPA** means certified public accountant. **SoA** is the ISO 27001 Statement
+of Applicability; **TSC** means the SOC 2 Trust Services Criteria; **AI RMF**
+is the National Institute of Standards and Technology (NIST) Artificial
+Intelligence Risk Management Framework; and **Amd1** means Amendment 1 to the
+pinned standard edition. A requirement is **MET** only with cited, verified
+evidence;
+**PARTIAL** names the remaining shortfall; **GAP** means no satisfying
+mechanism was found; **UNVERIFIABLE** means available sources cannot support a
+substantive requirement verdict. These are readiness verdicts, never an audit
+opinion.
+
 ## Purpose
 
 Answer "where do we actually stand against the framework(s) we chose, and
@@ -99,10 +113,13 @@ issues or simulates an audit opinion.
 
 ```
 COMPLIANCE GAP AUDIT — <org/system>
-Parameters: frameworks <27001 [+Amd1] | 42001 | SOC 2 (categories) | +AI RMF profile> | target <event/date> | editions pinned
+Parameters: frameworks <ISO 27001 [+Amendment 1 (Amd1)] | ISO 42001 |
+  SOC 2 (scoped categories) | +NIST AI RMF profile> | target <event/date> |
+  editions pinned
 Requirement sources in hand: <which texts; absent text ⇒ UNVERIFIABLE>
 Verdicts (per requirement):
-  <req id/name> — MET (evidence: <cited>) | PARTIAL (<residue>) | GAP | UNVERIFIABLE (<why>)
+  <requirement ID/name> — MET (evidence: <cited>) | PARTIAL (<residue>) |
+  GAP (<missing mechanism>) | UNVERIFIABLE (<why evidence or source is insufficient>)
 Summary: MET <n> | PARTIAL <n> | GAP <n> | UNVERIFIABLE <n>  (per framework)
 Remediation order:
   1. BLOCKERS: <item → owner → owning skill → needed by>
