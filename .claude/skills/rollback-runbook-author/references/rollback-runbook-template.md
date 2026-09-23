@@ -1,6 +1,11 @@
 # Rollback Runbook Template
 
-Detail file for `rollback-runbook-author`. Loaded on demand.
+Use this template with the [rollback runbook author](../SKILL.md) to document
+reversal steps, observable checks, and rehearsal status. The owning skill
+authors the procedure; a human incident owner uses an approved runbook during
+a live incident. **LB** means load balancer, **CLI** means command-line
+interface, **SLI** means service-level indicator, and **COMMS** means
+communications.
 
 ## Per-layer primitive table
 
@@ -20,7 +25,7 @@ State deviations and why.
 ## Runbook skeleton
 
 ```
-ROLLBACK RUNBOOK — <change id> — status: CURRENT | STALE (<trigger hit>)
+ROLLBACK RUNBOOK — <change id> — status: DRAFT | CURRENT | STALE (<trigger hit>)
 Last rehearsal: <date — executor — env — result>
 
 WHEN TO USE (decision criteria)
@@ -62,5 +67,7 @@ STALENESS TRIGGERS (this runbook must be re-validated when…)
 | --- | --- | --- | --- | --- | --- |
 
 A runbook with an empty rehearsal log is DRAFT, not CURRENT — say so at
-the top. Tabletop rehearsals count only when every command was actually
-resolved (paths exist, ids resolve, access confirmed).
+the top. Mark CURRENT only after rehearsal and verification of the exact
+steps; mark STALE when a listed trigger requires re-validation. Tabletop
+rehearsals count only when every command was actually resolved (paths exist,
+ids resolve, access confirmed).

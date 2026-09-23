@@ -1,7 +1,12 @@
 # RAG retrieval authorization & embedding-risk reference
 
-Detail for `rag-security-architect`. OWASP LLM08 (Vector and Embedding
-Weaknesses), 2025.
+Use this reference with the [RAG security architect](../SKILL.md) to keep
+retrieval inside the caller's authorized tenant and document scope. **RAG**
+means retrieval-augmented generation; **OWASP** means Open Worldwide
+Application Security Project; **LLM08** is its 2025 vector and embedding
+weaknesses category. **ANN** means approximate nearest-neighbor search,
+**ACL** means access control list, and **IDOR** means insecure direct object
+reference. These terms do not replace authorization enforced by the store.
 
 ## Retrieval-time authorization patterns
 
