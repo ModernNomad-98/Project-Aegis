@@ -1,5 +1,18 @@
 # Behavioral Eval Runner v1.1 — Fast-Track Successor (Scenario A Grading Stack)
 
+> **Current reading, checked 2026-09-23:** The 2026-09-12 pointer and original
+> design-status lines below are historical snapshots. WP-2B-3 is **AUTHORIZED**
+> under BER-DEC-008, but measured calibration and owner decision 1 (OD-1)
+> ratification remain unfinished. WP-2B-4 remains **BLOCKED**. Offline
+> continuous integration (CI) shipped in PR #91; the separate WP-2B-7 advisory
+> CI integration remains backlog work. Read the [current BER backlog](../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> before using any phase status below. This note grants no model/provider call.
+
+**Reading key:** A work package (WP) is a numbered delivery phase;
+`BER-DEC-008` is its Behavioral Eval Runner decision entry, and a pull request
+(PR) records reviewed repository delivery. `AUTHORIZED` does not mean a
+measured result exists or approve the next phase.
+
 > **Current-status pointer — 2026-09-12.** The design and August 14 notice below
 > retain their original context. BER-DEC-008 is now effective through merged
 > PR #87; PR #88's reviewed calibration engineering and PR #91's offline CI have
