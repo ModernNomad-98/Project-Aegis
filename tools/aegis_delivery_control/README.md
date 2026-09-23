@@ -62,6 +62,11 @@ they are not commands a user should type.
 
 ## What the package files do
 
+**Reading key:** SQLite is the embedded database engine that stores local
+state in a file. SHA-256 (Secure Hash Algorithm 256-bit) is a digest of bytes:
+it helps detect changes against a trusted value, but does not itself grant
+authority or prove the source is fresh.
+
 | File | Responsibility |
 | --- | --- |
 | `contracts.py` | Define typed operation, event, permission, budget and result records; reject malformed or ambiguous inputs. |
@@ -100,8 +105,20 @@ vector and checks synthetic issuer evidence. It requires both a vector file
 containing exactly `repository_id`, `catalog_head` and `run_heads`, and a
 separate file containing the synthetic issuer key under
 `synthetic_issuer_key_hex`. These are test inputs, not production credentials.
-Create the two files from an independently trusted synthetic fixture before
-using these ordinary path examples:
+Both files are JavaScript Object Notation (JSON). In the expected vector,
+`repository_id` must match the command's repository identity, `catalog_head`
+is the independently expected catalog revision, and `run_heads` maps each run
+identifier to its independently expected head. The separate key file has
+exactly `synthetic_issuer_key_hex`, a hexadecimal synthetic issuer key from
+the same offline test authority. The
+[command-line test fixture](tests/test_dispatch.py) shows the two JSON shapes
+and obtains their values from a synthetic setup; `verify --help` lists the
+required file arguments. That fixture exercises the command shape, not an
+independent freshness proof. Do not derive the expected vector from the state
+being checked when making a freshness claim, or substitute a real credential.
+Create both files from an
+independently trusted synthetic fixture before using these ordinary path
+examples:
 
 ```powershell
 python -m tools.aegis_delivery_control --repository-id example-project verify --expected-vector .\vector.json --authority-key-file .\synthetic-key.json
@@ -118,12 +135,15 @@ State lives outside the repository checkout in a user-local directory:
 
 - Windows: the operating system's LocalAppData known folder, then
   `ProjectAegis/control-plane/<repository-hash>/state.sqlite3`.
-- Linux: the `XDG_STATE_HOME` directory when set, otherwise
+- Linux: the `XDG_STATE_HOME` environment variable selects the user-state
+  directory when set; otherwise use
   `$HOME/.local/state/project-aegis/control-plane/<repository-hash>/state.sqlite3`.
 
 The database uses SQLite transactions, rollback journaling and
-`synchronous=FULL`. A stable operating-system lock excludes cooperating
-writers. The synthetic target and validator each have their own SQLite
+`synchronous=FULL`, SQLite's request to sync transaction writes to storage.
+The process-crash tests do not prove physical power-loss durability. A stable
+operating-system lock excludes cooperating writers. The synthetic target and
+validator each have their own SQLite
 ledger, so a restarted controller can reconcile an accepted effect or result
 without issuing it again. Checked paths reject unsafe links and ownership;
 unsupported path guarantees close dispatch.
