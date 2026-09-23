@@ -1,5 +1,14 @@
 # AEGIS-060+ register — proposed new findings, dedup map, and batch notes
 
+> **Current reading, checked 2026-09-23:** The AEGIS-060 rejection and typed
+> skill/subagent correction below remain the disposition of that candidate.
+> Sections 3–5 preserve the original 184-skill baseline's dedup map, coverage,
+> and planned remediation sequence. Phrases there such as "current main" and
+> "planned PR" refer to that baseline, not today's source tree. For current
+> skill contracts, inspect the [skills catalog](../skills-catalog.md) and
+> [source files](../../.claude/skills/); do not schedule work solely from the
+> historical rows.
+
 **Current disposition, reconciled 2026-09-12:** AEGIS-060 is a **REJECTED
 CANDIDATE / FALSE POSITIVE; ID RETIRED AND NEVER REUSED**. Merged
 [PR #89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), commit

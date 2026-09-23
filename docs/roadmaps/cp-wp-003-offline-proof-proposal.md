@@ -1,5 +1,20 @@
 # CP-WP-003 offline capability-proof authorization proposal
 
+> **Current reading, checked 2026-09-23:** The proposed grant below is the
+> historical route to the first increment. AEGIS-APR-006 authorized CP-WP-003A,
+> which [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123)
+> delivered as an offline synthetic capability proof. The
+> [current CP backlog](resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery)
+> and [CP-WP-003A review](../evidence/control-plane/cp-wp-003a-review.md)
+> record that delivery. Real-source, host, evidence, and billing proofs remain
+> absent; CP-WP-003 and CP-WP-004 are still BLOCKED. The original proposal does
+> not authorize a real dispatch.
+
+**Reading key:** Control plane (CP) names the delivery kernel; a work package
+(WP) is a bounded delivery unit, and `003A` was its synthetic first increment.
+`AEGIS-APR-006` is the matching owner approval-register entry; a pull request
+(PR) records reviewed repository delivery.
+
 Prepared 2026-09-23 from public `main` at
 `32144083bc86412e30d70873f877d4e7c051b6e0`. **Proposal only.**
 CP-WP-003 remains BLOCKED in the [control-plane backlog](resumable-control-plane-backlog.md).
