@@ -17,6 +17,11 @@ The deliverable is a triaged, deduplicated, ranked remediation list with an
 explicit suppression policy: nothing is dismissed without a written reason a
 reviewer can audit. A scanner hit is a lead, not a verdict.
 
+Terms used below: **SAST** means static application security testing;
+**SARIF** is the Static Analysis Results Interchange Format for tool output;
+**CVE** means Common Vulnerabilities and Exposures. **TP** and **FP** shorten
+the true-positive and false-positive dispositions defined in Workflow step 3.
+
 ## Use When
 
 - Use when: handed SAST / CodeQL / Semgrep / SARIF / security-linter output on
@@ -81,13 +86,16 @@ reviewer can audit. A scanner hit is a lead, not a verdict.
    confirmed location, the exploit path (for highs), and a fix direction —
    handing fixes to `appsec-implementer` and any diff-level nuance to
    `security-pr-reviewer`.
-8. **Report the triage math:** counts in vs out (TP/FP/dup/accepted), so the
+8. **Report the triage math:** counts in vs out (true positives (TP), false
+   positives (FP), duplicates, accepted risks), so the
    noise reduction is auditable and the scanner can be tuned.
 
 ## Output Format
 
 ```
 STATIC ANALYSIS TRIAGE — <tool + scope>
+Disposition legend: TP = true positive; FP = false positive;
+  dup = duplicate; accepted = accepted risk
 Input: <N raw findings> → <M after dedup>
 Disposition: true-positive <n> | false-positive <n> | duplicate <n> | accepted <n>
 True positives (ranked):
