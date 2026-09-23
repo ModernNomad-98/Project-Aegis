@@ -1,5 +1,40 @@
 # Aegis efficient execution plan and new-chat handoff
 
+> **Current reading, checked 2026-09-23 after pull request #146:** Sections
+> 1–9 below preserve the original handoff, including its then-current first
+> task and estimates. They are historical instructions, not today's execution
+> queue or a new authorization. Read the current routes and dispositions here
+> before using them. Existing safety and phase gates still apply.
+
+## Current status and reader routes
+
+This page helps a new maintainer or coding agent find the governing records.
+Behavioral Eval Runner (BER), control plane (CP), and issue #101 setup each
+have separate work packages (WPs) and approvals. A backlog item (BKL) records
+a need; an approval-register entry (APR) or BER decision (BER-DEC) records
+specific owner scope. A pull request (PR) can be open or merged. Owner decision
+1 (OD-1) is the later human ratification of measured BER calibration. R4/R5
+are BER host-confinement and execution-profile evidence gates. Continuous
+integration (CI) checks are not selected-host proof.
+
+| Original handoff topic | Current disposition |
+| --- | --- |
+| First task, BER-BKL-007 in §5 | **DONE** on [PR #104](https://github.com/ModernNomad-98/Project-Aegis/pull/104) merge. The [BER backlog](behavioral-eval-runner-backlog.md) owns its completed status; the old first-task steps remain as historical context. |
+| BER evidence policy | [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day complete-bundle policy. [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) granted only one synthetic offline proof; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this check. BKL-009 remains partial; real-host access, encryption and cleanup still need separate proof and scope. |
+| CP work | The synthetic CP-WP-003A increment shipped in [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123). The [CP backlog](resumable-control-plane-backlog.md) still blocks broader CP-WP-003 real-source/host claims and CP-WP-004 integration. |
+| Issue #101 setup | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only selection ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped in bounded scopes. The [setup plan](aegis-setup-routing-plan.md) keeps package 4 host/comparison work pending, packages 5/6 conditional, and package 7 pending. No helper is selected. |
+| BER calibration and host | Replacement labels, reviewed execution source and allowance, a named proven host, measured calibration and OD-1 remain open. No live BER phase is authorized by this handoff. Follow the [BER phase register](behavioral-eval-runner-backlog.md) and [current decision index](aegis-open-decisions-2026-09-23.md). |
+
+Start with the [owner approval register](../approvals/APPROVAL_REGISTER.md)
+for authorization and later lifecycle events, then the owning backlog or
+setup plan above for exact status. The [latest forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141)
+estimates **175–394 remaining active hours** of selected work; it does not
+grant implementation or provider authority. Review the current branch, head,
+checks and open PRs before choosing a task. Do not restart §5 from this dated
+handoff.
+
+## Original handoff: sections 1–9 as prepared
+
 Prepared: 2026-09-23. Owner: Peter Nguyen.
 Repository: `ModernNomad-98/Project-Aegis` (source-library Role A).
 Purpose: carry the revised workload, verified state, model policy and first task

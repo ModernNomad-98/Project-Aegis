@@ -1,5 +1,44 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
+> **Current reading, checked 2026-09-23 after pull request #145:** This is the
+> permanent continuation and decision register for Behavioral Eval Runner
+> maintainers and coding agents. The dated delivery checkpoints below remain
+> historical evidence. Use the current map and owning work-package record
+> before treating older conditional wording as today's status. This page does
+> not itself authorize a provider call, private-input access or live run.
+
+## Start here: status and routes
+
+Behavioral Eval Runner (BER) evaluates recorded skill behavior. A work package
+(WP) is the governing delivery unit; a backlog item (BKL) is a child need,
+not independent execution authority. A BER decision (BER-DEC) and an Aegis
+approval-register entry (APR) record specific owner scope. Pull request (PR)
+means a proposed or merged repository change. Owner decision 1 (OD-1) is the
+later human ratification of a measured judge-calibration result. R1–R5 name
+the five capability-evidence gates. Continuous integration (CI) checks source;
+its Linux run is not proof on a selected host. `NON-LIVE` means recorded or
+synthetic input only; `NON_BASELINE` means a result cannot qualify for the
+measured baseline. POSIX names a Unix-like operating-system interface.
+
+| Work or evidence gate | Current disposition | What remains |
+| --- | --- | --- |
+| WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
+| WP-2B-1B / BKL-009 | **AUTHORIZED** for one synthetic offline proof by [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this checkpoint. BKL-009 remains partial. | Real-host enforcement and cleanup need separate scope. See [WP-2B-1B](#wp-2b-1b--offline-evidence-policy-proof) and [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; measured calibration and OD-1 ratification remain unfinished. | Labels, source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate) and the [offline holdout proposal](ber-wp2b3-holdout-execution-scope.md). |
+| R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
+| WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
+
+For the binding start rule, read the [work-package authorization
+protocol](#work-package-authorization-protocol-binding) and the [append-only
+governance log](#13-append-only-governance-log). Use the [status
+vocabulary](#3-status-vocabulary) before interpreting `DONE`, `AUTHORIZED`,
+`BLOCKED` or `BACKLOG`; consult the [owner approval
+register](../approvals/APPROVAL_REGISTER.md) for later lifecycle events.
+The [current forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-141)
+estimates remaining work but grants no authority.
+
+## Original register and dated checkpoints
+
 Prepared: 2026-08-10.
 Purpose: the durable, repository-resident continuation and deferred-work register for the
 Behavioral Eval Runner, required before Phase 2B-0 may begin. This file replaces every
