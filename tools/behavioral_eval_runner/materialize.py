@@ -867,6 +867,8 @@ def verify_materialization_manifests(
 
     if not isinstance(expected_record, MaterializationRecord):
         raise MaterializationError("expected MaterializationRecord required")
+    if expected_record.schema_version != SCHEMA_VERSION:
+        raise MaterializationError("unsupported materialization schema_version")
     _refuse_reparse_points(destination_root)
     destination_real = os.path.realpath(destination_root)
     manifest_dir = _safe_join(destination_real, "materialization_manifests")

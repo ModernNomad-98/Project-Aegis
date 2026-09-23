@@ -144,6 +144,25 @@ class TestLedgerPersistence(unittest.TestCase):
         with self.assertRaises(LedgerIntegrityError):
             BudgetLedger.load(self.store, _caps(calls=50))
 
+    def test_self_consistent_checkpoint_requires_supported_version(self) -> None:
+        import json
+
+        for version in (None, "future-wp2b1"):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as root:
+                store = os.path.join(root, "ledger.jsonl")
+                BudgetLedger(_caps(calls=5), store_path=store)
+                checkpoint_path = store + ".checkpoint.json"
+                with open(checkpoint_path, encoding="utf-8") as fh:
+                    checkpoint = json.load(fh)
+                if version is None:
+                    del checkpoint["schema_version"]
+                else:
+                    checkpoint["schema_version"] = version
+                with open(checkpoint_path, "w", encoding="utf-8") as fh:
+                    json.dump(checkpoint, fh)
+                with self.assertRaises(LedgerIntegrityError):
+                    BudgetLedger.load(store, _caps(calls=5))
+
     def test_kill_switch_survives_restart(self) -> None:
         ledger = BudgetLedger(_caps(calls=5), store_path=self.store)
         ledger.engage_kill_switch("drift detected")

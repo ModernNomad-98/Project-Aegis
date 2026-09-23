@@ -7,8 +7,10 @@ import json
 import os
 import tempfile
 import unittest
+from typing import Any
 
-from tools.behavioral_eval_runner.canonical import sha256_hex
+from tools.behavioral_eval_runner import RUNNER_VERSION, SCHEMA_VERSION
+from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
 from tools.behavioral_eval_runner.errors import CircularEvidenceError, EvidenceError, EvidenceIntegrityError
 from tools.behavioral_eval_runner.evidence import (
     _POSIX_EVIDENCE_ATOMIC,
@@ -22,6 +24,11 @@ from tools.behavioral_eval_runner.evidence import (
     verify_final_bundle,
     verify_input_evidence,
 )
+from tools.behavioral_eval_runner.models import (
+    default_unselected_aggregate,
+    planned_unrun_attempt,
+)
+from tools.behavioral_eval_runner.tests.helpers import make_case_uid
 
 RUN = "run-ev"
 
@@ -43,6 +50,8 @@ class _BundleCase(unittest.TestCase):
     def _report(self, input_sha: str) -> dict:
         return {
             "report_kind": "behavioral_eval_run_report",
+            "schema_version": SCHEMA_VERSION,
+            "runner_version": RUNNER_VERSION,
             "run_id": RUN,
             "run_evidence_binding": {"input_evidence_manifest_sha256": input_sha},
             "aggregates": [],
@@ -58,8 +67,56 @@ class _BundleCase(unittest.TestCase):
         )
         return stage_a, stage_b
 
+    def _rewrite_json(self, name: str, payload: dict) -> str:
+        content = canonical_bytes(payload)
+        with open(os.path.join(self.root, name), "wb") as fh:
+            fh.write(content)
+        return sha256_hex(content)
+
+    def _mutate_final_component(self, name: str, field: str, value: Any) -> None:
+        """Keep every outer hash valid so version rejection is the tested boundary."""
+        def read(component: str) -> dict:
+            with open(os.path.join(self.root, component), encoding="utf-8") as fh:
+                return json.load(fh)
+
+        component = read(name)
+        if value is None:
+            component.pop(field)
+        else:
+            component[field] = value
+        component_sha = self._rewrite_json(name, component)
+        if name == FINAL_REPORT_NAME:
+            manifest = read(FINAL_MANIFEST_NAME)
+            for entry in manifest["artifacts"]:
+                if entry["path"] == FINAL_REPORT_NAME:
+                    entry["sha256"] = component_sha
+                    entry["bytes"] = len(canonical_bytes(component))
+            manifest_sha = self._rewrite_json(FINAL_MANIFEST_NAME, manifest)
+            marker = read(MARKER_NAME)
+            marker["final_report_sha256"] = component_sha
+            marker["final_evidence_manifest_sha256"] = manifest_sha
+            self._rewrite_json(MARKER_NAME, marker)
+        elif name == FINAL_MANIFEST_NAME:
+            marker = read(MARKER_NAME)
+            marker["final_evidence_manifest_sha256"] = component_sha
+            self._rewrite_json(MARKER_NAME, marker)
+
 
 class TestStageA(_BundleCase):
+    def test_input_manifest_requires_supported_version(self) -> None:
+        self.writer.finalize_input_evidence(_artifacts())
+        for version in (None, "future-wp2b1"):
+            with self.subTest(version=version):
+                with open(os.path.join(self.root, INPUT_MANIFEST_NAME), encoding="utf-8") as fh:
+                    manifest = json.load(fh)
+                if version is None:
+                    manifest.pop("schema_version", None)
+                else:
+                    manifest["schema_version"] = version
+                self._rewrite_json(INPUT_MANIFEST_NAME, manifest)
+                with self.assertRaises(EvidenceIntegrityError):
+                    verify_input_evidence(self.root)
+
     def test_finalize_and_verify(self) -> None:
         bundle = self.writer.finalize_input_evidence(_artifacts())
         self.assertEqual(bundle.artifact_count, 2)
@@ -145,6 +202,49 @@ class TestStageA(_BundleCase):
 
 
 class TestStageB(_BundleCase):
+    def test_nested_report_records_require_supported_versions(self) -> None:
+        uid = make_case_uid()
+        attempt = planned_unrun_attempt(RUN, uid, 1).to_dict()
+        attempt["schema_version"] = "future-wp2b1"
+        aggregate = default_unselected_aggregate(uid).to_dict()
+        del aggregate["schema_version"]
+        examples = {
+            "attempts": [attempt],
+            "aggregates": [aggregate],
+        }
+        for field, value in examples.items():
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as root:
+                original_root, original_writer = self.root, self.writer
+                try:
+                    self.root, self.writer = root, EvidenceWriter(root, RUN)
+                    self._full_bundle()
+                    self._mutate_final_component(FINAL_REPORT_NAME, field, value)
+                    with self.assertRaises(EvidenceIntegrityError):
+                        verify_final_bundle(self.root)
+                finally:
+                    self.root, self.writer = original_root, original_writer
+
+    def test_final_report_requires_runner_version_with_valid_hashes(self) -> None:
+        self._full_bundle()
+        self._mutate_final_component(FINAL_REPORT_NAME, "runner_version", None)
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_final_bundle(self.root)
+
+    def test_final_components_require_supported_versions_with_valid_hashes(self) -> None:
+        for name in (FINAL_MANIFEST_NAME, MARKER_NAME, FINAL_REPORT_NAME):
+            for version in (None, "future-wp2b1"):
+                with self.subTest(name=name, version=version):
+                    with tempfile.TemporaryDirectory() as root:
+                        original_root, original_writer = self.root, self.writer
+                        try:
+                            self.root, self.writer = root, EvidenceWriter(root, RUN)
+                            self._full_bundle()
+                            self._mutate_final_component(name, "schema_version", version)
+                            with self.assertRaises(EvidenceIntegrityError):
+                                verify_final_bundle(self.root)
+                        finally:
+                            self.root, self.writer = original_root, original_writer
+
     def test_detached_marker_binds_report_and_manifest(self) -> None:
         _stage_a, stage_b = self._full_bundle()
         result = verify_final_bundle(self.root)

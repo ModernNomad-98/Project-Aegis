@@ -1464,10 +1464,11 @@ authorization decisions in §13 remain unchanged.
 - **Title:** Final production JSON/YAML schemas and schema-migration policy
 - **Phase:** 2B-1
 - **Priority:** REQUIRED
-- **Status:** BACKLOG — PARTIALLY DELIVERED. PR #83 shipped versioned schemas,
-  closed enums and validating runtime records. The explicit schema-migration /
-  compatibility policy required by this entry has not been located; do not
-  schedule the existing schema implementation again or mark the whole entry DONE.
+- **Status:** READY_FOR_OWNER_REVIEW — PR #83 shipped versioned schemas,
+  closed enums and validating runtime records. WP-2B-1A proposes strict
+  external-version validation and the explicit compatibility policy in its
+  implementation PR. Keep this entry open until that PR passes review and the
+  owner accepts the final shapes; no measured or live phase is implied.
 - **Source / evidence:** Merged design §13 (every report carries `schema_version` /
   `runner_version`; versioned blocker/reason enums; canonical identities) and §5b ("the
   exact field names may be refined at build time into a better coherent schema, but every
@@ -1497,9 +1498,9 @@ authorization decisions in §13 remain unchanged.
   [schemas](../../tools/behavioral_eval_runner/schemas/),
   [runtime records](../../tools/behavioral_eval_runner/models.py) and
   [model tests](../../tools/behavioral_eval_runner/tests/test_enums_models.py).
-  Rejecting unsupported versions is implemented; that alone does not document
-  a migration/compatibility policy. Full closure still requires that policy
-  and its reviewed acceptance.
+  WP-2B-1A adds the [compatibility policy](../behavioral-eval-runner-schema-compatibility.md)
+  and external-boundary regressions; completion awaits its reviewed PR and
+  explicit owner shape acceptance. Historical evidence is never silently upgraded.
 - **Supersedes / superseded by:** None.
 
 ### BER-BKL-008 — Machine-generated corpus census

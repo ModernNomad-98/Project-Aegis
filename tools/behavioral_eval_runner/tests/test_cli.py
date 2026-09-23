@@ -120,6 +120,14 @@ class TestRecordCommands(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("error", payload)
 
+    def test_validate_record_rejects_missing_serialized_version(self) -> None:
+        attempt = planned_unrun_attempt("run-cli", make_case_uid(), 1).to_dict()
+        del attempt["schema_version"]
+        path = self._write("unversioned.json", attempt)
+        code, payload = _run_cli(["validate-record", "--schema", "attempt", "--file", path])
+        self.assertEqual(code, 2)
+        self.assertIn("error", payload)
+
     def test_aggregate_fixture(self) -> None:
         from tools.behavioral_eval_runner.enums import ReasonCode
 

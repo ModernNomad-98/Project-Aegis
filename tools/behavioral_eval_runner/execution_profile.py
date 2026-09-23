@@ -164,6 +164,8 @@ class ExecutionProfile:
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "ExecutionProfile":
+        if payload.get("schema_version") != SCHEMA_VERSION:
+            raise ProfileError(f"schema_version must be {SCHEMA_VERSION}")
         field_names = {item.name for item in fields(cls)}
         derived = {
             "baseline_eligible",

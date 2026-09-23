@@ -445,7 +445,7 @@ class AttemptRecord:
             cost_usage=CostUsage.from_dict(payload.get("cost_usage", {})),
             duration_seconds=payload.get("duration_seconds"),
             evidence_pointer=payload.get("evidence_pointer"),
-            schema_version=payload.get("schema_version", SCHEMA_VERSION),
+            schema_version=payload.get("schema_version"),
         )
         record.validate()
         return record
@@ -668,7 +668,7 @@ class AggregateRecord:
             quarantine_reason=payload.get("quarantine_reason"),
             quarantine_since=payload.get("quarantine_since"),
             waiver_ref=payload.get("waiver_ref"),
-            schema_version=payload.get("schema_version", SCHEMA_VERSION),
+            schema_version=payload.get("schema_version"),
         )
         record.validate()
         return record
@@ -990,7 +990,7 @@ class CaseManifestRecord:
             explicit_invocation_authorized=_opt_bool(
                 payload, "explicit_invocation_authorized", False
             ),
-            schema_version=payload.get("schema_version", SCHEMA_VERSION),
+            schema_version=payload.get("schema_version"),
         )
         record.validate()
         return record
