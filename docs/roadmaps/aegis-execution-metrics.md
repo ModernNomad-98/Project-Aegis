@@ -435,3 +435,66 @@ Prior snapshots remain intact; only the current first-screen navigation
 links were updated. Independent read-only review completed at **19:47:46
 UTC** with no blocker. GitHub Actions on the exact committed revision and
 the eventual start-to-merge interval remain pull request closeout gates.
+
+## Checkpoint after pull request #156 — 2026-09-23
+
+Five requests merged after #151, in order #152, #153, #154, #155 and #156.
+The merge clock is GitHub's pull-request `mergedAt` event. All times below
+are September 23, 2026, in Coordinated Universal Time (UTC). Duration
+notation uses **m** for minutes and **s** for seconds.
+
+| Pull request and bounded package | Previous and new estimates | First work checkpoint (UTC) | Merge event (UTC) | Observed wall time |
+| --- | --- | --- | --- | ---: |
+| [#152 — first skill screen](https://github.com/ModernNomad-98/Project-Aegis/pull/152) | Pull request records previous and new batch estimates of 2–4 active hours; see the scope note below | 19:31:24 | 19:49:02 | 17m38s |
+| [#153 — previous forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/153) | Previous and new checkpoint estimates: 1–2 active hours | 19:38:57, first preparation | 19:53:58 | 15m01s |
+| [#154 — cloud skill screen](https://github.com/ModernNomad-98/Project-Aegis/pull/154) | Previous and new batch estimates: 2–4 active hours | 19:34:25 | 19:57:41 | 23m16s |
+| [#155 — third skill screen](https://github.com/ModernNomad-98/Project-Aegis/pull/155) | Previous and new batch estimates: 2–4 active hours | 19:44:38 | 20:07:31 | 22m53s |
+| [#156 — fifth skill screen](https://github.com/ModernNomad-98/Project-Aegis/pull/156) | Previous fourth-batch estimate: 2–4 active hours; new fifth-batch estimate: 2–4 active hours | 19:57:30 | 20:09:10 | 11m40s |
+
+The [first batch's writer record](../evidence/documentation/skill-docs-first-20-readability-2026-09-23.md)
+states that its correction item had no prior estimate, while #152's
+pull request records a previous batch estimate of 2–4 active hours. Both
+sources record a new bounded estimate of 2–4 hours. This summary preserves
+the different scope labels instead of silently choosing one prior-estimate
+claim. For #156, the earlier range belongs to a different batch; it does not
+establish that batch 4 was delivered.
+
+Every package started with a selected backlog estimate of **175–394 active
+hours**. All five final revisions passed their Linux, Windows and
+protected-file checks, and the changed documents received independent review.
+The intervals overlap and include integration, review corrections and checks.
+Active effort, waiting and rework were not separately measured. The #153
+interval starts with preparation before editing began. These intervals must
+not be summed as active labor or extrapolated into a coding or full-sweep
+review rate.
+
+The [new every-item snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-156)
+reconsiders all **14 selected rows and seven optional rows**. Previous and
+revised selected totals are both **175–394 active hours**: **95–194** for
+non-documentation work plus **80–200** for documentation. Both optional
+issue #101 helpers add **16–40 hours**, giving **191–434 active hours**.
+The full all-options backlog remains unbounded.
+
+The exact #156 merge tree contains **521 tracked Markdown files**, compared
+with 517 after #151. Four 20-page entrypoint screens corrected 11 skill
+pages, but do not close the full documentation sweep. Batch 4 and the fifth
+batch's shared-ledger integration are outside this checkpoint. No selected
+implementation row closed, and pull request #139's policy candidate remains
+open. Owner waits, GitHub queues, provider execution and host provisioning
+remain outside the active-hour estimates.
+
+### Preparation and editing time for this checkpoint
+
+Previous and new checkpoint estimates are both **1–2 active hours**; the
+selected backlog estimate at start is **175–394 active hours**. Read-only
+preparation ran from **20:10:11 to 20:11:59 UTC**, an observed **1m48s**.
+Editing began at **2026-09-23 20:15:36 UTC** in an isolated worktree at
+the exact #156 merge. Active-only effort is not instrumented. Local checks
+completed at **20:16:40 UTC**, an observed **1m04s** from the editing start:
+185 skills valid with zero warnings, all 41 relative links and heading anchors
+across the two records resolved, all row counts and arithmetic checked, and
+the whitespace check passed. Historical snapshots remain intact; only the
+current first-screen navigation links were updated. Independent coordinator
+review completed at **20:17:42 UTC** with no blocker. GitHub Actions on the
+exact committed revision and the eventual start-to-merge interval remain
+pull request closeout gates.
