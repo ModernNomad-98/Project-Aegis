@@ -113,3 +113,7 @@ in the independently accepted 28/9/22 canonical inventory. The
 CP-WP-002 evidence record. No deployment,
 provider call, production data, real authority or real execution adapter is
 authorized.
+
+The [CP-WP-003 offline proof proposal](roadmaps/cp-wp-003-offline-proof-proposal.md)
+sets out the next bounded owner decision; CP-WP-003 remains blocked until
+separately authorized.

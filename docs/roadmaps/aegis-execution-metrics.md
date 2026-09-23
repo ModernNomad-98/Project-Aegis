@@ -19,7 +19,8 @@ earlier forecast update.
 | Private input storage amendment (BER-DEC-010) | 2026-09-23 11:39 | 20–40 minutes active work to review and merge-ready PR | Exact active total unavailable; 8m21s observed wall time to merge at 11:47:21 | Independent audit passed after correction; final Actions guard 4s, Linux 1m18s, Windows 2m55s | None recorded | PR #106 merged |
 | Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | 33m20s observed wall time to public PR #107 merge; active-only total unavailable | Private PR #1 open; local contract/restore checks passed; public PR #107 independent audit and all Actions passed | Owner semantic review pending | Private packet PENDING; public checkpoint merged |
 | Cross-stream owner decision packet | 2026-09-23 12:20 | 2–4 hours active work | 13m38s observed wall time to PR #108 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | BKL-009 owner selection pending after merge | PR #108 merged at 12:33:38 UTC; BKL-009 remains PARTIAL |
-| Issue #101 package 1 design | 2026-09-23 12:34 | 4–8 hours active work | In progress | Pending | No runtime authorization requested | Design, candidate discovery and durable planning only |
+| Issue #101 package 1 design | 2026-09-23 12:34 | 4–8 hours active work | 9m40s observed wall time to PR #109 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | No runtime authorization requested | PR #109 merged at 12:43:40 UTC; planning only |
+| CP-WP-003A offline proof scope proposal | 2026-09-23 12:44 | 2–4 hours active work | In progress | Pending | Owner authorization needed before code | Proposal only; CP-WP-003 BLOCKED |
 
 ## Progress checkpoints
 
@@ -83,6 +84,13 @@ earlier forecast update.
   the #106 forecast anchor. BKL-009 policy selection remains pending.
 - **2026-09-23 12:34 UTC — issue #101 package 1 started:** Estimated 4–8 active
   hours for offline design, candidate screening and a paired evaluation plan.
+- **2026-09-23 12:43:40 UTC — issue #101 package 1 plan merged:** PR #109 merged
+  at `32144083bc86412e30d70873f877d4e7c051b6e0` after independent
+  read-only audit and three green Actions. Observed wall time from 12:34 was
+  9m40s; active-only time is unavailable. This is merge 3 of 5 after #106.
+- **2026-09-23 12:44 UTC — CP-WP-003A scope proposal started:** Estimated 2–4
+  active hours to prepare synthetic capability-proof authorization; no code or
+  real CP action is authorized by drafting it.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
