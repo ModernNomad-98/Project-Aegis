@@ -124,6 +124,12 @@ in the reconciliation doc §5.
 
 ## Implemented
 
+### Issue #101 package 2 — optional setup conversation
+
+| Skill | Status | Role |
+| --- | --- | --- |
+| `aegis-setup` | Windows PowerShell Aegis-only selection tested; helpers unavailable | Manual-only four-choice conversation, explicit Aegis-only save/change/repair for one user and checkout. It does not replace `project-orchestrator` or route tasks. |
+
 ### Foundation (Phase 0)
 
 | Item | Type | Status |

@@ -1,0 +1,12 @@
+{
+  "skill": "aegis-setup",
+  "cases": [
+    {"id":"explicit-setup","prompt":"Help me set up Aegis","should_trigger":true},
+    {"id":"explicit-change","prompt":"Help me change my Aegis setup","should_trigger":true},
+    {"id":"project-orchestrator","prompt":"I want to build a SaaS app; where do I start?","should_trigger":false,"preferred_skill":"project-orchestrator"},
+    {"id":"security-review","prompt":"Review my authentication design for security issues","should_trigger":false,"preferred_skill":"security-pr-reviewer"},
+    {"id":"ber-run","prompt":"Run the Behavioral Eval Runner offline regression tests","should_trigger":false},
+    {"id":"ordinary-selection","prompt":"Which Aegis skill helps me write an ADR?","should_trigger":false,"preferred_skill":"project-orchestrator"},
+    {"id":"named-other-skill","prompt":"Use the project-orchestrator skill to guide my next stage","should_trigger":false,"preferred_skill":"project-orchestrator"}
+  ]
+}

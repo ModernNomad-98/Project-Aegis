@@ -1,13 +1,15 @@
 # Conversational setup and optional routing — issue #101
 
 Prepared 2026-09-23. Canonical planning home for [issue #101](https://github.com/ModernNomad-98/Project-Aegis/issues/101).
-Package 1 is design and candidate screening only. No setup skill, adapter,
-host hook, model, installation, credential, paid evaluation, or savings claim
-is delivered by this plan. Later packages need their own bounded scope and
-authority. The [BER](behavioral-eval-runner-backlog.md) and
+Package 1 is design and candidate screening only. Package 2 delivers a
+manual-only four-choice setup conversation and tested Windows PowerShell
+Aegis-only saved selection. Optional helpers remain unavailable. There is no
+host hook, model, installation, credential, paid evaluation, or savings claim.
+Later packages need their own bounded scope and authority. The [BER](behavioral-eval-runner-backlog.md) and
 [delivery control](resumable-control-plane-backlog.md) registers remain separate.
 The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
-sets out the next Aegis-only implementation decision without granting it.
+defines the implementation scope approved in AEGIS-APR-007; the proposal alone
+does not grant runtime authority.
 
 Package 3's approved offline advisory contract is implemented in
 [`tools/aegis_setup`](../../tools/aegis_setup/README.md). It validates bounded
@@ -186,7 +188,7 @@ candidate selection, but users can complete setup without dependencies.
 Revisit if the chosen host cannot expose a safe pre-dispatch hook or meaningful
 complete-task telemetry. This is a design proposal, not provider selection.
 
-Incremental sequence: (1) this package 1 planning and review; (2) package 2
+Incremental sequence: (1) package 1 planning and review; (2) package 2
 setup conversation, saved state and Aegis-only completion with unavailable
 helper status; (3) package 3 offline contract and mocked error paths; (4)
 package 4 host proof and predeclared comparison under separate authority;
