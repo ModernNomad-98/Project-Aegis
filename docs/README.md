@@ -24,6 +24,9 @@ their original context; use the active registers below to determine current work
   issue #101 decisions, candidate screen and proposed evaluation protocol.
 - [Issue #101 package-2 scope proposal](roadmaps/aegis-setup-package-2-authorization-proposal.md):
   reviewable Aegis-only conversation and saved-state implementation boundary.
+- [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
+  the plan to explain each component in plain language, define project shorthand,
+  and review all repository documentation for human and agent readers.
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
   [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
