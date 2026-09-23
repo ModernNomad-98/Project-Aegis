@@ -32,7 +32,8 @@ earlier forecast update.
 | Issue #101 package-2 authorization proposal | 2026-09-23 13:12 | Prior package-2 delivery ETA 6–12 h; new scope-packet ETA 1–2 h active | 11m21s observed wall time to PR #113 merge; active-only unavailable | Independent audit and all three Actions passed | Exact owner implementation grant pending | PR #113 merged at 13:23:21 UTC; selected total 112–228 h; both helpers 128–268 h; all options unbounded |
 | CP-WP-003A exact-file authorization packet | 2026-09-23 13:24 | Prior CP-WP-003 delivery ETA 12–24 h; prior separate packet ETA none; new packet ETA 1–2 h active | 8m35s observed wall time to PR #114 merge; active-only unavailable | Independent audit and all three Actions passed | Owner implementation grant pending | PR #114 merged at 13:32:35 UTC; selected backlog 112–228 h; both optional helpers 128–268 h; full all-options backlog has no finite ETA |
 | Issue #101 package-3 offline-contract scope packet | 2026-09-23 13:33 | Prior package-3 delivery ETA 6–12 h; prior separate packet ETA none; new packet ETA 1–2 h active | 7m15s observed wall time to PR #115 merge; active-only unavailable | Independent audit and all three Actions passed | Owner later approved exact scope; grant transcription/implementation pending | PR #115 merged at 13:40:15 UTC; selected backlog was 112–228 h before new documentation scope |
-| Five-merge forecast and documentation backlog | 2026-09-23 15:40 | Prior forecast-packet ETA 1–2 h; new packet ETA 1–2 h active. New documentation item previously 4–8 h, then 24–60 h, now 80–200 h after inventory | In progress | Pending | Owner approved several scopes and required repository-wide documentation readability | Revised selected backlog 191–426 h; both optional helpers 207–466 h; all-options backlog has no finite ETA |
+| Five-merge forecast and documentation backlog | 2026-09-23 15:40 | Prior forecast-packet ETA 1–2 h; new packet ETA 1–2 h active. New documentation item previously 4–8 h, then 24–60 h, now 80–200 h after inventory | 12m43s observed wall time to PR #117 merge; active-only unavailable | Independent audit and all three Actions passed | Owner approved several scopes and required repository-wide documentation readability | PR #117 merged at 15:52:43 UTC; revised selected backlog 191–426 h, optional helpers 207–466 h, all options unbounded |
+| BER WP-2B-3 holdout execution-support scope packet | 2026-09-23 15:21 | Prior execution-support delivery estimate 8–16 active hours; prior separate packet estimate none; new packet estimate 1–2 active hours | In progress | Independent audit passed on original proposal; reconciliation review pending | Offline-branch grant, later exact execution-source amendment and input-label review pending | Selected backlog 191–426 active hours after the five-merge re-estimate; optional helpers 207–466 hours; all options unbounded |
 
 ## Progress checkpoints
 
@@ -172,6 +173,18 @@ earlier forecast update.
   then found 491 Markdown files, including 344 skill docs and 84 under `docs/`;
   the initial 845 count had included unrelated untracked local artifacts and
   omitted hidden tracked skill files, so it was not the repository inventory.
+
+- **2026-09-23 15:52:43 UTC — five-merge and documentation packet merged:**
+  PR #117 merged at `a7c0724c86cce3f59b4dacfe0db7502ac148b49a` after
+  independent audit and all three Actions passed. Observed wall time from the
+  approximate 15:40 start was 12m43s; active-only time is unavailable. This is
+  merge 1 of the next five after PR #104. The selected backlog is 191–426
+  active hours; optional issue #101 helpers raise that to 207–466 hours.
+- **2026-09-23 15:21 UTC — BER WP-2B-3 holdout scope checkpoint:** The prior
+  execution-support estimate was 8–16 active hours. This separate proposal
+  had no prior estimate and was estimated at 1–2 active hours. It describes an
+  offline implementation boundary only; owner approval and a reviewed grant
+  remain required before code. The selected total is now 191–426 active hours.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
