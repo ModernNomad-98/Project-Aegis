@@ -1,5 +1,12 @@
 # Verification after GitHub review fixes
 
+> **Current reading, checked 2026-09-23:** The checks below bind to the exact
+> corrected candidate revision and tree, after the two review findings were
+> fixed. Pull request (PR) #90 later merged; the
+> [shared-contract closeout](README.md) records its delivery and main
+> verification. Preserve the candidate test counts and platform skips as
+> observed; they do not establish live Behavioral Eval Runner (BER) execution.
+
 The corrected implementation is
 `4d6d292168d8a6fb47b7593870409d61707bdd7a`, tree
 `facb8ed563fd722e2e5bfdf918e64bc8c1854969`. Both platform runs used this exact

@@ -1,5 +1,12 @@
 # Candidate verification — 2026-09-12
 
+> **Current reading, checked 2026-09-23:** The test counts below bind to the
+> named candidate commit and tree, not to every later revision. Pull request
+> (PR) #88 subsequently merged; the [delivery closeout](README.md) records
+> the final submitted revision and main-branch verification. This record
+> remains the candidate's historical test evidence and does not prove measured
+> judge calibration or a live provider run.
+
 Code candidate: `5863fb1ef2fa95f653e7983b74cea16caa95555b`.
 Tree: `88f04538a9fcfad9e13117c7d8d3afb28dbadfe7`.
 

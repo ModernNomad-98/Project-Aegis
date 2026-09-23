@@ -1,5 +1,13 @@
 # Hosted verification and Windows shell correction
 
+> **Current reading, checked 2026-09-23:** This page records a specific
+> pre-merge pull request (PR) #91 hosted run. Its overall protected-file guard
+> failure and the then-unmerged status remain accurate for that run. PR #91
+> later merged, and the [delivery record](DELIVERY.md) records passing
+> main-branch checks. For current offline continuous integration (CI)
+> commands and limits, use the [CI guide](../../offline-ci.md). Do not treat
+> the earlier failed workflow as today's delivery status or erase its evidence.
+
 [PR #91](https://github.com/ModernNomad-98/Project-Aegis/pull/91) implementation
 `0444f46a459150b9fb2aeae168dc5d03b8135b96` passed both verification jobs in
 [run 34675606660](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34675606660).
