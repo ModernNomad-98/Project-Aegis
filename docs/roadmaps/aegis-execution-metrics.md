@@ -1,9 +1,15 @@
 # Project Aegis execution measurements
 
-Record an estimate when each new work package starts. In its PR, record the
-estimated active time, actual active time, review and CI time, owner waiting,
-and meaningful progress checkpoints. Use observed timestamps rather than
-reconstructed precision. A range is an estimate, not a delivery promise.
+At the start of **every** new work package, state together: (1) its previously
+published remaining ETA, or "none" if it is new; (2) its new active-work ETA;
+and (3) the current **entire backlog** ETA. Give the bounded selected total,
+the conditional total when useful, and say explicitly when the full adoption
+backlog has no finite total because quantities/decisions are open. Repeat these
+figures in its PR with progress and actual time. Record actual active time,
+review and CI time, owner waiting, and meaningful checkpoints when the runtime
+exposes them; otherwise mark the split unavailable and give measured wall time.
+Use observed timestamps rather than reconstructed precision. A range is an
+estimate, not a delivery promise.
 
 After every five merged PRs following #106, re-estimate each open work item
 and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
@@ -21,7 +27,8 @@ earlier forecast update.
 | Cross-stream owner decision packet | 2026-09-23 12:20 | 2–4 hours active work | 13m38s observed wall time to PR #108 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | BKL-009 owner selection pending after merge | PR #108 merged at 12:33:38 UTC; BKL-009 remains PARTIAL |
 | Issue #101 package 1 design | 2026-09-23 12:34 | 4–8 hours active work | 9m40s observed wall time to PR #109 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | No runtime authorization requested | PR #109 merged at 12:43:40 UTC; planning only |
 | CP-WP-003A offline proof scope proposal | 2026-09-23 12:44 | 2–4 hours active work | 8m58s observed wall time to PR #110 merge; active-only time unavailable | Independent read-only audit passed after terminology correction; all three Actions green | Owner authorization needed before code | PR #110 merged at 12:52:58 UTC; CP-WP-003 BLOCKED |
-| BER R4/R5 selected-host decision packet | 2026-09-23 12:53 | 2–4 hours active work | In progress | Pending | Host choice and later probe grant pending | Proposal only; no host probe or live dispatch |
+| BER R4/R5 selected-host decision packet | 2026-09-23 12:53 | 2–4 hours active work | 8m19s observed wall time to PR #111 merge; active-only time unavailable | Independent read-only audit passed after CI/host distinction correction; all three Actions green | Host choice and later probe grant pending | PR #111 merged at 13:01:19 UTC; no host probe or live dispatch |
+| Five-merge backlog re-estimate | 2026-09-23 13:02 | 1–2 hours active work; no earlier item estimate | In progress | Pending | None needed for arithmetic; owner choices remain gates for execution | Five-merge checkpoint; selected total baseline 106–214 h, revised draft 112–228 h; all optional adoption unbounded |
 
 ## Progress checkpoints
 
@@ -99,6 +106,16 @@ earlier forecast update.
 - **2026-09-23 12:53 UTC — BER selected-host decision packet started:**
   Estimated 2–4 active hours to prepare the R4/R5 host choice and bounded
   offline proof boundary. No host or provider probe is authorized by drafting.
+- **2026-09-23 13:01:19 UTC — BER host packet merged:** PR #111 merged at
+  `8e6971d806e257097c76159ac0875b4fef8baf0b` after the independent
+  audit corrected a stale POSIX `UNRUN` claim and all three Actions passed.
+  Observed wall time from 12:53 was 8m19s; active-only time is unavailable.
+  This is merge 5 of 5 after #106.
+- **2026-09-23 13:02 UTC — five-merge re-estimate started:** Prior item ETA:
+  none. New item ETA: 1–2 active hours. Prior selected backlog total:
+  106–214 active hours; revised draft selected total: 112–228 active hours;
+  conditional both-helper total: 128–268 active hours; full all-options
+  backlog: no finite bound while adoption/quantity choices remain open.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
