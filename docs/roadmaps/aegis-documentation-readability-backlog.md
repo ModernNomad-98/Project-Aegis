@@ -143,7 +143,7 @@ corrected 28 skill pages, and the nine reference batches corrected 49 reference
 pages. Some references were also touched in skill-entrypoint batches. These are bounded
 readability checks, not full page, behavioral, provider or runtime acceptance.
 The remaining selected-backlog estimate at this checkpoint is provisionally
-**175–394 active hours**; see the [latest merged five-merge forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-173).
+**175–394 active hours**; see the [five-merge forecast recorded after PR #173](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-173).
 The previous integration estimate was none; this ledger update is estimated at
 1–3 active hours. Repository-wide documentation acceptance remains **IN
 PROGRESS**.
