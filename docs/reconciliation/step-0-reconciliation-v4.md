@@ -1,5 +1,14 @@
 # Step 0 Reconciliation (v4 canonical)
 
+> **Historical scope — current reading, 2026-09-23.** "Canonical" below names
+> the July 2026 choice between two *then-current* generation plans for the
+> former `nguyenpv1980-wq/Claude-Skills` repository. It does not make the old
+> prompts a current Project Aegis work order. Preserve the numbered decisions
+> as historical provenance, including their later appended corrections. For
+> current work, first use [AGENTS.md](../../AGENTS.md) to identify the workspace
+> role, then the [skills catalog](../skills-catalog.md) and
+> [skill authoring standard](../skill-generation-standard.md).
+
 **Prepared:** 2026-07-06
 **Repo:** `nguyenpv1980-wq/Claude-Skills`
 **Verified HEAD at reconciliation time:** `5f6f404a8e261c89b8264c3282acd32075f54411` — *"Merge PR #1: 300 repeatable Claude skills roadmap"* on `main`.

@@ -1,5 +1,14 @@
 # Senior Principal Claude Skills Execution Plan
 
+> **Historical execution plan — current reading, 2026-09-23.** This plan
+> describes the former `nguyenpv1980-wq/Claude-Skills` repository when its
+> `main` was effectively empty and pull request #1 was pending. Those status
+> statements are preparation-time facts, not today's Project Aegis state.
+> Do not execute the plan as a current work order. Read
+> [AGENTS.md](../../AGENTS.md), the [current skills catalog](../skills-catalog.md),
+> and the [skill authoring standard](../skill-generation-standard.md) before
+> working on the current source library. The original plan is retained below.
+
 **Repository:** `nguyenpv1980-wq/Claude-Skills`  
 **Prepared:** July 6, 2026  
 **Purpose:** Combine the prior chat requirements, uploaded v3 knowledge base, uploaded v3 generation prompt, current repo roadmap, and current Claude Code skill guidance into a phased execution plan Claude Code can use to build reusable skills and agent operating patterns.
