@@ -58,8 +58,8 @@ pinned against each other in both directions.
    READMEs, decision logs — so retiring one doesn't create dangling
    references.
 5. The repo's removal mechanics and approval path: how deletions are made
-   and approved (and the squash-merge revert convention, per D19), so
-   retirement rollback is correct.
+   and approved, and whether a squash-merged removal must be reverted as one
+   ordinary commit, so retirement rollback is correct.
 
 ## Workflow
 
@@ -91,8 +91,8 @@ pinned against each other in both directions.
    with no reason-to-keep (hoarding by default). Push both toward an
    explicit decision.
 7. **Specify rollback.** Retiring a doc must be reversible: in a
-   squash-merge repo, a removal reverts as one ordinary commit (honor the
-   D19 convention). State the rollback per retirement.
+   squash-merge repo, a removal reverts as one ordinary commit. State the
+   rollback per retirement.
 8. **Deliver** the index, the frontmatter convention, and the per-doc
    dispositions in the Output Format — with deletions flagged for human
    approval.
@@ -107,7 +107,7 @@ reverse-reference sweep checklist, and the mark→redirect→remove staging:
 DOCS RETENTION INDEX — <scope: workflow/process docs>
 Categories:    permanent/canonical | reference-until-superseded | time-boxed | transient
 Index (numbered):
-  <NN | doc path | category | reason-to-keep | superseded-by | cleanup rule | review/expiry>
+  <row number | doc path | category | reason-to-keep | superseded-by | cleanup rule | review/expiry>
 Frontmatter:   per-doc retention fields (mirrors the index; drift = finding)
 Retirements (recommended):
   <doc>: reverse-ref sweep result; disposition (relink/redirect/remove);
