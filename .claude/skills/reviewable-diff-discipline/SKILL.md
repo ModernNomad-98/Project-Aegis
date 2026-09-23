@@ -35,10 +35,13 @@ starts — and the final `git diff --cached` equals the intent, no more, no less
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route requiring its own classification and activation
+under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **Declare intent + expected file set before editing** — one sentence plus a
    file list.
