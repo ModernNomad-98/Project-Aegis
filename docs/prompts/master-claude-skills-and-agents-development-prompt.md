@@ -1,5 +1,15 @@
 # Master Prompt for Claude Code: Develop Reusable Skills and Agents
 
+> **Historical prompt — current reading, 2026-09-23.** The instructions below
+> were written for the former `nguyenpv1980-wq/Claude-Skills` foundation phase.
+> Project Aegis now has shipped skills and different source-repository rules.
+> Do not paste or run this prompt as a current work order. Start with
+> [AGENTS.md](../../AGENTS.md) to identify the workspace role, then use the
+> [current skills catalog](../skills-catalog.md) and
+> [skill authoring standard](../skill-generation-standard.md) for current
+> inventory and contracts. The original prompt remains below as history; it
+> grants no implementation or approval authority.
+
 Use this prompt from the root of `nguyenpv1980-wq/Claude-Skills`.
 
 ## Role

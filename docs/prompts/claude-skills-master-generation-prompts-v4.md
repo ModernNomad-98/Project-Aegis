@@ -1,5 +1,14 @@
 # Claude Skills Master Generation Prompts v4
 
+> **Historical generation prompts — current reading, 2026-09-23.** This v4
+> sequence describes the former `nguyenpv1980-wq/Claude-Skills` foundation
+> phase, before Project Aegis's shipped library. Its copyable Phase 0 and
+> batch prompts are not current instructions: do not paste or run them as a
+> work order. Use [AGENTS.md](../../AGENTS.md) for workspace role, the
+> [current skills catalog](../skills-catalog.md) for shipped entries, and the
+> [skill authoring standard](../skill-generation-standard.md) for current
+> contracts. The original v4 text remains below as a historical source.
+
 **Prepared for:** `nguyenpv1980-wq/Claude-Skills`  
 **Prepared on:** 2026-07-06  
 **Use from:** Claude Code at the root of the `Claude-Skills` repository.  

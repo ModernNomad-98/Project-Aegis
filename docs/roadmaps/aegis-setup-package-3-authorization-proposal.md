@@ -1,5 +1,18 @@
 # Issue #101 package 3 — offline advisory-contract scope
 
+> **Current status, 2026-09-23:** Package 3 shipped in
+> [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)
+> under [owner approval AEGIS-APR-008](../approvals/APPROVAL_REGISTER.md#aegis-apr-008-issue-101-offline-advisory-routing-contract).
+> Package 2 also shipped in
+> [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)
+> under [AEGIS-APR-007](../approvals/APPROVAL_REGISTER.md#aegis-apr-007-issue-101-conversational-setup-aegis-only-completion).
+> See the [setup plan](aegis-setup-routing-plan.md) and
+> [package-3 review](../evidence/setup/issue-101-package-3-review.md) for the
+> delivered boundaries. The advisory contract has no real host hook or dispatch.
+> The proposal below preserves its earlier package-2 status as history.
+
+**Historical authorization proposal follows.**
+
 Prepared 2026-09-23 from public `main` at
 `d187849287e5047fc821f7a1070b0c59cc5b32b9`. **Historical proposal.**
 The owner approved this bounded scope in AEGIS-APR-008, effective at merge
