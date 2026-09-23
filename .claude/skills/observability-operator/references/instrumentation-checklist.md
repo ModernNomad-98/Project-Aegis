@@ -1,6 +1,12 @@
 # Instrumentation Checklist Reference
 
-Detail file for `observability-operator`. Loaded on demand.
+Use this checklist with the [observability operator](../SKILL.md) to specify
+event fields, metrics, health checks, and alert verification. The parent skill
+is **manual-only** because it changes live telemetry configuration; reading
+this page does not authorize those changes or operational queries. **PII**
+means personally identifiable information; **RED** means request rate, errors,
+and duration; **USE** means utilization, saturation, and errors; **CPU** means
+central processing unit; **GC** means garbage collection.
 
 ## Structured event field standard (minimum)
 

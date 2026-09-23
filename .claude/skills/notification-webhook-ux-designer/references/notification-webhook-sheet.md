@@ -1,6 +1,12 @@
 # Notification & Webhook UX Sheet
 
-Detail tables for `notification-webhook-ux-designer`. Read on demand.
+Use these tables with the [notification and webhook designer](../SKILL.md) to
+choose user-experience (UX) defaults for notifications, digest behavior, and
+the developer-facing delivery view. **DM** means direct message. In Hypertext
+Transfer Protocol (HTTP), **2xx**, **4xx**, and **5xx** are success,
+client-error, and server-error response classes, respectively.
+Delivery-contract details remain with
+`api-event-architect`.
 
 ## Channel / default posture matrix
 
