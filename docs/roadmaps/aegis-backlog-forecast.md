@@ -287,6 +287,73 @@ GitHub queues, provider runs and host provisioning are excluded. Start the
 next five-merge counter after #126. Update earlier if a decision or audited
 completion materially changes scope.
 
+## Five-merge checkpoint — 2026-09-23, after pull request #130
+
+Five requests merged after #126, in merge order. The intervals below are wall
+time from the first recorded checkpoint, include overlapping review and queue
+time, and are not measured active labor. Four requests had all exact-head
+GitHub Actions green. PR #119 had Linux and Windows green; its protected-file
+guard remained failed under the owner's explicit, PR-only exception, now
+recorded as consumed in [APR-010 and APR-011](../approvals/APPROVAL_REGISTER.md).
+
+| Merged request | Merge commit | Observed wall interval | Delivered |
+| --- | --- | ---: | --- |
+| [#127](https://github.com/ModernNomad-98/Project-Aegis/pull/127) | `fe7d1f247ffef0301b225e0c899d7678d4c0e040` | About 14m35s | Skill-generation standard guide |
+| [#128](https://github.com/ModernNomad-98/Project-Aegis/pull/128) | `ecfa4114545e7b719eece88134c6fbc9aea7e1f2` | At least 13m23s | Skills-catalog navigation and representative entries |
+| [#119](https://github.com/ModernNomad-98/Project-Aegis/pull/119) | `d2053b61fa80738d9dd2c669980652914bb5c872` | About 1h6m03s | Behavioral Eval Runner and control-plane component guides |
+| [#129](https://github.com/ModernNomad-98/Project-Aegis/pull/129) | `ddbe7b02fdf5e93c2133296d22acf875f1762a4b` | 14m41s | Previous every-item forecast |
+| [#130](https://github.com/ModernNomad-98/Project-Aegis/pull/130) | `2badb39a76e2445e666ca320bef43591b5b6fad2` | 5m38s | Consumed #119 exception record |
+
+Each open row was reviewed against those delivered scopes and the observed
+durations. The documentation inventory is 503 tracked Markdown files at this
+checkpoint, compared with 491 at the original inventory and 501 after #126.
+The catalog batch reviewed navigation and representative entries; it did not
+review every skill entry. PR #131's later evidence-policy proposal is a scope
+proposal within the existing policy row, not another implementation row.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Evidence and remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Semantic and owner label review remain |
+| Behavioral Eval Runner backlog item 009 evidence policy enforcement | 8–16 | 8–16 | The selected policy still needs an implementation grant and evidence |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Executor implementation grant and code remain |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Labels, source, allowance, results and holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | No named host or completed isolation proof |
+| Work package 2B-4 | 12–24 | 12–24 | Calibration and host prerequisites remain |
+| Work package 2B-5 | 8–16 | 8–16 | Corpus execution remains |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof remain |
+| Control-plane work package 004 | 8–16 | 8–16 | Delivery target and prerequisite proof remain |
+| Issue #101 package 4 | 8–16 | 8–16 | Host integration and comparative evaluation remain |
+| Issue #101 package 7 | 6–12 | 6–12 | Release review remains |
+| Repository-wide documentation readability | 80–200 | 80–200 | More guides are readable, but most of the 503-page inventory still needs review |
+| **Selected remaining total** | **175–394** | **175–394** | No additional implementation row closed; non-documentation subtotal is 95–194 |
+
+The optional rows were also re-estimated. Their ranges do not enter the
+selected total until the owner chooses their scope and quantity.
+
+| Optional open work item | Previous active hours if selected | Revised active hours if selected | Remaining gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision |
+| Behavioral Eval Runner item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count |
+| Behavioral Eval Runner item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Architecture and adoption decisions |
+
+Selecting both issue #101 helpers would make the bounded selected-plus-both
+total **191–434 active hours**. The all-options backlog has
+**no finite total ETA** until optional quantities and architecture are chosen.
+These are active-work estimates; owner decisions, GitHub queues, provider runs
+and host provisioning are excluded. Start the next five-merge counter after
+#130 and revise sooner if an audited completion changes scope.
+
+**Historical baseline — recorded after pull request #106 on September 23,
+2026.** The paragraph and baseline tables below preserve estimates and pending
+decisions recorded then. They are not current work status or authorization.
+Use the checkpoint above for current remaining work. Pull request #104 has
+since merged, and issue #101 packages 2 and 3 delivered their approved scopes.
+
 The available timed PRs are sparse: #103 has only a late 10:52 UTC checkpoint
 and at least 5m14s to merge; #105 took 12m50s observed wall time from its first
 checkpoint to merge; #106 took 8m21s. PRs #100/#102 have no comparable active
