@@ -27,6 +27,15 @@ The library does not itself build, deploy or operate an application.
    you can also name a skill explicitly. Read the
    [skills catalog](docs/skills-catalog.md) to see the shipped roles.
 
+For an optional setup conversation, explicitly say **"Help me set up Aegis"**
+or **"Help me change my Aegis setup"** and invoke the manual-only
+[`aegis-setup`](.claude/skills/aegis-setup/SKILL.md) skill. It offers Aegis only,
+a local helper, an online helper, and help choosing. Only Aegis-only selection
+can currently be completed and remembered, on tested single-user Windows
+PowerShell. Local and online helpers remain unavailable; no provider is
+connected and no token saving is measured. Ordinary project work still starts
+with `project-orchestrator`.
+
 ## What is included
 
 | Part | What it is for | Current boundary |
@@ -479,7 +488,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->184<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->22<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->185<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below.
 
@@ -592,6 +601,9 @@ keeps a human as the approval gate on anything irreversible. See
     authority survives, design per-surface invalidation against a revocation-latency bound
     (deny direction first), verify the change actually took — composing the per-surface
     mechanism owners. *e.g.* `authority-invalidation-architect`.
+23. **Optional Aegis setup** *(Issue #101 package 2, 1)* — the manual four-choice
+    conversation and tested Windows PowerShell Aegis-only saved selection.
+    Local and online helpers remain unavailable. *e.g.* `aegis-setup`.
 
 ## Canonical reading order (for maintainers)
 
