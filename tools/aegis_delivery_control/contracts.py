@@ -44,6 +44,12 @@ class StopMode(str, Enum):
     IMMEDIATE = "IMMEDIATE"
 
 
+class ProofFreeDisposition(str, Enum):
+    REPORT_ONLY = "REPORT_ONLY"
+    STOPPED = "STOPPED"
+    FAILED_FINAL = "FAILED_FINAL"
+
+
 class TerminalRestartVerification(str, Enum):
     VERIFIED_CURRENT = "VERIFIED_CURRENT"
     LOCAL_FRESHNESS_UNVERIFIED = "LOCAL_FRESHNESS_UNVERIFIED"
@@ -1602,6 +1608,82 @@ class ReconcileValidatorResultRequest:
             raise ValueError(
                 "validator reconciliation slot generation must be positive"
             )
+
+
+@dataclass(frozen=True)
+class ProofFreeDispositionRequest:
+    disposition_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    disposition: ProofFreeDisposition
+    retained_uncertainty_ids: tuple[str, ...]
+    uncertainty_set_digest: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+    reason_code: str
+    terminal_fence_id: str | None
+
+    def validate(self) -> None:
+        scalar_fields = (
+            self.disposition_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.attempt_id, self.plan_id,
+            self.revision_digest, self.effect_descriptor_digest,
+            self.uncertainty_set_digest, self.expected_slot_attempt_id,
+            self.expected_catalog_head, self.expected_run_head,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_fields
+        ):
+            raise ValueError(
+                "proof-free disposition identifiers and bindings must be non-empty"
+            )
+        if not isinstance(self.disposition, ProofFreeDisposition):
+            raise ValueError("proof-free disposition is unsupported")
+        if (
+            not isinstance(self.retained_uncertainty_ids, tuple)
+            or not self.retained_uncertainty_ids
+            or list(self.retained_uncertainty_ids)
+            != sorted(set(self.retained_uncertainty_ids))
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in self.retained_uncertainty_ids
+            )
+        ):
+            raise ValueError(
+                "proof-free disposition requires a sorted distinct uncertainty set"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("proof-free disposition slot generation must be positive")
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError("proof-free disposition cursor must be non-empty or absent")
+        if self.disposition is ProofFreeDisposition.REPORT_ONLY:
+            if self.terminal_fence_id is not None:
+                raise ValueError("report-only disposition cannot name a terminal fence")
+        elif (
+            not isinstance(self.terminal_fence_id, str)
+            or not self.terminal_fence_id.strip()
+        ):
+            raise ValueError("terminal proof-free disposition requires a fence ID")
 
 
 @dataclass(frozen=True)

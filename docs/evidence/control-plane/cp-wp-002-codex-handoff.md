@@ -1462,6 +1462,46 @@ T11 and T17 cursor routing, and atomic contact revalidation. A post-intent denia
 must retain the active obligation until T25 authoritative nonexecution settles
 source/control/accounting; T26 remains terminal-only.
 
+### Stage 21 - T17/F18 proof-free terminal entry
+
+The local proof-free branch adds three closed owner actions:
+`DISPOSE_REPORT_ONLY`, `DISPOSE_STOPPED` and `DISPOSE_FAILED_FINAL`. Each uses a
+separate one-use operator grant and MAC-bound disposition evidence over the
+complete request. The request fixes the accepted plan/revision/descriptor,
+repository/run/item/effect/attempt, exact heads and cursor, retained slot,
+complete sorted unresolved operation-uncertainty set and terminal fence choice.
+
+The durable `OWNER_NONDISPATCHING_DISPOSITION` route always records the effect
+outcome as unknown. Report-only stays in `RECONCILIATION_REQUIRED`; terminal
+choices enter only `STOPPED` or `FAILED_FINAL` and add a permanent scoped fence.
+All branches retain the original slot, continuation cursor, uncertainty rows and
+fences, accounting and claims. They cannot authorize retry, validation success,
+completion, compensation or a fresh dispatch. Contacted accounting must already
+be durably classified; a merely reserved contacted obligation denies.
+
+Semantic version 7 creates a separate action projection only through its atomic
+6-to-7 migration. Initialization does not pre-create or heal the table. A
+pre-existing table at v6, missing/altered table at v7, proof-free event without
+its projection or projection/history/accounting-prefix divergence fails closed.
+Replay is checked before mutable freshness and state guards. Recovery validates
+the action, operator redemption, terminal fence, request-bound authority and
+historical accounting snapshot.
+
+Focused coverage includes all three dispositions, rollback before commit, lost
+acknowledgement, exact replay, stale heads, inexact uncertainty sets, accounting
+projection tamper, migration rollback and missing/altered schema. The storage
+module passed 363 tests and the full package reached 478 tests after correcting
+legacy migration fixtures for semantic version 7. The first implementation
+review found an accepted-plan issuer blocker and incomplete negative coverage;
+the corrected authority binding and expanded denial/replay/barrier matrix
+received `APPROVE` with no findings. Final repository gates and hosted exact-head
+checks were pending when this paragraph was written.
+Changed files are `contracts.py`, `authority.py`, `storage.py`, `dispatch.py`,
+`test_storage.py`, the two legacy migration expectation updates in
+`test_dispatch.py`, and status documentation. Canonical design, approval
+register, BER, dependencies, workflows, provider/production surfaces and
+preserved artifact/cache paths remain intentionally untouched.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1708,8 +1748,10 @@ owner before interpreting it more broadly.
   verified-receipt, authoritative-nonexecution and safe-retry slices are
   independently accepted as recorded in Stages 4-18. Complete T07/T08/T14 remain
   `UNVERIFIED` for their missing activity/source families. T17 remains
-  `UNVERIFIED` for its missing proof-free terminal/report-only branch. T24/F09
-  now has independently approved mandatory terminal-policy intake and exact-stop
+  `UNVERIFIED`; its proof-free terminal/report-only branch is now implemented
+  locally with semantic-v7 migration and strict projection recovery, has
+  independent `APPROVE`, and still awaits committed exact-head evidence. T24/F09
+  has independently approved mandatory terminal-policy intake and exact-stop
   coverage, with its committed exact-head verdict still pending. Later final review gates
   also remain.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
@@ -1751,6 +1793,8 @@ projections, signed PASS/FAIL/UNKNOWN facts and complete snapshots, universal
 no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
 replay/recheck and T25/T16 post-disable continuation. Aggregate
 T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
-The next implementation gate is T17/F18, followed by the remaining
-order in Section 10. Keep PR #99 draft until every remaining backlog
+The current implementation gate is T17/F18 proof-free terminal entry; its local
+code and tests have independent `APPROVE`, while exact-head evidence remains
+pending. Continue with the remaining order in Section 10 only after that
+gate closes. Keep PR #99 draft until every remaining backlog
 and final review gate passes; no merge or deployment decision is currently due.

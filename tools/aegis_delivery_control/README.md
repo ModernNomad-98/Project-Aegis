@@ -148,6 +148,18 @@ fixture. It is not a delivery integration.
   clean prefix routes to `VALIDATING`; replay precedes mutable freshness and
   state guards. Semantic version 2, recovery and reopen validate the exact
   route-specific projection without rewriting legacy validator history.
+- The local T17 proof-free disposition route accepts only separately
+  authenticated one-use `REPORT_ONLY`, `STOPPED` or `FAILED_FINAL` owner
+  commands. It binds the accepted plan, descriptor, exact repository/run heads,
+  cursor, retained slot and complete unresolved operation-uncertainty set.
+  Every branch preserves unknown outcome and historical accounting; report-only
+  stays in reconciliation, while terminal branches add a permanent scoped fence
+  without releasing the slot or manufacturing success/nonexecution. Semantic
+  version 7 creates its projection atomically, rejects partial/missing schema,
+  and reconstructs the exact accounting prefix and action from immutable
+  history. Independent implementation review returned `APPROVE` after the
+  accepted-plan issuer boundary and denial matrix were corrected; committed
+  exact-head evidence is still pending.
 - T22 exposes a separate read-only terminal-restart report. It opens existing
   main and auxiliary SQLite ledgers with `mode=ro` plus `query_only`, performs
   no initialization, migration, repair or lock-file creation, and separates
@@ -331,8 +343,10 @@ durably disable stale initiation for exact T25 settlement and later T16 resume.
 Crash rollback, lost acknowledgement, stale/rebound evidence, migration and
 strict projection recovery are covered, and the corrected increment received
 independent `APPROVE` with no findings. T11, T27, F11 and F17 remain
-`UNVERIFIED` pending committed exact-head trace review; the broader T17 and
-remaining canonical gaps are still open.
+`UNVERIFIED` pending committed exact-head trace review. The local proof-free
+T17/F18 branch is implemented and independently accepted but remains aggregate
+`UNVERIFIED` pending committed exact-head evidence; remaining canonical gaps
+are still open.
 
 ## Validation
 

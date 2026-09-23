@@ -1211,6 +1211,40 @@ and complete stop-obligation binding were corrected; 352 storage tests passed
 in the reviewer run. The next ordered correction is T17/F18 proof-free terminal
 entry.
 
+### 5.27 T17/F18 proof-free terminal-entry checkpoint
+
+The proof-free owner branch is implemented locally without converting risk
+acceptance into nonexecution or success. Three closed, separately authenticated
+one-use actions permit only report-only `RECONCILIATION_REQUIRED`, `STOPPED` or
+`FAILED_FINAL`. Each signed request binds the accepted plan and descriptor,
+exact repository/run heads, continuation cursor, retained operation slot and
+the complete sorted unresolved operation-uncertainty set. Missing outcome
+uncertainty, stale heads/cursor/slot, an inexact set or unclassified contacted
+accounting denies without mutation.
+
+Every branch records `effect_outcome=UNKNOWN`, preserves the cursor, slot,
+uncertainty instances/fences and prefix-derived accounting. Report-only adds no
+terminal fence. STOPPED and FAILED_FINAL atomically add a permanent scoped
+fence while leaving later T23/T26 accounting closure possible; neither route
+authorizes retry, validation success, completion, compensation or dispatch.
+Replay is resolved before mutable freshness/state checks and a consumed grant
+cannot be reused.
+
+Semantic version 7 owns a separate action projection. The 6-to-7 migration is
+atomic, performs no history backfill, rejects a pre-existing partial table or a
+missing/altered v7 table, and never lets base initialization heal schema drift.
+Recovery reconstructs the action, operator redemption, terminal fence and exact
+historical accounting snapshot from immutable event prefixes. Focused tests
+cover all three dispositions, rollback, lost acknowledgement, replay, stale and
+inexact bindings, accounting-projection tamper, migration rollback and schema
+drift. The complete storage module passed 363 tests; the full package passed 478
+tests after migration-fixture corrections. The first implementation review
+returned `REVISE` for an accepted-plan issuer boundary and missing negative
+coverage; the corrected entrypoint and expanded denial matrix received
+`APPROVE` with no findings. Repository validators and hosted exact-head checks
+remain pending, so T17 and F18 stay aggregate `UNVERIFIED` and PR #99 remains
+draft.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

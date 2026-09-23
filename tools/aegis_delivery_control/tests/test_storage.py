@@ -61,6 +61,8 @@ from tools.aegis_delivery_control.contracts import (
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
+    ProofFreeDisposition,
+    ProofFreeDispositionRequest,
     ReadinessEvaluationRequest,
     RecoverProvenNonexecutionRequest,
     ProvenNonexecutionIntentRequest,
@@ -4123,6 +4125,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
                 "verified_receipt_reconciliation_actions": 0,
+                "proof_free_disposition_actions": 0,
                 "proven_nonexecution_actions": 0,
                 "operation_nonexecution_resume_actions": 0,
                 "operation_recovery_actions": 0,
@@ -5078,6 +5081,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "uncertainty_resolutions": 0,
                 "reconciliation_actions": 0,
                 "verified_receipt_reconciliation_actions": 0,
+                "proof_free_disposition_actions": 0,
                 "proven_nonexecution_actions": 0,
                 "operation_nonexecution_resume_actions": 0,
                 "operation_recovery_actions": 0,
@@ -6804,6 +6808,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "DROP TABLE operation_nonexecution_resume_actions"
             )
             connection.execute("DROP TABLE proven_nonexecution_actions")
+            connection.execute("DROP TABLE proof_free_disposition_actions")
             connection.execute(
                 "UPDATE repositories SET catalog_head = '' WHERE "
                 "repository_id = 'repo-1'"
@@ -6867,10 +6872,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 6)
+        self.assertEqual(semantic_version, 7)
         migrated.load_verified("repo-1", authority=self.authority)
 
-    def test_trusted_readiness_schema_version_is_six(self) -> None:
+    def test_proof_free_disposition_schema_version_is_seven(self) -> None:
         connection = sqlite3.connect(self.database_path)
         try:
             semantic_version = connection.execute(
@@ -6878,7 +6883,108 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(semantic_version, 6)
+        self.assertEqual(semantic_version, 7)
+
+    def test_t17_v6_proof_free_schema_migrates_atomically(self) -> None:
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute("DROP TABLE proof_free_disposition_actions")
+            connection.execute("PRAGMA user_version = 6")
+            connection.commit()
+        finally:
+            connection.close()
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            with self.assertRaises(InjectedFailure):
+                SQLiteStateStore._migrate_proof_free_disposition_version(
+                    connection,
+                    failure_hook=raise_at(
+                        "after_proof_free_disposition_migration_writes_before_commit"
+                    ),
+                )
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 6
+            )
+            self.assertIsNone(connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'proof_free_disposition_actions'"
+            ).fetchone())
+        finally:
+            connection.close()
+        reopened = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        reopened._bind_classification_authority(self.authority)
+        reopened.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 7
+            )
+            self.assertIsNotNone(connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'proof_free_disposition_actions'"
+            ).fetchone())
+        finally:
+            connection.close()
+
+    def test_t17_proof_free_schema_never_heals_partial_or_missing_state(self) -> None:
+        for mutation, message in (
+            (
+                "ALTER TABLE proof_free_disposition_actions ADD COLUMN "
+                "unexpected TEXT",
+                "missing or incompatible",
+            ),
+            (
+                "DROP TABLE proof_free_disposition_actions",
+                "missing or incompatible",
+            ),
+        ):
+            with self.subTest(mutation=mutation):
+                path = self.database_path.parent / (
+                    "proof-free-schema-" + hashlib.sha256(
+                        mutation.encode("utf-8")
+                    ).hexdigest()[:8] + ".sqlite3"
+                )
+                shutil.copy2(self.database_path, path)
+                connection = sqlite3.connect(path)
+                try:
+                    connection.execute(mutation)
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(StorageIntegrityError, message):
+                    SQLiteStateStore(path, self.oracle, "repo-1")
+
+    def test_t17_v6_rejects_proof_free_event_without_projection(self) -> None:
+        self._running_operation()
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute("DROP TABLE proof_free_disposition_actions")
+            connection.execute(
+                "UPDATE events SET event_kind = 'RECONCILIATION_RECORDED', "
+                "body_json = ? WHERE rowid = "
+                "(SELECT MIN(rowid) FROM events)",
+                ('{"route":"OWNER_NONDISPATCHING_DISPOSITION"}',),
+            )
+            connection.execute("PRAGMA user_version = 6")
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "predates its projection"
+        ):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 6
+            )
+            self.assertIsNone(connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'proof_free_disposition_actions'"
+            ).fetchone())
+        finally:
+            connection.close()
 
     def test_t28_v4_reopen_rejects_schema_or_projection_healing(self) -> None:
         semantic_inputs = (("input", "digest-1"),)
@@ -9204,6 +9310,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.execute("DROP TABLE validation_check_launch_gates")
             connection.execute("DROP TABLE validation_check_dependencies")
             connection.execute("DROP TABLE validation_check_bindings")
+            connection.execute("DROP TABLE proof_free_disposition_actions")
             connection.execute("PRAGMA user_version = 5")
             connection.commit()
         finally:
@@ -9426,6 +9533,80 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         return committed, launched, contact, request
 
+    def _proof_free_disposition_fixture(
+        self,
+        disposition: ProofFreeDisposition,
+        *,
+        suffix: str,
+    ):
+        _, _, _, pause_request = self._contacted_operation(
+            f"proof-free-{suffix}"
+        )
+        paused = self.store.pause_external_mutation(
+            pause_request,
+            self._pause_capability(f"proof-free-{suffix}"),
+            self.authority,
+        )
+        self.oracle.allowed_head = paused.event_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            uncertainty_ids = tuple(
+                row[0]
+                for row in connection.execute(
+                    "SELECT uncertainty_id FROM uncertainty_instances "
+                    "WHERE run_id = 'run-1' AND check_id IS NULL "
+                    "ORDER BY uncertainty_id"
+                )
+            )
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE run_id = 'run-1'"
+            ).fetchone()
+            run = connection.execute(
+                "SELECT * FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()
+            catalog_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        uncertainty_digest = self.store._event_hash(
+            {
+                "domain": "AEGIS:T17:PROOF_FREE_UNCERTAINTY_SET:v1",
+                "retained_uncertainty_ids": list(uncertainty_ids),
+            }
+        )
+        action = {
+            ProofFreeDisposition.REPORT_ONLY: "DISPOSE_REPORT_ONLY",
+            ProofFreeDisposition.STOPPED: "DISPOSE_STOPPED",
+            ProofFreeDisposition.FAILED_FINAL: "DISPOSE_FAILED_FINAL",
+        }[disposition]
+        grant = SyntheticOperatorGrant(
+            f"proof-free-grant-{suffix}", "repo-1", "run-1", action,
+            f"proof-free-scope-{suffix}",
+        )
+        self.authority.register_operator(grant)
+        capability = self.authority.claim_operator(*grant.__dict__.values())
+        request = ProofFreeDispositionRequest(
+            f"proof-free-{suffix}", f"proof-free-command-{suffix}",
+            f"proof-free-event-{suffix}", "repo-1", "run-1", "item-1",
+            "effect-1", "attempt-1", str(plan["plan_id"]),
+            str(plan["revision_digest"]),
+            str(plan["effect_descriptor_digest"]), disposition,
+            uncertainty_ids, uncertainty_digest, "attempt-1", 1,
+            str(catalog_head), str(run["head_hash"]),
+            run["continuation_cursor"], "OWNER_RISK_DISPOSITION",
+            (
+                None
+                if disposition is ProofFreeDisposition.REPORT_ONLY
+                else f"proof-free-fence-{suffix}"
+            ),
+        )
+        evidence = self.authority.issue_proof_free_disposition_evidence(
+            f"proof-free-evidence-{suffix}", request
+        )
+        return request, capability, evidence
+
     def test_t05_pauses_owned_prelaunch_attempt_and_retains_obligations(self) -> None:
         committed = self._running_operation()
         receipt = self.store.pause_local_execution(
@@ -9468,6 +9649,325 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(
             receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
         )
+
+    def test_t17_proof_free_report_only_preserves_every_obligation(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="report"
+        )
+        before = self.store.table_counts()
+        receipt = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        after = self.store.table_counts()
+        self.assertEqual(
+            receipt.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        self.assertEqual(after["proof_free_disposition_actions"], 1)
+        self.assertEqual(after["uncertainty_instances"], before["uncertainty_instances"])
+        self.assertEqual(after["uncertainty_resolutions"], 0)
+        self.assertEqual(after["outstanding_slot"], 1)
+        self.assertEqual(after["dispatch_fences"], before["dispatch_fences"])
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_failed_final_is_atomic_and_replay_safe(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.FAILED_FINAL, suffix="failed-final"
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.record_proof_free_disposition(
+                request, capability, evidence, self.authority,
+                failure_hook=raise_at(
+                    "after_proof_free_disposition_writes_before_commit"
+                ),
+            )
+        self.assertEqual(
+            self.store.table_counts()["proof_free_disposition_actions"], 0
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.record_proof_free_disposition(
+                request, capability, evidence, self.authority,
+                failure_hook=raise_at(
+                    "after_proof_free_disposition_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.oracle.allowed_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = 'repo-1'"
+            ).fetchone()[0]
+            fence = connection.execute(
+                "SELECT reason_code FROM dispatch_fences WHERE fence_id = ?",
+                (request.terminal_fence_id,),
+            ).fetchone()[0]
+            slot_count = connection.execute(
+                "SELECT COUNT(*) FROM outstanding_slot"
+            ).fetchone()[0]
+            uncertainty_count = connection.execute(
+                "SELECT COUNT(*) FROM uncertainty_instances"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        replay = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.resulting_state, LifecycleState.FAILED_FINAL)
+        self.assertEqual(fence, "PROOF_FREE_FAILED_FINAL")
+        self.assertEqual(slot_count, 1)
+        self.assertGreater(uncertainty_count, 0)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_stopped_preserves_unknown_outcome_and_slot(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.STOPPED, suffix="stopped"
+        )
+        receipt = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            body = json.loads(
+                connection.execute(
+                    "SELECT body_json FROM proof_free_disposition_actions"
+                ).fetchone()[0]
+            )
+            slot_count = connection.execute(
+                "SELECT COUNT(*) FROM outstanding_slot"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.assertEqual(receipt.resulting_state, LifecycleState.STOPPED)
+        self.assertEqual(body["effect_outcome"], "UNKNOWN")
+        self.assertEqual(slot_count, 1)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_disposition_rejects_inexact_or_stale_bindings(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="negative"
+        )
+        reduced_ids = request.retained_uncertainty_ids[:-1]
+        inexact = replace(
+            request,
+            retained_uncertainty_ids=reduced_ids,
+            uncertainty_set_digest=self.store._event_hash(
+                {
+                    "domain": "AEGIS:T17:PROOF_FREE_UNCERTAINTY_SET:v1",
+                    "retained_uncertainty_ids": list(reduced_ids),
+                }
+            ),
+        )
+        stale = replace(request, expected_run_head="stale-run-head")
+        stale_catalog = replace(
+            request, expected_catalog_head="stale-catalog-head"
+        )
+        stale_cursor = replace(
+            request, expected_continuation_cursor="stale-cursor"
+        )
+        wrong_plan = replace(request, plan_id="wrong-plan")
+        wrong_revision = replace(request, revision_digest="wrong-revision")
+        wrong_descriptor = replace(
+            request, effect_descriptor_digest="wrong-descriptor"
+        )
+        wrong_slot = replace(request, expected_slot_generation=2)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        for altered, message in (
+            (inexact, "exact unresolved operation uncertainty set"),
+            (stale, "current heads are stale"),
+            (stale_catalog, "current heads are stale"),
+            (stale_cursor, "continuation cursor is stale"),
+            (wrong_plan, "accepted plan"),
+            (wrong_revision, "accepted plan"),
+            (wrong_descriptor, "accepted plan"),
+            (wrong_slot, "outstanding slot"),
+        ):
+            with self.subTest(message=message):
+                altered_evidence = (
+                    self.authority.issue_proof_free_disposition_evidence(
+                        f"{evidence.evidence_id}-{message}", altered
+                    )
+                )
+                with self.assertRaisesRegex(DispatchDenied, message):
+                    self.store.record_proof_free_disposition(
+                        altered, capability, altered_evidence, self.authority
+                    )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
+        receipt = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_disposition_rejects_wrong_issuer_without_writes(self) -> None:
+        request, _capability, _evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="wrong-issuer"
+        )
+        replacement = SyntheticAuthority(b"w" * 32)
+        grant = SyntheticOperatorGrant(
+            "wrong-issuer-grant", "repo-1", "run-1",
+            "DISPOSE_REPORT_ONLY", "wrong-issuer-scope",
+        )
+        replacement.register_operator(grant)
+        capability = replacement.claim_operator(*grant.__dict__.values())
+        evidence = replacement.issue_proof_free_disposition_evidence(
+            "wrong-issuer-evidence", request
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(DispatchDenied, "accepted plan|already bound"):
+            self.store.record_proof_free_disposition(
+                request, capability, evidence, replacement
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_replay_precedes_freshness_and_report_can_close(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="report-close"
+        )
+        reported = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.oracle.allowed_head = "deliberately-stale"
+        replay = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.assertEqual(replay.event_hash, reported.event_hash)
+
+        connection = sqlite3.connect(self.database_path)
+        try:
+            catalog_head = connection.execute(
+                "SELECT catalog_head FROM repositories WHERE repository_id = "
+                "'repo-1'"
+            ).fetchone()[0]
+            run_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = catalog_head
+        reused_request = replace(
+            request,
+            disposition_id="proof-free-report-close-reused",
+            command_id="proof-free-report-close-reused-command",
+            event_id="proof-free-report-close-reused-event",
+            expected_catalog_head=catalog_head,
+            expected_run_head=run_head,
+        )
+        reused_evidence = self.authority.issue_proof_free_disposition_evidence(
+            "proof-free-report-close-reused-evidence", reused_request
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "already committed|already redeemed"
+        ):
+            self.store.record_proof_free_disposition(
+                reused_request, capability, reused_evidence, self.authority
+            )
+        closing_request = replace(
+            request,
+            disposition_id="proof-free-report-close-terminal",
+            command_id="proof-free-report-close-terminal-command",
+            event_id="proof-free-report-close-terminal-event",
+            disposition=ProofFreeDisposition.STOPPED,
+            expected_catalog_head=catalog_head,
+            expected_run_head=run_head,
+            terminal_fence_id="proof-free-report-close-terminal-fence",
+        )
+        grant = SyntheticOperatorGrant(
+            "proof-free-report-close-terminal-grant", "repo-1", "run-1",
+            "DISPOSE_STOPPED", "proof-free-report-close-terminal-scope",
+        )
+        self.authority.register_operator(grant)
+        closing_capability = self.authority.claim_operator(
+            *grant.__dict__.values()
+        )
+        closing_evidence = self.authority.issue_proof_free_disposition_evidence(
+            "proof-free-report-close-terminal-evidence", closing_request
+        )
+        closed = self.store.record_proof_free_disposition(
+            closing_request, closing_capability, closing_evidence,
+            self.authority,
+        )
+        self.oracle.allowed_head = closed.event_hash
+        self.assertEqual(closed.resulting_state, LifecycleState.STOPPED)
+        counts = self.store.table_counts()
+        self.assertEqual(counts["proof_free_disposition_actions"], 2)
+        self.assertEqual(counts["operation_retry_authorizations"], 0)
+        self.assertEqual(counts["operation_finalizations"], 0)
+        self.assertEqual(counts["outstanding_slot"], 1)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t17_proof_free_authority_boundaries_reject_forgery(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="forgery"
+        )
+        with self.assertRaises(ValueError):
+            self.authority.issue_proof_free_disposition_evidence(  # type: ignore[arg-type]
+                42, request
+            )
+        forged = replace(evidence, issuer_mac="forged-mac")
+        wrong_action = replace(capability, action="DISPOSE_STOPPED")
+        connection = sqlite3.connect(self.database_path)
+        try:
+            before = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(DispatchDenied, "does not bind"):
+            self.store.record_proof_free_disposition(
+                request, wrong_action, evidence, self.authority
+            )
+        with self.assertRaisesRegex(DispatchDenied, "does not bind the request"):
+            self.store.record_proof_free_disposition(
+                request, capability, forged, self.authority
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            after = tuple(connection.iterdump())
+        finally:
+            connection.close()
+        self.assertEqual(after, before)
+
+    def test_t17_proof_free_accounting_projection_tamper_fails_closed(self) -> None:
+        request, capability, evidence = self._proof_free_disposition_fixture(
+            ProofFreeDisposition.REPORT_ONLY, suffix="accounting-tamper"
+        )
+        receipt = self.store.record_proof_free_disposition(
+            request, capability, evidence, self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            connection.execute(
+                "UPDATE proof_free_disposition_actions SET "
+                "accounting_snapshot_json = '[]' WHERE disposition_id = ?",
+                (request.disposition_id,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "proof-free disposition projection"
+        ):
+            self.store.load_verified("repo-1", authority=self.authority)
 
     def test_t25_contacted_nonexecution_clears_exact_uncertainty_and_pauses(
         self,
@@ -9595,6 +10095,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     "DROP TABLE operation_nonexecution_resume_actions"
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
+                connection.execute("DROP TABLE proof_free_disposition_actions")
                 connection.execute(
                     "UPDATE repositories SET catalog_head = '' WHERE "
                     "repository_id = 'repo-1'"
@@ -9638,7 +10139,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         migrated.load_verified("repo-1", authority=self.authority)
-        self.assertEqual(migrated_state, (6, 1, 4, 0))
+        self.assertEqual(migrated_state, (7, 1, 4, 0))
 
         late_observation = self._record_signed_effect_observation(
             EffectObservationRequest(
@@ -20035,6 +20536,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 connection.execute(
                     f"ALTER TABLE validator_intents DROP COLUMN {column}"
                 )
+            connection.execute("DROP TABLE proof_free_disposition_actions")
             connection.execute("PRAGMA user_version = 4")
             connection.commit()
         finally:
@@ -20056,7 +20558,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             version = connection.execute("PRAGMA user_version").fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(version, 6)
+        self.assertEqual(version, 7)
         self.assertEqual(migrated, (None, None, None, None))
         legacy_commit = CommitReceipt(
             committed.command_id, committed.event_id, committed.sequence,

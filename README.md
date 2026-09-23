@@ -622,7 +622,7 @@ use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
 The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 467-test package suite passes locally; all three stop findings, T13
+its full 478-test package suite passes locally; all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -660,7 +660,15 @@ facts, signed complete READY snapshots, universal no-preclaim T27 commit,
 atomic T11 next-check routing, exact T16 launch-route recovery, and contact-time
 stale-prerequisite disablement with T25/T16 continuation; the corrected
 increment received independent `APPROVE`. No complete row is
-promoted until committed exact-head trace review; broader T17 and the remaining
+promoted until committed exact-head trace review. The T17/F18 proof-free owner
+disposition route is now implemented locally: separately authenticated one-use
+REPORT_ONLY, STOPPED and FAILED_FINAL commands preserve the unknown outcome,
+accounting, slot, cursor and exact uncertainty set; terminal choices add a
+permanent scoped fence and never authorize retry, success or completion. Its
+semantic-v7 migration, crash/replay and strict historical projection checks are
+locally green. Independent implementation review returned `APPROVE` after the
+accepted-plan issuer boundary and denial matrix were corrected; committed
+exact-head evidence remains required before aggregate promotion. The remaining
 canonical gaps stay open.
 The PR remains draft and not
 merge-ready while the exact T/C/F trace and final architecture/security/QA

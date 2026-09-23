@@ -31,6 +31,7 @@ from .authority import (
     SyntheticOperationNonexecutionResumeEvidence,
     SyntheticOperationReadinessEvidence,
     SyntheticOperatorCapability,
+    SyntheticProofFreeDispositionEvidence,
     SyntheticPlanAcceptanceEvidence,
     SyntheticResumeEvidence,
     SyntheticReconciliationResumeEvidence,
@@ -81,6 +82,8 @@ from .contracts import (
     PauseReconciliationRequest,
     PauseValidationRequest,
     PlanAcceptanceRequest,
+    ProofFreeDisposition,
+    ProofFreeDispositionRequest,
     ReadinessEvaluationRequest,
     ReconciliationPauseResumeRequest,
     RecoverProvenNonexecutionRequest,
@@ -971,7 +974,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5, 6}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -992,7 +995,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5, 6} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6, 7} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -2063,6 +2066,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_trusted_readiness_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_proof_free_disposition_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -2140,7 +2146,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5, 6}:
+            if version not in {3, 4, 5, 6, 7}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -2169,11 +2175,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5, 6} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6, 7} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5, 6}:
+            if version in {4, 5, 6, 7}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2644,7 +2650,9 @@ class SQLiteStateStore:
                 )
             if version == 3:
                 connection.execute("PRAGMA user_version = 4")
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 4:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                4, 5, 6, 7,
+            }:
                 raise StorageIntegrityError(
                     "T28 foundation migration did not reach version 4"
                 )
@@ -2692,7 +2700,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5, 6}:
+            if version not in {4, 5, 6, 7}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2946,7 +2954,7 @@ class SQLiteStateStore:
         )
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {5, 6}:
+            if version not in {5, 6, 7}:
                 raise StorageIntegrityError(
                     "trusted-readiness semantic version is unsupported"
                 )
@@ -3005,7 +3013,9 @@ class SQLiteStateStore:
                         "after_trusted_readiness_migration_writes_before_commit"
                     )
                 connection.execute("PRAGMA user_version = 6")
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 6:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
+                6, 7,
+            }:
                 raise StorageIntegrityError(
                     "trusted-readiness migration did not reach version 6"
                 )
@@ -3092,6 +3102,125 @@ class SQLiteStateStore:
                 if failure_hook is not None and version == 5:
                     failure_hook(
                         "after_trusted_readiness_migration_commit_before_acknowledgement"
+                    )
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_proof_free_disposition_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        table_name = "proof_free_disposition_actions"
+        table_sql = """
+            CREATE TABLE proof_free_disposition_actions (
+                disposition_id TEXT PRIMARY KEY,
+                command_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL REFERENCES validation_plans(plan_id),
+                revision_digest TEXT NOT NULL,
+                effect_descriptor_digest TEXT NOT NULL,
+                disposition TEXT NOT NULL CHECK (disposition IN (
+                    'REPORT_ONLY', 'STOPPED', 'FAILED_FINAL'
+                )),
+                retained_uncertainty_ids_json TEXT NOT NULL,
+                uncertainty_set_digest TEXT NOT NULL,
+                accounting_snapshot_json TEXT NOT NULL,
+                slot_attempt_id TEXT NOT NULL,
+                slot_generation INTEGER NOT NULL CHECK (slot_generation > 0),
+                preserved_continuation_cursor TEXT,
+                reason_code TEXT NOT NULL,
+                terminal_fence_id TEXT UNIQUE REFERENCES dispatch_fences(fence_id),
+                capability_claim_id TEXT NOT NULL UNIQUE,
+                capability_grant_id TEXT NOT NULL UNIQUE,
+                capability_scope_digest TEXT NOT NULL,
+                evidence_id TEXT NOT NULL UNIQUE,
+                evidence_digest TEXT NOT NULL,
+                issuer_fingerprint TEXT NOT NULL,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL UNIQUE,
+                resulting_state TEXT NOT NULL CHECK (resulting_state IN (
+                    'RECONCILIATION_REQUIRED', 'STOPPED', 'FAILED_FINAL'
+                )),
+                body_json TEXT NOT NULL,
+                UNIQUE (
+                    repository_id, run_id, attempt_id,
+                    uncertainty_set_digest, disposition
+                )
+            )
+        """
+
+        def canonical_schema(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {6, 7}:
+                raise StorageIntegrityError(
+                    "proof-free disposition semantic version is unsupported"
+                )
+            existing = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                (table_name,),
+            ).fetchone()
+            if version == 6:
+                if existing is not None:
+                    raise StorageIntegrityError(
+                        "proof-free disposition schema is partially migrated"
+                    )
+                for row in connection.execute(
+                    "SELECT body_json FROM events WHERE event_kind = "
+                    "'RECONCILIATION_RECORDED'"
+                ):
+                    try:
+                        if json.loads(str(row["body_json"])).get("route") == (
+                            "OWNER_NONDISPATCHING_DISPOSITION"
+                        ):
+                            raise StorageIntegrityError(
+                                "proof-free disposition predates its projection"
+                            )
+                    except json.JSONDecodeError as error:
+                        raise StorageIntegrityError(
+                            "reconciliation history is not valid JSON"
+                        ) from error
+                connection.execute(table_sql)
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_proof_free_disposition_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 7")
+                existing = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                    (table_name,),
+                ).fetchone()
+            if existing is None or canonical_schema(str(existing["sql"])) != (
+                canonical_schema(table_sql)
+            ):
+                raise StorageIntegrityError(
+                    "proof-free disposition schema is missing or incompatible"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 7:
+                raise StorageIntegrityError(
+                    "proof-free disposition migration did not reach version 7"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 6:
+                    failure_hook(
+                        "after_proof_free_disposition_migration_commit_before_acknowledgement"
                     )
         except BaseException:
             if manage_transaction and connection.in_transaction:
@@ -3466,7 +3595,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5, 6}:
+            if version not in {0, 1, 2, 3, 4, 5, 6, 7}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -3474,7 +3603,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5, 6}:
+            if version in {2, 3, 4, 5, 6, 7}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -3526,7 +3655,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5, 6}:
+                if version in {3, 4, 5, 6, 7}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -3736,7 +3865,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5, 6,
+                1, 2, 3, 4, 5, 6, 7,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -3808,7 +3937,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5, 6}:
+            if version not in {1, 2, 3, 4, 5, 6, 7}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -3849,7 +3978,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5, 6,
+                2, 3, 4, 5, 6, 7,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -4052,7 +4181,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5, 6}:
+            if version not in {2, 3, 4, 5, 6, 7}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -4406,7 +4535,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5, 6,
+                3, 4, 5, 6, 7,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -8874,6 +9003,246 @@ class SQLiteStateStore:
         ) as error:
             raise StorageIntegrityError(
                 "validator observation semantics are invalid"
+            ) from error
+
+    @staticmethod
+    def _proof_free_accounting_snapshot(
+        connection: sqlite3.Connection,
+        repository_id: str,
+        run_id: str,
+        logical_effect_id: str,
+        *,
+        before_sequence: int,
+    ) -> list[dict[str, object]]:
+        snapshot: list[dict[str, object]] = []
+        for reservation in connection.execute(
+            "SELECT * FROM budget_reservations WHERE repository_id = ? AND "
+            "run_id = ? AND logical_effect_id = ? ORDER BY reservation_id",
+            (repository_id, run_id, logical_effect_id),
+        ):
+            settlement = connection.execute(
+                "SELECT settlement.* FROM budget_settlements AS settlement "
+                "JOIN events AS event ON event.event_id = "
+                "settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND event.sequence < ? ORDER "
+                "BY event.sequence DESC LIMIT 1",
+                (reservation["reservation_id"], before_sequence),
+            ).fetchone()
+            snapshot.append(
+                {
+                    "reservation_id": str(reservation["reservation_id"]),
+                    "attempt_id": str(reservation["attempt_id"]),
+                    "disposition": (
+                        BudgetDisposition.RESERVED.value
+                        if settlement is None
+                        else str(settlement["disposition"])
+                    ),
+                    "held_units": (
+                        int(reservation["reserved_units"])
+                        if settlement is None else int(settlement["held_units"])
+                    ),
+                    "charged_units": (
+                        0 if settlement is None
+                        else int(settlement["charged_units"])
+                    ),
+                    "worst_case_units": int(reservation["worst_case_units"]),
+                    "uncertainty": (
+                        0 if settlement is None
+                        else int(settlement["uncertainty"])
+                    ),
+                    "settlement_head_hash": (
+                        "" if settlement is None
+                        else str(settlement["settlement_hash"])
+                    ),
+                }
+            )
+        return snapshot
+
+    def _validate_proof_free_disposition_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(ProofFreeDispositionRequest.__dataclass_fields__) | {
+            "accounting_snapshot", "action", "capability_evidence",
+            "continuation_cursor", "disposition_evidence", "effect_outcome",
+            "event_kind", "lifecycle_from", "lifecycle_to", "payload_digest",
+            "previous_event_hash", "proof_free_disposition_binding_version",
+            "route", "schema_version", "sequence", "writer_epoch",
+        }
+        try:
+            if (
+                set(body) != expected_fields
+                or body["schema_version"] != 1
+                or body["proof_free_disposition_binding_version"] != 1
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+                or not isinstance(body["retained_uncertainty_ids"], list)
+                or not isinstance(body["accounting_snapshot"], list)
+                or not isinstance(body["capability_evidence"], dict)
+                or not isinstance(body["disposition_evidence"], dict)
+            ):
+                raise ValueError("proof-free disposition schema is invalid")
+            values = {
+                field: body[field]
+                for field in ProofFreeDispositionRequest.__dataclass_fields__
+            }
+            values["disposition"] = ProofFreeDisposition(values["disposition"])
+            values["retained_uncertainty_ids"] = tuple(
+                values["retained_uncertainty_ids"]
+            )
+            request = ProofFreeDispositionRequest(**values)
+            request.validate()
+            capability = SyntheticOperatorCapability(
+                **cast(dict[str, object], body["capability_evidence"])
+            )
+            evidence = SyntheticProofFreeDispositionEvidence(
+                **cast(dict[str, object], body["disposition_evidence"])
+            )
+            if self._classification_authority is None:
+                raise ValueError("proof-free disposition authority is not bound")
+            self._classification_authority.verify_operator_issued(capability)
+            self._classification_authority.verify_proof_free_disposition_evidence(
+                evidence, request
+            )
+            action = {
+                ProofFreeDisposition.REPORT_ONLY: "DISPOSE_REPORT_ONLY",
+                ProofFreeDisposition.STOPPED: "DISPOSE_STOPPED",
+                ProofFreeDisposition.FAILED_FINAL: "DISPOSE_FAILED_FINAL",
+            }[request.disposition]
+            payload = {
+                **request.__dict__,
+                "disposition": request.disposition.value,
+                "action": action,
+                "capability_evidence": dict(capability.__dict__),
+                "disposition_evidence": dict(evidence.__dict__),
+                "proof_free_disposition_binding_version": 1,
+            }
+            expected_state = {
+                ProofFreeDisposition.REPORT_ONLY: (
+                    LifecycleState.RECONCILIATION_REQUIRED
+                ),
+                ProofFreeDisposition.STOPPED: LifecycleState.STOPPED,
+                ProofFreeDisposition.FAILED_FINAL: LifecycleState.FAILED_FINAL,
+            }[request.disposition]
+            if (
+                self._event_hash(payload) != body["payload_digest"]
+                or predecessor_state
+                is not LifecycleState.RECONCILIATION_REQUIRED
+                or predecessor_cursor != request.expected_continuation_cursor
+                or body["previous_event_hash"] != request.expected_run_head
+                or body["lifecycle_from"]
+                != LifecycleState.RECONCILIATION_REQUIRED.value
+                or body["lifecycle_to"] != expected_state.value
+                or body["continuation_cursor"] != predecessor_cursor
+                or body["effect_outcome"] != "UNKNOWN"
+                or body["event_kind"] != "RECONCILIATION_RECORDED"
+                or body["route"] != "OWNER_NONDISPATCHING_DISPOSITION"
+                or body["action"] != action
+                or (
+                    capability.repository_id, capability.run_id,
+                    capability.action,
+                ) != (request.repository_id, request.run_id, action)
+            ):
+                raise ValueError("proof-free disposition binding is invalid")
+            plan = connection.execute(
+                "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                "repository_id = ? AND run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            if plan is None or (
+                plan["item_id"], plan["logical_effect_id"],
+                plan["revision_digest"], plan["effect_descriptor_digest"],
+            ) != (
+                request.item_id, request.logical_effect_id,
+                request.revision_digest, request.effect_descriptor_digest,
+            ):
+                raise ValueError("proof-free disposition plan is invalid")
+            uncertainty_rows = connection.execute(
+                "SELECT instance.* FROM uncertainty_instances AS instance "
+                "JOIN events AS origin ON origin.event_id = "
+                "instance.origin_event_id LEFT JOIN uncertainty_resolutions AS "
+                "resolution ON resolution.uncertainty_id = instance.uncertainty_id "
+                "LEFT JOIN events AS resolution_event ON resolution_event.event_id "
+                "= resolution.event_id WHERE instance.repository_id = ? AND "
+                "instance.run_id = ? AND instance.item_id = ? AND "
+                "instance.logical_effect_id = ? AND instance.attempt_id = ? AND "
+                "instance.check_id IS NULL AND origin.writer_epoch < ? AND "
+                "(resolution_event.event_id IS NULL OR resolution_event.writer_epoch "
+                ">= ?) ORDER BY instance.uncertainty_id",
+                (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.attempt_id,
+                    body["writer_epoch"], body["writer_epoch"],
+                ),
+            ).fetchall()
+            uncertainty_ids = tuple(
+                str(row["uncertainty_id"]) for row in uncertainty_rows
+            )
+            if (
+                uncertainty_ids != request.retained_uncertainty_ids
+                or request.uncertainty_set_digest
+                != self._event_hash(
+                    {
+                        "domain": "AEGIS:T17:PROOF_FREE_UNCERTAINTY_SET:v1",
+                        "retained_uncertainty_ids": list(uncertainty_ids),
+                    }
+                )
+                or not any(
+                    row["uncertainty_kind"] == "OUTCOME"
+                    for row in uncertainty_rows
+                )
+            ):
+                raise ValueError("proof-free uncertainty set is invalid")
+            historical_slot = self._historical_repository_activity(
+                connection, request.repository_id, int(body["writer_epoch"])
+            )[1]
+            if historical_slot != (
+                request.run_id, request.logical_effect_id,
+                request.expected_slot_attempt_id,
+                request.expected_slot_generation,
+            ) or request.attempt_id != request.expected_slot_attempt_id:
+                raise ValueError("proof-free disposition slot is invalid")
+            snapshot_fields = {
+                "reservation_id", "attempt_id", "disposition", "held_units",
+                "charged_units", "worst_case_units", "uncertainty",
+                "settlement_head_hash",
+            }
+            if any(
+                not isinstance(entry, dict) or set(entry) != snapshot_fields
+                for entry in cast(list[object], body["accounting_snapshot"])
+            ):
+                raise ValueError("proof-free accounting snapshot is invalid")
+            expected_accounting = self._proof_free_accounting_snapshot(
+                connection, request.repository_id, request.run_id,
+                request.logical_effect_id,
+                before_sequence=int(body["sequence"]),
+            )
+            if body["accounting_snapshot"] != expected_accounting:
+                raise ValueError(
+                    "proof-free accounting snapshot diverges from history"
+                )
+            if any(
+                obligation["historical_disposition"]
+                == BudgetDisposition.RESERVED.value
+                for obligation in self._unresolved_contact_reservations(
+                    connection, request.repository_id, request.run_id,
+                    before_sequence=int(body["sequence"]),
+                )
+            ):
+                raise ValueError(
+                    "proof-free disposition retained unclassified contacted accounting"
+                )
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "proof-free disposition semantics are invalid"
             ) from error
 
     def _validate_validator_reconciliation_event(
@@ -17695,6 +18064,381 @@ class SQLiteStateStore:
                 raise
         return ControlReceipt(
             request.reconciliation_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
+        )
+
+    def record_proof_free_disposition(
+        self,
+        request: ProofFreeDispositionRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticProofFreeDispositionEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "proof-free disposition targets another repository"
+            )
+        self._bind_classification_authority(authority)
+        action = {
+            ProofFreeDisposition.REPORT_ONLY: "DISPOSE_REPORT_ONLY",
+            ProofFreeDisposition.STOPPED: "DISPOSE_STOPPED",
+            ProofFreeDisposition.FAILED_FINAL: "DISPOSE_FAILED_FINAL",
+        }[request.disposition]
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, action):
+            raise DispatchDenied(
+                "synthetic operator capability does not bind this proof-free disposition"
+            )
+        capability_evidence = dict(capability.__dict__)
+        disposition_evidence = dict(evidence.__dict__)
+        request_payload = {
+            **request.__dict__,
+            "disposition": request.disposition.value,
+        }
+        payload = {
+            **request_payload,
+            "action": action,
+            "capability_evidence": capability_evidence,
+            "disposition_evidence": disposition_evidence,
+            "proof_free_disposition_binding_version": 1,
+        }
+        payload_digest = self._event_hash(payload)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_proof_free_disposition_evidence(
+                        evidence, request
+                    )
+                    prior = connection.execute(
+                        "SELECT * FROM proof_free_disposition_actions WHERE "
+                        "command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior is None or prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "proof-free disposition replay lost or changed its projection"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["disposition_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(prior_command["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                prior = connection.execute(
+                    "SELECT * FROM proof_free_disposition_actions WHERE "
+                    "disposition_id = ? OR event_id = ?",
+                    (request.disposition_id, request.event_id),
+                ).fetchone()
+                if prior is not None:
+                    if prior["payload_digest"] != payload_digest:
+                        raise StorageIntegrityError(
+                            "proof-free disposition identity was reused with different evidence"
+                        )
+                    outcome = connection.execute(
+                        "SELECT sequence FROM command_outcomes WHERE command_id = ?",
+                        (prior["command_id"],),
+                    ).fetchone()
+                    if outcome is None:
+                        raise StorageIntegrityError(
+                            "proof-free disposition lost its command outcome"
+                        )
+                    connection.rollback()
+                    return ControlReceipt(
+                        str(prior["disposition_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(outcome["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or run_heads.get(request.run_id) != request.expected_run_head
+                ):
+                    raise DispatchDenied(
+                        "proof-free disposition current heads are stale"
+                    )
+                authority.verify_operator_for_action(capability)
+                authority.verify_proof_free_disposition_evidence(
+                    evidence, request
+                )
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?",
+                    (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "synthetic operator grant was already redeemed"
+                    )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                if run is None or run["item_id"] != request.item_id:
+                    raise DispatchDenied(
+                        "proof-free disposition does not bind the run"
+                    )
+                current_state = LifecycleState(str(run["lifecycle_state"]))
+                if current_state is not LifecycleState.RECONCILIATION_REQUIRED:
+                    raise DispatchDenied(
+                        "proof-free T17 disposition requires RECONCILIATION_REQUIRED"
+                    )
+                if run["continuation_cursor"] != request.expected_continuation_cursor:
+                    raise DispatchDenied(
+                        "proof-free disposition continuation cursor is stale"
+                    )
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE repository_id = ? "
+                    "AND run_id = ? AND plan_id = ?",
+                    (request.repository_id, request.run_id, request.plan_id),
+                ).fetchone()
+                if plan is None or (
+                    plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"], plan["effect_descriptor_digest"],
+                ) != (
+                    request.item_id, request.logical_effect_id,
+                    request.revision_digest, request.effect_descriptor_digest,
+                ):
+                    raise DispatchDenied(
+                        "proof-free disposition does not bind the accepted plan"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id,
+                    authority,
+                )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ) or request.attempt_id != request.expected_slot_attempt_id:
+                    raise DispatchDenied(
+                        "proof-free disposition does not bind the outstanding slot"
+                    )
+                uncertainty_rows = connection.execute(
+                    "SELECT instance.* FROM uncertainty_instances AS instance "
+                    "LEFT JOIN uncertainty_resolutions AS resolution ON "
+                    "resolution.uncertainty_id = instance.uncertainty_id WHERE "
+                    "instance.repository_id = ? AND instance.run_id = ? AND "
+                    "instance.item_id = ? AND instance.logical_effect_id = ? "
+                    "AND instance.attempt_id = ? AND instance.check_id IS NULL "
+                    "AND resolution.uncertainty_id IS NULL ORDER BY "
+                    "instance.uncertainty_id",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchall()
+                uncertainty_ids = tuple(
+                    str(row["uncertainty_id"]) for row in uncertainty_rows
+                )
+                expected_uncertainty_digest = self._event_hash(
+                    {
+                        "domain": "AEGIS:T17:PROOF_FREE_UNCERTAINTY_SET:v1",
+                        "retained_uncertainty_ids": list(uncertainty_ids),
+                    }
+                )
+                if (
+                    uncertainty_ids != request.retained_uncertainty_ids
+                    or request.uncertainty_set_digest
+                    != expected_uncertainty_digest
+                    or not any(
+                        row["uncertainty_kind"] == "OUTCOME"
+                        for row in uncertainty_rows
+                    )
+                ):
+                    raise DispatchDenied(
+                        "proof-free disposition requires the exact unresolved operation uncertainty set"
+                    )
+                if any(
+                    obligation["historical_disposition"]
+                    == BudgetDisposition.RESERVED.value
+                    for obligation in self._unresolved_contact_reservations(
+                        connection, request.repository_id, request.run_id,
+                        before_sequence=int(run["head_sequence"]) + 1,
+                    )
+                ):
+                    raise DispatchDenied(
+                        "proof-free disposition requires classified contacted accounting"
+                    )
+                resulting_state = {
+                    ProofFreeDisposition.REPORT_ONLY: (
+                        LifecycleState.RECONCILIATION_REQUIRED
+                    ),
+                    ProofFreeDisposition.STOPPED: LifecycleState.STOPPED,
+                    ProofFreeDisposition.FAILED_FINAL: LifecycleState.FAILED_FINAL,
+                }[request.disposition]
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T17", current_state, resulting_state,
+                        TRANSITIONS["T17"].required_guards,
+                    )
+                else:
+                    authorize_transition(current_state, resulting_state)
+                writer_epoch = int(
+                    connection.execute(
+                        "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                        "WHERE repository_id = ?",
+                        (request.repository_id,),
+                    ).fetchone()[0]
+                )
+                sequence = int(run["head_sequence"]) + 1
+                previous_hash = str(run["head_hash"])
+                accounting_snapshot = self._proof_free_accounting_snapshot(
+                    connection, request.repository_id, request.run_id,
+                    request.logical_effect_id, before_sequence=sequence,
+                )
+                body = {
+                    **payload,
+                    "accounting_snapshot": accounting_snapshot,
+                    "continuation_cursor": run["continuation_cursor"],
+                    "effect_outcome": "UNKNOWN",
+                    "event_kind": "RECONCILIATION_RECORDED",
+                    "lifecycle_from": current_state.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": previous_hash,
+                    "route": "OWNER_NONDISPATCHING_DISPOSITION",
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RECONCILIATION_RECORDED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, previous_hash, event_hash, body_json,
+                    ),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_proof_free_disposition_event_before_fence"
+                    )
+                if request.terminal_fence_id is not None:
+                    connection.execute(
+                        "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            request.terminal_fence_id, request.repository_id,
+                            request.item_id, request.logical_effect_id,
+                            f"PROOF_FREE_{request.disposition.value}",
+                            request.event_id,
+                        ),
+                    )
+                evidence_digest = self._event_hash(disposition_evidence)
+                connection.execute(
+                    "INSERT INTO proof_free_disposition_actions VALUES ("
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        request.disposition_id, request.command_id,
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.attempt_id, request.plan_id,
+                        request.revision_digest,
+                        request.effect_descriptor_digest,
+                        request.disposition.value,
+                        json.dumps(request.retained_uncertainty_ids),
+                        request.uncertainty_set_digest,
+                        json.dumps(
+                            accounting_snapshot, sort_keys=True,
+                            separators=(",", ":"),
+                        ),
+                        request.expected_slot_attempt_id,
+                        request.expected_slot_generation,
+                        run["continuation_cursor"], request.reason_code,
+                        request.terminal_fence_id, capability.claim_id,
+                        capability.grant_id, capability.scope_digest,
+                        evidence.evidence_id, evidence_digest,
+                        authority.issuer_fingerprint, payload_digest,
+                        event_hash, resulting_state.value, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        capability.claim_id, request.repository_id,
+                        capability.grant_id, request.command_id, request.run_id,
+                        action, capability.scope_digest,
+                        authority.issuer_fingerprint,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, payload_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value, sequence, event_hash,
+                        request.run_id,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_proof_free_disposition_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_proof_free_disposition_commit_before_acknowledgement"
+                    )
+            except sqlite3.IntegrityError as error:
+                connection.rollback()
+                raise StorageIntegrityError(
+                    "proof-free disposition durable identity conflicts with state"
+                ) from error
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.disposition_id, request.command_id, request.event_id,
             sequence, event_hash, resulting_state, False,
         )
 
@@ -32189,9 +32933,14 @@ class SQLiteStateStore:
             body for body in reconciliations
             if body.get("route") == "VERIFIED_RECEIPT"
         ]
+        proof_free_dispositions = [
+            body for body in reconciliations
+            if body.get("route") == "OWNER_NONDISPATCHING_DISPOSITION"
+        ]
         if len(reconciliations) != (
             len(validator_reconciliations)
             + len(verified_receipt_reconciliations)
+            + len(proof_free_dispositions)
         ):
             raise StorageIntegrityError(
                 "reconciliation history contains an unknown route"
@@ -35979,6 +36728,17 @@ class SQLiteStateStore:
                 for body in stop_escalations
             }
         )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], body["action"],
+                    body["capability_evidence"]["scope_digest"],
+                    body["disposition_evidence"]["issuer_fingerprint"],
+                )
+                for body in proof_free_dispositions
+            }
+        )
         actual_operator_redemptions = {
             row["claim_id"]: (
                 row["grant_id"], row["command_id"], row["run_id"],
@@ -36545,6 +37305,33 @@ class SQLiteStateStore:
                 self._event_hash(body), body["lifecycle_to"],
                 json.dumps(body, sort_keys=True, separators=(",", ":")),
             )
+        expected_proof_free_actions = {
+            body["disposition_id"]: (
+                body["command_id"], body["event_id"], body["repository_id"],
+                body["run_id"], body["item_id"], body["logical_effect_id"],
+                body["attempt_id"], body["plan_id"], body["revision_digest"],
+                body["effect_descriptor_digest"], body["disposition"],
+                json.dumps(body["retained_uncertainty_ids"]),
+                body["uncertainty_set_digest"],
+                json.dumps(
+                    body["accounting_snapshot"], sort_keys=True,
+                    separators=(",", ":"),
+                ),
+                body["expected_slot_attempt_id"],
+                body["expected_slot_generation"], body["continuation_cursor"],
+                body["reason_code"], body["terminal_fence_id"],
+                body["capability_evidence"]["claim_id"],
+                body["capability_evidence"]["grant_id"],
+                body["capability_evidence"]["scope_digest"],
+                body["disposition_evidence"]["evidence_id"],
+                self._event_hash(body["disposition_evidence"]),
+                body["disposition_evidence"]["issuer_fingerprint"],
+                body["payload_digest"], self._event_hash(body),
+                body["lifecycle_to"],
+                json.dumps(body, sort_keys=True, separators=(",", ":")),
+            )
+            for body in proof_free_dispositions
+        }
         for action in connection.execute(
             "SELECT action.*, event.body_json AS event_body, "
             "event.event_hash AS source_event_hash, "
@@ -36863,6 +37650,32 @@ class SQLiteStateStore:
         if actual_verified_receipt_actions != expected_verified_receipt_actions:
             raise StorageIntegrityError(
                 "verified-receipt projection diverges from event history"
+            )
+        actual_proof_free_actions = {
+            row["disposition_id"]: (
+                row["command_id"], row["event_id"], row["repository_id"],
+                row["run_id"], row["item_id"], row["logical_effect_id"],
+                row["attempt_id"], row["plan_id"], row["revision_digest"],
+                row["effect_descriptor_digest"], row["disposition"],
+                row["retained_uncertainty_ids_json"],
+                row["uncertainty_set_digest"], row["accounting_snapshot_json"],
+                row["slot_attempt_id"], row["slot_generation"],
+                row["preserved_continuation_cursor"], row["reason_code"],
+                row["terminal_fence_id"], row["capability_claim_id"],
+                row["capability_grant_id"], row["capability_scope_digest"],
+                row["evidence_id"], row["evidence_digest"],
+                row["issuer_fingerprint"], row["payload_digest"],
+                row["event_hash"], row["resulting_state"], row["body_json"],
+            )
+            for row in connection.execute(
+                "SELECT * FROM proof_free_disposition_actions WHERE "
+                "repository_id = ?",
+                (repository_id,),
+            )
+        }
+        if actual_proof_free_actions != expected_proof_free_actions:
+            raise StorageIntegrityError(
+                "proof-free disposition projection diverges from event history"
             )
 
         expected_validator_cessations = {
@@ -37244,6 +38057,16 @@ class SQLiteStateStore:
                 )
                 for body in validator_observations
                 if isinstance(body.get("terminal_policy_obligation"), dict)
+            }
+        )
+        expected_fences.update(
+            {
+                str(body["terminal_fence_id"]): (
+                    str(body["item_id"]), str(body["logical_effect_id"]),
+                    f"PROOF_FREE_{body['disposition']}", str(body["event_id"]),
+                )
+                for body in proof_free_dispositions
+                if body["terminal_fence_id"] is not None
             }
         )
         for row in connection.execute(
@@ -37952,6 +38775,11 @@ class SQLiteStateStore:
                         connection, body, predecessor_state,
                         expected_cursors.get(run_id),
                     )
+                elif body.get("route") == "OWNER_NONDISPATCHING_DISPOSITION":
+                    self._validate_proof_free_disposition_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
                 else:
                     raise StorageIntegrityError(
                         "reconciliation event has an unknown route"
@@ -38621,6 +39449,7 @@ class SQLiteStateStore:
             "uncertainty_resolutions",
             "reconciliation_actions",
             "verified_receipt_reconciliation_actions",
+            "proof_free_disposition_actions",
             "proven_nonexecution_actions",
             "operation_nonexecution_resume_actions",
             "operation_recovery_actions",
@@ -38759,7 +39588,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 6:
+            if version != 7:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

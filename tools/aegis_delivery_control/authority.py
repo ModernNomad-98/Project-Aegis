@@ -19,6 +19,7 @@ from .contracts import (
     SyntheticGrantKind,
     SyntheticSourceConsumerKind,
     FailureClassification,
+    ProofFreeDispositionRequest,
     ReconciliationPauseResumeRequest,
     ResumeActivitySettlementRequest,
     ResumeOperationNonexecutionRequest,
@@ -137,6 +138,14 @@ class SyntheticClassificationEvidence:
     policy_id: str
     policy_version: str
     classification: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticProofFreeDispositionEvidence:
+    evidence_id: str
+    request_digest: str
+    issuer_fingerprint: str
     issuer_mac: str
 
 
@@ -1888,7 +1897,8 @@ class SyntheticAuthority:
             raise ValueError("synthetic operator grant fields must be non-empty")
         if grant.action not in {
             "PAUSE", "RESUME", "STOP_GRACEFUL", "STOP_IMMEDIATE",
-            "STOP_ESCALATE", "RECOVER_OPERATION",
+            "STOP_ESCALATE", "RECOVER_OPERATION", "DISPOSE_REPORT_ONLY",
+            "DISPOSE_STOPPED", "DISPOSE_FAILED_FINAL",
         }:
             raise ValueError("unsupported synthetic operator action")
         with self._lock:
@@ -1969,6 +1979,64 @@ class SyntheticAuthority:
         self.verify_operator_for_action(capability)
         with self._lock:
             self._committed_claims.add(capability.claim_id)
+
+    @staticmethod
+    def _proof_free_disposition_request_digest(
+        request: ProofFreeDispositionRequest,
+    ) -> str:
+        payload = {
+            **request.__dict__,
+            "disposition": request.disposition.value,
+            "proof_free_disposition_binding_version": 1,
+        }
+        return hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+
+    def issue_proof_free_disposition_evidence(
+        self,
+        evidence_id: str,
+        request: ProofFreeDispositionRequest,
+    ) -> SyntheticProofFreeDispositionEvidence:
+        request.validate()
+        if not isinstance(evidence_id, str) or not evidence_id.strip():
+            raise ValueError("proof-free disposition evidence ID must be non-empty")
+        request_digest = self._proof_free_disposition_request_digest(request)
+        return SyntheticProofFreeDispositionEvidence(
+            evidence_id,
+            request_digest,
+            self.issuer_fingerprint,
+            self._mac(
+                "PROOF_FREE_DISPOSITION_EVIDENCE",
+                evidence_id=evidence_id,
+                request_digest=request_digest,
+                issuer_fingerprint=self.issuer_fingerprint,
+            ),
+        )
+
+    def verify_proof_free_disposition_evidence(
+        self,
+        evidence: SyntheticProofFreeDispositionEvidence,
+        request: ProofFreeDispositionRequest,
+    ) -> None:
+        request.validate()
+        request_digest = self._proof_free_disposition_request_digest(request)
+        expected_mac = self._mac(
+            "PROOF_FREE_DISPOSITION_EVIDENCE",
+            evidence_id=evidence.evidence_id,
+            request_digest=request_digest,
+            issuer_fingerprint=self.issuer_fingerprint,
+        )
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(evidence.issuer_mac, expected_mac)
+        ):
+            raise DispatchDenied(
+                "proof-free disposition evidence does not bind the request"
+            )
 
     def issue_settlement_proof(
         self,

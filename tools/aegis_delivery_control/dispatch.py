@@ -22,6 +22,7 @@ from .authority import (
     SyntheticClassificationEvidence,
     SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
+    SyntheticProofFreeDispositionEvidence,
     SyntheticOperationNonexecutionResumeEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
@@ -54,6 +55,7 @@ from .contracts import (
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
     PauseValidationRequest,
+    ProofFreeDispositionRequest,
     ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ReconciliationPauseResumeRequest,
@@ -885,6 +887,30 @@ class SyntheticValidationCoordinator:
 
         return self._store.reconcile_validator_result(
             request,
+            authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def record_proof_free_disposition(
+        self,
+        request: ProofFreeDispositionRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticProofFreeDispositionEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T17", current_state, resulting_state,
+                TRANSITIONS["T17"].required_guards,
+            )
+
+        return self._store.record_proof_free_disposition(
+            request, capability, evidence, self._authority,
             authorize_transition=authorize,
             failure_hook=failure_hook,
         )
