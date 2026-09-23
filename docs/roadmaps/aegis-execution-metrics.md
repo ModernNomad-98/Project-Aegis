@@ -18,7 +18,8 @@ earlier forecast update.
 | Calibration replacement storage proposal | 2026-09-23 11:26 | 30–45 minutes active work | Exact active total unavailable; 12m50s observed wall time to merge at 11:38:50 | Independent review passed; final Actions green (Linux 1m24s, Windows 3m11s, guard 5s) | About 1 minute before owner chose A | PR #105 merged; choice A recorded |
 | Private input storage amendment (BER-DEC-010) | 2026-09-23 11:39 | 20–40 minutes active work to review and merge-ready PR | Exact active total unavailable; 8m21s observed wall time to merge at 11:47:21 | Independent audit passed after correction; final Actions guard 4s, Linux 1m18s, Windows 2m55s | None recorded | PR #106 merged |
 | Calibration replacement candidate packet | 2026-09-23 11:47 | 4–8 hours active work | 33m20s observed wall time to public PR #107 merge; active-only total unavailable | Private PR #1 open; local contract/restore checks passed; public PR #107 independent audit and all Actions passed | Owner semantic review pending | Private packet PENDING; public checkpoint merged |
-| Cross-stream owner decision packet | 2026-09-23 12:20 | 2–4 hours active work | In progress | Pending | None recorded | BKL-009 policy and distinct BER/CP/#101 choices being drafted |
+| Cross-stream owner decision packet | 2026-09-23 12:20 | 2–4 hours active work | 13m38s observed wall time to PR #108 merge; active-only time unavailable | Independent read-only audit passed; all three Actions green | BKL-009 owner selection pending after merge | PR #108 merged at 12:33:38 UTC; BKL-009 remains PARTIAL |
+| Issue #101 package 1 design | 2026-09-23 12:34 | 4–8 hours active work | In progress | Pending | No runtime authorization requested | Design, candidate discovery and durable planning only |
 
 ## Progress checkpoints
 
@@ -75,6 +76,13 @@ earlier forecast update.
 - **2026-09-23 12:20 UTC — owner decision packet started:** Estimated 2–4
   active hours to prepare BKL-009's concrete policy options and the distinct
   remaining BER/CP/#101 decision boundaries.
+- **2026-09-23 12:33:38 UTC — owner decision packet merged:** PR #108 merged at
+  `2b13be9fac1169bf8f6cd0cfcbe4da0c5b8bf926` after independent read-only
+  audit and three green Actions. Observed wall time since the 12:20 checkpoint:
+  13m38s; active-only time was not instrumented. This is merge 2 of 5 after
+  the #106 forecast anchor. BKL-009 policy selection remains pending.
+- **2026-09-23 12:34 UTC — issue #101 package 1 started:** Estimated 4–8 active
+  hours for offline design, candidate screening and a paired evaluation plan.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
