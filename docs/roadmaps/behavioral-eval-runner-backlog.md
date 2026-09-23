@@ -3200,7 +3200,10 @@ model call, and evidence artifact.
   in PR #105, the owner chose: "Use the private GitHub input repository
   (recommended)". PR #105 merged at
   `c6fa54ac0fd42342976c6e89a70fd02b390783b0`. The answer chooses storage;
-  it does not approve candidate labels or provider execution.
+  it does not approve candidate labels or provider execution. The bounded
+  offline preparation grant below implements the owner's current instruction
+  to continue the approved backlog and the reviewed replacement plan; it is
+  not inferred from the storage answer alone.
 - **Decision and effective condition:** For replacement WP-2B-3 calibration
   *inputs*, amend the input-location and input-retention portions of
   BER-DEC-008 decisions 24–25 and grant the bounded offline candidate-preparation
