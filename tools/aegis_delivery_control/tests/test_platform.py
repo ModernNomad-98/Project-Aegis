@@ -392,7 +392,8 @@ class PlatformContractTests(unittest.TestCase):
             selected_base.mkdir()
             redirect_target = root / "redirect-target"
             redirect_target.mkdir()
-            redirected_component = selected_base / "ProjectAegis"
+            product = "ProjectAegis" if sys.platform == "win32" else "project-aegis"
+            redirected_component = selected_base / product
             if sys.platform == "win32":
                 result = subprocess.run(
                     [
@@ -438,7 +439,9 @@ class PlatformContractTests(unittest.TestCase):
                 self.assertEqual(tuple(redirect_target.rglob("*")), before)
                 self.assertFalse((selected_base / "writer.lock").exists())
             finally:
-                if redirected_component.exists() or redirected_component.is_symlink():
+                if redirected_component.is_symlink():
+                    redirected_component.unlink()
+                elif redirected_component.exists():
                     os.rmdir(redirected_component)
 
     def test_freshness_requires_exact_repository_and_complete_run_vector(self) -> None:

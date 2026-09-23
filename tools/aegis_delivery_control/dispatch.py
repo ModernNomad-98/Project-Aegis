@@ -263,11 +263,18 @@ class SyntheticDispatchCoordinator:
         def authorize(
             current_state: LifecycleState, resulting_state: LifecycleState
         ) -> None:
+            transition_id = (
+                "T09"
+                if current_state is LifecycleState.RECONCILIATION_REQUIRED
+                else "T06"
+            )
             self._engine.authorize(
-                "T06",
+                transition_id,
                 current_state,
                 resulting_state,
-                TRANSITIONS["T06"].required_guards,
+                TRANSITIONS[transition_id].required_guards
+                | (frozenset({"effect_bound"}) if transition_id == "T09" else frozenset()),
+                event_kind="PAUSE_REQUESTED",
             )
 
         return self._store.pause_external_mutation(
@@ -288,11 +295,17 @@ class SyntheticDispatchCoordinator:
         def authorize(
             current_state: LifecycleState, resulting_state: LifecycleState
         ) -> None:
+            transition_id = (
+                "T09"
+                if current_state is LifecycleState.RECONCILIATION_REQUIRED
+                else "T08"
+            )
             self._engine.authorize(
-                "T08",
+                transition_id,
                 current_state,
                 resulting_state,
-                TRANSITIONS["T08"].required_guards,
+                TRANSITIONS[transition_id].required_guards,
+                event_kind="VALIDATION_PAUSE_REQUESTED",
             )
 
         return self._store.pause_validation(

@@ -246,6 +246,7 @@ _EVENT_KINDS = frozenset(
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
         "VALIDATION_CHECK_ROUTED",
+        "VALIDATION_APPLICATION_DENIED",
         "VALIDATION_GATE_FACT_RECORDED",
         "VALIDATION_LAUNCH_BLOCKED",
         "VALIDATION_LAUNCH_EVALUATED",
@@ -286,6 +287,7 @@ _LIFECYCLE_EVENT_KINDS = frozenset(
         "TERMINAL_VALIDATION_SETTLED",
         "VALIDATION_FAILED",
         "VALIDATION_CHECK_ROUTED",
+        "VALIDATION_APPLICATION_DENIED",
         "VALIDATION_GATE_FACT_RECORDED",
         "VALIDATION_LAUNCH_BLOCKED",
         "VALIDATION_LAUNCH_EVALUATED",
@@ -321,7 +323,15 @@ _SPECIALIZED_LIFECYCLE_ROUTES = frozenset(
 _LIFECYCLE_ROUTES: Mapping[
     str, frozenset[tuple[LifecycleState | None, LifecycleState]]
 ] = {
-    "ADAPTER_CONTACT_CLAIMED": _PRESERVE_LIFECYCLE_ROUTES,
+    "ADAPTER_CONTACT_CLAIMED": _PRESERVE_LIFECYCLE_ROUTES
+    | frozenset(
+        {
+            (
+                LifecycleState.RECONCILIATION_REQUIRED,
+                LifecycleState.VALIDATING,
+            )
+        }
+    ),
     "AUTHORITY_EVALUATED": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BINDING_MISMATCH": _SPECIALIZED_LIFECYCLE_ROUTES,
     "BLOCKER_RESOLVED": frozenset(
@@ -346,7 +356,13 @@ _LIFECYCLE_ROUTES: Mapping[
         {(LifecycleState.BLOCKED, LifecycleState.COMPLETED)}
     ),
     "OPERATION_LAUNCH_CLAIMED": frozenset(
-        {(LifecycleState.RUNNING, LifecycleState.RUNNING)}
+        {
+            (LifecycleState.RUNNING, LifecycleState.RUNNING),
+            (
+                LifecycleState.RUNNING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
+        }
     ),
     "PAUSE_REQUESTED": frozenset(
         {
@@ -355,6 +371,10 @@ _LIFECYCLE_ROUTES: Mapping[
             (LifecycleState.RUNNING, LifecycleState.PAUSING),
             (
                 LifecycleState.RUNNING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
+            (
+                LifecycleState.RECONCILIATION_REQUIRED,
                 LifecycleState.RECONCILIATION_REQUIRED,
             ),
         }
@@ -415,7 +435,13 @@ _LIFECYCLE_ROUTES: Mapping[
         }
     ),
     "VALIDATION_PAUSE_REQUESTED": frozenset(
-        {(LifecycleState.VALIDATING, LifecycleState.VALIDATING)}
+        {
+            (LifecycleState.VALIDATING, LifecycleState.VALIDATING),
+            (
+                LifecycleState.RECONCILIATION_REQUIRED,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
+        }
     ),
     "VALIDATION_PAUSE_CHECKPOINTED": frozenset(
         {
@@ -423,6 +449,10 @@ _LIFECYCLE_ROUTES: Mapping[
             (LifecycleState.VALIDATING, LifecycleState.PAUSED),
             (
                 LifecycleState.VALIDATING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            ),
+            (
+                LifecycleState.RECONCILIATION_REQUIRED,
                 LifecycleState.RECONCILIATION_REQUIRED,
             ),
         }
@@ -449,6 +479,7 @@ _LIFECYCLE_ROUTES: Mapping[
         }
     ),
     "VALIDATION_FAILED": _SPECIALIZED_LIFECYCLE_ROUTES,
+    "VALIDATION_APPLICATION_DENIED": _PRESERVE_LIFECYCLE_ROUTES,
     "VALIDATION_CHECK_ROUTED": frozenset(
         {
             (LifecycleState.VALIDATING, LifecycleState.VALIDATING),
@@ -466,10 +497,18 @@ _LIFECYCLE_ROUTES: Mapping[
     "VALIDATION_PASSED": _SPECIALIZED_LIFECYCLE_ROUTES,
     "VALIDATOR_CESSATION_RECORDED": _PRESERVE_LIFECYCLE_ROUTES,
     "VALIDATOR_INITIATION_DISABLED": frozenset(
-        {(LifecycleState.VALIDATING, LifecycleState.BLOCKED)}
+        {
+            (LifecycleState.VALIDATING, LifecycleState.BLOCKED),
+            (LifecycleState.RECONCILIATION_REQUIRED, LifecycleState.BLOCKED),
+        }
     ),
     "VALIDATOR_INTENT_COMMITTED": frozenset(
-        {(LifecycleState.VALIDATING, LifecycleState.VALIDATING)}
+        {
+            (
+                LifecycleState.VALIDATING,
+                LifecycleState.RECONCILIATION_REQUIRED,
+            )
+        }
     ),
     "VALIDATOR_OBSERVATION_RECORDED": frozenset(
         {
@@ -565,6 +604,7 @@ def _derive_effect_observation_route(
     *,
     accounting_unknown: bool | None = None,
     force_late: bool = False,
+    reconciles_current_dispatch: bool = False,
 ) -> tuple[str, str, LifecycleState]:
     ordinary_receipt = not force_late and current_state in {
         LifecycleState.RUNNING,
@@ -581,6 +621,11 @@ def _derive_effect_observation_route(
         LifecycleState.STOPPED,
     }:
         resulting_state = current_state
+    elif reconciles_current_dispatch and not unresolved_billing and (
+        source_control_classification
+        != SourceControlClassification.UNKNOWN.value
+    ):
+        resulting_state = LifecycleState.VALIDATING
     elif not ordinary_receipt:
         resulting_state = LifecycleState.RECONCILIATION_REQUIRED
     elif (
@@ -594,7 +639,13 @@ def _derive_effect_observation_route(
         resulting_state = LifecycleState.PAUSING
     else:
         resulting_state = LifecycleState.RECONCILIATION_REQUIRED
-    transition_id = "T10" if ordinary_receipt else "T23"
+    transition_id = (
+        "T10"
+        if ordinary_receipt
+        else "T17"
+        if reconciles_current_dispatch
+        else "T23"
+    )
     TransitionEngine().authorize(
         transition_id,
         current_state,
@@ -603,7 +654,13 @@ def _derive_effect_observation_route(
     )
     return (
         transition_id,
-        "RECEIPT_RECORDED" if ordinary_receipt else "LATE_RECEIPT_RECORDED",
+        (
+            "RECEIPT_RECORDED"
+            if ordinary_receipt
+            else "RECONCILIATION_RECORDED"
+            if reconciles_current_dispatch
+            else "LATE_RECEIPT_RECORDED"
+        ),
         resulting_state,
     )
 
@@ -1006,7 +1063,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -1027,7 +1084,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -2110,6 +2167,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_budget_overrun_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_validation_application_denial_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -2187,7 +2247,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5, 6, 7, 8, 9, 10}:
+            if version not in {3, 4, 5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -2216,11 +2276,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5, 6, 7, 8, 9, 10} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6, 7, 8, 9, 10, 11} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5, 6, 7, 8, 9, 10}:
+            if version in {4, 5, 6, 7, 8, 9, 10, 11}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2692,7 +2752,7 @@ class SQLiteStateStore:
             if version == 3:
                 connection.execute("PRAGMA user_version = 4")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                4, 5, 6, 7, 8, 9, 10,
+                4, 5, 6, 7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "T28 foundation migration did not reach version 4"
@@ -2741,7 +2801,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5, 6, 7, 8, 9, 10}:
+            if version not in {4, 5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2995,7 +3055,7 @@ class SQLiteStateStore:
         )
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {5, 6, 7, 8, 9, 10}:
+            if version not in {5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "trusted-readiness semantic version is unsupported"
                 )
@@ -3055,7 +3115,7 @@ class SQLiteStateStore:
                     )
                 connection.execute("PRAGMA user_version = 6")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                6, 7, 8, 9, 10,
+                6, 7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "trusted-readiness migration did not reach version 6"
@@ -3209,7 +3269,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {6, 7, 8, 9, 10}:
+            if version not in {6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "proof-free disposition semantic version is unsupported"
                 )
@@ -3254,7 +3314,7 @@ class SQLiteStateStore:
                     "proof-free disposition schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                7, 8, 9, 10,
+                7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "proof-free disposition migration did not reach version 7"
@@ -3346,7 +3406,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {7, 8, 9, 10}:
+            if version not in {7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "validation pause drain semantic version is unsupported"
                 )
@@ -3401,7 +3461,7 @@ class SQLiteStateStore:
                     "validation pause drain schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                8, 9, 10,
+                8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "validation pause drain migration did not reach version 8"
@@ -3509,7 +3569,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {8, 9, 10}:
+            if version not in {8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "safe-retry semantic version is unsupported"
                 )
@@ -3560,7 +3620,7 @@ class SQLiteStateStore:
                     "safe-retry schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                9, 10,
+                9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "safe-retry migration did not reach version 9"
@@ -3587,11 +3647,11 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {9, 10}:
+            if version not in {9, 10, 11}:
                 raise StorageIntegrityError(
                     "budget-overrun semantic version is unsupported"
                 )
-            if version == 10:
+            if version in {10, 11}:
                 if manage_transaction:
                     connection.commit()
                 return
@@ -3818,6 +3878,100 @@ class SQLiteStateStore:
                 if failure_hook is not None and version == 9:
                     failure_hook(
                         "after_budget_overrun_migration_commit_before_acknowledgement"
+                    )
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_validation_application_denial_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        """Add the durable F16 denied-APPLY command ledger."""
+
+        table_sql = """
+            CREATE TABLE validation_application_denials (
+                command_id TEXT PRIMARY KEY,
+                application_id TEXT NOT NULL UNIQUE,
+                event_id TEXT NOT NULL UNIQUE,
+                repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                run_id TEXT NOT NULL REFERENCES runs(run_id),
+                item_id TEXT NOT NULL,
+                logical_effect_id TEXT NOT NULL,
+                revision_digest TEXT NOT NULL,
+                check_id TEXT NOT NULL,
+                validator_attempt_id TEXT NOT NULL,
+                observation_id TEXT NOT NULL
+                    REFERENCES validator_observations(observation_id),
+                classification_digest TEXT,
+                payload_digest TEXT NOT NULL,
+                event_hash TEXT NOT NULL,
+                denied_settlement_head_hash TEXT NOT NULL,
+                reason_code TEXT NOT NULL CHECK (reason_code IN (
+                    'APPLICATION_NOT_ELIGIBLE',
+                    'VALIDATOR_ACCOUNTING_UNSETTLED'
+                )),
+                request_json TEXT NOT NULL
+            )
+        """
+
+        def canonical(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {10, 11}:
+                raise StorageIntegrityError(
+                    "validation application denial semantic version is unsupported"
+                )
+            existing = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'validation_application_denials'"
+            ).fetchone()
+            if version == 10:
+                if existing is not None and (
+                    canonical(str(existing["sql"])) != canonical(table_sql)
+                    or connection.execute(
+                        "SELECT COUNT(*) FROM validation_application_denials"
+                    ).fetchone()[0]
+                    != 0
+                ):
+                    raise StorageIntegrityError(
+                        "validation application denial schema is partially migrated"
+                    )
+                if existing is None:
+                    connection.execute(table_sql)
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_application_denial_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 11")
+                existing = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND "
+                    "name = 'validation_application_denials'"
+                ).fetchone()
+            if (
+                existing is None
+                or canonical(str(existing["sql"])) != canonical(table_sql)
+                or int(connection.execute("PRAGMA user_version").fetchone()[0])
+                != 11
+            ):
+                raise StorageIntegrityError(
+                    "validation application denial schema is missing or incompatible"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 10:
+                    failure_hook(
+                        "after_validation_application_denial_migration_commit_before_acknowledgement"
                     )
         except BaseException:
             if manage_transaction and connection.in_transaction:
@@ -4278,7 +4432,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
+            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -4286,7 +4440,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5, 6, 7, 8, 9, 10}:
+            if version in {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -4338,7 +4492,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5, 6, 7, 8, 9, 10}:
+                if version in {3, 4, 5, 6, 7, 8, 9, 10, 11}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -4403,7 +4557,7 @@ class SQLiteStateStore:
                                     "proven-nonexecution resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {9, 10}:
+                if version in {9, 10, 11}:
                     safe_retry_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'safe_same_effect_retry_actions'"
@@ -4495,20 +4649,34 @@ class SQLiteStateStore:
                             )
                         expected_instance, expected_fence = expected_spec
                         origin = connection.execute(
-                            "SELECT body_json FROM events WHERE event_id = ? "
+                            "SELECT event_kind, body_json FROM events WHERE event_id = ? "
                             "AND event_kind IN ('RECEIPT_RECORDED', "
-                            "'LATE_RECEIPT_RECORDED')",
+                            "'LATE_RECEIPT_RECORDED', "
+                            "'RECONCILIATION_RECORDED')",
                             (actual[9],),
                         ).fetchone()
+                        origin_body = (
+                            json.loads(str(origin["body_json"]))
+                            if origin is not None
+                            else {}
+                        )
+                        valid_receipt_origin = origin is not None and (
+                            str(origin["event_kind"])
+                            in {"RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED"}
+                            or (
+                                str(origin["event_kind"])
+                                == "RECONCILIATION_RECORDED"
+                                and origin_body.get("route") == "EFFECT_RECEIPT"
+                            )
+                        )
                         if (
                             actual[2] != "BILLING"
                             or actual[:-1] != expected_instance[:-1]
-                            or origin is None
+                            or not valid_receipt_origin
                         ):
                             raise StorageIntegrityError(
                                 "legacy operation uncertainty is malformed"
                             )
-                        origin_body = json.loads(str(origin["body_json"]))
                         legacy_body = {
                             "attempt_id": origin_body["attempt_id"],
                             "check_id": None,
@@ -4612,7 +4780,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -4684,7 +4852,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
+            if version not in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -4725,7 +4893,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5, 6, 7, 8, 9, 10,
+                2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -4928,7 +5096,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5, 6, 7, 8, 9, 10}:
+            if version not in {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -5282,7 +5450,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5, 6, 7, 8, 9, 10,
+                3, 4, 5, 6, 7, 8, 9, 10, 11,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -5487,13 +5655,20 @@ class SQLiteStateStore:
                 if manage_transaction:
                     connection.commit()
                 return
-            if connection.execute(
-                "SELECT 1 FROM events WHERE event_kind = "
-                "'RECONCILIATION_RECORDED' LIMIT 1"
-            ).fetchone() is not None:
-                raise StorageIntegrityError(
-                    "legacy T17 history has no reconstructible projection schema"
-                )
+            for row in connection.execute(
+                "SELECT body_json FROM events WHERE event_kind = "
+                "'RECONCILIATION_RECORDED'"
+            ):
+                try:
+                    route = json.loads(str(row["body_json"])).get("route")
+                except (AttributeError, json.JSONDecodeError) as error:
+                    raise StorageIntegrityError(
+                        "legacy T17 history has no reconstructible projection schema"
+                    ) from error
+                if route != "EFFECT_RECEIPT":
+                    raise StorageIntegrityError(
+                        "legacy T17 history has no reconstructible projection schema"
+                    )
 
             def verified_event_body(
                 event_id: str, event_kind: str, projection_json: str
@@ -8302,7 +8477,10 @@ class SQLiteStateStore:
             set(body) != expected_fields
             or body.get("pause_kind") != "EXTERNAL_MUTATION"
             or body.get("event_kind") != "PAUSE_REQUESTED"
-            or body.get("lifecycle_from") != LifecycleState.RUNNING.value
+            or body.get("lifecycle_from") not in {
+                LifecycleState.RUNNING.value,
+                LifecycleState.RECONCILIATION_REQUIRED.value,
+            }
             or body.get("lifecycle_to")
             != LifecycleState.RECONCILIATION_REQUIRED.value
             or body.get("pause_binding_version") != 1
@@ -9279,6 +9457,18 @@ class SQLiteStateStore:
                     "invalidated_retry_prior_status",
                     "invalidated_retry_consuming_event_id",
                     "retry_initiation_fence_id",
+                    "continuation_cursor",
+                }
+            )
+        dispatch_reconciliation = (
+            body.get("dispatch_reconciliation_version") == 1
+        )
+        if dispatch_reconciliation:
+            expected_fields.update(
+                {
+                    "dispatch_reconciliation_version",
+                    "continuation_cursor",
+                    "route",
                 }
             )
         try:
@@ -9300,6 +9490,15 @@ class SQLiteStateStore:
                 or (
                     body["usage_units"] is not None
                     and type(body["usage_units"]) is not int
+                )
+                or (
+                    (dispatch_reconciliation or retry_invalidation)
+                    and body["continuation_cursor"] is not None
+                    and not isinstance(body["continuation_cursor"], str)
+                )
+                or (
+                    dispatch_reconciliation
+                    and body["route"] != "EFFECT_RECEIPT"
                 )
             ):
                 raise ValueError("effect observation schema is invalid")
@@ -9448,6 +9647,9 @@ class SQLiteStateStore:
                         is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
                     ),
                     force_late=retry_invalidation,
+                    reconciles_current_dispatch=(
+                        body.get("dispatch_reconciliation_version") == 1
+                    ),
                 )
             )
             if (
@@ -9461,7 +9663,58 @@ class SQLiteStateStore:
                 )
             ):
                 raise ValueError("effect observation route mismatch")
+            if dispatch_reconciliation:
+                launch = connection.execute(
+                    "SELECT launch_id FROM operation_launches WHERE "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.attempt_id,
+                    ),
+                ).fetchone()
+                contact = (
+                    connection.execute(
+                        "SELECT event_id FROM adapter_contacts WHERE "
+                        "repository_id = ? AND run_id = ? AND item_id = ? "
+                        "AND contact_kind = 'EFFECT' AND source_id = ?",
+                        (
+                            request.repository_id, request.run_id,
+                            request.item_id,
+                            f"EFFECT:{launch['launch_id']}",
+                        ),
+                    ).fetchone()
+                    if launch is not None
+                    else None
+                )
+                expected_reconciliation_cursor = (
+                    None
+                    if resulting_state is LifecycleState.VALIDATING
+                    else f"operation-effect:v1:{launch['launch_id']}"
+                    if launch is not None
+                    else None
+                )
+                if (
+                    launch is None
+                    or contact is None
+                    or body["continuation_cursor"]
+                    != expected_reconciliation_cursor
+                ):
+                    raise ValueError(
+                        "effect receipt reconciliation cursor is invalid"
+                    )
             if retry_invalidation:
+                expected_retry_cursor = (
+                    "pending-validation:v1:" + request.observation_id
+                    if resulting_state
+                    is LifecycleState.RECONCILIATION_REQUIRED
+                    else None
+                )
+                if body["continuation_cursor"] != expected_retry_cursor:
+                    raise ValueError(
+                        "late receipt pending-validation cursor is invalid"
+                    )
                 authorization = connection.execute(
                     "SELECT * FROM operation_retry_authorizations WHERE "
                     "authorization_id = ? AND repository_id = ? AND run_id = "
@@ -10046,6 +10299,9 @@ class SQLiteStateStore:
                 field: body[field]
                 for field in AuthorizeSafeSameEffectRetryRequest.__dataclass_fields__
             }
+            values["continuation_cursor"] = body[
+                "source_continuation_cursor"
+            ]
             values["resolved_uncertainty_ids"] = tuple(
                 values["resolved_uncertainty_ids"]
             )
@@ -10578,9 +10834,13 @@ class SQLiteStateStore:
             for row in rows:
                 origin_body = json.loads(str(row["origin_body"]))
                 event_kind = str(row["event_kind"])
-                if event_kind in {
+                effect_receipt_origin = event_kind in {
                     "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
-                } and (
+                } or (
+                    event_kind == "RECONCILIATION_RECORDED"
+                    and origin_body.get("route") == "EFFECT_RECEIPT"
+                )
+                if effect_receipt_origin and (
                     origin_body.get("source_receipt_id"),
                     origin_body.get("source_claim_id"),
                     origin_body.get("payload_digest"),
@@ -10605,9 +10865,7 @@ class SQLiteStateStore:
                 if row["uncertainty_kind"] == "SOURCE_CONTROL":
                     prior_id = None
                     prior_digest = None
-                    if event_kind in {
-                        "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
-                    }:
+                    if effect_receipt_origin:
                         prior_id = origin_body.get(
                             "source_control_evidence_id"
                         )
@@ -15931,12 +16189,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -15972,6 +16224,12 @@ class SQLiteStateStore:
                     self._verify_local_pause_replay(prior, capability, authority)
                     connection.rollback()
                     return self._local_pause_receipt(prior, replayed=True)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "OPERATOR",
                     capability.grant_id, capability.action,
@@ -15994,7 +16252,9 @@ class SQLiteStateStore:
                     raise DispatchDenied("local pause does not bind the recorded run")
                 current_state = LifecycleState(str(run["lifecycle_state"]))
                 if current_state is not LifecycleState.RUNNING:
-                    raise DispatchDenied("T05 requires durable RUNNING state")
+                    raise DispatchDenied(
+                        "T05 requires durable RUNNING; reconciliation uses T09"
+                    )
                 plan = connection.execute(
                     "SELECT item_id, logical_effect_id FROM validation_plans "
                     "WHERE repository_id = ? AND run_id = ?",
@@ -16081,13 +16341,15 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "contacted external mutation requires the T06 pause route"
                     )
+                resulting_state = LifecycleState.PAUSING
+                transition_id = "T05"
                 if authorize_transition is None:
                     TransitionEngine().authorize(
-                        "T05", current_state, LifecycleState.PAUSING,
-                        TRANSITIONS["T05"].required_guards,
+                        transition_id, current_state, resulting_state,
+                        TRANSITIONS[transition_id].required_guards,
                     )
                 else:
-                    authorize_transition(current_state, LifecycleState.PAUSING)
+                    authorize_transition(current_state, resulting_state)
                 sequence = int(run["head_sequence"]) + 1
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
@@ -16100,7 +16362,7 @@ class SQLiteStateStore:
                 body = {
                     **payload,
                     "event_kind": "PAUSE_REQUESTED",
-                    "lifecycle_from": LifecycleState.RUNNING.value,
+                    "lifecycle_from": current_state.value,
                     "lifecycle_to": LifecycleState.PAUSING.value,
                     "payload_digest": payload_digest,
                     "previous_event_hash": previous_hash,
@@ -16143,7 +16405,7 @@ class SQLiteStateStore:
                         capability.action, capability.scope_digest,
                         capability.issuer_mac, authority.issuer_fingerprint,
                         payload_digest, event_hash,
-                        LifecycleState.PAUSING.value, body_json,
+                        resulting_state.value, body_json,
                     ),
                 )
                 connection.execute(
@@ -16163,9 +16425,9 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "UPDATE runs SET lifecycle_state = 'PAUSING', "
-                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
-                    (sequence, event_hash, request.run_id),
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (resulting_state.value, sequence, event_hash, request.run_id),
                 )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? "
@@ -16183,7 +16445,7 @@ class SQLiteStateStore:
         authority.mark_operator_action_committed(capability)
         return ControlReceipt(
             request.pause_id, request.command_id, request.event_id, sequence,
-            event_hash, LifecycleState.PAUSING, False,
+            event_hash, resulting_state, False,
         )
 
     def pause_external_mutation(
@@ -16231,12 +16493,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -16293,6 +16549,12 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "external pause identity lost its command outcome"
                     )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "OPERATOR",
                     capability.grant_id, capability.action,
@@ -16316,8 +16578,26 @@ class SQLiteStateStore:
                         "external pause does not bind the recorded run"
                     )
                 current_state = LifecycleState(str(run["lifecycle_state"]))
-                if current_state is not LifecycleState.RUNNING:
-                    raise DispatchDenied("T06 requires durable RUNNING state")
+                if current_state not in {
+                    LifecycleState.RUNNING,
+                    LifecycleState.RECONCILIATION_REQUIRED,
+                }:
+                    raise DispatchDenied(
+                        "T06/T09 effect pause requires durable RUNNING or "
+                        "reconciliation state"
+                    )
+                if (
+                    current_state is LifecycleState.RECONCILIATION_REQUIRED
+                    and not (
+                        isinstance(run["continuation_cursor"], str)
+                        and run["continuation_cursor"].startswith(
+                            "operation-effect:v1:"
+                        )
+                    )
+                ):
+                    raise DispatchDenied(
+                        "T09 effect pause does not bind a contacted operation"
+                    )
                 plan = connection.execute(
                     "SELECT item_id, logical_effect_id FROM validation_plans "
                     "WHERE repository_id = ? AND run_id = ?",
@@ -16445,11 +16725,18 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "external pause lost the exact budget reservation"
                     )
+                transition_id = (
+                    "T09"
+                    if current_state is LifecycleState.RECONCILIATION_REQUIRED
+                    else "T06"
+                )
                 if authorize_transition is None:
                     TransitionEngine().authorize(
-                        "T06", current_state,
+                        transition_id, current_state,
                         LifecycleState.RECONCILIATION_REQUIRED,
-                        TRANSITIONS["T06"].required_guards,
+                        TRANSITIONS[transition_id].required_guards
+                        | (frozenset({"effect_bound"}) if transition_id == "T09" else frozenset()),
+                        event_kind="PAUSE_REQUESTED",
                     )
                 else:
                     authorize_transition(
@@ -16606,7 +16893,7 @@ class SQLiteStateStore:
                 body = {
                     **payload,
                     "event_kind": "PAUSE_REQUESTED",
-                    "lifecycle_from": LifecycleState.RUNNING.value,
+                    "lifecycle_from": current_state.value,
                     "lifecycle_to": (
                         LifecycleState.RECONCILIATION_REQUIRED.value
                     ),
@@ -16751,12 +17038,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -17162,12 +17443,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -17417,12 +17692,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -17469,6 +17738,12 @@ class SQLiteStateStore:
                         str(prior["checkpoint_event_hash"]),
                         LifecycleState(str(prior["resulting_state"])), True,
                     )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "OPERATOR",
                     capability.grant_id, capability.action,
@@ -17502,10 +17777,21 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "validation pause does not bind the accepted run and plan"
                     )
-                if LifecycleState(str(run["lifecycle_state"])) is not (
-                    LifecycleState.VALIDATING
+                durable_state = LifecycleState(str(run["lifecycle_state"]))
+                validator_reconciliation = (
+                    durable_state is LifecycleState.RECONCILIATION_REQUIRED
+                    and isinstance(run["continuation_cursor"], str)
+                    and str(run["continuation_cursor"]).startswith(
+                        "validator-intent:v1:"
+                    )
+                )
+                if durable_state is not LifecycleState.VALIDATING and not (
+                    validator_reconciliation
                 ):
-                    raise DispatchDenied("T08 requires durable VALIDATING state")
+                    raise DispatchDenied(
+                        "T08/T09 validator pause requires durable VALIDATING "
+                        "or validator reconciliation state"
+                    )
                 if request.expected_preserved_continuation_cursor != (
                     run["continuation_cursor"]
                 ):
@@ -17554,15 +17840,22 @@ class SQLiteStateStore:
                         "validation pause contact targets a noncanonical ledger"
                     )
                 resulting_state = (
-                    LifecycleState.PAUSED
+                    LifecycleState.RECONCILIATION_REQUIRED
+                    if validator_reconciliation
+                    else LifecycleState.PAUSED
                     if checkpoint["checkpoint_kind"]
                     in {"IDLE", "ELIGIBLE_RESULT_SETTLED"}
                     else LifecycleState.RECONCILIATION_REQUIRED
                 )
-                if authorize_transition is not None:
-                    authorize_transition(
-                        LifecycleState.VALIDATING, resulting_state
+                transition_id = "T09" if validator_reconciliation else "T08"
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        transition_id, durable_state, resulting_state,
+                        TRANSITIONS[transition_id].required_guards,
+                        event_kind="VALIDATION_PAUSE_REQUESTED",
                     )
+                else:
+                    authorize_transition(durable_state, resulting_state)
                 sequence = int(run["head_sequence"])
                 previous_hash = str(run["head_hash"])
                 writer_epoch = int(
@@ -17691,8 +17984,8 @@ class SQLiteStateStore:
                     **payload,
                     "event_id": request.request_event_id,
                     "event_kind": "VALIDATION_PAUSE_REQUESTED",
-                    "lifecycle_from": LifecycleState.VALIDATING.value,
-                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "lifecycle_from": durable_state.value,
+                    "lifecycle_to": durable_state.value,
                     "payload_digest": payload_digest,
                     "previous_event_hash": previous_hash,
                     "schema_version": 1,
@@ -17743,7 +18036,7 @@ class SQLiteStateStore:
                     "checkpoint_snapshot": checkpoint_snapshot,
                     "event_id": request.checkpoint_event_id,
                     "event_kind": "VALIDATION_PAUSE_CHECKPOINTED",
-                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_from": durable_state.value,
                     "lifecycle_to": resulting_state.value,
                     "payload_digest": payload_digest,
                     "previous_event_hash": request_hash,
@@ -19169,12 +19462,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior_command = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -19216,6 +19503,12 @@ class SQLiteStateStore:
                     )
                     connection.rollback()
                     return self._local_pause_receipt(prior, replayed=True)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
                 self._require_effective_authority(
                     connection, authority.issuer_fingerprint, "OPERATOR",
                     capability.grant_id, capability.action,
@@ -19728,9 +20021,14 @@ class SQLiteStateStore:
                             "operation uncertainty fence is rebound"
                         )
                     origin_body = json.loads(str(row["origin_body"]))
-                    if str(row["event_kind"]) in {
+                    event_kind = str(row["event_kind"])
+                    effect_receipt_origin = event_kind in {
                         "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
-                    } and (
+                    } or (
+                        event_kind == "RECONCILIATION_RECORDED"
+                        and origin_body.get("route") == "EFFECT_RECEIPT"
+                    )
+                    if effect_receipt_origin and (
                         origin_body.get("source_receipt_id"),
                         origin_body.get("source_claim_id"),
                         origin_body.get("payload_digest"),
@@ -19742,10 +20040,7 @@ class SQLiteStateStore:
                             "verified receipt cannot clear another receipt's "
                             "uncertainty"
                         )
-                    if str(row["event_kind"]) not in {
-                        "PAUSE_REQUESTED", "RECEIPT_RECORDED",
-                        "LATE_RECEIPT_RECORDED",
-                    }:
+                    if event_kind != "PAUSE_REQUESTED" and not effect_receipt_origin:
                         raise StorageIntegrityError(
                             "operation uncertainty has an unsupported origin"
                         )
@@ -19762,9 +20057,7 @@ class SQLiteStateStore:
                     if kind == "SOURCE_CONTROL":
                         prior_id = None
                         prior_digest = None
-                        if str(row["event_kind"]) in {
-                            "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
-                        }:
+                        if effect_receipt_origin:
                             prior_id = origin_body.get(
                                 "source_control_evidence_id"
                             )
@@ -22450,7 +22743,7 @@ class SQLiteStateStore:
                     request.concurrent_old_attempts_safe,
                     request.original_key_lookup_complete,
                     request.mutation_paths_digest, request.mutation_paths_complete,
-                    request.continuation_cursor, request.expected_slot_generation,
+                    body["continuation_cursor"], request.expected_slot_generation,
                     request.target_slot_generation, request.expected_catalog_head,
                     request.expected_run_head,
                 )
@@ -24305,7 +24598,37 @@ class SQLiteStateStore:
                         raise StorageIntegrityError(
                             "command ID was reused with a different payload"
                         )
+                    self._require_plan_issuer(
+                        connection, request.repository_id, request.run_id,
+                        authority,
+                    )
+                    prior_intent = connection.execute(
+                        "SELECT redemption.claim_id, redemption.grant_id, "
+                        "redemption.scope_digest, event.event_id, "
+                        "event.event_hash FROM capability_redemptions AS "
+                        "redemption JOIN events AS event ON event.command_id = "
+                        "redemption.command_id WHERE redemption.command_id = ? "
+                        "AND event.event_kind = 'INTENT_COMMITTED'",
+                        (request.command_id,),
+                    ).fetchone()
+                    if prior_intent is None or (
+                        prior_intent["claim_id"], prior_intent["grant_id"],
+                        prior_intent["scope_digest"], prior_intent["event_id"],
+                        prior_intent["event_hash"],
+                    ) != (
+                        capability.claim_id, capability.grant_id,
+                        capability.scope_digest, prior["event_id"],
+                        prior["event_hash"],
+                    ):
+                        raise DispatchDenied(
+                            "intent replay does not bind the original capability"
+                        )
                     connection.rollback()
+                    authority.mark_or_recover_intent_committed(
+                        capability,
+                        str(prior["event_id"]),
+                        str(prior["event_hash"]),
+                    )
                     return CommitReceipt(
                         command_id=request.command_id,
                         event_id=str(prior["event_id"]),
@@ -24950,7 +25273,9 @@ class SQLiteStateStore:
                 connection.rollback()
                 raise
 
-            authority.mark_intent_committed(capability)
+            authority.mark_intent_committed(
+                capability, request.event_id, event_hash
+            )
 
         return CommitReceipt(
             command_id=request.command_id,
@@ -25131,13 +25456,17 @@ class SQLiteStateStore:
                     "item_id": request.item_id,
                     "launch_id": launch_id,
                     "lifecycle_from": LifecycleState.RUNNING.value,
-                    "lifecycle_to": LifecycleState.RUNNING.value,
+                    "lifecycle_to": (
+                        LifecycleState.RECONCILIATION_REQUIRED.value
+                    ),
                     "logical_effect_id": request.logical_effect_id,
                     "previous_event_hash": run["head_hash"],
                     "repository_id": request.repository_id,
                     "run_id": request.run_id,
                     "schema_version": 1,
                     "sequence": sequence,
+                    "continuation_cursor": f"operation-launch:v1:{launch_id}",
+                    "dispatch_reconciliation_version": 1,
                     "writer_epoch": writer_epoch,
                 }
                 if isinstance(
@@ -25176,9 +25505,13 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "UPDATE runs SET head_sequence = ?, head_hash = ? "
-                    "WHERE run_id = ?",
-                    (sequence, event_hash, request.run_id),
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        LifecycleState.RECONCILIATION_REQUIRED.value,
+                        f"operation-launch:v1:{launch_id}", sequence,
+                        event_hash, request.run_id,
+                    ),
                 )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? "
@@ -25275,13 +25608,32 @@ class SQLiteStateStore:
                     continuing_event_id=commit.event_id,
                     continuing_event_hash=commit.event_hash,
                 )
+                if (
+                    self._classification_authority is None
+                    or self._classification_authority.issuer_fingerprint
+                    != issuer["classification_issuer_fingerprint"]
+                ):
+                    raise DispatchDenied(
+                        "effect source authority is unavailable for contact"
+                    )
+                self._classification_authority.verify_intent_committed(
+                    capability, commit.event_id, commit.event_hash
+                )
                 run = connection.execute(
-                    "SELECT lifecycle_state FROM runs WHERE run_id = ? AND "
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = ? AND "
                     "repository_id = ? AND item_id = ?",
                     (request.run_id, request.repository_id, request.item_id),
                 ).fetchone()
-                if run is None or run["lifecycle_state"] != LifecycleState.RUNNING.value:
-                    raise DispatchDenied("adapter contact requires RUNNING state")
+                if run is None or (
+                    run["lifecycle_state"], run["continuation_cursor"]
+                ) != (
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                    f"operation-launch:v1:{launch.launch_id}",
+                ):
+                    raise DispatchDenied(
+                        "adapter contact requires the exact launch reconciliation"
+                    )
                 slot = connection.execute(
                     "SELECT * FROM outstanding_slot WHERE repository_id = ?",
                     (request.repository_id,),
@@ -25359,6 +25711,17 @@ class SQLiteStateStore:
                         )
                         else None
                     ),
+                    resulting_state=LifecycleState.RECONCILIATION_REQUIRED,
+                    continuation_cursor=(
+                        f"operation-effect:v1:{launch.launch_id}"
+                    ),
+                    dispatch_reconciliation_version=1,
+                )
+                self._append_contact_uncertainty_settlement(
+                    connection,
+                    reservation_id=request.reservation_id,
+                    contact_kind="EFFECT",
+                    source_id=f"EFFECT:{launch.launch_id}",
                 )
                 connection.commit()
             except BaseException:
@@ -25453,6 +25816,9 @@ class SQLiteStateStore:
                         "legacy or incomplete validator containment cannot launch"
                     )
                 authority.verify_validator_evidence(capability)
+                authority.verify_validator_intent_committed(
+                    capability, commit.event_id, commit.event_hash
+                )
                 durable_spec = parse_validator_containment_spec(
                     str(validator_body.get("containment_spec_json", ""))
                 )
@@ -25601,12 +25967,20 @@ class SQLiteStateStore:
                     connection.rollback()
                     return
                 run = connection.execute(
-                    "SELECT lifecycle_state FROM runs WHERE run_id = ? AND "
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = ? AND "
                     "repository_id = ? AND item_id = ?",
                     (request.run_id, request.repository_id, request.item_id),
                 ).fetchone()
-                if run is None or run["lifecycle_state"] != LifecycleState.VALIDATING.value:
-                    raise DispatchDenied("validator contact requires VALIDATING state")
+                if run is None or (
+                    run["lifecycle_state"], run["continuation_cursor"]
+                ) != (
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                    f"validator-intent:v1:{request.validator_intent_id}",
+                ):
+                    raise DispatchDenied(
+                        "validator contact requires exact initiation reconciliation"
+                    )
                 reservation = connection.execute(
                     "SELECT disposition, settlement_head_hash FROM "
                     "budget_reservations WHERE reservation_id = ?",
@@ -25756,6 +26130,9 @@ class SQLiteStateStore:
                         parent_recovery_authorization_id
                         if parent_slot_generation > 1 else None
                     ),
+                    resulting_state=LifecycleState.VALIDATING,
+                    continuation_cursor=None,
+                    dispatch_reconciliation_version=1,
                 )
                 if failure_hook is not None:
                     failure_hook(
@@ -25789,9 +26166,14 @@ class SQLiteStateStore:
             "SELECT * FROM runs WHERE run_id = ? AND repository_id = ?",
             (request.run_id, request.repository_id),
         ).fetchone()
-        if run is None or run["lifecycle_state"] != LifecycleState.VALIDATING.value:
+        if run is None or (
+            run["lifecycle_state"], run["continuation_cursor"]
+        ) != (
+            LifecycleState.RECONCILIATION_REQUIRED.value,
+            f"validator-intent:v1:{request.validator_intent_id}",
+        ):
             raise DispatchDenied(
-                "validator initiation disable requires VALIDATING state"
+                "validator initiation disable requires exact initiation reconciliation"
             )
         command_id = fence_id
         event_id = f"event:{fence_id}"
@@ -25808,7 +26190,7 @@ class SQLiteStateStore:
             "event_kind": "VALIDATOR_INITIATION_DISABLED",
             "fence_id": fence_id,
             "item_id": request.item_id,
-            "lifecycle_from": LifecycleState.VALIDATING.value,
+            "lifecycle_from": LifecycleState.RECONCILIATION_REQUIRED.value,
             "lifecycle_to": LifecycleState.BLOCKED.value,
             "logical_effect_id": request.logical_effect_id,
             "revision_digest": request.revision_digest,
@@ -25902,6 +26284,9 @@ class SQLiteStateStore:
         binding_evidence: Mapping[str, object] | None = None,
         slot_generation: int | None = None,
         recovery_authorization_id: str | None = None,
+        resulting_state: LifecycleState | None = None,
+        continuation_cursor: str | None = None,
+        dispatch_reconciliation_version: int | None = None,
     ) -> None:
         if target_digest != self._adapter_target_digest(
             repository_id, contact_kind
@@ -25931,6 +26316,30 @@ class SQLiteStateStore:
                 (repository_id,),
             ).fetchone()[0]
         )
+        if resulting_state is None:
+            if continuation_cursor is not None or dispatch_reconciliation_version is not None:
+                raise DispatchDenied(
+                    "adapter contact reconciliation binding is incomplete"
+                )
+            lifecycle_to = str(run["lifecycle_state"])
+        else:
+            valid_reconciliation_target = (
+                resulting_state is LifecycleState.RECONCILIATION_REQUIRED
+                and isinstance(continuation_cursor, str)
+                and bool(continuation_cursor)
+            )
+            valid_validator_target = (
+                resulting_state is LifecycleState.VALIDATING
+                and continuation_cursor is None
+            )
+            if (
+                not (valid_reconciliation_target or valid_validator_target)
+                or dispatch_reconciliation_version != 1
+            ):
+                raise DispatchDenied(
+                    "adapter contact reconciliation binding is invalid"
+                )
+            lifecycle_to = resulting_state.value
         body = {
             "attempt_id": attempt_id,
             "command_id": contact_id,
@@ -25940,7 +26349,7 @@ class SQLiteStateStore:
             "event_kind": "ADAPTER_CONTACT_CLAIMED",
             "item_id": item_id,
             "lifecycle_from": run["lifecycle_state"],
-            "lifecycle_to": run["lifecycle_state"],
+            "lifecycle_to": lifecycle_to,
             "logical_effect_id": logical_effect_id,
             "previous_event_hash": run["head_hash"],
             "repository_id": repository_id,
@@ -25951,6 +26360,13 @@ class SQLiteStateStore:
             "target_digest": target_digest,
             "writer_epoch": writer_epoch,
         }
+        if resulting_state is not None:
+            body.update(
+                {
+                    "continuation_cursor": continuation_cursor,
+                    "dispatch_reconciliation_version": dispatch_reconciliation_version,
+                }
+            )
         if binding_evidence is not None:
             if not binding_evidence:
                 raise DispatchDenied("adapter contact binding evidence is empty")
@@ -25992,13 +26408,144 @@ class SQLiteStateStore:
                 contact_kind, source_id, target_digest, event_hash, body_json,
             ),
         )
-        connection.execute(
-            "UPDATE runs SET head_sequence = ?, head_hash = ? WHERE run_id = ?",
-            (sequence, event_hash, run_id),
-        )
+        if resulting_state is None:
+            connection.execute(
+                "UPDATE runs SET head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                (sequence, event_hash, run_id),
+            )
+        else:
+            connection.execute(
+                "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                (lifecycle_to, continuation_cursor, sequence, event_hash, run_id),
+            )
         connection.execute(
             "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
             (event_hash, repository_id),
+        )
+
+    def _append_contact_uncertainty_settlement(
+        self,
+        connection: sqlite3.Connection,
+        *,
+        reservation_id: str,
+        contact_kind: str,
+        source_id: str,
+    ) -> None:
+        contact = connection.execute(
+            "SELECT * FROM adapter_contacts WHERE contact_kind = ? AND source_id = ?",
+            (contact_kind, source_id),
+        ).fetchone()
+        reservation = connection.execute(
+            "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+            (reservation_id,),
+        ).fetchone()
+        contact_body = (
+            json.loads(contact["body_json"]) if contact is not None else {}
+        )
+        if contact is None or reservation is None or (
+            contact["repository_id"], contact["run_id"], contact["item_id"],
+            contact_body.get("logical_effect_id"),
+            contact_body.get("attempt_id"),
+        ) != (
+            reservation["repository_id"], reservation["run_id"],
+            reservation["item_id"], reservation["logical_effect_id"],
+            reservation["attempt_id"],
+        ):
+            raise DispatchDenied(
+                "uncertainty settlement does not bind the adapter contact"
+            )
+        if (
+            reservation["disposition"] != BudgetDisposition.RESERVED.value
+            or reservation["settlement_head_hash"]
+        ):
+            raise DispatchDenied(
+                "adapter contact uncertainty requires an unsettled reservation"
+            )
+        run = connection.execute(
+            "SELECT head_sequence, head_hash FROM runs WHERE run_id = ?",
+            (reservation["run_id"],),
+        ).fetchone()
+        settlement_event_id = f"dispatch-uncertainty:{contact['contact_id']}"
+        sequence = int(run["head_sequence"]) + 1
+        writer_epoch = int(connection.execute(
+            "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+            "WHERE repository_id = ?", (reservation["repository_id"],),
+        ).fetchone()[0])
+        charged_units = int(reservation["worst_case_units"])
+        payload = {
+            "actual_units": None,
+            "additional_liability": False,
+            "all_obligations_settled": False,
+            "disposition": BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+            "evidence_digest": str(contact["event_hash"]),
+            "expected_previous_hash": reservation["settlement_head_hash"],
+            "non_dispatch_proven": False,
+            "reason_code": "DISPATCH_OUTCOME_UNKNOWN",
+            "repository_id": reservation["repository_id"],
+            "run_id": reservation["run_id"],
+            "item_id": reservation["item_id"],
+            "logical_effect_id": reservation["logical_effect_id"],
+            "attempt_id": reservation["attempt_id"],
+            "release_slot": False,
+            "reservation_id": reservation_id,
+            "settlement_event_id": settlement_event_id,
+            "zero_liability_proven": False,
+            "settlement_binding_version": 2,
+        }
+        payload_digest = self._event_hash(payload)
+        body = {
+            **payload,
+            "charged_units": charged_units,
+            "command_id": f"settlement:{settlement_event_id}",
+            "contradiction": False,
+            "event_id": settlement_event_id,
+            "event_kind": "BUDGET_SETTLED",
+            "held_units": 0,
+            "previous_event_hash": run["head_hash"],
+            "schema_version": 1,
+            "sequence": sequence,
+            "uncertainty": True,
+            "writer_epoch": writer_epoch,
+        }
+        event_hash = self._event_hash(body)
+        body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        connection.execute(
+            "INSERT INTO budget_settlements VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                settlement_event_id, reservation_id,
+                reservation["settlement_head_hash"], event_hash,
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                0, charged_units, 1, str(contact["event_hash"]),
+                "DISPATCH_OUTCOME_UNKNOWN", payload_digest, body_json,
+            ),
+        )
+        connection.execute(
+            "UPDATE budget_reservations SET held_units = 0, charged_units = ?, "
+            "uncertainty = 1, disposition = ?, settlement_head_hash = ? "
+            "WHERE reservation_id = ?",
+            (
+                charged_units,
+                BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED.value,
+                event_hash, reservation_id,
+            ),
+        )
+        connection.execute(
+            "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+            (
+                settlement_event_id, reservation["repository_id"],
+                reservation["run_id"], reservation["item_id"], sequence,
+                f"settlement:{settlement_event_id}", writer_epoch,
+                "BUDGET_SETTLED", run["head_hash"], event_hash, body_json,
+            ),
+        )
+        connection.execute(
+            "UPDATE runs SET head_sequence = ?, head_hash = ? WHERE run_id = ?",
+            (sequence, event_hash, reservation["run_id"]),
+        )
+        connection.execute(
+            "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+            (event_hash, reservation["repository_id"]),
         )
 
     def _adapter_target_digest(
@@ -27815,6 +28362,36 @@ class SQLiteStateStore:
                     and retry_authorization is None
                     and owns_slot
                 )
+                launch = connection.execute(
+                    "SELECT launch_id FROM operation_launches WHERE "
+                    "repository_id = ? AND run_id = ? AND item_id = ? AND "
+                    "logical_effect_id = ? AND attempt_id = ?",
+                    (
+                        request.repository_id, request.run_id, request.item_id,
+                        request.logical_effect_id, request.attempt_id,
+                    ),
+                ).fetchone()
+                reconciles_current_dispatch = (
+                    current_state is LifecycleState.RECONCILIATION_REQUIRED
+                    and owns_slot
+                    and launch is not None
+                    and run["continuation_cursor"]
+                    == f"operation-effect:v1:{launch['launch_id']}"
+                    and connection.execute(
+                        "SELECT 1 FROM adapter_contacts WHERE contact_kind = "
+                        "'EFFECT' AND source_id = ?",
+                        (f"EFFECT:{launch['launch_id']}",),
+                    ).fetchone() is not None
+                    and connection.execute(
+                        "SELECT 1 FROM dispatch_fences WHERE repository_id = ? "
+                        "AND ((item_id IS NULL AND logical_effect_id IS NULL) OR "
+                        "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                        (
+                            request.repository_id, request.item_id,
+                            request.logical_effect_id,
+                        ),
+                    ).fetchone() is None
+                )
                 transition_id, event_kind, resulting_state = (
                     _derive_effect_observation_route(
                         current_state,
@@ -27825,6 +28402,7 @@ class SQLiteStateStore:
                             is BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
                         ),
                         force_late=not ordinary_receipt,
+                        reconciles_current_dispatch=reconciles_current_dispatch,
                     )
                 )
 
@@ -27891,9 +28469,28 @@ class SQLiteStateStore:
                     "slot_released": slot_released,
                     "writer_epoch": writer_epoch,
                 }
+                if reconciles_current_dispatch:
+                    body.update(
+                        {
+                            "continuation_cursor": (
+                                None
+                                if resulting_state is LifecycleState.VALIDATING
+                                else run["continuation_cursor"]
+                            ),
+                            "dispatch_reconciliation_version": 1,
+                            "route": "EFFECT_RECEIPT",
+                        }
+                    )
                 if retry_authorization is not None:
                     body.update(
                         {
+                            "continuation_cursor": (
+                                "pending-validation:v1:"
+                                + request.observation_id
+                                if resulting_state
+                                is LifecycleState.RECONCILIATION_REQUIRED
+                                else None
+                            ),
                             "retry_invalidation_version": 1,
                             "invalidated_retry_authorization_id": (
                                 retry_authorization["authorization_id"]
@@ -28023,8 +28620,13 @@ class SQLiteStateStore:
                             "late receipt did not release its operation slot"
                         )
                 connection.execute(
-                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, head_hash = ? WHERE run_id = ?",
-                    (resulting_state.value, sequence, event_hash, request.run_id),
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        resulting_state.value,
+                        body.get("continuation_cursor", run["continuation_cursor"]),
+                        sequence, event_hash, request.run_id,
+                    ),
                 )
                 dependent_head = None
                 if body["event_kind"] == "LATE_RECEIPT_RECORDED":
@@ -28138,12 +28740,6 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
@@ -28414,7 +29010,9 @@ class SQLiteStateStore:
                     LifecycleState.VALIDATING.value,
                 ):
                     raise DispatchDenied(
-                        "validation launch does not bind a VALIDATING plan"
+                        "validation launch does not bind a VALIDATING plan; "
+                        "active reconciliation or recovery is not current or "
+                        "already consumed"
                     )
                 if plan["plan_acceptance_binding_version"] != 2:
                     raise DispatchDenied(
@@ -29214,8 +29812,6 @@ class SQLiteStateStore:
                 "canonical validator launch requires an unclaimed grant and snapshot"
             )
         payload_digest = self._event_hash(request.__dict__)
-        claimed_for_commit = False
-        transaction_committed = False
 
         with self._writer_lock(), closing(
             self._connect()
@@ -29226,17 +29822,51 @@ class SQLiteStateStore:
                     connection, request.repository_id
                 )
                 self._verify_projections(connection, request.repository_id)
-                if not self._freshness_oracle.verify(
-                    request.repository_id, catalog_head, run_heads
-                ):
-                    raise DispatchDenied(
-                        "independent recovery freshness proof failed"
-                    )
                 prior = connection.execute(
                     "SELECT * FROM command_outcomes WHERE command_id = ?",
                     (request.command_id,),
                 ).fetchone()
                 if prior is not None:
+                    self._require_plan_issuer(
+                        connection, request.repository_id, request.run_id,
+                        authority,
+                    )
+                    validator = connection.execute(
+                        "SELECT validator.capability_claim_id, "
+                        "validator.capability_grant_id, "
+                        "validator.capability_scope_digest, "
+                        "validator.event_id, validator.event_hash, "
+                        "redemption.claim_id AS redeemed_claim_id, "
+                        "redemption.grant_id AS redeemed_grant_id, "
+                        "redemption.scope_digest AS redeemed_scope_digest, "
+                        "validator.body_json "
+                        "FROM validator_intents AS validator JOIN "
+                        "capability_redemptions AS redemption ON "
+                        "redemption.command_id = validator.command_id WHERE "
+                        "validator.command_id = ?",
+                        (request.command_id,),
+                    ).fetchone()
+                    if validator is None or (
+                        validator["capability_grant_id"],
+                        validator["capability_scope_digest"],
+                        validator["event_id"], validator["event_hash"],
+                        validator["redeemed_grant_id"],
+                        validator["redeemed_scope_digest"],
+                    ) != (
+                        str(grant_id), str(scope_digest), prior["event_id"],
+                        prior["event_hash"], str(grant_id), str(scope_digest),
+                    ):
+                        raise DispatchDenied(
+                            "validator intent replay does not bind the original grant"
+                        )
+                    validator_body = json.loads(str(validator["body_json"]))
+                    if (
+                        validator_body.get("capability_issuer_fingerprint")
+                        != authority.issuer_fingerprint
+                    ):
+                        raise DispatchDenied(
+                            "validator intent replay does not bind the original issuer"
+                        )
                     if capability is None:
                         capability = authority.claim_or_recover_validator(
                             str(grant_id), request.repository_id,
@@ -29250,18 +29880,25 @@ class SQLiteStateStore:
                         raise StorageIntegrityError(
                             "command ID was reused with a different payload"
                         )
-                    validator = connection.execute(
-                        "SELECT 1 FROM validator_intents WHERE command_id = ?",
-                        (request.command_id,),
-                    ).fetchone()
-                    if validator is None:
-                        raise StorageIntegrityError(
-                            "validator command outcome lost its intent"
+                    if (
+                        validator["capability_claim_id"],
+                        validator["redeemed_claim_id"],
+                    ) != (capability.claim_id, capability.claim_id):
+                        raise DispatchDenied(
+                            "validator intent replay does not bind the original claim"
+                        )
+                    if validator_body.get("capability_evidence") != dict(
+                        capability.__dict__
+                    ):
+                        raise DispatchDenied(
+                            "validator intent replay does not bind the original capability"
                         )
                     connection.rollback()
                     if canonical_unclaimed_launch:
                         authority.mark_or_recover_validator_intent_committed(
-                            capability
+                            capability,
+                            str(validator["event_id"]),
+                            str(validator["event_hash"]),
                         )
                     return CommitReceipt(
                         request.command_id,
@@ -29269,6 +29906,13 @@ class SQLiteStateStore:
                         int(prior["sequence"]),
                         str(prior["event_hash"]),
                         True,
+                    )
+
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
                     )
 
                 preflight_run = connection.execute(
@@ -29684,15 +30328,18 @@ class SQLiteStateStore:
                             "validation launch prerequisites are stale or unmet"
                         )
                     if capability is None:
-                        capability = authority.claim_validator(
+                        capability = authority.claim_or_recover_validator(
                             str(grant_id), request.repository_id,
                             request.logical_effect_id, request.revision_digest,
                             request.check_id, request.input_digest,
                             request.validator_attempt_id, str(scope_digest),
                             containment_digest,
                         )
-                        claimed_for_commit = True
                         authority.verify_validator_for_intent(capability)
+                        if failure_hook is not None:
+                            failure_hook(
+                                "after_validator_source_claim_before_intent_writes"
+                            )
 
                 if capability is None:
                     raise StorageIntegrityError(
@@ -29720,7 +30367,11 @@ class SQLiteStateStore:
                     "containment_digest": containment_digest,
                     "event_kind": "VALIDATOR_INTENT_COMMITTED",
                     "lifecycle_from": LifecycleState.VALIDATING.value,
-                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": LifecycleState.RECONCILIATION_REQUIRED.value,
+                    "continuation_cursor": (
+                        f"validator-intent:v1:{request.validator_intent_id}"
+                    ),
+                    "dispatch_reconciliation_version": 1,
                     "previous_event_hash": previous_hash,
                     "schema_version": 1,
                     "sequence": sequence,
@@ -29867,9 +30518,13 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "UPDATE runs SET continuation_cursor = NULL, head_sequence = ?, "
-                    "head_hash = ? WHERE run_id = ?",
-                    (sequence, event_hash, request.run_id),
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (
+                        LifecycleState.RECONCILIATION_REQUIRED.value,
+                        f"validator-intent:v1:{request.validator_intent_id}",
+                        sequence, event_hash, request.run_id,
+                    ),
                 )
                 connection.execute(
                     "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
@@ -29878,22 +30533,17 @@ class SQLiteStateStore:
                 if failure_hook is not None:
                     failure_hook("after_validator_intent_writes_before_commit")
                 connection.commit()
-                transaction_committed = True
                 if failure_hook is not None:
                     failure_hook(
                         "after_validator_intent_commit_before_acknowledgement"
                     )
             except BaseException:
                 connection.rollback()
-                if (
-                    claimed_for_commit
-                    and not transaction_committed
-                    and capability is not None
-                ):
-                    authority.release_uncommitted_validator_claim(capability)
                 raise
 
-        authority.mark_validator_intent_committed(capability)
+        authority.mark_validator_intent_committed(
+            capability, request.event_id, event_hash
+        )
         return CommitReceipt(
             request.command_id,
             request.event_id,
@@ -30344,7 +30994,8 @@ class SQLiteStateStore:
                     ),
                 )
                 connection.execute(
-                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    "UPDATE runs SET lifecycle_state = ?, head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
                     (resulting_state.value, sequence, event_hash, request.run_id),
                 )
                 connection.execute(
@@ -30367,6 +31018,77 @@ class SQLiteStateStore:
             request.observation_id, request.command_id, request.event_id,
             sequence, event_hash, resulting_state, False,
         )
+
+    def _record_validation_application_denial(
+        self,
+        connection: sqlite3.Connection,
+        request: ValidationApplicationRequest,
+        run: sqlite3.Row,
+        classification_digest: str | None,
+        payload_digest: str,
+        settlement_head_hash: str,
+        reason_code: str,
+    ) -> str:
+        """Anchor a rejected APPLY to the same immutable history as accepted commands."""
+        sequence = int(run["head_sequence"]) + 1
+        previous_hash = str(run["head_hash"])
+        writer_epoch = int(connection.execute(
+            "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events WHERE "
+            "repository_id = ?", (request.repository_id,),
+        ).fetchone()[0])
+        body = {
+            **request.__dict__,
+            "classification_digest": classification_digest,
+            "payload_digest": payload_digest,
+            "denied_settlement_head_hash": settlement_head_hash,
+            "reason_code": reason_code,
+            "retained_continuation_cursor": run["continuation_cursor"],
+            "event_kind": "VALIDATION_APPLICATION_DENIED",
+            "lifecycle_from": run["lifecycle_state"],
+            "lifecycle_to": run["lifecycle_state"],
+            "previous_event_hash": previous_hash,
+            "schema_version": 1,
+            "sequence": sequence,
+            "writer_epoch": writer_epoch,
+        }
+        event_hash = self._event_hash(body)
+        body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        connection.execute(
+            "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)",
+            (
+                request.event_id, request.repository_id, request.run_id,
+                request.item_id, sequence, request.command_id, writer_epoch,
+                "VALIDATION_APPLICATION_DENIED", previous_hash, event_hash,
+                body_json,
+            ),
+        )
+        connection.execute(
+            "INSERT INTO validation_application_denials VALUES ("
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                request.command_id, request.application_id, request.event_id,
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, request.revision_digest,
+                request.check_id, request.validator_attempt_id,
+                request.observation_id, classification_digest, payload_digest,
+                event_hash, settlement_head_hash, reason_code,
+                json.dumps(request.__dict__, sort_keys=True, separators=(",", ":")),
+            ),
+        )
+        connection.execute(
+            "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+            (request.command_id, payload_digest, request.event_id,
+             sequence, event_hash),
+        )
+        connection.execute(
+            "UPDATE runs SET head_sequence = ?, head_hash = ? WHERE run_id = ?",
+            (sequence, event_hash, request.run_id),
+        )
+        connection.execute(
+            "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+            (event_hash, request.repository_id),
+        )
+        return event_hash
 
     def _apply_validator_observation(
         self,
@@ -30406,16 +31128,52 @@ class SQLiteStateStore:
                     raise DispatchDenied(
                         "independent recovery freshness proof failed"
                     )
-                prior = connection.execute(
+                denied = connection.execute(
+                    "SELECT * FROM validation_application_denials WHERE "
+                    "command_id = ? OR application_id = ? OR event_id = ?",
+                    (
+                        request.command_id, request.application_id,
+                        request.event_id,
+                    ),
+                ).fetchone()
+                if denied is not None:
+                    if (
+                        denied["payload_digest"] != payload_digest
+                        or denied["classification_digest"]
+                        != classification_digest
+                        or json.loads(str(denied["request_json"]))
+                        != request.__dict__
+                    ):
+                        raise StorageIntegrityError(
+                            "denied validation application identity was reused"
+                        )
+                    connection.rollback()
+                    if denied["reason_code"] == "APPLICATION_NOT_ELIGIBLE":
+                        raise DispatchDenied(
+                            "C05 requires durable VALIDATING state",
+                            event_hash=str(denied["event_hash"]),
+                        )
+                    raise DispatchDenied(
+                        "validator accounting is not fully settled",
+                        event_hash=str(denied["event_hash"]),
+                    )
+                identity_prior = connection.execute(
                     "SELECT * FROM validation_applications WHERE command_id = ? OR "
-                    "application_id = ? OR observation_id = ? OR "
+                    "application_id = ? OR event_id = ?",
+                    (
+                        request.command_id, request.application_id,
+                        request.event_id,
+                    ),
+                ).fetchone()
+                semantic_prior = connection.execute(
+                    "SELECT * FROM validation_applications WHERE observation_id = ? OR "
                     "(repository_id = ? AND run_id = ? AND logical_effect_id = ? "
                     "AND check_id = ? AND validator_attempt_id = ? AND observation_id = ?)",
                     (
-                        request.command_id, request.application_id,
                         request.observation_id, *natural_binding,
                     ),
                 ).fetchone()
+                prior = identity_prior or semantic_prior
                 if prior is not None:
                     prior_binding = (
                         prior["application_id"], prior["command_id"],
@@ -30425,13 +31183,22 @@ class SQLiteStateStore:
                         prior["validator_attempt_id"], prior["observation_id"],
                     )
                     requested_full_binding = tuple(request.__dict__.values())
-                    if prior_binding != requested_full_binding:
+                    semantic_binding = prior_binding[3:]
+                    requested_semantic_binding = requested_full_binding[3:]
+                    if identity_prior is not None and (
+                        prior_binding != requested_full_binding
+                    ):
                         raise StorageIntegrityError(
                             "validation application identity was reused with another result"
                         )
+                    if semantic_binding != requested_semantic_binding:
+                        raise StorageIntegrityError(
+                            "validation application result binding changed"
+                        )
                     if (
                         classification is not None
-                        and prior["classification_digest"] != classification_digest
+                        and prior["classification_digest"]
+                        != classification_digest
                     ):
                         raise StorageIntegrityError(
                             "validation application replay supplied a contradictory "
@@ -30440,14 +31207,14 @@ class SQLiteStateStore:
                     route = connection.execute(
                         "SELECT * FROM validation_check_routes WHERE "
                         "source_application_id = ?",
-                        (request.application_id,),
+                        (prior["application_id"],),
                     ).fetchone()
                     connection.rollback()
                     if route is not None:
                         route_body = json.loads(route["body_json"])
                         return ApplicationReceipt(
-                            request.application_id,
-                            request.command_id,
+                            str(prior["application_id"]),
+                            str(prior["command_id"]),
                             str(route["event_id"]),
                             int(route_body["sequence"]),
                             str(route["event_hash"]),
@@ -30471,6 +31238,52 @@ class SQLiteStateStore:
                 if run is None or run["item_id"] != request.item_id:
                     raise DispatchDenied("validation application does not bind the run")
                 if run["lifecycle_state"] != LifecycleState.VALIDATING.value:
+                    denied_observation = connection.execute(
+                        "SELECT observation.*, intent.reservation_id FROM "
+                        "validator_observations AS observation JOIN "
+                        "validator_intents AS intent ON "
+                        "intent.validator_intent_id = "
+                        "observation.validator_intent_id WHERE "
+                        "observation.observation_id = ?",
+                        (request.observation_id,),
+                    ).fetchone()
+                    if denied_observation is not None and (
+                        denied_observation["repository_id"],
+                        denied_observation["run_id"],
+                        denied_observation["item_id"],
+                        denied_observation["logical_effect_id"],
+                        denied_observation["revision_digest"],
+                        denied_observation["check_id"],
+                        denied_observation["validator_attempt_id"],
+                    ) == (
+                        request.repository_id, request.run_id,
+                        request.item_id, request.logical_effect_id,
+                        request.revision_digest, request.check_id,
+                        request.validator_attempt_id,
+                    ):
+                        denial_accounting = connection.execute(
+                            "SELECT settlement_head_hash FROM "
+                            "budget_reservations WHERE reservation_id = ?",
+                            (denied_observation["reservation_id"],),
+                        ).fetchone()
+                        if denial_accounting is None or not denial_accounting[
+                            "settlement_head_hash"
+                        ]:
+                            raise StorageIntegrityError(
+                                "ineligible validation application lost its "
+                                "durable accounting head"
+                            )
+                        denial_hash = self._record_validation_application_denial(
+                            connection, request, run, classification_digest,
+                            payload_digest,
+                            str(denial_accounting["settlement_head_hash"]),
+                            "APPLICATION_NOT_ELIGIBLE",
+                        )
+                        connection.commit()
+                        raise DispatchDenied(
+                            "C05 requires durable VALIDATING state",
+                            event_hash=denial_hash,
+                        )
                     raise DispatchDenied("C05 requires durable VALIDATING state")
                 plan = connection.execute(
                     "SELECT * FROM validation_plans WHERE run_id = ?",
@@ -30622,7 +31435,28 @@ class SQLiteStateStore:
                         }
                     )
                 if not observation_accounting_settled:
-                    raise DispatchDenied("validator accounting is not fully settled")
+                    denial_accounting = connection.execute(
+                        "SELECT settlement_head_hash FROM budget_reservations "
+                        "WHERE reservation_id = ?",
+                        (observation["reservation_id"],),
+                    ).fetchone()
+                    if denial_accounting is None or not denial_accounting[
+                        "settlement_head_hash"
+                    ]:
+                        raise StorageIntegrityError(
+                            "unsettled validator accounting lost its durable head"
+                        )
+                    denial_hash = self._record_validation_application_denial(
+                        connection, request, run, classification_digest,
+                        payload_digest,
+                        str(denial_accounting["settlement_head_hash"]),
+                        "VALIDATOR_ACCOUNTING_UNSETTLED",
+                    )
+                    connection.commit()
+                    raise DispatchDenied(
+                        "validator accounting is not fully settled",
+                        event_hash=denial_hash,
+                    )
                 if connection.execute(
                     "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND ("
                     "(item_id IS NULL AND logical_effect_id IS NULL) OR "
@@ -34581,7 +35415,10 @@ class SQLiteStateStore:
                     raise StorageIntegrityError("event body binding mismatch")
                 if row["event_kind"] == "PAUSE_REQUESTED":
                     is_local_route = (
-                        body.get("lifecycle_from") == LifecycleState.RUNNING.value
+                        body.get("lifecycle_from") in {
+                            LifecycleState.RUNNING.value,
+                            LifecycleState.RECONCILIATION_REQUIRED.value,
+                        }
                         and body.get("lifecycle_to")
                         == LifecycleState.PAUSING.value
                     )
@@ -36304,6 +37141,8 @@ class SQLiteStateStore:
                 "capability_grant_id",
                 "capability_scope_digest",
                 "event_kind",
+                "continuation_cursor",
+                "dispatch_reconciliation_version",
                 "lifecycle_from",
                 "lifecycle_to",
                 "previous_event_hash",
@@ -36580,11 +37419,17 @@ class SQLiteStateStore:
             body for body in reconciliations
             if body.get("route") == "SAFE_SAME_EFFECT_RETRY"
         ]
+        effect_receipt_reconciliations = [
+            body for body in reconciliations
+            if body.get("route") == "EFFECT_RECEIPT"
+        ]
+        observation_events.extend(effect_receipt_reconciliations)
         if len(reconciliations) != (
             len(validator_reconciliations)
             + len(verified_receipt_reconciliations)
             + len(proof_free_dispositions)
             + len(safe_retry_reconciliations)
+            + len(effect_receipt_reconciliations)
         ):
             raise StorageIntegrityError(
                 "reconciliation history contains an unknown route"
@@ -36609,7 +37454,12 @@ class SQLiteStateStore:
         expected_outcomes.update(
             {
                 body["command_id"]: (
-                    body["payload_digest"], body["event_id"],
+                    (
+                        body["command_payload_digest"]
+                        if body.get("route") == "EFFECT_RECEIPT"
+                        else body["payload_digest"]
+                    ),
+                    body["event_id"],
                     body["sequence"], self._event_hash(body),
                 )
                 for body in reconciliations
@@ -36653,6 +37503,21 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in applications
+            }
+        )
+        denial_event_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "event_kind = 'VALIDATION_APPLICATION_DENIED'",
+            (repository_id,),
+        ).fetchall()
+        denial_events = [json.loads(row["body_json"]) for row in denial_event_rows]
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in denial_events
             }
         )
         terminal_settlement_rows = connection.execute(
@@ -36899,12 +37764,14 @@ class SQLiteStateStore:
                     != "VALIDATION_PAUSE_CHECKPOINTED"
                     or request_body["event_kind"]
                     != "VALIDATION_PAUSE_REQUESTED"
-                    or body["lifecycle_from"]
-                    != LifecycleState.VALIDATING.value
+                    or body["lifecycle_from"] not in {
+                        LifecycleState.VALIDATING.value,
+                        LifecycleState.RECONCILIATION_REQUIRED.value,
+                    }
                     or request_body["lifecycle_from"]
-                    != LifecycleState.VALIDATING.value
+                    != body["lifecycle_from"]
                     or request_body["lifecycle_to"]
-                    != LifecycleState.VALIDATING.value
+                    != body["lifecycle_from"]
                     or body["request_event_hash"]
                     != request_event["event_hash"]
                     or body["previous_event_hash"]
@@ -37008,7 +37875,12 @@ class SQLiteStateStore:
         expected_outcomes.update(
             {
                 body["command_id"]: (
-                    body["payload_digest"], body["event_id"],
+                    (
+                        body["command_payload_digest"]
+                        if body.get("route") == "EFFECT_RECEIPT"
+                        else body["payload_digest"]
+                    ),
+                    body["event_id"],
                     body["sequence"], self._event_hash(body),
                 )
                 for row in drain_outcome_rows
@@ -39390,6 +40262,153 @@ class SQLiteStateStore:
 
         for plan_id in dependency_graph:
             visit_dependency(plan_id)
+        denial_events_by_id = {
+            body["event_id"]: body for body in denial_events
+        }
+        seen_denial_events: set[str] = set()
+        for denial in connection.execute(
+            "SELECT * FROM validation_application_denials WHERE "
+            "repository_id = ?",
+            (repository_id,),
+        ):
+            try:
+                request_values = json.loads(str(denial["request_json"]))
+                if set(request_values) != set(
+                    ValidationApplicationRequest.__dataclass_fields__
+                ):
+                    raise ValueError("denied application request schema changed")
+                denied_request = ValidationApplicationRequest(**request_values)
+                denied_request.validate()
+            except (TypeError, ValueError, json.JSONDecodeError) as error:
+                raise StorageIntegrityError(
+                    "denied validation application request is invalid"
+                ) from error
+            stored_binding = (
+                denial["application_id"], denial["command_id"],
+                denial["event_id"], denial["repository_id"],
+                denial["run_id"], denial["item_id"],
+                denial["logical_effect_id"], denial["revision_digest"],
+                denial["check_id"], denial["validator_attempt_id"],
+                denial["observation_id"],
+            )
+            classification_digest = denial["classification_digest"]
+            expected_payload_digest = self._event_hash(
+                {
+                    **denied_request.__dict__,
+                    "classification_digest": classification_digest,
+                }
+            )
+            body = denial_events_by_id.get(str(denial["event_id"]))
+            if body is None:
+                raise StorageIntegrityError(
+                    "denied validation application has no issuing event"
+                )
+            seen_denial_events.add(str(denial["event_id"]))
+            expected_body = {
+                **denied_request.__dict__,
+                "classification_digest": classification_digest,
+                "payload_digest": expected_payload_digest,
+                "denied_settlement_head_hash": denial["denied_settlement_head_hash"],
+                "reason_code": denial["reason_code"],
+                "retained_continuation_cursor": body.get(
+                    "retained_continuation_cursor"
+                ),
+                "event_kind": "VALIDATION_APPLICATION_DENIED",
+                "lifecycle_from": body.get("lifecycle_from"),
+                "lifecycle_to": body.get("lifecycle_to"),
+                "previous_event_hash": body.get("previous_event_hash"),
+                "schema_version": 1,
+                "sequence": body.get("sequence"),
+                "writer_epoch": body.get("writer_epoch"),
+            }
+            observation = connection.execute(
+                "SELECT o.*, i.reservation_id, e.writer_epoch AS "
+                "observation_writer_epoch FROM validator_observations AS o "
+                "JOIN validator_intents AS i ON i.validator_intent_id = "
+                "o.validator_intent_id JOIN events AS e ON e.event_id = "
+                "o.event_id WHERE o.observation_id = ?",
+                (denial["observation_id"],),
+            ).fetchone()
+            latest_accounting = (
+                connection.execute(
+                    "SELECT s.*, e.writer_epoch FROM budget_settlements AS s "
+                    "JOIN events AS e ON e.event_id = s.settlement_event_id "
+                    "WHERE s.reservation_id = ? AND e.writer_epoch < ? "
+                    "ORDER BY e.writer_epoch DESC LIMIT 1",
+                    (observation["reservation_id"], body["writer_epoch"]),
+                ).fetchone()
+                if observation is not None else None
+            )
+            accounting = connection.execute(
+                "SELECT settlement.*, intent.reservation_id AS "
+                "observation_reservation_id FROM budget_settlements AS "
+                "settlement JOIN validator_observations AS observation ON "
+                "observation.observation_id = ? JOIN validator_intents AS "
+                "intent ON intent.validator_intent_id = "
+                "observation.validator_intent_id WHERE "
+                "settlement.settlement_hash = ? AND "
+                "settlement.reservation_id = intent.reservation_id",
+                (
+                    denial["observation_id"],
+                    denial["denied_settlement_head_hash"],
+                ),
+            ).fetchone()
+            if (
+                stored_binding != tuple(denied_request.__dict__.values())
+                or body != expected_body
+                or denial["event_hash"] != self._event_hash(body)
+                or denial["payload_digest"] != expected_payload_digest
+                or denial["reason_code"] not in {
+                    "APPLICATION_NOT_ELIGIBLE",
+                    "VALIDATOR_ACCOUNTING_UNSETTLED",
+                }
+                or accounting is None
+                or observation is None
+                or int(observation["observation_writer_epoch"])
+                >= int(body["writer_epoch"])
+                or (
+                    observation["repository_id"], observation["run_id"],
+                    observation["item_id"], observation["logical_effect_id"],
+                    observation["revision_digest"], observation["check_id"],
+                    observation["validator_attempt_id"],
+                ) != (
+                    denial["repository_id"], denial["run_id"],
+                    denial["item_id"], denial["logical_effect_id"],
+                    denial["revision_digest"], denial["check_id"],
+                    denial["validator_attempt_id"],
+                )
+                or latest_accounting is None
+                or latest_accounting["settlement_hash"]
+                != denial["denied_settlement_head_hash"]
+                or (
+                    denial["reason_code"]
+                    == "VALIDATOR_ACCOUNTING_UNSETTLED"
+                    and
+                    not bool(accounting["uncertainty"])
+                    and int(accounting["held_units"]) == 0
+                    and accounting["disposition"]
+                    in {
+                        BudgetDisposition.CONSUMED.value,
+                        BudgetDisposition.ADJUSTED.value,
+                    }
+                )
+                or connection.execute(
+                    "SELECT 1 FROM validation_applications WHERE "
+                    "command_id = ? OR application_id = ? OR event_id = ?",
+                    (
+                        denial["command_id"], denial["application_id"],
+                        denial["event_id"],
+                    ),
+                ).fetchone()
+                is not None
+            ):
+                raise StorageIntegrityError(
+                    "denied validation application projection is invalid"
+                )
+        if seen_denial_events != set(denial_events_by_id):
+            raise StorageIntegrityError(
+                "validation application denial event lost its projection"
+            )
         expected_applications = {
             body["application_id"]: (
                 body["command_id"], body["event_id"], body["run_id"],
@@ -41686,7 +42705,9 @@ class SQLiteStateStore:
         }
         if actual_safe_retry_actions != expected_safe_retry_actions:
             raise StorageIntegrityError(
-                "safe-retry action projection diverges from event history"
+                "safe-retry action projection diverges from event history: "
+                f"actual={actual_safe_retry_actions!r}, "
+                f"expected={expected_safe_retry_actions!r}"
             )
 
         expected_validator_cessations = {
@@ -42725,7 +43746,10 @@ class SQLiteStateStore:
                     )
                 if body.get("lifecycle_from") != predecessor_value:
                     raise StorageIntegrityError(
-                        "event lifecycle predecessor diverges from history"
+                        "event lifecycle predecessor diverges from history: "
+                        f"event={body.get('event_id')!r}, "
+                        f"actual={body.get('lifecycle_from')!r}, "
+                        f"expected={predecessor_value!r}"
                     )
                 try:
                     resulting_state = LifecycleState(str(body["lifecycle_to"]))
@@ -42857,6 +43881,10 @@ class SQLiteStateStore:
                 elif body.get("route") == "SAFE_SAME_EFFECT_RETRY":
                     self._validate_safe_same_effect_retry_event(
                         body, predecessor_state, expected_cursors.get(run_id)
+                    )
+                elif body.get("route") == "EFFECT_RECEIPT":
+                    self._validate_effect_observation_event(
+                        connection, body, predecessor_state
                     )
                 else:
                     raise StorageIntegrityError(
@@ -43202,6 +44230,24 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "stop predecessor state or continuation cursor diverges"
                 )
+            if row["event_kind"] == "VALIDATION_APPLICATION_DENIED" and (
+                body["retained_continuation_cursor"]
+                != expected_cursors.get(run_id)
+                or body["lifecycle_from"] != body["lifecycle_to"]
+                or (
+                    body["reason_code"] == "APPLICATION_NOT_ELIGIBLE"
+                    and expected_lifecycle.get(run_id)
+                    == LifecycleState.VALIDATING.value
+                )
+                or (
+                    body["reason_code"] == "VALIDATOR_ACCOUNTING_UNSETTLED"
+                    and expected_lifecycle.get(run_id)
+                    != LifecycleState.VALIDATING.value
+                )
+            ):
+                raise StorageIntegrityError(
+                    "validation application denial historical reason diverges"
+                )
             if "lifecycle_to" in body:
                 expected_lifecycle[run_id] = str(body["lifecycle_to"])
                 if row["event_kind"] == "RESUME_ACCEPTED":
@@ -43218,6 +44264,10 @@ class SQLiteStateStore:
                 ):
                     expected_cursors[run_id] = body["continuation_cursor"]
                 elif row["event_kind"] in {
+                    "RECEIPT_RECORDED", "LATE_RECEIPT_RECORDED",
+                } and "continuation_cursor" in body:
+                    expected_cursors[run_id] = body["continuation_cursor"]
+                elif row["event_kind"] in {
                     "VALIDATION_PASSED", "VALIDATION_FAILED",
                     "OPERATION_FINALIZED", "NONDISPATCH_PROVEN",
                     "BLOCKER_RESOLVED", "READINESS_EVALUATED",
@@ -43226,6 +44276,8 @@ class SQLiteStateStore:
                     "VALIDATION_LAUNCH_BLOCKED",
                     "VALIDATION_CHECK_ROUTED",
                     "VALIDATOR_INITIATION_DISABLED",
+                    "OPERATION_LAUNCH_CLAIMED",
+                    "ADAPTER_CONTACT_CLAIMED",
                 }:
                     expected_cursors[run_id] = body.get(
                         "continuation_cursor"
@@ -43252,7 +44304,8 @@ class SQLiteStateStore:
         }
         if actual_cursors != expected_cursors:
             raise StorageIntegrityError(
-                "continuation-cursor projection diverges from event history"
+                "continuation-cursor projection diverges from event history: "
+                f"actual={actual_cursors!r}, expected={expected_cursors!r}"
             )
 
         for body in finalizations:
@@ -43554,6 +44607,7 @@ class SQLiteStateStore:
             "validator_observations",
             "validator_cessations",
             "validation_applications",
+            "validation_application_denials",
             "validation_recoveries",
             "terminal_validation_settlements",
             "operation_finalizations",
@@ -43710,7 +44764,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 10:
+            if version != 11:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

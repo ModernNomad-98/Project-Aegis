@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import ctypes
 from ctypes import wintypes
+import errno
 import os
 from pathlib import Path, PureWindowsPath
 import re
@@ -672,11 +673,22 @@ class CheckedPathCapability:
                     os.mkdir(part, 0o700, dir_fd=fd)
                 except FileExistsError:
                     pass
-            next_fd = os.open(
-                part,
-                os.O_RDONLY | directory_flag | no_follow_flag,
-                dir_fd=fd,
-            )
+            try:
+                next_fd = os.open(
+                    part,
+                    os.O_RDONLY | directory_flag | no_follow_flag,
+                    dir_fd=fd,
+                )
+            except FileNotFoundError as error:
+                raise PathCapabilityUnavailable(
+                    "owned path ancestor is missing"
+                ) from error
+            except OSError as error:
+                if error.errno in {errno.ELOOP, errno.ENOTDIR}:
+                    raise PathCapabilityUnavailable(
+                        "symlink or redirected ancestor refused in owned path"
+                    ) from error
+                raise
             self._fds.append(next_fd)
             info = os.fstat(next_fd)
             if info.st_dev != device:
@@ -739,10 +751,15 @@ class CheckedPathCapability:
         )
         self._fds.append(descriptor)
         info = os.fstat(descriptor)
-        if (
-            not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
-            or stat.S_IMODE(info.st_mode) & 0o077 or info.st_nlink != 1
-        ):
+        if not stat.S_ISREG(info.st_mode):
+            raise PathCapabilityUnavailable(
+                "owned database leaf is not a regular file"
+            )
+        if info.st_nlink != 1:
+            raise PathCapabilityUnavailable(
+                "owned database leaf is not a single-link file"
+            )
+        if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o077:
             raise PathCapabilityUnavailable("owned database leaf is not owner-private")
         return PathIdentity(
             "posix", self._component_ids, (info.st_dev, info.st_ino), str(self.path)

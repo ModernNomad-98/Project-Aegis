@@ -22,6 +22,7 @@ class TransitionSpec:
     allowed_from: FrozenSet[LifecycleState | None]
     allowed_to: FrozenSet[LifecycleState]
     required_guards: FrozenSet[str] = frozenset()
+    event_variants: tuple[tuple[str, FrozenSet[str]], ...] = ()
 
 
 def _states(*states: LifecycleState | None) -> FrozenSet[LifecycleState | None]:
@@ -37,7 +38,16 @@ TRANSITIONS: Mapping[str, TransitionSpec] = {
     "T06": TransitionSpec("T06", "PAUSE_REQUESTED", _states(LifecycleState.RUNNING), _states(LifecycleState.PAUSING, LifecycleState.RECONCILIATION_REQUIRED), frozenset({"operator_authentic", "effect_bound"})),
     "T07": TransitionSpec("T07", "PAUSE_SETTLED", _states(LifecycleState.PAUSING), _states(LifecycleState.PAUSED, LifecycleState.RECONCILIATION_REQUIRED), frozenset({"activity_accounted"})),
     "T08": TransitionSpec("T08", "VALIDATION_PAUSE_REQUESTED", _states(LifecycleState.VALIDATING), _states(LifecycleState.PAUSING, LifecycleState.PAUSED, LifecycleState.RECONCILIATION_REQUIRED), frozenset({"operator_authentic"})),
-    "T09": TransitionSpec("T09", "PAUSE_FENCE_RECORDED", _states(LifecycleState.RECONCILIATION_REQUIRED), _states(LifecycleState.RECONCILIATION_REQUIRED), frozenset({"operator_authentic"})),
+    "T09": TransitionSpec(
+        "T09", "PAUSE_FENCE_RECORDED",
+        _states(LifecycleState.RECONCILIATION_REQUIRED),
+        _states(LifecycleState.RECONCILIATION_REQUIRED),
+        frozenset({"operator_authentic"}),
+        (
+            ("PAUSE_REQUESTED", frozenset({"effect_bound"})),
+            ("VALIDATION_PAUSE_REQUESTED", frozenset()),
+        ),
+    ),
     "T10": TransitionSpec("T10", "RECEIPT_RECORDED", _states(LifecycleState.RUNNING, LifecycleState.PAUSING), _states(LifecycleState.VALIDATING, LifecycleState.PAUSING, LifecycleState.RECONCILIATION_REQUIRED), frozenset({"receipt_bound", "usage_classified", "source_claim_classified"})),
     "T11": TransitionSpec("T11", "VALIDATION_PASSED", _states(LifecycleState.VALIDATING), _states(LifecycleState.VALIDATING, LifecycleState.BLOCKED), frozenset({"observation_unapplied", "application_guards_met", "accounting_settled"})),
     "T12": TransitionSpec("T12", "VALIDATION_FAILED", _states(LifecycleState.VALIDATING), _states(LifecycleState.BLOCKED, LifecycleState.FAILED_FINAL), frozenset({"observation_unapplied", "failure_classified", "accounting_settled"})),
@@ -69,6 +79,8 @@ class TransitionEngine:
         current_state: LifecycleState | None,
         resulting_state: LifecycleState,
         satisfied_guards: FrozenSet[str],
+        *,
+        event_kind: str | None = None,
     ) -> TransitionSpec:
         spec = TRANSITIONS.get(transition_id)
         if spec is None:
@@ -81,7 +93,15 @@ class TransitionEngine:
             raise DispatchDenied(
                 f"{transition_id} cannot result in {resulting_state.value}"
             )
-        missing = spec.required_guards - satisfied_guards
+        selected_event_kind = spec.event_kind if event_kind is None else event_kind
+        variant_guards = dict(spec.event_variants).get(selected_event_kind)
+        if selected_event_kind != spec.event_kind and variant_guards is None:
+            raise DispatchDenied(
+                f"{transition_id} does not authorize event {selected_event_kind}"
+            )
+        missing = (
+            spec.required_guards | (variant_guards or frozenset())
+        ) - satisfied_guards
         if missing:
             raise DispatchDenied(
                 f"{transition_id} is missing guards: {', '.join(sorted(missing))}"

@@ -62,9 +62,10 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [work-package register](roadmaps/resumable-control-plane-backlog.md) and the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
-CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) but is
-still an unaccepted draft checkpoint. The full local package suite passed 515
-tests on 2026-09-22; all three stop findings, the aggregate stop gate, T13
+CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) and is
+at its final merge-readiness gates. The exact package suite passed 542 tests on
+Windows and 542 on Linux (three expected platform skips) on 2026-09-23; all
+three stop findings, the aggregate stop gate, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause received independent `APPROVE`. The narrow
@@ -92,20 +93,17 @@ correction ownership, clock rollback and lost-receipt replay are now directly
 asserted. F04a reservation-boundary accounting is also independently accepted,
 including exact known usage, durable overrun fences, unknown-liability retention,
 pre-contact bound denial and strict semantic-v10 migration. All 22 acceptance-
-family rows now have tested, independently accepted coverage; remaining row-
-level reviews and final gates stay open.
+family rows now have tested, independently accepted coverage. All 28 transition,
+9 crash-boundary and 22 acceptance-family rows are independently accepted; only
+the final exact-head architecture/security/QA and hosted gates remain open.
 The independently accepted selected-check foundation binds explicit v2
 per-check dependencies and launch gates, derives a deterministic topological
 order and reconstructs projections strictly. The current increment adds signed
 monotonic gate facts and complete launch snapshots, universal no-preclaim T27,
 atomic T11 next-check routing, exact T16 route recovery and contact-time stale
-launch disablement with T25/T16 continuation. T11, T27, F11 and F17 remain
-`UNVERIFIED` pending committed exact-head trace review even though the corrected
-increment received independent `APPROVE`; broader T17 and the
-remaining canonical gaps still block merge.
-Remaining exact
-T/C/F backlog and final review gates still
-block merge, so the
+launch disablement with T25/T16 continuation. T11, T27, F11 and F17 are included
+in the independently accepted 28/9/22 canonical inventory. Final exact-head
+architecture, security, QA and hosted validation still block merge, so the
 passing suite is not a completion or merge claim.
 Continue only from the
 [Codex handoff](evidence/control-plane/cp-wp-002-codex-handoff.md). No deployment,

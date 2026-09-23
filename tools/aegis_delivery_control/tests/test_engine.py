@@ -19,6 +19,38 @@ class TransitionEngineTests(unittest.TestCase):
             set(TRANSITIONS), {f"T{number:02d}" for number in range(1, 29)}
         )
 
+    def test_t09_event_variants_share_the_canonical_state_contract(self) -> None:
+        for event_kind, guards in (
+            ("PAUSE_FENCE_RECORDED", frozenset({"operator_authentic"})),
+            ("PAUSE_REQUESTED", frozenset({"operator_authentic", "effect_bound"})),
+            ("VALIDATION_PAUSE_REQUESTED", frozenset({"operator_authentic"})),
+        ):
+            with self.subTest(event_kind=event_kind):
+                self.engine.authorize(
+                    "T09",
+                    LifecycleState.RECONCILIATION_REQUIRED,
+                    LifecycleState.RECONCILIATION_REQUIRED,
+                    guards,
+                    event_kind=event_kind,
+                )
+                with self.assertRaises(DispatchDenied):
+                    self.engine.authorize(
+                        "T09", LifecycleState.RECONCILIATION_REQUIRED,
+                        LifecycleState.PAUSING, guards, event_kind=event_kind,
+                    )
+        with self.assertRaisesRegex(DispatchDenied, "effect_bound"):
+            self.engine.authorize(
+                "T09", LifecycleState.RECONCILIATION_REQUIRED,
+                LifecycleState.RECONCILIATION_REQUIRED,
+                frozenset({"operator_authentic"}), event_kind="PAUSE_REQUESTED",
+            )
+        with self.assertRaisesRegex(DispatchDenied, "does not authorize event"):
+            self.engine.authorize(
+                "T09", LifecycleState.RECONCILIATION_REQUIRED,
+                LifecycleState.RECONCILIATION_REQUIRED,
+                frozenset({"operator_authentic"}), event_kind="PAUSE_SETTLED",
+            )
+
     def test_t03_requires_every_launch_guard(self) -> None:
         guards = TRANSITIONS["T03"].required_guards - {"fresh"}
         with self.assertRaisesRegex(DispatchDenied, "fresh"):

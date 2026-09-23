@@ -220,8 +220,9 @@ later store mutation, and it does not replace the durable outstanding operation
 slot. Checked paths reject lexical escapes, links, unsafe ownership/ACLs,
 hardlinks, WAL/SHM and unsafe rollback journals. Windows retains the fixed-
 volume/known-folder and managed-descendant handles for each connection/lock
-scope. POSIX uses descriptor-relative no-follow traversal, but the current
-checkpoint has no POSIX runtime receipt and does not claim one.
+scope. POSIX uses descriptor-relative no-follow traversal. The exact 542-test
+package suite passed in the pinned Linux runtime on 2026-09-23 with three
+expected platform-specific skips.
 
 ## Commands
 
@@ -238,8 +239,9 @@ difference fails closed.
 
 ## Current draft checkpoint
 
-The 2026-09-22 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 485 tests successfully, and
+The 2026-09-23 checkpoint is a reviewed offline merge candidate, not a deployable
+controller. The complete package suite ran 543 tests successfully on Windows
+and 543 on Linux (three expected platform-specific skips), and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -355,9 +357,9 @@ Filesystem
 ownership/reparse/path-swap protection also has independent implementation
 `APPROVE`: Windows actual junction/replacement and same-volume known-folder
 rebound probes pass, the stable lock identity is pinned, and unsafe sidecars and
-hardlinks fail closed. POSIX runtime remains `UNVERIFIED`. The broader exact
-T/C/F trace and final reviews remain, so this checkpoint is
-not merge-ready and does not authorize real authority, external calls, provider
+hardlinks fail closed. POSIX runtime is verified by the pinned Linux package
+suite. All 59 T/C/F rows are independently accepted; final exact-head reviews
+and hosted checks remain, so this checkpoint does not authorize real authority, external calls, provider
 integration, release, or deployment.
 
 The selected-check foundation is independently accepted. New plan acceptance
@@ -374,11 +376,10 @@ prerequisites pass, and contact rechecks either replay an existing contact or
 durably disable stale initiation for exact T25 settlement and later T16 resume.
 Crash rollback, lost acknowledgement, stale/rebound evidence, migration and
 strict projection recovery are covered, and the corrected increment received
-independent `APPROVE` with no findings. T11, T27, F11 and F17 remain
-`UNVERIFIED` pending committed exact-head trace review. The local proof-free
-T17/F18 branch is implemented and independently accepted but remains aggregate
-`UNVERIFIED` pending committed exact-head evidence; remaining canonical gaps
-are still open.
+independent `APPROVE` with no findings. T11, T27, F11 and F17 and the proof-free
+T17/F18 branch are included in the independently accepted 28/9/22 canonical
+inventory. Final exact-head architecture, security, QA and hosted validation
+remain required before merge.
 
 ## Validation
 

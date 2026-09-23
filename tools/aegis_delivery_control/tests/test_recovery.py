@@ -141,7 +141,9 @@ class SyntheticBoundaryTests(unittest.TestCase):
     def test_f03_one_use_grant_has_exactly_one_claim_winner(self) -> None:
         capability = self.claim()
         self.assertEqual(capability.grant_id, "grant-1")
-        with self.assertRaisesRegex(DispatchDenied, "already claimed"):
+        with self.assertRaisesRegex(
+            DispatchDenied, "exact launch reconciliation|already claimed"
+        ):
             self.claim()
 
     def test_f03_binding_mismatch_denies_claim(self) -> None:
@@ -171,7 +173,9 @@ class SyntheticBoundaryTests(unittest.TestCase):
         )
         self.assertIsNotNone(recovered)
         self.assertIsNone(recovered.usage_units)
-        with self.assertRaisesRegex(DispatchDenied, "already claimed"):
+        with self.assertRaisesRegex(
+            DispatchDenied, "exact launch reconciliation|already claimed"
+        ):
             adapter._execute_committed(
                 capability, self.request(), self.authority, self.store,
                 commit, launch, self.intent()

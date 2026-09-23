@@ -621,8 +621,9 @@ The experimental offline delivery-control kernel is under active development;
 use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
-The CP-WP-002 draft checkpoint has broad synthetic coverage but is not accepted:
-its full 504-test package suite passes locally; all three stop findings, T13
+The CP-WP-002 offline merge candidate has complete synthetic row coverage:
+its exact 542-test package suite passes on Windows and Linux (three expected
+Linux platform skips); all three stop findings, T13
 authority lifecycle intake, T15 binding-mismatch handling, the T14
 PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
 external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
@@ -652,24 +653,24 @@ containment is typed, bounded and strictly recovered. Filesystem ownership,
 reparse-point and path-swap protection now also has independent `APPROVE` on
 Windows: checked OS-known-folder and descendant handles, stable lock identity,
 sidecar/hardlink denial and actual junction/replacement probes fail closed.
-POSIX runtime evidence remains `UNVERIFIED`.
+POSIX runtime evidence is verified by the pinned Linux package suite.
 The selected-check foundation has independently accepted v2 per-check
 dependency/launch-gate declarations, deterministic topological order and strict
 projection recovery. The current increment adds authenticated monotonic gate
 facts, signed complete READY snapshots, universal no-preclaim T27 commit,
 atomic T11 next-check routing, exact T16 launch-route recovery, and contact-time
 stale-prerequisite disablement with T25/T16 continuation; the corrected
-increment received independent `APPROVE`. No complete row is
-promoted until committed exact-head trace review. The T17/F18 proof-free owner
+increment received independent `APPROVE`, and its complete rows are included in
+the accepted 28/9/22 canonical inventory. The T17/F18 proof-free owner
 disposition route is now implemented locally: separately authenticated one-use
 REPORT_ONLY, STOPPED and FAILED_FINAL commands preserve the unknown outcome,
 accounting, slot, cursor and exact uncertainty set; terminal choices add a
 permanent scoped fence and never authorize retry, success or completion. Its
 semantic-v7 migration, crash/replay and strict historical projection checks are
 locally green. Independent implementation review returned `APPROVE` after the
-accepted-plan issuer boundary and denial matrix were corrected; committed
-exact-head evidence remains required before aggregate promotion. The remaining
-canonical gaps stay open. T18/T19 now have independently accepted authentic
+accepted-plan issuer boundary and denial matrix were corrected. Final exact-head
+architecture, security, QA and hosted validation remain required before merge.
+T18/T19 now have independently accepted authentic
 every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
 independent `APPROVE`: canonical operation/validator nonexecution covers
 before/after handoff, authentic paused/pausing/reconciliation and terminal
@@ -684,11 +685,10 @@ clock rollback and lost acknowledgements fail closed, and synthetic authority
 cannot enable a real adapter. F04a now also has independent `APPROVE`: known
 usage below/equal/above the reservation settles exactly once, overruns fence,
 unknown liability remains blocked, and semantic-v10 migration preserves older
-valid histories without healing tamper. All 22 acceptance-family rows now have
-tested, independently accepted coverage; remaining row-level reviews still apply.
-The PR remains draft and not
-merge-ready while the exact T/C/F trace and final architecture/security/QA
-review gates remain. Read the
+valid histories without healing tamper. All 28 transition, 9 crash-boundary and
+22 acceptance-family rows now have tested, independently accepted coverage. The
+PR remains draft until final architecture/security/QA and hosted exact-head
+gates pass. Read the
 [Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
 continuing. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:

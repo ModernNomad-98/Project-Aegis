@@ -5,6 +5,7 @@ from contextlib import closing
 import json
 import multiprocessing
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -487,6 +488,82 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertIsNotNone(observation)
             self.assertEqual(len(uncertainties), 2)
             self.assertIsNotNone(cessation)
+            validation = SyntheticValidationCoordinator(
+                store, TransitionEngine(), authority, validator_adapter
+            )
+            denied_application = ValidationApplicationRequest(
+                "application-denied-before-t17",
+                "apply-command-denied-before-t17",
+                "apply-event-denied-before-t17", "repo-1", "run-1",
+                "item-1", "effect-1", "revision-1", "check-1",
+                "validator-attempt-1", observation[0],
+            )
+            with self.assertRaisesRegex(
+                DispatchDenied, "C05 requires durable VALIDATING state"
+            ) as first_denial:
+                validation.apply_result(denied_application)
+            connection = sqlite3.connect(store._database_path)
+            try:
+                denial_snapshot = tuple(connection.iterdump())
+                denial_count = connection.execute(
+                    "SELECT COUNT(*) FROM validation_application_denials"
+                ).fetchone()[0]
+            finally:
+                connection.close()
+            with self.assertRaisesRegex(
+                DispatchDenied, "C05 requires durable VALIDATING state"
+            ) as repeated_denial:
+                validation.apply_result(denied_application)
+            self.assertIsNotNone(first_denial.exception.event_hash)
+            self.assertEqual(
+                repeated_denial.exception.event_hash,
+                first_denial.exception.event_hash,
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                self.assertEqual(tuple(connection.iterdump()), denial_snapshot)
+            finally:
+                connection.close()
+            self.assertEqual(denial_count, 1)
+            store.load_verified("repo-1", authority=authority)
+            forged_request = ValidationApplicationRequest(
+                "application-forged-after-t17", "apply-command-forged-after-t17",
+                "apply-event-forged-after-t17", "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", "check-1", "validator-attempt-1",
+                observation[0],
+            )
+            connection = sqlite3.connect(store._database_path)
+            try:
+                denial = connection.execute(
+                    "SELECT * FROM validation_application_denials WHERE command_id = ?",
+                    (denied_application.command_id,),
+                ).fetchone()
+                forged_values = list(denial)
+                forged_values[0:3] = [
+                    forged_request.command_id, forged_request.application_id,
+                    forged_request.event_id,
+                ]
+                forged_values[12] = store._event_hash(
+                    {**forged_request.__dict__, "classification_digest": None}
+                )
+                forged_values[16] = json.dumps(
+                    forged_request.__dict__, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO validation_application_denials VALUES ("
+                    + ",".join("?" for _ in forged_values) + ")",
+                    forged_values,
+                )
+                connection.commit()
+                with self.assertRaises(StorageIntegrityError):
+                    store.load_verified("repo-1", authority=authority)
+                connection.execute(
+                    "DELETE FROM validation_application_denials WHERE command_id = ?",
+                    (forged_request.command_id,),
+                )
+                connection.commit()
+            finally:
+                connection.close()
             adjusted_request = BudgetSettlementRequest(
                 "validator-adjusted-t17", "validator-reservation-t08",
                 unknown_head, BudgetDisposition.ADJUSTED, 1,
@@ -499,9 +576,6 @@ class MediatedDispatchTests(unittest.TestCase):
                     "validator-adjusted-proof-t17", adjusted_request
                 ),
                 authority,
-            )
-            validation = SyntheticValidationCoordinator(
-                store, TransitionEngine(), authority, validator_adapter
             )
             request = ReconcileValidatorResultRequest(
                 "reconciliation-validator-result-t17",
@@ -553,6 +627,10 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
             store.load_verified("repo-1", authority=authority)
+            with self.assertRaisesRegex(
+                DispatchDenied, "C05 requires durable VALIDATING state"
+            ):
+                validation.apply_result(denied_application)
             applied = validation.apply_result(
                 ValidationApplicationRequest(
                     "application-after-t17", "apply-command-after-t17",
@@ -562,6 +640,61 @@ class MediatedDispatchTests(unittest.TestCase):
                 )
             )
             self.assertEqual(applied.resulting_state, LifecycleState.BLOCKED)
+            semantic_replay = validation.apply_result(
+                ValidationApplicationRequest(
+                    "application-semantic-replay-t17",
+                    "apply-command-semantic-replay-t17",
+                    "apply-event-semantic-replay-t17", "repo-1", "run-1",
+                    "item-1", "effect-1", "revision-1", "check-1",
+                    "validator-attempt-1", observation[0],
+                )
+            )
+            self.assertTrue(semantic_replay.replayed)
+            self.assertEqual(
+                semantic_replay.application_id, "application-after-t17"
+            )
+            self.assertEqual(
+                store.table_counts()["validation_applications"], 1
+            )
+            stop_grant = SyntheticOperatorGrant(
+                "terminal-replay-stop-grant", "repo-1", "run-1",
+                "STOP_IMMEDIATE", "terminal-replay-stop-scope",
+            )
+            authority.register_operator(stop_grant)
+            stopped = store.stop(
+                StopRequest(
+                    "terminal-replay-stop", "terminal-replay-stop-command",
+                    "terminal-replay-stop-event", "repo-1", "run-1",
+                    StopMode.IMMEDIATE, "TERMINAL_REPLAY_TEST",
+                ),
+                authority.claim_operator(*stop_grant.__dict__.values()),
+                authority,
+            )
+            self.assertEqual(stopped.resulting_state, LifecycleState.STOPPED)
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                terminal_snapshot = tuple(connection.iterdump())
+            for replay_request in (
+                ValidationApplicationRequest(
+                    "application-after-t17", "apply-command-after-t17",
+                    "apply-event-after-t17", "repo-1", "run-1", "item-1",
+                    "effect-1", "revision-1", "check-1",
+                    "validator-attempt-1", observation[0],
+                ),
+                ValidationApplicationRequest(
+                    "application-terminal-semantic-replay-t17",
+                    "apply-command-terminal-semantic-replay-t17",
+                    "apply-event-terminal-semantic-replay-t17", "repo-1",
+                    "run-1", "item-1", "effect-1", "revision-1", "check-1",
+                    "validator-attempt-1", observation[0],
+                ),
+            ):
+                terminal_replay = validation.apply_result(replay_request)
+                self.assertTrue(terminal_replay.replayed)
+                self.assertEqual(
+                    terminal_replay.application_id, "application-after-t17"
+                )
+                with closing(sqlite3.connect(store._database_path)) as connection:
+                    self.assertEqual(tuple(connection.iterdump()), terminal_snapshot)
             store.load_verified("repo-1", authority=authority)
 
     def test_t17_validator_reconciliation_crash_boundaries_are_atomic(
@@ -1067,7 +1200,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 10)
+            self.assertEqual(version, 11)
             self.assertEqual(action_count, 0)
             with self.assertRaisesRegex(
                 StorageIntegrityError, "readiness event semantics"
@@ -1114,7 +1247,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 10
+                    connection.execute("PRAGMA user_version").fetchone()[0], 11
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -1141,7 +1274,7 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 11")
+                connection.execute("PRAGMA user_version = 12")
                 connection.commit()
             finally:
                 connection.close()
@@ -2139,8 +2272,27 @@ class MediatedDispatchTests(unittest.TestCase):
                         "after_reconciliation_pause_commit_before_acknowledgement"
                     ),
                 )
+            store._freshness_oracle = NeverFreshOracle()
             replay = dispatch.pause_reconciliation(request, capability)
             self.assertTrue(replay.replayed)
+            new_request = self._t09_pause_request(
+                store, suffix="stale-first-use"
+            )
+            new_grant = SyntheticOperatorGrant(
+                "pause-grant-t09-stale-first-use", "repo-1", "run-1",
+                "PAUSE", "pause-scope-t09-stale-first-use",
+            )
+            authority.register_operator(new_grant)
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                before = tuple(connection.iterdump())
+            with self.assertRaisesRegex(DispatchDenied, "freshness proof failed"):
+                dispatch.pause_reconciliation(
+                    new_request,
+                    authority.claim_operator(*new_grant.__dict__.values()),
+                )
+            with closing(sqlite3.connect(store._database_path)) as connection:
+                self.assertEqual(tuple(connection.iterdump()), before)
+            store._freshness_oracle = AlwaysFreshOracle()
             store.load_verified("repo-1", authority=authority)
 
     def test_t09_recovery_rejects_capability_projection_and_event_schema_tamper(
@@ -2601,7 +2753,9 @@ class MediatedDispatchTests(unittest.TestCase):
             self.assertIsNone(
                 validator_adapter.reconcile(validator_capability.claim_id)
             )
-            with self.assertRaisesRegex(DispatchDenied, "VALIDATING state"):
+            with self.assertRaisesRegex(
+                DispatchDenied, "active dispatch fence|VALIDATING state"
+            ):
                 store._contact_committed_validator(
                     validator_intent, validator_capability, committed,
                     validator_adapter._target_digest("repo-1"), authority,
@@ -2948,8 +3102,10 @@ class MediatedDispatchTests(unittest.TestCase):
                         "after_validation_pause_commit_before_acknowledgement"
                     ),
                 )
+            store._freshness_oracle = NeverFreshOracle()
             replay = dispatch.pause_validation(request, capability)
             self.assertTrue(replay.replayed)
+            store._freshness_oracle = AlwaysFreshOracle()
             store.load_verified("repo-1", authority=authority)
 
     def test_t08_recovery_rejects_every_persisted_operator_capability_tamper(
@@ -3480,8 +3636,7 @@ class MediatedDispatchTests(unittest.TestCase):
                 "pause-grant-t06", "repo-1", "run-1", "PAUSE", "pause-scope-t06"
             )
             authority.register_operator(pause_grant)
-            receipt = coordinator.pause_external_mutation(
-                PauseExternalMutationRequest(
+            external_pause = PauseExternalMutationRequest(
                     "external-pause-1", "external-pause-command-1",
                     "external-pause-event-1", "external-pause-fence-1",
                     "repo-1", "run-1", "item-1", "effect-1", "attempt-1",
@@ -3490,7 +3645,9 @@ class MediatedDispatchTests(unittest.TestCase):
                     contact["contact_id"], contact["event_id"],
                     contact["event_hash"], contact["target_digest"], 1,
                     "OPERATOR_PAUSE_EXTERNAL_MUTATION",
-                ),
+                )
+            receipt = coordinator.pause_external_mutation(
+                external_pause,
                 authority.claim_operator(*pause_grant.__dict__.values()),
             )
             self.assertEqual(
@@ -3505,33 +3662,27 @@ class MediatedDispatchTests(unittest.TestCase):
                 slot_count = connection.execute(
                     "SELECT COUNT(*) FROM outstanding_slot"
                 ).fetchone()[0]
-                fence_count = connection.execute(
-                    "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = "
-                    "'external-pause-fence-1'"
-                ).fetchone()[0]
-                uncertainty_rows = connection.execute(
-                    "SELECT uncertainty_kind, fence_id FROM "
-                    "uncertainty_instances WHERE origin_event_id = "
-                    "'external-pause-event-1' ORDER BY uncertainty_kind"
-                ).fetchall()
+                lifecycle_state, continuation_cursor = connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone()
             finally:
                 connection.close()
             self.assertEqual(
                 reservation, ("UNKNOWN_WORST_CASE_CHARGED", 0, 2, 1)
             )
             self.assertEqual(slot_count, 1)
-            self.assertEqual(fence_count, 1)
             self.assertEqual(
-                [row[0] for row in uncertainty_rows],
-                ["ACTIVITY", "BILLING", "OUTCOME", "SOURCE_CONTROL"],
+                lifecycle_state, LifecycleState.RECONCILIATION_REQUIRED.value,
             )
-            self.assertTrue(
-                all(row[1] != "external-pause-fence-1" for row in uncertainty_rows)
+            self.assertEqual(
+                continuation_cursor,
+                f"operation-effect:v1:{launch['launch_id']}",
             )
             self.assertEqual(
                 adapter.reconcile(effect_capability.claim_id),
                 canonical_before_pause,
-                "T06 must not contact, cancel, or mutate the target ledger",
+                "T09 must not contact, cancel, or mutate the target ledger",
             )
             late = coordinator.intake_effect_receipt(
                 EffectObservationCommand(
@@ -4619,7 +4770,7 @@ class MediatedDispatchTests(unittest.TestCase):
             },
         )
 
-    def _prepare_t25_effect(self, root: Path):
+    def _prepare_t25_effect(self, root: Path, *, launch_effect: bool = True):
         authority = SyntheticAuthority()
         grant = SyntheticGrant(
             "grant-1", "repo-1", "effect-1", "attempt-1", "scope-1"
@@ -4645,12 +4796,24 @@ class MediatedDispatchTests(unittest.TestCase):
             intent, capability, authority,
             expected_head=plan.event_hash, writer_epoch=2,
         )
-        launch = store.claim_operation_launch(intent, committed)
+        launch = (
+            store.claim_operation_launch(intent, committed)
+            if launch_effect
+            else None
+        )
+        source_id = (
+            f"EFFECT:{launch.launch_id}"
+            if launch is not None
+            else f"EFFECT-INTENT:{intent.command_id}"
+        )
+        source_event_hash = (
+            launch.event_hash if launch is not None else committed.event_hash
+        )
         attestation = authority.issue_nonexecution_attestation(
             "nonexecution-attestation-1", "nonexecution-seal-1",
             "EFFECT", adapter._target_digest("repo-1"),
-            capability.claim_id, f"EFFECT:{launch.launch_id}",
-            launch.event_hash, "reservation-1", "repo-1", "run-1",
+            capability.claim_id, source_id,
+            source_event_hash, "reservation-1", "repo-1", "run-1",
             "item-1", "effect-1", "attempt-1",
         )
         return (
@@ -5029,6 +5192,32 @@ class MediatedDispatchTests(unittest.TestCase):
                     )
                 )
             self.assertEqual(store.table_counts()["operation_launches"], 1)
+            with self.state_root_context(root):
+                reopened = SQLiteStateStore.open_canonical(
+                    "repo-1", AlwaysFreshOracle()
+                )
+                reopened.load_verified("repo-1")
+                connection = sqlite3.connect(reopened._database_path)
+                try:
+                    lifecycle_state, continuation_cursor, launch_id = (
+                        connection.execute(
+                            "SELECT run.lifecycle_state, "
+                            "run.continuation_cursor, launch.launch_id FROM "
+                            "runs AS run JOIN operation_launches AS launch ON "
+                            "launch.run_id = run.run_id WHERE run.run_id = "
+                            "'run-1'"
+                        ).fetchone()
+                    )
+                finally:
+                    connection.close()
+            self.assertEqual(
+                lifecycle_state, LifecycleState.RECONCILIATION_REQUIRED.value
+            )
+            self.assertEqual(
+                continuation_cursor, f"operation-launch:v1:{launch_id}"
+            )
+            self.assertEqual(reopened.table_counts()["outstanding_slot"], 1)
+            self.assertEqual(reopened.table_counts()["budget_settlements"], 0)
             release = BudgetSettlementRequest(
                 "release-after-launch", "reservation-1", "",
                 BudgetDisposition.RELEASED, None, "nondispatch-proof",
@@ -5119,14 +5308,14 @@ class MediatedDispatchTests(unittest.TestCase):
                 )
             connection = sqlite3.connect(store._database_path)
             try:
-                contact_hash = connection.execute(
-                    "SELECT event_hash FROM adapter_contacts WHERE "
-                    "contact_kind = 'EFFECT'"
+                settlement_head = connection.execute(
+                    "SELECT settlement_head_hash FROM budget_reservations "
+                    "WHERE reservation_id = 'reservation-1'"
                 ).fetchone()[0]
             finally:
                 connection.close()
             release = BudgetSettlementRequest(
-                "release-after-seal", "reservation-1", "",
+                "release-after-seal", "reservation-1", settlement_head,
                 BudgetDisposition.RELEASED, None, "nonexecution-seal-evidence",
                 "NONDISPATCH_PROVEN", non_dispatch_proven=True,
                 zero_liability_proven=True, release_slot=True,
@@ -5746,7 +5935,9 @@ class MediatedDispatchTests(unittest.TestCase):
             (
                 authority, capability, store, adapter, intent, _effect,
                 committed, _launch, attestation,
-            ) = self._prepare_t25_effect(Path(temporary_directory))
+            ) = self._prepare_t25_effect(
+                Path(temporary_directory), launch_effect=False
+            )
             sealed = adapter.seal_nonexecution(attestation, authority)
             connection = sqlite3.connect(adapter._ledger_path)
             try:
@@ -6516,8 +6707,17 @@ class MediatedDispatchTests(unittest.TestCase):
                 validator_adapter.reconcile(validator_capability.claim_id)
             )
             self.assertEqual(
-                reopened.load_run_lifecycle("run-1"), LifecycleState.VALIDATING
+                reopened.load_run_lifecycle("run-1"),
+                LifecycleState.RECONCILIATION_REQUIRED,
             )
+            with closing(sqlite3.connect(reopened._database_path)) as connection:
+                self.assertEqual(
+                    connection.execute(
+                        "SELECT continuation_cursor FROM runs WHERE run_id = ?",
+                        ("run-1",),
+                    ).fetchone()[0],
+                    "validator-intent:v1:validator-intent-1",
+                )
             self.assertEqual(reopened.table_counts()["outstanding_slot"], 1)
             with self.assertRaisesRegex(DispatchDenied, "already redeemed"):
                 validation.launch(
@@ -7005,7 +7205,7 @@ class MediatedDispatchTests(unittest.TestCase):
                         "after_observation_settlement_before_observation"
                     ),
                 )
-            self.assertEqual(store.table_counts()["budget_settlements"], 0)
+            self.assertEqual(store.table_counts()["budget_settlements"], 1)
             self.assertEqual(store.table_counts()["effect_observations"], 0)
             self.assertEqual(store.table_counts()["outstanding_slot"], 1)
 
@@ -7027,14 +7227,88 @@ class MediatedDispatchTests(unittest.TestCase):
             replay = recovered_coordinator.intake_effect_receipt(command)
 
             self.assertTrue(replay.replayed)
-            self.assertEqual(recovered_store.table_counts()["events"], 7)
+            self.assertEqual(recovered_store.table_counts()["events"], 8)
             self.assertEqual(
-                recovered_store.table_counts()["budget_settlements"], 1
+                recovered_store.table_counts()["budget_settlements"], 2
             )
             self.assertEqual(
                 recovered_store.table_counts()["effect_observations"], 1
             )
             self.assertEqual(recovered_store.table_counts()["outstanding_slot"], 1)
+            with closing(recovered_store._connect()) as connection:
+                observation_body = json.loads(connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (replay.event_id,),
+                ).fetchone()[0])
+                run_projection = connection.execute(
+                    "SELECT lifecycle_state, continuation_cursor FROM runs "
+                    "WHERE run_id = 'run-1'"
+                ).fetchone()
+            self.assertEqual(
+                (
+                    observation_body["event_kind"],
+                    observation_body["lifecycle_from"],
+                    observation_body["lifecycle_to"],
+                    observation_body["continuation_cursor"],
+                    observation_body["dispatch_reconciliation_version"],
+                ),
+                (
+                    "RECONCILIATION_RECORDED",
+                    LifecycleState.RECONCILIATION_REQUIRED.value,
+                    LifecycleState.VALIDATING.value,
+                    None,
+                    1,
+                ),
+            )
+            self.assertEqual(
+                tuple(run_projection),
+                (LifecycleState.VALIDATING.value, None),
+            )
+            tampered_path = recovered_store._database_path.with_name(
+                "t10-reconciliation-cursor-tamper.sqlite3"
+            )
+            shutil.copy2(recovered_store._database_path, tampered_path)
+            with closing(sqlite3.connect(tampered_path)) as connection:
+                tampered_body = json.loads(connection.execute(
+                    "SELECT body_json FROM events WHERE event_id = ?",
+                    (replay.event_id,),
+                ).fetchone()[0])
+                tampered_body["continuation_cursor"] = "forged-cursor"
+                tampered_hash = recovered_store._event_hash(tampered_body)
+                tampered_json = json.dumps(
+                    tampered_body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "UPDATE events SET event_hash = ?, body_json = ? WHERE "
+                    "event_id = ?",
+                    (tampered_hash, tampered_json, replay.event_id),
+                )
+                connection.execute(
+                    "UPDATE effect_observations SET event_hash = ?, "
+                    "body_json = ? WHERE event_id = ?",
+                    (tampered_hash, tampered_json, replay.event_id),
+                )
+                connection.execute(
+                    "UPDATE command_outcomes SET event_hash = ? WHERE "
+                    "event_id = ?", (tampered_hash, replay.event_id)
+                )
+                connection.execute(
+                    "UPDATE runs SET continuation_cursor = 'forged-cursor', "
+                    "head_hash = ? WHERE run_id = 'run-1'", (tampered_hash,)
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE "
+                    "repository_id = 'repo-1'", (tampered_hash,)
+                )
+                connection.commit()
+            tampered_store = SQLiteStateStore(
+                tampered_path, AlwaysFreshOracle(), "repo-1"
+            )
+            with self.assertRaisesRegex(
+                StorageIntegrityError,
+                "effect receipt reconciliation cursor is invalid",
+            ):
+                tampered_store.load_verified("repo-1", authority=authority)
             with self.assertRaisesRegex(DispatchDenied, "already redeemed"):
                 coordinator.dispatch(
                     intent,
@@ -7194,7 +7468,7 @@ class MediatedDispatchTests(unittest.TestCase):
                         replace(command, **{field: value})
                     )
             self.assertEqual(store.table_counts()["effect_observations"], 0)
-            self.assertEqual(store.table_counts()["budget_settlements"], 0)
+            self.assertEqual(store.table_counts()["budget_settlements"], 1)
 
     def test_t24_lost_validator_result_can_be_applied_and_replayed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

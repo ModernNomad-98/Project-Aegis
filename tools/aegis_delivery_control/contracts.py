@@ -3290,5 +3290,9 @@ class StorageIntegrityError(RuntimeError):
 class DispatchDenied(RuntimeError):
     """A deterministic guard denied dispatch before adapter contact."""
 
+    def __init__(self, message: str, *, event_hash: str | None = None) -> None:
+        super().__init__(message)
+        self.event_hash = event_hash
+
 
 RunHeads = Sequence[tuple[str, str]]

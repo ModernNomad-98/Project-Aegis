@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, F04a reservation-boundary accounting, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. Stage 28 records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested and independently accepted coverage at 28/28 T and 22/22 F. Remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, F04a reservation-boundary accounting, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and cross-platform filesystem protections. All 28/28 T, 9/9 C and 22/22 F rows have tested, independently accepted coverage, and the pinned Linux runtime evidence is verified. Final exact-head architecture/security/QA approval and hosted gates still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1449,6 +1449,26 @@ unknown-liability, adjustment and slot clauses pass; the storage module passed
 406 tests and the complete package passed 528 tests. F04a is promoted to
 `YES/YES/YES`, bringing acceptance-family coverage to 22/22. PR #99 remains
 draft pending remaining row reviews, POSIX evidence and final exact-head reviews.
+
+### 5.35 Complete row-review checkpoint
+
+The remaining exact-row audit is complete. Independent read-only review accepted
+T04/T10/T12/T16/T21/T23/T26, C02-C09 and F04b/F07/F08/F10/F14/F15/F16/F21
+after corrections for durable operation/validator initiation, atomic contact
+accounting, source-ledger recovery, exact interruption replay, authentic T23
+every-state histories and canonical T10/T17 receipt provenance. T10 now keeps
+ordinary RUNNING/PAUSING observations on `RECEIPT_RECORDED`, routes an exact
+current contacted dispatch already in reconciliation through T17
+`RECONCILIATION_RECORDED`, derives its cursor during strict recovery and rejects
+self-consistent cursor rewrites. T23 persists an exact typed pending-validation
+cursor and replays crash/lost-ack histories through a reopened store.
+
+The canonical inventory is now independently accepted at 28/28 transition rows,
+9/9 crash boundaries and 22/22 acceptance-family rows. The exact Windows package
+suite passed 542 tests on 2026-09-23, including the new ordinary PAUSING T10,
+source-claim process-termination and terminal replay regressions. This row-level
+checkpoint does not itself claim the final architecture/security/QA reviews,
+hosted exact-head checks or merge; those remain the final CP-WP-002 gates.
 
 ## 6. Handoff contract
 

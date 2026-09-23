@@ -1749,29 +1749,29 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T01 | YES | YES | YES | Authenticated acceptance, explicit prior dependency provenance, atomic replay and strict recovery are assertion-traced at committed Stage 23 head and independently accepted |
 | T02 | YES | YES | YES | Signed readiness, epoch-bound dependency snapshots, complete predecessor/source vectors, blocker preservation and atomic replay are assertion-traced and independently accepted |
 | T03 | YES | YES | YES | Current verified T02 provenance, fresh retry readiness, source anchor, global slot/fence checks and pre-intent denial are assertion-traced and independently accepted |
-| T04 | YES | YES | UNVERIFIED | `pause_before_dispatch`; dual-event atomic commit, lost-ack replay, operator binding and fence-tamper assertions in `test_t04_*`; row-level review pending |
+| T04 | YES | YES | YES | `pause_before_dispatch`; dual-event atomic commit, lost-ack replay, operator binding and fence-tamper assertions in `test_t04_*`; independently accepted |
 | T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
 | T07 | YES | YES | YES | Exact T05/T25 local settlement and authenticated RESULT/INTERRUPTION/NONLAUNCH active-validator settlement reach PAUSED only with authoritative accounting; strict recovery and all source branches are assertion-traced and independently accepted |
 | T08 | YES | YES | YES | Idle, unresolved, settled-result and contacted active-validator pause routes retain exact checkpoints/obligations, deny unknown activity, and are crash/replay/recovery traced and independently accepted |
 | T09 | YES | YES | YES | Exact current-head reconciliation fence, one-use authority, idempotent replay, stacked fence, no-adapter invariants and strict recovery independently accepted |
-| T10 | YES | YES | UNVERIFIED | Effect receipt intake verifies request/effect/source/control/usage binding, persists observation plus settlement atomically, routes unknowns to reconciliation and delegates contradictions to T23; C04/T06/T17 assertions; row-level review pending |
+| T10 | YES | YES | YES | Effect receipt intake verifies request/effect/source/control/usage binding, persists observation plus settlement atomically, routes unknowns to reconciliation and delegates contradictions to T23; C04/T06/T17 assertions; independently accepted |
 | T11 | YES | YES | YES | PASS application atomically records the next topological check's complete dependency/gate vector, routes READY/BLOCKED/FINALIZING exactly, replays by immutable observation reference and requires fresh T27 authority; independently accepted |
-| T12 | YES | YES | UNVERIFIED | `_apply_validator_observation` FAIL path separates recoverable BLOCKED from atomic FAILED_FINAL fence/closure, with classification, accounting, replay and pending-check assertions; row-level review pending |
+| T12 | YES | YES | YES | `_apply_validator_observation` FAIL path separates recoverable BLOCKED from atomic FAILED_FINAL fence/closure, with classification, accounting, replay and pending-check assertions; independently accepted |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
 | T14 | YES | YES | YES | PLANNED/BLOCKED, T07 local/validator settlements, clean T08, stacked T09 and operation-nonexecution sources clear only their exact pause fence; blocker/cursor preservation and strict recovery are assertion-traced and independently accepted |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
-| T16 | YES | YES | UNVERIFIED | Typed validation/operation blocker recovery and distinct finalization are implemented with exact evidence heads, aggregate gates, accounting/fence/slot closure, atomic replay and tamper assertions; row-level review pending |
+| T16 | YES | YES | YES | Typed validation/operation blocker recovery and distinct finalization are implemented with exact evidence heads, aggregate gates, accounting/fence/slot closure, atomic replay and tamper assertions; independently accepted |
 | T17 | YES | YES | YES | Validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution, generation-bound safe-retry and closed proof-free report/STOPPED/FAILED_FINAL branches are assertion-traced with exact accounting/fence retention and independently accepted |
 | T18 | YES | YES | YES | Graceful stop is assertion-traced from all seven authentic nonterminal states with exact predecessor/cursor/slot/intent/contact/observation/uncertainty/fence retention, no-new-contact denial, unchanged contacted accounting, crash/lost-ack replay and strict recovery; independently accepted at Stage 24 |
 | T19 | YES | YES | YES | Immediate stop is assertion-traced from all seven authentic nonterminal states with exact obligation retention, contacted effect/validator worst-case charging, precontact reserve retention, no-new-contact denial, intermediate-settlement rollback, lost-ack replay and strict recovery; independently accepted at Stage 24 |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
-| T21 | YES | YES | UNVERIFIED | Stable `writer.lock` identity and OS exclusion are implemented; an actual second process is denied and lock replacement/reacquisition behavior is asserted; row-level review pending |
+| T21 | YES | YES | YES | Stable `writer.lock` identity and OS exclusion are implemented; an actual second process is denied and lock replacement/reacquisition behavior is asserted; independently accepted |
 | T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |
-| T23 | YES | YES | UNVERIFIED | Late/contrary receipt intake preserves terminal state, true/unknown accounting, other slot owners and dependent retry/adoption fences across every lifecycle class; `test_f13_*`, stop/T26 ordering and retry-invalidation assertions; row-level review pending |
+| T23 | YES | YES | YES | Late/contrary receipt intake preserves terminal state, true/unknown accounting, other slot owners and dependent retry/adoption fences across every lifecycle class; `test_f13_*`, stop/T26 ordering and retry-invalidation assertions; independently accepted |
 | T24 | YES | YES | YES | RESULT/cessation intake derives signed per-check terminal policy, atomically retains observation/accounting and records exact late-FAIL obligation/fence without application; crash/replay/terminal-fixed behavior is assertion-traced and independently accepted |
 | T25 | YES | YES | YES | Canonical all-path operation/validator nonexecution is assertion-traced before/after handoff across authentic paused, pausing, reconciliation, terminal and historical states; contradiction classification precedes release, preserves charges/other slot owners, atomically fences T28 dependents, and survives crash/replay/strict recovery; independently accepted at Stage 25 |
-| T26 | YES | YES | UNVERIFIED | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; row-level review pending |
+| T26 | YES | YES | YES | Terminal validation settlement by observation, non-launch or cessation proof is atomic/idempotent, preserves late-result intake and releases the slot only after all obligations; extensive T23/T24 ordering/recovery assertions; independently accepted |
 | T27 | YES | YES | YES | Signed complete dependency/gate snapshots, no-capability pre-claim decisions, atomic claim+intent, exact recovery consumption, dependency order and contact-time guard rechecks are assertion-traced and independently accepted |
 | T28 | YES | YES | YES | Exact accepted validation-only adoption, separate authority consumption, free-slot check, no adapter contact, crash replay, contrary-fact fencing and source-history recovery independently accepted in the T28/F01 review |
 
@@ -1782,14 +1782,14 @@ Canonical rows: [design crash boundaries](../../design/resumable-control-plane-v
 | ID | Implemented | Tested | Independently accepted | Current disposition / evidence |
 | --- | --- | --- | --- | --- |
 | C01 | YES | YES | YES | Initial and retry dispatch require current signed T02 readiness; failures before intent leave no permission, reservation, slot or contact, with rollback/recovery assertions and independent acceptance |
-| C02 | YES | YES | UNVERIFIED | Operation and validator intent/launch commit-before-contact failures retain intent, claim, reservation and slot, deny redispatch, and require bound nonexecution/recovery; row-level review pending |
-| C03 | YES | YES | UNVERIFIED | Accepted synthetic effect with missing receipt preserves original key, worst-case accounting and slot; canonical-ledger recovery and no-redispatch assertions cover restart; row-level review pending |
-| C04 | YES | YES | UNVERIFIED | Effect and validator observation intake pre/post-commit failures preserve one immutable observation/accounting reference and later apply without recontact/recharge; row-level review pending |
-| C05 | YES | YES | UNVERIFIED | PASS, recoverable FAIL, final FAIL and distinct finalization pre/post-commit failures replay the committed application/finalization key exactly once with correct slot disposition; row-level review pending |
-| C06 | YES | YES | UNVERIFIED | T04-T09 and T18-T20 control transactions inject before-commit rollback and after-commit lost acknowledgement, acknowledge only committed fences and expose retained uncertainty; row-level review pending |
-| C07 | YES | YES | UNVERIFIED | Older internally valid effect/source checkpoints, incomplete vectors and unavailable/stale/contradictory anchors remain read-only/denied until a complete independent vector matches; row-level review pending |
-| C08 | YES | YES | UNVERIFIED | Source claim/redemption identity, lost/unknown claim status, one-use races and replay preserve the original claim and deny re-claim/contact; row-level review pending |
-| C09 | YES | YES | UNVERIFIED | Budget settlement/slot-release pre-commit rollback and lost-ack replay prevent duplicate credit, dropped charge and duplicate slot release across restart; row-level review pending |
+| C02 | YES | YES | YES | Operation and validator intent/launch commit-before-contact failures retain intent, claim, reservation and slot, deny redispatch, and require bound nonexecution/recovery; independently accepted |
+| C03 | YES | YES | YES | Accepted synthetic effect with missing receipt preserves original key, worst-case accounting and slot; canonical-ledger recovery and no-redispatch assertions cover restart; independently accepted |
+| C04 | YES | YES | YES | Effect and validator observation intake pre/post-commit failures preserve one immutable observation/accounting reference and later apply without recontact/recharge; independently accepted |
+| C05 | YES | YES | YES | PASS, recoverable FAIL, final FAIL and distinct finalization pre/post-commit failures replay the committed application/finalization key exactly once with correct slot disposition; independently accepted |
+| C06 | YES | YES | YES | T04-T09 and T18-T20 control transactions inject before-commit rollback and after-commit lost acknowledgement, acknowledge only committed fences and expose retained uncertainty; independently accepted |
+| C07 | YES | YES | YES | Older internally valid effect/source checkpoints, incomplete vectors and unavailable/stale/contradictory anchors remain read-only/denied until a complete independent vector matches; independently accepted |
+| C08 | YES | YES | YES | Source claim/redemption identity, lost/unknown claim status, one-use races and replay preserve the original claim and deny re-claim/contact; independently accepted |
+| C09 | YES | YES | YES | Budget settlement/slot-release pre-commit rollback and lost-ack replay prevent duplicate credit, dropped charge and duplicate slot release across restart; independently accepted |
 
 ### F01-F21 acceptance-family matrix
 
@@ -1801,24 +1801,24 @@ Canonical rows: [design acceptance families](../../design/resumable-control-plan
 | F02 | YES | YES | YES | Proof-free dispositions cannot resend, alias, compensate or erase unknown history; the sole reviewed same-key successor is expiry/generation/authority bound, retains outcome/activity uncertainty and T06 pause, requires distinct T14 RESUME, survives crash/restart, and is independently accepted at Stage 26 |
 | F03 | YES | YES | YES | Three independent HOST/HOST/MANUAL consumers reach one source-atomic winner and two grant-exhaustion denials; exact lifecycle timing/corrections, persistent clock rollback, lost receipt replay, rebinding denial and synthetic-only isolation are assertion-traced and independently accepted at Stage 27 |
 | F04a | YES | YES | YES | Exact below/equal/above-reservation actuals, durable breach fencing, known/unknown nonexecution cost, two-proof release, absolute adjustment, pre-contact operation/validator bound denial and strict v9-to-v10 migration are assertion-traced and independently accepted at Stage 28 |
-| F04b | YES | YES | UNVERIFIED | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; row-level review pending |
+| F04b | YES | YES | YES | Stop/cancel accounting retains known/unknown liability, survives C09 replay and accepts late terminal adjustment without reopen, reset or duplicate credit; independently accepted |
 | F05 | YES | YES | YES | Complete-vector mutation inventory, effect/source rollback, incomplete/stale/unavailable anchors and stale one-use source denial independently accepted |
 | F06 | YES | YES | YES | Repository-wide lifecycle/accounting slot matrix, other item/run denial, crash/restart retention, terminal settlement and generation-bound same-effect retry independently accepted |
-| F07 | YES | YES | UNVERIFIED | Valid receipt plus missing usage/source is retained in reconciliation, cannot launch validation/release slot, and authoritative settlement restores only the original continuation; row-level review pending |
-| F08 | YES | YES | UNVERIFIED | Terminal late receipt with missing/invalid/known usage preserves terminal state, worst-case or prior known charge, slot and later absolute adjustment without reopen/double charge; row-level review pending |
+| F07 | YES | YES | YES | Valid receipt plus missing usage/source is retained in reconciliation, cannot launch validation/release slot, and authoritative settlement restores only the original continuation; independently accepted |
+| F08 | YES | YES | YES | Terminal late receipt with missing/invalid/known usage preserves terminal state, worst-case or prior known charge, slot and later absolute adjustment without reopen/double charge; independently accepted |
 | F09 | YES | YES | YES | No-start, uncertainty, late result/cessation, mandatory terminal-policy, exact stop fulfillment, crash/replay and terminal-fixed evidence paths are assertion-traced and independently accepted |
-| F10 | YES | YES | UNVERIFIED | Empty check set denies; independent A/B application, FINALIZING cursor, aggregate-gate wait and distinct T16 finalization retain the slot and avoid reapplication; row-level review pending |
+| F10 | YES | YES | YES | Empty check set denies; independent A/B application, FINALIZING cursor, aggregate-gate wait and distinct T16 finalization retain the slot and avoid reapplication; independently accepted |
 | F11 | YES | YES | YES | Source/control settlement restores the exact pending validation cursor; fresh signed launch evidence and current authority/gate recheck are required before contact and independently accepted |
 | F12 | YES | YES | YES | Validator nonlaunch/interruption routes to typed BLOCKED/VALIDATING recovery, pause resumes through BLOCKED, T02/accounting cannot bypass exact T16 and terminal state remains fixed; assertion-traced and independently accepted |
 | F13 | YES | YES | YES | Known/unknown proof-first contrary receipts across every nonterminal and terminal lifecycle class preserve prior proof, true/unknown liability, another slot owner and terminal state; independently accepted |
-| F14 | YES | YES | UNVERIFIED | Recoverable failure retains slot/blocker, explicit remediation permits one fresh T27 attempt, all bypass routes deny and later terminal closure requires complete settlement; row-level review pending |
-| F15 | YES | YES | UNVERIFIED | Result, cessation/cancellation and delayed result remain separate facts; terminal lifecycle does not reopen, contradictions fence and unknown cessation retains the slot; row-level review pending |
-| F16 | YES | YES | UNVERIFIED | UNKNOWN observation is retained once, later APPLY references it, denied/replayed applications are idempotent and finalization is distinct with no duplicate charge/slot release; row-level review pending |
+| F14 | YES | YES | YES | Recoverable failure retains slot/blocker, explicit remediation permits one fresh T27 attempt, all bypass routes deny and later terminal closure requires complete settlement; independently accepted |
+| F15 | YES | YES | YES | Result, cessation/cancellation and delayed result remain separate facts; terminal lifecycle does not reopen, contradictions fence and unknown cessation retains the slot; independently accepted |
+| F16 | YES | YES | YES | UNKNOWN observation is retained once, later APPLY references it, denied/replayed applications are idempotent and finalization is distinct with no duplicate charge/slot release. Denied APPLY is now an atomic event-backed record with an externally witnessable hash; recovery rejects an unissued forged row and checks the historical denial reason, while a new eligible command can still apply once; independently accepted |
 | F17 | YES | YES | YES | Authenticated PASS/FAIL/UNKNOWN facts, complete selected-check vectors, stale/missing denial, exact T16 unblock, authority/budget/containment/fence denial and post-intent contact recheck are assertion-traced and independently accepted |
 | F18 | YES | YES | YES | Final failure retains/release obligations correctly, and proof-free T17 terminal entry atomically records its permanent fence while preserving unknown obligations for later T23/T26 closure; crash/replay traced and independently accepted |
 | F19 | YES | YES | YES | Exact authoritative operation/validator nonexecution covers before/after handoff, independent control cost, unknown/missing billing, authentic every-state contrary proof, historical progress, terminal invariance, dependent-adoption fencing, newer-slot preservation and crash/replay/recovery; independently accepted at Stage 25 |
 | F20 | YES | YES | YES | Typed bounded validator containment, authority binding, pure checking, output/path/action limits and strict migration/recovery independently accepted |
-| F21 | YES | YES | UNVERIFIED | Exact generated uncertainty fences clear only by bound receipt/nonexecution/accounting proof; stacked/newer/cross-attempt fences survive and crash/retry-initiation ordering is asserted; row-level review pending |
+| F21 | YES | YES | YES | Exact generated uncertainty fences clear only by bound receipt/nonexecution/accounting proof; stacked/newer/cross-attempt fences survive and crash/retry-initiation ordering is asserted; independently accepted |
 
 ### Exact-head trace authoring evidence
 
@@ -1838,13 +1838,10 @@ after exact replay, terminal-fixed intake, complete stop binding and the
 one-result-per-validator-attempt invariant were corrected. The committed-head
 deferral recorded there is closed by Stage 23 above.
 
-All 28 transition rows now have implementation surfaces and T18/T19/T25 have
-complete independently accepted durable state matrices. All nine crash rows now have
-implementation and test coverage; C02-C09 retain their prior row-review status.
-All 22 F rows have implementation surfaces and tested, independently accepted
-coverage. Current independently accepted counts are 28/28 transitions, 1/9
-crash boundaries and 22/22 acceptance rows; already-tested crash and other rows
-that have not received their own row review retain explicit `UNVERIFIED` status.
+All 28 transition rows, all nine crash rows and all 22 acceptance-family rows
+have implementation, test coverage and independent row-level acceptance. Current
+independently accepted counts are therefore 28/28 transitions, 9/9 crash
+boundaries and 22/22 acceptance rows.
 
 | Evidence field | Exact value |
 | --- | --- |
@@ -1854,7 +1851,7 @@ that have not received their own row review retain explicit `UNVERIFIED` status.
 | Local package command | `python -m unittest discover -s tools/aegis_delivery_control/tests -p "test_*.py"` |
 | Local package result | Exit 0; 485 tests passed in 85.807 seconds; zero skips |
 | Hosted exact-head result | On `15cfdc50c5ae24ad1f5ac88ce623aa489ac6575a`: `gate-guard` passed in 7s; `validate-skills` passed in 1m14s; `windows-offline-checks` passed in 3m3s |
-| Capability outcome | Windows ownership/ACL/reparse/path-swap and process-lock probes executed; POSIX policy unit tests passed but POSIX runtime remains `UNVERIFIED` |
+| Capability outcome | At this historical checkpoint, Windows ownership/ACL/reparse/path-swap and process-lock probes executed; POSIX policy unit tests passed but no POSIX runtime was yet available. The later pinned-Linux evidence below supersedes that limitation. |
 | Trace plan review | Initial `REVISE` corrected 58 to 59 rows and separated F04a/F04b plus row-level acceptance rules; corrected plan `APPROVE` |
 | Trace implementation review | Initial `REVISE` identified two BLOCKER root causes (verified readiness/dependency provenance and selected-check gates), plus mandatory terminal-policy, proof-free T17/F18 and durable T18/T19 all-state matrix corrections; corrected map re-review `APPROVE`, no findings |
 
@@ -1868,19 +1865,13 @@ Immediate order:
 
 Current durable order after the independently approved exact-head trace map is:
 
-1. T01-T03, T05-T09, T11, T13-T15, T17, T20, T22, T24, T27 and T28 are complete and independently accepted at row level; C01 and F01/F05/F06/F09/F11/F12/F13/F17/F18/F20 are likewise accepted.
-2. T04/T10/T12/T16/T21/T23/T26, C02-C09 and the other already-tested F rows retain their prior row-review status; the accumulated trace does not promote rows outside its 16-row scope.
-3. T22 complete and independently accepted.
-4. T28 with F01 complete and independently accepted.
-5. Cross-family F05/F06/F13/F20 complete and independently accepted.
-6. Filesystem ownership/reparse/path-swap protection complete and independently accepted; POSIX runtime remains `UNVERIFIED`.
-7. The Stage 23 committed-head trace closes the accumulated T01-T03/C01,
-   T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 deferrals.
-8. F04a reservation-boundary accounting - complete; independent `APPROVE`.
-9. Perform row review for every remaining
-   implemented/tested-but-unaccepted matrix row.
-10. Obtain exact-head full validation plus final architecture/security/QA approval; obtain POSIX runtime evidence without weakening unavailable-platform behavior.
-11. Commit and push only reviewed checkpoints. Keep PR #99 draft and do not merge until every canonical row and final gate is independently accepted.
+1. All 28 T rows, 9 C rows and 22 F rows are implemented, tested and
+   independently accepted at row level.
+2. Re-run exact-head full Windows and pinned-Linux validation and obtain final
+   architecture/security/QA approval without weakening unavailable-platform
+   behavior; the required POSIX runtime path has already passed.
+3. Commit and push only the reviewed checkpoint. Keep PR #99 draft until those
+   final gates and hosted checks pass.
 
 This later order is recovered session context, not a superseding design record.
 Before each item, compare it with the current backlog, design and actual diff.
@@ -1964,19 +1955,9 @@ owner before interpreting it more broadly.
 
 ## 14. Intentionally not done / omitted
 
-- R-STOP-01, R-STOP-02, R-STOP-03, T13, T15, T05, T06, T09, T28/F01,
-  cross-family F05/F06/F13/F20, the narrow T07
-  local-nonexecution slice, T08 validation-pause slice, T14 core/T09-source
-  slices, and all ordered T17 validator-result, operation-uncertainty,
-  verified-receipt, authoritative-nonexecution and safe-retry slices are
-  independently accepted as recorded in Stages 4-18. Complete T07/T08/T14 remain
-  `UNVERIFIED` for their missing activity/source families. T17 remains
-  `UNVERIFIED`; its proof-free terminal/report-only branch is now implemented
-  locally with semantic-v7 migration and strict projection recovery, has
-  independent `APPROVE`, and still awaits committed exact-head evidence. T24/F09
-  has independently approved mandatory terminal-policy intake and exact-stop
-  coverage, with its committed exact-head verdict still pending. Later final review gates
-  also remain.
+- All 28 transition, 9 crash-boundary and 22 acceptance-family rows are
+  implemented, tested and independently accepted. Final exact-head
+  architecture/security/QA and hosted checks remain before merge.
 - T05 performs no cancel/drain contact. T06 performs no observe/cancel/retry and
   treats bare contact as reconciliation uncertainty. T07 accepts only an exact
   T05 plus authoritative T25 nonexecution source; it is not inferred from a
@@ -1986,10 +1967,10 @@ owner before interpreting it more broadly.
   resolves only its exact proof-covered set. The authoritative-nonexecution and
   safe-retry slice adds no real adapter, authority or provider integration.
 - The exact-head T01-T28/C01-C09/F01-F21 map is complete and independently
-  approved as an honest status map; it does not promote the open rows listed in
-  Section 10.
-- Windows exact-head hosted checks are recorded for `a9dbeab`; POSIX runtime
-  evidence remains absent.
+  approved. Historical intermediate `UNVERIFIED` entries remain dated evidence,
+  not current status.
+- Windows and pinned Linux runtime package suites pass on the current working
+  tree; hosted checks still require the final pushed head.
 - Independent final architecture, security and QA approval of a merge-ready
   accumulated checkpoint does not yet exist.
 - No merge, release, deployment, provider call, production-data operation,
@@ -1997,30 +1978,9 @@ owner before interpreting it more broadly.
 
 ## 15. Next entry criterion
 
-Codex may continue only after each cold-start preflight matches this handoff and
-the next backlog item's narrow plan has independently passed review. All three
-stop findings, T13, T15, T05, T06 and the reviewed T07/T08/T14 slices are accepted.
-T09 and the narrow T17 validator-result/T14 T09-source slice are also
-independently accepted, as are the T17 operation-uncertainty foundation and
-verified-receipt route and the authoritative-nonexecution/safe-retry slice. The
-T22 terminal-restart report, T28/F01 verified-effect adoption and cross-family
-F05/F06/F13/F20 are also independently accepted. Filesystem ownership/reparse/
-path-swap protection is independently accepted on Windows; POSIX runtime remains
-`UNVERIFIED`. Exact committed-head hosted checks for `a9dbeab` passed, and the
-corrected exact-head trace map has independent `APPROVE`. The local
-T01-T03/C01 trusted-readiness/dependency-provenance correction is independently
-approved but remains aggregate-`UNVERIFIED` until committed exact-head trace
-review. The selected-check v2 binding and authenticated-launch increment is
-independently accepted, including topological dependency order, strict
-projections, signed PASS/FAIL/UNKNOWN facts and complete snapshots, universal
-no-preclaim T27, T11 next-check routing, exact T16 recovery, contact
-replay/recheck and T25/T16 post-disable continuation. Aggregate
-T11/T27/F11/F17 remain `UNVERIFIED` until committed exact-head trace review.
-F02's proof-free matrix and bounded same-effect successor now have final
-independent `APPROVE`. F03 source-atomic one-use authority also has final
-independent `APPROVE`. F04a reservation-boundary accounting has final
-independent `APPROVE`, completing tested and accepted F-row coverage. The
-current gate is row review for every remaining implemented/tested-but-unaccepted
-T/C/F entry, followed by POSIX runtime and final exact-head reviews.
-Keep PR #99 draft until every remaining backlog
-and final review gate passes; no merge or deployment decision is currently due.
+Codex may continue only after each cold-start preflight matches this handoff.
+All 59 canonical rows and the Windows/Linux runtime package gates are accepted.
+The current gate is final exact-head architecture/security/QA review, followed
+by commit, push, hosted checks and the pre-approved administrator merge. No
+release, deployment, provider call, production data, real authority or real
+adapter work is authorized.
