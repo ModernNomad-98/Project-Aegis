@@ -20,7 +20,8 @@ happy path proves nothing about isolation and is treated as absent.
 ## Use When
 
 - Use when: asked to write or plan security tests for tenant isolation,
-  authorization, IDOR, or privilege escalation.
+  authorization, insecure direct object reference (IDOR), or privilege
+  escalation.
 - Use when: converting `tenant-isolation-reviewer` findings or
   `threat-modeler` abuse cases into permanent regression tests.
 - Use when: a security-sensitive launch needs a cross-tenant negative suite as
@@ -31,7 +32,8 @@ happy path proves nothing about isolation and is treated as absent.
   is `tenant-isolation-reviewer`; this skill proves/refutes with tests.
 - Do NOT use when: tenant semantics are undefined — `tenant-modeler` first;
   you cannot test a boundary that isn't defined.
-- Do NOT use when: the ask is to audit RLS policy TEXT — `rls-policy-auditor`
+- Do NOT use when: the ask is to audit row-level security (RLS) policy TEXT —
+  `rls-policy-auditor`
   (which itself produces an RLS negative-test plan; this skill covers the
   application/API and cross-surface layers).
 - Do NOT use when: reviewing a diff — `security-pr-reviewer`.
@@ -53,10 +55,13 @@ happy path proves nothing about isolation and is treated as absent.
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route requiring its own classification and
+activation under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **Confirm a defined boundary and a real target.** Pin the tenant
    definition and the enforcement point. Undefined or no runnable system →

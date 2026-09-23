@@ -10,14 +10,17 @@ description: 'Author the reusable operator prompt template gating a RECURRING cl
 Turn improvised risky operations into templated, evidence-calibrated ones.
 When migrations, production grants, or backfills recur, each run improvised
 from memory re-decides the safety rails under time pressure — and the rails
-lose. The evidence pattern (Repo B's migration-deployment prompt template
-plus its deployment-history index) is a reusable OPERATOR PROMPT: the human
-fills placeholders, the prompt carries the hard rules, stop conditions,
+lose. An anonymized source repository called Repo B in the
+[workflow extraction report](../../../docs/research/aegis-workflow-extraction-report.md)
+used a migration-deployment prompt template plus a deployment-history index.
+That pattern is a reusable operator prompt: the human fills placeholders;
+the prompt carries the hard rules, stop conditions,
 backup-then-verify gating, smoke expectations, and report requirement — and
-its ETA ranges are calibrated from the history index, where every anchor
-cites the prior run's report. This skill authors that template and index
-for a repo's recurring op class. It never executes the operation; it makes
-every future execution start from discipline instead of recall.
+its estimated time-to-complete (ETA) ranges are calibrated from the history
+index, where every anchor cites the prior run's report. This skill authors
+that template and index for a repo's recurring op class. It never executes
+the operation; it makes every future execution start from discipline instead
+of recall.
 
 ## Use When
 
@@ -118,14 +121,15 @@ within their actual scope and do not need repeated consent.
 
 ```
 GATED DEPLOYMENT PROMPT TEMPLATE — <operation class> (<doc path>)
-Placeholders:      <the operator-filled block — env-var NAMES for credentials>
+Operator placeholders: <the operator-filled block — environment-variable names
+  for credentials, never values>
 Hard rules:        <non-negotiables incl. required inputs: review verdict,
                     rollback artifact, approval citation>
 Stop conditions:   <halt triggers + safe-state-on-halt per trigger>
 Backup gate:       verified backup BEFORE; expected-delta verification AFTER
 Smoke per phase:   <phase → observable → expected value>
 Report path:       <dated per-run location + required contents>
-ETA ranges:        <range> (anchor: index rows <ids> → prior reports)
+Estimated run duration: <range> (anchor: index rows <ids> → prior reports)
                    uncited claims labeled "unverified — recommend confirming"
 DEPLOYMENT HISTORY INDEX — <index path>
   | date | operation | phase durations | outcome | report |

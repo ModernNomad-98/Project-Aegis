@@ -5,6 +5,14 @@ description: Design or review the security of a RAG / retrieval pipeline and its
 
 # RAG Security Architect
 
+Terms used below: **RAG** means retrieval-augmented generation; an **ACL** is
+an access control list recording who may access a document. **OWASP** means
+Open Worldwide Application Security Project; **LLM08** is its large-language-model
+risk code used here for vector and embedding weaknesses. **IDOR** means insecure
+direct object reference, and **PII** means personally identifiable information.
+These terms describe risks; they do not
+replace authorization enforced inside the retrieval query.
+
 ## Purpose
 
 Design or review a retrieval-augmented-generation pipeline so that retrieval
@@ -88,15 +96,15 @@ and `multi-tenant-data-architect`, not re-invented here.
 ## Output Format
 
 ```
-RAG SECURITY DESIGN/REVIEW — <system>
-Query trace: <query → embed → search → filter → context> | Authz point: <retrieval | POST (finding)>
+RAG (RETRIEVAL-AUGMENTED GENERATION) SECURITY DESIGN/REVIEW — <system>
+Query trace: <query → embed → search → filter → context> | Authorization point: <retrieval | after retrieval (finding)>
 Vector-store tenant scoping: <namespace/index/filter mechanism + can-it-be-omitted>
-Document ACL propagation: <metadata stored | how ACL change/delete flows to embeddings>
-Embedding risks (LLM08):
+Document access-control-list (ACL) propagation: <metadata stored | how ACL change/delete flows to embeddings>
+Embedding risks (OWASP LLM08):
   Inversion: <embeddings exposed? sensitivity of embedded data>
   Membership inference: <exposure + mitigation>
   Poisoning: <ingestion trust + ranking abuse> (→ model-poisoning-reviewer)
-Findings (severity-ranked): [SEV] <issue> — <leak path> — <fix>
+Findings (severity-ranked): <severity> <issue> — <leak path> — <fix>
 Negative tests: <cross-tenant / no-access / stale-ACL cases> (→ multi-tenant-security-tester)
 Citation safety: <no existence/metadata leak of unauthorized docs>
 Not reviewed: <areas + why>
