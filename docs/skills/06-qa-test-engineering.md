@@ -1,8 +1,26 @@
-# QA, Test Architecture & Validation
+# Quality assurance (QA), test architecture, and validation
 
-QA skills for risk-based validation, test harnesses, E2E, CI evidence, and release confidence.
+QA skills for risk-based validation, test harnesses, end-to-end (E2E) tests,
+continuous integration (CI) evidence, and release confidence.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: QA means quality assurance; CI means continuous
+integration; E2E means end-to-end testing; API means application programming
+interface; UI means user interface; RLS means row-level security; TTL means
+time to live; SMS means Short Message Service (text messaging); auth means
+authentication.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -62,9 +80,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 234 | Export QA Strategy | P2 | Test authorization, redaction, file generation, expiration, and audit evidence. |
 | 235 | QA Closeout Report | P0 | Summarize tests run, evidence, skips, failures, risks, and recommended release decision. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use

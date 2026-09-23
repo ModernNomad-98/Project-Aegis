@@ -1,8 +1,26 @@
-# DevOps, Release & Reliability Engineering
+# Development and operations (DevOps), release, and reliability engineering
 
-Operational skills for CI/CD, release, rollback, monitoring, incident response, and environments.
+Operational skills for continuous integration and continuous delivery or
+deployment (CI/CD), release, rollback, monitoring, incident response, and
+environments.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: DevOps means development and operations practices; CI/CD
+means continuous integration and continuous delivery/deployment; E2E means
+end-to-end testing; SLO means service-level objective; IaC means
+infrastructure as code; env vars are environment variables.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -32,9 +50,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 259 | Developer Onboarding Runbook | P1 | Document local setup, tools, environment, scripts, validation, and troubleshooting. |
 | 260 | Operational Handoff Report | P1 | Summarize what changed, how it runs, how to monitor, how to roll back, and known risks. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use

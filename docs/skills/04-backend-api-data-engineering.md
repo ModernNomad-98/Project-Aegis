@@ -1,8 +1,24 @@
-# Backend, API & Data Engineering
+# Backend, application programming interface (API), and data engineering
 
 Backend skills for commands, APIs, database design, integrations, jobs, and data integrity.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: API means application programming interface; REST means
+representational state transfer; RPC means remote procedure call; GraphQL
+names a query language; an N+1 query pattern repeats data fetching for each
+result; cron means scheduled jobs; auth means authentication.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -37,9 +53,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 159 | API Compatibility Test Design | P1 | Protect API contracts from breaking existing clients and automation. |
 | 160 | Backend Observability Hooks | P1 | Emit logs, metrics, traces, audit events, and correlation IDs from backend boundaries. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use

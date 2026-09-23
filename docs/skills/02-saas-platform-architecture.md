@@ -1,8 +1,24 @@
-# SaaS Platform Architecture
+# Software as a service (SaaS) platform architecture
 
 Repeatable SaaS platform skills for tenants, roles, billing, imports, storage, admin, and operations.
 
-These are product-agnostic, repeatable Claude skills. They are meant to become executable `SKILL.md` workflows, not one-off prompts.
+These numbered rows are historical candidates from the [original 300-skill
+roadmap](../300-repeatable-software-saas-skills-roadmap.md). They are not an
+installed-skill inventory: a capability may have shipped under a reconciled
+name, been combined with another, or remain unbuilt. Use the [current
+catalog](../skills-catalog.md) to find shipped names, then open
+`.claude/skills/<skill-name>/SKILL.md` for trigger and invocation rules. The
+row numbers are original candidate identifiers (IDs), not executable skill
+names or authorization.
+
+Priority labels are original planning tiers: **P0** is foundation, **P1** is
+high-value follow-on work, and **P2** is later expansion. A priority does not
+state whether a row shipped.
+
+Terms in the table: SaaS means software as a service; API means application
+programming interface; AI means artificial intelligence; UI means user
+interface; SMS means Short Message Service (text messaging); RLS means
+row-level security; URL means web address.
 
 | # | Skill | Priority | Usage |
 |---:|---|---|---|
@@ -42,9 +58,12 @@ These are product-agnostic, repeatable Claude skills. They are meant to become e
 | 89 | SaaS Cost Observability | P1 | Track infrastructure, AI, storage, provider, integration, and tenant-level cost drivers. |
 | 90 | SaaS Incident Blast Radius Mapping | P1 | Determine affected tenants, users, data, integrations, and workflows during incidents. |
 
-## Skill implementation standard
+## Historical implementation checklist
 
-When this category is converted into executable skills, each `SKILL.md` should include:
+This is the original candidate-conversion checklist. For a new or changed
+executable skill, follow the [current skill generation
+standard](../skill-generation-standard.md) and its required validation. The
+checklist called for:
 
 - Purpose
 - When to use
