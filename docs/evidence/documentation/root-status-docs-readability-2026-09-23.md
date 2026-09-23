@@ -1,5 +1,12 @@
 # Root status docs readability — 2026-09-23
 
+> **Current reading, 2026-09-23:** This batch merged in [pull request (PR)
+> #176](https://github.com/ModernNomad-98/Project-Aegis/pull/176), recorded
+> locally by merge commit `02ff5f0`. The pending independent review below
+> describes the frozen-draft checkpoint, not current delivery status. Use the
+> linked changelog and startup instructions for current reading. UTC below
+> means Coordinated Universal Time.
+
 ## Scope and reason
 
 This bounded documentation change starts from `37c018d166f0647703b4a0f7009ae0ca4c5e32b0`.
