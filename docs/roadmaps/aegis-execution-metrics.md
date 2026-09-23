@@ -636,3 +636,75 @@ across the two records resolved, all row counts, duration calculations and
 arithmetic checked, and the whitespace check passed. Historical snapshots
 remain intact; only the current first-screen navigation links were updated.
 Independent review and the eventual pull request closeout remain pending.
+
+## Checkpoint after pull request #169 — 2026-09-23
+
+Five requests merged after #164, in order #174, #166, #167, #168 and #169.
+The merge clock is GitHub's pull-request `mergedAt` event. All times below
+are September 23, 2026, in Coordinated Universal Time (UTC). Duration
+notation uses **m** for minutes and **s** for seconds.
+
+| Pull request and bounded package | Previous and new estimates | First work checkpoint (UTC) | Merge event (UTC) | Observed wall time |
+| --- | --- | --- | --- | ---: |
+| [#174 — previous forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/174) | Previous and new checkpoint estimates: 1–2 active hours | 20:51:28, first preparation | 21:01:09 | 9m41s |
+| [#166 — third reference batch](https://github.com/ModernNomad-98/Project-Aegis/pull/166) | Previous second-reference-batch estimate: 2–4 active hours; new third-reference-batch estimate: 2–4 active hours | 20:21:41 | 21:02:08 | 40m27s |
+| [#167 — fourth reference batch](https://github.com/ModernNomad-98/Project-Aegis/pull/167) | Previous third-reference-batch estimate: 2–4 active hours; new fourth-reference-batch estimate: 2–4 active hours | 20:21:54 | 21:03:14 | 41m20s |
+| [#168 — fifth screen, first half](https://github.com/ModernNomad-98/Project-Aegis/pull/168) | Previous whole-screen estimate: 2–4 active hours; new first-half estimate: 1–3 active hours | 20:27:55 | 21:04:15 | 36m20s |
+| [#169 — fifth screen, second half](https://github.com/ModernNomad-98/Project-Aegis/pull/169) | Previous whole-screen estimate: 2–4 active hours; new second-half estimate: 1–3 active hours | 20:28:01 | 21:05:02 | 37m01s |
+
+The earlier batch ranges for #166 and #167 describe different page sets.
+For #168 and #169, the prior whole-screen range and new half-screen ranges
+also describe different scopes; neither half was originally estimated at
+2–4 hours. Every package started with a selected backlog estimate of
+**175–394 active hours**. All five final revisions passed their Linux,
+Windows and protected-file checks. The changed documents received independent
+review, including corrections to incident-authoring wording, mainline-parent
+selection and first-use terms before the final revisions.
+
+The #174 interval begins with preparation; its editing start was 20:53:14 UTC,
+giving a separate edit-to-merge interval of **7m55s**. These overlapping wall
+intervals include waiting, review corrections, integration and checks. Active
+effort, waiting and rework were not separately instrumented, so the intervals
+must not be summed as active labor or extrapolated into a coding or full-sweep
+review rate. Pull request bodies and timing comments supply the original
+estimates and starts; observed merge events provide the interval endpoints.
+
+The [new every-item snapshot](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-169)
+records the five merge commits and reconsiders all **14 selected rows and
+seven optional rows**. Previous and revised selected totals are both
+**175–394 active hours**: **95–194** for non-documentation work plus
+**80–200** for documentation. Both optional issue #101 helpers add **16–40
+hours**, giving **191–434 active hours**. The full all-options backlog remains
+unbounded. No selected implementation row closed, and no optional quantity or
+package was selected.
+
+The exact #169 merge tree contains **533 tracked Markdown files**, compared
+with 529 after #164. This interval corrects **27 reference pages**, giving
+**34 cumulative delivered reference corrections**. Bounded reference screens
+now reach sorted positions **1–100 of 156**. This is terminology, navigation
+and specific technical-guidance review, not full page acceptance. Earlier
+entrypoint coverage remains **186 `SKILL.md` paths**, comprising 185 shipped
+skills and one template, with 28 corrected pages in those screen batches.
+
+At the **21:06:39 UTC** preparation checkpoint, reference requests #171–#173
+remained open; their 56-reference screen scope is excluded here. Requests
+#175 and #139 were also open, and #139's documented protected-file guard
+failure and separate owner disposition remained pending. Shared-ledger
+integration and the wider documentation sweep remain open. Unmerged work and
+requests outside this five-merge checkpoint are excluded from delivery
+claims. Owner waits, GitHub queues, provider execution and host provisioning
+remain outside the active-hour estimates.
+
+### Preparation and editing time for this checkpoint
+
+Previous and new checkpoint estimates are both **1–2 active hours**; the
+selected backlog estimate at start is **175–394 active hours**. Read-only
+preparation ran from **21:05:58 to 21:06:39 UTC**, an observed **41 seconds**.
+Editing began at **2026-09-23 21:07:20 UTC** in an isolated worktree at the
+exact #169 merge. Active-only effort is not instrumented. Local checks
+completed at **21:10:28 UTC**, an observed **3m08s** from the editing start:
+185 skills valid with zero warnings, all 68 relative links and heading anchors
+across the two records resolved, all row counts, duration calculations and
+arithmetic checked, and the whitespace check passed. Historical snapshots
+remain intact; only the current first-screen navigation links were updated.
+Independent review and the eventual pull request closeout remain pending.
