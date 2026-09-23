@@ -1559,6 +1559,9 @@ authorization decisions in §13 remain unchanged.
   here is not established by those scoped terms. Remaining work is the final
   policy, owner parameters and operator integration, including the recorded
   GitHub recovery direction; do not rebuild the existing writer.
+  A [2026-09-23 decision proposal](ber-bkl-009-evidence-policy-decision.md)
+  maps current artifact classes and recommends concrete parameters; it is not
+  owner acceptance or implementation authority.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
