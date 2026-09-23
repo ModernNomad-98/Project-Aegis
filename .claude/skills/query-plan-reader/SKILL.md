@@ -72,10 +72,13 @@ tool in the performance pack — one query, its plan, its verdict.
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route requiring its own classification and activation
+under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **Capture the plan honestly.** Prefer actual-execution statistics
    over estimates for reads; for INSERT/UPDATE/DELETE, analyze-style
