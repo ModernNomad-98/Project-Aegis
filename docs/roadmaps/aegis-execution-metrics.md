@@ -9,6 +9,8 @@ reconstructed precision. A range is an estimate, not a delivery promise.
 | --- | --- | --- | --- | --- | --- | --- |
 | BER-BKL-007 authorization (WP-2B-1A governance) | 2026-09-23 10:52 | 20–30 minutes remaining at checkpoint; earlier start was not timed | Pending; earlier active time unknown | Pending | Pending | PR preparation |
 | BER-BKL-007 implementation | Not started | 3–5 hours active work after authorization merge | Pending | Pending | Pending | Gated by authorization merge |
+| Calibration replacement storage proposal | 2026-09-23 11:26 | 30–45 minutes active work | About 3 minutes to first push; final total pending | Independent review passed; first Actions Linux 1m22s, Windows 3m20s, guard 7s | About 1 minute before owner chose A; final pending | Choice A recorded; amendment pending |
+| Calibration replacement candidate packet | Not started; contract inspected 2026-09-23 11:20 | TBD when storage and input authority are settled; prior 4–8 hour forecast withdrawn | Pending | Pending | Pending | Input publication gated by storage decision |
 
 ## Progress checkpoints
 
@@ -16,6 +18,15 @@ reconstructed precision. A range is an estimate, not a delivery promise.
   independently reviewed and corrected; structural validation passed. The
   governance branch was committed and pushed. This is the first timed
   checkpoint; the preceding work has no measured start timestamp.
+- **2026-09-23 11:27 UTC — calibration storage proposal:** The public source
+  repository's visibility was verified on GitHub. A separate private GitHub
+  input repository is proposed to preserve holdout confidentiality; the
+  existing external execution-evidence root remains distinct. No candidate
+  dataset, repository or provider request has been created.
+- **2026-09-23 11:34 UTC — storage choice:** Peter Nguyen selected the
+  recommended private GitHub input repository after PR #105's first green
+  Actions run. The branch now records that answer; a BER-DEC amendment and
+  another final-revision check are pending before publication of inputs.
 
 Append later observations and final actuals in the relevant PR. Keep provider
 or model token/credit usage as unknown when the runtime does not expose it.
