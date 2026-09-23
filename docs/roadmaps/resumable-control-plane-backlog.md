@@ -1245,6 +1245,38 @@ coverage; the corrected entrypoint and expanded denial matrix received
 remain pending, so T17 and F18 stay aggregate `UNVERIFIED` and PR #99 remains
 draft.
 
+### 5.28 Active validator pause, drain and exact recovery checkpoint
+
+The active-validator gap in the local T07/T08/T14 implementation is closed and
+independently accepted. T08 now requires authenticated operator authority and a
+signed activity attestation for the exact contacted validator, plan,
+containment, heads, slot and reservation. It records `VALIDATING -> PAUSING`
+without adapter cancellation, retry, release, refund or lost application work.
+
+T07 reaches PAUSED only from one exact authoritative source: matching result
+plus all-descendant cessation, result-free interruption plus cessation, or the
+complete T25 validator nonlaunch proof. Result/interruption require closed known
+accounting; nonlaunch requires released zero-charge accounting, zero liability,
+all obligations settled, no uncertainty/contradiction and an already-settled
+intent. Unknown accounting remains denied.
+
+T14 resumes a preserved result to VALIDATING. Interruption and nonlaunch resume
+to BLOCKED and require an exact issuer-signed T16 authorization before one bound
+successor validator intent can consume it. The operation slot and reservation
+remain intact. Runtime and recovery derive the same exact source identities,
+chronology, accounting predicates and typed cursors.
+
+Crash rollback, lost acknowledgement, replay, wrong issuer, stale/rebound
+sources, unknown cost, duplicate consumption and self-consistent history
+rewrites are covered. The final independent audit returned `APPROVE` with no
+remaining BLOCKER or MAJOR finding, and the corrected storage suite passed 370
+tests. The complete delivery-control package passed 485 tests; the skill,
+validator, contract-audit, offline-CI, BER and Windows PowerShell 5.1 acceptance
+checks also passed locally. PowerShell Core acceptance remains assigned to the
+hosted Windows lane because `pwsh` is absent locally. Aggregate T07/T08/T14
+status remains `UNVERIFIED` until committed-head trace refresh; PR #99 remains
+draft.
+
 ## 6. Handoff contract
 
 A new session verifies role, repository, current branch/head/remote and complete

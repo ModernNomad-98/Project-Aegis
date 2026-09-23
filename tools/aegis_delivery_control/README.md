@@ -107,9 +107,11 @@ fixture. It is not a delivery integration.
   Recovery independently derives the latest pre-T07 settlement, so intervening
   non-accounting facts remain valid. Its distinct T14 activity-resume route
   clears only that pause fence and returns to `BLOCKED`, retaining the exact
-  slot generation, recovery cursor and every other blocker. Other T07 source
-  families and the complete T14 transition remain unverified pending T24 and
-  other ordered sources.
+  slot generation, recovery cursor and every other blocker. It also accepts
+  authenticated active-validator RESULT/INTERRUPTION/NONLAUNCH sources only
+  after exact cessation or full nonexecution evidence and authoritative closed
+  accounting. Result preserves the intent/application path; interruption and
+  nonlaunch require a separate exact T16 successor authorization.
 - T08 now accepts a typed, issuer-authenticated pause-validation request bound
   to one exact shared runtime/recovery checkpoint. Idle work, or a matching
   RESULT observation with known accounting and authoritative validator
@@ -120,6 +122,14 @@ fixture. It is not a delivery integration.
   retains the repository slot, cursor and application obligation. T14 can clear
   only this exact T08 fence and return a clean eligible checkpoint to
   VALIDATING; unresolved checkpoints cannot resume through T14.
+- The active-validator T08 route adds an issuer-signed activity attestation for
+  the exact durable contact and containment, records `VALIDATING -> PAUSING`,
+  and retains slot, reservation and cursor. T07 closes only exact result plus
+  cessation, interruption plus cessation, or complete T25 nonlaunch evidence.
+  T14 returns the result path to VALIDATING and interruption/nonlaunch to
+  BLOCKED; the latter consume one exact signed T16 recovery before a successor
+  validator intent. Strict recovery rejects self-consistent source/cursor
+  rewrites. The tranche received independent `APPROVE` with no blocker/major.
 - The reviewed T17 validator-result route binds one exact observation,
   authoritative cessation, adjusted settlement and uncertainty set. Runtime and
   recovery use the same global-writer-epoch prefix reducer, reject superseded
@@ -228,8 +238,8 @@ difference fails closed.
 
 ## Current draft checkpoint
 
-The 2026-09-21 checkpoint is implementation work in progress, not a deployable
-controller. The complete local package suite ran 433 tests successfully, and
+The 2026-09-22 checkpoint is implementation work in progress, not a deployable
+controller. The complete local package suite ran 485 tests successfully, and
 `git diff --check` passed. R-STOP-01 and R-STOP-02 received independent
 implementation `APPROVE` after focused route, migration, accounting,
 crash/replay, recovery and tamper validation:
@@ -253,10 +263,11 @@ against idle, paused, active, uncertain and terminal cases.
 The T14 PLANNED/BLOCKED resume slice received independent implementation
 `APPROVE` after four recovery findings were corrected: exact event-schema
 validation, non-null cursor reconstruction, true legacy cursor migration and
-run-scoped active-validator recovery. T14 remains `UNVERIFIED` as a complete
-transition; the independently accepted T08 slice now supplies its public clean
-VALIDATING path, while other ordered source families still prevent full T14
-promotion.
+run-scoped active-validator recovery. T14 remains aggregate `UNVERIFIED`
+pending committed-head trace refresh. Its active-validator sources are now
+independently accepted: preserved results return to VALIDATING, while
+interruption and nonlaunch return to BLOCKED until one exact T16 successor
+authorization is consumed.
 T05 local-execution pause received independent implementation `APPROVE` after
 the initial plan was corrected for the pre-launch window, durable capability
 authenticity and T04/T05 schema separation, and the implementation was corrected
@@ -266,20 +277,21 @@ T06 contacted external-mutation pause received independent implementation
 worst-case reconciliation and the implementation was corrected to verify the
 complete historical contact body/order and prefix-derived accounting head.
 It performs no adapter observe/cancel/retry and does not claim T07 settlement.
-The reviewed T07 slice now accepts only the exact T05/T25 local nonexecution
-combination, retains the slot and fence in PAUSED, and supports a separate
-BLOCKED-only T14 activity resume. Its initial implementation review found two
-recovery/generation findings; prefix-derived settlement-head validation and
-exact source-generation binding closed them, and corrected review returned
-`APPROVE`. Other T07 source families and full T14 promotion remain deferred.
+The reviewed T07 paths retain the slot and fence in PAUSED. In addition to the
+exact T05/T25 local source, active-validator settlement now accepts only exact
+RESULT/INTERRUPTION cessation or complete T25 nonlaunch evidence with
+authoritative closed accounting. Result application is preserved; the retry
+paths require exact T16. Runtime/recovery source and cursor derivation,
+self-consistent rewrite rejection and one-use consumption received independent
+`APPROVE`.
 The reviewed T08 slice uses one exact checkpoint across runtime, T14 and
 recovery. Its initial implementation review found two MAJOR gaps: a RESULT
 checkpoint could omit authoritative cessation, and deterministic pause/contact
 and pause/result races were not tested. Exact cessation ordering, serialized
 verified reads and the two race regressions closed both; corrected independent
-review returned `APPROVE`. T08 remains `UNVERIFIED` as a complete transition
-because authenticated active/drain/cancel and broader cessation source families
-are still ordered work.
+review returned `APPROVE`. The authenticated contacted active-validator drain
+is now also implemented and accepted without claiming adapter cancellation.
+T08 remains aggregate `UNVERIFIED` only until committed-head trace refresh.
 T09 reconciliation pause received independent implementation `APPROVE` after
 its first review identified one future-clearance schema defect. The corrected
 route binds a typed one-use PAUSE capability to the exact current

@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from enum import Enum
 
 from .contracts import (
+    ActiveValidationPauseRequest,
     AuthorityLifecycleFactRequest,
     BindingMismatchRequest,
     BudgetSettlementRequest,
@@ -20,6 +21,7 @@ from .contracts import (
     SyntheticSourceConsumerKind,
     FailureClassification,
     ProofFreeDispositionRequest,
+    ResumeSettledValidationPauseRequest,
     ReconciliationPauseResumeRequest,
     ResumeActivitySettlementRequest,
     ResumeOperationNonexecutionRequest,
@@ -150,6 +152,23 @@ class SyntheticProofFreeDispositionEvidence:
 
 
 @dataclass(frozen=True)
+class SyntheticValidatorActivityAttestation:
+    attestation_id: str
+    request_digest: str
+    descendant_scope_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticSettledValidationResumeEvidence:
+    proof_id: str
+    request_digest: str
+    issuer_fingerprint: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
 class SyntheticFinalizationAttestation:
     attestation_id: str
     repository_id: str
@@ -184,6 +203,34 @@ class SyntheticValidationRecoveryAttestation:
     check_id: str
     failed_application_id: str
     failed_application_event_hash: str
+    failed_validator_attempt_id: str
+    successor_validator_attempt_id: str
+    remediation_evidence_digest: str
+    evaluated_run_head: str
+    slot_attempt_id: str
+    slot_generation: int
+    action: str
+    policy_id: str
+    policy_version: str
+    issuer_mac: str
+
+
+@dataclass(frozen=True)
+class SyntheticSettledValidationPauseRecoveryAttestation:
+    attestation_id: str
+    recovery_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    plan_event_hash: str
+    revision_digest: str
+    check_id: str
+    source_settlement_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    failed_validator_intent_id: str
     failed_validator_attempt_id: str
     successor_validator_attempt_id: str
     remediation_evidence_digest: str
@@ -2038,6 +2085,133 @@ class SyntheticAuthority:
                 "proof-free disposition evidence does not bind the request"
             )
 
+    @staticmethod
+    def _active_validation_pause_request_digest(
+        request: ActiveValidationPauseRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **request.__dict__,
+                    "active_validation_pause_binding_version": 1,
+                },
+                sort_keys=True, separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_validator_activity_attestation(
+        self,
+        attestation_id: str,
+        request: ActiveValidationPauseRequest,
+        descendant_scope_digest: str,
+    ) -> SyntheticValidatorActivityAttestation:
+        request.validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (attestation_id, descendant_scope_digest)
+        ):
+            raise ValueError(
+                "validator activity attestation bindings must be non-empty"
+            )
+        request_digest = self._active_validation_pause_request_digest(request)
+        fields = {
+            "attestation_id": attestation_id,
+            "request_digest": request_digest,
+            "descendant_scope_digest": descendant_scope_digest,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        return SyntheticValidatorActivityAttestation(
+            **fields,
+            issuer_mac=self._mac(
+                "VALIDATOR_ACTIVITY_ATTESTATION", **fields
+            ),
+        )
+
+    def verify_validator_activity_attestation(
+        self,
+        attestation: SyntheticValidatorActivityAttestation,
+        request: ActiveValidationPauseRequest,
+    ) -> None:
+        request.validate()
+        request_digest = self._active_validation_pause_request_digest(request)
+        fields = {
+            "attestation_id": attestation.attestation_id,
+            "request_digest": request_digest,
+            "descendant_scope_digest": attestation.descendant_scope_digest,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        if (
+            attestation.request_digest != request_digest
+            or attestation.issuer_fingerprint != self.issuer_fingerprint
+            or not attestation.descendant_scope_digest.strip()
+            or not hmac.compare_digest(
+                attestation.issuer_mac,
+                self._mac("VALIDATOR_ACTIVITY_ATTESTATION", **fields),
+            )
+        ):
+            raise DispatchDenied(
+                "validator activity attestation does not bind the pause"
+            )
+
+    @staticmethod
+    def _settled_validation_resume_request_digest(
+        request: ResumeSettledValidationPauseRequest,
+    ) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                {
+                    **request.__dict__,
+                    "settled_validation_resume_binding_version": 1,
+                },
+                sort_keys=True, separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+
+    def issue_settled_validation_resume_evidence(
+        self,
+        proof_id: str,
+        request: ResumeSettledValidationPauseRequest,
+    ) -> SyntheticSettledValidationResumeEvidence:
+        request.validate()
+        if not isinstance(proof_id, str) or not proof_id.strip():
+            raise ValueError("settled validation resume proof ID must be non-empty")
+        request_digest = self._settled_validation_resume_request_digest(request)
+        fields = {
+            "proof_id": proof_id,
+            "request_digest": request_digest,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        return SyntheticSettledValidationResumeEvidence(
+            **fields,
+            issuer_mac=self._mac(
+                "SETTLED_VALIDATION_RESUME_EVIDENCE", **fields
+            ),
+        )
+
+    def verify_settled_validation_resume_evidence(
+        self,
+        evidence: SyntheticSettledValidationResumeEvidence,
+        request: ResumeSettledValidationPauseRequest,
+    ) -> None:
+        request.validate()
+        request_digest = self._settled_validation_resume_request_digest(request)
+        fields = {
+            "proof_id": evidence.proof_id,
+            "request_digest": request_digest,
+            "issuer_fingerprint": self.issuer_fingerprint,
+        }
+        if (
+            evidence.request_digest != request_digest
+            or evidence.issuer_fingerprint != self.issuer_fingerprint
+            or not hmac.compare_digest(
+                evidence.issuer_mac,
+                self._mac("SETTLED_VALIDATION_RESUME_EVIDENCE", **fields),
+            )
+        ):
+            raise DispatchDenied(
+                "settled validation resume evidence does not bind the request"
+            )
+
     def issue_settlement_proof(
         self,
         proof_id: str,
@@ -2577,6 +2751,120 @@ class SyntheticAuthority:
         ):
             raise DispatchDenied(
                 "synthetic validation recovery has an unsupported policy"
+            )
+
+    def issue_settled_validation_pause_recovery_attestation(
+        self,
+        attestation_id: str,
+        recovery_id: str,
+        repository_id: str,
+        run_id: str,
+        item_id: str,
+        logical_effect_id: str,
+        plan_id: str,
+        plan_event_hash: str,
+        revision_digest: str,
+        check_id: str,
+        source_settlement_id: str,
+        source_settlement_event_hash: str,
+        source_pause_id: str,
+        failed_validator_intent_id: str,
+        failed_validator_attempt_id: str,
+        successor_validator_attempt_id: str,
+        remediation_evidence_digest: str,
+        evaluated_run_head: str,
+        slot_attempt_id: str,
+        slot_generation: int,
+        *,
+        action: str = "RETRY_VALIDATION",
+        policy_id: str = SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
+        policy_version: str = SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
+    ) -> SyntheticSettledValidationPauseRecoveryAttestation:
+        values = (
+            attestation_id, recovery_id, repository_id, run_id, item_id,
+            logical_effect_id, plan_id, plan_event_hash, revision_digest,
+            check_id, source_settlement_id, source_settlement_event_hash,
+            source_pause_id, failed_validator_intent_id,
+            failed_validator_attempt_id, successor_validator_attempt_id,
+            remediation_evidence_digest, evaluated_run_head, slot_attempt_id,
+            action, policy_id, policy_version,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise ValueError(
+                "settled validation pause recovery fields must be non-empty"
+            )
+        if type(slot_generation) is not int or slot_generation <= 0:
+            raise ValueError(
+                "settled validation pause recovery slot generation must be positive"
+            )
+        if action != "RETRY_VALIDATION":
+            raise ValueError("unsupported settled validation pause recovery action")
+        if failed_validator_attempt_id == successor_validator_attempt_id:
+            raise ValueError(
+                "settled validation pause recovery requires a new validator attempt"
+            )
+        if (
+            policy_id != SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID
+            or policy_version != SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION
+        ):
+            raise ValueError("unsupported synthetic validation recovery policy")
+        fields = {
+            "attestation_id": attestation_id,
+            "recovery_id": recovery_id,
+            "repository_id": repository_id,
+            "run_id": run_id,
+            "item_id": item_id,
+            "logical_effect_id": logical_effect_id,
+            "plan_id": plan_id,
+            "plan_event_hash": plan_event_hash,
+            "revision_digest": revision_digest,
+            "check_id": check_id,
+            "source_settlement_id": source_settlement_id,
+            "source_settlement_event_hash": source_settlement_event_hash,
+            "source_pause_id": source_pause_id,
+            "failed_validator_intent_id": failed_validator_intent_id,
+            "failed_validator_attempt_id": failed_validator_attempt_id,
+            "successor_validator_attempt_id": successor_validator_attempt_id,
+            "remediation_evidence_digest": remediation_evidence_digest,
+            "evaluated_run_head": evaluated_run_head,
+            "slot_attempt_id": slot_attempt_id,
+            "slot_generation": slot_generation,
+            "action": action,
+            "policy_id": policy_id,
+            "policy_version": policy_version,
+        }
+        return SyntheticSettledValidationPauseRecoveryAttestation(
+            *fields.values(), self._mac(
+                "SETTLED_VALIDATION_PAUSE_RECOVERY", **fields
+            )
+        )
+
+    def verify_settled_validation_pause_recovery_attestation(
+        self, attestation: SyntheticSettledValidationPauseRecoveryAttestation
+    ) -> None:
+        expected_mac = self._mac(
+            "SETTLED_VALIDATION_PAUSE_RECOVERY",
+            **{
+                name: value
+                for name, value in attestation.__dict__.items()
+                if name != "issuer_mac"
+            },
+        )
+        if not hmac.compare_digest(expected_mac, attestation.issuer_mac):
+            raise DispatchDenied(
+                "settled validation pause recovery attestation was not issued here"
+            )
+        if attestation.action != "RETRY_VALIDATION":
+            raise DispatchDenied(
+                "settled validation pause recovery has an unsupported action"
+            )
+        if (
+            attestation.policy_id != SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID
+            or attestation.policy_version
+            != SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION
+        ):
+            raise DispatchDenied(
+                "settled validation pause recovery has an unsupported policy"
             )
 
 

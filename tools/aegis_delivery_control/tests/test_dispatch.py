@@ -948,6 +948,11 @@ class MediatedDispatchTests(unittest.TestCase):
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
                 connection.execute("DROP TABLE proof_free_disposition_actions")
+                connection.execute(
+                    "DROP TABLE settled_validation_pause_resume_actions"
+                )
+                connection.execute("DROP TABLE validation_pause_settlements")
+                connection.execute("DROP TABLE active_validation_pause_actions")
                 strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 0")
                 connection.commit()
@@ -1023,6 +1028,11 @@ class MediatedDispatchTests(unittest.TestCase):
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
                 connection.execute("DROP TABLE proof_free_disposition_actions")
+                connection.execute(
+                    "DROP TABLE settled_validation_pause_resume_actions"
+                )
+                connection.execute("DROP TABLE validation_pause_settlements")
+                connection.execute("DROP TABLE active_validation_pause_actions")
                 strip_t28_foundation_schema(connection)
                 connection.execute("PRAGMA user_version = 1")
                 connection.commit()
@@ -1047,7 +1057,7 @@ class MediatedDispatchTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(after, before)
-            self.assertEqual(version, 7)
+            self.assertEqual(version, 8)
             self.assertEqual(action_count, 0)
             with self.assertRaisesRegex(
                 StorageIntegrityError, "readiness event semantics"
@@ -1094,7 +1104,7 @@ class MediatedDispatchTests(unittest.TestCase):
             connection = sqlite3.connect(store._database_path)
             try:
                 self.assertEqual(
-                    connection.execute("PRAGMA user_version").fetchone()[0], 7
+                    connection.execute("PRAGMA user_version").fetchone()[0], 8
                 )
                 connection.execute(
                     "INSERT INTO dispatch_fences VALUES ("
@@ -1121,7 +1131,8 @@ class MediatedDispatchTests(unittest.TestCase):
             )
             connection = sqlite3.connect(store._database_path)
             try:
-                connection.execute("PRAGMA user_version = 8")
+                connection.execute("PRAGMA user_version = 9")
+                connection.commit()
             finally:
                 connection.close()
             with self.assertRaisesRegex(

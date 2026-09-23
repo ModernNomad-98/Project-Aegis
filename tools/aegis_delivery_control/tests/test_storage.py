@@ -38,6 +38,7 @@ from tools.aegis_delivery_control.adapters import (
     validate_synthetic_validator_containment,
 )
 from tools.aegis_delivery_control.contracts import (
+    ActiveValidationPauseRequest,
     AuthorityFactKind,
     AuthorityLifecycleFactRequest,
     BindingMismatchKind,
@@ -60,6 +61,7 @@ from tools.aegis_delivery_control.contracts import (
     PauseExternalMutationRequest,
     PauseLocalExecutionRequest,
     PauseReconciliationRequest,
+    PauseValidationRequest,
     PlanAcceptanceRequest as PlanAcceptanceContract,
     ProofFreeDisposition,
     ProofFreeDispositionRequest,
@@ -67,6 +69,8 @@ from tools.aegis_delivery_control.contracts import (
     RecoverProvenNonexecutionRequest,
     ProvenNonexecutionIntentRequest,
     ResumeActivitySettlementRequest,
+    ResumeSettledValidationPauseRequest,
+    SettledValidationPauseRecoveryRequest,
     ResumeOperationNonexecutionRequest,
     ResumeRequest,
     SourceControlClassification,
@@ -87,6 +91,7 @@ from tools.aegis_delivery_control.contracts import (
     ValidationGateFactRequest,
     ValidationLaunchRequest,
     ValidationLaunchResolutionRequest,
+    ValidationPauseSettlementRequest,
     ValidationRecoveryRequest,
     ValidatorCessationRequest,
     ValidatorContainmentSpec,
@@ -484,6 +489,14 @@ def _settle_until_terminated(
 
 
 class SQLiteStateStoreTests(unittest.TestCase):
+    @staticmethod
+    def _drop_v8_validation_pause_drain_schema(
+        connection: sqlite3.Connection,
+    ) -> None:
+        connection.execute("DROP TABLE settled_validation_pause_resume_actions")
+        connection.execute("DROP TABLE validation_pause_settlements")
+        connection.execute("DROP TABLE active_validation_pause_actions")
+
     def _row_count(self, table_name: str) -> int:
         connection = sqlite3.connect(self.database_path)
         try:
@@ -4131,6 +4144,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_recovery_actions": 0,
                 "operation_retry_authorizations": 0,
                 "validation_pause_actions": 0,
+                "active_validation_pause_actions": 0,
+                "validation_pause_settlements": 0,
+                "settled_validation_pause_resume_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
                 "stop_actions": 0,
@@ -5087,6 +5103,9 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 "operation_recovery_actions": 0,
                 "operation_retry_authorizations": 0,
                 "validation_pause_actions": 0,
+                "active_validation_pause_actions": 0,
+                "validation_pause_settlements": 0,
+                "settled_validation_pause_resume_actions": 0,
                 "resume_actions": 0,
                 "reconciliation_resume_actions": 0,
                 "stop_actions": 0,
@@ -6809,6 +6828,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             )
             connection.execute("DROP TABLE proven_nonexecution_actions")
             connection.execute("DROP TABLE proof_free_disposition_actions")
+            self._drop_v8_validation_pause_drain_schema(connection)
             connection.execute(
                 "UPDATE repositories SET catalog_head = '' WHERE "
                 "repository_id = 'repo-1'"
@@ -6872,10 +6892,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.assertEqual(migrated_event_bytes, event_bytes)
         self.assertEqual(migrated_body["schema_version"], 2)
-        self.assertEqual(semantic_version, 7)
+        self.assertEqual(semantic_version, 8)
         migrated.load_verified("repo-1", authority=self.authority)
 
-    def test_proof_free_disposition_schema_version_is_seven(self) -> None:
+    def test_validation_pause_drain_schema_version_is_eight(self) -> None:
         connection = sqlite3.connect(self.database_path)
         try:
             semantic_version = connection.execute(
@@ -6883,11 +6903,93 @@ class SQLiteStateStoreTests(unittest.TestCase):
             ).fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(semantic_version, 7)
+        self.assertEqual(semantic_version, 8)
+
+    def test_t08_v7_validation_pause_drain_schema_migrates_atomically(self) -> None:
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            self._drop_v8_validation_pause_drain_schema(connection)
+            connection.execute("PRAGMA user_version = 7")
+            connection.commit()
+            with self.assertRaises(InjectedFailure):
+                ProductionSQLiteStateStore._migrate_validation_pause_drain_version(
+                    connection,
+                    failure_hook=raise_at(
+                        "after_validation_pause_drain_migration_writes_before_commit"
+                    ),
+                )
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 7
+            )
+            self.assertIsNone(connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
+                "name = 'active_validation_pause_actions'"
+            ).fetchone())
+        finally:
+            connection.close()
+        reopened = SQLiteStateStore(self.database_path, self.oracle, "repo-1")
+        reopened._bind_classification_authority(self.authority)
+        reopened.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute("PRAGMA user_version").fetchone()[0], 8
+            )
+        finally:
+            connection.close()
+
+    def test_t08_v8_schema_never_heals_or_backfills_drain_history(self) -> None:
+        for mutation in (
+            "DROP TABLE validation_pause_settlements",
+            "ALTER TABLE active_validation_pause_actions ADD COLUMN surplus TEXT",
+        ):
+            with self.subTest(mutation=mutation):
+                path = self.database_path.parent / (
+                    "v8-" + hashlib.sha256(mutation.encode()).hexdigest()[:8]
+                    + ".sqlite3"
+                )
+                source = sqlite3.connect(self.database_path)
+                target = sqlite3.connect(path)
+                try:
+                    source.backup(target)
+                finally:
+                    target.close()
+                    source.close()
+                connection = sqlite3.connect(path)
+                try:
+                    connection.execute(mutation)
+                    connection.commit()
+                finally:
+                    connection.close()
+                with self.assertRaisesRegex(
+                    StorageIntegrityError, "validation pause drain schema"
+                ):
+                    SQLiteStateStore(path, self.oracle, "repo-1")
+
+        request, capability, activity = self._active_validation_pause_fixture(
+            "no-backfill"
+        )
+        receipt = self.store.pause_active_validation(
+            request, capability, activity, self.authority
+        )
+        self.oracle.allowed_head = receipt.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self._drop_v8_validation_pause_drain_schema(connection)
+            connection.execute("PRAGMA user_version = 7")
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "predates its projection"
+        ):
+            SQLiteStateStore(self.database_path, self.oracle, "repo-1")
 
     def test_t17_v6_proof_free_schema_migrates_atomically(self) -> None:
         connection = sqlite3.connect(self.database_path)
         try:
+            self._drop_v8_validation_pause_drain_schema(connection)
             connection.execute("DROP TABLE proof_free_disposition_actions")
             connection.execute("PRAGMA user_version = 6")
             connection.commit()
@@ -6918,7 +7020,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         connection = sqlite3.connect(self.database_path)
         try:
             self.assertEqual(
-                connection.execute("PRAGMA user_version").fetchone()[0], 7
+                connection.execute("PRAGMA user_version").fetchone()[0], 8
             )
             self.assertIsNotNone(connection.execute(
                 "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
@@ -9311,6 +9413,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.execute("DROP TABLE validation_check_dependencies")
             connection.execute("DROP TABLE validation_check_bindings")
             connection.execute("DROP TABLE proof_free_disposition_actions")
+            self._drop_v8_validation_pause_drain_schema(connection)
             connection.execute("PRAGMA user_version = 5")
             connection.commit()
         finally:
@@ -10096,6 +10199,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 )
                 connection.execute("DROP TABLE proven_nonexecution_actions")
                 connection.execute("DROP TABLE proof_free_disposition_actions")
+                self._drop_v8_validation_pause_drain_schema(connection)
                 connection.execute(
                     "UPDATE repositories SET catalog_head = '' WHERE "
                     "repository_id = 'repo-1'"
@@ -10139,7 +10243,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
         finally:
             connection.close()
         migrated.load_verified("repo-1", authority=self.authority)
-        self.assertEqual(migrated_state, (7, 1, 4, 0))
+        self.assertEqual(migrated_state, (8, 1, 4, 0))
 
         late_observation = self._record_signed_effect_observation(
             EffectObservationRequest(
@@ -14728,6 +14832,930 @@ class SQLiteStateStoreTests(unittest.TestCase):
             synthetic_validator_output_size("result-digest-1", "PASS"),
         )
         return intent, capability, committed, adapter, request
+
+    def _active_validation_pause_fixture(self, suffix: str = "drain"):
+        intent, validator_capability, committed, _adapter, _request = (
+            self._prepared_validator_execution()
+        )
+        target_digest = self.store._adapter_target_digest("repo-1", "VALIDATOR")
+        self.store._contact_committed_validator(
+            intent, validator_capability, committed, target_digest,
+            self.authority,
+            containment_digest=validator_capability.containment_digest,
+            containment_verifier=lambda: validator_capability.containment_digest,
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            run = connection.execute(
+                "SELECT * FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()
+            contact = connection.execute(
+                "SELECT * FROM adapter_contacts WHERE source_id = "
+                "'VALIDATOR:validator-intent-1'"
+            ).fetchone()
+            intent_row = connection.execute(
+                "SELECT * FROM validator_intents WHERE validator_intent_id = "
+                "'validator-intent-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        assert run is not None and contact is not None and intent_row is not None
+        self.oracle.allowed_head = str(run["head_hash"])
+        request = ActiveValidationPauseRequest(
+            pause_id=f"active-pause-{suffix}",
+            command_id=f"active-pause-command-{suffix}",
+            request_event_id=f"active-pause-request-{suffix}",
+            checkpoint_event_id=f"active-pause-checkpoint-{suffix}",
+            fence_id=f"active-pause-fence-{suffix}",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1",
+            validator_intent_id="validator-intent-1",
+            validator_intent_event_id="validator-event-1",
+            validator_intent_event_hash=str(intent_row["event_hash"]),
+            validator_attempt_id="validator-attempt-1", check_id="check-1",
+            contact_id=str(contact["contact_id"]),
+            contact_event_id=str(contact["event_id"]),
+            contact_event_hash=str(contact["event_hash"]),
+            contact_target_digest=target_digest,
+            reservation_id="validator-reservation-1",
+            expected_settlement_head_hash="",
+            expected_slot_attempt_id="attempt-1", expected_slot_generation=1,
+            expected_catalog_head=str(run["head_hash"]),
+            expected_run_head=str(run["head_hash"]),
+            expected_preserved_continuation_cursor=run["continuation_cursor"],
+            reason_code="OPERATOR_ACTIVE_VALIDATION_PAUSE",
+        )
+        activity = self.authority.issue_validator_activity_attestation(
+            f"activity-{suffix}", request,
+            validator_capability.containment_digest,
+        )
+        return request, self._pause_capability(suffix), activity
+
+    def test_t08_active_validator_pause_requires_activity_and_preserves_obligations(
+        self,
+    ) -> None:
+        request, pause_capability, activity = (
+            self._active_validation_pause_fixture()
+        )
+        with self.assertRaisesRegex(DispatchDenied, "activity attestation"):
+            forged = replace(activity, descendant_scope_digest="forged")
+            self.store.pause_active_validation(
+                request, pause_capability, forged, self.authority
+            )
+        receipt = self.store.pause_active_validation(
+            request, pause_capability, activity, self.authority
+        )
+        self.assertEqual(receipt.resulting_state, LifecycleState.PAUSING)
+        self.oracle.allowed_head = receipt.event_hash
+        replay = self.store.pause_active_validation(
+            request, pause_capability, activity, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            state = connection.execute(
+                "SELECT lifecycle_state FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+            reservation = connection.execute(
+                "SELECT disposition, held_units, charged_units FROM "
+                "budget_reservations WHERE reservation_id = "
+                "'validator-reservation-1'"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT attempt_id, generation FROM outstanding_slot"
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertEqual(state, LifecycleState.PAUSING.value)
+        self.assertEqual(reservation, (BudgetDisposition.RESERVED.value, 1, 0))
+        self.assertEqual(slot, ("attempt-1", 1))
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t08_active_validator_pause_is_atomic_and_lost_ack_replays(self) -> None:
+        request, capability, activity = self._active_validation_pause_fixture(
+            "atomic"
+        )
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_active_validation(
+                request, capability, activity, self.authority,
+                failure_hook=raise_at(
+                    "after_active_validation_pause_writes_before_commit"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM active_validation_pause_actions"
+            ).fetchone()[0], 0)
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences WHERE fence_id = ?",
+                (request.fence_id,),
+            ).fetchone()[0], 0)
+        finally:
+            connection.close()
+        with self.assertRaises(InjectedFailure):
+            self.store.pause_active_validation(
+                request, capability, activity, self.authority,
+                failure_hook=raise_at(
+                    "after_active_validation_pause_commit_before_acknowledgement"
+                ),
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            durable_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        self.oracle.allowed_head = durable_head
+        replay = self.store.pause_active_validation(
+            request, capability, activity, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t07_t14_interruption_cessation_settles_then_resumes_blocked(
+        self,
+    ) -> None:
+        pause_request, pause_capability, activity = (
+            self._active_validation_pause_fixture("interrupt")
+        )
+        paused = self.store.pause_active_validation(
+            pause_request, pause_capability, activity, self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        accounting_request = BudgetSettlementRequest(
+            "validator-settlement-interrupt", "validator-reservation-1", "",
+            BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED, None,
+            "validator-interruption", "VALIDATOR_INTERRUPTED_USAGE_UNKNOWN",
+        )
+        accounting = self.store._settle_budget(
+            accounting_request,
+            self.authority.issue_settlement_proof(
+                "validator-proof-interrupt", accounting_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = accounting.settlement_hash
+        cessation = self._record_validator_cessation_for(result_available=False)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            pause_request_hash = connection.execute(
+                "SELECT request_event_hash FROM "
+                "active_validation_pause_actions WHERE pause_id = ?",
+                (pause_request.pause_id,),
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        settlement_request = ValidationPauseSettlementRequest(
+            settlement_id="validation-pause-settlement-interrupt",
+            command_id="validation-pause-settlement-command-interrupt",
+            event_id="validation-pause-settlement-event-interrupt",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1",
+            source_pause_id=pause_request.pause_id,
+            source_pause_request_event_id=pause_request.request_event_id,
+            source_pause_request_event_hash=pause_request_hash,
+            source_pause_checkpoint_event_id=pause_request.checkpoint_event_id,
+            source_pause_checkpoint_event_hash=paused.event_hash,
+            pause_fence_id=pause_request.fence_id,
+            validator_intent_id="validator-intent-1",
+            validator_attempt_id="validator-attempt-1", check_id="check-1",
+            resolution_kind="INTERRUPTION_CESSATION",
+            resolution_id=cessation.cessation_id,
+            resolution_event_id=cessation.event_id,
+            resolution_event_hash=cessation.event_hash,
+            cessation_id=cessation.cessation_id,
+            cessation_event_id=cessation.event_id,
+            cessation_event_hash=cessation.event_hash,
+            reservation_id="validator-reservation-1",
+            expected_settlement_head_hash=accounting.settlement_hash,
+            expected_slot_attempt_id="attempt-1", expected_slot_generation=1,
+            continuation_cursor=(
+                "validator-cessation:v1:cessation-1:check-1:validator-attempt-1"
+            ),
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "accounting is not authoritative"
+        ):
+            self.store.settle_validation_pause(settlement_request)
+        adjustment_request = BudgetSettlementRequest(
+            "validator-adjustment-interrupt", "validator-reservation-1",
+            accounting.settlement_hash, BudgetDisposition.ADJUSTED, 2,
+            "validator-adjustment-evidence-interrupt",
+            "VALIDATOR_USAGE_RECONCILED",
+        )
+        adjustment = self.store._settle_budget(
+            adjustment_request,
+            self.authority.issue_settlement_proof(
+                "validator-adjustment-proof-interrupt", adjustment_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = adjustment.settlement_hash
+        settlement_request = replace(
+            settlement_request,
+            expected_settlement_head_hash=adjustment.settlement_hash,
+        )
+        settled = self.store.settle_validation_pause(settlement_request)
+        self.assertEqual(settled.resulting_state, LifecycleState.PAUSED)
+        retargeted_path = (
+            self.database_path.parent / "retargeted-interruption.sqlite3"
+        )
+        shutil.copy2(self.database_path, retargeted_path)
+        connection = sqlite3.connect(retargeted_path)
+        try:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (settlement_request.event_id,),
+            ).fetchone()[0])
+            body["resolution_kind"] = "RESULT_CESSATION"
+            rebound_request = ValidationPauseSettlementRequest(**{
+                field: body[field]
+                for field in ValidationPauseSettlementRequest.__dataclass_fields__
+            })
+            body["payload_digest"] = self.store._event_hash({
+                **rebound_request.__dict__,
+                "pause_kind": "VALIDATION_PAUSE_SETTLEMENT",
+                "validation_pause_drain_binding_version": 1,
+            })
+            rebound_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (rebound_hash, body_json, settlement_request.event_id),
+            )
+            connection.execute(
+                "UPDATE validation_pause_settlements SET resolution_kind = ?, "
+                "payload_digest = ?, event_hash = ?, body_json = ? WHERE "
+                "settlement_id = ?",
+                (
+                    "RESULT_CESSATION", body["payload_digest"], rebound_hash,
+                    body_json, settlement_request.settlement_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, event_hash = ? "
+                "WHERE command_id = ?",
+                (
+                    body["payload_digest"], rebound_hash,
+                    settlement_request.command_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (rebound_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (rebound_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        retargeted_oracle = MutableFreshnessOracle()
+        retargeted_oracle.allowed_head = rebound_hash
+        retargeted_store = SQLiteStateStore(
+            retargeted_path, retargeted_oracle, "repo-1"
+        )
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "validation pause settlement"
+        ):
+            retargeted_store.load_verified("repo-1", authority=self.authority)
+        self.oracle.allowed_head = settled.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        resume_request = ResumeSettledValidationPauseRequest(
+            resume_id="validation-resume-interrupt",
+            command_id="validation-resume-command-interrupt",
+            event_id="validation-resume-event-interrupt",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1",
+            source_settlement_id=settlement_request.settlement_id,
+            source_settlement_event_id=settlement_request.event_id,
+            source_settlement_event_hash=settled.event_hash,
+            source_pause_id=pause_request.pause_id,
+            source_pause_request_event_id=pause_request.request_event_id,
+            source_pause_request_event_hash=(
+                settlement_request.source_pause_request_event_hash
+            ),
+            pause_fence_id=pause_request.fence_id,
+            expected_preserved_continuation_cursor=(
+                settlement_request.continuation_cursor
+            ),
+            expected_catalog_head=catalog_head,
+            expected_run_head=run_heads["run-1"],
+            expected_run_heads_digest=self.store._run_heads_digest(run_heads),
+            expected_slot_attempt_id="attempt-1", expected_slot_generation=1,
+            expected_reservation_id="validator-reservation-1",
+            expected_settlement_head_hash=adjustment.settlement_hash,
+        )
+        resume_capability = self._resume_capability("interrupt")
+        resume_evidence = self.authority.issue_settled_validation_resume_evidence(
+            "validation-resume-proof-interrupt", resume_request
+        )
+        resumed = self.store.resume_settled_validation_pause(
+            resume_request, resume_capability, resume_evidence, self.authority
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        self.oracle.allowed_head = resumed.event_hash
+        replay = self.store.resume_settled_validation_pause(
+            resume_request, resume_capability, resume_evidence, self.authority
+        )
+        self.assertTrue(replay.replayed)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            plan_event_hash = connection.execute(
+                "SELECT event_hash FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        recovery_request = SettledValidationPauseRecoveryRequest(
+            "pause-recovery-interrupt", "pause-recovery-command-interrupt",
+            "pause-recovery-event-interrupt", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", "check-1",
+            settlement_request.settlement_id, settlement_request.event_id,
+            settled.event_hash, pause_request.pause_id,
+            "validator-intent-1", "validator-attempt-1",
+            "validator-attempt-2", "remediation-interrupt",
+            resumed.event_hash, "attempt-1", 1,
+        )
+        def issue_recovery_attestation(issuer, request, suffix):
+            return issuer.issue_settled_validation_pause_recovery_attestation(
+                f"pause-recovery-attestation-{suffix}", request.recovery_id,
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, request.plan_id, plan_event_hash,
+                request.revision_digest, request.check_id,
+                request.source_settlement_id,
+                request.source_settlement_event_hash,
+                request.source_pause_id, request.failed_validator_intent_id,
+                request.failed_validator_attempt_id,
+                request.successor_validator_attempt_id,
+                request.remediation_evidence_digest,
+                request.expected_run_head, request.expected_slot_attempt_id,
+                request.expected_slot_generation,
+            )
+
+        recovery_attestation = issue_recovery_attestation(
+            self.authority, recovery_request, "interrupt"
+        )
+        stale_request = replace(
+            recovery_request,
+            recovery_id="pause-recovery-stale",
+            command_id="pause-recovery-command-stale",
+            event_id="pause-recovery-event-stale",
+            expected_run_head="stale-head",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "run head is stale"):
+            self.store.recover_settled_validation_pause(
+                stale_request,
+                issue_recovery_attestation(
+                    self.authority, stale_request, "stale"
+                ),
+                self.authority,
+            )
+        rebound_request = replace(
+            recovery_request,
+            recovery_id="pause-recovery-rebound",
+            command_id="pause-recovery-command-rebound",
+            event_id="pause-recovery-event-rebound",
+            source_settlement_event_hash="rebound-settlement-hash",
+        )
+        with self.assertRaisesRegex(DispatchDenied, "lost its source"):
+            self.store.recover_settled_validation_pause(
+                rebound_request,
+                issue_recovery_attestation(
+                    self.authority, rebound_request, "rebound"
+                ),
+                self.authority,
+            )
+        wrong_authority = SyntheticAuthority()
+        with self.assertRaisesRegex(DispatchDenied, "accepted plan"):
+            self.store.recover_settled_validation_pause(
+                recovery_request,
+                issue_recovery_attestation(
+                    wrong_authority, recovery_request, "wrong-issuer"
+                ),
+                wrong_authority,
+            )
+        recovered = self.store.recover_settled_validation_pause(
+            recovery_request, recovery_attestation, self.authority
+        )
+        self.assertEqual(recovered.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = recovered.event_hash
+        self.assertTrue(self.store.recover_settled_validation_pause(
+            recovery_request, recovery_attestation, self.authority
+        ).replayed)
+        self.store.load_verified("repo-1", authority=self.authority)
+        connection = sqlite3.connect(self.database_path)
+        try:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (recovery_request.event_id,),
+            ).fetchone()[0])
+            body["source_pause_id"] = "tampered-pause"
+            event_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (event_hash, body_json, recovery_request.event_id),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET event_hash = ? WHERE command_id = ?",
+                (event_hash, recovery_request.command_id),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (event_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (event_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        self.oracle.allowed_head = event_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "settled validation pause recovery"
+        ):
+            self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t07_t14_result_and_cessation_resume_validation_without_release(
+        self,
+    ) -> None:
+        pause_request, pause_capability, activity = (
+            self._active_validation_pause_fixture("result")
+        )
+        paused = self.store.pause_active_validation(
+            pause_request, pause_capability, activity, self.authority
+        )
+        self.oracle.allowed_head = paused.event_hash
+        accounting_request = BudgetSettlementRequest(
+            "validator-settlement-result", "validator-reservation-1", "",
+            BudgetDisposition.CONSUMED, 1, "validator-result-1",
+            "VALIDATOR_USAGE_REPORTED",
+        )
+        accounting = self.store._settle_budget(
+            accounting_request,
+            self.authority.issue_settlement_proof(
+                "validator-proof-result", accounting_request
+            ),
+            self.authority,
+        )
+        self.oracle.allowed_head = accounting.settlement_hash
+        cessation = self._record_validator_cessation_for(result_available=True)
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            intent = connection.execute(
+                "SELECT * FROM validator_intents WHERE validator_intent_id = "
+                "'validator-intent-1'"
+            ).fetchone()
+            pause_row = connection.execute(
+                "SELECT * FROM active_validation_pause_actions WHERE pause_id = ?",
+                (pause_request.pause_id,),
+            ).fetchone()
+        finally:
+            connection.close()
+        observation = self.store._record_validator_observation(
+            ValidatorObservationRequest(
+                "validator-observation-result",
+                "validator-observe-command-result",
+                "validator-observation-event-result",
+                "repo-1", "run-1", "item-1", "effect-1",
+                "validator-intent-1", "validator-attempt-1",
+                "validator-result-1", str(intent["capability_claim_id"]),
+                "revision-1", "check-1", "input-1", "result-digest-1",
+                "PASS", 1, "validator-settlement-result",
+                accounting.settlement_hash,
+            )
+        )
+        self.oracle.allowed_head = observation.event_hash
+        cursor = (
+            "validation-application:v1:validator-observation-result:"
+            "check-1:validator-attempt-1"
+        )
+        settlement_request = ValidationPauseSettlementRequest(
+            "validation-pause-settlement-result",
+            "validation-pause-settlement-command-result",
+            "validation-pause-settlement-event-result",
+            "repo-1", "run-1", "item-1", "effect-1", "plan-1",
+            "revision-1", pause_request.pause_id,
+            pause_request.request_event_id, str(pause_row["request_event_hash"]),
+            pause_request.checkpoint_event_id, paused.event_hash,
+            pause_request.fence_id, "validator-intent-1",
+            "validator-attempt-1", "check-1", "RESULT_CESSATION",
+            observation.observation_id, observation.event_id,
+            observation.event_hash, cessation.cessation_id,
+            cessation.event_id, cessation.event_hash,
+            "validator-reservation-1", accounting.settlement_hash,
+            "attempt-1", 1, cursor,
+        )
+        settled = self.store.settle_validation_pause(settlement_request)
+        retargeted_path = self.database_path.parent / "retargeted-result.sqlite3"
+        shutil.copy2(self.database_path, retargeted_path)
+        connection = sqlite3.connect(retargeted_path)
+        try:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (settlement_request.event_id,),
+            ).fetchone()[0])
+            body["cessation_id"] = "missing-cessation"
+            body["cessation_event_id"] = "missing-cessation-event"
+            body["cessation_event_hash"] = "missing-cessation-hash"
+            rebound_request = ValidationPauseSettlementRequest(**{
+                field: body[field]
+                for field in ValidationPauseSettlementRequest.__dataclass_fields__
+            })
+            body["payload_digest"] = self.store._event_hash({
+                **rebound_request.__dict__,
+                "pause_kind": "VALIDATION_PAUSE_SETTLEMENT",
+                "validation_pause_drain_binding_version": 1,
+            })
+            rebound_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (rebound_hash, body_json, settlement_request.event_id),
+            )
+            connection.execute(
+                "UPDATE validation_pause_settlements SET payload_digest = ?, "
+                "event_hash = ?, body_json = ? WHERE settlement_id = ?",
+                (
+                    body["payload_digest"], rebound_hash, body_json,
+                    settlement_request.settlement_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, event_hash = ? "
+                "WHERE command_id = ?",
+                (
+                    body["payload_digest"], rebound_hash,
+                    settlement_request.command_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE runs SET head_hash = ? WHERE run_id = 'run-1'",
+                (rebound_hash,),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (rebound_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        retargeted_oracle = MutableFreshnessOracle()
+        retargeted_oracle.allowed_head = rebound_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "validation pause settlement source"
+        ):
+            SQLiteStateStore(
+                retargeted_path, retargeted_oracle, "repo-1"
+            ).load_verified("repo-1", authority=self.authority)
+        cursor_path = self.database_path.parent / "retargeted-result-cursor.sqlite3"
+        shutil.copy2(self.database_path, cursor_path)
+        connection = sqlite3.connect(cursor_path)
+        try:
+            body = json.loads(connection.execute(
+                "SELECT body_json FROM events WHERE event_id = ?",
+                (settlement_request.event_id,),
+            ).fetchone()[0])
+            body["resolution_id"] = "rebound-observation"
+            body["continuation_cursor"] = (
+                "validation-application:v1:rebound-observation:check-1:"
+                "validator-attempt-1"
+            )
+            rebound_request = ValidationPauseSettlementRequest(**{
+                field: body[field]
+                for field in ValidationPauseSettlementRequest.__dataclass_fields__
+            })
+            body["payload_digest"] = self.store._event_hash({
+                **rebound_request.__dict__,
+                "pause_kind": "VALIDATION_PAUSE_SETTLEMENT",
+                "validation_pause_drain_binding_version": 1,
+            })
+            rebound_hash = self.store._event_hash(body)
+            body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            connection.execute(
+                "UPDATE events SET event_hash = ?, body_json = ? WHERE event_id = ?",
+                (rebound_hash, body_json, settlement_request.event_id),
+            )
+            connection.execute(
+                "UPDATE validation_pause_settlements SET payload_digest = ?, "
+                "event_hash = ?, body_json = ? WHERE settlement_id = ?",
+                (
+                    body["payload_digest"], rebound_hash, body_json,
+                    settlement_request.settlement_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE command_outcomes SET payload_digest = ?, event_hash = ? "
+                "WHERE command_id = ?",
+                (
+                    body["payload_digest"], rebound_hash,
+                    settlement_request.command_id,
+                ),
+            )
+            connection.execute(
+                "UPDATE runs SET continuation_cursor = ?, head_hash = ? "
+                "WHERE run_id = 'run-1'",
+                (body["continuation_cursor"], rebound_hash),
+            )
+            connection.execute(
+                "UPDATE repositories SET catalog_head = ? WHERE repository_id = 'repo-1'",
+                (rebound_hash,),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        cursor_oracle = MutableFreshnessOracle()
+        cursor_oracle.allowed_head = rebound_hash
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "validation pause settlement"
+        ):
+            SQLiteStateStore(
+                cursor_path, cursor_oracle, "repo-1"
+            ).load_verified("repo-1", authority=self.authority)
+        self.oracle.allowed_head = settled.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        resume_request = ResumeSettledValidationPauseRequest(
+            "validation-resume-result", "validation-resume-command-result",
+            "validation-resume-event-result", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1",
+            settlement_request.settlement_id, settlement_request.event_id,
+            settled.event_hash, pause_request.pause_id,
+            pause_request.request_event_id, str(pause_row["request_event_hash"]),
+            pause_request.fence_id, cursor, catalog_head,
+            run_heads["run-1"], self.store._run_heads_digest(run_heads),
+            "attempt-1", 1, "validator-reservation-1",
+            accounting.settlement_hash,
+        )
+        resume_capability = self._resume_capability("result")
+        resume_evidence = self.authority.issue_settled_validation_resume_evidence(
+            "validation-resume-proof-result", resume_request
+        )
+        resumed = self.store.resume_settled_validation_pause(
+            resume_request, resume_capability, resume_evidence, self.authority
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = resumed.event_hash
+        applied = self.store._apply_validator_observation(
+            ValidationApplicationRequest(
+                "application-result", "apply-command-result",
+                "apply-event-result", "repo-1", "run-1", "item-1",
+                "effect-1", "revision-1", "check-1",
+                "validator-attempt-1", "validator-observation-result",
+            )
+        )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(
+                connection.execute("SELECT COUNT(*) FROM outstanding_slot").fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT applied FROM validator_observations WHERE "
+                    "observation_id = 'validator-observation-result'"
+                ).fetchone()[0],
+                1,
+            )
+        finally:
+            connection.close()
+        self.oracle.allowed_head = applied.event_hash
+        self.store.load_verified("repo-1", authority=self.authority)
+
+    def test_t07_t14_t16_nonlaunch_settles_resumes_and_authorizes_retry(
+        self,
+    ) -> None:
+        intent, validator_capability, committed, adapter, _ = (
+            self._prepared_validator_execution()
+        )
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            checkpoint = self.store._validator_pause_checkpoint(
+                connection, "repo-1", "run-1"
+            )
+            run = connection.execute(
+                "SELECT * FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        pause_request = PauseValidationRequest(
+            pause_id="legacy-pause-nonlaunch",
+            command_id="legacy-pause-command-nonlaunch",
+            request_event_id="legacy-pause-request-nonlaunch",
+            checkpoint_event_id="legacy-pause-checkpoint-nonlaunch",
+            fence_id="legacy-pause-fence-nonlaunch",
+            repository_id="repo-1", run_id="run-1", item_id="item-1",
+            logical_effect_id="effect-1", plan_id="plan-1",
+            revision_digest="revision-1",
+            reason_code="OPERATOR_PAUSE_VALIDATION",
+            expected_preserved_continuation_cursor=run["continuation_cursor"],
+            expected_checkpoint_kind="UNCONTACTED_UNRESOLVED",
+            **{
+                field: checkpoint[field]
+                for field in (
+                    "expected_slot_attempt_id", "expected_slot_generation",
+                    "validator_intent_id", "validator_intent_event_id",
+                    "validator_intent_event_hash", "validator_attempt_id",
+                    "check_id", "reservation_id",
+                    "expected_settlement_head_hash", "contact_id",
+                    "contact_event_id", "contact_event_hash",
+                    "contact_target_digest", "observation_id",
+                    "observation_event_id", "observation_event_hash",
+                    "observation_settlement_event_id",
+                    "observation_settlement_event_hash",
+                )
+            },
+        )
+        paused = self.store.pause_validation(
+            pause_request, self._pause_capability("nonlaunch"), self.authority
+        )
+        self.assertEqual(
+            paused.resulting_state, LifecycleState.RECONCILIATION_REQUIRED
+        )
+        self.oracle.allowed_head = paused.event_hash
+        nonexecution_attestation = self.authority.issue_nonexecution_attestation(
+            "nonlaunch-attestation", "nonlaunch-seal", "VALIDATOR",
+            adapter._target_digest("repo-1"), validator_capability.claim_id,
+            "VALIDATOR:validator-intent-1", committed.event_hash,
+            "validator-reservation-1", "repo-1", "run-1", "item-1",
+            "effect-1", "validator-attempt-1",
+        )
+        seal = adapter.seal_nonexecution(
+            nonexecution_attestation, self.authority
+        )
+        nonexecution_request = BudgetSettlementRequest(
+            "nonlaunch-settlement", "validator-reservation-1", "",
+            BudgetDisposition.RELEASED, None, "nonlaunch-evidence",
+            "NONDISPATCH_PROVEN", non_dispatch_proven=True,
+            zero_liability_proven=True, all_obligations_settled=True,
+            attempt_id="validator-attempt-1",
+            nonexecution_seal_id=seal.seal_id,
+        )
+        nonexecution = self.store._settle_budget(
+            nonexecution_request,
+            self.authority.issue_settlement_proof(
+                "nonlaunch-proof", nonexecution_request
+            ),
+            self.authority,
+        )
+        self.assertEqual(
+            self.store.load_run_lifecycle("run-1"), LifecycleState.PAUSED
+        )
+        self.oracle.allowed_head = nonexecution.settlement_hash
+        connection = sqlite3.connect(self.database_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            pause_row = connection.execute(
+                "SELECT * FROM validation_pause_actions WHERE pause_id = ?",
+                (pause_request.pause_id,),
+            ).fetchone()
+        finally:
+            connection.close()
+        cursor = "validator-initiation-disabled:validator-intent-1"
+        settlement_request = ValidationPauseSettlementRequest(
+            "pause-settlement-nonlaunch", "pause-settlement-command-nonlaunch",
+            "pause-settlement-event-nonlaunch", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", pause_request.pause_id,
+            pause_request.request_event_id, pause_row["request_event_hash"],
+            pause_request.checkpoint_event_id, pause_row["checkpoint_event_hash"],
+            pause_request.fence_id, "validator-intent-1",
+            "validator-attempt-1", "check-1", "NONLAUNCH",
+            nonexecution_request.settlement_event_id,
+            nonexecution_request.settlement_event_id,
+            nonexecution.settlement_hash, None, None, None,
+            "validator-reservation-1", nonexecution.settlement_hash,
+            "attempt-1", 1, cursor,
+        )
+        settled = self.store.settle_validation_pause(settlement_request)
+        self.assertEqual(settled.resulting_state, LifecycleState.PAUSED)
+        self.oracle.allowed_head = settled.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        resume_request = ResumeSettledValidationPauseRequest(
+            "resume-nonlaunch", "resume-command-nonlaunch",
+            "resume-event-nonlaunch", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1",
+            settlement_request.settlement_id, settlement_request.event_id,
+            settled.event_hash, pause_request.pause_id,
+            pause_request.request_event_id, pause_row["request_event_hash"],
+            pause_request.fence_id, cursor, catalog_head,
+            run_heads["run-1"], self.store._run_heads_digest(run_heads),
+            "attempt-1", 1, "validator-reservation-1",
+            nonexecution.settlement_hash,
+        )
+        resume_capability = self._resume_capability("nonlaunch")
+        resume_evidence = self.authority.issue_settled_validation_resume_evidence(
+            "resume-proof-nonlaunch", resume_request
+        )
+        resumed = self.store.resume_settled_validation_pause(
+            resume_request, resume_capability, resume_evidence, self.authority
+        )
+        self.assertEqual(resumed.resulting_state, LifecycleState.BLOCKED)
+        self.oracle.allowed_head = resumed.event_hash
+        connection = sqlite3.connect(self.database_path)
+        try:
+            plan_event_hash = connection.execute(
+                "SELECT event_hash FROM validation_plans WHERE plan_id = 'plan-1'"
+            ).fetchone()[0]
+        finally:
+            connection.close()
+        recovery_request = SettledValidationPauseRecoveryRequest(
+            "pause-recovery-nonlaunch", "pause-recovery-command-nonlaunch",
+            "pause-recovery-event-nonlaunch", "repo-1", "run-1", "item-1",
+            "effect-1", "plan-1", "revision-1", "check-1",
+            settlement_request.settlement_id, settlement_request.event_id,
+            settled.event_hash, pause_request.pause_id,
+            "validator-intent-1", "validator-attempt-1",
+            "validator-attempt-2", "remediation-nonlaunch",
+            resumed.event_hash, "attempt-1", 1,
+        )
+        recovery_attestation = (
+            self.authority.issue_settled_validation_pause_recovery_attestation(
+                "pause-recovery-attestation-nonlaunch",
+                recovery_request.recovery_id, "repo-1", "run-1", "item-1",
+                "effect-1", "plan-1", plan_event_hash, "revision-1",
+                "check-1", settlement_request.settlement_id,
+                settled.event_hash, pause_request.pause_id,
+                "validator-intent-1", "validator-attempt-1",
+                "validator-attempt-2", "remediation-nonlaunch",
+                resumed.event_hash, "attempt-1", 1,
+            )
+        )
+        recovered = self.store.recover_settled_validation_pause(
+            recovery_request, recovery_attestation, self.authority
+        )
+        self.assertEqual(recovered.resulting_state, LifecycleState.VALIDATING)
+        self.oracle.allowed_head = recovered.event_hash
+        successor_grant = SyntheticValidatorGrant(
+            "validator-grant-2", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-2",
+            "read-only-scope-2", validator_capability.containment_digest,
+        )
+        self.authority.register_validator(successor_grant)
+        successor_capability = self.authority.claim_validator(
+            *successor_grant.__dict__.values()
+        )
+        successor_intent = replace(
+            intent,
+            validator_intent_id="validator-intent-2",
+            command_id="validator-command-2",
+            event_id="validator-event-2",
+            validator_attempt_id="validator-attempt-2",
+            permission_use_id="validator-permission-2",
+            reservation_id="validator-reservation-2",
+            recovery_id=recovery_request.recovery_id,
+        )
+        successor = self.store.commit_validator_intent(
+            successor_intent, successor_capability, self.authority
+        )
+        self.oracle.allowed_head = successor.event_hash
+        duplicate_grant = SyntheticValidatorGrant(
+            "validator-grant-duplicate", "repo-1", "effect-1", "revision-1",
+            "check-1", "input-1", "validator-attempt-2",
+            "read-only-scope-duplicate",
+            validator_capability.containment_digest,
+        )
+        self.authority.register_validator(duplicate_grant)
+        duplicate_capability = self.authority.claim_validator(
+            *duplicate_grant.__dict__.values()
+        )
+        duplicate_intent = replace(
+            successor_intent,
+            validator_intent_id="validator-intent-duplicate",
+            command_id="validator-command-duplicate",
+            event_id="validator-event-duplicate",
+            permission_use_id="validator-permission-duplicate",
+            reservation_id="validator-reservation-duplicate",
+        )
+        with self.assertRaisesRegex(
+            DispatchDenied, "recovery is not current|already consumed"
+        ):
+            self.store.commit_validator_intent(
+                duplicate_intent, duplicate_capability, self.authority
+            )
+        connection = sqlite3.connect(self.database_path)
+        try:
+            self.assertEqual(connection.execute(
+                "SELECT recovery_id FROM validator_intents WHERE "
+                "validator_intent_id = 'validator-intent-2'"
+            ).fetchone()[0], recovery_request.recovery_id)
+        finally:
+            connection.close()
+        self.store.load_verified("repo-1", authority=self.authority)
 
     def _record_validator_result(
         self,
@@ -20537,6 +21565,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     f"ALTER TABLE validator_intents DROP COLUMN {column}"
                 )
             connection.execute("DROP TABLE proof_free_disposition_actions")
+            self._drop_v8_validation_pause_drain_schema(connection)
             connection.execute("PRAGMA user_version = 4")
             connection.commit()
         finally:
@@ -20558,7 +21587,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
             version = connection.execute("PRAGMA user_version").fetchone()[0]
         finally:
             connection.close()
-        self.assertEqual(version, 7)
+        self.assertEqual(version, 8)
         self.assertEqual(migrated, (None, None, None, None))
         legacy_commit = CommitReceipt(
             committed.command_id, committed.event_id, committed.sequence,

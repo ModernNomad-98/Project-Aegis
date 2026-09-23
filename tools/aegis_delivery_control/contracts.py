@@ -1382,6 +1382,50 @@ class ValidationRecoveryReceipt:
 
 
 @dataclass(frozen=True)
+class SettledValidationPauseRecoveryRequest:
+    recovery_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    failed_validator_intent_id: str
+    failed_validator_attempt_id: str
+    successor_validator_attempt_id: str
+    remediation_evidence_digest: str
+    expected_run_head: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    action: str = "RETRY_VALIDATION"
+
+    def validate(self) -> None:
+        values = tuple(self.__dict__.values())[:-2]
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise ValueError("settled validation pause recovery fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "settled validation pause recovery slot generation must be positive"
+            )
+        if self.action != "RETRY_VALIDATION":
+            raise ValueError("unsupported settled validation pause recovery action")
+        if self.failed_validator_attempt_id == self.successor_validator_attempt_id:
+            raise ValueError(
+                "settled validation pause recovery requires a new validator attempt"
+            )
+
+
+@dataclass(frozen=True)
 class TerminalValidationSettlementRequest:
     terminal_settlement_id: str
     command_id: str
@@ -2129,6 +2173,220 @@ class PauseValidationRequest:
         }[self.expected_checkpoint_kind]
         if (active_present, contact_present, observation_present) != expected_shape:
             raise ValueError("validation pause checkpoint tuple does not match its kind")
+
+
+@dataclass(frozen=True)
+class ActiveValidationPauseRequest:
+    pause_id: str
+    command_id: str
+    request_event_id: str
+    checkpoint_event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    validator_intent_id: str
+    validator_intent_event_id: str
+    validator_intent_event_hash: str
+    validator_attempt_id: str
+    check_id: str
+    contact_id: str
+    contact_event_id: str
+    contact_event_hash: str
+    contact_target_digest: str
+    reservation_id: str
+    expected_settlement_head_hash: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_preserved_continuation_cursor: str | None
+    reason_code: str
+
+    def validate(self) -> None:
+        strings = (
+            self.pause_id, self.command_id, self.request_event_id,
+            self.checkpoint_event_id, self.fence_id, self.repository_id,
+            self.run_id, self.item_id, self.logical_effect_id, self.plan_id,
+            self.revision_digest, self.validator_intent_id,
+            self.validator_intent_event_id, self.validator_intent_event_hash,
+            self.validator_attempt_id, self.check_id, self.contact_id,
+            self.contact_event_id, self.contact_event_hash,
+            self.contact_target_digest, self.reservation_id,
+            self.expected_slot_attempt_id, self.expected_catalog_head,
+            self.expected_run_head, self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in strings
+        ):
+            raise ValueError(
+                "active validation pause bindings must be non-empty"
+            )
+        if not isinstance(self.expected_settlement_head_hash, str):
+            raise ValueError(
+                "active validation pause settlement head must be a string"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "active validation pause slot generation must be positive"
+            )
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "active validation pause cursor must be non-empty or absent"
+            )
+        if self.request_event_id == self.checkpoint_event_id:
+            raise ValueError("active validation pause event IDs must differ")
+
+
+@dataclass(frozen=True)
+class ValidationPauseSettlementRequest:
+    settlement_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_request_event_id: str
+    source_pause_request_event_hash: str
+    source_pause_checkpoint_event_id: str
+    source_pause_checkpoint_event_hash: str
+    pause_fence_id: str
+    validator_intent_id: str
+    validator_attempt_id: str
+    check_id: str
+    resolution_kind: str
+    resolution_id: str
+    resolution_event_id: str
+    resolution_event_hash: str
+    cessation_id: str | None
+    cessation_event_id: str | None
+    cessation_event_hash: str | None
+    reservation_id: str
+    expected_settlement_head_hash: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    continuation_cursor: str
+
+    def validate(self) -> None:
+        required = (
+            self.settlement_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.plan_id, self.revision_digest,
+            self.source_pause_id, self.source_pause_request_event_id,
+            self.source_pause_request_event_hash,
+            self.source_pause_checkpoint_event_id,
+            self.source_pause_checkpoint_event_hash, self.pause_fence_id,
+            self.validator_intent_id, self.validator_attempt_id,
+            self.check_id, self.resolution_kind, self.resolution_id,
+            self.resolution_event_id, self.resolution_event_hash,
+            self.reservation_id, self.expected_settlement_head_hash,
+            self.expected_slot_attempt_id, self.continuation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError(
+                "validation pause settlement bindings must be non-empty"
+            )
+        if self.resolution_kind not in {
+            "RESULT_CESSATION", "INTERRUPTION_CESSATION", "NONLAUNCH",
+        }:
+            raise ValueError("validation pause settlement source is unsupported")
+        cessation = (
+            self.cessation_id, self.cessation_event_id,
+            self.cessation_event_hash,
+        )
+        if self.resolution_kind == "NONLAUNCH":
+            if any(value is not None for value in cessation):
+                raise ValueError(
+                    "validation nonlaunch settlement cannot name cessation"
+                )
+        elif any(
+            not isinstance(value, str) or not value.strip()
+            for value in cessation
+        ):
+            raise ValueError(
+                "active validation settlement requires exact cessation"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "validation pause settlement slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeSettledValidationPauseRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    source_pause_request_event_id: str
+    source_pause_request_event_hash: str
+    pause_fence_id: str
+    expected_preserved_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_reservation_id: str
+    expected_settlement_head_hash: str
+
+    def validate(self) -> None:
+        strings = (
+            self.resume_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.plan_id, self.revision_digest,
+            self.source_settlement_id, self.source_settlement_event_id,
+            self.source_settlement_event_hash, self.source_pause_id,
+            self.source_pause_request_event_id,
+            self.source_pause_request_event_hash, self.pause_fence_id,
+            self.expected_preserved_continuation_cursor,
+            self.expected_catalog_head, self.expected_run_head,
+            self.expected_run_heads_digest, self.expected_slot_attempt_id,
+            self.expected_reservation_id, self.expected_settlement_head_hash,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in strings
+        ):
+            raise ValueError(
+                "settled validation pause resume bindings must be non-empty"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "settled validation pause slot generation must be positive"
+            )
 
 
 @dataclass(frozen=True)

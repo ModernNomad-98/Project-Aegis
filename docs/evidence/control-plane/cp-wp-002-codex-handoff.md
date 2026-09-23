@@ -1502,6 +1502,44 @@ Changed files are `contracts.py`, `authority.py`, `storage.py`, `dispatch.py`,
 register, BER, dependencies, workflows, provider/production surfaces and
 preserved artifact/cache paths remain intentionally untouched.
 
+### Stage 22 - active validator pause, drain and exact recovery
+
+The remaining local T07/T08/T14 validator-activity tranche is implemented and
+independently accepted. A contacted validator enters `PAUSING` only through an
+authenticated PAUSE grant plus an issuer-signed activity attestation bound to
+the accepted plan, exact intent/contact, containment, slot, reservation and
+current heads. No adapter cancel, observe, retry, release or refund occurs.
+
+T07 accepts three closed sources. `RESULT_CESSATION` requires one exact
+observation, matching result-available all-descendant cessation and authoritative
+known accounting; it preserves the intent so T14 can restore `VALIDATING` and
+apply the observation. `INTERRUPTION_CESSATION` requires the exact result-free
+cessation and authoritative accounting. `NONLAUNCH` requires the complete T25
+zero-liability, all-obligations-settled, released/zero-charge proof and an
+already-settled intent. Unknown accounting is denied.
+
+T14 clears only the exact pause fence. Result-backed settlement returns to
+`VALIDATING`; interruption and nonlaunch return to `BLOCKED`. A signed T16
+authorization binds the exact settlement, prior intent/attempt, successor,
+accepted-plan issuer, current head and retained slot, and permits exactly one
+successor validator intent without regenerating or releasing the operation
+slot. Recovery re-derives every source, accounting predicate and typed cursor.
+
+Coverage includes rollback, lost acknowledgement, replay, wrong issuer, stale
+head, rebound source, unknown-cost denial, second-consumer denial, post-resume
+result application and self-consistent source-kind, cessation,
+observation-ID/cursor and recovery-event rewrites. The final read-only audit
+returned `APPROVE` with no remaining BLOCKER or MAJOR finding. The storage
+module passed 370 tests after correction, and the complete delivery-control
+package passed 485 tests in 85.807 seconds. Compileall, the 184-skill validator,
+91 validator assertions, 63 contract-audit assertions, 8 offline-CI tests (4
+expected host skips), BER self-check, all 987 BER tests (14 expected host
+skips), Windows PowerShell 5.1 acceptance (113 tests), and `git diff --check`
+also passed. PowerShell Core is not installed on this workstation, so that
+acceptance host remains assigned to the hosted Windows lane. T07, T08 and T14
+remain aggregate `UNVERIFIED` until committed exact-head trace refresh; PR #99
+remains draft.
+
 ## 10. Backlog state
 
 Canonical obligations remain T01-T28, C01-C09 and F01-F21. Do not infer a family
@@ -1528,14 +1566,14 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T04 | YES | YES | UNVERIFIED | `pause_before_dispatch`; dual-event atomic commit, lost-ack replay, operator binding and fence-tamper assertions in `test_t04_*`; row-level review pending |
 | T05 | YES | YES | YES | Exact owned pre-launch/launched-before-contact local pause, durable fence/authenticity, crash/replay and recovery independently accepted; no cancel/drain side effect claimed |
 | T06 | YES | YES | YES | Exact contacted/no-receipt route, atomic worst-case accounting/fence, T23 late-receipt behavior, crash/replay and prefix-derived recovery independently accepted; no unauthenticated PAUSING/cancel claim |
-| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | `settle_activity_pause` is deliberately restricted to exact T05 plus T25 local nonexecution. No T07 activity-settled route covers contacted T06 or active/ceased T08 validator work; full row remains open |
-| T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle, uncontacted, contacted-unknown, settled-result and unresolved-result paths are asserted, but no bounded active validator cancel/drain path reaches T07/PAUSED; full row remains open |
+| T07 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Exact T05/T25 local settlement plus authenticated active-validator RESULT/INTERRUPTION/NONLAUNCH settlement now reach PAUSED with authoritative accounting and strict recovery; accumulated committed-head row trace remains pending |
+| T08 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Idle, unresolved and settled-result checkpoints plus authenticated contacted active-validator pause/drain are locally implemented, tested and independently accepted; accumulated committed-head row trace remains pending |
 | T09 | YES | YES | YES | Exact current-head reconciliation fence, one-use authority, idempotent replay, stacked fence, no-adapter invariants and strict recovery independently accepted |
 | T10 | YES | YES | UNVERIFIED | Effect receipt intake verifies request/effect/source/control/usage binding, persists observation plus settlement atomically, routes unknowns to reconciliation and delegates contradictions to T23; C04/T06/T17 assertions; row-level review pending |
 | T11 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PASS application/reference/finalization behavior and accepted v2 per-check bindings exist, but T11 does not yet derive the next check's complete gate vector or route unmet/unknown readiness to its exact BLOCKED cursor |
 | T12 | YES | YES | UNVERIFIED | `_apply_validator_observation` FAIL path separates recoverable BLOCKED from atomic FAILED_FINAL fence/closure, with classification, accounting, replay and pending-check assertions; row-level review pending |
 | T13 | YES | YES | YES | Typed lifecycle facts, grant-wide denial, exact own-use continuation, typed supersession and correction independently accepted |
-| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, exact T07-local, clean T08, sequential T09 and operation-nonexecution resume sources are asserted, but the missing T07/T08 activity families prevent complete cursor/source coverage |
+| T14 | UNVERIFIED | UNVERIFIED | UNVERIFIED | PLANNED/BLOCKED, exact T07 local/validator settlements, clean T08, sequential T09 and operation-nonexecution resume sources are asserted; the new validator RESULT path resumes to VALIDATING while INTERRUPTION/NONLAUNCH require exact T16, with committed-head aggregate trace pending |
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | YES | YES | UNVERIFIED | Typed validation/operation blocker recovery and distinct finalization are implemented with exact evidence heads, aggregate gates, accounting/fence/slot closure, atomic replay and tamper assertions; row-level review pending |
 | T17 | UNVERIFIED | UNVERIFIED | UNVERIFIED | Validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution and generation-bound safe-retry routes are asserted. No explicit proof-free STOPPED/FAILED_FINAL/report-only reconciliation route completes the canonical row |

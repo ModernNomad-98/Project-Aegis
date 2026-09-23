@@ -32,6 +32,8 @@ from .authority import (
     SyntheticOperationReadinessEvidence,
     SyntheticOperatorCapability,
     SyntheticProofFreeDispositionEvidence,
+    SyntheticSettledValidationResumeEvidence,
+    SyntheticSettledValidationPauseRecoveryAttestation,
     SyntheticPlanAcceptanceEvidence,
     SyntheticResumeEvidence,
     SyntheticReconciliationResumeEvidence,
@@ -47,9 +49,11 @@ from .authority import (
     SyntheticValidationLaunchSnapshot,
     SyntheticValidatorCessationAttestation,
     SyntheticValidatorCapability,
+    SyntheticValidatorActivityAttestation,
 )
 from .contracts import (
     ApplicationReceipt,
+    ActiveValidationPauseRequest,
     AuthorityFactKind,
     AuthorityLifecycleFactRequest,
     BindingMismatchKind,
@@ -90,10 +94,12 @@ from .contracts import (
     ReconcileVerifiedReceiptRequest,
     ReconcileValidatorResultRequest,
     ResumeActivitySettlementRequest,
+    ResumeSettledValidationPauseRequest,
     ResumeOperationNonexecutionRequest,
     ResumeRequest,
     ProvenNonexecutionIntentRequest,
     SettlementReceipt,
+    SettledValidationPauseRecoveryRequest,
     SourceControlClassification,
     SourceControlEvidenceRequest,
     SourceControlSettlementRequest,
@@ -117,6 +123,7 @@ from .contracts import (
     ValidationLaunchReceipt,
     ValidationLaunchRequest,
     ValidationLaunchResolutionRequest,
+    ValidationPauseSettlementRequest,
     ValidationRecoveryReceipt,
     ValidationRecoveryRequest,
     ValidatorCessationReceipt,
@@ -361,6 +368,7 @@ _LIFECYCLE_ROUTES: Mapping[
             (LifecycleState.PLANNED, LifecycleState.PAUSED),
             (LifecycleState.BLOCKED, LifecycleState.PAUSED),
             (LifecycleState.PAUSING, LifecycleState.PAUSED),
+            (LifecycleState.PAUSED, LifecycleState.PAUSED),
         }
     ),
     "PLAN_ACCEPTED": frozenset({(None, LifecycleState.PLANNED)}),
@@ -407,6 +415,7 @@ _LIFECYCLE_ROUTES: Mapping[
     ),
     "VALIDATION_PAUSE_CHECKPOINTED": frozenset(
         {
+            (LifecycleState.VALIDATING, LifecycleState.PAUSING),
             (LifecycleState.VALIDATING, LifecycleState.PAUSED),
             (
                 LifecycleState.VALIDATING,
@@ -974,7 +983,7 @@ class SQLiteStateStore:
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
         semantic_version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7}:
+        if semantic_version not in {0, 1, 2, 3, 4, 5, 6, 7, 8}:
             raise StorageIntegrityError(
                 "state database semantic version is unsupported"
             )
@@ -995,7 +1004,7 @@ class SQLiteStateStore:
             raise StorageIntegrityError(
                 "T17 reconciliation schema is partially migrated"
             )
-        if semantic_version in {1, 2, 3, 4, 5, 6, 7} and (
+        if semantic_version in {1, 2, 3, 4, 5, 6, 7, 8} and (
             existing_reconciliation_tables != reconciliation_tables
         ):
             raise StorageIntegrityError(
@@ -2069,6 +2078,9 @@ class SQLiteStateStore:
             SQLiteStateStore._migrate_proof_free_disposition_version(
                 connection, manage_transaction=False
             )
+            SQLiteStateStore._migrate_validation_pause_drain_version(
+                connection, manage_transaction=False
+            )
             if semantic_version == 0 and connection.execute(
                 "PRAGMA foreign_key_check"
             ).fetchone() is not None:
@@ -2146,7 +2158,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {3, 4, 5, 6, 7}:
+            if version not in {3, 4, 5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "T28 foundation semantic version is unsupported"
                 )
@@ -2175,11 +2187,11 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "T28 foundation schema is partially migrated"
                 )
-            if version in {4, 5, 6, 7} and existing_foundation_tables != foundation_tables:
+            if version in {4, 5, 6, 7, 8} and existing_foundation_tables != foundation_tables:
                 raise StorageIntegrityError(
                     "T28 foundation schema is missing or incompatible"
                 )
-            if version in {4, 5, 6, 7}:
+            if version in {4, 5, 6, 7, 8}:
                 expected_schema_hashes = {
                     "adoption_dependencies": "9b3fe0062a34efe1f9f29beb30526de4763ed6775a3555661ca3a0b0dde9ceb3",
                     "dependent_adoption_fences": "c83840c79b9bb190450c675468d042c617a2253bb7959915b4acbb8f1affa1b6",
@@ -2651,7 +2663,7 @@ class SQLiteStateStore:
             if version == 3:
                 connection.execute("PRAGMA user_version = 4")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                4, 5, 6, 7,
+                4, 5, 6, 7, 8,
             }:
                 raise StorageIntegrityError(
                     "T28 foundation migration did not reach version 4"
@@ -2700,7 +2712,7 @@ class SQLiteStateStore:
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
             migrated = version == 4
-            if version not in {4, 5, 6, 7}:
+            if version not in {4, 5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "validator containment semantic version is unsupported"
                 )
@@ -2954,7 +2966,7 @@ class SQLiteStateStore:
         )
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {5, 6, 7}:
+            if version not in {5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "trusted-readiness semantic version is unsupported"
                 )
@@ -3014,7 +3026,7 @@ class SQLiteStateStore:
                     )
                 connection.execute("PRAGMA user_version = 6")
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                6, 7,
+                6, 7, 8,
             }:
                 raise StorageIntegrityError(
                     "trusted-readiness migration did not reach version 6"
@@ -3168,7 +3180,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {6, 7}:
+            if version not in {6, 7, 8}:
                 raise StorageIntegrityError(
                     "proof-free disposition semantic version is unsupported"
                 )
@@ -3212,7 +3224,7 @@ class SQLiteStateStore:
                 raise StorageIntegrityError(
                     "proof-free disposition schema is missing or incompatible"
                 )
-            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 7:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {7, 8}:
                 raise StorageIntegrityError(
                     "proof-free disposition migration did not reach version 7"
                 )
@@ -3221,6 +3233,151 @@ class SQLiteStateStore:
                 if failure_hook is not None and version == 6:
                     failure_hook(
                         "after_proof_free_disposition_migration_commit_before_acknowledgement"
+                    )
+        except BaseException:
+            if manage_transaction and connection.in_transaction:
+                connection.rollback()
+            raise
+
+    @staticmethod
+    def _migrate_validation_pause_drain_version(
+        connection: sqlite3.Connection,
+        *,
+        manage_transaction: bool = True,
+        failure_hook: FailureHook | None = None,
+    ) -> None:
+        table_sql = {
+            "active_validation_pause_actions": """
+                CREATE TABLE active_validation_pause_actions (
+                    pause_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    request_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    checkpoint_event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    fence_id TEXT NOT NULL UNIQUE,
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    payload_digest TEXT NOT NULL,
+                    request_event_hash TEXT NOT NULL UNIQUE,
+                    checkpoint_event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSING'),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "validation_pause_settlements": """
+                CREATE TABLE validation_pause_settlements (
+                    settlement_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    source_pause_id TEXT NOT NULL UNIQUE,
+                    resolution_kind TEXT NOT NULL CHECK (resolution_kind IN (
+                        'RESULT_CESSATION', 'INTERRUPTION_CESSATION', 'NONLAUNCH'
+                    )),
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state = 'PAUSED'),
+                    body_json TEXT NOT NULL
+                )
+            """,
+            "settled_validation_pause_resume_actions": """
+                CREATE TABLE settled_validation_pause_resume_actions (
+                    resume_id TEXT PRIMARY KEY,
+                    command_id TEXT NOT NULL UNIQUE,
+                    event_id TEXT NOT NULL UNIQUE REFERENCES events(event_id),
+                    repository_id TEXT NOT NULL REFERENCES repositories(repository_id),
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    item_id TEXT NOT NULL,
+                    logical_effect_id TEXT NOT NULL,
+                    source_settlement_id TEXT NOT NULL UNIQUE REFERENCES validation_pause_settlements(settlement_id),
+                    source_pause_id TEXT NOT NULL UNIQUE,
+                    pause_fence_id TEXT NOT NULL UNIQUE,
+                    payload_digest TEXT NOT NULL,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    resulting_state TEXT NOT NULL CHECK (resulting_state IN (
+                        'VALIDATING', 'BLOCKED', 'PAUSED'
+                    )),
+                    body_json TEXT NOT NULL
+                )
+            """,
+        }
+
+        def canonical(sql: str) -> str:
+            return "".join(sql.upper().split()).replace(
+                "IFNOTEXISTS", ""
+            ).rstrip(";")
+
+        if manage_transaction:
+            connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {7, 8}:
+                raise StorageIntegrityError(
+                    "validation pause drain semantic version is unsupported"
+                )
+            existing = {
+                str(row["name"]): str(row["sql"])
+                for row in connection.execute(
+                    "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                    "AND name IN (?, ?, ?)", tuple(table_sql)
+                )
+            }
+            if version == 7:
+                if existing:
+                    raise StorageIntegrityError(
+                        "validation pause drain schema is partially migrated"
+                    )
+                for row in connection.execute(
+                    "SELECT body_json FROM events WHERE event_kind IN "
+                    "('VALIDATION_PAUSE_REQUESTED', "
+                    "'VALIDATION_PAUSE_CHECKPOINTED', 'PAUSE_SETTLED', "
+                    "'RESUME_ACCEPTED')"
+                ):
+                    try:
+                        if json.loads(str(row["body_json"])).get(
+                            "validation_pause_drain_binding_version"
+                        ) == 1:
+                            raise StorageIntegrityError(
+                                "validation pause drain history predates its projection"
+                            )
+                    except json.JSONDecodeError as error:
+                        raise StorageIntegrityError(
+                            "validation pause drain history is not valid JSON"
+                        ) from error
+                for sql in table_sql.values():
+                    connection.execute(sql)
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_validation_pause_drain_migration_writes_before_commit"
+                    )
+                connection.execute("PRAGMA user_version = 8")
+                existing = {
+                    str(row["name"]): str(row["sql"])
+                    for row in connection.execute(
+                        "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
+                        "AND name IN (?, ?, ?)", tuple(table_sql)
+                    )
+                }
+            if set(existing) != set(table_sql) or any(
+                canonical(existing[name]) != canonical(sql)
+                for name, sql in table_sql.items()
+            ):
+                raise StorageIntegrityError(
+                    "validation pause drain schema is missing or incompatible"
+                )
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) != 8:
+                raise StorageIntegrityError(
+                    "validation pause drain migration did not reach version 8"
+                )
+            if manage_transaction:
+                connection.commit()
+                if failure_hook is not None and version == 7:
+                    failure_hook(
+                        "after_validation_pause_drain_migration_commit_before_acknowledgement"
                     )
         except BaseException:
             if manage_transaction and connection.in_transaction:
@@ -3595,7 +3752,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4, 5, 6, 7}:
+            if version not in {0, 1, 2, 3, 4, 5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported"
                 )
@@ -3603,7 +3760,7 @@ class SQLiteStateStore:
                 connection
             )
             resolved_operation_ids: set[str] = set()
-            if version in {2, 3, 4, 5, 6, 7}:
+            if version in {2, 3, 4, 5, 6, 7, 8}:
                 table_exists = connection.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                     "name = 'verified_receipt_reconciliation_actions'"
@@ -3655,7 +3812,7 @@ class SQLiteStateStore:
                                     "verified-receipt resolution is missing"
                                 )
                             resolved_operation_ids.add(str(uncertainty_id))
-                if version in {3, 4, 5, 6, 7}:
+                if version in {3, 4, 5, 6, 7, 8}:
                     proven_table = connection.execute(
                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND "
                         "name = 'proven_nonexecution_actions'"
@@ -3865,7 +4022,7 @@ class SQLiteStateStore:
                     "operation-uncertainty projection diverges from history"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                1, 2, 3, 4, 5, 6, 7,
+                1, 2, 3, 4, 5, 6, 7, 8,
             }:
                 raise StorageIntegrityError(
                     "operation-uncertainty migration did not advance"
@@ -3937,7 +4094,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {1, 2, 3, 4, 5, 6, 7}:
+            if version not in {1, 2, 3, 4, 5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "verified-receipt semantic version is unsupported"
                 )
@@ -3978,7 +4135,7 @@ class SQLiteStateStore:
                     "verified-receipt action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                2, 3, 4, 5, 6, 7,
+                2, 3, 4, 5, 6, 7, 8,
             }:
                 raise StorageIntegrityError(
                     "verified-receipt migration did not advance"
@@ -4181,7 +4338,7 @@ class SQLiteStateStore:
             connection.execute("BEGIN IMMEDIATE")
         try:
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {2, 3, 4, 5, 6, 7}:
+            if version not in {2, 3, 4, 5, 6, 7, 8}:
                 raise StorageIntegrityError(
                     "proven-nonexecution semantic version is unsupported"
                 )
@@ -4535,7 +4692,7 @@ class SQLiteStateStore:
                     "proven-nonexecution action schema is missing or incompatible"
                 )
             if int(connection.execute("PRAGMA user_version").fetchone()[0]) not in {
-                3, 4, 5, 6, 7,
+                3, 4, 5, 6, 7, 8,
             }:
                 raise StorageIntegrityError(
                     "proven-nonexecution migration did not advance"
@@ -10474,6 +10631,224 @@ class SQLiteStateStore:
                 "validation recovery attestation or semantics are invalid"
             ) from error
 
+    def _validate_settled_validation_pause_recovery_event(
+        self,
+        connection: sqlite3.Connection,
+        body: Mapping[str, object],
+        predecessor_state: LifecycleState,
+        predecessor_cursor: str | None,
+    ) -> None:
+        expected_fields = set(
+            SettledValidationPauseRecoveryRequest.__dataclass_fields__
+        ) | {
+            "attestation_digest", "attestation_evidence", "attestation_id",
+            "continuation_cursor", "event_kind", "lifecycle_from",
+            "lifecycle_to", "plan_event_hash", "policy_id",
+            "policy_version", "previous_event_hash", "recovery_kind",
+            "request_digest", "schema_version", "sequence",
+            "source_continuation_cursor", "transition_id", "writer_epoch",
+        }
+        try:
+            if set(body) != expected_fields or (
+                type(body["schema_version"]) is not int
+                or body["schema_version"] != 1
+                or type(body["sequence"]) is not int
+                or int(body["sequence"]) <= 0
+                or type(body["writer_epoch"]) is not int
+                or int(body["writer_epoch"]) <= 0
+            ):
+                raise ValueError(
+                    "settled validation pause recovery schema is invalid"
+                )
+            request = SettledValidationPauseRecoveryRequest(
+                **{
+                    field: body[field]
+                    for field in SettledValidationPauseRecoveryRequest.__dataclass_fields__
+                }
+            )
+            request.validate()
+            if (
+                body["request_digest"] != self._event_hash(request.__dict__)
+                or request.expected_run_head != body["previous_event_hash"]
+            ):
+                raise ValueError(
+                    "settled validation pause recovery request binding is invalid"
+                )
+            plan = connection.execute(
+                "SELECT plan.*, event.sequence AS plan_sequence FROM "
+                "validation_plans AS plan JOIN events AS event ON "
+                "event.event_id = plan.event_id WHERE plan.plan_id = ? AND "
+                "plan.repository_id = ? AND plan.run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            settlement = connection.execute(
+                "SELECT settlement.*, event.sequence AS source_sequence FROM "
+                "validation_pause_settlements AS settlement JOIN events AS "
+                "event ON event.event_id = settlement.event_id WHERE "
+                "settlement.settlement_id = ? AND settlement.event_id = ? AND "
+                "settlement.event_hash = ? AND settlement.source_pause_id = ?",
+                (
+                    request.source_settlement_id,
+                    request.source_settlement_event_id,
+                    request.source_settlement_event_hash,
+                    request.source_pause_id,
+                ),
+            ).fetchone()
+            intent = connection.execute(
+                "SELECT intent.*, event.sequence AS intent_sequence FROM "
+                "validator_intents AS intent JOIN events AS event ON "
+                "event.event_id = intent.event_id WHERE "
+                "intent.validator_intent_id = ?",
+                (request.failed_validator_intent_id,),
+            ).fetchone()
+            if (
+                plan is None or settlement is None or intent is None
+                or int(plan["plan_sequence"]) >= int(body["sequence"])
+                or int(settlement["source_sequence"]) >= int(body["sequence"])
+                or int(intent["intent_sequence"]) >= int(body["sequence"])
+            ):
+                raise ValueError(
+                    "settled validation pause recovery lost its source"
+                )
+            settlement_body = json.loads(str(settlement["body_json"]))
+            if (
+                plan["item_id"], plan["logical_effect_id"],
+                plan["revision_digest"], plan["event_hash"],
+                settlement["resolution_kind"],
+                settlement_body["validator_intent_id"],
+                settlement_body["validator_attempt_id"],
+                intent["repository_id"], intent["run_id"], intent["check_id"],
+            ) != (
+                request.item_id, request.logical_effect_id,
+                request.revision_digest, body["plan_event_hash"],
+                settlement["resolution_kind"],
+                request.failed_validator_intent_id,
+                request.failed_validator_attempt_id, request.repository_id,
+                request.run_id, request.check_id,
+            ) or settlement["resolution_kind"] not in {
+                "INTERRUPTION_CESSATION", "NONLAUNCH",
+            }:
+                raise ValueError(
+                    "settled validation pause recovery source is invalid"
+                )
+            evidence_value = body["attestation_evidence"]
+            if not isinstance(evidence_value, dict) or set(evidence_value) != set(
+                SyntheticSettledValidationPauseRecoveryAttestation.__dataclass_fields__
+            ):
+                raise ValueError(
+                    "settled validation pause recovery attestation schema is invalid"
+                )
+            attestation = SyntheticSettledValidationPauseRecoveryAttestation(
+                **evidence_value
+            )
+            if self._classification_authority is None or (
+                plan["classification_issuer_fingerprint"]
+                != self._classification_authority.issuer_fingerprint
+            ):
+                raise ValueError(
+                    "settled validation pause recovery has no trusted issuer"
+                )
+            self._classification_authority.verify_settled_validation_pause_recovery_attestation(
+                attestation
+            )
+            expected_attestation = (
+                request.recovery_id, request.repository_id, request.run_id,
+                request.item_id, request.logical_effect_id, request.plan_id,
+                plan["event_hash"], request.revision_digest, request.check_id,
+                request.source_settlement_id,
+                request.source_settlement_event_hash, request.source_pause_id,
+                request.failed_validator_intent_id,
+                request.failed_validator_attempt_id,
+                request.successor_validator_attempt_id,
+                request.remediation_evidence_digest,
+                request.expected_run_head, request.expected_slot_attempt_id,
+                request.expected_slot_generation, request.action,
+                SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
+                SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
+            )
+            actual_attestation = (
+                attestation.recovery_id, attestation.repository_id,
+                attestation.run_id, attestation.item_id,
+                attestation.logical_effect_id, attestation.plan_id,
+                attestation.plan_event_hash, attestation.revision_digest,
+                attestation.check_id, attestation.source_settlement_id,
+                attestation.source_settlement_event_hash,
+                attestation.source_pause_id,
+                attestation.failed_validator_intent_id,
+                attestation.failed_validator_attempt_id,
+                attestation.successor_validator_attempt_id,
+                attestation.remediation_evidence_digest,
+                attestation.evaluated_run_head, attestation.slot_attempt_id,
+                attestation.slot_generation, attestation.action,
+                attestation.policy_id, attestation.policy_version,
+            )
+            expected_cursor = f"validation-recovery:{request.recovery_id}"
+            if (
+                body["attestation_id"] != attestation.attestation_id
+                or body["attestation_digest"]
+                != self._event_hash(attestation.__dict__)
+                or actual_attestation != expected_attestation
+                or predecessor_state is not LifecycleState.BLOCKED
+                or predecessor_cursor != settlement_body["continuation_cursor"]
+                or body["source_continuation_cursor"] != predecessor_cursor
+                or body["lifecycle_from"] != LifecycleState.BLOCKED.value
+                or body["lifecycle_to"] != LifecycleState.VALIDATING.value
+                or body["continuation_cursor"] != expected_cursor
+                or body["event_kind"] != "BLOCKER_RESOLVED"
+                or body["recovery_kind"] != "SETTLED_VALIDATION_PAUSE"
+                or body["transition_id"] != "T16"
+            ):
+                raise ValueError(
+                    "settled validation pause recovery route is invalid"
+                )
+            reservation = connection.execute(
+                "SELECT * FROM budget_reservations WHERE repository_id = ? "
+                "AND run_id = ? AND item_id = ? AND logical_effect_id = ? "
+                "AND attempt_id = ?",
+                (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                ),
+            ).fetchone()
+            if reservation is None or not self._operation_slot_current_before(
+                connection, reservation, int(body["sequence"]),
+                expected_generation=request.expected_slot_generation,
+            ):
+                raise ValueError(
+                    "settled validation pause recovery did not own the slot"
+                )
+            for row in connection.execute(
+                "SELECT validator_intent_id FROM validator_intents WHERE "
+                "repository_id = ? AND run_id = ?",
+                (request.repository_id, request.run_id),
+            ):
+                if self._validator_intent_active_before(
+                    connection, str(row["validator_intent_id"]),
+                    int(body["sequence"]),
+                ):
+                    raise ValueError(
+                        "settled validation pause recovery has active validator work"
+                    )
+            accounting_error = self._accounting_closure_error(
+                connection, request.repository_id, request.run_id,
+                request.logical_effect_id,
+                request.expected_slot_attempt_id,
+                settlement_sequence_limit=int(body["sequence"]),
+            )
+            if accounting_error is not None:
+                raise ValueError(
+                    "settled validation pause recovery accounting is open: "
+                    f"{accounting_error}"
+                )
+        except (
+            DispatchDenied, KeyError, TypeError, ValueError,
+            json.JSONDecodeError,
+        ) as error:
+            raise StorageIntegrityError(
+                "settled validation pause recovery attestation or semantics are invalid"
+            ) from error
+
     def _validate_validation_launch_recovery_event(
         self,
         connection: sqlite3.Connection,
@@ -11762,11 +12137,18 @@ class SQLiteStateStore:
                     "settlement.settlement_event_id = event.event_id AND "
                     "settlement.reservation_id = ?) AND json_extract("
                     "event.body_json, '$.lifecycle_to') NOT IN "
-                    "('STOPPED', 'FAILED_FINAL', 'COMPLETED'))) LIMIT 1",
+                    "('STOPPED', 'FAILED_FINAL', 'COMPLETED')) OR "
+                    "(event.event_kind = 'PAUSE_SETTLED' AND json_extract("
+                    "event.body_json, '$.pause_kind') = "
+                    "'VALIDATION_PAUSE_SETTLEMENT' AND json_extract("
+                    "event.body_json, '$.validator_intent_id') = ? AND "
+                    "json_extract(event.body_json, '$.resolution_kind') != "
+                    "'RESULT_CESSATION')) LIMIT 1",
                     (
                         settlement_sequence_limit, run_id,
                         intent["validator_intent_id"],
                         intent["validator_intent_id"], intent["reservation_id"],
+                        intent["validator_intent_id"],
                     ),
                 ).fetchone() is not None
             if not historically_settled and not is_settling:
@@ -11807,6 +12189,24 @@ class SQLiteStateStore:
                     ),
                 ).fetchone() is not None
                 if settling_cessation or terminally_cancelled:
+                    continue
+                interruption_settlement = connection.execute(
+                    "SELECT 1 FROM validation_pause_settlements AS settlement "
+                    "JOIN events AS event ON event.event_id = "
+                    "settlement.event_id WHERE settlement.repository_id = ? "
+                    "AND settlement.run_id = ? AND "
+                    "settlement.resolution_kind = 'INTERRUPTION_CESSATION' "
+                    "AND json_extract(settlement.body_json, "
+                    "'$.validator_intent_id') = ? AND json_extract("
+                    "settlement.body_json, '$.cessation_id') IS NOT NULL AND "
+                    "(? IS NULL OR event.sequence < ?) LIMIT 1",
+                    (
+                        repository_id, run_id,
+                        intent["validator_intent_id"],
+                        settlement_sequence_limit, settlement_sequence_limit,
+                    ),
+                ).fetchone()
+                if interruption_settlement is not None:
                     continue
                 nonexecution = connection.execute(
                     "SELECT e.body_json FROM budget_settlements AS settlement "
@@ -16712,6 +17112,1251 @@ class SQLiteStateStore:
             request.pause_id, request.command_id,
             request.checkpoint_event_id, sequence, checkpoint_hash,
             resulting_state, False,
+        )
+
+    def pause_active_validation(
+        self,
+        request: ActiveValidationPauseRequest,
+        capability: SyntheticOperatorCapability,
+        activity: SyntheticValidatorActivityAttestation,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("active validation pause targets another repository")
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, "PAUSE"):
+            raise DispatchDenied("operator capability does not bind active validation pause")
+        payload = {
+            **request.__dict__,
+            "activity_attestation": dict(activity.__dict__),
+            "capability_evidence": dict(capability.__dict__),
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "drain_kind": "ACTIVE_VALIDATOR",
+            "validation_pause_drain_binding_version": 1,
+        }
+        payload_digest = self._event_hash(payload)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM active_validation_pause_actions WHERE "
+                    "command_id = ? OR pause_id = ? OR request_event_id = ? OR "
+                    "checkpoint_event_id = ?",
+                    (
+                        request.command_id, request.pause_id,
+                        request.request_event_id, request.checkpoint_event_id,
+                    ),
+                ).fetchone()
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None or prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_validator_activity_attestation(
+                        activity, request
+                    )
+                    if prior is None or prior_command is None or (
+                        prior["payload_digest"] != payload_digest
+                        or prior_command["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "active validation pause replay lost exact evidence"
+                        )
+                    connection.rollback()
+                    body = json.loads(str(prior["body_json"]))
+                    return ControlReceipt(
+                        str(prior["pause_id"]), str(prior["command_id"]),
+                        str(prior["checkpoint_event_id"]), int(body["sequence"]),
+                        str(prior["checkpoint_event_hash"]),
+                        LifecycleState.PAUSING, True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or request.expected_run_head != run_heads.get(request.run_id)
+                ):
+                    raise DispatchDenied("active validation pause head is stale")
+                authority.verify_operator_for_action(capability)
+                authority.verify_validator_activity_attestation(activity, request)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?", (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied("operator grant was already redeemed")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                intent = connection.execute(
+                    "SELECT * FROM validator_intents WHERE validator_intent_id = ?",
+                    (request.validator_intent_id,),
+                ).fetchone()
+                contact = connection.execute(
+                    "SELECT * FROM adapter_contacts WHERE contact_id = ? AND "
+                    "event_id = ? AND event_hash = ?",
+                    (
+                        request.contact_id, request.contact_event_id,
+                        request.contact_event_hash,
+                    ),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+                    (request.reservation_id,),
+                ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                ):
+                    raise DispatchDenied("active validation pause lost its plan")
+                if plan["classification_issuer_fingerprint"] != (
+                    authority.issuer_fingerprint
+                ):
+                    raise DispatchDenied("active validation pause issuer differs from plan")
+                if LifecycleState(str(run["lifecycle_state"])) is not (
+                    LifecycleState.VALIDATING
+                ) or run["continuation_cursor"] != (
+                    request.expected_preserved_continuation_cursor
+                ):
+                    raise DispatchDenied("active validation pause requires current VALIDATING cursor")
+                if intent is None or contact is None:
+                    raise DispatchDenied("active validator evidence is unavailable")
+                try:
+                    intent_body = json.loads(str(intent["body_json"]))
+                    contact_body = json.loads(str(contact["body_json"]))
+                except (TypeError, json.JSONDecodeError) as error:
+                    raise DispatchDenied("active validator evidence is unavailable") from error
+                if (
+                    intent["repository_id"], intent["run_id"], intent["item_id"],
+                    intent["logical_effect_id"], intent["event_id"],
+                    intent["event_hash"], intent["validator_attempt_id"],
+                    intent["check_id"], intent["reservation_id"], intent["status"],
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.validator_intent_event_id,
+                    request.validator_intent_event_hash,
+                    request.validator_attempt_id, request.check_id,
+                    request.reservation_id, "ACTIVE",
+                ):
+                    raise DispatchDenied("activity attestation does not bind the active intent")
+                if (
+                    contact["repository_id"], contact["run_id"], contact["item_id"],
+                    contact["contact_kind"], contact["source_id"],
+                    contact["target_digest"],
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    "VALIDATOR", f"VALIDATOR:{request.validator_intent_id}",
+                    request.contact_target_digest,
+                ) or contact_body.get("attempt_id") != request.validator_attempt_id:
+                    raise DispatchDenied("activity attestation does not bind validator contact")
+                if request.contact_target_digest != self._adapter_target_digest(
+                    request.repository_id, "VALIDATOR"
+                ) or activity.descendant_scope_digest != intent_body.get(
+                    "containment_digest"
+                ) or contact_body.get("containment_digest") != (
+                    activity.descendant_scope_digest
+                ):
+                    raise DispatchDenied("validator activity descendant scope is not exact")
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
+                    int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("active validation pause slot is stale")
+                if reservation is None or (
+                    reservation["repository_id"], reservation["run_id"],
+                    reservation["item_id"], reservation["logical_effect_id"],
+                    reservation["attempt_id"], reservation["settlement_head_hash"],
+                    reservation["disposition"],
+                ) != (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.validator_attempt_id,
+                    request.expected_settlement_head_hash,
+                    BudgetDisposition.RESERVED.value,
+                ):
+                    raise DispatchDenied("active validation pause reservation is stale")
+                if connection.execute(
+                    "SELECT 1 FROM validator_cessations WHERE validator_intent_id = ?",
+                    (request.validator_intent_id,),
+                ).fetchone() is not None:
+                    raise DispatchDenied("validator already ceased before active pause")
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T08", LifecycleState.VALIDATING,
+                        LifecycleState.PAUSING, TRANSITIONS["T08"].required_guards,
+                    )
+                else:
+                    authorize_transition(
+                        LifecycleState.VALIDATING, LifecycleState.PAUSING
+                    )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                request_body = {
+                    **payload, "event_id": request.request_event_id,
+                    "event_kind": "VALIDATION_PAUSE_REQUESTED",
+                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": run["head_hash"], "schema_version": 1,
+                    "sequence": sequence, "writer_epoch": writer_epoch,
+                }
+                request_hash = self._event_hash(request_body)
+                request_json = json.dumps(request_body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'VALIDATION_PAUSE_REQUESTED', ?, ?, ?)",
+                    (request.request_event_id, request.repository_id, request.run_id,
+                     request.item_id, sequence, request.command_id, writer_epoch,
+                     run["head_hash"], request_hash, request_json),
+                )
+                connection.execute(
+                    "INSERT INTO dispatch_fences VALUES (?, ?, ?, ?, ?, ?)",
+                    (request.fence_id, request.repository_id, request.item_id,
+                     request.logical_effect_id, request.reason_code,
+                     request.request_event_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_active_validation_pause_request_before_checkpoint")
+                sequence += 1
+                checkpoint_body = {
+                    **payload, "event_id": request.checkpoint_event_id,
+                    "event_kind": "VALIDATION_PAUSE_CHECKPOINTED",
+                    "lifecycle_from": LifecycleState.VALIDATING.value,
+                    "lifecycle_to": LifecycleState.PAUSING.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request_hash,
+                    "request_event_hash": request_hash, "schema_version": 1,
+                    "sequence": sequence, "writer_epoch": writer_epoch,
+                }
+                checkpoint_hash = self._event_hash(checkpoint_body)
+                checkpoint_json = json.dumps(checkpoint_body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'VALIDATION_PAUSE_CHECKPOINTED', ?, ?, ?)",
+                    (request.checkpoint_event_id, request.repository_id,
+                     request.run_id, request.item_id, sequence,
+                     request.command_id, writer_epoch, request_hash,
+                     checkpoint_hash, checkpoint_json),
+                )
+                connection.execute(
+                    "INSERT INTO active_validation_pause_actions VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PAUSING', ?)",
+                    (request.pause_id, request.command_id, request.request_event_id,
+                     request.checkpoint_event_id, request.fence_id,
+                     request.repository_id, request.run_id, request.item_id,
+                     request.logical_effect_id, payload_digest, request_hash,
+                     checkpoint_hash, checkpoint_json),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'PAUSE', ?, ?)",
+                    (capability.claim_id, request.repository_id,
+                     capability.grant_id, request.command_id, request.run_id,
+                     capability.scope_digest, authority.issuer_fingerprint),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (request.command_id, payload_digest,
+                     request.checkpoint_event_id, sequence, checkpoint_hash),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSING', head_sequence = ?, "
+                    "head_hash = ? WHERE run_id = ?",
+                    (sequence, checkpoint_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (checkpoint_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_active_validation_pause_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_active_validation_pause_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.pause_id, request.command_id, request.checkpoint_event_id,
+            sequence, checkpoint_hash, LifecycleState.PAUSING, False,
+        )
+
+    def settle_validation_pause(
+        self,
+        request: ValidationPauseSettlementRequest,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("validation pause settlement targets another repository")
+        payload = {
+            **request.__dict__,
+            "pause_kind": "VALIDATION_PAUSE_SETTLEMENT",
+            "validation_pause_drain_binding_version": 1,
+        }
+        payload_digest = self._event_hash(payload)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM validation_pause_settlements WHERE "
+                    "command_id = ? OR settlement_id = ? OR event_id = ?",
+                    (request.command_id, request.settlement_id, request.event_id),
+                ).fetchone()
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None or prior_command is not None:
+                    if prior is None or prior_command is None or (
+                        prior["payload_digest"] != payload_digest
+                        or prior_command["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "validation pause settlement replay lost exact evidence"
+                        )
+                    connection.rollback()
+                    body = json.loads(str(prior["body_json"]))
+                    return ControlReceipt(
+                        str(prior["settlement_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(body["sequence"]),
+                        str(prior["event_hash"]), LifecycleState.PAUSED, True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                active_pause = connection.execute(
+                    "SELECT * FROM active_validation_pause_actions WHERE "
+                    "pause_id = ? AND request_event_id = ? AND "
+                    "request_event_hash = ? AND checkpoint_event_id = ? AND "
+                    "checkpoint_event_hash = ? AND fence_id = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_request_event_id,
+                        request.source_pause_request_event_hash,
+                        request.source_pause_checkpoint_event_id,
+                        request.source_pause_checkpoint_event_hash,
+                        request.pause_fence_id,
+                    ),
+                ).fetchone()
+                legacy_pause = None
+                if active_pause is None and request.resolution_kind == "NONLAUNCH":
+                    legacy_pause = connection.execute(
+                        "SELECT * FROM validation_pause_actions WHERE pause_id = ? "
+                        "AND request_event_id = ? AND request_event_hash = ? AND "
+                        "checkpoint_event_id = ? AND checkpoint_event_hash = ? "
+                        "AND fence_id = ?",
+                        (
+                            request.source_pause_id,
+                            request.source_pause_request_event_id,
+                            request.source_pause_request_event_hash,
+                            request.source_pause_checkpoint_event_id,
+                            request.source_pause_checkpoint_event_hash,
+                            request.pause_fence_id,
+                        ),
+                    ).fetchone()
+                if run is None or plan is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                ):
+                    raise DispatchDenied("validation pause settlement lost its plan")
+                if active_pause is None and legacy_pause is None:
+                    raise DispatchDenied("validation pause settlement source is not exact")
+                if active_pause is not None and (
+                    LifecycleState(str(run["lifecycle_state"]))
+                    is not LifecycleState.PAUSING
+                ):
+                    raise DispatchDenied("T07 requires durable PAUSING state")
+                if legacy_pause is not None and (
+                    legacy_pause["checkpoint_kind"] not in {
+                        "UNCONTACTED_UNRESOLVED", "CONTACTED_UNRESOLVED",
+                    }
+                    or LifecycleState(str(run["lifecycle_state"]))
+                    is not LifecycleState.PAUSED
+                ):
+                    raise DispatchDenied("nonlaunch settlement requires unresolved validation pause")
+                pause_body = json.loads(str(
+                    (active_pause if active_pause is not None else legacy_pause)["body_json"]
+                ))
+                expected_bindings = (
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.plan_id,
+                    request.revision_digest, request.validator_intent_id,
+                    request.validator_attempt_id, request.check_id,
+                    request.reservation_id, request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                )
+                pause_bindings = tuple(
+                    pause_body.get(key) for key in (
+                        "repository_id", "run_id", "item_id", "logical_effect_id",
+                        "plan_id", "revision_digest", "validator_intent_id",
+                        "validator_attempt_id", "check_id", "reservation_id",
+                        "expected_slot_attempt_id", "expected_slot_generation",
+                    )
+                )
+                if pause_bindings != expected_bindings:
+                    raise DispatchDenied("validation pause settlement changed pause bindings")
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (request.pause_fence_id, request.repository_id,
+                     request.source_pause_request_event_id),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+                    (request.reservation_id,),
+                ).fetchone()
+                accounting_event = connection.execute(
+                    "SELECT event.body_json FROM budget_settlements AS "
+                    "settlement JOIN events AS event ON event.event_id = "
+                    "settlement.settlement_event_id WHERE "
+                    "settlement.settlement_hash = ? AND "
+                    "settlement.reservation_id = ?",
+                    (
+                        request.expected_settlement_head_hash,
+                        request.reservation_id,
+                    ),
+                ).fetchone()
+                if fence is None or slot is None or (
+                    slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
+                    int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("validation pause settlement lost fence or slot")
+                if reservation is None or accounting_event is None or (
+                    reservation["settlement_head_hash"]
+                    != request.expected_settlement_head_hash
+                ):
+                    raise DispatchDenied("validation pause settlement accounting is unresolved")
+                accounting_body = json.loads(str(accounting_event["body_json"]))
+                authoritative_usage = (
+                    reservation["disposition"] in {
+                        BudgetDisposition.CONSUMED.value,
+                        BudgetDisposition.ADJUSTED.value,
+                    }
+                    and int(reservation["held_units"]) == 0
+                    and not bool(reservation["uncertainty"])
+                    and accounting_body.get("actual_units")
+                    == int(reservation["charged_units"])
+                )
+                authoritative_nonlaunch = (
+                    reservation["disposition"]
+                    == BudgetDisposition.RELEASED.value
+                    and int(reservation["held_units"]) == 0
+                    and int(reservation["charged_units"]) == 0
+                    and not bool(reservation["uncertainty"])
+                    and accounting_body.get("event_kind")
+                    == "NONDISPATCH_PROVEN"
+                    and accounting_body.get("non_dispatch_proven") is True
+                    and accounting_body.get("zero_liability_proven") is True
+                    and accounting_body.get("all_obligations_settled") is True
+                    and accounting_body.get("contradiction") is False
+                    and accounting_body.get("uncertainty") is False
+                )
+                if (
+                    request.resolution_kind == "NONLAUNCH"
+                    and not authoritative_nonlaunch
+                ) or (
+                    request.resolution_kind != "NONLAUNCH"
+                    and not authoritative_usage
+                ):
+                    raise DispatchDenied(
+                        "validation pause settlement accounting is not authoritative"
+                    )
+                cessation = None
+                if request.resolution_kind != "NONLAUNCH":
+                    cessation = connection.execute(
+                        "SELECT * FROM validator_cessations WHERE cessation_id = ? "
+                        "AND event_id = ? AND event_hash = ? AND "
+                        "validator_intent_id = ? AND validator_attempt_id = ?",
+                        (
+                            request.cessation_id, request.cessation_event_id,
+                            request.cessation_event_hash,
+                            request.validator_intent_id,
+                            request.validator_attempt_id,
+                        ),
+                    ).fetchone()
+                    if cessation is None:
+                        raise DispatchDenied("all-descendant validator cessation is absent")
+                if request.resolution_kind == "RESULT_CESSATION":
+                    observation = connection.execute(
+                        "SELECT * FROM validator_observations WHERE "
+                        "observation_id = ? AND event_id = ? AND event_hash = ? "
+                        "AND validator_intent_id = ? AND validator_attempt_id = ?",
+                        (
+                            request.resolution_id, request.resolution_event_id,
+                            request.resolution_event_hash,
+                            request.validator_intent_id,
+                            request.validator_attempt_id,
+                        ),
+                    ).fetchone()
+                    if observation is None or not bool(cessation["result_available"]) or (
+                        cessation["result_id"] != observation["source_result_id"]
+                        or cessation["result_digest"] != observation["result_digest"]
+                        or observation["settlement_hash"]
+                        != request.expected_settlement_head_hash
+                    ):
+                        raise DispatchDenied("result and cessation do not form one closed source")
+                    derived_cursor = (
+                        "validation-application:v1:"
+                        f"{observation['observation_id']}:{observation['check_id']}:"
+                        f"{observation['validator_attempt_id']}"
+                    )
+                elif request.resolution_kind == "INTERRUPTION_CESSATION":
+                    if bool(cessation["result_available"]) or (
+                        request.resolution_id, request.resolution_event_id,
+                        request.resolution_event_hash,
+                    ) != (
+                        request.cessation_id, request.cessation_event_id,
+                        request.cessation_event_hash,
+                    ):
+                        raise DispatchDenied("interruption settlement is not result-free cessation")
+                    derived_cursor = (
+                        "validator-cessation:v1:"
+                        f"{request.cessation_id}:{request.check_id}:"
+                        f"{request.validator_attempt_id}"
+                    )
+                else:
+                    resolution = connection.execute(
+                        "SELECT * FROM events WHERE event_id = ? AND event_hash = ? "
+                        "AND repository_id = ? AND run_id = ? AND "
+                        "event_kind = 'NONDISPATCH_PROVEN'",
+                        (
+                            request.resolution_event_id,
+                            request.resolution_event_hash,
+                            request.repository_id, request.run_id,
+                        ),
+                    ).fetchone()
+                    if resolution is None or request.resolution_id != (
+                        request.resolution_event_id
+                    ):
+                        raise DispatchDenied("validator nonlaunch proof is absent")
+                    resolution_body = json.loads(str(resolution["body_json"]))
+                    intent = connection.execute(
+                        "SELECT status FROM validator_intents WHERE "
+                        "validator_intent_id = ? AND repository_id = ? AND "
+                        "run_id = ? AND reservation_id = ?",
+                        (
+                            request.validator_intent_id,
+                            request.repository_id, request.run_id,
+                            request.reservation_id,
+                        ),
+                    ).fetchone()
+                    if (
+                        resolution_body.get("reservation_id")
+                        != request.reservation_id
+                        or resolution_body.get("non_dispatch_proven") is not True
+                        or resolution_body.get("zero_liability_proven") is not True
+                        or resolution_body.get("all_obligations_settled") is not True
+                        or resolution_body.get("disposition")
+                        != BudgetDisposition.RELEASED.value
+                        or resolution_body.get("held_units") != 0
+                        or resolution_body.get("charged_units") != 0
+                        or resolution_body.get("contradiction") is not False
+                        or resolution_body.get("uncertainty") is not False
+                        or intent is None or intent["status"] != "SETTLED"
+                    ):
+                        raise DispatchDenied("validator nonlaunch proof is not authoritative")
+                    derived_cursor = (
+                        f"validator-initiation-disabled:{request.validator_intent_id}"
+                    )
+                if request.continuation_cursor != derived_cursor:
+                    raise DispatchDenied("validation pause settlement cursor is not exact")
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T07", LifecycleState.PAUSING, LifecycleState.PAUSED,
+                        TRANSITIONS["T07"].required_guards,
+                    )
+                elif active_pause is not None:
+                    authorize_transition(LifecycleState.PAUSING, LifecycleState.PAUSED)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                body = {
+                    **payload, "event_kind": "PAUSE_SETTLED",
+                    "lifecycle_from": run["lifecycle_state"],
+                    "lifecycle_to": LifecycleState.PAUSED.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1, "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'PAUSE_SETTLED', ?, ?, ?)",
+                    (request.event_id, request.repository_id, request.run_id,
+                     request.item_id, sequence, request.command_id, writer_epoch,
+                     run["head_hash"], event_hash, body_json),
+                )
+                connection.execute(
+                    "INSERT INTO validation_pause_settlements VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PAUSED', ?)",
+                    (request.settlement_id, request.command_id, request.event_id,
+                     request.repository_id, request.run_id, request.item_id,
+                     request.logical_effect_id, request.source_pause_id,
+                     request.resolution_kind, payload_digest, event_hash, body_json),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (request.command_id, payload_digest, request.event_id,
+                     sequence, event_hash),
+                )
+                if request.resolution_kind != "RESULT_CESSATION":
+                    connection.execute(
+                        "UPDATE validator_intents SET status = 'SETTLED' WHERE "
+                        "validator_intent_id = ?", (request.validator_intent_id,),
+                    )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'PAUSED', "
+                    "continuation_cursor = ?, head_sequence = ?, head_hash = ? "
+                    "WHERE run_id = ?",
+                    (derived_cursor, sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_validation_pause_settlement_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_validation_pause_settlement_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        return ControlReceipt(
+            request.settlement_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.PAUSED, False,
+        )
+
+    def resume_settled_validation_pause(
+        self,
+        request: ResumeSettledValidationPauseRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticSettledValidationResumeEvidence,
+        authority: SyntheticAuthority,
+        *,
+        authorize_transition: Callable[[LifecycleState, LifecycleState], None]
+        | None = None,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied("settled validation resume targets another repository")
+        if (
+            capability.repository_id, capability.run_id, capability.action,
+        ) != (request.repository_id, request.run_id, "RESUME"):
+            raise DispatchDenied("operator capability does not bind validation resume")
+        payload = {
+            **request.__dict__,
+            "capability_evidence": dict(capability.__dict__),
+            "capability_issuer_fingerprint": authority.issuer_fingerprint,
+            "resume_evidence": dict(evidence.__dict__),
+            "resume_kind": "VALIDATION_PAUSE_SETTLEMENT",
+            "validation_pause_drain_binding_version": 1,
+        }
+        payload_digest = self._event_hash(payload)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM settled_validation_pause_resume_actions WHERE "
+                    "command_id = ? OR resume_id = ? OR event_id = ?",
+                    (request.command_id, request.resume_id, request.event_id),
+                ).fetchone()
+                prior_command = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                if prior is not None or prior_command is not None:
+                    authority.verify_operator_issued(capability)
+                    authority.verify_settled_validation_resume_evidence(
+                        evidence, request
+                    )
+                    if prior is None or prior_command is None or (
+                        prior["payload_digest"] != payload_digest
+                        or prior_command["payload_digest"] != payload_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "settled validation resume replay lost exact evidence"
+                        )
+                    connection.rollback()
+                    body = json.loads(str(prior["body_json"]))
+                    return ControlReceipt(
+                        str(prior["resume_id"]), str(prior["command_id"]),
+                        str(prior["event_id"]), int(body["sequence"]),
+                        str(prior["event_hash"]),
+                        LifecycleState(str(prior["resulting_state"])), True,
+                    )
+                actual_vector_digest = self._run_heads_digest(run_heads)
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied("independent recovery freshness proof failed")
+                if (
+                    request.expected_catalog_head != catalog_head
+                    or request.expected_run_head != run_heads.get(request.run_id)
+                    or request.expected_run_heads_digest != actual_vector_digest
+                ):
+                    raise DispatchDenied("settled validation resume head vector is stale")
+                authority.verify_operator_for_action(capability)
+                authority.verify_settled_validation_resume_evidence(evidence, request)
+                self._require_effective_authority(
+                    connection, authority.issuer_fingerprint, "OPERATOR",
+                    capability.grant_id, capability.action,
+                    capability.scope_digest,
+                )
+                if connection.execute(
+                    "SELECT 1 FROM operator_redemptions WHERE claim_id = ? OR "
+                    "grant_id = ?", (capability.claim_id, capability.grant_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied("operator grant was already redeemed")
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                settlement = connection.execute(
+                    "SELECT * FROM validation_pause_settlements WHERE "
+                    "settlement_id = ? AND event_id = ? AND event_hash = ? AND "
+                    "source_pause_id = ?",
+                    (
+                        request.source_settlement_id,
+                        request.source_settlement_event_id,
+                        request.source_settlement_event_hash,
+                        request.source_pause_id,
+                    ),
+                ).fetchone()
+                if run is None or plan is None or settlement is None or (
+                    run["item_id"], plan["item_id"], plan["logical_effect_id"],
+                    plan["revision_digest"],
+                ) != (
+                    request.item_id, request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                ):
+                    raise DispatchDenied("settled validation resume lost its plan or source")
+                if plan["classification_issuer_fingerprint"] != (
+                    authority.issuer_fingerprint
+                ):
+                    raise DispatchDenied("settled validation resume issuer differs from plan")
+                settlement_body = json.loads(str(settlement["body_json"]))
+                if (
+                    LifecycleState(str(run["lifecycle_state"]))
+                    is not LifecycleState.PAUSED
+                    or run["continuation_cursor"]
+                    != request.expected_preserved_continuation_cursor
+                    or settlement_body.get("source_pause_request_event_id")
+                    != request.source_pause_request_event_id
+                    or settlement_body.get("source_pause_request_event_hash")
+                    != request.source_pause_request_event_hash
+                    or settlement_body.get("pause_fence_id")
+                    != request.pause_fence_id
+                ):
+                    raise DispatchDenied("settled validation resume does not bind exact pause")
+                fence = connection.execute(
+                    "SELECT * FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (request.pause_fence_id, request.repository_id,
+                     request.source_pause_request_event_id),
+                ).fetchone()
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                reservation = connection.execute(
+                    "SELECT * FROM budget_reservations WHERE reservation_id = ?",
+                    (request.expected_reservation_id,),
+                ).fetchone()
+                if fence is None or slot is None or (
+                    slot["run_id"], slot["logical_effect_id"], slot["attempt_id"],
+                    int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied("settled validation resume lost fence or slot")
+                if reservation is None or (
+                    reservation["settlement_head_hash"]
+                    != request.expected_settlement_head_hash
+                ):
+                    raise DispatchDenied("settled validation resume accounting changed")
+                other_fences = connection.execute(
+                    "SELECT event.event_kind FROM dispatch_fences AS fence JOIN "
+                    "events AS event ON event.event_id = fence.originating_event_id "
+                    "WHERE fence.repository_id = ? AND fence.fence_id <> ? AND "
+                    "(fence.item_id IS NULL OR fence.item_id = ?) AND "
+                    "(fence.logical_effect_id IS NULL OR fence.logical_effect_id = ?)",
+                    (
+                        request.repository_id, request.pause_fence_id,
+                        request.item_id, request.logical_effect_id,
+                    ),
+                ).fetchall()
+                pause_kinds = {
+                    "PAUSE_FENCE_RECORDED", "PAUSE_REQUESTED",
+                    "VALIDATION_PAUSE_REQUESTED",
+                }
+                has_stacked_pause = any(
+                    row["event_kind"] in pause_kinds for row in other_fences
+                )
+                has_other_blocker = bool(other_fences) and not has_stacked_pause
+                resolution_kind = str(settlement["resolution_kind"])
+                if has_stacked_pause:
+                    resulting_state = LifecycleState.PAUSED
+                elif resolution_kind != "RESULT_CESSATION" or has_other_blocker:
+                    resulting_state = LifecycleState.BLOCKED
+                else:
+                    resulting_state = LifecycleState.VALIDATING
+                if authorize_transition is None:
+                    TransitionEngine().authorize(
+                        "T14", LifecycleState.PAUSED, resulting_state,
+                        TRANSITIONS["T14"].required_guards,
+                    )
+                else:
+                    authorize_transition(LifecycleState.PAUSED, resulting_state)
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                body = {
+                    **payload,
+                    "blocker_codes": (
+                        ["STACKED_PAUSE"] if has_stacked_pause else
+                        ["VALIDATION_RECOVERY_PENDING"]
+                        if resolution_kind != "RESULT_CESSATION" else
+                        ["NON_PAUSE_FENCE_PRESENT"] if has_other_blocker else []
+                    ),
+                    "continuation_cursor": request.expected_preserved_continuation_cursor,
+                    "event_kind": "RESUME_ACCEPTED",
+                    "lifecycle_from": LifecycleState.PAUSED.value,
+                    "lifecycle_to": resulting_state.value,
+                    "payload_digest": payload_digest,
+                    "previous_event_hash": request.expected_run_head,
+                    "schema_version": 1, "sequence": sequence,
+                    "verified_run_heads_digest": actual_vector_digest,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'RESUME_ACCEPTED', ?, ?, ?)",
+                    (request.event_id, request.repository_id, request.run_id,
+                     request.item_id, sequence, request.command_id, writer_epoch,
+                     request.expected_run_head, event_hash, body_json),
+                )
+                if connection.execute(
+                    "DELETE FROM dispatch_fences WHERE fence_id = ? AND "
+                    "repository_id = ? AND originating_event_id = ?",
+                    (request.pause_fence_id, request.repository_id,
+                     request.source_pause_request_event_id),
+                ).rowcount != 1:
+                    raise StorageIntegrityError("validation resume did not clear exact fence")
+                connection.execute(
+                    "INSERT INTO settled_validation_pause_resume_actions VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (request.resume_id, request.command_id, request.event_id,
+                     request.repository_id, request.run_id, request.item_id,
+                     request.logical_effect_id, request.source_settlement_id,
+                     request.source_pause_id, request.pause_fence_id,
+                     payload_digest, event_hash, resulting_state.value, body_json),
+                )
+                connection.execute(
+                    "INSERT INTO operator_redemptions VALUES "
+                    "(?, ?, ?, ?, ?, 'RESUME', ?, ?)",
+                    (capability.claim_id, request.repository_id,
+                     capability.grant_id, request.command_id, request.run_id,
+                     capability.scope_digest, authority.issuer_fingerprint),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (request.command_id, payload_digest, request.event_id,
+                     sequence, event_hash),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = ?, continuation_cursor = ?, "
+                    "head_sequence = ?, head_hash = ? WHERE run_id = ?",
+                    (resulting_state.value,
+                     request.expected_preserved_continuation_cursor,
+                     sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook("after_settled_validation_resume_writes_before_commit")
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook("after_settled_validation_resume_commit_before_acknowledgement")
+            except BaseException:
+                connection.rollback()
+                raise
+        authority.mark_operator_action_committed(capability)
+        return ControlReceipt(
+            request.resume_id, request.command_id, request.event_id,
+            sequence, event_hash, resulting_state, False,
+        )
+
+    def recover_settled_validation_pause(
+        self,
+        request: SettledValidationPauseRecoveryRequest,
+        attestation: SyntheticSettledValidationPauseRecoveryAttestation,
+        authority: SyntheticAuthority,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ValidationRecoveryReceipt:
+        """Authorize one T16 retry after interruption or proven nonlaunch."""
+        request.validate()
+        if request.repository_id != self._repository_id:
+            raise DispatchDenied(
+                "settled validation pause recovery targets another repository"
+            )
+        authority.verify_settled_validation_pause_recovery_attestation(
+            attestation
+        )
+        request_digest = self._event_hash(request.__dict__)
+        attestation_digest = self._event_hash(attestation.__dict__)
+        with self._writer_lock(), closing(self._connect()) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                catalog_head, run_heads = self._heads(
+                    connection, request.repository_id
+                )
+                self._verify_projections(connection, request.repository_id)
+                prior = connection.execute(
+                    "SELECT * FROM command_outcomes WHERE command_id = ?",
+                    (request.command_id,),
+                ).fetchone()
+                prior_event = connection.execute(
+                    "SELECT * FROM events WHERE event_id = ? OR "
+                    "(event_kind = 'BLOCKER_RESOLVED' AND "
+                    "json_extract(body_json, '$.recovery_kind') = "
+                    "'SETTLED_VALIDATION_PAUSE' AND "
+                    "json_extract(body_json, '$.recovery_id') = ?)",
+                    (request.event_id, request.recovery_id),
+                ).fetchone()
+                if prior is not None or prior_event is not None:
+                    if prior is None or prior_event is None:
+                        raise StorageIntegrityError(
+                            "settled validation pause recovery replay is partial"
+                        )
+                    body = json.loads(str(prior_event["body_json"]))
+                    if (
+                        body.get("request_digest") != request_digest
+                        or body.get("attestation_digest") != attestation_digest
+                        or prior["payload_digest"] != request_digest
+                    ):
+                        raise StorageIntegrityError(
+                            "settled validation pause recovery identity was rebound"
+                        )
+                    connection.rollback()
+                    return ValidationRecoveryReceipt(
+                        request.recovery_id, request.command_id,
+                        request.event_id, int(prior_event["sequence"]),
+                        str(prior_event["event_hash"]),
+                        LifecycleState.VALIDATING, True,
+                    )
+                if not self._freshness_oracle.verify(
+                    request.repository_id, catalog_head, run_heads
+                ):
+                    raise DispatchDenied(
+                        "independent recovery freshness proof failed"
+                    )
+                if run_heads.get(request.run_id) != request.expected_run_head:
+                    raise DispatchDenied(
+                        "settled validation pause recovery run head is stale"
+                    )
+                self._require_plan_issuer(
+                    connection, request.repository_id, request.run_id, authority
+                )
+                run = connection.execute(
+                    "SELECT * FROM runs WHERE repository_id = ? AND run_id = ?",
+                    (request.repository_id, request.run_id),
+                ).fetchone()
+                plan = connection.execute(
+                    "SELECT * FROM validation_plans WHERE plan_id = ? AND "
+                    "repository_id = ? AND run_id = ?",
+                    (request.plan_id, request.repository_id, request.run_id),
+                ).fetchone()
+                settlement = connection.execute(
+                    "SELECT * FROM validation_pause_settlements WHERE "
+                    "settlement_id = ? AND event_id = ? AND event_hash = ? AND "
+                    "source_pause_id = ?",
+                    (
+                        request.source_settlement_id,
+                        request.source_settlement_event_id,
+                        request.source_settlement_event_hash,
+                        request.source_pause_id,
+                    ),
+                ).fetchone()
+                intent = connection.execute(
+                    "SELECT * FROM validator_intents WHERE "
+                    "validator_intent_id = ?",
+                    (request.failed_validator_intent_id,),
+                ).fetchone()
+                if run is None or plan is None or settlement is None or intent is None:
+                    raise DispatchDenied(
+                        "settled validation pause recovery lost its source"
+                    )
+                settlement_body = json.loads(str(settlement["body_json"]))
+                source_cursor = str(settlement_body["continuation_cursor"])
+                if (
+                    run["item_id"], run["lifecycle_state"],
+                    run["continuation_cursor"], plan["item_id"],
+                    plan["logical_effect_id"], plan["revision_digest"],
+                    settlement_body["validator_intent_id"],
+                    settlement_body["validator_attempt_id"],
+                    intent["repository_id"], intent["run_id"],
+                    intent["item_id"], intent["logical_effect_id"],
+                    intent["check_id"], intent["validator_attempt_id"],
+                    intent["status"],
+                ) != (
+                    request.item_id, LifecycleState.BLOCKED.value,
+                    source_cursor, request.item_id, request.logical_effect_id,
+                    request.revision_digest,
+                    request.failed_validator_intent_id,
+                    request.failed_validator_attempt_id,
+                    request.repository_id, request.run_id, request.item_id,
+                    request.logical_effect_id, request.check_id,
+                    request.failed_validator_attempt_id, "SETTLED",
+                ) or settlement["resolution_kind"] not in {
+                    "INTERRUPTION_CESSATION", "NONLAUNCH",
+                }:
+                    raise DispatchDenied(
+                        "settled validation pause recovery source is not retryable"
+                    )
+                slot = connection.execute(
+                    "SELECT * FROM outstanding_slot WHERE repository_id = ?",
+                    (request.repository_id,),
+                ).fetchone()
+                if slot is None or (
+                    slot["run_id"], slot["logical_effect_id"],
+                    slot["attempt_id"], int(slot["generation"]),
+                ) != (
+                    request.run_id, request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                    request.expected_slot_generation,
+                ):
+                    raise DispatchDenied(
+                        "settled validation pause recovery does not own the slot"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM dispatch_fences WHERE repository_id = ? AND "
+                    "((item_id IS NULL AND logical_effect_id IS NULL) OR "
+                    "item_id = ? OR logical_effect_id = ?) LIMIT 1",
+                    (
+                        request.repository_id, request.item_id,
+                        request.logical_effect_id,
+                    ),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "settled validation pause recovery has an active fence"
+                    )
+                if connection.execute(
+                    "SELECT 1 FROM validator_intents WHERE repository_id = ? "
+                    "AND run_id = ? AND status = 'ACTIVE' LIMIT 1",
+                    (request.repository_id, request.run_id),
+                ).fetchone() is not None:
+                    raise DispatchDenied(
+                        "settled validation pause recovery has active validator work"
+                    )
+                accounting_error = self._accounting_closure_error(
+                    connection, request.repository_id, request.run_id,
+                    request.logical_effect_id,
+                    request.expected_slot_attempt_id,
+                )
+                if accounting_error is not None:
+                    raise DispatchDenied(accounting_error)
+                expected_attestation = (
+                    request.recovery_id, request.repository_id, request.run_id,
+                    request.item_id, request.logical_effect_id, request.plan_id,
+                    plan["event_hash"], request.revision_digest,
+                    request.check_id, request.source_settlement_id,
+                    request.source_settlement_event_hash,
+                    request.source_pause_id, request.failed_validator_intent_id,
+                    request.failed_validator_attempt_id,
+                    request.successor_validator_attempt_id,
+                    request.remediation_evidence_digest,
+                    request.expected_run_head, request.expected_slot_attempt_id,
+                    request.expected_slot_generation, request.action,
+                    SYNTHETIC_VALIDATION_RECOVERY_POLICY_ID,
+                    SYNTHETIC_VALIDATION_RECOVERY_POLICY_VERSION,
+                )
+                actual_attestation = (
+                    attestation.recovery_id, attestation.repository_id,
+                    attestation.run_id, attestation.item_id,
+                    attestation.logical_effect_id, attestation.plan_id,
+                    attestation.plan_event_hash, attestation.revision_digest,
+                    attestation.check_id, attestation.source_settlement_id,
+                    attestation.source_settlement_event_hash,
+                    attestation.source_pause_id,
+                    attestation.failed_validator_intent_id,
+                    attestation.failed_validator_attempt_id,
+                    attestation.successor_validator_attempt_id,
+                    attestation.remediation_evidence_digest,
+                    attestation.evaluated_run_head, attestation.slot_attempt_id,
+                    attestation.slot_generation, attestation.action,
+                    attestation.policy_id, attestation.policy_version,
+                )
+                if actual_attestation != expected_attestation:
+                    raise DispatchDenied(
+                        "settled validation pause recovery attestation does not bind current state"
+                    )
+                TransitionEngine().authorize(
+                    "T16", LifecycleState.BLOCKED,
+                    LifecycleState.VALIDATING,
+                    TRANSITIONS["T16"].required_guards,
+                )
+                sequence = int(run["head_sequence"]) + 1
+                writer_epoch = int(connection.execute(
+                    "SELECT COALESCE(MAX(writer_epoch), 0) + 1 FROM events "
+                    "WHERE repository_id = ?", (request.repository_id,),
+                ).fetchone()[0])
+                cursor = f"validation-recovery:{request.recovery_id}"
+                body = {
+                    **request.__dict__,
+                    "attestation_id": attestation.attestation_id,
+                    "attestation_digest": attestation_digest,
+                    "attestation_evidence": attestation.__dict__,
+                    "request_digest": request_digest,
+                    "plan_event_hash": plan["event_hash"],
+                    "recovery_kind": "SETTLED_VALIDATION_PAUSE",
+                    "source_continuation_cursor": source_cursor,
+                    "policy_id": attestation.policy_id,
+                    "policy_version": attestation.policy_version,
+                    "event_kind": "BLOCKER_RESOLVED",
+                    "transition_id": "T16",
+                    "lifecycle_from": LifecycleState.BLOCKED.value,
+                    "lifecycle_to": LifecycleState.VALIDATING.value,
+                    "continuation_cursor": cursor,
+                    "previous_event_hash": run["head_hash"],
+                    "schema_version": 1,
+                    "sequence": sequence,
+                    "writer_epoch": writer_epoch,
+                }
+                event_hash = self._event_hash(body)
+                body_json = json.dumps(
+                    body, sort_keys=True, separators=(",", ":")
+                )
+                connection.execute(
+                    "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, 1, "
+                    "'BLOCKER_RESOLVED', ?, ?, ?)",
+                    (
+                        request.event_id, request.repository_id, request.run_id,
+                        request.item_id, sequence, request.command_id,
+                        writer_epoch, run["head_hash"], event_hash, body_json,
+                    ),
+                )
+                connection.execute(
+                    "INSERT INTO command_outcomes VALUES (?, ?, ?, ?, ?)",
+                    (
+                        request.command_id, request_digest, request.event_id,
+                        sequence, event_hash,
+                    ),
+                )
+                connection.execute(
+                    "UPDATE runs SET lifecycle_state = 'VALIDATING', "
+                    "continuation_cursor = ?, head_sequence = ?, head_hash = ? "
+                    "WHERE run_id = ?",
+                    (cursor, sequence, event_hash, request.run_id),
+                )
+                connection.execute(
+                    "UPDATE repositories SET catalog_head = ? WHERE repository_id = ?",
+                    (event_hash, request.repository_id),
+                )
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_settled_validation_pause_recovery_writes_before_commit"
+                    )
+                connection.commit()
+                if failure_hook is not None:
+                    failure_hook(
+                        "after_settled_validation_pause_recovery_commit_before_acknowledgement"
+                    )
+            except BaseException:
+                connection.rollback()
+                raise
+        return ValidationRecoveryReceipt(
+            request.recovery_id, request.command_id, request.event_id,
+            sequence, event_hash, LifecycleState.VALIDATING, False,
         )
 
     def pause_reconciliation(
@@ -22442,8 +24087,19 @@ class SQLiteStateStore:
                         "validator_intents AS intent ON intent.recovery_id = "
                         "recovery.recovery_id WHERE recovery.recovery_id = ? AND "
                         "intent.validator_intent_id = ? AND "
-                        "recovery.successor_validator_attempt_id = ?",
+                        "recovery.successor_validator_attempt_id = ? UNION ALL "
+                        "SELECT 1 FROM events AS recovery JOIN validator_intents "
+                        "AS intent ON intent.recovery_id = json_extract("
+                        "recovery.body_json, '$.recovery_id') WHERE "
+                        "recovery.event_kind = 'BLOCKER_RESOLVED' AND "
+                        "json_extract(recovery.body_json, '$.recovery_kind') = "
+                        "'SETTLED_VALIDATION_PAUSE' AND json_extract("
+                        "recovery.body_json, '$.recovery_id') = ? AND "
+                        "intent.validator_intent_id = ? AND json_extract("
+                        "recovery.body_json, '$.successor_validator_attempt_id') = ?",
                         (
+                            request.recovery_id, request.validator_intent_id,
+                            request.validator_attempt_id,
                             request.recovery_id, request.validator_intent_id,
                             request.validator_attempt_id,
                         ),
@@ -23258,6 +24914,11 @@ class SQLiteStateStore:
                 and bool(body.get("all_obligations_settled"))
                 and not bool(body.get("contradiction"))
                 and not bool(body.get("uncertainty"))
+            ) or (
+                row["event_kind"] == "PAUSE_SETTLED"
+                and body.get("pause_kind") == "VALIDATION_PAUSE_SETTLEMENT"
+                and body.get("validator_intent_id") == validator_intent_id
+                and body.get("resolution_kind") != "RESULT_CESSATION"
             ):
                 return False
         return True
@@ -23741,6 +25402,22 @@ class SQLiteStateStore:
                             reservation["attempt_id"],
                         ),
                     ).fetchone()
+                    validation_pause = None
+                    if validator_nonexecution is not None:
+                        validation_pause = connection.execute(
+                            "SELECT pause.pause_id FROM validation_pause_actions "
+                            "AS pause JOIN dispatch_fences AS fence ON "
+                            "fence.fence_id = pause.fence_id WHERE "
+                            "pause.repository_id = ? AND pause.run_id = ? AND "
+                            "pause.item_id = ? AND pause.logical_effect_id = ? "
+                            "AND pause.validator_intent_id = ?",
+                            (
+                                reservation["repository_id"],
+                                reservation["run_id"], reservation["item_id"],
+                                reservation["logical_effect_id"],
+                                validator_nonexecution["validator_intent_id"],
+                            ),
+                        ).fetchone()
                     current_attempt = (
                         validator_nonexecution is not None
                         and validator_nonexecution["status"] == "ACTIVE"
@@ -23756,7 +25433,10 @@ class SQLiteStateStore:
                                 validator_nonexecution is not None
                             ),
                             attempt_id=str(reservation["attempt_id"]),
-                            external_pause_active=(external_pause is not None),
+                            external_pause_active=(
+                                external_pause is not None
+                                or validation_pause is not None
+                            ),
                         )
                     )
                     settlement_body.update(
@@ -26202,31 +27882,65 @@ class SQLiteStateStore:
                 )
                 if latest_application is None:
                     if request.recovery_id is not None:
-                        raise DispatchDenied(
-                            "unattempted validation check does not accept recovery"
+                        recovery_event = connection.execute(
+                            "SELECT * FROM events WHERE event_kind = "
+                            "'BLOCKER_RESOLVED' AND json_extract(body_json, "
+                            "'$.recovery_kind') = 'SETTLED_VALIDATION_PAUSE' "
+                            "AND json_extract(body_json, '$.recovery_id') = ?",
+                            (request.recovery_id,),
+                        ).fetchone()
+                        recovery_body = (
+                            None if recovery_event is None else
+                            json.loads(str(recovery_event["body_json"]))
                         )
-                    allowed_cursors = {None, LifecycleState.VALIDATING.value}
-                    if launch_snapshot is not None:
-                        allowed_cursors.add(
-                            f"validation-check:{request.check_id}"
-                        )
-                    elif connection.execute(
-                        "SELECT 1 FROM validation_check_routes WHERE "
-                        "run_id = ? AND check_id = ? AND ready = 1 AND "
-                        "cursor = ?",
-                        (
-                            request.run_id,
-                            request.check_id,
-                            f"validation-check:{request.check_id}",
-                        ),
-                    ).fetchone() is not None:
-                        allowed_cursors.add(
-                            f"validation-check:{request.check_id}"
-                        )
-                    if run["continuation_cursor"] not in allowed_cursors:
-                        raise DispatchDenied(
-                            "another validation recovery is pending"
-                        )
+                        if recovery_body is None or tuple(
+                            recovery_body.get(field) for field in (
+                                "repository_id", "run_id", "item_id",
+                                "logical_effect_id", "plan_id",
+                                "revision_digest", "check_id",
+                                "successor_validator_attempt_id",
+                            )
+                        ) != (
+                            request.repository_id, request.run_id,
+                            request.item_id, request.logical_effect_id,
+                            plan["plan_id"], request.revision_digest,
+                            request.check_id, request.validator_attempt_id,
+                        ):
+                            raise DispatchDenied(
+                                "validator retry does not bind the settled pause recovery"
+                            )
+                        if run["continuation_cursor"] != (
+                            f"validation-recovery:{request.recovery_id}"
+                        ) or connection.execute(
+                            "SELECT 1 FROM validator_intents WHERE recovery_id = ?",
+                            (request.recovery_id,),
+                        ).fetchone() is not None:
+                            raise DispatchDenied(
+                                "settled pause validation recovery is not current"
+                            )
+                    else:
+                        allowed_cursors = {None, LifecycleState.VALIDATING.value}
+                        if launch_snapshot is not None:
+                            allowed_cursors.add(
+                                f"validation-check:{request.check_id}"
+                            )
+                        elif connection.execute(
+                            "SELECT 1 FROM validation_check_routes WHERE "
+                            "run_id = ? AND check_id = ? AND ready = 1 AND "
+                            "cursor = ?",
+                            (
+                                request.run_id,
+                                request.check_id,
+                                f"validation-check:{request.check_id}",
+                            ),
+                        ).fetchone() is not None:
+                            allowed_cursors.add(
+                                f"validation-check:{request.check_id}"
+                            )
+                        if run["continuation_cursor"] not in allowed_cursors:
+                            raise DispatchDenied(
+                                "another validation recovery is pending"
+                            )
                 elif latest_application["verdict"] == "PASS":
                     raise DispatchDenied("validation check already passed")
                 elif latest_application["classification"] == (
@@ -31310,16 +33024,25 @@ class SQLiteStateStore:
             ):
                 try:
                     checkpoint_body = json.loads(rows[-1]["body_json"])
-                    unknown_id = checkpoint_body["checkpoint_snapshot"].get(
-                        "unknown_settlement_event_id"
-                    )
-                    validation_pause_epoch = (
-                        (len(rows) == 2 and unknown_id is None)
-                        or (
-                            len(rows) == 3
-                            and unknown_id == rows[0]["event_id"]
+                    if checkpoint_body.get(
+                        "validation_pause_drain_binding_version"
+                    ) == 1:
+                        validation_pause_epoch = (
+                            len(rows) == 2
+                            and checkpoint_body.get("drain_kind")
+                            == "ACTIVE_VALIDATOR"
                         )
-                    )
+                    else:
+                        unknown_id = checkpoint_body[
+                            "checkpoint_snapshot"
+                        ].get("unknown_settlement_event_id")
+                        validation_pause_epoch = (
+                            (len(rows) == 2 and unknown_id is None)
+                            or (
+                                len(rows) == 3
+                                and unknown_id == rows[0]["event_id"]
+                            )
+                        )
                 except (KeyError, TypeError, json.JSONDecodeError):
                     validation_pause_epoch = False
             if not (
@@ -31428,10 +33151,407 @@ class SQLiteStateStore:
                 raise DispatchDenied("independent recovery freshness proof failed")
             return catalog_head, run_heads
 
+    def _verify_validation_pause_drain_projections(
+        self, connection: sqlite3.Connection, repository_id: str
+    ) -> None:
+        event_rows = connection.execute(
+            "SELECT event_id, event_hash, sequence, body_json FROM events WHERE "
+            "repository_id = ? AND event_kind IN "
+            "('VALIDATION_PAUSE_REQUESTED', "
+            "'VALIDATION_PAUSE_CHECKPOINTED', 'PAUSE_SETTLED', "
+            "'RESUME_ACCEPTED')",
+            (repository_id,),
+        ).fetchall()
+        drain_events: dict[str, tuple[sqlite3.Row, dict[str, object]]] = {}
+        for row in event_rows:
+            try:
+                body = json.loads(str(row["body_json"]))
+            except json.JSONDecodeError as error:
+                raise StorageIntegrityError(
+                    "validation pause drain history is not valid JSON"
+                ) from error
+            if body.get("validation_pause_drain_binding_version") == 1:
+                drain_events[str(row["event_id"])] = (row, body)
+
+        active_rows = connection.execute(
+            "SELECT * FROM active_validation_pause_actions WHERE repository_id = ?",
+            (repository_id,),
+        ).fetchall()
+        settlement_rows = connection.execute(
+            "SELECT * FROM validation_pause_settlements WHERE repository_id = ?",
+            (repository_id,),
+        ).fetchall()
+        resume_rows = connection.execute(
+            "SELECT * FROM settled_validation_pause_resume_actions WHERE "
+            "repository_id = ?", (repository_id,),
+        ).fetchall()
+        expected_ids: set[str] = set()
+        for row in active_rows:
+            try:
+                body = json.loads(str(row["body_json"]))
+                request = ActiveValidationPauseRequest(**{
+                    field: body[field]
+                    for field in ActiveValidationPauseRequest.__dataclass_fields__
+                })
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                activity = SyntheticValidatorActivityAttestation(
+                    **body["activity_attestation"]
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied(
+                        "active validation pause recovery requires authority"
+                    )
+                self._classification_authority.verify_operator_issued(capability)
+                self._classification_authority.verify_validator_activity_attestation(
+                    activity, request
+                )
+                expected_payload = {
+                    **request.__dict__,
+                    "activity_attestation": dict(activity.__dict__),
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                    "drain_kind": "ACTIVE_VALIDATOR",
+                    "validation_pause_drain_binding_version": 1,
+                }
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+                json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "active validation pause projection is invalid"
+                ) from error
+            request_pair = drain_events.get(str(row["request_event_id"]))
+            checkpoint_pair = drain_events.get(str(row["checkpoint_event_id"]))
+            plan = connection.execute(
+                "SELECT classification_issuer_fingerprint FROM validation_plans "
+                "WHERE plan_id = ? AND repository_id = ? AND run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            if request_pair is None or checkpoint_pair is None or (
+                checkpoint_pair[1] != body
+                or request_pair[0]["event_hash"] != row["request_event_hash"]
+                or checkpoint_pair[0]["event_hash"]
+                != row["checkpoint_event_hash"]
+                or body.get("drain_kind") != "ACTIVE_VALIDATOR"
+                or body.get("pause_id") != row["pause_id"]
+                or body.get("command_id") != row["command_id"]
+                or body.get("fence_id") != row["fence_id"]
+                or body.get("payload_digest") != row["payload_digest"]
+                or row["payload_digest"] != self._event_hash(expected_payload)
+                or body.get("lifecycle_to") != row["resulting_state"]
+                or row["resulting_state"] != LifecycleState.PAUSING.value
+                or plan is None
+                or plan["classification_issuer_fingerprint"]
+                != self._classification_authority.issuer_fingerprint
+                or request_pair[1].get("request_event_id")
+                != row["request_event_id"]
+                or request_pair[1].get("checkpoint_event_id")
+                != row["checkpoint_event_id"]
+            ):
+                raise StorageIntegrityError(
+                    "active validation pause projection diverges from history"
+                )
+            expected_ids.update(
+                {str(row["request_event_id"]), str(row["checkpoint_event_id"])}
+            )
+        for row in settlement_rows:
+            pair = drain_events.get(str(row["event_id"]))
+            try:
+                body = json.loads(str(row["body_json"]))
+                request = ValidationPauseSettlementRequest(**{
+                    field: body[field]
+                    for field in ValidationPauseSettlementRequest.__dataclass_fields__
+                })
+                request.validate()
+                expected_payload = {
+                    **request.__dict__,
+                    "pause_kind": "VALIDATION_PAUSE_SETTLEMENT",
+                    "validation_pause_drain_binding_version": 1,
+                }
+            except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+                raise StorageIntegrityError(
+                    "validation pause settlement projection is invalid"
+                ) from error
+            accounting = connection.execute(
+                "SELECT settlement.*, event.body_json AS event_body_json, "
+                "event.sequence AS source_sequence FROM budget_settlements AS "
+                "settlement JOIN events AS event ON event.event_id = "
+                "settlement.settlement_event_id WHERE "
+                "settlement.reservation_id = ? AND settlement.settlement_hash = ?",
+                (
+                    request.reservation_id,
+                    request.expected_settlement_head_hash,
+                ),
+            ).fetchone()
+            resolution = connection.execute(
+                "SELECT * FROM events WHERE event_id = ? AND event_hash = ?",
+                (request.resolution_event_id, request.resolution_event_hash),
+            ).fetchone()
+            pause = connection.execute(
+                "SELECT * FROM active_validation_pause_actions WHERE "
+                "pause_id = ? AND request_event_id = ? AND "
+                "request_event_hash = ? AND checkpoint_event_id = ? AND "
+                "checkpoint_event_hash = ? AND fence_id = ?",
+                (
+                    request.source_pause_id,
+                    request.source_pause_request_event_id,
+                    request.source_pause_request_event_hash,
+                    request.source_pause_checkpoint_event_id,
+                    request.source_pause_checkpoint_event_hash,
+                    request.pause_fence_id,
+                ),
+            ).fetchone()
+            if pause is None and request.resolution_kind == "NONLAUNCH":
+                pause = connection.execute(
+                    "SELECT * FROM validation_pause_actions WHERE "
+                    "pause_id = ? AND request_event_id = ? AND "
+                    "request_event_hash = ? AND checkpoint_event_id = ? AND "
+                    "checkpoint_event_hash = ? AND fence_id = ?",
+                    (
+                        request.source_pause_id,
+                        request.source_pause_request_event_id,
+                        request.source_pause_request_event_hash,
+                        request.source_pause_checkpoint_event_id,
+                        request.source_pause_checkpoint_event_hash,
+                        request.pause_fence_id,
+                    ),
+                ).fetchone()
+            cessation = None
+            if request.resolution_kind != "NONLAUNCH":
+                cessation = connection.execute(
+                    "SELECT cessation.*, event.sequence AS source_sequence "
+                    "FROM validator_cessations AS cessation JOIN events AS "
+                    "event ON event.event_id = cessation.event_id WHERE "
+                    "cessation.cessation_id = ? AND cessation.event_id = ? "
+                    "AND cessation.event_hash = ? AND "
+                    "cessation.validator_intent_id = ? AND "
+                    "cessation.validator_attempt_id = ?",
+                    (
+                        request.cessation_id, request.cessation_event_id,
+                        request.cessation_event_hash,
+                        request.validator_intent_id,
+                        request.validator_attempt_id,
+                    ),
+                ).fetchone()
+            if (
+                pair is None or accounting is None or resolution is None
+                or pause is None
+                or (
+                    request.resolution_kind != "NONLAUNCH"
+                    and cessation is None
+                )
+            ):
+                raise StorageIntegrityError(
+                    "validation pause settlement source is invalid"
+                )
+            try:
+                accounting_body = json.loads(str(accounting["event_body_json"]))
+                resolution_body = json.loads(str(resolution["body_json"]))
+                pause_body = json.loads(str(pause["body_json"]))
+            except (TypeError, json.JSONDecodeError) as error:
+                raise StorageIntegrityError(
+                    "validation pause settlement source is invalid"
+                ) from error
+            authoritative_usage = (
+                accounting["disposition"] in {
+                    BudgetDisposition.CONSUMED.value,
+                    BudgetDisposition.ADJUSTED.value,
+                }
+                and accounting_body.get("held_units") == 0
+                and accounting_body.get("uncertainty") is False
+                and accounting_body.get("actual_units")
+                == accounting_body.get("charged_units")
+            )
+            authoritative_nonlaunch = (
+                accounting["disposition"] == BudgetDisposition.RELEASED.value
+                and accounting_body.get("held_units") == 0
+                and accounting_body.get("charged_units") == 0
+                and accounting_body.get("uncertainty") is False
+                and accounting_body.get("event_kind") == "NONDISPATCH_PROVEN"
+                and accounting_body.get("non_dispatch_proven") is True
+                and accounting_body.get("zero_liability_proven") is True
+                and accounting_body.get("all_obligations_settled") is True
+                and accounting_body.get("contradiction") is False
+            )
+            source_precedes = (
+                int(accounting["source_sequence"]) < int(pair[0]["sequence"])
+                and int(resolution["sequence"]) < int(pair[0]["sequence"])
+                and (
+                    cessation is None
+                    or int(cessation["source_sequence"])
+                    < int(pair[0]["sequence"])
+                )
+            )
+            pause_valid = tuple(
+                pause_body.get(field) for field in (
+                    "repository_id", "run_id", "item_id",
+                    "logical_effect_id", "plan_id", "revision_digest",
+                    "validator_intent_id", "validator_attempt_id", "check_id",
+                    "reservation_id", "expected_slot_attempt_id",
+                    "expected_slot_generation",
+                )
+            ) == (
+                request.repository_id, request.run_id, request.item_id,
+                request.logical_effect_id, request.plan_id,
+                request.revision_digest, request.validator_intent_id,
+                request.validator_attempt_id, request.check_id,
+                request.reservation_id, request.expected_slot_attempt_id,
+                request.expected_slot_generation,
+            )
+            source_valid = source_precedes and (
+                (
+                    request.resolution_kind == "NONLAUNCH"
+                    and authoritative_nonlaunch
+                    and resolution["event_kind"] == "NONDISPATCH_PROVEN"
+                    and resolution_body == accounting_body
+                    and request.resolution_id == request.resolution_event_id
+                    and request.continuation_cursor == (
+                        "validator-initiation-disabled:"
+                        f"{request.validator_intent_id}"
+                    )
+                )
+                or (
+                    request.resolution_kind == "RESULT_CESSATION"
+                    and authoritative_usage
+                    and resolution["event_kind"]
+                    == "VALIDATOR_OBSERVATION_RECORDED"
+                    and resolution_body.get("validator_intent_id")
+                    == request.validator_intent_id
+                    and resolution_body.get("validator_attempt_id")
+                    == request.validator_attempt_id
+                    and resolution_body.get("check_id") == request.check_id
+                    and request.resolution_id
+                    == resolution_body.get("observation_id")
+                    and resolution_body.get("settlement_hash")
+                    == request.expected_settlement_head_hash
+                    and cessation["check_id"] == request.check_id
+                    and cessation["result_available"] == 1
+                    and cessation["result_id"]
+                    == resolution_body.get("source_result_id")
+                    and cessation["result_digest"]
+                    == resolution_body.get("result_digest")
+                    and request.continuation_cursor == (
+                        "validation-application:v1:"
+                        f"{request.resolution_id}:{request.check_id}:"
+                        f"{request.validator_attempt_id}"
+                    )
+                )
+                or (
+                    request.resolution_kind == "INTERRUPTION_CESSATION"
+                    and authoritative_usage
+                    and resolution["event_kind"]
+                    == "VALIDATOR_CESSATION_RECORDED"
+                    and request.resolution_id == request.cessation_id
+                    and request.resolution_event_id
+                    == request.cessation_event_id
+                    and request.resolution_event_hash
+                    == request.cessation_event_hash
+                    and cessation["check_id"] == request.check_id
+                    and cessation["result_available"] == 0
+                    and request.continuation_cursor == (
+                        "validator-cessation:v1:"
+                        f"{request.cessation_id}:{request.check_id}:"
+                        f"{request.validator_attempt_id}"
+                    )
+                )
+            )
+            if pair is None or pair[1] != body or (
+                pair[0]["event_hash"] != row["event_hash"]
+                or body.get("settlement_id") != row["settlement_id"]
+                or body.get("command_id") != row["command_id"]
+                or body.get("source_pause_id") != row["source_pause_id"]
+                or body.get("resolution_kind") != row["resolution_kind"]
+                or body.get("payload_digest") != row["payload_digest"]
+                or row["payload_digest"] != self._event_hash(expected_payload)
+                or body.get("lifecycle_to") != row["resulting_state"]
+                or not pause_valid
+                or not source_valid
+            ):
+                raise StorageIntegrityError(
+                    "validation pause settlement projection diverges from history"
+                )
+            expected_ids.add(str(row["event_id"]))
+        for row in resume_rows:
+            pair = drain_events.get(str(row["event_id"]))
+            try:
+                body = json.loads(str(row["body_json"]))
+                request = ResumeSettledValidationPauseRequest(**{
+                    field: body[field]
+                    for field in ResumeSettledValidationPauseRequest.__dataclass_fields__
+                })
+                request.validate()
+                capability = SyntheticOperatorCapability(
+                    **body["capability_evidence"]
+                )
+                evidence = SyntheticSettledValidationResumeEvidence(
+                    **body["resume_evidence"]
+                )
+                if self._classification_authority is None:
+                    raise DispatchDenied(
+                        "settled validation resume recovery requires authority"
+                    )
+                self._classification_authority.verify_operator_issued(capability)
+                self._classification_authority.verify_settled_validation_resume_evidence(
+                    evidence, request
+                )
+                expected_payload = {
+                    **request.__dict__,
+                    "capability_evidence": dict(capability.__dict__),
+                    "capability_issuer_fingerprint": (
+                        self._classification_authority.issuer_fingerprint
+                    ),
+                    "resume_evidence": dict(evidence.__dict__),
+                    "resume_kind": "VALIDATION_PAUSE_SETTLEMENT",
+                    "validation_pause_drain_binding_version": 1,
+                }
+            except (
+                DispatchDenied, KeyError, TypeError, ValueError,
+                json.JSONDecodeError,
+            ) as error:
+                raise StorageIntegrityError(
+                    "settled validation pause resume projection is invalid"
+                ) from error
+            plan = connection.execute(
+                "SELECT classification_issuer_fingerprint FROM validation_plans "
+                "WHERE plan_id = ? AND repository_id = ? AND run_id = ?",
+                (request.plan_id, request.repository_id, request.run_id),
+            ).fetchone()
+            if pair is None or pair[1] != body or (
+                pair[0]["event_hash"] != row["event_hash"]
+                or body.get("resume_id") != row["resume_id"]
+                or body.get("command_id") != row["command_id"]
+                or body.get("source_settlement_id")
+                != row["source_settlement_id"]
+                or body.get("source_pause_id") != row["source_pause_id"]
+                or body.get("pause_fence_id") != row["pause_fence_id"]
+                or body.get("payload_digest") != row["payload_digest"]
+                or row["payload_digest"] != self._event_hash(expected_payload)
+                or body.get("lifecycle_to") != row["resulting_state"]
+                or plan is None
+                or plan["classification_issuer_fingerprint"]
+                != self._classification_authority.issuer_fingerprint
+            ):
+                raise StorageIntegrityError(
+                    "settled validation pause resume projection diverges from history"
+                )
+            expected_ids.add(str(row["event_id"]))
+        if expected_ids != set(drain_events):
+            raise StorageIntegrityError(
+                "validation pause drain history lost its exact projection"
+            )
+
     def _verify_projections(
         self, connection: sqlite3.Connection, repository_id: str
     ) -> None:
         self._verify_event_history(connection, repository_id)
+        self._verify_validation_pause_drain_projections(
+            connection, repository_id
+        )
         event_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND event_kind = 'INTENT_COMMITTED'",
             (repository_id,),
@@ -32849,10 +34969,15 @@ class SQLiteStateStore:
             body for body in all_recoveries
             if body.get("recovery_kind") == "VALIDATION_LAUNCH"
         ]
+        settled_validation_pause_recoveries = [
+            body for body in all_recoveries
+            if body.get("recovery_kind") == "SETTLED_VALIDATION_PAUSE"
+        ]
         if (
             len(validation_recoveries)
             + len(operation_recoveries)
             + len(validation_launch_recoveries)
+            + len(settled_validation_pause_recoveries)
             != len(all_recoveries)
         ):
             raise StorageIntegrityError(
@@ -32883,6 +35008,15 @@ class SQLiteStateStore:
                     body["sequence"], self._event_hash(body),
                 )
                 for body in validation_launch_recoveries
+            }
+        )
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["request_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for body in settled_validation_pause_recoveries
             }
         )
         validator_observation_rows = connection.execute(
@@ -33135,7 +35269,18 @@ class SQLiteStateStore:
             (repository_id,),
         ).fetchall()
         validation_pauses = [
-            json.loads(row["body_json"]) for row in validation_pause_rows
+            body
+            for row in validation_pause_rows
+            if (body := json.loads(row["body_json"])).get(
+                "validation_pause_drain_binding_version"
+            ) != 1
+        ]
+        active_validation_pauses = [
+            body
+            for row in validation_pause_rows
+            if (body := json.loads(row["body_json"])).get(
+                "validation_pause_drain_binding_version"
+            ) == 1
         ]
         for body in validation_pauses:
             try:
@@ -33333,6 +35478,24 @@ class SQLiteStateStore:
                 for body in validation_pauses
             }
         )
+        drain_outcome_rows = connection.execute(
+            "SELECT body_json FROM events WHERE repository_id = ? AND "
+            "json_extract(body_json, "
+            "'$.validation_pause_drain_binding_version') = 1 AND "
+            "event_kind IN ('VALIDATION_PAUSE_CHECKPOINTED', "
+            "'PAUSE_SETTLED', 'RESUME_ACCEPTED')",
+            (repository_id,),
+        ).fetchall()
+        expected_outcomes.update(
+            {
+                body["command_id"]: (
+                    body["payload_digest"], body["event_id"],
+                    body["sequence"], self._event_hash(body),
+                )
+                for row in drain_outcome_rows
+                for body in (json.loads(row["body_json"]),)
+            }
+        )
         pause_settled_rows = connection.execute(
             "SELECT body_json FROM events WHERE repository_id = ? AND event_kind = 'PAUSE_SETTLED'",
             (repository_id,),
@@ -33348,8 +35511,16 @@ class SQLiteStateStore:
             body for body in all_pause_settlements
             if body.get("pause_kind") == "ACTIVITY_SETTLEMENT"
         ]
-        if len(pauses) + len(activity_pause_settlements) != len(
+        validation_pause_settlements = [
+            body for body in all_pause_settlements
+            if body.get("pause_kind") == "VALIDATION_PAUSE_SETTLEMENT"
+        ]
+        if (
+            len(pauses) + len(activity_pause_settlements)
+            + len(validation_pause_settlements)
+            != len(
             all_pause_settlements
+            )
         ):
             raise StorageIntegrityError(
                 "unsupported PAUSE_SETTLED event discriminator"
@@ -33912,9 +36083,14 @@ class SQLiteStateStore:
             body for body in all_resumes
             if body.get("resume_kind") == "OPERATION_NONEXECUTION"
         ]
+        validation_pause_resumes = [
+            body for body in all_resumes
+            if body.get("resume_kind") == "VALIDATION_PAUSE_SETTLEMENT"
+        ]
         if (
             len(resumes) + len(activity_resumes)
             + len(operation_nonexecution_resumes)
+            + len(validation_pause_resumes)
             != len(all_resumes)
         ):
             raise StorageIntegrityError(
@@ -36654,6 +38830,17 @@ class SQLiteStateStore:
             {
                 body["capability_evidence"]["claim_id"]: (
                     body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "PAUSE",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in active_validation_pauses
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
                     body["command_id"], body["run_id"], "RESUME",
                     body["capability_evidence"]["scope_digest"],
                     body["capability_issuer_fingerprint"],
@@ -36681,6 +38868,17 @@ class SQLiteStateStore:
                     body["capability_issuer_fingerprint"],
                 )
                 for body in operation_nonexecution_resumes
+            }
+        )
+        expected_operator_redemptions.update(
+            {
+                body["capability_evidence"]["claim_id"]: (
+                    body["capability_evidence"]["grant_id"],
+                    body["command_id"], body["run_id"], "RESUME",
+                    body["capability_evidence"]["scope_digest"],
+                    body["capability_issuer_fingerprint"],
+                )
+                for body in validation_pause_resumes
             }
         )
         expected_operator_redemptions.update(
@@ -36841,6 +39039,11 @@ class SQLiteStateStore:
             body["validator_intent_id"]
             for body in terminal_settlements
             if body["validator_intent_id"] is not None
+        )
+        settled_intent_ids.update(
+            body["validator_intent_id"]
+            for body in validation_pause_settlements
+            if body["resolution_kind"] != "RESULT_CESSATION"
         )
         expected_validator_intents = {
             body["validator_intent_id"]: (
@@ -38010,6 +40213,15 @@ class SQLiteStateStore:
         )
         expected_fences.update(
             {
+                body["fence_id"]: (
+                    body["item_id"], body["logical_effect_id"],
+                    body["reason_code"], body["request_event_id"],
+                )
+                for body in active_validation_pauses
+            }
+        )
+        expected_fences.update(
+            {
                 str(body["fence_id"]): (
                     str(body["item_id"]), str(body["logical_effect_id"]),
                     "AUTHORITY_CURRENT_DENIAL", str(body["event_id"]),
@@ -38599,6 +40811,17 @@ class SQLiteStateStore:
                 )
             del expected_fences[body["pause_fence_id"]]
 
+        for body in validation_pause_resumes:
+            source_fence = expected_fences.get(body["pause_fence_id"])
+            if (
+                source_fence is None
+                or source_fence[3] != body["source_pause_request_event_id"]
+            ):
+                raise StorageIntegrityError(
+                    "validation resume source pause fence diverges from history"
+                )
+            del expected_fences[body["pause_fence_id"]]
+
         actual_fences = {
             row["fence_id"]: (
                 row["item_id"], row["logical_effect_id"], row["reason_code"],
@@ -38816,6 +41039,11 @@ class SQLiteStateStore:
                         connection, body, predecessor_state,
                         expected_cursors.get(run_id),
                     )
+                elif body.get("recovery_kind") == "SETTLED_VALIDATION_PAUSE":
+                    self._validate_settled_validation_pause_recovery_event(
+                        connection, body, predecessor_state,
+                        expected_cursors.get(run_id),
+                    )
                 elif body.get("recovery_kind") is None:
                     self._validate_validation_recovery_event(
                         connection, body, predecessor_state,
@@ -39004,13 +41232,42 @@ class SQLiteStateStore:
                         "events AS event ON event.event_id = pause.event_id "
                         "WHERE pause.repository_id = ? AND pause.run_id = ? "
                         "AND pause.item_id = ? AND pause.logical_effect_id = ? "
-                        "AND pause.attempt_id = ? AND event.sequence < ? LIMIT 1",
+                        "AND pause.attempt_id = ? AND event.sequence < ? AND "
+                        "NOT EXISTS (SELECT 1 FROM events AS resume WHERE "
+                        "resume.repository_id = pause.repository_id AND "
+                        "resume.run_id = pause.run_id AND resume.sequence < ? "
+                        "AND resume.event_kind = 'RESUME_ACCEPTED' AND "
+                        "json_extract(resume.body_json, '$.pause_fence_id') = "
+                        "pause.fence_id) LIMIT 1",
                         (
                             body["repository_id"], body["run_id"],
                             body["item_id"], body["logical_effect_id"],
                             body["attempt_id"], body["sequence"],
+                            body["sequence"],
                         ),
                     ).fetchone() is not None
+                    if validator_nonexecution and not external_pause_active:
+                        external_pause_active = connection.execute(
+                            "SELECT 1 FROM validation_pause_actions AS pause "
+                            "JOIN events AS event ON "
+                            "event.event_id = pause.request_event_id WHERE "
+                            "pause.repository_id = ? AND pause.run_id = ? AND "
+                            "pause.item_id = ? AND pause.logical_effect_id = ? "
+                            "AND pause.validator_intent_id = ? AND "
+                            "event.sequence < ? AND NOT EXISTS (SELECT 1 FROM "
+                            "events AS resume WHERE resume.repository_id = "
+                            "pause.repository_id AND resume.run_id = pause.run_id "
+                            "AND resume.sequence < ? AND resume.event_kind IN "
+                            "('RESUME_ACCEPTED', 'RECONCILIATION_PAUSE_RESUMED') "
+                            "AND json_extract(resume.body_json, "
+                            "'$.pause_fence_id') = pause.fence_id) LIMIT 1",
+                            (
+                                body["repository_id"], body["run_id"],
+                                body["item_id"], body["logical_effect_id"],
+                                validator["validator_intent_id"],
+                                body["sequence"], body["sequence"],
+                            ),
+                        ).fetchone() is not None
                     expected_state, expected_cursor = (
                         _derive_nonexecution_route(
                             predecessor_state,
@@ -39099,7 +41356,10 @@ class SQLiteStateStore:
                     )
                 elif (
                     row["event_kind"] == "PAUSE_SETTLED"
-                    and body.get("pause_kind") == "ACTIVITY_SETTLEMENT"
+                    and body.get("pause_kind") in {
+                        "ACTIVITY_SETTLEMENT",
+                        "VALIDATION_PAUSE_SETTLEMENT",
+                    }
                 ):
                     expected_cursors[run_id] = body["continuation_cursor"]
                 elif row["event_kind"] in {
@@ -39455,6 +41715,9 @@ class SQLiteStateStore:
             "operation_recovery_actions",
             "operation_retry_authorizations",
             "validation_pause_actions",
+            "active_validation_pause_actions",
+            "validation_pause_settlements",
+            "settled_validation_pause_resume_actions",
             "resume_actions",
             "reconciliation_resume_actions",
             "stop_actions",
@@ -39588,7 +41851,7 @@ class SQLiteStateReader:
             connection = self._connect_read_only()
             connection.execute("BEGIN")
             version = int(connection.execute("PRAGMA user_version").fetchone()[0])
-            if version != 7:
+            if version != 8:
                 raise StorageIntegrityError(
                     "state database semantic version is unsupported for read-only T22"
                 )

@@ -23,6 +23,8 @@ from .authority import (
     SyntheticFinalizationAttestation,
     SyntheticOperatorCapability,
     SyntheticProofFreeDispositionEvidence,
+    SyntheticSettledValidationResumeEvidence,
+    SyntheticSettledValidationPauseRecoveryAttestation,
     SyntheticOperationNonexecutionResumeEvidence,
     SyntheticReconciliationResumeEvidence,
     SyntheticResumeEvidence,
@@ -32,9 +34,11 @@ from .authority import (
     SyntheticAdoptionReadinessEvidence,
     SyntheticValidationLaunchSnapshot,
     SyntheticValidatorCapability,
+    SyntheticValidatorActivityAttestation,
 )
 from .contracts import (
     ApplicationReceipt,
+    ActiveValidationPauseRequest,
     AuthorityLifecycleFactRequest,
     BindingMismatchRequest,
     CommitReceipt,
@@ -62,6 +66,8 @@ from .contracts import (
     RecoverProvenNonexecutionRequest,
     ResumeRequest,
     ResumeActivitySettlementRequest,
+    ResumeSettledValidationPauseRequest,
+    SettledValidationPauseRecoveryRequest,
     ResumeOperationNonexecutionRequest,
     SourceControlClassification,
     SourceControlEvidenceRequest,
@@ -71,6 +77,7 @@ from .contracts import (
     TerminalRestartReport,
     TerminalRestartRequest,
     ValidationApplicationRequest,
+    ValidationPauseSettlementRequest,
     ValidatorIntentRequest,
     ValidatorObservationCommand,
     ValidatorObservationRequest,
@@ -290,6 +297,79 @@ class SyntheticDispatchCoordinator:
             capability,
             self._authority,
             authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def pause_active_validation(
+        self,
+        request: ActiveValidationPauseRequest,
+        capability: SyntheticOperatorCapability,
+        activity: SyntheticValidatorActivityAttestation,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T08", current_state, resulting_state,
+                TRANSITIONS["T08"].required_guards,
+            )
+
+        return self._store.pause_active_validation(
+            request, capability, activity, self._authority,
+            authorize_transition=authorize, failure_hook=failure_hook,
+        )
+
+    def settle_validation_pause(
+        self,
+        request: ValidationPauseSettlementRequest,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T07", current_state, resulting_state,
+                TRANSITIONS["T07"].required_guards,
+            )
+
+        return self._store.settle_validation_pause(
+            request, authorize_transition=authorize,
+            failure_hook=failure_hook,
+        )
+
+    def resume_settled_validation_pause(
+        self,
+        request: ResumeSettledValidationPauseRequest,
+        capability: SyntheticOperatorCapability,
+        evidence: SyntheticSettledValidationResumeEvidence,
+        *,
+        failure_hook: FailureHook | None = None,
+    ) -> ControlReceipt:
+        def authorize(
+            current_state: LifecycleState, resulting_state: LifecycleState
+        ) -> None:
+            self._engine.authorize(
+                "T14", current_state, resulting_state,
+                TRANSITIONS["T14"].required_guards,
+            )
+
+        return self._store.resume_settled_validation_pause(
+            request, capability, evidence, self._authority,
+            authorize_transition=authorize, failure_hook=failure_hook,
+        )
+
+    def recover_settled_validation_pause(
+        self,
+        request: SettledValidationPauseRecoveryRequest,
+        attestation: SyntheticSettledValidationPauseRecoveryAttestation,
+        *,
+        failure_hook: FailureHook | None = None,
+    ):
+        return self._store.recover_settled_validation_pause(
+            request, attestation, self._authority,
             failure_hook=failure_hook,
         )
 
