@@ -5,6 +5,15 @@ description: Derive SLOs from user journeys, not infrastructure — inventory th
 
 # SLO Reliability Architect
 
+Terms used below: a **service-level indicator (SLI)** measures a user-visible
+symptom; a **service-level objective (SLO)** is the target for that indicator;
+and a **service-level agreement (SLA)** is an applicable customer commitment.
+An **error budget** is the allowed amount of failed or slow experience implied
+by an SLO over its window. Infrastructure signals and components such as
+central processing unit (CPU) load, Domain Name System (DNS), content
+delivery network (CDN), and garbage collection (GC) help diagnosis but do
+not replace journey SLIs.
+
 ## Purpose
 
 Produce a reliability design the business can reason about and on-call can
@@ -111,13 +120,13 @@ a target, a budget, and a page.
 RELIABILITY DESIGN — <product/scope>
 Journey inventory: <journey — users — business impact — volume — ranked;
   explicitly not-covered journeys listed>
-SLI definitions: <journey — SLI — good/valid definitions — measurement
-  point + blind spots>
-SLO targets & budgets: <SLI — target — budget in user-meaningful units —
-  justification (baseline/commercial/cost) — provisional flags + review
-  dates>
-Alert spec (for observability-operator): <SLI — fast/slow burn thresholds
-  + windows — severity — owner — page/ticket — runbook link placeholder>
+Service-level indicator (SLI) definitions: <journey — measured signal —
+  good/valid definitions — measurement point + blind spots>
+Service-level objective (SLO) targets & error budgets: <SLI — target —
+  allowed failure in user-meaningful units — justification
+  (baseline/commercial/cost) — provisional flags + review dates>
+Alert spec (for observability-operator): <SLI — fast/slow error-budget burn
+  thresholds + windows — severity — owner — page/ticket — runbook link placeholder>
 Demotions: <today's cause-alerts that stop paging, each with rationale>
 Failure-mode analysis: <journey — dependency chain — shared/single points
   — amplification risks — architectural findings routed>
