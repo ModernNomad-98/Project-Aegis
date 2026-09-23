@@ -1,5 +1,15 @@
 # Replacement calibration preparation
 
+> **Current reading, checked 2026-09-23:** This September 11 plan predates
+> replacement candidate preparation. The owner selected private GitHub input
+> storage under BER-DEC-010; a 160-case packet now exists in an owner-only
+> private repository, but its labels remain **PENDING** owner review. Read the
+> [sanitized candidate summary](../ber-replacement-candidate-1-summary.md)
+> and [BER backlog](../../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> for current gates. The original lost input bytes and approval are not
+> reconstructed; no provider request or measured result follows from this
+> candidate. See the [evidence index](../README.md) for nearby records.
+
 Prepared 2026-09-11 after the owner answered "no" to access to the original
 review conversation. The old computer is lost, the repository scan found no
 approved input bytes, and no other surviving copy is identified. Stop pursuing

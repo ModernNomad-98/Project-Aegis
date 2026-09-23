@@ -1,5 +1,14 @@
 # PR #88, then shared skill contracts — audited execution plan
 
+> **Current reading, checked 2026-09-23:** This is the preflight plan as it
+> stood before delivery. Pull request (PR) #88's engineering, PR #90's shared
+> contracts and PR #91's offline continuous integration (CI) have since merged.
+> The [PR #88 closeout](../README.md) and
+> [current BER backlog](../../../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> record that delivery and the remaining measured-calibration gates. The
+> original authorization, estimates, branch state and action list below are
+> historical evidence, not instructions to reopen those PRs or start a run.
+
 Prepared 2026-09-12. This is the requested preflight and final plan; implementation,
 publication and merging have not started in this turn. The owner authorized fixes,
 commits, pushes, merges and repeated Actions remediation. That authorization persists;

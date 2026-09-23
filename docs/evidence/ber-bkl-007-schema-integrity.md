@@ -1,5 +1,13 @@
 # BER-BKL-007 schema integrity review record
 
+> **Current reading, checked 2026-09-23:** The conditional DONE wording below
+> was recorded before pull request (PR) #104 merged. BER-BKL-007 (the Behavioral
+> Eval Runner schema-integrity backlog item) is now **DONE** for its scoped
+> offline delivery; the [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md#ber-bkl-007--final-production-jsonyaml-schemas-and-schema-migration-policy)
+> holds the current disposition. This evidence records the historical test
+> revisions and skips, not live calibration or provider readiness. Start at the
+> [evidence index](README.md) for related records.
+
 Status: OWNER_ACCEPTED; DONE when PR #104 merges. Governing package: WP-2B-1A / BER-DEC-009,
 effective after governance [PR #103](https://github.com/ModernNomad-98/Project-Aegis/pull/103)
 merged at `f82a4bce770c173df6d4ddc6b920a7b35a6a63e7`.
