@@ -1,5 +1,14 @@
 # Behavioral Eval Runner — WP-2B-0 capability-and-evidence spike: repository-safe summary
 
+> **Current reading, checked 2026-09-23:** The Outcome B and R1–R5 labels
+> below are the accepted result of work package 2B-0 (WP-2B-0), not today's
+> phase queue. WP-2B-1, WP-2B-2 and the scoped calibration engineering later
+> shipped; WP-2B-3 is authorized but measured calibration and owner decision 1
+> (OD-1) remain unfinished. WP-2B-4 live execution is still blocked. Use the
+> [current BER backlog](../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> and [evidence index](README.md). The original decision text below stays
+> historical and grants no new dispatch authority.
+
 **WP-2B-0 OWNER OUTCOME: OUTCOME B / LIMITED SCOPE — ACCEPTED.**
 **EVIDENCE STATE: R1/R3 remain UNAVAILABLE/UNKNOWN; R2/R4/R5 remain INCOMPLETE/BLOCKED.**
 **LIVE BEHAVIORAL EXECUTION: STILL BLOCKED. WP-2B-1: NOT AUTHORIZED BY THIS PR.**
