@@ -20,6 +20,10 @@ their original context; use the active registers below to determine current work
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
 - [Efficient execution plan and new-chat handoff](roadmaps/aegis-efficient-execution-handoff-2026-09-23.md):
   September 23 backlog sequence, model policy, verified state and continuation task.
+- [Conversational setup and routing plan](roadmaps/aegis-setup-routing-plan.md):
+  issue #101 decisions, candidate screen and proposed evaluation protocol.
+- [Issue #101 package-2 scope proposal](roadmaps/aegis-setup-package-2-authorization-proposal.md):
+  reviewable Aegis-only conversation and saved-state implementation boundary.
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
   [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
@@ -52,6 +56,8 @@ integration is future work. Green offline CI does not close those gates.
 
 The [new-computer handoff](evidence/ber-recovery-2026-09-11/README.md) separates
 current setup from historical reproduction and records exactly what is missing.
+The [selected-host capability proposal](roadmaps/ber-selected-host-capability-decision.md)
+defines the next R4/R5 host choice and staged evidence gate.
 Original roadmap proposals and dated evidence remain useful history, rather
 than instructions to reopen completed PRs or reproduce the lost computer.
 
@@ -111,3 +117,7 @@ in the independently accepted 28/9/22 canonical inventory. The
 CP-WP-002 evidence record. No deployment,
 provider call, production data, real authority or real execution adapter is
 authorized.
+
+The [CP-WP-003 offline proof proposal](roadmaps/cp-wp-003-offline-proof-proposal.md)
+sets out the next bounded owner decision; CP-WP-003 remains blocked until
+separately authorized.
