@@ -126,6 +126,14 @@ implementation.
 | Skill references 141–156, PR #173 | Five corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-final-16-readability-2026-09-23.md) | Clarified leakage, tenancy, threat, observability and supply-chain guidance. This closes the sorted reference screen, not full page or runtime acceptance. |
 | Owning-skill governance and incident routing, PR #165 | Two owning skill pages and one governance evaluation; [exact paths and review](../evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md) | Corrected squash-revert wording and live poisoning-incident routing. PR #168 separately reviewed the related reference pages; neither correction grants execution authority. |
 | Scoped standing-grant clarification, [PR #175](https://github.com/ModernNomad-98/Project-Aegis/pull/175) | Two governance skill pages, their two evaluations and two references in `agent-authorization-matrix` and `standing-approval-and-auto-advance` | Explained that a still-active scoped human grant can satisfy an approval-required action while green checks and this skill grant no authority. Manual-only posture and separate auto-merge gate remain; this row records a correction, not a new approval. |
+| Changelog and startup routing, pull request (PR) #176 | `CHANGELOG.md` and `CLAUDE.md`; [exact scope and checks](../evidence/documentation/root-status-docs-readability-2026-09-23.md) | Marked old changelog highlights as historical and clarified local role checks before task work. Original history and source-library versus product-repository boundaries remain. |
+| Seven operational guides, PR #178 | Storage, selected-host and holdout proposals; control-plane proof proposal; successor design; audit rubric and register; [exact paths and checks](../evidence/documentation/operational-guides-seven-readability-2026-09-23.md) | Added dated reading notes and routes to current records. Original proposals, thresholds and decision text remain; no implementation or live-execution gate closed. |
+| Five authorization proposals, PR #179 | Setup packages 2/3, measured calibration, evidence-policy choice and offline proof scope; [exact paths and checks](../evidence/documentation/operational-proposals-five-readability-2026-09-23.md) | Distinguished delivered synthetic scopes, historical decisions and pending live work. The policy choice and offline proof grant remain separate; original decision bodies were preserved. |
+| Seven historical plans and research pages, PR #181 | Four generation-prompt pages, one reconciliation and two research reports; [exact scope and checks](../evidence/documentation/legacy-prompts-current-reading-2026-09-23.md) | Labeled the former repository and foundation-phase instructions as historical and linked current authoring routes. Original prompts and numbered decisions remain; no legacy prompt was executed. |
+| Three roadmap and audit reading keys, PR #183 | The 300-skill candidate roadmap, frozen skill-contract baseline and VolunteerFlow handoff; [exact paths and corrected review](../evidence/documentation/remaining-active-docs-readability-2026-09-23.md) | Defined terms and explained historical baseline limits. Later corrections do not establish a current disposition for every old defect; the original candidate rows and observations remain. |
+| Evidence index and seven dated status banners, PR #184 | `docs/evidence/README.md`, the documentation-index link and seven evidence pages; [reading index](../evidence/README.md) and [exact changed paths](https://github.com/ModernNomad-98/Project-Aegis/pull/184/files) | Indexed 15 selected decision/delivery records and corrected stale first-screen status readings on seven pages. This is a bounded index and correction, not review of every evidence page or a new approval. |
+| Five historical verification reading notes, PR #186 | Earlier review corrections, two calibration-closeout records, the hosted-run record and shared-contract verification; [exact scope and review](../evidence/documentation/evidence-followup-current-reading-2026-09-23.md) | Distinguished candidate-specific results and an earlier guard failure from later deliveries. All original findings, test counts, skips, candidate identities and failure evidence remain. |
+
 
 This table records bounded page progress, not completion of the full sweep.
 The original inventory had 491 Markdown files. The #146 five-merge forecast
@@ -147,3 +155,33 @@ The remaining selected-backlog estimate at this checkpoint is provisionally
 The previous integration estimate was none; this ledger update is estimated at
 1–3 active hours. Repository-wide documentation acceptance remains **IN
 PROGRESS**.
+
+## Ledger checkpoint through pull request #186 — 2026-09-23
+
+The seven rows above record documentation batches delivered after the earlier
+#173 checkpoint. Pull request #182 already integrated the skill and reference
+screen rows and the separate owning-skill corrections; those rows are not
+counted again. Pull requests #180 and #185 updated the forecast and execution
+measurements, rather than adding another readability screen.
+
+At the exact #186 merge
+`d5b007b0a3cc2bd43806a16970f19c84be9a86b0`, the repository contains
+**543 tracked Markdown files**. The older 491, 513, 517 and 536 counts above
+remain historical snapshots. The increase from 536 after #173 consists of
+six dated evidence notes and one evidence index; it is not seven more pages
+accepted against every documentation criterion.
+
+The later forecast recording this #186 tree was delivered by pull request
+#189. Its [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-186)
+and [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-186--2026-09-23)
+retain the individual package estimates, observed wall intervals and limits.
+The previous ledger-update estimate was **1–3 active hours**; this update's
+estimate is **1–3 active hours**. The selected backlog remains
+**175–394 active hours**, or **191–434** if both optional issue #101
+helpers are selected. The full all-options backlog has no finite estimate
+while optional quantities and architecture choices remain open.
+
+Documentation acceptance remains **IN PROGRESS**. These rows record bounded
+reading improvements, navigation and preservation of historical evidence.
+They do not certify full page acceptance, model behavior, a real host or
+provider readiness, and they grant no new execution authority.
