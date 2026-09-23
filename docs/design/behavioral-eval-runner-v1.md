@@ -1,5 +1,20 @@
 # Behavioral Eval Runner v1 — design (specification only)
 
+> **Current reading — 2026-09-23.** This is the original version 1 (v1)
+> Behavioral Eval Runner (BER) design, not the current delivery register. A
+> work package (WP) is a numbered delivery unit; pull request (PR) records a
+> repository change; a BER decision (BER-DEC) records reviewed owner scope.
+> Owner decision 1 (OD-1) is the later measured-calibration ratification gate.
+> The 2026-09-12 pointer and **Status** line below are historical design-time
+> statements: “nothing here is built” is not today's implementation status.
+> Offline WP-2B-1 and WP-2B-2 and scoped PR #88 engineering shipped; BER-DEC-008
+> authorized WP-2B-3, but measured calibration and OD-1 remain unfinished.
+> WP-2B-4 remains blocked. Use the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md)
+> for current status and authority, the [runner guide](../../tools/behavioral_eval_runner/README.md)
+> for implemented behavior, and the [version 1.1 (v1.1) successor](behavioral-eval-runner-v1-fast-track-successor.md)
+> only for the design scope it explicitly supersedes. This note grants no
+> model or provider call, private input access, or live run.
+
 > **Current-status pointer — 2026-09-12.** This approved design retains its
 > original design-time statements below. WP-2B-1/WP-2B-2 and PR #88's scoped
 > calibration engineering have since shipped; BER-DEC-008 is effective.
