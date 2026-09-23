@@ -507,6 +507,81 @@ provisioning remain excluded. Start the next five-merge counter after #141;
 revisit sooner if an audited implementation or owner decision changes the
 remaining scope materially.
 
+## Five-merge checkpoint — 2026-09-23, after pull request #146
+
+This is the fifth merge after #141. The five requests below passed independent
+review and all three exact-head GitHub Actions before merge. Pull request (PR)
+numbers are not merge order. Times are GitHub `mergedAt` events in Coordinated
+Universal Time (UTC); durations start at the first recorded work checkpoint.
+They overlap and include review, queue time, and rework. Active-only labor was
+not instrumented, so the intervals are not an implementation rate.
+
+| Merge order and delivered scope | Original bounded estimate | Merge event (UTC) | Observed start-to-merge wall | Merge commit |
+| --- | ---: | --- | ---: | --- |
+| [#142](https://github.com/ModernNomad-98/Project-Aegis/pull/142): historical skill category maps 08–09 | 1–3 active hours | 18:44:39 | 15m47s | `4ed081818f6456b4d2763a3f1cc1c6bd45c0e740` |
+| [#143](https://github.com/ModernNomad-98/Project-Aegis/pull/143): prior five-merge forecast | 1–2 active hours | 18:52:10 | 24m50s from first preparation; 14m41s from editing start | `7e5a429b6e4cd3e96a694be0342bab81f9442c13` |
+| [#144](https://github.com/ModernNomad-98/Project-Aegis/pull/144): historical skill category maps 01–07 | 2–4 active hours, revised from 1–3 | 18:55:43 | 16m44s | `adcef2b97a34c018da76c6b7cae673e62a2365cd` |
+| [#145](https://github.com/ModernNomad-98/Project-Aegis/pull/145): current control-plane backlog guide | 2–4 active hours | 19:04:34 | About 8m34s; start recorded only as about 18:56 | `cf63696527400d5119ff39e37b2c5e35f0006c68` |
+| [#146](https://github.com/ModernNomad-98/Project-Aegis/pull/146): current owner-decision index | 1–3 active hours | 19:11:10 | 14m16s | `831dd75a5f43463b032e162160b0348299d3c6c1` |
+
+Nine historical category maps now explain that their 300 numbered entries are
+planning candidates. The control-plane register and owner-decision index now
+show current delivery and remaining gates first. These are bounded page fixes;
+they close no selected implementation row or the repository-wide documentation
+sweep. The merged tree contains **513 tracked Markdown files**, versus 509 at
+the #141 checkpoint. The individual PR bodies and timing comments record
+their prior estimates, checks, audit findings and corrections.
+
+[PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) remains
+open at this checkpoint with its protected-file guard failure. Its offline
+evidence-policy implementation is not counted as merged delivery. The
+30-day policy choice and synthetic grant do not establish real-host controls.
+No new label approval, selected host, provider authority, or optional product
+scope was established by this five-merge interval.
+
+Every selected row was re-estimated from delivered scope and remaining gates.
+The short, overlapping documentation intervals do not support a reduction to
+the broad 80–200-hour sweep or to runtime work. The full inventory still needs
+recorded review.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Remaining gate |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Semantic review and owner-approved private labels remain |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | #139 is open; real-host enforcement and operator controls remain |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Offline executor implementation grant and code remain |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Labels, source, allowance, results and holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured tool-path and execution-profile isolation remain |
+| Work package 2B-4 | 12–24 | 12–24 | Calibration and selected-host proof remain prerequisites |
+| Work package 2B-5 | 8–16 | 8–16 | Generic corpus work follows package 2B-4 |
+| Work package 2B-6 | 8–16 | 8–16 | Scheduling, cost, quarantine and dataset operations remain |
+| Work package 2B-7 | 4–8 | 4–8 | Advisory continuous integration and operator workflow remain |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof remain |
+| Control-plane work package 004 | 8–16 | 8–16 | Selected target and package-003 prerequisites remain |
+| Issue #101 package 4 | 8–16 | 8–16 | Host, cases, budget, authority and comparative results remain |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation follows chosen integration outcomes |
+| Repository-wide documentation readability | 80–200 | 80–200 | Bounded pages improved; most of the 513-file inventory remains unreviewed |
+| **Selected remaining total** | **175–394** | **175–394** | Non-documentation: **95–194**; documentation: **80–200** |
+
+Every optional row was also re-estimated. No optional quantity or product was
+selected. The two helper ranges are additive only if both are later selected.
+
+| Optional open work item | Previous active hours if selected | Revised active hours if selected | Remaining gate |
+| --- | ---: | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | 8–20 | Package-4 comparison and explicit helper choice |
+| Issue #101 package 6, online helper | 8–20 | 8–20 | Package-4 comparison, provider authority and explicit helper choice |
+| Behavioral Eval Runner item 010, signing and immutable storage | 4–12 | 4–12 | Adoption decision |
+| Behavioral Eval Runner item 014, additional host adapters | 8–20 per host | 8–20 per host | Host identity and count |
+| Behavioral Eval Runner item 015, optional operations products | 8–24 per product | 8–24 per product | Product identity and count |
+| Strategic skill expansion and framework coverage | Unbounded until a candidate batch is selected | Unbounded until a candidate batch is selected | Demand, coverage and package selection |
+| Multi-judge arbitration and future control-plane architecture | Unbounded | Unbounded | Architecture and adoption decisions |
+
+The selected total stays **175–394 active hours**. Selecting both issue #101
+helpers would add **16–40 hours**, for **191–434 active hours**. The full
+all-options backlog has no finite estimate while optional quantities and
+strategic choices are unset. Owner waits, GitHub queues, provider execution
+and host provisioning are outside the active-hour ranges. Restart the
+five-merge counter after #146; revise sooner if verified scope changes.
+
 **Historical baseline — recorded after pull request #106 on September 23,
 2026.** The paragraph and baseline tables below preserve estimates and pending
 decisions recorded then. They are not current work status or authorization.
