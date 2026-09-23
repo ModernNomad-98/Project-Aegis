@@ -68,6 +68,42 @@ own proven practice, including failures it absorbed during its own construction.
    *Why:* the validator checks that the library's structure is intact; a
    red validator means the change is not shippable, full stop.
 
+## Write documentation for a new reader
+
+Every changed documentation page should make sense to a human developer or an
+artificial intelligence agent arriving without this project's conversation
+history. The reviewer must be able to explain the page's purpose, normal use
+and current limits from the page itself.
+
+1. Open with what the page or component is for and who should read it. Put the
+   normal workflow before implementation history or decision codes.
+2. Expand an abbreviation on first use and explain numbered project codes in
+   plain words. For example, write “Behavioral Eval Runner (BER)” and explain
+   that `CP-WP-003` means control-plane work package 003. A bare code is a
+   reference, not an explanation.
+3. Use descriptive headings and separate distinct functions into short
+   paragraphs, lists or labeled tables. Explain what a command accepts,
+   produces or changes, and include a concrete example when prose alone is
+   hard to follow. Verify read-only or offline examples in a safe fixture.
+   Check commands that install, delete, deploy, spend or contact a provider
+   against their parser or source; run them only within the task's recorded
+   authorization. Angle-bracket placeholders can be interpreted as redirection
+   by a shell.
+4. Distinguish shipped behavior from proposed, blocked or historical behavior.
+   A passing synthetic check is not proof of a live host or model result.
+5. Link to the authoritative design, backlog or evidence record for detailed
+   contracts. Check relative links and referenced commands against the files
+   and source revision being reviewed. Preserve immutable historical records;
+   add a dated explanation instead of silently rewriting their claims.
+6. In the pull request, name the pages reviewed and any pages still waiting
+   for the repository-wide readability sweep. Ask an independent reviewer to
+   describe the component's purpose and normal use from the documentation
+   alone, then correct any gap they find.
+
+The [documentation readability backlog](docs/roadmaps/aegis-documentation-readability-backlog.md)
+tracks the full repository sweep and reviewed batches. These rules apply to
+new pages and edits now; they do not imply every older page has passed review.
+
 ## How to add a skill
 
 1. Copy the `_template` skill directory to `.claude/skills/<your-skill-name>/` and rename it

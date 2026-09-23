@@ -1,65 +1,47 @@
 # Project Aegis
 
-**Project Aegis — Shield of the agent fleet**
+Project Aegis is a public library of instructions, called **skills**, for
+artificial intelligence (AI) coding assistants. It helps developers plan,
+build, review and troubleshoot software with explicit evidence and human
+approval at consequential steps. Product teams copy the skills into their own
+repository; Project Aegis maintainers work in this source-library checkout.
+The library does not itself build, deploy or operate an application.
 
-*Discipline before code. Evidence before merge.*
+## Start here
 
-Project Aegis is an operating system for engineering software with AI — a reusable
-engineering shield for AI coding agents: a library of skills, subagents, validation gates,
-and safety patterns in the open Agent Skills format (Claude Code as the reference surface,
-plus OpenAI Codex, Cursor, Gemini CLI, and other Agent Skills tools), governed by Zero Trust
-AI Engineering Discipline (Zet-AI Engineering for short), that turns your coding agent into a
-disciplined senior/principal engineering partner for architecture, SaaS,
-security, QA, audit, troubleshooting, and AI safety.
+1. **Choose a path.** If you have an idea, a broken application or a security
+   question, use the [guided paths](#start-here-pick-your-path). If you are
+   maintaining this library, begin with the [documentation index](docs/README.md).
+2. **Get the library.** Install Git, then clone this repository. The detailed
+   [setup guide](#getting-started) explains how to use it with Claude Code and
+   other Agent Skills tools.
 
-## About
+   ```bash
+   git clone https://github.com/ModernNomad-98/Project-Aegis.git
+   cd Project-Aegis
+   ```
 
-Returning to the project or setting up another computer? Start with the
-[documentation index](docs/README.md) for current setup, delivered work and remaining
-calibration gates. See the [changelog](CHANGELOG.md) for recent changes.
+3. **Describe your task to your coding assistant.** For example: "Review this
+   change for customer-data access problems and explain your evidence." The
+   assistant selects a relevant skill when its host supports skill discovery;
+   you can also name a skill explicitly. Read the
+   [skills catalog](docs/skills-catalog.md) to see the shipped roles.
 
-Project Aegis is a reusable engineering operating system for AI coding agents, built to
-protect, guide, and sharpen AI-assisted software development. It combines reusable skills in
-the open Agent Skills format, read-only specialist subagents, validation gates, eval
-conventions, and disciplined engineering workflows so your coding agent operates like a
-senior/principal engineering partner.
-The name carries three layers: the divine shield of Zeus and Athena; the Navy's Aegis,
-shield of the fleet — fitting for a veteran-founded project whose operating model is a
-fleet of agents; and a shield proven in use — several skills' eval cases are drawn from
-real incidents this project absorbed during its own construction (an unauthorized
-auto-merge, stale-memory session collisions, an empty-directory build). The goal is not
-prompt bloat; it is a protected execution framework where the agent models before coding,
-reads docs before implementation, tests before changes, keeps diffs small, respects
-human approval boundaries, and produces evidence before closeout.
+## What is included
 
-**How it's built.** Aegis grows in validated phases, each a batch that builds on the ones
-before it. Every addition is recorded as an immutable, dated decision in the reconciliation
-log, and nothing merges without independent audit and a green validator. The full
-phase-by-phase story lives in [docs/HISTORY.md](docs/HISTORY.md); the decision-by-decision
-record is [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md).
+| Part | What it is for | Current boundary |
+| --- | --- | --- |
+| [Skills and guided paths](docs/skills-catalog.md) | Reusable instructions for architecture, development, security, testing and review. | The host assistant performs the work; a skill is not a standalone service. |
+| [Behavioral Eval Runner](tools/behavioral_eval_runner/README.md) | Maintainer harness for inventorying cases and grading recorded skill behavior. | General commands use offline data; measured model calibration remains gated. |
+| [Delivery control plane](tools/aegis_delivery_control/README.md) | Maintainer kernel for deciding whether an interrupted operation can safely continue. | Shipped kernel uses synthetic authorities and targets only. |
 
-Full per-pack detail lives in [Skills (shipped)](#skills-shipped) below; for a quick map of
-what *kinds* of help the library offers, see [What's in the library](#whats-in-the-library).
-
-## What this is
-
-Aegis is not just a collection of skills; it is an **operating system for engineering
-software with AI**. It combines (a) a library of ready-to-use skills an AI coding
-assistant follows, (b) read-only specialist reviewers that give independent second
-opinions, (c) validation gates and eval conventions that check the work mechanically,
-and (d) — governing all of it — **Zero Trust AI Engineering Discipline**, the doctrine
-that decides how everything above is allowed to operate.
-
-The discipline's essence in one line: **"Never trust, always verify — every step of the
-lifecycle. Assume drift. Demand evidence. Track everything."** It is documented at
-[docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md)
-and deliberately extends the Zero Trust security principle from network access to the
-whole development lifecycle. The problem it solves: AI assistants confidently act on
-stale memory, claim done-when-not-done, and let docs drift away from the code — this
-system replaces that risk with enforced evidence at every step.
-
-The library holds itself to the bar it enforces: `skill-quality-reviewer` (D18) reviews the
-library's own additions, and its sweep corrections were applied in D33.
+For the engineering principles, read
+[Zero Trust AI Engineering Discipline](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md).
+For current work and decisions, use the [documentation index](docs/README.md)
+and [owner approval register](docs/approvals/APPROVAL_REGISTER.md).
+Contributors should start with [CONTRIBUTING.md](CONTRIBUTING.md); security
+reports follow [SECURITY.md](SECURITY.md). The
+[construction history](docs/HISTORY.md) records why the library took this form.
 
 ## The roles Aegis can play
 
