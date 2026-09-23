@@ -485,9 +485,8 @@ entry in the reconciliation doc.
   — its dated §5 entries form the project's immutable decision log. A `D`
   code means a decision: D12 and D14 are decisions 12 and 14; D12.8 is the
   eighth subentry of decision 12. Those candidate scopes were initially banked.
-  Later decisions
-  D21 and D22 recorded delivery of the D12.8 operational pack and completion
-  of the D13 library-meta scope, respectively.
+  Later decisions D21 and D22 recorded delivery of the D12.8 operational pack
+  and completion of the D13 library-meta scope, respectively.
 - **The doctrine**
   ([docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md))
   and **the operating rules** ([CONTRIBUTING.md](CONTRIBUTING.md)) — why the system
@@ -639,8 +638,8 @@ deployment is implemented or authorized.
 
 The version 4 (v4) references below record the library's construction
 history. Here, "canonical" describes that earlier planning context; the
-generation prompts are not current work orders. For current status and authoring, use the
-index, catalog, and standard linked above.
+generation prompts are not current work orders. For current status and
+authoring, use the index, catalog, and standard linked above.
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — how the former generation plans were reconciled.
 2. [`docs/research/claude-skills-architecture-audit-findings-v4.md`](docs/research/claude-skills-architecture-audit-findings-v4.md) — architecture audit of the former `nguyenpv1980-wq/Claude-Skills` repository.
