@@ -14,8 +14,9 @@ their original context; use the active registers below to determine current work
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
 - [Offline CI](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
-- [Owner approval register](approvals/APPROVAL_REGISTER.md): recurring read-only-agent
-  and administrator-merge authority for `ModernNomad-98/Project-Aegis` only.
+- [Owner approval register](approvals/APPROVAL_REGISTER.md): all current
+  Project Aegis grants, limits and lifecycle events; read the complete register
+  before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
@@ -61,5 +62,50 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [work-package register](roadmaps/resumable-control-plane-backlog.md) and the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
-CP-WP-002 remains blocked. Starting it requires separate explicit authorization
-and does not follow automatically from CP-WP-001's delivery or acceptance.
+CP-WP-002 is active under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md) and is
+at its final merge-readiness gates. The exact package suite passed 542 tests on
+Windows and 542 on Linux (three expected platform skips) on 2026-09-23; all
+three stop findings, the aggregate stop gate, T13
+authority lifecycle intake, T15 binding-mismatch handling, the T14
+PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
+external-mutation uncertainty pause received independent `APPROVE`. The narrow
+T07 local-nonexecution settlement and its BLOCKED-only T14 recovery route, plus
+the narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
+route, T09's exact-head reconciliation pause fence, and the narrow T17
+validator-result/T14 exact-T09-resume slice also received independent
+`APPROVE`. The T17 operation-uncertainty foundation, including typed
+source/control evidence, conditional uncertainty categories, atomic semantic
+migration and exact-set recovery, also received independent `APPROVE`.
+The T17 verified-receipt route now also has independent `APPROVE`: it binds a
+typed query/time/source/response lookup, exact receipt/plan/slot/head facts and
+complete settlement ancestry, then clears its exact uncertainty set atomically
+with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. The
+T17 authoritative-nonexecution and authenticated safe-retry slice also has
+independent `APPROVE`, including all-path seal binding, generation-bound retry,
+stacked-pause replay and proof-prefix-safe migration. F02 is now independently
+accepted: proof-free owner dispositions remain non-dispatching, and the only
+reviewed same-key successor retains outcome/activity uncertainty plus the exact
+T06 pause until distinct T14 RESUME authority clears it. T22 terminal-restart
+reporting is independently accepted with strictly read-only main/auxiliary
+verification and typed stale/unverified status. F03 source-atomic one-use
+authority is independently accepted: host/manual races, lifecycle timing,
+correction ownership, clock rollback and lost-receipt replay are now directly
+asserted. F04a reservation-boundary accounting is also independently accepted,
+including exact known usage, durable overrun fences, unknown-liability retention,
+pre-contact bound denial and strict semantic-v10 migration. All 22 acceptance-
+family rows now have tested, independently accepted coverage. All 28 transition,
+9 crash-boundary and 22 acceptance-family rows are independently accepted; only
+the final exact-head architecture/security/QA and hosted gates remain open.
+The independently accepted selected-check foundation binds explicit v2
+per-check dependencies and launch gates, derives a deterministic topological
+order and reconstructs projections strictly. The current increment adds signed
+monotonic gate facts and complete launch snapshots, universal no-preclaim T27,
+atomic T11 next-check routing, exact T16 route recovery and contact-time stale
+launch disablement with T25/T16 continuation. T11, T27, F11 and F17 are included
+in the independently accepted 28/9/22 canonical inventory. Final exact-head
+architecture, security, QA and hosted validation still block merge, so the
+passing suite is not a completion or merge claim.
+Continue only from the
+[Codex handoff](evidence/control-plane/cp-wp-002-codex-handoff.md). No deployment,
+provider call, production data, real authority or real execution adapter is
+authorized.

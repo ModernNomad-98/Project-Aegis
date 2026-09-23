@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Current kernel demonstrates atomic intent rollback/replay, coordinator-owned T03 dispatch with durable PLANNED→RUNNING state, canonical supported controller/target roots, durable claim redemption, C04 canonical full-provenance receipt intake, and C05 exactly-once PASS/recoverable/final validation application. C05 uses store-bound issuer verification, full observation binding, item/effect-scoped permanent failure fences, crash/restart replay, and conditional slot release. It also proves event-anchored settlement/fence/slot facts, worst-case unknown charging, proof-bound release and OS writer exclusion. Filesystem ownership/reparse/path-swap protection and complete T01–T28/C06–C09/F01–F21 application remain blocking; do not promote to DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T25/F19 authoritative nonexecution, F02 bounded safe retry, F03 source-atomic one-use authority, F04a reservation-boundary accounting, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and cross-platform filesystem protections. All 28/28 T, 9/9 C and 22/22 F rows have tested, independently accepted coverage, and the pinned Linux runtime evidence is verified. Final exact-head architecture/security/QA approval and hosted gates still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -220,8 +220,14 @@ before independent freshness can pass. Synthetic capabilities and settlement
 proofs are issuer-verifiable. One state database atomically records claim
 redemption with intent, and a separate durable synthetic target ledger preserves
 accepted effects and receipts across adapter instances. These facts do not
-establish protection against filesystem path replacement/permission attacks or
-real source-atomic authority consumption.
+establish real source-atomic authority consumption. The reviewed filesystem
+slice now fails closed on unsafe ownership, ACL, hardlink, sidecar, reparse and
+identity conditions; retains checked Windows handles for the fixed-volume and
+known-folder anchors and every managed descendant; and pins the stable writer-
+lock identity for the lifetime of a store. Windows tests use actual junction
+and rename probes. The POSIX descriptor-relative policy is implemented and
+unit-checked, but has not run on a POSIX host and therefore is not promoted to
+verified platform evidence.
 
 Focused local evidence through 2026-09-19 includes the package `unittest` suite
 on Windows and an actual second-process writer-lock denial. This evidence covers
@@ -255,14 +261,1214 @@ not yet establish the complete normative rows. Before DONE, complete executable
 finalization records and crash replay for C06; then
 cover the remaining F01-F21 families, especially multi-check validation,
 stop/late-receipt ordering, adoption, exact fence clearance and complete
-transition application. Add filesystem ownership/reparse/path-swap protections
-and durable application paths for the remaining lifecycle rows. Re-run independent
+transition application. Add durable application paths for the remaining
+lifecycle rows. Re-run independent
 architecture, security and QA reviews against the resulting exact head. Power-loss
 durability and any real authority/execution capability remain unavailable, not
 inferred from these process-level tests.
 The delivery-control suite is not yet wired into repository CI; AEGIS-APR-004
 does not authorize workflow changes, so CI gating remains a declared follow-up
 rather than a silent scope expansion.
+
+### 5.3 Paused CP-WP-002 checkpoint — 2026-09-21
+
+The current checkpoint is based on `497a4529b84ec223245e001213271a9266514f62`
+on `main`, which matched `origin/main` before checkpoint delivery. The working
+tree contained 11 modified tracked delivery-control source/test files. The
+accidental untracked `tools/aegis_delivery_control/dashboard/` detour was outside
+AEGIS-APR-004, disconnected from the kernel and removed before checkpointing.
+Existing untracked `artifacts/recovery/`, `artifacts/reviews/` and bytecode cache
+directories were not added to the work package.
+
+Fresh local evidence at this checkpoint:
+
+| Command | Result |
+| --- | --- |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -v` | Exit 0; 198 tests ran in 16.659 seconds; `OK` |
+| `git diff --check` | Exit 0; no whitespace errors |
+| `git status --short --untracked-files=normal` | The 11 tracked delivery-control files remained modified; the dashboard no longer appeared; preserved artifact/cache directories remained untracked |
+| `gh pr list --repo ModernNomad-98/Project-Aegis --state open ...` | Only unrelated Dependabot PR #98 was open; no CP-WP-002 PR or deployment existed |
+
+Passing tests do not close the current independent gate. A read-only
+`principal-architecture-reviewer` re-audit of T18/T19 and their required
+T20/T23-T26 interactions returned `REVISE`:
+
+1. **BLOCKER — terminal slot can be stranded.** STOP from
+	`BLOCKED/FINALIZING` or recoverable validation failure can retain a slot that
+	neither T16 nor T26 can later close. Add a T26-compatible terminal closure by
+	reference to already-applied validation evidence, with crash/replay and
+	unrelated-run dispatch tests.
+2. **MAJOR — T20 is declaration-only.** Add a typed, idempotent escalation bound
+	to the original graceful stop/deadline, the coordinator/storage transaction,
+	`STOP_ESCALATED` event and recovery/projection validation, plus deadline,
+	tamper and commit-boundary tests.
+3. **MAJOR — post-contact immediate-stop uncertainty is underclassified.** When
+	adapter contact is durably claimed but no receipt exists, T19 must atomically
+	preserve the obligation and classify bounded liability as
+	`UNKNOWN_WORST_CASE_CHARGED`, with late authoritative correction and replay
+	tests.
+
+No software was deployed. No release, production data, provider call, external
+integration, real authority, credential, real adapter, BER, dependency, CI or
+artifact-directory change is authorized by this checkpoint. CP-WP-003,
+CP-WP-004 and CP-FUT-001 remain blocked. The exact continuation rules, current
+file inventory, approval boundaries and ordered backlog are recorded in the
+[Codex handoff](../evidence/control-plane/cp-wp-002-codex-handoff.md).
+
+### 5.4 R-STOP-01 terminal slot closure checkpoint
+
+R-STOP-01 is corrected and independently accepted. T26 now has a typed
+`VALIDATION_APPLICATION` source that binds the exact prior T11/T12 application,
+its observation, current validator attempt and complete plan/run/item/effect/check
+identity. `PASS` maps only to `PASSED`; `FAIL` maps only to `FAILED`. The terminal
+transaction never reapplies validation, changes classification or reopens the
+run. It releases the repository-wide slot atomically only when
+`_validation_checks_settled` and `_accounting_closure_error` establish closure of
+every check, effect, validator and budget obligation.
+
+The SQLite table constraint is upgraded by an atomic, exact-schema migration.
+Historical rows, event bodies and hashes are preserved. Incompatible schema,
+foreign-key divergence, source/application tampering and superseded attempts fail
+closed. Focused coverage exercises both T18 and T19 from applied PASS
+`BLOCKED/FINALIZING` and applied recoverable FAIL `BLOCKED/VALIDATING`, denial of
+unrelated dispatch before closure, dispatch after closure, C05/C09 rollback and
+lost-acknowledgement replay, populated legacy migration and self-consistent tamper
+attempts.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: typed mapping, four-route matrix, exact migration and crash assertions needed clarification |
+| Corrected plan re-audit | `APPROVE`; no findings |
+| Focused first falsification | Failed on unsupported `VALIDATION_APPLICATION`, then passed after the narrow implementation |
+| `python -m unittest tools.aegis_delivery_control.tests.test_storage` | Exit 0; 168 tests ran in 14.231 seconds; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -v` | Exit 0; 209 tests ran in 16.666 seconds; `OK` |
+| Independent implementation review | `APPROVE`; no blocker, major, minor or nit findings; reviewer independently ran 9 focused tests |
+
+This checkpoint establishes only the R-STOP-01 slices of T18/T19/T26, C05/C09
+and F06/F09/F14/F18. Full-row and full-family traceability remain `UNVERIFIED`.
+R-STOP-02 and R-STOP-03 remain major blockers; the aggregate stop gate remains
+`REVISE`, PR #99 remains draft, and no merge, release or deployment is ready.
+
+### 5.5 R-STOP-02 graceful-stop escalation checkpoint
+
+R-STOP-02 is corrected and independently accepted. T20 now has a typed
+`StopEscalationRequest`, a synthetic operator-only coordinator route, and one
+idempotent SQLite transaction bound to the exact graceful stop, persisted drain
+deadline, accepted plan/run/item/effect, retained slot attempt/generation and
+complete unresolved drain snapshot. The store's injected UTC clock must reach
+the recorded deadline; the caller's deadline is binding evidence, not authority.
+
+At escalation, every ambiguous `RESERVED` obligation in the snapshot is
+atomically classified `UNKNOWN_WORST_CASE_CHARGED` through ordinary versioned
+budget-settlement events. Known and already-unknown settlements are retained.
+The transaction then records `STOP_ESCALATED`, operator redemption, command
+outcome and projection without changing the terminal lifecycle, fence, cursor or
+repository-wide slot. Recovery reconstructs the historical prefix, validates
+the source/plan/slot identities and exact obligation/accounting snapshots, and
+continues to accept later authoritative adjustments and terminal slot release.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: exact ambiguous-reservation conversion, historical-prefix validation, drain predicate and operator route required clarification |
+| Corrected plan re-audit | `APPROVE`; no findings; synthetic operator route accepted, approved-rule scheduler explicitly omitted |
+| Focused first falsification | Failed because the coordinator lacked `escalate_stop`, then passed after the narrow implementation |
+| Focused T20 suite after review correction | Exit 0; 10 tests ran; `OK` |
+| `python -m unittest tools.aegis_delivery_control.tests.test_storage` | Exit 0; 177 tests ran in 14.474 seconds; `OK` |
+| `python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py'` | Exit 0; 219 tests ran in 19.387 seconds; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | Initial `REVISE` for self-consistent item retargeting; corrected re-review `APPROVE`, no findings; reviewer independently passed 10 focused tests and reproduced fail-closed retarget recovery |
+
+This checkpoint establishes T20's operator route and its C06/C09/F04b slices.
+It does not claim an approved deadline-rule scheduler. R-STOP-03 remains a major
+blocker, so the aggregate stop gate remains `REVISE`, PR #99 remains draft, and
+no merge, release or deployment is ready.
+
+### 5.6 R-STOP-03 post-contact immediate-stop checkpoint
+
+R-STOP-03 is corrected and independently accepted. Every new immediate T19 stop
+records an exact nested uncertainty snapshot while preserving the legacy event
+envelope and historical stop bodies. A contacted effect or validator reservation
+with no exact receipt/observation/cessation/nonexecution resolution is atomically
+settled from `RESERVED` to `UNKNOWN_WORST_CASE_CHARGED` before `STOP_RECORDED` in
+the same writer epoch. Pre-contact reservations remain reserved and known
+accounting is never downgraded.
+
+Settlement identities are domain-separated hashes of the stop, exact reservation,
+contact identity/hash and predecessor head. Recovery reconstructs the historical
+prefix and rejects omitted, added, retargeted or aliased contact classifications
+while allowing later authoritative adjustment without reopening the terminal run.
+
+| Evidence | Result |
+| --- | --- |
+| Initial plan audit | `REVISE`: exact legacy compatibility, durable identity, per-contact historical predicates and exact-set/crash coverage required |
+| Corrected plan re-audits | `REVISE` for infeasible event-envelope v2, then `APPROVE` after retaining envelope schema 1 with exact nested snapshot version 1 |
+| Focused first falsification | Failed with contacted reservation still `RESERVED`; passed after atomic T19 settlement |
+| Focused R-STOP-03 suite | Exit 0; 7 tests; `OK` |
+| Storage module | Exit 0; 184 tests; `OK` |
+| Complete delivery-control package | Exit 0; 226 tests; `OK` |
+| Independent implementation review | Initial `REVISE` for cross-run/effect attempt-ID alias; corrected re-review `APPROVE`, no remaining blocker/major; reviewer independently passed 7 focused tests and reproduced the corrected probe |
+
+This establishes the R-STOP-03 slices of T19, C09, F04b and F08. All three
+stop findings are independently accepted and the aggregate stop gate is
+`APPROVE`. Full-row/family traceability remains unclaimed where the matrix says
+`UNVERIFIED`; PR #99 remains draft and not merge-ready for the remaining backlog.
+
+### 5.7 T13 authority lifecycle checkpoint
+
+T13 is implemented and independently accepted. Typed, issuer-authenticated
+synthetic lifecycle facts cover expiry, revocation, supersession, foreign and
+own consumption, source unavailability, unknown local claim status and exact
+correction. One atomic event records the governed boundary/order, durable
+grant-wide effective-authority generation, scoped provenance fence and
+deterministic lifecycle result. Effect, validator and operator consumers consult
+the index, with a second exact check before adapter contact.
+
+Corrections rematerialize the newest remaining uncorrected prohibition rather
+than erasing stacked facts. Typed supersession graphs admit independent acyclic
+chains by issuer/kind/action/scope, reject conflicts and reachability cycles, and
+remove only an exactly corrected edge. Lawful own consumption remains a durable
+future-use denial while allowing only its exact already-committed intent to
+continue through launch/contact. Terminal lifecycle never reopens.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` rounds clarified the fact/order table, claim-status retention, typed graph, exact correction and lifecycle routes; corrected plan `APPROVE` |
+| Focused first falsification | Failed because `record_authority_fact` was absent; passed after the typed durable route |
+| Complete delivery-control package | Exit 0; 242 tests; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | `REVISE` findings for stacked correction, claim-kind binding, graph reachability/namespacing and own-use continuation were corrected; final `APPROVE`, no remaining blocker/major; reviewer passed 16 focused tests |
+
+This promotes T13 itself to `YES/YES/YES`. It establishes the T13 slices of C08
+and F03 only; full cross-family C08/F03 traceability remains `UNVERIFIED`. T15 is
+the next ordered item, followed by T14. PR #99 remains draft and not merge-ready.
+
+### 5.8 T15 immutable binding-mismatch checkpoint
+
+T15 is implemented and independently accepted. New plan acceptance requires
+explicit source-tree, item-definition, plan-schema and reducer pins. Acceptance
+persists a domain-separated semantic-plan digest and a complete-policy digest
+covering permission/budget policy, checks/gates, failure-classification policy
+and issuer, finalization policy and issuer, schema and reducer. Historical
+unpinned plan events remain readable with NULL derived fields, but cannot accept
+a new mismatch fact.
+
+Typed SOURCE, ITEM, PLAN and POLICY mismatch requests carry an issuer-signed,
+current-head synthetic observation. Storage rederives the accepted value, owns
+the deterministic reason-keyed fence identity and atomically records the event,
+fresh observation, projection, fence, command outcome, catalog/run heads and
+lifecycle. PAUSED retains its state and fence; truly idle work becomes BLOCKED;
+active or uncertain work, including BLOCKED/FINALIZING with the outstanding
+slot, becomes RECONCILIATION_REQUIRED. Terminal states reject T15. Recovery
+recomputes the plan/policy digests, evidence MAC, historical activity predicate,
+route, fence and full projection/fence union.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Two `REVISE` rounds added explicit source pins, authenticated/store-derived observations, complete policy identity, strict legacy migration, exact kind mapping and narrow F01 boundaries; corrected plan `APPROVE` |
+| Focused first falsifications | Unpinned plan was initially accepted; the first typed mismatch then failed because `record_binding_mismatch` was absent; both became green through the narrow implementation path |
+| Focused T15 suite | Exit 0; 14 tests; `OK` |
+| Complete delivery-control package | Exit 0; 256 tests; `OK` |
+| `python scripts/validate-skills.py` | `OK: 184 skill(s) valid, 0 warning(s)` |
+| `python scripts/tests/test_validator.py` | `OK: 91 gate self-test assertion(s) passed` |
+| Independent implementation review | Initial `REVISE` found active BLOCKED work incorrectly treated as idle; historical-prefix activity routing and regression coverage corrected it; final `APPROVE`, no remaining blocker/major; reviewer passed 14 focused tests |
+| Commit/push and hosted checks | Signed-off commit `2de362612f43c125829ff8c73e22bcdcfa6147c0` pushed to the existing branch; `gate-guard`, `validate-skills` and `windows-offline-checks` passed on that exact head; PR #99 remained open, draft and blocked |
+
+This promotes T15 itself to `YES/YES/YES`. The narrow F01 non-mutation controls
+show that T15 does not change an existing effect key/descriptor, accepted plan,
+slot or accounting state, but full F01 remains `UNVERIFIED` for the later T28
+work. T14 is the next ordered item. PR #99 remains draft and not merge-ready.
+
+### 5.9 T14 pause-source resume checkpoint
+
+The reviewed T14 slice adds a typed resume request, issuer-authenticated exact
+request evidence and a coordinator-owned route from durable PAUSED history. The
+state owner verifies the current catalog and complete run-head vector, accepted
+plan/revision, exact pause settlement and active pause fence. One transaction
+appends `RESUME_ACCEPTED`, clears only the source pause fence, redeems the
+operator grant and updates the run/catalog heads. Other fences, readiness
+blockers, the repository-wide slot, accounting and intervening facts survive.
+Unresolved activity owned by the resumed run still requires T17; unrelated-run
+activity yields BLOCKED without making the committed resume unrecoverable.
+
+Recovery verifies the exact event and nested evidence schemas, issuer MACs,
+full historical prefix, route, cursor and projections. A compatibility-safe
+migration adds preserved lifecycle/cursor columns to the legacy pause projection,
+derives their values from verified pre-pause history and does not rewrite legacy
+event bodies. Partial schemas and malformed prefixes fail transactionally.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Two `REVISE` rounds closed source-pause/current-vector, legacy migration, route, capability-MAC and public VALIDATING-path scope gaps; corrected plan `APPROVE` |
+| Focused first falsifications | Typed request, coordinator route, signed evidence, authority action, durable route and recovery tests failed before their narrow implementations; the later review probes reproduced four additional recovery gaps before correction |
+| Focused T14 suite | Exit 0; 21 tests in 0.957 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 255 tests in 21.039 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 277 tests in 22.194 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found surplus-schema acceptance, non-null cursor replay, true-legacy projection and cross-run validator divergences; corrected final `APPROVE`, no remaining blocker/major; reviewer passed 21 focused tests in 0.982 seconds |
+| Commit/push and hosted checks | Signed-off commit `c3c94bf3d367380d1ff60835fb72cb300e69c3e4` pushed to the existing branch; `gate-guard` passed in 3s, `validate-skills` in 1m18s and `windows-offline-checks` in 3m23s; PR #99 remained open, draft and blocked |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+T14 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. The
+reviewed PLANNED/BLOCKED resume slice and narrow C06/C07 and F03/F05/F06/F12/F14/F21
+interactions do not establish those complete families. Exact public-path clean
+VALIDATING resume is intentionally deferred to the ordered T08 work. At this
+checkpoint T05-T09 was next; section 5.10 records the completed T05 successor.
+PR #99 remains draft and not merge-ready.
+
+### 5.10 T05 local-execution pause checkpoint
+
+T05 is implemented and independently accepted for the synthetic request-only
+local-execution boundary. `PauseLocalExecutionRequest` binds the exact committed
+intent event/hash, repository slot owner and generation. The store admits both
+valid RUNNING windows: committed intent before launch and a launch with no
+adapter contact. A contacted attempt is denied to the ordered T06 route.
+
+The single atomic transaction appends a closed-schema, explicitly
+`LOCAL_EXECUTION` `PAUSE_REQUESTED`, installs an item/effect fence, persists the
+full signed operator capability and redemption, advances RUNNING to PAUSING and
+retains the outstanding slot, permission use, budget reservation, launch and
+continuation cursor. The coordinator performs no cancel/drain contact: this
+offline kernel has no trusted local-child cancellation adapter, so neither a
+pause request nor parent exit is represented as cessation proof. Contact and
+pause serialize under the repository writer boundary; only the committed
+contact or committed fence can win.
+
+Recovery reconstructs and verifies the exact intent and historical slot,
+issuer MAC, closed T05/T04-discriminated event shape, projection/redemption/fence
+union, predecessor lifecycle and predecessor-derived continuation cursor.
+Self-consistent event/projection/head rewrites of capability fields, cursor or
+surplus schema fail closed.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` found three MAJOR gaps: launch was over-required, the capability MAC was not durably recoverable and T05 was not separated from T04 history; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused first falsifications | Typed contract failed because it was absent; store route failed because `pause_local_execution` was absent; coordinator route failed because it was absent; each passed after its narrow implementation |
+| Focused T05 suite | Exit 0; 17 tests in 0.675 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 272 tests in 22.140 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 294 tests in 23.893 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found a forgeable retained cursor; prefix-derived cursor validation and a self-consistent tamper regression corrected it; final `APPROVE`, no remaining blocker/major; reviewer independently passed 17 focused tests in 0.743 seconds |
+| Commit/push and hosted checks | Signed-off commit `13bda54b9bc63e962a3900ac16640fd2bb18d304` pushed to the existing branch; `gate-guard` passed in 4s, `validate-skills` in 1m18s and `windows-offline-checks` in 3m22s; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+This promotes T05 itself to `YES/YES/YES`. Its accepted crash/replay and
+repository-slot-retention slices inform C06 and F06, but both complete families
+remain `UNVERIFIED`. No cancel/drain adapter or T07 settlement is claimed. T06
+through T09 are next in their documented order; PR #99 remains draft and not
+merge-ready.
+
+### 5.11 T06 contacted external-mutation pause checkpoint
+
+T06 is implemented and independently accepted for the synthetic contacted,
+no-control-plane-receipt boundary. `PauseExternalMutationRequest` binds the exact
+committed intent, operation launch, durable `EFFECT` adapter contact, canonical
+target digest, repository slot owner and generation. Bare contact is not treated
+as proof that the mutation remains active or drainable. The only implemented T06
+outcome is therefore `RUNNING -> RECONCILIATION_REQUIRED`; no unauthenticated
+`PAUSING` branch is claimed.
+
+One writer transaction converts a still-`RESERVED` reservation to a normal,
+versioned `UNKNOWN_WORST_CASE_CHARGED` settlement at W, appends the closed-schema
+`EXTERNAL_MUTATION` `PAUSE_REQUESTED`, installs the item/effect fence and redeems
+the signed operator grant. Existing known or unknown accounting is retained by
+exact prefix-head reference without downgrade or duplicate charge. The slot,
+effect identity, intent/launch/contact evidence and continuation cursor remain.
+The route performs no adapter observe, cancel, rollback, retry or new mutation
+and never infers cessation. A later receipt enters through T23: known use adjusts
+the prior worst-case charge while unknown use retains it; both remain in
+reconciliation with the fence and slot intact.
+
+Recovery round-trips the complete contact event body and independently verifies
+its repository/run/item/effect/attempt/kind/source/target/hash and strict
+pre-pause order. It derives the reservation disposition and settlement head from
+the pre-transaction writer-epoch prefix rather than trusting the pause snapshot.
+Self-consistent contact retarget, settlement-head retarget, snapshot, projection,
+schema and cursor/history tampering fail closed.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` found one BLOCKER and two MAJOR gaps: bare contact was incorrectly treated as ordinary PAUSING, worst-case accounting was omitted and later receipt routing incorrectly used T10; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused first falsification | The coordinator test failed at import because `PauseExternalMutationRequest` was absent; the narrow typed route then made the contacted/no-receipt worst-case behavior pass |
+| Focused T06 suite | Exit 0; 14 tests in 0.923 seconds; `OK` |
+| Affected storage/dispatch modules | Exit 0; 285 tests in 23.229 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 307 tests in 23.939 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR recovery gaps in exact contact-body/order verification and prefix-derived retained accounting; both were corrected with self-consistent tamper regressions; final `APPROVE`, no remaining blocker/major; reviewer independently passed 14 focused tests in 0.824 seconds |
+| Commit/push and hosted checks | Signed-off commit `39b3268adc984e3d0b10e55a42fe37a172229e60` pushed to the existing branch; `gate-guard` passed in 7s, `validate-skills` in 1m20s and `windows-offline-checks` in 2m49s; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, artifacts/caches, real authority/adapters and external systems |
+
+This promotes T06 itself to `YES/YES/YES`. Its accepted contact uncertainty,
+crash/replay, late-receipt and slot-retention slices inform C03, C06, F06, F07
+and F08, but those complete families remain `UNVERIFIED`. No authenticated
+active/drainable PAUSING route or T07 settlement is claimed. T07 through T09 are
+next in their documented order; PR #99 remains draft and not merge-ready.
+
+### 5.12 T07 local nonexecution settlement checkpoint
+
+The reviewed T07 slice settles only an exact T05 local-execution pause whose
+same attempt and reservation have an authoritative T25 `NONDISPATCH_PROVEN`
+settlement. That proof must be the reservation's latest pre-T07 accounting
+head, `RELEASED`, zero-liability, non-uncertain, non-contradictory and complete,
+with `release_slot=false`. One transaction appends the distinct
+`ACTIVITY_SETTLEMENT` `PAUSE_SETTLED` event and projection, advances
+`PAUSING -> PAUSED`, and retains the pause fence, outstanding slot, T25
+accounting and `operation-recovery:<attempt>` cursor.
+
+The associated versioned T14 activity-resume route uses a distinct typed
+request/evidence/projection so legacy T04 signed bytes remain unchanged. It
+clears only the exact T05 fence and returns `PAUSED -> BLOCKED`, retaining the
+recovery cursor, outstanding slot and every non-pause fence/blocker. Runtime and
+recovery bind the slot generation to the exact T07 projection/event pair rather
+than assuming generation 1. Recovery derives the latest reservation settlement
+from the historical prefix independently of journal chaining, so a legitimate
+intervening T13 non-accounting fact remains recoverable.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Three `REVISE` rounds closed authority/cessation overclaim, missing T25/T17/T14 interactions, projection separation and legacy signed-request compatibility; corrected plan `APPROVE` with no remaining blocker/major |
+| Focused falsification and correction tests | Initial typed-contract/coordinator tests failed before implementation; final correction suite passed 3 tests in 0.197 seconds |
+| Affected storage/dispatch modules | Exit 0; 296 tests in 24.830 seconds; `OK` |
+| Complete delivery-control package | Exit 0; 318 tests in 25.638 seconds; `OK` |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR recovery defects: journal predecessor was incorrectly equated with T25 head and T14 assumed slot generation 1. Prefix-derived accounting and exact T07 generation binding, with intervening-T13 and non-1 regressions, closed both. Final `APPROVE`, no remaining blocker/major; reviewer independently passed 3 correction tests in 0.194 seconds |
+| Commit/push and hosted checks | Signed-off commit `a0d27bbdd64d7d86bf080355ca933d28760244ab` pushed to the existing branch; `gate-guard` passed in 5s, `validate-skills` in 1m19s and `windows-offline-checks` in 2m58s; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, artifacts/caches, real authority/adapters and external systems |
+
+T07 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition: this
+checkpoint proves only the T05-local/T25-authoritative nonexecution source. T08
+validation-pause and T24/other source families remain ordered work, so full T14
+also remains `UNVERIFIED`. The accepted slice informs C06 and F06/F12 but does
+not promote those complete families. The T08 slice below is next; PR #99 remains draft and not
+merge-ready.
+
+### 5.13 T08 validation-pause checkpoint
+
+The reviewed T08 slice introduces a distinct typed pause-validation request and
+one exact checkpoint shared by runtime, T14 and recovery. `IDLE` and an
+`ELIGIBLE_RESULT_SETTLED` checkpoint with an exact RESULT observation, known
+accounting and authoritative validator cessation enter `PAUSED`. Unresolved
+work enters `RECONCILIATION_REQUIRED`: uncontacted work retains its RESERVED
+budget, while contacted work atomically settles a still-RESERVED budget as
+`UNKNOWN_WORST_CASE_CHARGED`. The transaction retains the repository-wide slot,
+validation cursor and result-application obligation, and performs no adapter
+observe, cancel or retry call.
+
+The associated T14 route accepts only the exact clean T08 PAUSED source, clears
+only its pause fence and resumes `VALIDATING`. It rejects unresolved T08
+checkpoints. Recovery independently derives the same checkpoint from the
+historical prefix, validates the full signed operator capability and closed
+event/projection schemas, and verifies the deterministic uncertainty settlement.
+Repository writer serialization prevents a verifier from accepting a mixed
+projection/event snapshot while contact or result intake commits.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | Initial `REVISE` identified three checkpoint/cessation/race gaps; the corrected narrow plan received `APPROVE` before editing |
+| Focused falsification and race tests | 13 T08 tests passed locally in 2.536 seconds; the two deterministic race tests passed in three repeated runs |
+| Affected dispatch module | 40 tests passed in 4.925 seconds |
+| Complete delivery-control package | 331 tests passed in 28.693 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: zero cessation was accepted as eligible and pause/contact plus pause/result races lacked deterministic coverage. Both were corrected; final `APPROVE`, no remaining blocker/major; reviewer independently passed 13 focused tests in 2.479 seconds |
+| Commit/push and hosted checks | Reviewed implementation commit `a0d27bbdd64d7d86bf080355ca933d28760244ab` and evidence commit `9b4cc6ff0d656409b071e16ed6a81ec06a692e5a` were pushed; all three hosted checks passed on both exact heads; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T08 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a complete transition. This
+slice proves the synthetic idle, exact settled-result, uncontacted uncertainty
+and contacted worst-case branches plus the clean VALIDATING T14 route; it does
+not claim authenticated active drain/cancel or every T17/T24 cessation source.
+T14 and the implicated C/F families likewise remain `UNVERIFIED`. T09 follows;
+PR #99 remains draft and not merge-ready.
+
+### 5.14 T09 reconciliation-required pause checkpoint
+
+T09 now has a distinct typed operator request and coordinator/state-owner route
+for an already durable `RECONCILIATION_REQUIRED` run. The request binds the
+repository, run, item, logical effect, accepted plan and revision, exact current
+source event ID/hash, preserved continuation cursor, new event and fence IDs,
+reason and signed one-use PAUSE capability. Under the repository writer lock and
+one `BEGIN IMMEDIATE` transaction, the route verifies the current head, cursor,
+plan and authority, appends `PAUSE_FENCE_RECORDED`, inserts the fence and immutable
+action projection, redeems the capability and advances both durable heads.
+
+The lifecycle remains `RECONCILIATION_REQUIRED`. The route leaves accounting,
+the repository-wide outstanding slot, continuation cursor, prior evidence and
+prior fences unchanged, performs no adapter call and does not hide or clear
+uncertainty. Same-command replay is idempotent; a distinct stale-source command
+is denied, while a deliberate new command bound to the new exact head can stack
+another fence. Recovery reconstructs and authenticates the complete event,
+source, plan, projection, redemption and fence history and fails closed on
+schema or self-consistent source retarget tamper.
+
+| Evidence | Result |
+| --- | --- |
+| Plan audit | The narrow plan received independent `APPROVE` before editing; T14 clearance remained deferred to T17 |
+| Focused first falsification | Typed contract import failed before implementation; the narrow route made the contract/coordinator test pass |
+| Focused T09 suite | 8 tests passed in 1.580 seconds |
+| Affected dispatch module | 48 tests passed in 6.715 seconds |
+| Complete delivery-control package | 339 tests passed in 30.792 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed; `git diff --check` exit 0 with line-ending notices only |
+| Independent implementation review | Initial `REVISE` found one MAJOR future-clearance foreign-key defect; removing only the T09 action-to-live-fence dependency and adding its regression produced final `APPROVE`, no findings; reviewer independently passed 8 focused tests in 1.453 seconds |
+| Commit/push and hosted checks | Signed-off commit `9599bcb748f2290f328561704c860f5cb3b9c4c3` pushed to the existing branch; `gate-guard` passed in 7s, `validate-skills` in 1m18s and `windows-offline-checks` in 2m47s on that exact head; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T09 is `YES/YES/YES`. Its crash/replay, slot-retention and uncertainty/fence
+persistence tests are narrow evidence for C06, F06 and F21; those complete
+families remain `UNVERIFIED`. T17 with F02/F11/F12/F21 is next. PR #99 remains
+draft and not merge-ready.
+
+### 5.15 T17 validator-result reconciliation and T09-resume checkpoint
+
+The reviewed T17 slice reconciles one exact ceased validator RESULT from its
+immutable observation, cessation, accounting settlement and uncertainty set.
+Runtime and recovery share one repository-prefix reducer bounded by the global
+writer epoch. It rejects a superseded validator attempt, resolves only the
+named uncertainty instances and exact associated fences, and derives the
+remaining route from applicable item/effect history. A same-run pause preserves
+`PAUSED`; an applicable cross-run pause is a blocker; later history cannot
+retroactively alter the recorded route. The typed validation-application cursor
+is retained for the still-unapplied result.
+
+The associated versioned T14 route is distinct from legacy `ResumeRequest`.
+Its signed request binds the immutable T09 pause and T17 reconciliation sources,
+the independently current catalog/run-head vector and current run head. One
+transaction clears only the named T09 fence, redeems the one-use operator
+capability and advances the run chain. If another same-run T09 fence remains,
+the first resume remains `PAUSED`; a later independently signed resume chains
+from that new head and may return the eligible result to `VALIDATING`. Historical
+reducers replay both exact clearances so a removed fence is not resurrected.
+
+| Evidence | Result |
+| --- | --- |
+| Focused falsification and correction tests | T17 validator reconciliation, cross-run prefix ordering, T09/T17 stacking, two-stage exact fence clearance, rollback/replay and recovery tamper tests passed |
+| Affected dispatch/storage modules | 330 tests passed in 40.735 seconds before the final current-head binding correction; focused two-stage regression passed afterward |
+| Complete delivery-control package | 352 tests passed in 41.590 seconds after all corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | First `REVISE` required repository-wide applicable scope and a distinct T14 contract. Second `REVISE` found stranded stacked fences, historical fence resurrection and incomplete recovery rebinding. Current-head signing, PAUSED preservation, both historical reducers and full source bindings closed the findings; final `APPROVE`, no remaining blocker or major |
+| Commit/push and hosted checks | Signed-off commit `2bd6112215d78937bb23d694aa933eebf8d417e2` pushed to the existing branch; `gate-guard`, `validate-skills` and `windows-offline-checks` passed on that exact head; PR #99 remained open, draft and blocked |
+| Files changed | `contracts.py`, `authority.py`, `dispatch.py`, `engine.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+This checkpoint accepts only the validator-result T17 route and the exact T09
+pause-source T14 route. T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` as a
+complete transition: effect-operation uncertainty backfill, the complete T06
+uncertainty categories, operation receipt/nonexecution reconciliation and safe
+retry remain ordered T17 work. F02, F11, F12 and F21 receive narrow evidence but
+remain `UNVERIFIED` as complete families. PR #99 remains draft and not
+merge-ready.
+
+### 5.16 T17 operation-uncertainty foundation checkpoint
+
+The reviewed foundation gives operation uncertainty one canonical derivation
+used by runtime, semantic migration and recovery. T06 now records distinct
+`OUTCOME`, `ACTIVITY` and `SOURCE_CONTROL` instances and records `BILLING` only
+when the complete settlement history is genuinely unknown. Effect receipts use
+typed, issuer-authenticated source/control classification: `SOURCE_CONTROL` is
+created only for authenticated `UNKNOWN`, while known `CONSUMED` or `ADJUSTED`
+accounting is never downgraded merely because the incoming receipt omits usage.
+The operator pause fence remains separate from these uncertainty fences.
+
+SQLite `PRAGMA user_version=1` is the semantic boundary. Version 0 performs the
+reconciliation backfill, exact legacy-operation audit, canonical operation-row
+derivation and version advance in one `BEGIN IMMEDIATE` transaction. Version 1
+validates the exact row/fence set and never heals deletion or surplus data.
+Migration rejects disguised validator-shaped operation rows and verifies every
+settlement projection against its immutable event body, hash and scope before
+classification. New evidence-bearing receipt history requires the bound issuer
+and MAC during recovery; immutable legacy receipt bodies retain their original
+digest semantics.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T17 foundation plan tied runtime, migration, recovery and the accounting matrix to T06/T10/T17 and F02/F04a/F07/F11/F12/F21; corrected plan received `APPROVE` before editing |
+| Cheapest falsification and regressions | Evidence omission, v2 authority/MAC recovery, conditional T06/receipt category matrices, exact legacy migration, atomic rollback, repeated reopen, deletion/surplus/tamper and crash/replay cases passed; the final disguised-row and settlement-projection rollback probes passed 2 tests independently |
+| Affected storage/dispatch modules | 342 tests passed in 43.910 seconds after the final migration corrections |
+| Complete delivery-control package | 364 tests passed in 44.034 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found four MAJOR evidence, recovery-MAC, transaction-boundary and legacy-row-healing gaps. A second `REVISE` found disguised operation rows and unverified settlement projections at migration. Both correction rounds were regression-tested; final `APPROVE`, no remaining blocker or major |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+This checkpoint adds narrow evidence to T17 and F02/F04a/F07/F11/F12/F21 but
+does not promote any complete family. T17 remains
+`UNVERIFIED/UNVERIFIED/UNVERIFIED`: verified-receipt reconciliation,
+authoritative nonexecution resolution and authenticated concurrent-safe
+same-effect retry remain next in their documented order. PR #99 remains draft
+and not merge-ready.
+
+### 5.17 T17 verified-receipt reconciliation checkpoint
+
+The reviewed `VERIFIED_RECEIPT` slice accepts only an exact durable effect
+receipt plus authoritative current accounting. Its synthetic lookup evidence is
+a closed, domain-separated MAC over the exact catalog/run heads, canonical
+timezone-aware query time, governed query-after event, derived source identity,
+response identity/digest, mandatory `KNOWN` classification and sorted prior
+`SOURCE_CONTROL` uncertainty bindings. Runtime and recovery independently
+derive those bindings from immutable receipt and uncertainty history.
+
+Every applicable operation uncertainty for the current repository/run/item/
+effect/attempt must be named exactly. Billing clearance proves the complete
+settlement ancestry from each uncertain head to the current `CONSUMED` or
+`ADJUSTED` head. One SQLite transaction appends the reconciliation event,
+resolution rows, route-specific action projection and command outcome, deletes
+only the exact uncertainty fences, and updates the run/catalog heads. The
+server-derived `operation-validation:v1` cursor routes uncovered reconciliation
+to `RECONCILIATION_REQUIRED`, a retained same-run pause to `PAUSED`, other
+recovery/finalization blockers to `BLOCKED`, and a clean prefix to `VALIDATING`.
+Exact replay occurs before mutable freshness and state guards.
+
+Semantic version 2 adds the separate
+`verified_receipt_reconciliation_actions` projection without changing legacy
+validator reconciliation bodies, hashes or rows. Recovery re-verifies the
+signed lookup, exact action/resolution sets, settlement ancestry, route and
+deleted-fence history. Version 2 never recreates a missing table or cleared
+fence; the operation-uncertainty reopen audit excludes only resolutions backed
+by an exact verified-receipt event/action pair.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Initial plan received two `REVISE` rounds for ordered source evidence and replay/pause reducer semantics; corrected plan received `APPROVE` before editing |
+| Focused falsification and regressions | Four-category T06 late receipt routes to `PAUSED`; observation-only billing ancestry routes to `VALIDATING`; forged/stale source/response/order, `UNKNOWN`, missing/surplus schema, slot/set substitutions, crash rollback/commit, replay under denied freshness, resolution/action tamper and migration cases pass |
+| Complete delivery-control package | 368 tests passed in 45.506 seconds after review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: incomplete query/time/source/response proof and replay behind mutable freshness. Typed lookup/order derivation and replay reordering closed both; corrected review returned `APPROVE`, no remaining blocker or major, with 3 focused tests independently passing |
+| T/C/F traceability | Adds narrow accepted evidence to T17, C03/C04/C06 and F02/F04a/F07/F11/F12/F21; all complete families retain their prior status |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T17 remains `UNVERIFIED/UNVERIFIED/UNVERIFIED`. Authoritative
+`PROVEN_NONEXECUTION` is next, followed by authenticated concurrent-safe
+`SAFE_SAME_EFFECT_RETRY`. The existing validator-only T09-after-T17 resume
+projection is intentionally unchanged; operation-sourced T14 clearance remains
+deferred. PR #99 remains draft and not merge-ready.
+
+### 5.18 T17 authoritative nonexecution and safe-retry checkpoint
+
+The reviewed slice closes the remaining ordered T17 implementation work for
+synthetic operation nonexecution. T25 requires an issuer-authenticated,
+canonical target-ledger seal for every `INTENT_ONLY`, `LAUNCHED` or `CONTACTED`
+operation routed to recovery. It persists the exact proof/action, clears only
+uncertainties that existed at the proof prefix and retains every newer or
+independent fence. T14 clears only the exact operator pause and remains PAUSED
+when another prefix-active pause survives. T16 creates one typed, one-use retry
+authorization; the exact successor T03 intent atomically consumes it and
+transfers the repository slot from generation 1 to generation 2 without
+authorizing another effect.
+
+Recovered generation and authorization identity are carried through operation
+launch/contact, T10/T23 effect intake, T27 validator intent/contact, T11/T12
+application, T16 finalization and T26 terminal settlement. Exact replay covers
+pre-commit rollback and post-commit acknowledgement loss. Ordinary generation-1
+event shapes remain unchanged. Recovery rejects rebound generation or
+authorization fields, while a stopped contacted retry retains its slot until
+the missing authoritative effect outcome is settled.
+
+The initial implementation review returned `REVISE` because generation-2
+recovery stopped at operation contact, INTENT_ONLY T25 recovery lacked its
+canonical action/seal, and T14 replay counted cleared historical pauses as
+active. After those corrections, two migration-only blockers were corrected.
+Terminal-settlement migration
+now recognizes both committed generation-1 schemas and migrates populated rows
+losslessly to positive generations with foreign keys intact. The v2-to-v3 T25
+backfill now derives its resolution set from the exact proof-event prefix,
+preserves later uncertainties/fences and atomically rejects incompatible later
+resolution ownership instead of committing a partially recoverable database.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T17/T25/T14/T16 plan was independently approved; a corrected remediation plan closed all-path proof and crash/replay coverage gaps before editing |
+| Focused falsification and regressions | Generation-2 observation/validation/finalization/terminal crash-replay, INTENT_ONLY/LAUNCHED/CONTACTED seal binding, stacked-pause replay, generation/authorization tamper, generation-1 compatibility and both migration boundaries passed |
+| Storage module | 279 tests passed in 32.924 seconds |
+| Complete delivery-control package | 373 tests passed in 47.700 seconds |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Independent implementation review | Initial `REVISE` closed generation propagation, missing INTENT_ONLY action/seal and cleared-pause replay findings. Two later migration blockers exposed exact-HEAD terminal-schema and historical T25-backfill defects; both were corrected and independently retested. Final `APPROVE`, no remaining blocker or major; reviewer independently passed the two migration probes |
+| Commit/push and hosted checks | Signed-off commit `a6b2d8624400d7af3be2cb309db01864d6e8e472` pushed to the existing branch; exact-head `gate-guard` passed in 5s, `validate-skills` in 1m7s and `windows-offline-checks` in 3m1s; PR #99 remained open, draft and blocked |
+| T/C/F traceability | Adds accepted operation-nonexecution/safe-retry evidence to T14/T16/T17/T25 and generation-aware T10/T11/T12/T23/T26/T27, plus C03/C04/C06 and F02/F04a/F06/F07/F11/F12/F19/F21; complete families remain conservatively `UNVERIFIED` pending accumulated exact-head audit |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+The ordered T17 implementation slice is complete and independently accepted,
+but the T17 matrix row remains `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the
+accumulated exact-head transition trace is performed. The succeeding T22
+checkpoint is recorded below. PR #99 remains draft and not merge-ready.
+
+### 5.19 T22 terminal restart reporting checkpoint
+
+T22 now has a typed, non-authorizing restart/resume report for `COMPLETED`,
+`FAILED_FINAL` and `STOPPED`. A dedicated read facade opens only an existing
+SQLite database with URI `mode=ro` and `query_only`, verifies the complete local
+history/projections with injected trusted synthetic authority, derives the
+unique terminal-entry event server-side and invokes the T22 engine guard only
+when independent complete-vector freshness also passes. A stale or unavailable
+freshness proof returns locally verified status with dispatch closed. Integrity,
+schema or trust failure returns explicitly unverified status with dispatch
+closed. Verified nonterminal state is reported separately without claiming that
+ordinary dispatch guards were evaluated.
+
+The report never appends an event, consumes authority, clears a fence, releases
+the repository slot or changes budget/cap state. Caller-provided terminal/head
+anchors are comparisons rather than freshness proof. T23 and T26 remain separate
+guarded mutation routes; T22 reports that separation but authorizes neither.
+Main and auxiliary synthetic proof ledgers are opened read-only, so reporting
+does not initialize, migrate, backfill, repair, create `writer.lock` or recover a
+hot journal.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Three `REVISE` rounds separated local integrity, independent freshness, caller assertion matching, request disposition and global dispatch posture; corrected plan received `APPROVE` before editing |
+| Focused falsification and regressions | 11 T22 tests passed, covering all terminal states, nonterminal status, stale/raising freshness, wrong anchors/authority, missing/corrupt/legacy state, repeated reads, retained budget/slot, concurrent snapshots, non-object event bodies and read-only main/auxiliary ledgers |
+| Complete delivery-control package | 384 tests passed in 53.243 seconds after review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exit 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found two MAJOR gaps: a write-capable auxiliary proof-ledger handle and an escaping structural JSON exception. Shared read-only auxiliary connections and verifier-boundary normalization closed both; corrected review returned `APPROVE`, no remaining blocker or major, and independently passed all 11 focused tests |
+| Commit/push and hosted checks | Signed implementation commit `39ad374a172122c14d06070f65c1e033da3b5c83` pushed to the existing branch; exact-head `gate-guard` passed in 4s, `validate-skills` in 1m24s and `windows-offline-checks` in 2m14s; local and remote heads matched, `ba13394` remained an ancestor, and PR #99 remained open, draft and blocked |
+| T/C/F traceability | T22 is implemented, tested and independently accepted. Adds narrow evidence to CP-D06/CP-D10, C07 and F04b without promoting those broader families |
+| Files changed | `contracts.py`, `dispatch.py`, `storage.py`, `test_storage.py`, plus status README/backlog/handoff synchronization |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, adapters, preserved artifacts/caches, real authority/adapters and external systems |
+
+T22 is complete and independently accepted. The succeeding T28/F01 checkpoint
+is recorded below. PR #99 remains draft and not merge-ready.
+
+### 5.20 T28 verified-effect adoption and F01 identity checkpoint
+
+The reviewed T28 slice adopts only an already completed, canonically identified
+effect into a new accepted plan and validation-check set. It performs no effect
+delivery, reuses no prior validation pass or charge, requires the repository-wide
+slot to be free, and consumes one dedicated synthetic adoption grant exactly
+once. The immutable adoption identity binds the complete root observation and
+finalization, immediate predecessor edge, current check set, source/version/
+terms/scope, plan and effect descriptor. Chained adoption provenance, readiness,
+authority use, dependencies, slot ownership and crash/replay recovery are all
+durable and independently reconstructed.
+
+F01 now also has canonical effect definitions and explicitly authorized
+`REPEAT_OF`, `DIFFERENT_FROM` and `COMPENSATES` edges. Relationship authority
+binds both effects' canonical descriptors, predecessor defining plan/history,
+the new defining plan and exact source terms. T03 denies an unsettled or fenced
+predecessor for every relationship kind. Late contrary T23 evidence retains a
+typed integrity fence on every dependent adoption; T13 correction clears only
+authority-owned dependent fences, even when an authority fact ID collides with
+an observation ID.
+
+The v4 foundation migration is atomic and strict: an existing v4 database is
+verified but never healed. Recovery sequentially proves every synthetic source
+use occurred after registration, inside its grant window, below its use limit
+and before any effective lifecycle denial. Exact lost-ack plan/adoption replay
+precedes mutable freshness, reuses the original outcome and authority use, and
+rejects capability rebinding.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | The narrow T28/F01 plan was independently approved before editing; implementation review correction rounds closed authority binding, source-history, replay and typed-fence ownership findings |
+| Focused regressions | Root/immediate/check/source key rebinding, all relationship kinds, occupied slot, spent one-use grant, post-use expiry, adoption terminal settlement, v4 no-heal, source window/use-limit/revoke recovery and T13/T23 ID collision passed |
+| Complete delivery-control package | 391 tests passed in 60.210 seconds after final review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Final `APPROVE`; no remaining blocker or major after complete adoption source-term binding and provenance-scoped dependent-fence correction |
+| Commit/push | Signed implementation commit `bbc96cffc31b8d1c82ba8877309d14674f133ff5` pushed to the existing branch; hosted exact-head checks were pending when this durable record was written |
+| T/C/F traceability | Adds accepted T28/F01 slices plus narrow T01/T03/T13/T23/T26 and C06 evidence; complete accumulated rows remain conservatively `UNVERIFIED` pending exact-head trace |
+| Files changed | `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py`, `test_storage.py` and `_legacy_schema.py`; this backlog/handoff and status READMEs record evidence separately |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
+
+T28/F01 implementation is independently accepted, but their accumulated matrix
+rows remain `UNVERIFIED/UNVERIFIED/UNVERIFIED` until the exact-head trace and
+final architecture/security/QA gates. At that checkpoint, cross-family
+F05/F06/F13/F20 was next in the documented order. PR #99 remained draft and
+not merge-ready.
+
+### 5.21 Cross-family F05/F06/F13/F20 checkpoint
+
+The reviewed cross-family slice makes every dispatch-capable storage boundary
+prove the complete independent freshness vector, including a new one-use
+synthetic source consumption. Exact replay is resolved before mutable freshness,
+while a stale copy cannot spend a still-unconsumed source grant or change any
+database byte. F06 exercises the single repository-wide outstanding-operation
+slot across items, runs, lifecycle states, uncertain billing and generation-
+bound same-effect retry before and after ownership transfer.
+
+F13 now routes proof-first contrary receipts against every relevant durable
+lifecycle state, preserving terminal states and forcing active nonterminal
+states into reconciliation with exact known or worst-case accounting. Tests
+assert the actual pre-receipt state, including a lawful T05 PAUSING state before
+adapter contact. F20 adds an exact typed validator-containment contract,
+capability binding, canonical output-size derivation and bounded output, pairwise
+disjoint roots, pure checker restrictions, strict schema/event recovery and
+crash/replay coverage. Legacy active validator intent without containment is
+nonlaunchable.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Two `REVISE` audits corrected the complete F05 mutation inventory, F06 state/generation matrix, F13 lifecycle/accounting matrix and F20 containment/recovery invariants; the third audit returned `APPROVE` before editing |
+| Focused regressions | The final three-test falsification set passed in 2.143 seconds, covering replay-before-freshness plus stale-copy non-mutation, the dispatch-boundary guard inventory and lawful PAUSING contrary-receipt recovery |
+| Complete delivery-control package | 413 tests passed in 67.555 seconds after final review corrections |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Three `REVISE` rounds closed caller-asserted output bounds, nested roots, optional recovery authority, exact schema/event checks, incomplete F05/F06/F13 matrices, stale source-use freshness and a mislabeled PAUSING fixture; final `APPROVE`, no remaining blocker or major |
+| Commit/push and hosted checks | DCO-signed commit `cf09be260bbffcb78dc44847b317d6c4a0de8237` pushed to the existing branch after remote head `676c4e2bc366290f28802721cd1dd99467a71707` matched its parent; exact-head `gate-guard` passed in 6s, `validate-skills` in 1m19s and `windows-offline-checks` in 1m55s; PR #99 remained open, draft and blocked |
+| T/C/F traceability | Adds independently accepted F05/F06/F13/F20 evidence across their implicated T/C routes; complete accumulated rows remain conservatively `UNVERIFIED` pending the final exact-head trace |
+| Files changed | `adapters.py`, `authority.py`, `contracts.py`, `dispatch.py`, `storage.py`, `test_dispatch.py` and `test_storage.py`; this backlog/handoff and status READMEs record evidence separately |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI, CLI, real authority/adapters, external systems and preserved artifacts/caches |
+
+Cross-family F05/F06/F13/F20 is independently accepted. The next documented
+slice was filesystem ownership/reparse/path-swap protection, recorded below.
+PR #99 remains draft and not merge-ready; no release or deployment is authorized.
+
+### 5.22 Filesystem ownership/reparse/path-swap checkpoint
+
+The filesystem slice routes the controller database, synthetic execution and
+validator ledgers, stable writer lock and read-only CLI/reader access through a
+standard-library checked-path capability. On Windows, the OS-known LocalAppData
+path is bound to a retained non-reparse handle, a fixed-volume-root handle and a
+normalized handle-verified lexical path; every managed descendant and leaf is
+retained and identity checked. Same-volume known-folder rebinding, junctions,
+leaf/ancestor replacement, hardlinks, unsafe ACLs, WAL/SHM sidecars and unsafe
+rollback journals fail closed. The original `writer.lock` identity is retained
+by each store and required by every later mutation, so lock replacement cannot
+split repository serialization.
+
+POSIX traversal starts at `/`, uses descriptor-relative `O_NOFOLLOW`, rejects
+mount transitions and untrusted owners, and requires an owner-private child
+after a sticky directory. That policy is implemented and its decision rules are
+unit tested, but no POSIX runtime was available; it remains `UNVERIFIED` rather
+than inheriting the Windows result. A legitimate owned rollback journal is
+accepted for SQLite crash recovery, while WAL/SHM and linked journals are
+rejected. Read-only status and terminal-report access neither create nor repair
+state and return a typed unavailable result when the checked capability cannot
+be established.
+
+| Evidence | Result |
+| --- | --- |
+| Plan and independent audit | Two `REVISE` rounds corrected exact OS anchors, same-owner prevention/detection claims, short-lived rollback-journal checks and read-only behavior; final `APPROVE` preceded editing |
+| Focused platform regressions | Initial 22-test module and independent 23-test falsifier rerun passed; final-review corrections expanded the module to 27 passing tests covering unavailable canonical-root routing, explicit-path independence, hostile Windows ACL denial, initialized-status nonmutation and missing POSIX traversal flags |
+| Complete delivery-control package | 433 tests passed in 78.889 seconds on the final reviewed diff |
+| Repository validators | 184 skills valid with zero warnings; 8 script tests passed with 4 expected skips; 91 gate self-test assertions passed; compileall passed |
+| Diff validation | `git diff --check` exited 0 with Windows line-ending notices only |
+| Independent implementation review | Initial `REVISE` found Windows ancestor/anchor binding, stable-lock identity, POSIX ownership and cleanup gaps; correction rounds closed them, including a same-volume known-folder rebound probe; final `APPROVE`, no remaining blocker or major |
+| Final-review correction pass | Architecture `REVISE` found premature canonical-root discovery in path-independent/noncanonical routes; QA `REVISE` required durable hostile-ACL and initialized-status nonmutation tests; security initially `APPROVE` with minor wording/test/flag notes. Corrections passed 27 platform and 433 package tests; architecture, security and QA re-reviews all returned `APPROVE` with no blocker or major. Exact committed-head/hosted confirmation remains pending |
+| T/C/F traceability | Strengthens platform/exclusion evidence implicated by T03/T21/T22 and path-escape families; accumulated T/C/F rows remain conservatively `UNVERIFIED` pending final exact-head trace |
+| Files changed | New `owned_paths.py`; `storage.py`, `adapters.py`, `cli.py`, `test_platform.py`, and isolation/canonical-path fixtures in `test_dispatch.py`, `test_recovery.py` and `test_storage.py`; backlog, handoff and status READMEs record evidence |
+| Intentionally untouched | Canonical design, approval register, BER, dependencies, CI workflows, real authority/adapters, external systems and preserved artifact/cache paths |
+| Known limitation | The current sandbox principal does not own its OS-returned LocalAppData directory, so a real default-root smoke run is correctly `UNAVAILABLE`; tests use a checked temporary known-folder seam. POSIX runtime evidence is absent |
+
+This filesystem slice and its corrected pre-commit diff are independently
+accepted. Exact committed-head/hosted confirmation is next. PR #99 remains
+draft and not merge-ready; no release or deployment is authorized.
+
+### 5.23 Exact-head T/C/F trace authoring checkpoint
+
+The accumulated trace authoring pass is anchored to implementation head
+`a9dbeab2b2e28f2914df32dd55558a2d051517e6`. Its three hosted checks passed:
+`gate-guard` in 6 seconds, `validate-skills` in 1 minute 10 seconds and
+`windows-offline-checks` in 3 minutes 6 seconds. The exact local package suite
+passed 433 tests in 78.889 seconds with zero skips on Windows 10.0.26200,
+Python 3.14.7 and Windows PowerShell 5.1.26100.9444. Windows capability probes
+executed; POSIX runtime remains `UNVERIFIED`.
+
+The inventory is 59 normative rows: T01-T28, C01-C09 and 22 F rows because
+F04a and F04b are separate. Corrected assertion-level mapping establishes
+implementation surfaces for 18 T rows, 8 C rows and 18 F rows, with complete
+test coverage for 15 T rows, 8 C rows and 14 F rows. Existing independently
+accepted rows retain their verdicts. Corrected-map re-review approved these
+conservative statuses; rows without prior complete acceptance remain
+`UNVERIFIED` rather than being promoted by the mapping review itself.
+
+The audit does not hide the remaining gaps. The local reviewed T01-T03/C01
+trusted-readiness/dependency-provenance correction remains aggregate
+`UNVERIFIED` until committed exact-head trace review. T11/T27 lack selected-
+check dependency and launch-gate bindings; T07, T08, T14 and T17 are partial;
+T24 lacks mandatory terminal-policy intake behavior. T18/T19 need durable
+every-nonterminal-state matrices, and T25 has incomplete all-state/contradiction
+coverage. F02, F03, F04a, F09, F11, F17, F18 and F19 remain incomplete. The
+handoff records exact routes, test evidence and missing clauses. CP-WP-002 and
+PR #99 remain blocked from DONE/merge until the gaps are corrected and
+independently accepted.
+
+The plan audit first returned `REVISE` because it counted 58 rows and did not
+separate F04a/F04b; the corrected 59-row, assertion-level, non-circular plan
+returned `APPROVE` before these documentation edits. The first implementation
+review then returned `REVISE` for two BLOCKER root causes (trusted readiness and
+selected-check gates), plus terminal-policy, proof-free terminal-entry and stop-
+matrix corrections. Corrected-map re-review returned `APPROVE` with no findings
+and confirmed exact aggregate counts of T 28/18/15/8, C 9/8/8/0 and F
+22/18/14/5 (rows/implemented/tested/independently accepted). Canonical design,
+approval register, BER, dependencies, CI workflows, production/provider
+surfaces and preserved artifacts/caches remain untouched.
+
+### 5.24 Selected-check v2 binding foundation checkpoint
+
+The first selected-check increment is independently accepted without promoting
+T11, T27, F11 or F17. New accepted plans explicitly declare every check's
+dependency and launch-gate sets, derive a deterministic topological order with
+lexical tie-breaking, bind those values into authenticated v2 payload, semantic
+and completion-policy digests, and persist normalized projections. Recovery
+reconstructs the projections from authenticated event history; v1 plan history
+remains readable but fails closed at T27 rather than receiving invented empty
+bindings.
+
+T27 now selects only the first unresolved check in the bound topological order.
+A declared launch gate denies before validator intent, permission use, budget
+reservation, capability redemption or adapter contact until the signed launch-
+readiness increment exists. Focused tests cover the lexically earlier dependent
+case, newly eligible lexical ordering, incomplete/cyclic declarations,
+projection persistence, dependency-order launch and no-mutation gate denial.
+The complete local package passed 446 tests in 69.851 seconds. The first
+implementation review returned `REVISE` for inferred empty bindings, batchwise
+topological ordering, premature authority checks and unguarded declared gates;
+the corrected diff received `APPROVE` with no findings.
+Repository validation also passed: 184 skills with zero warnings, 8 script tests
+with 4 expected skips and all 91 gate self-test assertions.
+
+Still open in this same ordered gate: authenticated complete PASS/FAIL/UNKNOWN
+launch-gate facts and snapshots, the no-capability pre-claim decision, exact T16
+unblock, T11 next-check BLOCKED/VALIDATING routing, T17 post-event refresh and
+atomic contact recheck with T25 nonexecution settlement. PR #99 remains draft
+and not merge-ready. No real authority, adapter, provider, deployment or later
+work package is authorized by this foundation.
+
+### 5.25 Authenticated selected-check launch and routing checkpoint
+
+The next selected-check increment implements the previously open launch and
+routing foundation without promoting a canonical row. Issuer-authenticated,
+monotonic PASS/FAIL/UNKNOWN gate facts are append-only inputs to a signed
+complete dependency/gate snapshot. A missing, FAIL or UNKNOWN prerequisite
+records an exact BLOCKED decision before intent, permission use, budget
+reservation, capability redemption or adapter contact. A READY decision is
+bound to the accepted v2 plan, selected check, complete predecessor head vector
+and current event head.
+
+T27 now accepts only an unclaimed validator grant plus that durable READY
+snapshot, including for zero-gate plans. Capability acquisition and intent
+commit share the writer operation; rollback releases the synthetic claim, while
+only a durable command outcome permits lost-ack claim recovery. The old
+production preclaimed coordinator entrypoint and caller-controlled compatibility
+escape were removed. A final contact check replays an existing contact before
+testing current gates; otherwise changed prerequisites atomically record
+`VALIDATOR_INITIATION_DISABLED`, a scoped fence and an exact launch decision.
+T25 nonexecution settlement clears that fence without erasing its cursor, and
+fresh prerequisites can then resume only through the bound T16 resolution.
+
+T11 PASS now atomically appends a signed next-check route in accepted
+topological order. READY routes retain VALIDATING; unmet dependency/gate vectors
+record BLOCKED and can be resolved through exact T16 after all current values
+pass. A routed READY check still performs a fresh T27 launch evaluation rather
+than treating its older route snapshot as spend authority. Replay returns the
+same final route event identity. Strict recovery reconstructs gate facts,
+launch evaluations/decisions and check routes from authenticated history, and
+the schema migration creates all four projections for pre-increment stores.
+
+Focused coverage includes zero-gate launch, disguised preclaim denial,
+transaction rollback and lost acknowledgement, signed UNKNOWN/FAIL and missing
+facts, stale/rebound snapshots, contact replay versus later gate changes,
+post-disable T25/T16 continuation, T11 READY/BLOCKED routes, exact T16 recovery,
+malformed signed-snapshot denial and old-schema migration. The corrected
+implementation received independent `APPROVE` with no findings. T11, T27, F11 and
+F17 remain `UNVERIFIED` until the corrected accumulated exact-head trace is
+reviewed and accepted. T17 proof-free terminal entry, T07/T08/T14,
+T18/T19, T25/F19, F02/F03/F04a, POSIX runtime evidence and final
+architecture/security/QA gates remain open. PR #99 remains draft and no real
+authority, adapter, provider, release or deployment is authorized.
+
+### 5.26 T24/F09 mandatory terminal-policy intake checkpoint
+
+The mandatory late-result branch is implemented and locally tested. Every new
+accepted plan now carries a closed, complete per-check terminal-policy map in
+the operator-signed acceptance payload and complete-policy digest; intake does
+not accept policy applicability or stop mode from its caller. A FAIL arriving
+after authoritative all-descendant cessation without a retained result records
+one unapplied observation, treats cessation as settled activity, and atomically
+creates its exact plan/check/attempt/result-bound terminal-policy obligation and
+irreversible fence. Legacy authenticated plans fail closed with a policy-unknown
+obligation/fence rather than silently assuming `NONE`.
+
+The prescribed immediate T19 route binds the complete sorted set of open
+obligations in its event and uses the closed `MANDATORY_TERMINAL_POLICY:ALL_OPEN`
+reason. An ordinary or wrong-mode stop is denied; the matching stop atomically
+enters `STOPPED` and fulfills every bound obligation while retaining the
+irreversible policy and stop fences. A late FAIL first observed after terminal
+entry is recorded as `TERMINAL_FIXED` without reopening the run. Direct and transitive dependent
+adoptions receive durable terminal-policy provenance fences without reopening
+terminal dependents. T11/T12/finalization and new dispatch remain denied by the
+active fence. Rollback before commit leaves no partial observation/obligation/
+fence, while lost acknowledgement replays the complete bundle once.
+
+Focused storage coverage includes accepted-policy persistence, authoritative
+cessation followed by late FAIL, no fabricated activity uncertainty, rollback,
+lost acknowledgement, exact replay, ordinary- and wrong-mode-stop denial,
+exact T19 fulfillment, post-STOPPED late failure and restart projection
+verification. T24 and F09 remain aggregate
+`UNVERIFIED` pending the committed exact-head trace. Independent implementation
+review returned `APPROVE` after the one-result-per-validator-attempt invariant
+and complete stop-obligation binding were corrected; 352 storage tests passed
+in the reviewer run. The next ordered correction is T17/F18 proof-free terminal
+entry.
+
+### 5.27 T17/F18 proof-free terminal-entry checkpoint
+
+The proof-free owner branch is implemented locally without converting risk
+acceptance into nonexecution or success. Three closed, separately authenticated
+one-use actions permit only report-only `RECONCILIATION_REQUIRED`, `STOPPED` or
+`FAILED_FINAL`. Each signed request binds the accepted plan and descriptor,
+exact repository/run heads, continuation cursor, retained operation slot and
+the complete sorted unresolved operation-uncertainty set. Missing outcome
+uncertainty, stale heads/cursor/slot, an inexact set or unclassified contacted
+accounting denies without mutation.
+
+Every branch records `effect_outcome=UNKNOWN`, preserves the cursor, slot,
+uncertainty instances/fences and prefix-derived accounting. Report-only adds no
+terminal fence. STOPPED and FAILED_FINAL atomically add a permanent scoped
+fence while leaving later T23/T26 accounting closure possible; neither route
+authorizes retry, validation success, completion, compensation or dispatch.
+Replay is resolved before mutable freshness/state checks and a consumed grant
+cannot be reused.
+
+Semantic version 7 owns a separate action projection. The 6-to-7 migration is
+atomic, performs no history backfill, rejects a pre-existing partial table or a
+missing/altered v7 table, and never lets base initialization heal schema drift.
+Recovery reconstructs the action, operator redemption, terminal fence and exact
+historical accounting snapshot from immutable event prefixes. Focused tests
+cover all three dispositions, rollback, lost acknowledgement, replay, stale and
+inexact bindings, accounting-projection tamper, migration rollback and schema
+drift. The complete storage module passed 363 tests; the full package passed 478
+tests after migration-fixture corrections. The first implementation review
+returned `REVISE` for an accepted-plan issuer boundary and missing negative
+coverage; the corrected entrypoint and expanded denial matrix received
+`APPROVE` with no findings. Repository validators and hosted exact-head checks
+remain pending, so T17 and F18 stay aggregate `UNVERIFIED` and PR #99 remains
+draft.
+
+### 5.28 Active validator pause, drain and exact recovery checkpoint
+
+The active-validator gap in the local T07/T08/T14 implementation is closed and
+independently accepted. T08 now requires authenticated operator authority and a
+signed activity attestation for the exact contacted validator, plan,
+containment, heads, slot and reservation. It records `VALIDATING -> PAUSING`
+without adapter cancellation, retry, release, refund or lost application work.
+
+T07 reaches PAUSED only from one exact authoritative source: matching result
+plus all-descendant cessation, result-free interruption plus cessation, or the
+complete T25 validator nonlaunch proof. Result/interruption require closed known
+accounting; nonlaunch requires released zero-charge accounting, zero liability,
+all obligations settled, no uncertainty/contradiction and an already-settled
+intent. Unknown accounting remains denied.
+
+T14 resumes a preserved result to VALIDATING. Interruption and nonlaunch resume
+to BLOCKED and require an exact issuer-signed T16 authorization before one bound
+successor validator intent can consume it. The operation slot and reservation
+remain intact. Runtime and recovery derive the same exact source identities,
+chronology, accounting predicates and typed cursors.
+
+Crash rollback, lost acknowledgement, replay, wrong issuer, stale/rebound
+sources, unknown cost, duplicate consumption and self-consistent history
+rewrites are covered. The final independent audit returned `APPROVE` with no
+remaining BLOCKER or MAJOR finding, and the corrected storage suite passed 370
+tests. The complete delivery-control package passed 485 tests; the skill,
+validator, contract-audit, offline-CI, BER and Windows PowerShell 5.1 acceptance
+checks also passed locally. PowerShell Core acceptance remains assigned to the
+hosted Windows lane because `pwsh` is absent locally. Aggregate T07/T08/T14
+status remains `UNVERIFIED` until committed-head trace refresh; PR #99 remains
+draft.
+
+### 5.29 Committed-head accumulated trace checkpoint
+
+The 16-row accumulated trace was refreshed against committed head
+`15cfdc50c5ae24ad1f5ac88ce623aa489ac6575a` by reading the canonical contracts,
+runtime routes and behavioral assertions. It promotes T01-T03/C01,
+T07/T08/T14/F12, T11/T27/F11/F17, T17/F18 and T24/F09 to
+`YES/YES/YES`. The cited tests assert lifecycle, cursor, slot, accounting,
+authority, fence, crash/replay and recovery outcomes; none is counted merely
+because it executes a route. Prior independent implementation reviews for each
+promoted tranche ended `APPROVE` with no remaining BLOCKER or MAJOR finding.
+
+The resulting inventory has implementation surfaces for 28/28 transitions,
+9/9 crash boundaries and 22/22 acceptance-family rows. Stage 24 below raises
+verifying and independently accepted transition coverage to 27/28; acceptance-
+family coverage remains 18/22. The next ordered gaps are T25/F19 before/after-
+handoff and contradiction matrices, F02 proof-bound disposition coverage, F03
+clock/host/manual claim interleavings and F04a reservation-boundary accounting.
+Rows outside the narrow refresh retain their prior independent-review status.
+POSIX runtime and final architecture/security/QA gates remain open, and PR #99
+remains draft.
+
+### 5.30 T18/T19 every-nonterminal-state stop checkpoint
+
+Committed implementation head `b9f31c3f40eab222f0fd5bd47dba60784ef1eae1`
+adds the durable graceful/immediate matrix for all seven authentic nonterminal
+states. It verifies exact predecessor and continuation binding, retained slots,
+intents, launches, contacts, observations, uncertainties, resolutions and prior
+fences, permanent target-scoped STOPPED_RUN fencing, source-valid operation and
+validator no-new-contact denial, and strict recovery. Accounting distinguishes
+uncontacted reserves from contacted effect/validator obligations, including
+contacted active-validator PAUSING: graceful stop preserves exact accounting and
+immediate stop atomically records only the required worst-case unknown charges.
+
+The runtime correction resolves an exact committed stop replay before
+independent freshness denial while retaining projection, issuer, payload and
+identity validation; first-use stops still require freshness. Byte-identical
+stale-first-use denial, intermediate-settlement rollback, high-risk precommit
+rollback and lost-ack replay are directly asserted. Independent read-only audit
+returned `APPROVE` after the initial gaps were corrected, with no remaining
+BLOCKER or MAJOR finding. The full storage suite passed 378 tests, the complete
+delivery-control package passed 493, and all repository gates passed locally;
+the unchanged BER suite passed all 987 tests with 14 expected skips outside the
+sandbox limitations. T18 and T19 are therefore promoted to `YES/YES/YES`.
+
+The resulting inventory remains 28/28 implemented transitions and 9/9 tested
+crash boundaries, with verifying and independently accepted transition coverage
+now 27/28. The next ordered gap is T25/F19 before/after-handoff and contradiction
+coverage, followed by F02, F03 and F04a. POSIX runtime and final exact-head
+architecture/security/QA gates remain open; PR #99 remains draft.
+
+### 5.31 T25/F19 authoritative nonexecution checkpoint
+
+The T25/F19 checkpoint accepts issuer-authenticated canonical operation and
+validator nonexecution seals before and after adapter handoff. It classifies
+contradiction before clearance or release, distinguishes zero, known nonzero,
+unknown and missing control cost, and replays exact committed settlements before
+freshness while keeping first use freshness-bound. Precommit rollback and
+committed lost-ack replay are asserted for operation, validator and dependent-
+adoption paths.
+
+Authentic fixtures ingest current and historical T25 proof from PAUSING, PAUSED,
+RECONCILIATION_REQUIRED, COMPLETED, FAILED_FINAL and STOPPED for both operation
+and validator derivatives. Contrary proof preserves the accepted effect/result,
+charges, unresolved exposure, terminal state and any newer slot owner. It now
+atomically fences every T28 dependent with durable `NONEXECUTION` provenance;
+strict recovery reconstructs the dependent projection and scoped integrity
+fence while routing nonterminal dependents to reconciliation.
+
+Independent read-only review returned `APPROVE` after the initial dependent-
+adoption blocker and lifecycle-matrix gaps were corrected, with no remaining
+BLOCKER or MAJOR finding. The reviewer passed the full 80-test dispatch module;
+the local storage module passed 382 tests. T25 and F19 are promoted to
+`YES/YES/YES`. Verifying and independently accepted transition coverage is now
+28/28 and acceptance-family coverage is 19/22. The next ordered gaps are F02,
+F03 and F04a at that checkpoint; remaining row reviews, POSIX runtime and final
+exact-head reviews remain open, and PR #99 remains draft.
+
+### 5.32 F02 bounded same-effect retry checkpoint
+
+F02 is independently accepted. Proof-free REPORT_ONLY, STOPPED and
+FAILED_FINAL dispositions remain non-dispatching, cannot certify success or
+nonexecution, cannot erase uncertainty, and cannot be repackaged as a resend,
+alias or new-ID compensation. A late authoritative receipt remains admissible
+without reopening terminal lifecycle.
+
+The sole retry exception is a separately authenticated, reviewed same-effect
+contract for one successor generation and the original effect key. It requires
+complete mutation-path review, concurrent-old-attempt safety, settled billing,
+an unexpired target idempotency window, exact outcome/activity/source-control
+uncertainty, and a mandatory active T06 pause fence. Authorization atomically
+settles only the ordered source-control uncertainty, retains outcome/activity
+uncertainty and fences, retains the T06 pause, and records PAUSED. A distinct
+one-use T14 RESUME grant must clear that exact pause before T03 can consume the
+retry authorization; forged, revoked, consumed or missing authority denies,
+and any stacked/new fence survives and prevents a PLANNED route.
+
+Expiry is rechecked at authorization, intent, launch and contact. The retry
+authorization is generation-bound, consumed once at intent, and cannot be
+rebound after rollback, lost acknowledgement or replay. A late original
+receipt disables the authorization without erasing evidence. Semantic version
+9, restart migration and strict recovery verify the action, resolution,
+authorization, retained pause and subsequent resume without healing malformed
+schema or history. Independent review returned `APPROVE` after correcting the
+pause/RESUME separation and making the retained T06 fence mandatory. The full
+storage and dispatch modules passed 393 and 80 tests; the complete package
+passed 515 tests. F02 is promoted to `YES/YES/YES`; the next ordered gaps are
+F03 and F04a at that checkpoint. PR #99 remains draft pending the later gates.
+
+### 5.33 F03 source-atomic one-use authority checkpoint
+
+F03 is independently accepted. The synthetic trusted source now applies one
+shared exact lifecycle decision during live claim/consume and strict recovery,
+so revocation, expiry, supersession, foreign consumption, unavailable/unknown
+source status and correction timing cannot diverge across restart. Pre-action
+ADOPTION facts are admitted without fabricating an adoption use; post-use facts
+still bind the exact source receipt and dependent provenance. A correction must
+already be effective before it can clear its owned denial, and stacked facts
+remain independently effective.
+
+Three independent controller connections, representing two hosts and a manual
+consumer after identical verified reads, reach the authoritative use-limit
+decision concurrently: one source event wins and both losers are denied as
+exhausted, with no adapter contact. Persisted clock rollback, not-before/expiry,
+wrong or forged binding, unavailable grants, rollback before commit, lost
+acknowledgement after commit, rebound claim identity and replay after later
+expiry/lifecycle change all fail closed. Exact replay returns the original
+synthetic receipt without another use. The package continues to expose no real
+adapter or real authority path.
+
+Independent review initially returned `REVISE` for premature future-correction
+clearance and a race masked by stale freshness. Rejecting not-yet-effective
+corrections preserves the current fence/effective-authority projection, and a
+current-head race now proves both durable losers reach source exhaustion. Final
+review returned `APPROVE` with no BLOCKER or MAJOR finding. Eight focused tests,
+the 400-test storage module and the complete 522-test package passed. F03 is
+promoted to `YES/YES/YES`; F04a is the sole remaining acceptance-family gap. PR
+#99 remains draft pending F04a and the later row, POSIX and final review gates.
+
+### 5.34 F04a reservation-boundary accounting checkpoint
+
+F04a is independently accepted. Authoritative actual usage below, equal to and
+above the original reservation is recorded as one absolute charge and replays
+without duplicate settlement. Known `A > R` records a durable breach fence even
+when still below the outer cap; usage above the cap is retained rather than
+rejected. A later authoritative lower adjustment replaces the current absolute
+charge but cannot erase the historical overrun fence.
+
+Missing dispatch/billing telemetry charges the declared worst case and retains
+uncertainty, the repository slot and other-item/run denial. Proven nonexecution
+with a known control cost consumes that cost; full release still requires both
+exact non-dispatch and zero-liability proof. Operation and validator requests
+with missing, string or boolean worst-case bounds deny before durable intent,
+redemption, launch or contact, while a known zero synthetic bound remains valid.
+
+Semantic version 10 atomically upgrades valid v9 histories. Before adding a
+newly required historical `A > R` fence, migration reconstructs exact immutable
+operation/validator reservation origins, event metadata, reservation and
+settlement projections, and every breach fence. Reservation/settlement/event
+retargeting, missing rows, changed R/cap/charge and wrong-ID reason-coded fences
+all deny without version advance or healing. Precommit rollback and postcommit
+lost acknowledgement are covered; v10 reopen is idempotent and strict recovery
+reconstructs the same breach set.
+
+The revised plan received independent `APPROVE` after adding semantic migration
+and validator-bound coverage. Implementation review twice returned `REVISE` for
+incomplete pre-migration linkage; exact origin and settlement metadata plus the
+expanded tamper matrix closed both findings. Final review returned `APPROVE`
+with no BLOCKER or MAJOR finding. Six new F04a tests and the reused release,
+unknown-liability, adjustment and slot clauses pass; the storage module passed
+406 tests and the complete package passed 528 tests. F04a is promoted to
+`YES/YES/YES`, bringing acceptance-family coverage to 22/22. PR #99 remains
+draft pending remaining row reviews, POSIX evidence and final exact-head reviews.
+
+### 5.35 Complete row-review checkpoint
+
+The remaining exact-row audit is complete. Independent read-only review accepted
+T04/T10/T12/T16/T21/T23/T26, C02-C09 and F04b/F07/F08/F10/F14/F15/F16/F21
+after corrections for durable operation/validator initiation, atomic contact
+accounting, source-ledger recovery, exact interruption replay, authentic T23
+every-state histories and canonical T10/T17 receipt provenance. T10 now keeps
+ordinary RUNNING/PAUSING observations on `RECEIPT_RECORDED`, routes an exact
+current contacted dispatch already in reconciliation through T17
+`RECONCILIATION_RECORDED`, derives its cursor during strict recovery and rejects
+self-consistent cursor rewrites. T23 persists an exact typed pending-validation
+cursor and replays crash/lost-ack histories through a reopened store.
+
+The canonical inventory is now independently accepted at 28/28 transition rows,
+9/9 crash boundaries and 22/22 acceptance-family rows. The exact Windows package
+suite passed 542 tests on 2026-09-23, including the new ordinary PAUSING T10,
+source-claim process-termination and terminal replay regressions. This row-level
+checkpoint does not itself claim the final architecture/security/QA reviews,
+hosted exact-head checks or merge; those remain the final CP-WP-002 gates.
 
 ## 6. Handoff contract
 

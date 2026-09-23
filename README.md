@@ -621,9 +621,76 @@ The experimental offline delivery-control kernel is under active development;
 use its [implementation guide](tools/aegis_delivery_control/README.md) for
 current guarantees and limitations, and its
 [durable backlog](docs/roadmaps/resumable-control-plane-backlog.md) for status.
-Its current locally validated milestones include C04 atomic receipt observation
-and C05 exactly-once classified validation application; the backlog records the
-remaining review and completion gates.
+The CP-WP-002 offline merge candidate has complete synthetic row coverage:
+its exact 542-test package suite passes on Windows and Linux (three expected
+Linux platform skips); all three stop findings, T13
+authority lifecycle intake, T15 binding-mismatch handling, the T14
+PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
+external-mutation uncertainty pause have independent `APPROVE`. The narrow T07
+local-nonexecution settlement and its BLOCKED-only T14 recovery route, plus the
+narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
+route, T09's exact-head reconciliation pause fence, and the narrow T17
+validator-result/T14 exact-T09-resume slice also have independent `APPROVE`.
+The T17 operation-uncertainty foundation—typed source/control evidence,
+conditional uncertainty categories, atomic semantic migration and exact-set
+recovery—also has independent `APPROVE`. The T17 verified-receipt route—typed
+query/time/source/response proof, full settlement ancestry, atomic exact-set
+clearance, typed routing, crash/replay and recovery—also has independent
+`APPROVE`. The remaining T17 authoritative-nonexecution and authenticated
+safe-retry slice also has independent `APPROVE`: exact all-path seals, typed
+operation recovery, one-use generation-bound retry, crash/replay and strict
+prefix migration preserve later uncertainty and stacked pauses. T22 read-only
+terminal restart reporting also has independent `APPROVE`; it reports verified
+terminal denial without authorizing advancement or reconciliation and preserves
+the database byte-for-byte. T28/F01 verified-effect adoption also has independent
+`APPROVE`: exact root/immediate provenance, current checks and source terms are
+bound without redispatch or reused charge, while contrary dependent evidence
+retains its typed integrity fence. Cross-family F05/F06/F13/F20 also has
+independent `APPROVE`: complete-vector freshness covers one-use source
+consumption, the repository-wide slot is exercised across lifecycle/generation
+boundaries, contrary receipts follow exact durable states and validator
+containment is typed, bounded and strictly recovered. Filesystem ownership,
+reparse-point and path-swap protection now also has independent `APPROVE` on
+Windows: checked OS-known-folder and descendant handles, stable lock identity,
+sidecar/hardlink denial and actual junction/replacement probes fail closed.
+POSIX runtime evidence is verified by the pinned Linux package suite.
+The selected-check foundation has independently accepted v2 per-check
+dependency/launch-gate declarations, deterministic topological order and strict
+projection recovery. The current increment adds authenticated monotonic gate
+facts, signed complete READY snapshots, universal no-preclaim T27 commit,
+atomic T11 next-check routing, exact T16 launch-route recovery, and contact-time
+stale-prerequisite disablement with T25/T16 continuation; the corrected
+increment received independent `APPROVE`, and its complete rows are included in
+the accepted 28/9/22 canonical inventory. The T17/F18 proof-free owner
+disposition route is now implemented locally: separately authenticated one-use
+REPORT_ONLY, STOPPED and FAILED_FINAL commands preserve the unknown outcome,
+accounting, slot, cursor and exact uncertainty set; terminal choices add a
+permanent scoped fence and never authorize retry, success or completion. Its
+semantic-v7 migration, crash/replay and strict historical projection checks are
+locally green. Independent implementation review returned `APPROVE` after the
+accepted-plan issuer boundary and denial matrix were corrected. Final exact-head
+architecture, security, QA and hosted validation remain required before merge.
+T18/T19 now have independently accepted authentic
+every-nonterminal-state graceful/immediate stop matrices. T25/F19 also have
+independent `APPROVE`: canonical operation/validator nonexecution covers
+before/after handoff, authentic paused/pausing/reconciliation and terminal
+states, accounting and replay boundaries, contradictory evidence, newer slot
+owners and atomic dependent-adoption fencing. F02 now also has independent
+`APPROVE`: proof-free choices remain non-dispatching, while the sole reviewed
+same-key successor retains unknown outcome/activity and its T06 pause until a
+distinct T14 RESUME grant clears exactly that fence. F03 now has independent
+`APPROVE`: three concurrent host/manual consumers reach one authoritative
+winner, live and recovery lifecycle decisions share one exact evaluator,
+clock rollback and lost acknowledgements fail closed, and synthetic authority
+cannot enable a real adapter. F04a now also has independent `APPROVE`: known
+usage below/equal/above the reservation settles exactly once, overruns fence,
+unknown liability remains blocked, and semantic-v10 migration preserves older
+valid histories without healing tamper. All 28 transition, 9 crash-boundary and
+22 acceptance-family rows now have tested, independently accepted coverage. The
+PR remains draft until final architecture/security/QA and hosted exact-head
+gates pass. Read the
+[Codex handoff](docs/evidence/control-plane/cp-wp-002-codex-handoff.md) before
+continuing. No delivery integration or deployment is implemented or authorized.
 The construction and authoring references below explain the library's design:
 
 1. [`docs/reconciliation/step-0-reconciliation-v4.md`](docs/reconciliation/step-0-reconciliation-v4.md) — what was reconciled and why (read first).

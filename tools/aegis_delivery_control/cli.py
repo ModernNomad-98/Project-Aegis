@@ -3,14 +3,22 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import json
 import sqlite3
 import sys
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
 from .storage import SQLiteStateStore, default_state_root
+from .owned_paths import (
+    PathCapabilityUnavailable,
+    connect_checked,
+    nearest_existing_trusted_root,
+    prepare_owned_file,
+)
 
 
 class ExpectedFreshnessOracle:
@@ -72,6 +80,26 @@ def _load_expected_vector(path: Path) -> tuple[str, str, dict[str, str]]:
     return repository_id, catalog_head, dict(run_heads)
 
 
+def _load_authority(path: Path) -> SyntheticAuthority:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("authority key file must be readable JSON") from error
+    if not isinstance(value, dict) or set(value) != {
+        "synthetic_issuer_key_hex"
+    }:
+        raise ValueError("authority key file has an invalid schema")
+    key_hex = value["synthetic_issuer_key_hex"]
+    if (
+        not isinstance(key_hex, str)
+        or len(key_hex) < 64
+        or len(key_hex) % 2 != 0
+        or any(character not in "0123456789abcdefABCDEF" for character in key_hex)
+    ):
+        raise ValueError("synthetic issuer key must be canonical hexadecimal")
+    return SyntheticAuthority(bytes.fromhex(key_hex))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m tools.aegis_delivery_control",
@@ -83,6 +111,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("status")
     verify = subparsers.add_parser("verify")
     verify.add_argument("--expected-vector", required=True, type=Path)
+    verify.add_argument("--authority-key-file", required=True, type=Path)
     return parser
 
 
@@ -90,21 +119,51 @@ def _database_path(arguments: argparse.Namespace) -> Path:
     return default_state_root(arguments.repository_id) / "state.sqlite3"
 
 
-def _status(database_path: Path) -> dict[str, object]:
-    if not database_path.is_file():
-        return {"initialized": False, "database": str(database_path)}
-    uri = f"file:{database_path.as_posix()}?mode=ro"
-    with sqlite3.connect(uri, uri=True) as connection:
-        repository = connection.execute(
-            "SELECT repository_id, catalog_head FROM repositories LIMIT 1"
-        ).fetchone()
-        slot = connection.execute(
-            "SELECT run_id, logical_effect_id, attempt_id, generation FROM outstanding_slot"
-        ).fetchone()
-        fences = connection.execute("SELECT COUNT(*) FROM dispatch_fences").fetchone()[0]
+def _status(
+    database_path: Path,
+    *,
+    trusted_root: Path | None = None,
+    os_known_root: bool = False,
+) -> dict[str, object]:
+    trusted_root = trusted_root or nearest_existing_trusted_root(
+        database_path.parent
+    )
+    try:
+        identity = prepare_owned_file(
+            database_path,
+            create=False,
+            trusted_root=trusted_root,
+            os_known_root=os_known_root,
+        )
+        with closing(connect_checked(
+            database_path,
+            expected=identity,
+            read_only=True,
+            trusted_root=trusted_root,
+            os_known_root=os_known_root,
+        )) as connection:
+            repository = connection.execute(
+                "SELECT repository_id, catalog_head FROM repositories LIMIT 1"
+            ).fetchone()
+            slot = connection.execute(
+                "SELECT run_id, logical_effect_id, attempt_id, generation "
+                "FROM outstanding_slot"
+            ).fetchone()
+            fences = connection.execute(
+                "SELECT COUNT(*) FROM dispatch_fences"
+            ).fetchone()[0]
+    except (PathCapabilityUnavailable, sqlite3.Error, OSError) as error:
+        return {
+            "initialized": False,
+            "database": str(database_path),
+            "path_capability": "UNAVAILABLE",
+            "verified": False,
+            "reason": str(error),
+        }
     return {
         "initialized": True,
         "database": str(database_path),
+        "path_capability": "VERIFIED",
         "repository_id": None if repository is None else repository[0],
         "catalog_head": None if repository is None else repository[1],
         "outstanding_slot": None
@@ -121,7 +180,6 @@ def _status(database_path: Path) -> dict[str, object]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
-    database_path = _database_path(arguments)
     if arguments.command == "capabilities":
         print(
             json.dumps(
@@ -138,8 +196,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0
+    try:
+        database_path = _database_path(arguments)
+    except (PathCapabilityUnavailable, OSError) as error:
+        if arguments.command == "status":
+            print(json.dumps(
+                {
+                    "initialized": False,
+                    "database": None,
+                    "path_capability": "UNAVAILABLE",
+                    "verified": False,
+                    "reason": str(error),
+                },
+                sort_keys=True,
+            ))
+            return 0
+        print(f"verification failed: {error}", file=sys.stderr)
+        return 3
     if arguments.command == "status":
-        print(json.dumps(_status(database_path), sort_keys=True))
+        print(json.dumps(
+            _status(
+                database_path,
+                trusted_root=database_path.parents[3],
+                os_known_root=sys.platform == "win32",
+            ),
+            sort_keys=True,
+        ))
         return 0
     if not database_path.is_file():
         print("state database does not exist", file=sys.stderr)
@@ -148,6 +230,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         expected_repository_id, expected_catalog_head, expected_run_heads = (
             _load_expected_vector(arguments.expected_vector)
         )
+        authority = _load_authority(arguments.authority_key_file)
         store = SQLiteStateStore.open_canonical(
             arguments.repository_id,
             ExpectedFreshnessOracle(
@@ -156,7 +239,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 expected_run_heads,
             ),
         )
-        catalog_head, run_heads = store.load_verified(arguments.repository_id)
+        catalog_head, run_heads = store.load_verified(
+            arguments.repository_id, authority=authority
+        )
     except (DispatchDenied, StorageIntegrityError, ValueError, sqlite3.Error) as error:
         print(f"verification failed: {error}", file=sys.stderr)
         return 3

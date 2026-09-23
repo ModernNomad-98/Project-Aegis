@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from pathlib import PurePosixPath
 from typing import Mapping, Protocol, Sequence
 
 
@@ -33,6 +37,250 @@ class FailureClassification(str, Enum):
 
     RECOVERABLE = "RECOVERABLE"
     FINAL = "FINAL"
+
+
+class StopMode(str, Enum):
+    GRACEFUL = "GRACEFUL"
+    IMMEDIATE = "IMMEDIATE"
+
+
+class ProofFreeDisposition(str, Enum):
+    REPORT_ONLY = "REPORT_ONLY"
+    STOPPED = "STOPPED"
+    FAILED_FINAL = "FAILED_FINAL"
+
+
+class TerminalRestartVerification(str, Enum):
+    VERIFIED_CURRENT = "VERIFIED_CURRENT"
+    LOCAL_FRESHNESS_UNVERIFIED = "LOCAL_FRESHNESS_UNVERIFIED"
+    UNVERIFIED_INTEGRITY_OR_SCHEMA = "UNVERIFIED_INTEGRITY_OR_SCHEMA"
+
+
+class TerminalRestartDisposition(str, Enum):
+    TERMINAL_RESTART_DENIED = "TERMINAL_RESTART_DENIED"
+    NONTERMINAL = "NONTERMINAL"
+    EXPECTED_STATE_MISMATCH = "EXPECTED_STATE_MISMATCH"
+    ANCHOR_MISMATCH = "ANCHOR_MISMATCH"
+    UNVERIFIED = "UNVERIFIED"
+
+
+class DispatchPosture(str, Enum):
+    CLOSED = "CLOSED"
+    NOT_EVALUATED = "NOT_EVALUATED"
+
+
+class OperationOriginKind(str, Enum):
+    EXECUTION_INTENT = "EXECUTION_INTENT"
+    EFFECT_ADOPTION = "EFFECT_ADOPTION"
+
+
+class EffectRelationshipKind(str, Enum):
+    DIFFERENT_FROM = "DIFFERENT_FROM"
+    REPEAT_OF = "REPEAT_OF"
+    COMPENSATES = "COMPENSATES"
+
+
+class SyntheticGrantKind(str, Enum):
+    ADOPTION = "ADOPTION"
+    EFFECT_RELATIONSHIP = "EFFECT_RELATIONSHIP"
+
+
+class SyntheticSourceConsumerKind(str, Enum):
+    EFFECT_ADOPTION = "EFFECT_ADOPTION"
+    EFFECT_RELATIONSHIP = "EFFECT_RELATIONSHIP"
+    HOST = "HOST"
+    MANUAL = "MANUAL"
+
+
+class SourceControlClassification(str, Enum):
+    """Closed synthetic classification for receipt/source authority."""
+
+    KNOWN = "KNOWN"
+    UNKNOWN = "UNKNOWN"
+
+
+class AuthorityFactKind(str, Enum):
+    EXPIRED = "EXPIRED"
+    REVOKED = "REVOKED"
+    SUPERSEDED = "SUPERSEDED"
+    FOREIGN_CONSUMED = "FOREIGN_CONSUMED"
+    OWN_CONSUMED = "OWN_CONSUMED"
+    SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
+    CLAIM_STATUS_UNKNOWN = "CLAIM_STATUS_UNKNOWN"
+    CORRECTION = "CORRECTION"
+
+
+class GovernedOrder(str, Enum):
+    BEFORE = "BEFORE"
+    DURING = "DURING"
+    AFTER = "AFTER"
+    UNKNOWN = "UNKNOWN"
+
+
+class BindingMismatchKind(str, Enum):
+    SOURCE = "SOURCE"
+    ITEM = "ITEM"
+    PLAN = "PLAN"
+    POLICY = "POLICY"
+
+
+@dataclass(frozen=True)
+class BindingMismatchRequest:
+    mismatch_id: str
+    observation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    mismatch_kind: BindingMismatchKind
+    expected_digest: str
+    observed_digest: str
+    evidence_head: str
+    reason_code: str
+
+    def validate(self) -> None:
+        if not isinstance(self.mismatch_kind, BindingMismatchKind):
+            raise ValueError("binding mismatch kind is unsupported")
+        required = (
+            self.mismatch_id, self.observation_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.expected_digest,
+            self.observed_digest, self.evidence_head, self.reason_code,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("binding mismatch identifiers must be non-empty")
+        if self.expected_digest == self.observed_digest:
+            raise ValueError("binding mismatch values must differ")
+        expected_reason = f"BINDING_MISMATCH_{self.mismatch_kind.value}"
+        if self.reason_code != expected_reason:
+            raise ValueError("binding mismatch reason does not match its kind")
+
+
+@dataclass(frozen=True)
+class AuthorityLifecycleFactRequest:
+    fact_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    grant_kind: str
+    grant_id: str
+    action: str
+    scope_digest: str
+    fact_kind: AuthorityFactKind
+    governed_order: GovernedOrder
+    governed_boundary_kind: str
+    governed_event_id: str | None
+    governed_event_hash: str | None
+    successor_grant_id: str | None = None
+    corrected_fact_id: str | None = None
+    corrected_event_hash: str | None = None
+    recorded_at_utc: str | None = None
+    effective_at_utc: str | None = None
+
+    def validate(self) -> None:
+        required = (
+            self.fact_id, self.command_id, self.event_id, self.repository_id,
+            self.run_id, self.item_id, self.logical_effect_id,
+            self.grant_kind, self.grant_id, self.action, self.scope_digest,
+            self.governed_boundary_kind,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("authority fact identifiers must be non-empty")
+        if self.grant_kind not in {
+            "EFFECT", "VALIDATOR", "OPERATOR", "ADOPTION",
+            "EFFECT_RELATIONSHIP",
+        }:
+            raise ValueError("authority fact grant kind is unsupported")
+        if self.governed_boundary_kind not in {
+            "NO_ACTION", "INTENT", "CLAIM", "CONTACT", "REDEMPTION",
+            "SOURCE_USE",
+        }:
+            raise ValueError("authority fact boundary kind is unsupported")
+        boundary = (self.governed_event_id, self.governed_event_hash)
+        if self.governed_boundary_kind == "NO_ACTION":
+            if boundary != (None, None):
+                raise ValueError("NO_ACTION boundary cannot carry an event")
+        elif any(
+            value is None or not isinstance(value, str) or not value.strip()
+            for value in boundary
+        ):
+            raise ValueError("authority fact boundary event is required")
+        if self.fact_kind is AuthorityFactKind.SUPERSEDED:
+            if (
+                not self.successor_grant_id
+                or self.successor_grant_id == self.grant_id
+            ):
+                raise ValueError("supersession requires a distinct successor")
+        elif self.successor_grant_id is not None:
+            raise ValueError("successor is valid only for supersession")
+        correction_fields = (
+            self.corrected_fact_id, self.corrected_event_hash,
+        )
+        if self.fact_kind is AuthorityFactKind.CORRECTION:
+            if any(
+                value is None or not isinstance(value, str) or not value.strip()
+                for value in correction_fields
+            ):
+                raise ValueError("correction requires exact prior fact binding")
+        elif correction_fields != (None, None):
+            raise ValueError("correction binding is valid only for correction")
+        if (
+            self.governed_order in {GovernedOrder.DURING, GovernedOrder.AFTER}
+            and self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("ordered authority fact requires a governed event")
+        source_kind = self.grant_kind in {
+            "ADOPTION", "EFFECT_RELATIONSHIP",
+        }
+        if source_kind:
+            if (
+                not isinstance(self.effective_at_utc, str)
+                or not self.effective_at_utc.strip()
+                or (
+                    self.recorded_at_utc is not None
+                    and (
+                        not isinstance(self.recorded_at_utc, str)
+                        or not self.recorded_at_utc.strip()
+                    )
+                )
+            ):
+                raise ValueError(
+                    "source authority fact requires an effective time"
+                )
+            if self.governed_boundary_kind not in {
+                "NO_ACTION", "SOURCE_USE",
+            }:
+                raise ValueError(
+                    "source authority fact boundary kind is unsupported"
+                )
+        elif (
+            self.recorded_at_utc is not None
+            or self.effective_at_utc is not None
+            or self.governed_boundary_kind == "SOURCE_USE"
+        ):
+            raise ValueError(
+                "source authority timestamps require a source grant kind"
+            )
+        if self.fact_kind is AuthorityFactKind.OWN_CONSUMED and (
+            self.governed_order is not GovernedOrder.DURING
+            or self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("own consumption requires its exact governed use")
+        if self.fact_kind is AuthorityFactKind.CLAIM_STATUS_UNKNOWN and (
+            self.governed_order is not GovernedOrder.UNKNOWN
+            or self.governed_boundary_kind == "NO_ACTION"
+        ):
+            raise ValueError("unknown claim status requires its exact local use")
+        if (
+            self.fact_kind is AuthorityFactKind.SOURCE_UNAVAILABLE
+            and self.governed_order is not GovernedOrder.UNKNOWN
+        ):
+            raise ValueError("source unavailability has unknown governed ordering")
 
 
 @dataclass(frozen=True)
@@ -66,14 +314,80 @@ class IntentRequest:
             self.reservation_id,
             self.budget_policy_digest,
         )
-        if any(not value or not value.strip() for value in required):
+        if any(not isinstance(value, str) or not value.strip() for value in required):
             raise ValueError("intent identifiers and digests must be non-empty")
+        if any(
+            type(value) is not int
+            for value in (self.reserved_units, self.worst_case_units, self.cap_units)
+        ):
+            raise ValueError("budget units must be non-negative integers")
         if min(self.reserved_units, self.worst_case_units, self.cap_units) < 0:
             raise ValueError("budget units must be non-negative integers")
         if self.reserved_units > self.worst_case_units:
             raise ValueError("reserved units cannot exceed worst-case units")
         if self.worst_case_units > self.cap_units:
             raise ValueError("worst-case units cannot exceed the budget cap")
+
+
+@dataclass(frozen=True)
+class ProvenNonexecutionIntentRequest(IntentRequest):
+    recovery_authorization_id: str
+    prior_attempt_id: str
+    expected_source_generation: int
+    expected_target_generation: int
+
+    def validate(self) -> None:
+        super().validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.recovery_authorization_id,
+                self.prior_attempt_id,
+            )
+        ):
+            raise ValueError(
+                "proven-nonexecution intent recovery bindings must be non-empty"
+            )
+        if self.prior_attempt_id == self.attempt_id:
+            raise ValueError(
+                "proven-nonexecution intent requires a successor attempt"
+            )
+        if (
+            type(self.expected_source_generation) is not int
+            or type(self.expected_target_generation) is not int
+            or self.expected_source_generation <= 0
+            or self.expected_target_generation
+            != self.expected_source_generation + 1
+        ):
+            raise ValueError(
+                "proven-nonexecution intent generations must advance exactly once"
+            )
+
+
+@dataclass(frozen=True)
+class SafeSameEffectRetryIntentRequest(IntentRequest):
+    recovery_authorization_id: str
+    prior_attempt_id: str
+    expected_source_generation: int
+    expected_target_generation: int
+
+    def validate(self) -> None:
+        super().validate()
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.recovery_authorization_id, self.prior_attempt_id)
+        ):
+            raise ValueError("safe-retry intent bindings must be non-empty")
+        if self.prior_attempt_id == self.attempt_id:
+            raise ValueError("safe retry requires a successor attempt")
+        if (
+            type(self.expected_source_generation) is not int
+            or type(self.expected_target_generation) is not int
+            or self.expected_source_generation <= 0
+            or self.expected_target_generation
+            != self.expected_source_generation + 1
+        ):
+            raise ValueError("safe-retry generations must advance exactly once")
 
 
 @dataclass(frozen=True)
@@ -86,18 +400,359 @@ class PlanAcceptanceRequest:
     item_id: str
     logical_effect_id: str
     revision_digest: str
+    effect_descriptor_digest: str
+    permission_scope_digest: str
+    budget_policy_digest: str
     check_ids: tuple[str, ...]
+    aggregate_gate_ids: tuple[str, ...] = ()
+    source_tree_digest: str | None = None
+    item_definition_digest: str | None = None
+    plan_schema_version: str | None = None
+    reducer_version: str | None = None
+    effect_action: str | None = None
+    effect_target: str | None = None
+    effect_semantic_inputs: tuple[tuple[str, str], ...] = ()
+    target_generation: int | None = None
+    relationship_kind: EffectRelationshipKind | None = None
+    predecessor_logical_effect_id: str | None = None
+    relationship_grant_id: str | None = None
+    predecessor_descriptor_digest: str | None = None
+    predecessor_defining_plan_id: str | None = None
+    predecessor_defining_event_hash: str | None = None
+    relationship_source_id: str | None = None
+    relationship_source_version: str | None = None
+    relationship_terms_digest: str | None = None
+    relationship_scope_digest: str | None = None
+    dependency_plan_ids: tuple[str, ...] = ()
+    check_dependency_ids: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    check_launch_gate_ids: tuple[tuple[str, tuple[str, ...]], ...] = ()
+
+    def canonical_check_dependencies(
+        self,
+    ) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        declared = {check_id: tuple(dependencies) for check_id, dependencies in self.check_dependency_ids}
+        return tuple(
+            (check_id, tuple(sorted(declared.get(check_id, ()))))
+            for check_id in sorted(self.check_ids)
+        )
+
+    def canonical_check_launch_gates(
+        self,
+    ) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        declared = {check_id: tuple(gates) for check_id, gates in self.check_launch_gate_ids}
+        return tuple(
+            (check_id, tuple(sorted(declared.get(check_id, ()))))
+            for check_id in sorted(self.check_ids)
+        )
+
+    def canonical_check_order(self) -> tuple[str, ...]:
+        dependencies = {
+            check_id: set(dependency_ids)
+            for check_id, dependency_ids in self.canonical_check_dependencies()
+        }
+        remaining = set(dependencies)
+        ordered: list[str] = []
+        while remaining:
+            eligible = min(
+                check_id
+                for check_id in remaining
+                if dependencies[check_id].isdisjoint(remaining)
+            ) if any(
+                dependencies[check_id].isdisjoint(remaining)
+                for check_id in remaining
+            ) else None
+            if eligible is None:
+                raise ValueError("validation check dependency graph must be acyclic")
+            ordered.append(eligible)
+            remaining.remove(eligible)
+        return tuple(ordered)
 
     def validate(self) -> None:
-        identifiers = tuple(self.__dict__.values())[:-1]
+        identifiers = (
+            self.plan_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.revision_digest,
+            self.effect_descriptor_digest,
+            self.permission_scope_digest,
+            self.budget_policy_digest,
+        )
         if any(not value or not value.strip() for value in identifiers):
             raise ValueError("plan identifiers and digests must be non-empty")
+        immutable_pins = (
+            self.source_tree_digest,
+            self.item_definition_digest,
+            self.plan_schema_version,
+            self.reducer_version,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in immutable_pins
+        ):
+            raise ValueError(
+                "new plan acceptance requires all immutable binding pins"
+            )
         if not self.check_ids:
             raise ValueError("accepted plan requires at least one validation check")
         if any(not check_id or not check_id.strip() for check_id in self.check_ids):
             raise ValueError("validation check identifiers must be non-empty")
         if len(set(self.check_ids)) != len(self.check_ids):
             raise ValueError("validation check identifiers must be unique")
+        if any(
+            not isinstance(plan_id, str) or not plan_id.strip()
+            for plan_id in self.dependency_plan_ids
+        ):
+            raise ValueError("dependency plan identifiers must be non-empty")
+        if len(set(self.dependency_plan_ids)) != len(self.dependency_plan_ids):
+            raise ValueError("dependency plan identifiers must be unique")
+        if self.plan_id in self.dependency_plan_ids:
+            raise ValueError("accepted plan cannot depend on itself")
+        check_set = set(self.check_ids)
+        for field_name, declarations in (
+            ("dependency", self.check_dependency_ids),
+            ("launch-gate", self.check_launch_gate_ids),
+        ):
+            declared_checks: set[str] = set()
+            for declaration in declarations:
+                if (
+                    not isinstance(declaration, tuple)
+                    or len(declaration) != 2
+                    or not isinstance(declaration[0], str)
+                    or not declaration[0].strip()
+                    or not isinstance(declaration[1], tuple)
+                ):
+                    raise ValueError(
+                        f"validation check {field_name} declaration is malformed"
+                    )
+                check_id, values = declaration
+                if check_id not in check_set:
+                    raise ValueError(
+                        f"validation check {field_name} declaration targets an unknown check"
+                    )
+                if check_id in declared_checks:
+                    raise ValueError(
+                        f"validation check {field_name} declarations must be unique"
+                    )
+                declared_checks.add(check_id)
+                if any(
+                    not isinstance(value, str) or not value.strip()
+                    for value in values
+                ):
+                    raise ValueError(
+                        f"validation check {field_name} identifiers must be non-empty"
+                    )
+                if len(set(values)) != len(values):
+                    raise ValueError(
+                        f"validation check {field_name} identifiers must be unique"
+                    )
+                if field_name == "dependency":
+                    if check_id in values:
+                        raise ValueError("validation check cannot depend on itself")
+                    if any(value not in check_set for value in values):
+                        raise ValueError(
+                            "validation check dependency targets an unknown check"
+                        )
+            if declared_checks != check_set:
+                raise ValueError(
+                    f"validation check {field_name} declarations must cover every check"
+                )
+        self.canonical_check_order()
+        if any(
+            not gate_id or not gate_id.strip()
+            for gate_id in self.aggregate_gate_ids
+        ):
+            raise ValueError("aggregate gate identifiers must be non-empty")
+        if len(set(self.aggregate_gate_ids)) != len(self.aggregate_gate_ids):
+            raise ValueError("aggregate gate identifiers must be unique")
+        descriptor_fields = (
+            self.effect_action, self.effect_target, self.target_generation,
+        )
+        has_descriptor = any(value is not None for value in descriptor_fields) or bool(
+            self.effect_semantic_inputs
+        )
+        if has_descriptor:
+            if (
+                not isinstance(self.effect_action, str)
+                or not self.effect_action.strip()
+                or not isinstance(self.effect_target, str)
+                or not self.effect_target.strip()
+                or type(self.target_generation) is not int
+                or self.target_generation <= 0
+            ):
+                raise ValueError(
+                    "canonical effect descriptor requires action, target and "
+                    "positive target generation"
+                )
+            if (
+                any(
+                    not isinstance(key, str) or not key.strip()
+                    or not isinstance(value, str) or not value.strip()
+                    for key, value in self.effect_semantic_inputs
+                )
+                or tuple(sorted(self.effect_semantic_inputs))
+                != self.effect_semantic_inputs
+                or len({key for key, _value in self.effect_semantic_inputs})
+                != len(self.effect_semantic_inputs)
+            ):
+                raise ValueError(
+                    "canonical semantic inputs must be sorted unique non-empty pairs"
+                )
+        elif any(value is not None for value in descriptor_fields):
+            raise ValueError("canonical effect descriptor must be complete")
+        relationship_fields = (
+            self.relationship_kind,
+            self.predecessor_logical_effect_id,
+            self.relationship_grant_id,
+            self.predecessor_descriptor_digest,
+            self.predecessor_defining_plan_id,
+            self.predecessor_defining_event_hash,
+            self.relationship_source_id,
+            self.relationship_source_version,
+            self.relationship_terms_digest,
+            self.relationship_scope_digest,
+        )
+        if any(value is not None for value in relationship_fields) and not all(
+            value is not None for value in relationship_fields
+        ):
+            raise ValueError("effect relationship binding must be complete")
+        if self.relationship_kind is not None:
+            if not isinstance(self.relationship_kind, EffectRelationshipKind):
+                raise ValueError("effect relationship kind is invalid")
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in (
+                    self.predecessor_logical_effect_id,
+                    self.relationship_grant_id,
+                    self.predecessor_descriptor_digest,
+                    self.predecessor_defining_plan_id,
+                    self.predecessor_defining_event_hash,
+                    self.relationship_source_id,
+                    self.relationship_source_version,
+                    self.relationship_terms_digest,
+                    self.relationship_scope_digest,
+                )
+            ):
+                raise ValueError("effect relationship identifiers must be non-empty")
+            if self.predecessor_logical_effect_id == self.logical_effect_id:
+                raise ValueError("effect relationship requires another effect ID")
+
+
+@dataclass(frozen=True)
+class EffectAdoptionRequest:
+    adoption_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    revision_digest: str
+    logical_effect_id: str
+    effect_descriptor_digest: str
+    target_generation: int
+    root_run_id: str
+    root_attempt_id: str
+    root_observation_id: str
+    root_observation_event_hash: str
+    root_observation_digest: str
+    root_finalization_id: str
+    root_finalization_key: str
+    root_finalization_event_hash: str
+    immediate_origin_kind: OperationOriginKind
+    immediate_origin_id: str
+    immediate_origin_event_hash: str
+    immediate_finalization_key: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_head_vector_digest: str
+    expected_lifecycle: LifecycleState
+    expected_continuation_cursor: str | None
+    readiness_evidence_id: str
+    adoption_grant_id: str
+    current_check_set_digest: str
+    adoption_source_id: str
+    adoption_source_version: str
+    adoption_terms_digest: str
+    adoption_scope_digest: str
+    superseded_readiness_id: str | None = None
+    superseded_readiness_event_hash: str | None = None
+    superseded_blocker_set_digest: str | None = None
+
+    def validate(self) -> None:
+        string_fields = tuple(
+            value
+            for name, value in self.__dict__.items()
+            if name not in {
+                "target_generation", "immediate_origin_kind",
+                "expected_lifecycle", "expected_continuation_cursor",
+                "superseded_readiness_id",
+                "superseded_readiness_event_hash",
+                "superseded_blocker_set_digest",
+            }
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in string_fields
+        ):
+            raise ValueError("effect adoption identifiers and digests must be non-empty")
+        if type(self.target_generation) is not int or self.target_generation <= 0:
+            raise ValueError("effect adoption target generation must be positive")
+        if not isinstance(self.immediate_origin_kind, OperationOriginKind):
+            raise ValueError("effect adoption immediate origin kind is invalid")
+        if self.expected_lifecycle not in {
+            LifecycleState.PLANNED, LifecycleState.BLOCKED,
+        }:
+            raise ValueError("T28 requires expected PLANNED or BLOCKED state")
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError("expected continuation cursor must be non-empty")
+        superseded = (
+            self.superseded_readiness_id,
+            self.superseded_readiness_event_hash,
+            self.superseded_blocker_set_digest,
+        )
+        if self.expected_lifecycle is LifecycleState.BLOCKED:
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in superseded
+            ):
+                raise ValueError(
+                    "BLOCKED adoption requires exact superseded readiness"
+                )
+        elif superseded != (None, None, None):
+            raise ValueError(
+                "PLANNED adoption cannot carry superseded readiness"
+            )
+
+
+@dataclass(frozen=True)
+class EffectAdoptionReceipt:
+    adoption_id: str
+    adoption_key: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    slot_attempt_id: str
+    slot_generation: int
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class SyntheticSourceReceipt:
+    source_event_id: str
+    sequence: int
+    event_hash: str
+    consumer_kind: SyntheticSourceConsumerKind | None
+    consumer_key: str | None
+    replayed: bool
 
 
 @dataclass(frozen=True)
@@ -105,6 +760,62 @@ class CommitReceipt:
     command_id: str
     event_id: str
     sequence: int
+    event_hash: str
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class ReadinessEvaluationRequest:
+    readiness_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    plan_id: str
+    revision_digest: str
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+    inputs_evidence_digest: str
+    prerequisites_met: bool
+
+    def validate(self) -> None:
+        required = (
+            self.readiness_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.plan_id,
+            self.revision_digest,
+            self.expected_run_head,
+            self.inputs_evidence_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("readiness identifiers and evidence must be non-empty")
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError("expected readiness cursor must be non-empty or absent")
+        if type(self.prerequisites_met) is not bool:
+            raise ValueError("readiness prerequisite result must be boolean")
+
+
+@dataclass(frozen=True)
+class OperationLaunchReceipt:
+    launch_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    intent_event_hash: str
     event_hash: str
     replayed: bool
 
@@ -124,9 +835,57 @@ class EffectObservationCommand:
     settlement_hash: str
 
     def validate(self) -> None:
-        required = tuple(self.__dict__.values())[:-1]
+        required = (
+            self.observation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.source_claim_id,
+            self.settlement_event_id,
+        )
         if any(not value or not value.strip() for value in required):
             raise ValueError("observation command identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class SourceControlEvidenceRequest:
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    source_claim_id: str
+    source_receipt_id: str
+    payload_digest: str
+    usage_units: int | None
+    accepted: bool
+    classification: SourceControlClassification
+
+    def validate(self) -> None:
+        required = (
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.source_claim_id,
+            self.source_receipt_id,
+            self.payload_digest,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("source/control evidence identifiers must be non-empty")
+        if self.usage_units is not None and (
+            type(self.usage_units) is not int or self.usage_units < 0
+        ):
+            raise ValueError("source/control evidence usage must be non-negative or unknown")
+        if type(self.accepted) is not bool or self.accepted is not True:
+            raise ValueError("source/control evidence requires an accepted receipt")
+        if not isinstance(self.classification, SourceControlClassification):
+            raise ValueError("source/control classification is invalid")
 
 
 @dataclass(frozen=True)
@@ -145,6 +904,11 @@ class EffectObservationRequest:
     usage_units: int | None
     settlement_event_id: str
     settlement_hash: str
+    source_control_classification: str = ""
+    source_control_evidence_id: str = ""
+    source_control_evidence_digest: str = ""
+    source_control_issuer_fingerprint: str = ""
+    source_control_issuer_mac: str = ""
 
     def validate(self) -> None:
         required = (
@@ -163,8 +927,26 @@ class EffectObservationRequest:
         )
         if any(not value or not value.strip() for value in required):
             raise ValueError("observation identifiers and digests must be non-empty")
-        if self.usage_units is not None and self.usage_units < 0:
+        if self.usage_units is not None and (
+            type(self.usage_units) is not int or self.usage_units < 0
+        ):
             raise ValueError("observation usage must be non-negative or unknown")
+        evidence_values = (
+            self.source_control_classification,
+            self.source_control_evidence_id,
+            self.source_control_evidence_digest,
+            self.source_control_issuer_fingerprint,
+            self.source_control_issuer_mac,
+        )
+        if any(evidence_values) and not all(
+            isinstance(value, str) and value.strip() for value in evidence_values
+        ):
+            raise ValueError("source/control evidence must be complete or absent")
+        if self.source_control_classification and (
+            self.source_control_classification
+            not in {item.value for item in SourceControlClassification}
+        ):
+            raise ValueError("source/control classification is invalid")
 
 
 @dataclass(frozen=True)
@@ -176,6 +958,122 @@ class ObservationReceipt:
     event_hash: str
     resulting_state: LifecycleState
     replayed: bool
+
+
+VALIDATOR_CONTAINMENT_BINDING_VERSION = 1
+VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES = 4096
+VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS = (
+    "READ_PINNED_INPUT",
+    "EMIT_BOUNDED_RESULT",
+)
+SYNTHETIC_VALIDATOR_SUPPORT_ID = "aegis.synthetic.validator.in-process.v1"
+SYNTHETIC_VALIDATOR_SUPPORT_DIGEST = hashlib.sha256(
+    json.dumps(
+        {
+            "arbitrary_code": False,
+            "descendants": "DENY",
+            "external_io": False,
+            "network": "DENY",
+            "support_id": SYNTHETIC_VALIDATOR_SUPPORT_ID,
+            "tools": "DENY",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("ascii")
+).hexdigest()
+
+
+def _validate_containment_path(value: str, field_name: str) -> None:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise ValueError(f"validator containment {field_name} is invalid")
+    path = PurePosixPath(value)
+    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+        raise ValueError(f"validator containment {field_name} escapes its root")
+
+
+@dataclass(frozen=True)
+class ValidatorContainmentSpec:
+    binding_version: int
+    support_id: str
+    support_digest: str
+    input_digest: str
+    input_root: str
+    output_root: str
+    scratch_root: str
+    allowed_actions: tuple[str, ...]
+    max_output_bytes: int
+    descendant_mode: str
+    tool_mode: str
+    network_mode: str
+
+    def validate(self) -> None:
+        if self.binding_version != VALIDATOR_CONTAINMENT_BINDING_VERSION:
+            raise ValueError("validator containment binding version is unsupported")
+        if (
+            self.support_id != SYNTHETIC_VALIDATOR_SUPPORT_ID
+            or self.support_digest != SYNTHETIC_VALIDATOR_SUPPORT_DIGEST
+        ):
+            raise ValueError("validator containment support is unavailable")
+        if not isinstance(self.input_digest, str) or not self.input_digest:
+            raise ValueError("validator containment input digest is invalid")
+        for field_name in ("input_root", "output_root", "scratch_root"):
+            _validate_containment_path(getattr(self, field_name), field_name)
+        roots = tuple(
+            PurePosixPath(getattr(self, field_name)).parts
+            for field_name in ("input_root", "output_root", "scratch_root")
+        )
+        if any(
+            left[: len(right)] == right or right[: len(left)] == left
+            for index, left in enumerate(roots)
+            for right in roots[index + 1 :]
+        ):
+            raise ValueError("validator containment roots must be isolated")
+        if self.allowed_actions != VALIDATOR_CONTAINMENT_ALLOWED_ACTIONS:
+            raise ValueError("validator containment actions are unsupported")
+        if (
+            type(self.max_output_bytes) is not int
+            or self.max_output_bytes <= 0
+            or self.max_output_bytes > VALIDATOR_CONTAINMENT_MAX_OUTPUT_BYTES
+        ):
+            raise ValueError("validator containment output bound is invalid")
+        if (
+            self.descendant_mode,
+            self.tool_mode,
+            self.network_mode,
+        ) != ("DENY", "DENY", "DENY"):
+            raise ValueError("validator containment mutation channels must be denied")
+
+
+def validator_containment_spec_json(spec: ValidatorContainmentSpec) -> str:
+    spec.validate()
+    return json.dumps(spec.__dict__, sort_keys=True, separators=(",", ":"))
+
+
+def parse_validator_containment_spec(value: str) -> ValidatorContainmentSpec:
+    try:
+        payload = json.loads(value)
+    except (TypeError, json.JSONDecodeError) as error:
+        raise ValueError("validator containment specification is invalid") from error
+    expected = set(ValidatorContainmentSpec.__dataclass_fields__)
+    if not isinstance(payload, dict) or set(payload) != expected:
+        raise ValueError("validator containment specification schema is invalid")
+    if not isinstance(payload.get("allowed_actions"), list):
+        raise ValueError("validator containment actions are invalid")
+    payload["allowed_actions"] = tuple(payload["allowed_actions"])
+    try:
+        spec = ValidatorContainmentSpec(**payload)
+    except TypeError as error:
+        raise ValueError("validator containment specification is invalid") from error
+    spec.validate()
+    if value != validator_containment_spec_json(spec):
+        raise ValueError("validator containment specification is not canonical")
+    return spec
+
+
+def validator_containment_digest(spec: ValidatorContainmentSpec) -> str:
+    return hashlib.sha256(
+        validator_containment_spec_json(spec).encode("utf-8")
+    ).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -200,17 +1098,134 @@ class ValidatorIntentRequest:
     reserved_units: int
     worst_case_units: int
     cap_units: int
+    recovery_id: str | None = None
+    containment_spec_json: str = ""
 
     def validate(self) -> None:
-        identifiers = tuple(self.__dict__.values())[:-3]
+        identifiers = (
+            self.validator_intent_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.parent_attempt_id,
+            self.parent_observation_id,
+            self.parent_event_hash,
+            self.revision_digest,
+            self.check_id,
+            self.input_digest,
+            self.validator_attempt_id,
+            self.permission_use_id,
+            self.reservation_id,
+            self.budget_policy_digest,
+        )
         if any(not isinstance(value, str) or not value.strip() for value in identifiers):
             raise ValueError("validator intent identifiers and digests must be non-empty")
+        if self.recovery_id is not None and (
+            not isinstance(self.recovery_id, str) or not self.recovery_id.strip()
+        ):
+            raise ValueError("validator recovery ID must be non-empty when supplied")
+        if any(
+            type(value) is not int
+            for value in (self.reserved_units, self.worst_case_units, self.cap_units)
+        ):
+            raise ValueError("validator budget units must be non-negative integers")
         if min(self.reserved_units, self.worst_case_units, self.cap_units) < 0:
             raise ValueError("validator budget units must be non-negative integers")
         if self.reserved_units > self.worst_case_units:
             raise ValueError("validator reserve cannot exceed worst-case units")
         if self.worst_case_units > self.cap_units:
             raise ValueError("validator worst-case units cannot exceed the budget cap")
+        try:
+            containment = parse_validator_containment_spec(
+                self.containment_spec_json
+            )
+        except ValueError as error:
+            raise ValueError("validator containment specification is required") from error
+        if containment.input_digest != self.input_digest:
+            raise ValueError("validator containment does not bind the pinned input")
+
+
+@dataclass(frozen=True)
+class ValidationGateFactRequest:
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    fact_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError("validation gate fact identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidationLaunchRequest:
+    evaluation_id: str
+    decision_id: str
+    command_id: str
+    event_id: str
+    decision_event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError("validation launch identifiers must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidationLaunchReceipt:
+    evaluation_id: str
+    decision_id: str | None
+    snapshot_id: str
+    snapshot_digest: str
+    ready: bool
+    event_id: str
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class ValidationLaunchResolutionRequest:
+    resolution_id: str
+    command_id: str
+    event_id: str
+    decision_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "validation launch resolution identifiers must be non-empty"
+            )
 
 
 @dataclass(frozen=True)
@@ -234,18 +1249,31 @@ class ValidatorObservationRequest:
     usage_units: int | None
     settlement_event_id: str
     settlement_hash: str
+    containment_digest: str | None = None
 
     def validate(self) -> None:
-        required = tuple(self.__dict__.values())[:-3] + (
-            self.settlement_event_id,
-            self.settlement_hash,
+        required = (
+            self.observation_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.validator_intent_id,
+            self.validator_attempt_id, self.source_result_id,
+            self.source_claim_id, self.revision_digest, self.check_id,
+            self.input_digest, self.result_digest, self.verdict,
+            self.settlement_event_id, self.settlement_hash,
         )
         if any(not isinstance(value, str) or not value.strip() for value in required):
             raise ValueError("validator observation fields must be non-empty")
         if self.verdict not in {"PASS", "FAIL"}:
             raise ValueError("validator verdict must be PASS or FAIL")
-        if self.usage_units is not None and self.usage_units < 0:
+        if self.usage_units is not None and (
+            type(self.usage_units) is not int or self.usage_units < 0
+        ):
             raise ValueError("validator observation usage must be non-negative or unknown")
+        if self.containment_digest is not None and (
+            not isinstance(self.containment_digest, str)
+            or not self.containment_digest.strip()
+        ):
+            raise ValueError("validator observation containment digest is invalid")
 
 
 @dataclass(frozen=True)
@@ -263,6 +1291,43 @@ class ValidatorObservationCommand:
     def validate(self) -> None:
         if any(not value or not value.strip() for value in self.__dict__.values()):
             raise ValueError("validator observation command fields must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidatorCessationRequest:
+    cessation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    validator_intent_id: str
+    validator_attempt_id: str
+    revision_digest: str
+    check_id: str
+    source_cessation_hash: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError("validator cessation fields must be non-empty")
+
+
+@dataclass(frozen=True)
+class ValidatorCessationReceipt:
+    cessation_id: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    result_id: str | None
+    result_digest: str | None
+    result_available: bool
+    resulting_state: LifecycleState
+    replayed: bool
 
 
 @dataclass(frozen=True)
@@ -296,6 +1361,1568 @@ class ApplicationReceipt:
 
 
 @dataclass(frozen=True)
+class ValidationRecoveryRequest:
+    recovery_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+    failed_application_id: str
+    failed_validator_attempt_id: str
+    successor_validator_attempt_id: str
+    remediation_evidence_digest: str
+    expected_run_head: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    action: str = "RETRY_VALIDATION"
+
+    def validate(self) -> None:
+        values = tuple(self.__dict__.values())[:-2]
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise ValueError("validation recovery fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("validation recovery slot generation must be positive")
+        if self.action != "RETRY_VALIDATION":
+            raise ValueError("unsupported validation recovery action")
+        if self.failed_validator_attempt_id == self.successor_validator_attempt_id:
+            raise ValueError("validation recovery requires a new validator attempt")
+
+
+@dataclass(frozen=True)
+class ValidationRecoveryReceipt:
+    recovery_id: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class SettledValidationPauseRecoveryRequest:
+    recovery_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    failed_validator_intent_id: str
+    failed_validator_attempt_id: str
+    successor_validator_attempt_id: str
+    remediation_evidence_digest: str
+    expected_run_head: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    action: str = "RETRY_VALIDATION"
+
+    def validate(self) -> None:
+        values = tuple(self.__dict__.values())[:-2]
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise ValueError("settled validation pause recovery fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "settled validation pause recovery slot generation must be positive"
+            )
+        if self.action != "RETRY_VALIDATION":
+            raise ValueError("unsupported settled validation pause recovery action")
+        if self.failed_validator_attempt_id == self.successor_validator_attempt_id:
+            raise ValueError(
+                "settled validation pause recovery requires a new validator attempt"
+            )
+
+
+@dataclass(frozen=True)
+class TerminalValidationSettlementRequest:
+    terminal_settlement_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    check_id: str
+    source_kind: str
+    source_id: str
+    source_event_hash: str
+    disposition: str
+    validator_intent_id: str | None = None
+    validator_attempt_id: str | None = None
+    cessation_id: str | None = None
+    cessation_event_hash: str | None = None
+
+    def validate(self) -> None:
+        required = (
+            self.terminal_settlement_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.check_id,
+            self.source_kind,
+            self.source_id,
+            self.source_event_hash,
+            self.disposition,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError(
+                "terminal validation settlement fields must be non-empty"
+            )
+        allowed = {
+            "VALIDATOR_OBSERVATION": {"PASSED", "FAILED"},
+            "VALIDATION_APPLICATION": {"PASSED", "FAILED"},
+            "VALIDATOR_CESSATION": {"CANCELLED_AFTER_START"},
+            "NONDISPATCH_PROVEN": {"CANCELLED_WITHOUT_START"},
+            "PLAN": {"CANCELLED_WITHOUT_START"},
+        }
+        if (
+            self.source_kind not in allowed
+            or self.disposition not in allowed[self.source_kind]
+        ):
+            raise ValueError(
+                "terminal validation source and disposition are incompatible"
+            )
+        intent_fields = (
+            self.validator_intent_id,
+            self.validator_attempt_id,
+        )
+        cessation_fields = (self.cessation_id, self.cessation_event_hash)
+        if self.source_kind == "PLAN":
+            if any(
+                value is not None
+                for value in intent_fields + cessation_fields
+            ):
+                raise ValueError(
+                    "unstarted terminal validation cannot name a validator intent"
+                )
+        elif any(
+            not isinstance(value, str) or not value.strip()
+            for value in intent_fields
+        ):
+            raise ValueError(
+                "terminal validation evidence requires validator intent binding"
+            )
+        if self.source_kind in {
+            "VALIDATOR_OBSERVATION", "VALIDATOR_CESSATION"
+        } and any(
+            not isinstance(value, str) or not value.strip()
+            for value in cessation_fields
+        ):
+            raise ValueError(
+                "terminal validator result or cancellation requires cessation"
+            )
+        if self.source_kind in {
+            "NONDISPATCH_PROVEN", "VALIDATION_APPLICATION"
+        } and any(
+            value is not None for value in cessation_fields
+        ):
+            raise ValueError(
+                "terminal source cannot also claim started cessation"
+            )
+
+
+@dataclass(frozen=True)
+class TerminalValidationSettlementReceipt:
+    terminal_settlement_id: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    slot_released: bool
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class FinalizeOperationRequest:
+    finalization_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+
+    def validate(self) -> None:
+        values = tuple(self.__dict__.values())[:-1]
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise ValueError("operation finalization fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("expected slot generation must be positive")
+
+
+@dataclass(frozen=True)
+class OperationFinalizationReceipt:
+    finalization_id: str
+    finalization_key: str
+    command_id: str
+    event_id: str
+    sequence: int
+    event_hash: str
+    resulting_state: LifecycleState
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class ReconcileValidatorResultRequest:
+    reconciliation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    observation_id: str
+    observation_event_hash: str
+    cessation_id: str
+    cessation_event_id: str
+    cessation_event_hash: str
+    settlement_event_id: str
+    settlement_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+
+    def validate(self) -> None:
+        scalar_fields = (
+            self.reconciliation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.observation_id,
+            self.observation_event_hash,
+            self.cessation_id,
+            self.cessation_event_id,
+            self.cessation_event_hash,
+            self.settlement_event_id,
+            self.settlement_hash,
+            self.expected_slot_attempt_id,
+            self.expected_run_head,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_fields
+        ):
+            raise ValueError(
+                "validator reconciliation identifiers and bindings must be "
+                "non-empty"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in self.resolved_uncertainty_ids
+            )
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "validator reconciliation requires distinct uncertainty IDs"
+            )
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "validator reconciliation cursor must be non-empty or absent"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "validator reconciliation slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class ProofFreeDispositionRequest:
+    disposition_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    disposition: ProofFreeDisposition
+    retained_uncertainty_ids: tuple[str, ...]
+    uncertainty_set_digest: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+    reason_code: str
+    terminal_fence_id: str | None
+
+    def validate(self) -> None:
+        scalar_fields = (
+            self.disposition_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.attempt_id, self.plan_id,
+            self.revision_digest, self.effect_descriptor_digest,
+            self.uncertainty_set_digest, self.expected_slot_attempt_id,
+            self.expected_catalog_head, self.expected_run_head,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_fields
+        ):
+            raise ValueError(
+                "proof-free disposition identifiers and bindings must be non-empty"
+            )
+        if not isinstance(self.disposition, ProofFreeDisposition):
+            raise ValueError("proof-free disposition is unsupported")
+        if (
+            not isinstance(self.retained_uncertainty_ids, tuple)
+            or not self.retained_uncertainty_ids
+            or list(self.retained_uncertainty_ids)
+            != sorted(set(self.retained_uncertainty_ids))
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in self.retained_uncertainty_ids
+            )
+        ):
+            raise ValueError(
+                "proof-free disposition requires a sorted distinct uncertainty set"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("proof-free disposition slot generation must be positive")
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError("proof-free disposition cursor must be non-empty or absent")
+        if self.disposition is ProofFreeDisposition.REPORT_ONLY:
+            if self.terminal_fence_id is not None:
+                raise ValueError("report-only disposition cannot name a terminal fence")
+        elif (
+            not isinstance(self.terminal_fence_id, str)
+            or not self.terminal_fence_id.strip()
+        ):
+            raise ValueError("terminal proof-free disposition requires a fence ID")
+
+
+@dataclass(frozen=True)
+class SourceControlUncertaintyBinding:
+    uncertainty_id: str
+    origin_event_id: str
+    origin_event_hash: str
+    prior_evidence_id: str | None = None
+    prior_evidence_digest: str | None = None
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.uncertainty_id,
+                self.origin_event_id,
+                self.origin_event_hash,
+            )
+        ):
+            raise ValueError("source/control uncertainty binding is incomplete")
+        if (self.prior_evidence_id is None) != (
+            self.prior_evidence_digest is None
+        ):
+            raise ValueError(
+                "source/control prior evidence must be complete or absent"
+            )
+        if self.prior_evidence_id is not None and any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                self.prior_evidence_id,
+                self.prior_evidence_digest,
+            )
+        ):
+            raise ValueError("source/control prior evidence is malformed")
+
+
+@dataclass(frozen=True)
+class SourceControlSettlementRequest:
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    observation_id: str
+    observation_event_hash: str
+    source_receipt_id: str
+    source_claim_id: str
+    source_payload_digest: str
+    expected_catalog_head: str
+    expected_run_head: str
+    authoritative_query_id: str
+    authoritative_queried_at_utc: str
+    authoritative_query_after_event_id: str
+    authoritative_query_after_event_hash: str
+    authoritative_source_id: str
+    authoritative_response_id: str
+    authoritative_response_digest: str
+    resulting_classification: SourceControlClassification
+    covered_source_bindings: tuple[SourceControlUncertaintyBinding, ...]
+
+    def validate(self) -> None:
+        values = (
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.observation_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.authoritative_query_id,
+            self.authoritative_queried_at_utc,
+            self.authoritative_query_after_event_id,
+            self.authoritative_query_after_event_hash,
+            self.authoritative_source_id,
+            self.authoritative_response_id,
+            self.authoritative_response_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip() for value in values
+        ):
+            raise ValueError(
+                "source/control settlement identifiers must be non-empty"
+            )
+        try:
+            observed_at = datetime.fromisoformat(
+                self.authoritative_queried_at_utc
+            )
+        except ValueError as error:
+            raise ValueError(
+                "source/control settlement query time is invalid"
+            ) from error
+        if (
+            observed_at.tzinfo is None
+            or observed_at.utcoffset() is None
+            or observed_at.isoformat()
+            != self.authoritative_queried_at_utc
+        ):
+            raise ValueError(
+                "source/control settlement query time must be canonical and "
+                "timezone-aware"
+            )
+        if self.resulting_classification is not (
+            SourceControlClassification.KNOWN
+        ):
+            raise ValueError(
+                "source/control settlement must result in KNOWN"
+            )
+        if (
+            not isinstance(self.covered_source_bindings, tuple)
+        ):
+            raise ValueError(
+                "source/control settlement bindings must be a tuple"
+            )
+        for binding in self.covered_source_bindings:
+            if not isinstance(binding, SourceControlUncertaintyBinding):
+                raise ValueError("source/control settlement binding is invalid")
+            binding.validate()
+        identities = tuple(
+            binding.uncertainty_id for binding in self.covered_source_bindings
+        )
+        if len(set(identities)) != len(identities) or identities != tuple(
+            sorted(identities)
+        ):
+            raise ValueError(
+                "source/control settlement bindings must be distinct and sorted"
+            )
+
+
+@dataclass(frozen=True)
+class ReconcileVerifiedReceiptRequest:
+    reconciliation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    observation_id: str
+    observation_event_id: str
+    observation_event_hash: str
+    source_receipt_id: str
+    source_claim_id: str
+    source_payload_digest: str
+    settlement_event_id: str
+    settlement_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    source_control_bindings: tuple[SourceControlUncertaintyBinding, ...]
+    source_control_query_id: str
+    source_control_queried_at_utc: str
+    source_control_query_after_event_id: str
+    source_control_query_after_event_hash: str
+    source_control_authority_id: str
+    source_control_response_id: str
+    source_control_response_digest: str
+    source_control_resulting_classification: SourceControlClassification
+    source_control_evidence_id: str
+    source_control_evidence_digest: str
+    source_control_issuer_fingerprint: str
+    source_control_issuer_mac: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_continuation_cursor: str | None
+    expected_validation_cursor: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.reconciliation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.plan_id,
+            self.revision_digest,
+            self.observation_id,
+            self.observation_event_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.settlement_event_id,
+            self.settlement_hash,
+            self.source_control_query_id,
+            self.source_control_queried_at_utc,
+            self.source_control_query_after_event_id,
+            self.source_control_query_after_event_hash,
+            self.source_control_authority_id,
+            self.source_control_response_id,
+            self.source_control_response_digest,
+            self.source_control_evidence_id,
+            self.source_control_evidence_digest,
+            self.source_control_issuer_fingerprint,
+            self.source_control_issuer_mac,
+            self.expected_slot_attempt_id,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_validation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "verified-receipt reconciliation bindings must be non-empty"
+            )
+        if self.expected_continuation_cursor is not None and (
+            not isinstance(self.expected_continuation_cursor, str)
+            or not self.expected_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "verified-receipt predecessor cursor must be non-empty or absent"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "verified-receipt slot generation must be positive"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "verified-receipt uncertainty IDs must be distinct and sorted"
+            )
+        SourceControlSettlementRequest(
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.observation_id,
+            self.observation_event_hash,
+            self.source_receipt_id,
+            self.source_claim_id,
+            self.source_payload_digest,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.source_control_query_id,
+            self.source_control_queried_at_utc,
+            self.source_control_query_after_event_id,
+            self.source_control_query_after_event_hash,
+            self.source_control_authority_id,
+            self.source_control_response_id,
+            self.source_control_response_digest,
+            self.source_control_resulting_classification,
+            self.source_control_bindings,
+        ).validate()
+
+
+@dataclass(frozen=True)
+class PauseReconciliationRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    reason_code: str
+    source_event_id: str
+    source_event_hash: str
+    expected_preserved_continuation_cursor: str | None
+
+    def validate(self) -> None:
+        required = tuple(self.__dict__.values())[:-1]
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError(
+                "reconciliation pause identifiers and source event must be non-empty"
+            )
+        if self.event_id == self.source_event_id:
+            raise ValueError(
+                "reconciliation pause event must differ from its source event"
+            )
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "reconciliation pause preserved cursor must be non-empty or absent"
+            )
+
+
+@dataclass(frozen=True)
+class PauseValidationRequest:
+    pause_id: str
+    command_id: str
+    request_event_id: str
+    checkpoint_event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    reason_code: str
+    expected_preserved_continuation_cursor: str | None
+    expected_checkpoint_kind: str
+    expected_slot_attempt_id: str | None
+    expected_slot_generation: int | None
+    validator_intent_id: str | None
+    validator_intent_event_id: str | None
+    validator_intent_event_hash: str | None
+    validator_attempt_id: str | None
+    check_id: str | None
+    reservation_id: str | None
+    expected_settlement_head_hash: str | None
+    contact_id: str | None
+    contact_event_id: str | None
+    contact_event_hash: str | None
+    contact_target_digest: str | None
+    observation_id: str | None
+    observation_event_id: str | None
+    observation_event_hash: str | None
+    observation_settlement_event_id: str | None
+    observation_settlement_event_hash: str | None
+
+    def validate(self) -> None:
+        required = (
+            self.pause_id,
+            self.command_id,
+            self.request_event_id,
+            self.checkpoint_event_id,
+            self.fence_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.reason_code,
+            self.expected_checkpoint_kind,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("validation pause identifiers and evidence must be non-empty")
+        if self.request_event_id == self.checkpoint_event_id:
+            raise ValueError("validation pause event IDs must differ")
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "validation pause preserved cursor must be non-empty or absent"
+            )
+        checkpoint_kinds = {
+            "IDLE",
+            "ELIGIBLE_RESULT_SETTLED",
+            "UNCONTACTED_UNRESOLVED",
+            "CONTACTED_UNRESOLVED",
+        }
+        if self.expected_checkpoint_kind not in checkpoint_kinds:
+            raise ValueError("validation pause checkpoint kind must be closed and typed")
+
+        active = (
+            self.expected_slot_attempt_id,
+            self.expected_slot_generation,
+            self.validator_intent_id,
+            self.validator_intent_event_id,
+            self.validator_intent_event_hash,
+            self.validator_attempt_id,
+            self.check_id,
+            self.reservation_id,
+            self.expected_settlement_head_hash,
+        )
+        active_present = any(value is not None for value in active)
+        if active_present:
+            active_strings = active[:1] + active[2:8]
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in active_strings
+            ) or not isinstance(self.expected_settlement_head_hash, str):
+                raise ValueError("validation pause active validator tuple must be all-or-none")
+            if (
+                type(self.expected_slot_generation) is not int
+                or self.expected_slot_generation <= 0
+            ):
+                raise ValueError("validation pause slot generation must be positive")
+        elif any(value is not None for value in active):
+            raise ValueError("validation pause active validator tuple must be all-or-none")
+
+        contact = (
+            self.contact_id,
+            self.contact_event_id,
+            self.contact_event_hash,
+            self.contact_target_digest,
+        )
+        contact_present = any(value is not None for value in contact)
+        if contact_present and (
+            not active_present
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in contact
+            )
+        ):
+            raise ValueError("validation pause contact tuple must be all-or-none")
+
+        observation = (
+            self.observation_id,
+            self.observation_event_id,
+            self.observation_event_hash,
+            self.observation_settlement_event_id,
+            self.observation_settlement_event_hash,
+        )
+        observation_present = any(value is not None for value in observation)
+        if observation_present and any(
+            not isinstance(value, str) or not value.strip()
+            for value in observation
+        ):
+            raise ValueError("validation pause observation tuple must be all-or-none")
+
+        expected_shape = {
+            "IDLE": (False, False, False),
+            "UNCONTACTED_UNRESOLVED": (True, False, False),
+            "CONTACTED_UNRESOLVED": (True, True, False),
+            "ELIGIBLE_RESULT_SETTLED": (True, True, True),
+        }[self.expected_checkpoint_kind]
+        if (active_present, contact_present, observation_present) != expected_shape:
+            raise ValueError("validation pause checkpoint tuple does not match its kind")
+
+
+@dataclass(frozen=True)
+class ActiveValidationPauseRequest:
+    pause_id: str
+    command_id: str
+    request_event_id: str
+    checkpoint_event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    validator_intent_id: str
+    validator_intent_event_id: str
+    validator_intent_event_hash: str
+    validator_attempt_id: str
+    check_id: str
+    contact_id: str
+    contact_event_id: str
+    contact_event_hash: str
+    contact_target_digest: str
+    reservation_id: str
+    expected_settlement_head_hash: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_preserved_continuation_cursor: str | None
+    reason_code: str
+
+    def validate(self) -> None:
+        strings = (
+            self.pause_id, self.command_id, self.request_event_id,
+            self.checkpoint_event_id, self.fence_id, self.repository_id,
+            self.run_id, self.item_id, self.logical_effect_id, self.plan_id,
+            self.revision_digest, self.validator_intent_id,
+            self.validator_intent_event_id, self.validator_intent_event_hash,
+            self.validator_attempt_id, self.check_id, self.contact_id,
+            self.contact_event_id, self.contact_event_hash,
+            self.contact_target_digest, self.reservation_id,
+            self.expected_slot_attempt_id, self.expected_catalog_head,
+            self.expected_run_head, self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in strings
+        ):
+            raise ValueError(
+                "active validation pause bindings must be non-empty"
+            )
+        if not isinstance(self.expected_settlement_head_hash, str):
+            raise ValueError(
+                "active validation pause settlement head must be a string"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "active validation pause slot generation must be positive"
+            )
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError(
+                "active validation pause cursor must be non-empty or absent"
+            )
+        if self.request_event_id == self.checkpoint_event_id:
+            raise ValueError("active validation pause event IDs must differ")
+
+
+@dataclass(frozen=True)
+class ValidationPauseSettlementRequest:
+    settlement_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_request_event_id: str
+    source_pause_request_event_hash: str
+    source_pause_checkpoint_event_id: str
+    source_pause_checkpoint_event_hash: str
+    pause_fence_id: str
+    validator_intent_id: str
+    validator_attempt_id: str
+    check_id: str
+    resolution_kind: str
+    resolution_id: str
+    resolution_event_id: str
+    resolution_event_hash: str
+    cessation_id: str | None
+    cessation_event_id: str | None
+    cessation_event_hash: str | None
+    reservation_id: str
+    expected_settlement_head_hash: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    continuation_cursor: str
+
+    def validate(self) -> None:
+        required = (
+            self.settlement_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.plan_id, self.revision_digest,
+            self.source_pause_id, self.source_pause_request_event_id,
+            self.source_pause_request_event_hash,
+            self.source_pause_checkpoint_event_id,
+            self.source_pause_checkpoint_event_hash, self.pause_fence_id,
+            self.validator_intent_id, self.validator_attempt_id,
+            self.check_id, self.resolution_kind, self.resolution_id,
+            self.resolution_event_id, self.resolution_event_hash,
+            self.reservation_id, self.expected_settlement_head_hash,
+            self.expected_slot_attempt_id, self.continuation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError(
+                "validation pause settlement bindings must be non-empty"
+            )
+        if self.resolution_kind not in {
+            "RESULT_CESSATION", "INTERRUPTION_CESSATION", "NONLAUNCH",
+        }:
+            raise ValueError("validation pause settlement source is unsupported")
+        cessation = (
+            self.cessation_id, self.cessation_event_id,
+            self.cessation_event_hash,
+        )
+        if self.resolution_kind == "NONLAUNCH":
+            if any(value is not None for value in cessation):
+                raise ValueError(
+                    "validation nonlaunch settlement cannot name cessation"
+                )
+        elif any(
+            not isinstance(value, str) or not value.strip()
+            for value in cessation
+        ):
+            raise ValueError(
+                "active validation settlement requires exact cessation"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "validation pause settlement slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeSettledValidationPauseRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    source_pause_request_event_id: str
+    source_pause_request_event_hash: str
+    pause_fence_id: str
+    expected_preserved_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_reservation_id: str
+    expected_settlement_head_hash: str
+
+    def validate(self) -> None:
+        strings = (
+            self.resume_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.plan_id, self.revision_digest,
+            self.source_settlement_id, self.source_settlement_event_id,
+            self.source_settlement_event_hash, self.source_pause_id,
+            self.source_pause_request_event_id,
+            self.source_pause_request_event_hash, self.pause_fence_id,
+            self.expected_preserved_continuation_cursor,
+            self.expected_catalog_head, self.expected_run_head,
+            self.expected_run_heads_digest, self.expected_slot_attempt_id,
+            self.expected_reservation_id, self.expected_settlement_head_hash,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in strings
+        ):
+            raise ValueError(
+                "settled validation pause resume bindings must be non-empty"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "settled validation pause slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_settled_event_id: str
+    source_pause_settled_event_hash: str
+    pause_fence_id: str
+    expected_preserved_lifecycle: LifecycleState
+    expected_preserved_continuation_cursor: str | None
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        required = (
+            self.resume_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.plan_id,
+            self.revision_digest,
+            self.source_pause_id,
+            self.source_pause_settled_event_id,
+            self.source_pause_settled_event_hash,
+            self.pause_fence_id,
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_run_heads_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("resume identifiers and evidence must be non-empty")
+        if self.expected_preserved_lifecycle not in {
+            LifecycleState.PLANNED,
+            LifecycleState.BLOCKED,
+            LifecycleState.VALIDATING,
+        }:
+            raise ValueError("resume preserved lifecycle must be typed")
+        if self.expected_preserved_continuation_cursor is not None and (
+            not isinstance(self.expected_preserved_continuation_cursor, str)
+            or not self.expected_preserved_continuation_cursor.strip()
+        ):
+            raise ValueError("resume preserved cursor must be non-empty or absent")
+
+
+@dataclass(frozen=True)
+class ReconciliationPauseResumeRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    plan_id: str
+    revision_digest: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    source_reconciliation_id: str
+    source_reconciliation_event_id: str
+    source_reconciliation_event_hash: str
+    expected_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "reconciliation-pause resume bindings must be non-empty"
+            )
+        parts = self.expected_continuation_cursor.split(":")
+        if (
+            len(parts) != 5
+            or parts[0:2] != ["validation-application", "v1"]
+            or not all(parts[2:])
+        ):
+            raise ValueError(
+                "reconciliation-pause resume requires a typed T17 cursor"
+            )
+        if self.source_pause_event_id == self.source_reconciliation_event_id:
+            raise ValueError(
+                "pause and reconciliation resume sources must be distinct"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeActivitySettlementRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    source_settlement_id: str
+    source_settlement_event_id: str
+    source_settlement_event_hash: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    expected_preserved_continuation_cursor: str
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in self.__dict__.values()
+        ):
+            raise ValueError(
+                "activity-settlement resume identifiers and evidence must be non-empty"
+            )
+        if self.expected_preserved_continuation_cursor != (
+            f"operation-recovery:{self.attempt_id}"
+        ):
+            raise ValueError(
+                "activity-settlement resume requires its operation recovery cursor"
+            )
+
+
+@dataclass(frozen=True)
+class ResumeOperationNonexecutionRequest:
+    resume_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    source_nonexecution_event_id: str
+    source_nonexecution_event_hash: str
+    reservation_id: str
+    settlement_head_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    continuation_cursor: str
+    expected_slot_attempt_id: str
+    expected_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+    expected_run_heads_digest: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.resume_id, self.command_id, self.event_id,
+            self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.attempt_id, self.plan_id,
+            self.revision_digest, self.effect_descriptor_digest,
+            self.source_pause_id, self.source_pause_event_id,
+            self.source_pause_event_hash, self.pause_fence_id,
+            self.source_nonexecution_event_id,
+            self.source_nonexecution_event_hash, self.reservation_id,
+            self.settlement_head_hash, self.continuation_cursor,
+            self.expected_slot_attempt_id, self.expected_catalog_head,
+            self.expected_run_head, self.expected_run_heads_digest,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "operation-nonexecution resume bindings must be non-empty"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "operation-nonexecution resume uncertainty IDs must be sorted "
+                "and distinct"
+            )
+        if self.continuation_cursor != f"operation-recovery:{self.attempt_id}":
+            raise ValueError(
+                "operation-nonexecution resume requires its recovery cursor"
+            )
+        if self.expected_slot_attempt_id != self.attempt_id:
+            raise ValueError(
+                "operation-nonexecution resume must retain the exact attempt slot"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "operation-nonexecution resume slot generation must be positive"
+            )
+
+
+@dataclass(frozen=True)
+class RecoverProvenNonexecutionRequest:
+    recovery_id: str
+    authorization_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    prior_attempt_id: str
+    successor_attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    source_nonexecution_event_id: str
+    source_nonexecution_event_hash: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    continuation_cursor: str
+    expected_slot_generation: int
+    target_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+
+    def validate(self) -> None:
+        scalar_values = (
+            self.recovery_id, self.authorization_id, self.command_id,
+            self.event_id, self.repository_id, self.run_id, self.item_id,
+            self.logical_effect_id, self.prior_attempt_id,
+            self.successor_attempt_id, self.plan_id, self.revision_digest,
+            self.effect_descriptor_digest,
+            self.source_nonexecution_event_id,
+            self.source_nonexecution_event_hash, self.continuation_cursor,
+            self.expected_catalog_head, self.expected_run_head,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery bindings must be non-empty"
+            )
+        if self.prior_attempt_id == self.successor_attempt_id:
+            raise ValueError(
+                "proven-nonexecution recovery requires a successor attempt"
+            )
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery uncertainty IDs must be sorted "
+                "and distinct"
+            )
+        if self.continuation_cursor != (
+            f"operation-recovery:{self.prior_attempt_id}"
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery requires its operation cursor"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or type(self.target_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+            or self.target_slot_generation != self.expected_slot_generation + 1
+        ):
+            raise ValueError(
+                "proven-nonexecution recovery generations must advance once"
+            )
+
+
+@dataclass(frozen=True)
+class AuthorizeSafeSameEffectRetryRequest:
+    recovery_id: str
+    authorization_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    prior_attempt_id: str
+    successor_attempt_id: str
+    plan_id: str
+    revision_digest: str
+    effect_descriptor_digest: str
+    original_effect_key: str
+    outcome_uncertainty_id: str
+    outcome_fence_id: str
+    source_control_uncertainty_id: str
+    source_control_fence_id: str
+    source_control_settlement_id: str
+    retained_pause_fence_id: str
+    resolved_uncertainty_ids: tuple[str, ...]
+    retry_contract_id: str
+    reviewed_approval_id: str
+    retry_contract_digest: str
+    target_idempotency_expires_at_utc: str
+    concurrent_old_attempts_safe: bool
+    original_key_lookup_complete: bool
+    mutation_paths_digest: str
+    mutation_paths_complete: bool
+    continuation_cursor: str | None
+    expected_slot_generation: int
+    target_slot_generation: int
+    expected_catalog_head: str
+    expected_run_head: str
+
+    def validate(self) -> None:
+        scalar_values = tuple(
+            value
+            for name, value in self.__dict__.items()
+            if name not in {
+                "resolved_uncertainty_ids",
+                "continuation_cursor",
+                "concurrent_old_attempts_safe",
+                "original_key_lookup_complete",
+                "mutation_paths_complete",
+                "expected_slot_generation",
+                "target_slot_generation",
+            }
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in scalar_values
+        ):
+            raise ValueError("safe-retry bindings must be non-empty")
+        if self.prior_attempt_id == self.successor_attempt_id:
+            raise ValueError("safe retry requires a successor attempt")
+        if (
+            not isinstance(self.resolved_uncertainty_ids, tuple)
+            or not self.resolved_uncertainty_ids
+            or tuple(sorted(self.resolved_uncertainty_ids))
+            != self.resolved_uncertainty_ids
+            or len(set(self.resolved_uncertainty_ids))
+            != len(self.resolved_uncertainty_ids)
+        ):
+            raise ValueError(
+                "safe retry requires sorted distinct covered uncertainty IDs"
+            )
+        if (
+            self.concurrent_old_attempts_safe is not True
+            or self.original_key_lookup_complete is not True
+            or self.mutation_paths_complete is not True
+        ):
+            raise ValueError("safe-retry contract guarantees must be explicit")
+        if (
+            type(self.expected_slot_generation) is not int
+            or type(self.target_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+            or self.target_slot_generation != self.expected_slot_generation + 1
+        ):
+            raise ValueError("safe-retry generations must advance once")
+
+
+@dataclass(frozen=True)
+class PauseLocalExecutionRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    expected_slot_generation: int
+    reason_code: str
+
+    def validate(self) -> None:
+        identifiers = (
+            self.pause_id,
+            self.command_id,
+            self.event_id,
+            self.fence_id,
+            self.repository_id,
+            self.run_id,
+            self.item_id,
+            self.logical_effect_id,
+            self.attempt_id,
+            self.intent_event_id,
+            self.intent_event_hash,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in identifiers
+        ):
+            raise ValueError("local pause command fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("local pause slot generation must be positive")
+
+
+@dataclass(frozen=True)
+class PauseActivitySettlementRequest:
+    settlement_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    source_pause_id: str
+    source_pause_event_id: str
+    source_pause_event_hash: str
+    pause_fence_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    nonexecution_event_id: str
+    nonexecution_event_hash: str
+    reservation_id: str
+    settlement_head_hash: str
+    expected_slot_generation: int
+    continuation_cursor: str
+
+    def validate(self) -> None:
+        string_values = tuple(self.__dict__.values())[:-2] + (
+            self.continuation_cursor,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in string_values
+        ):
+            raise ValueError(
+                "activity pause settlement fields must be non-empty"
+            )
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError(
+                "activity pause settlement slot generation must be positive"
+            )
+        if self.continuation_cursor != f"operation-recovery:{self.attempt_id}":
+            raise ValueError(
+                "activity pause settlement requires its operation recovery cursor"
+            )
+
+
+@dataclass(frozen=True)
+class PauseExternalMutationRequest:
+    pause_id: str
+    command_id: str
+    event_id: str
+    fence_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    attempt_id: str
+    intent_event_id: str
+    intent_event_hash: str
+    launch_id: str
+    launch_event_id: str
+    launch_event_hash: str
+    contact_id: str
+    contact_event_id: str
+    contact_event_hash: str
+    target_digest: str
+    expected_slot_generation: int
+    reason_code: str
+
+    def validate(self) -> None:
+        identifiers = tuple(self.__dict__.values())[:-2] + (self.reason_code,)
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in identifiers
+        ):
+            raise ValueError("external pause command fields must be non-empty")
+        if (
+            type(self.expected_slot_generation) is not int
+            or self.expected_slot_generation <= 0
+        ):
+            raise ValueError("external pause slot generation must be positive")
+
+
+@dataclass(frozen=True)
 class PauseBeforeDispatchRequest:
     pause_id: str
     command_id: str
@@ -306,13 +2933,197 @@ class PauseBeforeDispatchRequest:
     run_id: str
     item_id: str
     reason_code: str
-    continuation_cursor: str
+    continuation_cursor: str | None
 
     def validate(self) -> None:
-        if any(not value or not value.strip() for value in self.__dict__.values()):
+        required = tuple(self.__dict__.values())[:-1]
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
             raise ValueError("pause command fields must be non-empty")
+        if self.continuation_cursor is not None and (
+            not isinstance(self.continuation_cursor, str)
+            or not self.continuation_cursor.strip()
+        ):
+            raise ValueError("pause expected preserved cursor must be non-empty or absent")
         if self.request_event_id == self.settled_event_id:
             raise ValueError("pause request and settlement event IDs must differ")
+
+
+@dataclass(frozen=True)
+class StopRequest:
+    stop_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    mode: StopMode
+    reason_code: str
+    drain_deadline_utc: str | None = None
+
+    def validate(self) -> None:
+        required = (
+            self.stop_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.reason_code,
+        )
+        if any(not isinstance(value, str) or not value.strip() for value in required):
+            raise ValueError("stop command fields must be non-empty")
+        if not isinstance(self.mode, StopMode):
+            raise ValueError("stop mode must be GRACEFUL or IMMEDIATE")
+        if self.mode is StopMode.GRACEFUL:
+            if not isinstance(self.drain_deadline_utc, str):
+                raise ValueError("graceful stop requires a drain deadline")
+            try:
+                datetime.strptime(
+                    self.drain_deadline_utc, "%Y-%m-%dT%H:%M:%SZ"
+                )
+            except ValueError as exc:
+                raise ValueError(
+                    "graceful stop deadline must use YYYY-MM-DDTHH:MM:SSZ"
+                ) from exc
+        elif self.drain_deadline_utc is not None:
+            raise ValueError("immediate stop cannot carry a drain deadline")
+
+
+@dataclass(frozen=True)
+class StopEscalationSettlement:
+    reservation_id: str
+    settlement_event_id: str
+    expected_previous_hash: str
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.reservation_id, self.settlement_event_id)
+        ):
+            raise ValueError("escalation settlement identifiers must be non-empty")
+        if not isinstance(self.expected_previous_hash, str):
+            raise ValueError("escalation settlement predecessor must be a string")
+
+
+@dataclass(frozen=True)
+class StopEscalationRequest:
+    escalation_id: str
+    command_id: str
+    event_id: str
+    repository_id: str
+    run_id: str
+    source_stop_id: str
+    source_stop_event_id: str
+    expected_drain_deadline_utc: str
+    reason_code: str
+    unknown_settlements: tuple[StopEscalationSettlement, ...] = ()
+
+    def validate(self) -> None:
+        required = (
+            self.escalation_id,
+            self.command_id,
+            self.event_id,
+            self.repository_id,
+            self.run_id,
+            self.source_stop_id,
+            self.source_stop_event_id,
+            self.expected_drain_deadline_utc,
+            self.reason_code,
+        )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in required
+        ):
+            raise ValueError("stop escalation fields must be non-empty")
+        try:
+            datetime.strptime(
+                self.expected_drain_deadline_utc, "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError as exc:
+            raise ValueError(
+                "stop escalation deadline must use YYYY-MM-DDTHH:MM:SSZ"
+            ) from exc
+        if not isinstance(self.unknown_settlements, tuple):
+            raise ValueError("stop escalation settlements must be a tuple")
+        for settlement in self.unknown_settlements:
+            if not isinstance(settlement, StopEscalationSettlement):
+                raise ValueError("stop escalation settlement has an invalid type")
+            settlement.validate()
+        reservation_ids = [item.reservation_id for item in self.unknown_settlements]
+        event_ids = [item.settlement_event_id for item in self.unknown_settlements]
+        if len(set(reservation_ids)) != len(reservation_ids):
+            raise ValueError("stop escalation repeats a reservation")
+        if len(set(event_ids)) != len(event_ids):
+            raise ValueError("stop escalation repeats a settlement event")
+        if self.event_id in event_ids:
+            raise ValueError("stop escalation and settlement event IDs must differ")
+
+
+@dataclass(frozen=True)
+class TerminalRestartRequest:
+    request_id: str
+    repository_id: str
+    run_id: str
+    expected_terminal_state: LifecycleState
+    expected_terminal_event_id: str | None = None
+    expected_terminal_event_hash: str | None = None
+    expected_catalog_head: str | None = None
+    expected_run_head: str | None = None
+    expected_run_heads_digest: str | None = None
+
+    def validate(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.request_id, self.repository_id, self.run_id)
+        ):
+            raise ValueError("terminal restart request identifiers must be non-empty")
+        if self.expected_terminal_state not in {
+            LifecycleState.COMPLETED,
+            LifecycleState.FAILED_FINAL,
+            LifecycleState.STOPPED,
+        }:
+            raise ValueError("terminal restart request requires a terminal state")
+        event_anchor = (
+            self.expected_terminal_event_id,
+            self.expected_terminal_event_hash,
+        )
+        if any(value is not None for value in event_anchor) and any(
+            not isinstance(value, str) or not value.strip()
+            for value in event_anchor
+        ):
+            raise ValueError("terminal event anchor must be complete or absent")
+        head_anchor = (
+            self.expected_catalog_head,
+            self.expected_run_head,
+            self.expected_run_heads_digest,
+        )
+        if any(value is not None for value in head_anchor) and any(
+            not isinstance(value, str) or not value.strip()
+            for value in head_anchor
+        ):
+            raise ValueError("terminal head anchor must be complete or absent")
+
+
+@dataclass(frozen=True)
+class TerminalRestartReport:
+    request_id: str
+    repository_id: str
+    run_id: str
+    verification: TerminalRestartVerification
+    disposition: TerminalRestartDisposition
+    observed_state: LifecycleState | None
+    observed_state_trusted: bool
+    terminal_event_id: str | None
+    terminal_event_hash: str | None
+    catalog_head: str | None
+    run_head: str | None
+    run_heads_digest: str | None
+    restart_advancement_authorized: bool
+    dispatch_posture: DispatchPosture
+    separate_reconciliation_route_required: bool
+    reconciliation_authorized: bool
+    reason_code: str
 
 
 @dataclass(frozen=True)
@@ -338,6 +3149,7 @@ class ValidatorIntentBinding:
     input_digest: str
     validator_attempt_id: str
     capability_claim_id: str
+    containment_digest: str | None = None
 
 
 @dataclass(frozen=True)
@@ -353,19 +3165,63 @@ class BudgetSettlementRequest:
     zero_liability_proven: bool = False
     release_slot: bool = False
     all_obligations_settled: bool = False
+    additional_liability: bool = False
+    repository_id: str = ""
+    run_id: str = ""
+    item_id: str = ""
+    logical_effect_id: str = ""
+    attempt_id: str = ""
+    nonexecution_seal_id: str | None = None
 
     def validate(self) -> None:
-        if not all(
-            (
+        identifiers = (
                 self.settlement_event_id,
                 self.reservation_id,
                 self.evidence_digest,
                 self.reason_code,
+                self.repository_id,
+                self.run_id,
+                self.item_id,
+                self.logical_effect_id,
+                self.attempt_id,
+            )
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in identifiers
+        ):
+            raise ValueError(
+                "settlement identifiers, binding, and evidence must be non-empty"
+            )
+        if self.actual_units is not None and (
+            type(self.actual_units) is not int or self.actual_units < 0
+        ):
+            raise ValueError("actual usage must be non-negative")
+        if self.nonexecution_seal_id is not None and (
+            not isinstance(self.nonexecution_seal_id, str)
+            or not self.nonexecution_seal_id.strip()
+        ):
+            raise ValueError(
+                "nonexecution seal ID must be non-empty when supplied"
+            )
+        if any(
+            type(value) is not bool
+            for value in (
+                self.non_dispatch_proven,
+                self.zero_liability_proven,
+                self.release_slot,
+                self.all_obligations_settled,
+                self.additional_liability,
             )
         ):
-            raise ValueError("settlement identifiers and evidence must be non-empty")
-        if self.actual_units is not None and self.actual_units < 0:
-            raise ValueError("actual usage must be non-negative")
+            raise ValueError("settlement control flags must be booleans")
+        if (
+            self.additional_liability
+            and self.disposition
+            is not BudgetDisposition.UNKNOWN_WORST_CASE_CHARGED
+        ):
+            raise ValueError(
+                "additional liability is represented only by unknown accounting"
+            )
 
 
 @dataclass(frozen=True)
@@ -376,6 +3232,38 @@ class SettlementReceipt:
     charged_units: int
     uncertainty: bool
     slot_released: bool
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class NonexecutionSealReceipt:
+    seal_id: str
+    contact_kind: str
+    target_digest: str
+    claim_id: str
+    source_id: str
+    reservation_id: str
+    seal_hash: str
+    replayed: bool
+
+
+@dataclass(frozen=True)
+class ValidatorCessationSealReceipt:
+    cessation_id: str
+    target_digest: str
+    claim_id: str
+    source_id: str
+    repository_id: str
+    run_id: str
+    item_id: str
+    logical_effect_id: str
+    revision_digest: str
+    check_id: str
+    validator_attempt_id: str
+    result_id: str | None
+    result_digest: str | None
+    result_available: bool
+    cessation_hash: str
     replayed: bool
 
 
@@ -401,6 +3289,10 @@ class StorageIntegrityError(RuntimeError):
 
 class DispatchDenied(RuntimeError):
     """A deterministic guard denied dispatch before adapter contact."""
+
+    def __init__(self, message: str, *, event_hash: str | None = None) -> None:
+        super().__init__(message)
+        self.event_hash = event_hash
 
 
 RunHeads = Sequence[tuple[str, str]]
