@@ -14,7 +14,9 @@ Supporting detail for `tenant-modeler`. Read on demand.
 
 Transitions worth defining explicitly: payment-failure → suspended (after what
 grace?), suspended → active (restore is instant?), offboarding → purged (after
-what window? who can cancel it?), any-state → offboarding (who may trigger?).
+what window? who can cancel it?), each eligible non-purged state → offboarding
+(which states permit it, and who may trigger it?). `Purged` has no transition
+back to offboarding or an active state.
 Purge is irreversible: it requires an approval gate and an audit event.
 
 ## Membership patterns

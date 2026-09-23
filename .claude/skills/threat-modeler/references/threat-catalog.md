@@ -4,6 +4,17 @@ Progressive-disclosure detail for `threat-modeler`. Use these prompts to
 enumerate threats per boundary. Every prompt is a question; the answer becomes
 a threat row (or an explicit "not applicable, because…").
 
+## Terms used here
+
+- **STRIDE:** spoofing, tampering, repudiation, information disclosure,
+  denial of service, and elevation of privilege—the six threat prompts below.
+- **SaaS / RLS / IDOR:** software as a service, row-level security, and
+  insecure direct object reference (accessing an object without authorization).
+- **SSRF / CI / PR:** server-side request forgery, continuous integration,
+  and pull request.
+- **UI / authz:** user interface and authorization (checking what a caller
+  may access or do).
+
 ## STRIDE prompts per boundary type
 
 ### Client → server (any request boundary)
@@ -76,7 +87,11 @@ Bad: "Attacker exploits IDOR." (no persona, no steps, no payoff → not testable
 
 A HIGH-ranked threat states: **who** (persona), **from where** (surface/entry),
 **doing what** (steps), **getting what** (asset + blast radius). Missing any
-element → cap at MEDIUM and record "confirmed by: <experiment/test>".
+element → mark the threat description incomplete and assign an owner to
+verify the missing step with a named experiment or test. Keep a provisional
+priority based on plausible impact and exposure; missing documentation alone
+must not lower severity. Record a final severity after the exploit path and
+mitigations have been checked.
 
 ## Mitigation → test mapping
 
