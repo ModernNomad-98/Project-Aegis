@@ -1,5 +1,15 @@
 # Operational proposal status pointers — 2026-09-23
 
+> **Current reading, 2026-09-23:** This batch merged in [pull request (PR)
+> #179](https://github.com/ModernNomad-98/Project-Aegis/pull/179), recorded
+> locally by merge commit `61b3589`. The independent review marked pending
+> below was the frozen-draft checkpoint, not the present delivery status.
+> The pull request #139 observation remains bound to its stated check time;
+> use the [Behavioral Eval Runner (BER) backlog](../../roadmaps/behavioral-eval-runner-backlog.md)
+> for current work. `APR` identifies an owner approval-register entry;
+> `BER-DEC` identifies a BER decision record; UTC means Coordinated Universal
+> Time.
+
 ## Scope
 
 This documentation-only batch starts from `37c018d166f0647703b4a0f7009ae0ca4c5e32b0`
