@@ -71,7 +71,7 @@ the files in bounded batches so unrelated technical changes stay separate.
 
 ## Delivery and estimate
 
-Status: **OPEN**. Start with the two component READMEs and the root/index
+Status: **IN PROGRESS**. Start with the two component READMEs and the root/index
 navigation, then continue through the full inventory in reviewable batches.
 Previously stated estimate for the narrower component-guide item was 4–8
 active hours; after the repository-wide clarification an interim estimate
@@ -83,3 +83,12 @@ after only the two component READMEs are improved.
 This documentation work does not authorize provider calls, deployment,
 private calibration input publication, approval changes or later-phase runtime
 implementation.
+
+## Reviewed batches
+
+| Batch | Tracked pages | Progress and remaining review |
+| --- | --- | --- |
+| First component guides, started 2026-09-23 16:12 UTC | `tools/behavioral_eval_runner/README.md`, `tools/aegis_delivery_control/README.md`, `docs/README.md` | Rewritten around purpose, workflow, examples, functions and limits. Local commands and links passed; independent read-only review found no remaining blocker after corrections. Root README navigation remains a separate batch. |
+
+This table records page review, not completion of the 491-file sweep. Add each
+later batch with its exact files, findings, verification and disposition.

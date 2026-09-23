@@ -3,6 +3,21 @@
 Start here for current guidance. Dated evidence and design proposals preserve
 their original context; use the active registers below to determine current work.
 
+Project Aegis ships a skills library for artificial intelligence-assisted
+engineering. Two
+maintainer tools accompany it:
+
+- The [Behavioral Eval Runner](../tools/behavioral_eval_runner/README.md)
+  inventories test cases and grades recorded behavior so maintainers can
+  measure whether the skills work. Its general commands are offline; measured
+  model calibration remains gated.
+- The [delivery control plane](../tools/aegis_delivery_control/README.md)
+  records authority, budget, intent and receipts so an interrupted delivery
+  operation can resume safely. Its current kernel runs synthetic targets only.
+
+Each component guide explains normal use, commands, files and current limits.
+The backlog links below show what remains proposed or blocked.
+
 ## Use the skills
 
 - [Project README](../README.md): setup, skill picker, shipped skills and agents.
@@ -121,6 +136,9 @@ CP-WP-002 evidence record. No deployment,
 provider call, production data, real authority or real execution adapter is
 authorized.
 
-The [CP-WP-003 offline proof proposal](roadmaps/cp-wp-003-offline-proof-proposal.md)
-sets out the next bounded owner decision; CP-WP-003 remains blocked until
-separately authorized.
+The [control-plane work package 003A offline proof proposal](roadmaps/cp-wp-003-offline-proof-proposal.md)
+defined the synthetic increment delivered in PR #123. It tests failures of
+source, freshness, containment, evidence and accounting claims. Work package
+003 still needs real-source and selected-host proof before any live route;
+the [current backlog](roadmaps/resumable-control-plane-backlog.md) tracks those
+gates.
