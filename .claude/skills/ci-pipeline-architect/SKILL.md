@@ -6,6 +6,13 @@ disable-model-invocation: true
 
 # CI Pipeline Architect
 
+Terms used below: **CI/CD** means continuous integration and continuous
+delivery (or deployment); **E2E** means end-to-end testing; **OIDC** means
+OpenID Connect; **PR** means pull request; **SAST** means static application
+security testing; and **YAML** is the human-readable configuration format
+used by many pipeline definitions. These expansions do not change this
+skill's manual-only invocation or its approval requirements for pipeline edits.
+
 ## Purpose
 
 Produce a delivery pipeline that is fast enough to be obeyed and strict
@@ -110,15 +117,16 @@ weakened.
 ## Output Format
 
 ```
-CI PIPELINE DESIGN — <repo/scope>
+CI PIPELINE DESIGN (CONTINUOUS INTEGRATION/DELIVERY) — <repo/scope>
 Current state: <stages, what ACTUALLY blocks merge, runtimes, secret usage>
 Stage graph: <stage — trigger — blocking semantics — timeout — defect class
   it catches — measured/estimated runtime>
-Secret governance: <OIDC roles vs stored secrets; job→secret map; fork-PR
-  posture; missing-secret behavior>
+Secret governance: <OpenID Connect (OIDC) roles vs stored secrets;
+  job→secret map; forked pull-request (PR) secret-access posture;
+  missing-secret behavior>
 Caching & artifacts: <cache keys + poisoning posture; artifact retention +
   provenance fields; evidence collection>
-Environments & promotion: <env → secrets scope → approvers → deployment
+Environments & promotion: <environment → secrets scope → approvers → deployment
   strategy → rollback primitive>
 Branch protection: <required checks (must equal merge-blocking stages),
   bypass list, review rules>
