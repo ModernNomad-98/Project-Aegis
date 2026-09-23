@@ -1,4 +1,4 @@
-# AI Software Engineering & LLM Systems
+# Artificial intelligence (AI) software engineering and large language model (LLM) systems
 
 This is the original 20-candidate map for artificial intelligence (AI)
 engineering: model routing, prompt contracts, safety, evaluation, retrieval,

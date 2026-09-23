@@ -1,4 +1,4 @@
-# AI-Era SDLC & Agent Operating Discipline
+# Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline
 
 This is the original 20-candidate map for making artificial intelligence (AI)
 assisted development controlled, traceable, reviewable, and safe. It is a
