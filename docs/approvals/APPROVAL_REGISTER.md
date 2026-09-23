@@ -331,3 +331,42 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #119](https://github.com/ModernNomad-98/Project-Aegis/pull/119)
   merged as `d2053b61fa80738d9dd2c669980652914bb5c872`. Its final timing and
   check disposition are in [the completion comment](https://github.com/ModernNomad-98/Project-Aegis/pull/119#issuecomment-5799438319).
+
+### AEGIS-APR-012: Offline Behavioral Eval Runner evidence-policy proof
+
+- **Event:** GRANT, effective only after this reviewed register and
+  Behavioral Eval Runner decision-log change merges.
+- **Status at recording:** ACTIVE on that merge.
+- **Date / Grantor:** 2026-09-23 / Peter Nguyen.
+- **Owner decision:** "A. Approve bounded offline proof (recommended)" in
+  response to the question presenting [PR #131's exact proposal](../roadmaps/ber-bkl-009a-offline-policy-scope-proposal.md): APR-009 selected the
+  30-day policy but requires a separate implementation grant; option A permits
+  only the offline synthetic proof after its exact grant is recorded and
+  merged, excluding real inputs, provider calls, deletion and a future
+  protected-file guard exception.
+- **Reason:** Prove the selected complete-bundle evidence contract before any
+  real-host storage or cleanup implementation.
+- **Scope allowed:** One synthetic-only WP-2B-1B policy checker and
+  regression package for child item BER-BKL-009, under the seven exact paths
+  and acceptance evidence in
+  the merged PR #131 proposal. Start its implementation branch from this
+  grant's exact merge commit. The paired append-only decision is BER-DEC-011
+  in [the Behavioral Eval Runner governance log](../roadmaps/behavioral-eval-runner-backlog.md).
+- **Scope FORBIDDEN and size limits:** At most 8 active implementation hours,
+  1,000 added code/test lines and zero task-controlled external spend. No
+  real host, credentials, customer/private/holdout data, provider calls,
+  external evidence root, actual deletion, publication, or schema change
+  without a separate versioned decision. This grant does not waive a future
+  protected-file guard failure. Stop for a reviewed scope change before
+  exceeding a bound.
+- **Delivery:** One signed implementation PR, exact-path staging, synthetic
+  positive/negative and legacy regression tests, full relevant offline
+  suite, skill validation, independent architecture/security review, and
+  exact-head Linux and Windows Actions. A future failed protected-file guard
+  requires its own explicit owner disposition before merge.
+- **Evidence:** Direct owner option-A reply in the Project Aegis conversation
+  on 2026-09-23, quoted above, after the exact PR #131 proposal and limits
+  were presented. [PR #131](https://github.com/ModernNomad-98/Project-Aegis/pull/131)
+  merged at `e783f0f772700d30e203390b31e56c25187a1bc6`.
+- **Expiry / use limit:** One bounded implementation package; no calendar
+  expiry stated. No broader BER-BKL-009 work follows automatically.
