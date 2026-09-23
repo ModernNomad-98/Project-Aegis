@@ -1571,11 +1571,43 @@ Outside the scoped refresh, 43 rows are explicitly not inspected here.
 The prior independent implementation reviews for every scoped tranche ended
 `APPROVE` with no remaining BLOCKER or MAJOR finding. Accordingly these rows now
 record `YES/YES/YES`; this is an accumulated evidence promotion, not new runtime
-behavior. Remaining risk-ranked coverage gaps are T18/T19 every-nonterminal-state
-stop matrices, T25/F19 before/after-handoff contradiction matrices, F02
+behavior. The subsequent Stage 24 trace also promotes T18/T19 after their
+every-nonterminal-state stop matrices were independently accepted. Remaining
+risk-ranked coverage gaps are T25/F19 before/after-handoff contradiction matrices, F02
 proof-bound disposition matrix, F03 clock/host/manual interleavings and F04a
 reservation-boundary accounting. POSIX runtime and final exact-head
 architecture/security/QA review remain separate release gates.
+
+### Stage 24 - T18/T19 every-nonterminal-state stop matrix
+
+Committed implementation head `b9f31c3f40eab222f0fd5bd47dba60784ef1eae1`
+closes the canonical T18/T19 coverage gap. Tests construct PLANNED, BLOCKED,
+RUNNING, PAUSING, PAUSED, VALIDATING and RECONCILIATION_REQUIRED through their
+authentic transitions, clone each durable history for separate graceful and
+immediate grants, and assert the exact predecessor, continuation cursor,
+outstanding slot, reservations, intents, launches, contacts, observations,
+uncertainties, resolutions and pre-existing fences. The permanent STOPPED_RUN
+fence is target-scoped; no new operation or validator contact is admitted.
+
+Mode-specific accounting covers uncontacted reserves, contacted effects,
+contacted validators and contacted active-validator PAUSING. Graceful stop
+retains accounting exactly; immediate stop changes only unresolved contacted
+RESERVED obligations to UNKNOWN_WORST_CASE_CHARGED. Injected failures cover the
+intermediate immediate-settlement boundary, both high-risk predecessor states,
+precommit rollback and lost acknowledgement. First-use stale freshness denies
+with a byte-identical database, while an exact committed replay succeeds before
+freshness and remains byte-identical. Projection, issuer, payload and identity
+verification still precede replay, and first use still requires freshness.
+
+Independent read-only review returned `APPROVE` with no BLOCKER or MAJOR
+finding after one revise-and-correct cycle. The final focused audit suite passed
+11 tests; the full storage suite passed 378 tests and the complete delivery-
+control package passed 493 tests. Validator, contract-audit, offline-CI, BER
+self-check, all 987 BER tests (14 expected skips), Windows PowerShell 5.1
+acceptance (113 tests), compileall and `git diff --check` also passed. The first
+BER attempt was sandbox-limited by Git ownership and process-tree termination;
+the unchanged escalated run passed. PowerShell Core remains assigned to hosted
+Windows because `pwsh` is unavailable locally.
 
 ## 10. Backlog state
 
@@ -1614,8 +1646,8 @@ Canonical rows: [design transition table](../../design/resumable-control-plane-v
 | T15 | YES | YES | YES | Immutable source/item/plan/policy pins, authenticated mismatch evidence, atomic scoped fence and historical activity routing independently accepted |
 | T16 | YES | YES | UNVERIFIED | Typed validation/operation blocker recovery and distinct finalization are implemented with exact evidence heads, aggregate gates, accounting/fence/slot closure, atomic replay and tamper assertions; row-level review pending |
 | T17 | YES | YES | YES | Validator-result, operation-uncertainty, verified-receipt, authoritative-nonexecution, generation-bound safe-retry and closed proof-free report/STOPPED/FAILED_FINAL branches are assertion-traced with exact accounting/fence retention and independently accepted |
-| T18 | YES | UNVERIFIED | UNVERIFIED | Graceful stop and R-STOP closure slices are asserted, but no durable every-nonterminal-state matrix covers PAUSING/RECONCILIATION_REQUIRED and prior review did not accept the complete row |
-| T19 | YES | UNVERIFIED | UNVERIFIED | Immediate stop and post-contact uncertainty slices are asserted, but no durable every-nonterminal-state matrix covers PAUSING/RECONCILIATION_REQUIRED and prior review did not accept the complete row |
+| T18 | YES | YES | YES | Graceful stop is assertion-traced from all seven authentic nonterminal states with exact predecessor/cursor/slot/intent/contact/observation/uncertainty/fence retention, no-new-contact denial, unchanged contacted accounting, crash/lost-ack replay and strict recovery; independently accepted at Stage 24 |
+| T19 | YES | YES | YES | Immediate stop is assertion-traced from all seven authentic nonterminal states with exact obligation retention, contacted effect/validator worst-case charging, precontact reserve retention, no-new-contact denial, intermediate-settlement rollback, lost-ack replay and strict recovery; independently accepted at Stage 24 |
 | T20 | YES | YES | YES | Operator escalation route independently accepted; no deadline-rule scheduler claimed |
 | T21 | YES | YES | UNVERIFIED | Stable `writer.lock` identity and OS exclusion are implemented; an actual second process is denied and lock replacement/reacquisition behavior is asserted; row-level review pending |
 | T22 | YES | YES | YES | Typed strictly read-only terminal restart denial, local/current/unverified reporting, unique terminal-entry derivation, no budget/slot mutation and concurrent snapshot behavior independently accepted |

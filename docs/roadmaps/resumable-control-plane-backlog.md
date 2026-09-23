@@ -171,7 +171,7 @@ permission for runtime work.
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
-| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 23 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested coverage at 25/28 T, 9/9 C and 18/22 F. T18/T19, T25/F19, F02, F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
+| CP-WP-002 — Offline state and recovery kernel | IN_PROGRESS under AEGIS-APR-004: standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | Reviewed slices now include the stop gate, trusted readiness, active-validator pause/drain, selected-check launch/routing, proof-free dispositions, terminal-policy intake, T18/T19 every-nonterminal-state stop, T22 terminal reporting, T28/F01 adoption, cross-family F05/F06/F13/F20 and Windows filesystem protections. The Stage 24 accumulated trace records implementation surfaces for 28/28 T, 9/9 C and 22/22 F rows, with tested coverage at 27/28 T, 9/9 C and 18/22 F. T25/F19, F02, F03 and F04a coverage, remaining row reviews, POSIX runtime evidence and final exact-head architecture/security/QA approval still block DONE |
 | CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
@@ -1289,14 +1289,43 @@ because it executes a route. Prior independent implementation reviews for each
 promoted tranche ended `APPROVE` with no remaining BLOCKER or MAJOR finding.
 
 The resulting inventory has implementation surfaces for 28/28 transitions,
-9/9 crash boundaries and 22/22 acceptance-family rows. Verifying test coverage
-is 25/28 transitions, 9/9 crash boundaries and 18/22 acceptance rows. The next
-ordered gaps are T18/T19 every-nonterminal-state stop matrices, T25/F19
-before/after-handoff and contradiction matrices, F02 proof-bound disposition
-coverage, F03 clock/host/manual claim interleavings and F04a reservation-boundary
-accounting. Rows outside the narrow refresh retain their prior independent-review
-status. POSIX runtime and final architecture/security/QA gates remain open, and
-PR #99 remains draft.
+9/9 crash boundaries and 22/22 acceptance-family rows. Stage 24 below raises
+verifying and independently accepted transition coverage to 27/28; acceptance-
+family coverage remains 18/22. The next ordered gaps are T25/F19 before/after-
+handoff and contradiction matrices, F02 proof-bound disposition coverage, F03
+clock/host/manual claim interleavings and F04a reservation-boundary accounting.
+Rows outside the narrow refresh retain their prior independent-review status.
+POSIX runtime and final architecture/security/QA gates remain open, and PR #99
+remains draft.
+
+### 5.30 T18/T19 every-nonterminal-state stop checkpoint
+
+Committed implementation head `b9f31c3f40eab222f0fd5bd47dba60784ef1eae1`
+adds the durable graceful/immediate matrix for all seven authentic nonterminal
+states. It verifies exact predecessor and continuation binding, retained slots,
+intents, launches, contacts, observations, uncertainties, resolutions and prior
+fences, permanent target-scoped STOPPED_RUN fencing, source-valid operation and
+validator no-new-contact denial, and strict recovery. Accounting distinguishes
+uncontacted reserves from contacted effect/validator obligations, including
+contacted active-validator PAUSING: graceful stop preserves exact accounting and
+immediate stop atomically records only the required worst-case unknown charges.
+
+The runtime correction resolves an exact committed stop replay before
+independent freshness denial while retaining projection, issuer, payload and
+identity validation; first-use stops still require freshness. Byte-identical
+stale-first-use denial, intermediate-settlement rollback, high-risk precommit
+rollback and lost-ack replay are directly asserted. Independent read-only audit
+returned `APPROVE` after the initial gaps were corrected, with no remaining
+BLOCKER or MAJOR finding. The full storage suite passed 378 tests, the complete
+delivery-control package passed 493, and all repository gates passed locally;
+the unchanged BER suite passed all 987 tests with 14 expected skips outside the
+sandbox limitations. T18 and T19 are therefore promoted to `YES/YES/YES`.
+
+The resulting inventory remains 28/28 implemented transitions and 9/9 tested
+crash boundaries, with verifying and independently accepted transition coverage
+now 27/28. The next ordered gap is T25/F19 before/after-handoff and contradiction
+coverage, followed by F02, F03 and F04a. POSIX runtime and final exact-head
+architecture/security/QA gates remain open; PR #99 remains draft.
 
 ## 6. Handoff contract
 
