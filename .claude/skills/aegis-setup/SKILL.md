@@ -22,13 +22,14 @@ never authorizes a tool, provider, model or agent.
   ordinary conversation and ask for the named `aegis-setup` invocation before
   any state write.
 - Do not use for a vague product idea, lifecycle navigation (owned by
-  `project-orchestrator`), engineering task, security review, BER run, or a
+  `project-orchestrator`), engineering task, security review, Behavioral Eval
+  Runner (BER) run, or a
   request explicitly naming another skill.
 
 ## Inputs to Inspect
 
 1. Current checkout root and whether it is a real directory, not a redirect.
-2. Operating system and shell: the saved selection path is tested only on
+2. Operating system (OS) and shell: the saved selection path is tested only on
    Windows PowerShell 5.1 in a single user account and one local checkout.
 3. For a change request, read current status with `scripts/selection.ps1`.
 4. [State contract](references/state-contract.md) before describing persistence.
@@ -93,7 +94,8 @@ Never imply account connection, host routing or measured savings.
 
 ## Gotchas
 
-- A copied checkout on another path or host has a new key and starts unselected.
+- A checkout at another path has a new key. Another host has separate local
+  state even if its checkout path and key match.
 - An unavailable helper is exploration, not a saved completed setup.
 - `selected` means preference only. `verified` requires separate host proof and
   is not emitted here.
@@ -116,4 +118,5 @@ Never imply account connection, host routing or measured savings.
 - `scripts/selection.ps1` provides Windows status, select and explicit repair.
 - `scripts/test-selection.ps1` uses only synthetic temporary directories.
 - `evals/evals.json` and `evals/trigger-evals.json` provide behavioral review
-  cases; the validator checks their JSON structure only.
+  cases; the validator checks their JavaScript Object Notation (JSON)
+  structure only.

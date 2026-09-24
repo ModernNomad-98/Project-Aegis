@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #245 on 2026-09-24, this remains the active
+As of merged pull request (PR) #247 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -221,6 +221,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Setup skill follow-up after merged PR #246, 2026-09-24 | `.claude/skills/aegis-setup/SKILL.md` changed its Windows command example in #246 | Two read-only full-page reviews found one false cross-host key claim and first-use abbreviations. This checkpoint corrects them and obtains corrected-candidate review; prior accepted-page status remains valid on this PR's merge. The script's 44 synthetic selection assertions and #246 exact-head Actions passed. |
 | Current-tree note follow-up after PR #245, 2026-09-24 | [BER offline policy review](../evidence/ber-bkl-009a-offline-review.md) and [runner command-effects note](../evidence/documentation/ber-runner-command-effects-2026-09-23.md) added by PRs #139 and #197 | The #245 baseline had 582 Markdown files: 536 accepted readers, 44 classified fixtures and these two pending notes. Dated current-reading corrections passed two independent full-page reviews; links, first-use terms and historical status were checked. On this PR's accepted merge, the 582-file tree has 538 accepted readers, 44 classified fixtures and zero known pending pages. Previous ETA 1–3 active hours; new ETA 0. |
 | Last protected reader page, merged as PR #239 on 2026-09-24 | `scripts/tests/fixtures/README.md` and its new [review record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md) | Owner approved a PR-specific protected guard exception after independent review; Linux and Windows passed, and PR #239 merged as `66ae4deb5f5600a4ab54f0a86bee858b8b9d7c76`. The original #238 pending set closed; the #239 tree had 582 Markdown pages because PRs #139 and #197 had added two evidence notes. Confidential conduct intake remains a separate owner decision. |
 | Last protected reader page after merged PR #238, draft PR #239 | `scripts/tests/fixtures/README.md`; [one-page review and guard record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md) | The reader correction passed independent review and offline checks. It remains pending because the exact PR's `gate-guard` exception has not been granted. Previous and current remaining documentation ETA are 1–3 active hours until owner disposition and merge; on accepted merge, the bounded inventory closes at zero known pages. Confidential conduct intake remains a separate owner decision. |

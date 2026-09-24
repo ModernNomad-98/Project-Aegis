@@ -85,6 +85,12 @@ after this PR's accepted merge. The full all-options
 backlog has no finite total. Start the next five-merge counter after #245;
 re-estimate sooner when a material owner choice changes scope.
 
+After this checkpoint, PRs #246 and #247 merged focused corrections to the
+already delivered Issue #101 setup path and synthetic control-plane validator
+contact boundary. Their exact-head Actions passed; neither closes an open
+selected package or changes the estimates above. They are the first two
+merges toward the next cadence checkpoint.
+
 ## Five-merge checkpoint — 2026-09-24, after pull request #238
 
 Five requests merged after [#232](#five-merge-checkpoint--2026-09-24-after-pull-request-232):
