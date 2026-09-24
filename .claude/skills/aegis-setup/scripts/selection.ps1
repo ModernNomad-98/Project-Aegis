@@ -137,7 +137,7 @@ function Save-AegisOnlySelection {
     }
 }
 
-# Normal invocation: powershell -NoProfile -File selection.ps1 -Action status|select|repair -ProjectRoot <absolute path>
+# Normal invocation: powershell -NoProfile -ExecutionPolicy Bypass -File selection.ps1 -Action status|select|repair -ProjectRoot "<absolute path>"
 if ($MyInvocation.InvocationName -ne '.') {
     $arguments = @($args)
     if ($arguments.Length -ne 4 -or $arguments[0] -ne '-Action' -or $arguments[2] -ne '-ProjectRoot') {
