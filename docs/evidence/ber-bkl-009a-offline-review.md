@@ -1,5 +1,17 @@
 # Behavioral Eval Runner offline evidence-policy review
 
+## Current reading — 2026-09-24
+
+This note helps maintainers review what the bounded synthetic evidence-policy
+proof checks and what it leaves open. Its premerge test and guard entries below
+are dated preparation evidence. [Pull request (PR) #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+merged as `b4b1195d6162728ffc37d22d038a08e3722db7c0` after Linux and Windows
+passed and the owner approved its one-time protected guard exception, now
+consumed by [approval-register entry APR-015](../approvals/APPROVAL_REGISTER.md#aegis-apr-015-consumption-of-pr-139-exception).
+The offline increment is delivered; Behavioral Eval Runner backlog item 009
+(BER-BKL-009) still needs separately scoped
+real-host access, encryption, privacy and operator cleanup controls.
+
 Here, BER-BKL-009A means Behavioral Eval Runner backlog item 009, offline
 increment A; WP-2B-1B is its bounded work package; APR-012 and BER-DEC-011
 are the matching owner approval and runner decision records.
@@ -15,8 +27,10 @@ does not claim a merged implementation.
 ## What the synthetic proof checks
 
 The opt-in writer requires an explicit, content-bound classification decision
-for every caller artifact and the final report. It rejects caller-supplied
-creation times, empty Stage A inputs, unversioned access-policy references,
+for every caller artifact and the final report. Stage A is the hash-verified
+input bundle; Stage B is the final report and verification bundle. The writer
+rejects caller-supplied creation times, empty Stage A inputs,
+unversioned access-policy references,
 mixed retention and missing citations. The first Coordinated Universal Time
 (UTC) value is minted by the writer before its first policy artifact write.
 A Stage A receipt and Stage B receipt are ordinary hash-listed artifacts.

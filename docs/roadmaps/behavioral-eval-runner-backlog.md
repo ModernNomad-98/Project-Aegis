@@ -1,6 +1,6 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-23 after pull request #145:** This is the
+> **Current reading, checked 2026-09-24 after pull request #245:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -33,8 +33,8 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | Work or evidence gate | Current disposition | What remains |
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
-| WP-2B-1B / BKL-009 | **AUTHORIZED** for one synthetic offline proof by [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this checkpoint. BKL-009 remains partial. | Real-host enforcement and cleanup need separate scope. See [WP-2B-1B](#wp-2b-1b--offline-evidence-policy-proof) and [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
-| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 separately grants one bounded synthetic offline holdout-support branch. Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
+| WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy; BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy and cleanup need separate scope. See [WP-2B-1B](#wp-2b-1b--offline-evidence-policy-proof) and [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support now delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
 
@@ -854,6 +854,14 @@ policy receipts hold one 30-day bundle review deadline while legacy
 per-artifact expiration metadata keeps its original meaning. BER-BKL-009
 remains PARTIALLY DELIVERED; this checkpoint does not authorize a real host,
 privacy release, provider call, or cleanup.
+
+**2026-09-24 delivery update:** PR #139 merged the independently reviewed
+synthetic proof as `b4b1195d6162728ffc37d22d038a08e3722db7c0` after
+Linux and Windows passed and the owner-approved one-time protected guard
+exception was consumed. The [offline review note](../evidence/ber-bkl-009a-offline-review.md)
+explains the shipped checks. WP-2B-1B's bounded offline increment is delivered;
+BER-BKL-009 remains PARTIAL until separately authorized real-host, privacy and
+operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
 
 ### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 

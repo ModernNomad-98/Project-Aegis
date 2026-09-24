@@ -3,16 +3,21 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [five-merge checkpoint after #238](#five-merge-checkpoint--2026-09-24-after-pull-request-238)
-reassessed every selected and optional row. Merged #238 left **one protected
-reader page / 1–3 active hours** for documentation, excluding owner wait.
-The other selected rows retain **95–194 active hours**, so selected remaining
-work is **96–197 active hours**. Draft PR #239 proposes the last page's
-correction; only its accepted merge would reduce this bounded documentation
-inventory to zero known pages and leave **95–194 selected active hours**.
+to start blocked work. The [five-merge checkpoint after #245](#five-merge-checkpoint--2026-09-24-after-pull-request-245)
+reassessed every selected and optional row. PR #239 closed the original
+protected reader-page residual. Two evidence notes introduced by #139 and #197
+received independent full-page acceptance in this checkpoint PR; on its
+accepted merge, documentation has **zero known pending pages**. At the #245
+checkpoint, other selected work retained **95–194 active hours**. Since then,
+[PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249) delivered
+the 8–16-hour offline holdout-support item. With the two notes accepted here,
+current selected remaining work is **87–178 active hours**; both optional
+Issue #101 helpers would make it **103–218**. The #245 baseline before note
+acceptance was **96–197**. These estimates still depend on owner decisions
+and provisional real-host scope.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-238--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-245--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -29,6 +34,56 @@ tables below are retained as historical snapshots. Their dated estimates,
 pending decisions, and statements about what will happen next describe their
 original checkpoints. Follow the latest checkpoint and the owning records for
 current status and authorization.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #245
+
+Five requests merged after #244: #139, #197, #239, #235 and #245. The
+[measurement checkpoint](aegis-execution-metrics.md#checkpoint-after-pull-request-245--2026-09-24)
+records their exact merge commits and prior-merge wall intervals. Their
+5h51m45s combined interval includes owner wait, CI and unrelated work; no
+active-only rate can be inferred. Linux and Windows execution checks passed at
+each reviewed head. #139, #197 and #239 merged under separate owner-approved,
+now-consumed protected guard exceptions in APR-014–019. #235 and #245 had all
+exact-head Actions green. No provider or real-host execution occurred.
+
+The #245 tree has **582 tracked Markdown files**. The #238 pending reader
+page was corrected in #239, whose new review note was accepted. The #139 and
+#197 evidence notes entered the tree before #239; corrected current-reading
+versions passed two independent full-page reviews in this checkpoint PR. The
+baseline residual was **1–3 documentation active hours**. On this PR's
+accepted merge, it becomes **zero known pages** and the inventory comprises
+538 accepted readers and 44 classified fixtures. This is a small bounded
+follow-up, not a measured throughput rate. Confidential conduct intake
+still needs a private route and separate recipient decision.
+
+| Selected open work item | After #238 active hours | Revised after #245 | Remaining gate or reason |
+| --- | ---: | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 | 1–4 | Owner semantic and exact-label review remains |
+| BER-BKL-009 evidence policy | 8–16 | 8–16, provisional | #139 delivered the synthetic offline proof; real-host access, encryption, privacy and cleanup remain unscoped. Do not subtract an unmeasured increment mechanically |
+| WP-2B-3 execution support | 8–16 | 8–16 | BER-DEC-012 became effective on #235 merge; one bounded synthetic implementation is authorized but undelivered |
+| WP-2B-3 measurement and OD-1 | 4–10 | 4–10 | Private labels, source, allowance, development result and holdout freeze remain |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured isolation remain |
+| WP-2B-4 | 12–24 | 12–24 | Calibration and host proof before limited live suite |
+| WP-2B-5 | 8–16 | 8–16 | WP-2B-4 gate before generic corpus |
+| WP-2B-6 | 8–16 | 8–16 | Later scheduling, cost, quarantine and dataset operations |
+| WP-2B-7 | 4–8 | 4–8 | Later advisory CI and operator workflow |
+| CP-WP-003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof remain |
+| CP-WP-004 | 8–16 | 8–16 | Selected target and CP-WP-003 prerequisites remain |
+| Issue #101 package 4 | 8–16 | 8–16 | #237 prepared options; host and comparison authority remain unselected |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation follows selected integration outcomes |
+| Documentation readability | 1–3 | **0 on this PR's accepted merge** | #239 closed the protected README; two new notes passed corrected-candidate review |
+| **Selected remaining total** | **96–197** | **95–194 on this PR's accepted merge** | Non-documentation subtotal 95–194 |
+
+All **14 selected** and **seven optional** rows were reconsidered. The optional
+rows remain Issue #101 package 5 **8–20** if selected; package 6 **8–20**
+with separate provider authority; BER-BKL-010 **4–12**; BER-BKL-014 **8–20
+per selected host**; BER-BKL-015 **8–24 per selected product**; strategic skill
+and framework expansion unbounded until scoped; and multi-judge arbitration
+plus future control-plane architecture unbounded until adopted. Both optional
+Issue #101 helpers would add **16–40**, making selected-plus-both **111–234**
+after this PR's accepted merge. The full all-options
+backlog has no finite total. Start the next five-merge counter after #245;
+re-estimate sooner when a material owner choice changes scope.
 
 ## Five-merge checkpoint — 2026-09-24, after pull request #238
 
