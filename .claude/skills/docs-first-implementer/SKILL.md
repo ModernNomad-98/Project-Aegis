@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Docs-First Implementer
 
+Terms: **API** means application programming interface; **ORM** means
+object-relational mapper; **UI** means user interface; **SDK** means software
+development kit; **AI** means artificial intelligence; **CI** means
+continuous integration.
+
 ## Purpose
 
 Eliminate the "implemented against a remembered API" failure mode: code

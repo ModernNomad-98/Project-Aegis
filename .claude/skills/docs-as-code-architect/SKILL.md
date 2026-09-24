@@ -5,6 +5,10 @@ description: Design the docs-as-code TOOLCHAIN and pipeline — docs living in t
 
 # Docs-as-Code Architect
 
+Terms: **CI** means continuous integration; **PR** means pull request;
+**API** means application programming interface; **i18n** means
+internationalization; **CDN** means content delivery network.
+
 ## Purpose
 
 Docs rot because they live outside the workflow that changes the code:
@@ -113,20 +117,20 @@ Boundaries:     content org → diataxis-doc-organizer; README → readme-crafts
 
 ## Validation Checklist
 
-- [ ] Docs live in the repo and change via PR alongside code, with a docs
-      CODEOWNER.
-- [ ] A generator/format is chosen for stated reasons (versioning/API/
-      search/i18n), not fashion.
-- [ ] Per-PR preview builds exist; deploy-on-merge and rollback are
-      defined.
-- [ ] CI checks cover buildability, link-checking, prose/style, and
+- [ ] The design specifies docs living in the repo and changing via PR
+      alongside code, with a docs CODEOWNER.
+- [ ] The design chooses a generator/format for stated reasons (versioning/
+      API/search/i18n), not fashion.
+- [ ] Per-PR preview builds, deploy-on-merge, and rollback are specified
+      in the pipeline design.
+- [ ] The CI design covers buildability, link-checking, prose/style, and
       spelling, with blocking vs advisory decided.
-- [ ] Code samples are tested (executable or snippet-included) so they
-      can't silently rot.
-- [ ] Docs are versioned with releases; a version selector exists; version
-      values are single-sourced.
-- [ ] Search, generated navigation, and stable URLs with redirects are
-      provided.
+- [ ] The design specifies executable or snippet-included code-sample tests
+      so examples cannot silently rot.
+- [ ] The design versions docs with releases, includes a version selector,
+      and uses one source for version values.
+- [ ] The design specifies search, generated navigation, stable URLs and
+      redirects.
 - [ ] Content organization, README, API-reference generation, and
       contribution-guide CONTENT are handed to their owning skills.
 

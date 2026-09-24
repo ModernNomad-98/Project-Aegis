@@ -13,7 +13,7 @@
           "Confirms the write/size ceiling is evidenced (saturated write TPS, 4TB table, replicas + indexing already tried) before designing shards.",
           "Selects a shard key (tenant_id as the natural key) and states its hot-tenant limit — a single large tenant still lands on one shard.",
           "Chooses a partitioning scheme per table (range/hash/list) against its query pattern, distinguishing in-node partitioning from cross-node sharding.",
-          "Prices the cross-shard cost (joins, transactions without cheap 2PC, global uniqueness, fan-out) and delivers a reversible reshard runbook that is designed, not executed."
+          "Prices the cross-shard cost (joins, transactions without cheap 2PC, global uniqueness, fan-out) and delivers a reshard runbook with rollback conditions and no-return gates, designed but not executed."
         ]
       }
     },
@@ -26,7 +26,7 @@
         "assertions": [
           "Identifies that tenant_id sharding cannot split a single hot tenant, which is exactly why one shard became the hotspot.",
           "Proposes a composite/sub-key to split that tenant's data, or surfaces that a dedicated silo/cell may be the better answer, rather than just adding shards.",
-          "Designs the rebalance as dual-write/backfill → verify → cutover → route update, reversible per step and DESIGNED not executed against production."
+          "Designs the rebalance as dual-write/backfill → verify → cutover → route update, with rollback conditions and no-return gates per stage; does not execute against production."
         ]
       }
     },

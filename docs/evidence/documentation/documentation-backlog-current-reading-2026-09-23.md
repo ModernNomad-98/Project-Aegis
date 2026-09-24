@@ -1,5 +1,12 @@
 # Documentation backlog current-reading correction
 
+**Current reading (2026-09-24):** The 547-page inventory, 80–200-hour
+documentation estimate, 175–394-hour selected total, and future PR-comment
+wording below belong to this dated batch. Use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current counts
+and estimates.
+
 Date: 2026-09-23. Base: pull request (PR) #198 merge
 `24d613ebddd6ff4cd6ce35be772f6a80ad1a85f4`. The broader documentation
 item previously and currently carries an **80–200 active-hour** estimate;

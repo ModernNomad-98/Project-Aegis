@@ -1,5 +1,10 @@
 # Full-page documentation acceptance batch after pull request #208
 
+**Current reading:** PR #209 delivered this batch. Its future-tense PR
+comment and 555/30/525 inventory figures below are pre-merge expectations;
+the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+contains the current accepted and pending counts.
+
 This record is for Project Aegis maintainers tracking the repository-wide
 documentation readability backlog. The batch began at approximately 00:09
 Coordinated Universal Time (UTC) on 2026-09-24, from the exact merged pull

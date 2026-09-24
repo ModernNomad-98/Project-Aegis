@@ -1,5 +1,12 @@
 # Execution handoff readability batch — 2026-09-23
 
+**Current reading (2026-09-24):** The exact-head checks described below as
+pending were later completed. Read the
+[current execution handoff](../../roadmaps/aegis-efficient-execution-handoff-2026-09-23.md)
+and [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for present status. Its first-task and PR #139 wording is preserved as dated
+handoff context.
+
 ## Scope and forecast
 
 This bounded batch adds a current-reading entry point to the

@@ -1,5 +1,10 @@
 # Backlog forecast navigation batch — 2026-09-23
 
+**Current reading (2026-09-24):** The “#146 latest” route and 175–394-hour
+total below describe the original navigation snapshot. Use the
+[current forecast](../../roadmaps/aegis-backlog-forecast.md) for the active
+estimate; the hashes and timing below remain the batch's historical receipt.
+
 ## Scope and estimate
 
 This bounded documentation batch adds a current-reading route above the

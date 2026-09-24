@@ -1,9 +1,13 @@
 ---
 name: data-partitioning-sharding-strategist
-description: 'Design OLTP partitioning and sharding for WRITE/size scale in a multi-tenant SaaS — shard-key selection (tenant-as-shard-key and its hot-tenant limit), range/hash/list partitioning of large tables, resharding/rebalancing a hot tenant, and the cross-shard query/transaction costs you inherit — all gated behind the DON''T-SHARD-PREMATURELY rule: a single well-indexed primary plus read replicas serves a very large SaaS, so shard ONLY on evidence of a real write or size ceiling. Use when a primary has hit (or has a dated forecast to hit) a write/size ceiling that indexing and replicas cannot fix, when one hot tenant dominates a shared table, or when choosing a shard key/partitioning scheme. Do NOT use for per-store ISOLATION scoping (multi-tenant-data-architect), ANALYTICAL-estate partitioning (warehouse-lake-architect), or deciding WHAT leaves the OLTP store (operational-vs-analytical-splitter). Reshapes production data — DESIGNS the plan, does not run it.'
+description: 'Design OLTP partitioning and sharding for WRITE/size scale in a multi-tenant SaaS — shard-key selection (tenant-as-shard-key and its hot-tenant limit), range/hash/list partitioning of large tables, resharding/rebalancing a hot tenant, and the cross-shard query/transaction costs you inherit — all gated behind the DON''T-SHARD-PREMATURELY rule: a well-indexed primary plus read replicas can serve a large SaaS while measured write, size, and maintenance limits permit, so shard ONLY on evidence of a real write or size ceiling. Use when a primary has hit (or has a dated forecast to hit) a write/size ceiling that indexing and replicas cannot fix, when one hot tenant dominates a shared table, or when choosing a shard key/partitioning scheme. Do NOT use for per-store ISOLATION scoping (multi-tenant-data-architect), ANALYTICAL-estate partitioning (warehouse-lake-architect), or deciding WHAT leaves the OLTP store (operational-vs-analytical-splitter). Reshapes production data — DESIGNS the plan, does not run it.'
 ---
 
 # Data Partitioning & Sharding Strategist
+
+Terms: **OLTP** means online transaction processing; **TPS** means
+transactions per second; **ACID** means atomicity, consistency, isolation,
+and durability. **SaaS** means software as a service.
 
 ## Purpose
 
@@ -13,9 +17,10 @@ decision (with tenant-as-shard-key and its hot-tenant limit spelled out), a
 range/hash/list partitioning scheme per large table, the inherited cross-shard
 query/transaction cost, and a resharding/rebalancing runbook — all gated
 behind the discipline that governs the whole skill: **don't shard
-prematurely.** A single well-indexed primary plus read replicas serves a very
-large SaaS; sharding is a one-way door that multiplies operational complexity,
-so it is justified only by evidence of a real write or size ceiling, never by
+prematurely.** A well-indexed primary plus read replicas can serve a large
+SaaS when measured write load, size, and maintenance windows permit. Sharding
+multiplies operational complexity, so it is justified only by evidence of a
+real write or size ceiling, never by
 anticipation. This skill designs the reshape; it does not execute it against
 production.
 
@@ -64,10 +69,12 @@ production.
    indexing path, name exactly what to measure to revisit, and STOP. This gate
    is the skill's core, not a formality.
 2. **Exhaust the cheaper levers.** Indexing and partial indexes, read replicas
-   for read pressure, and declarative table PARTITIONING within one node
-   (range/hash/list partitions — a table-SIZE and maintenance lever) all come
+   for read pressure, and declarative table PARTITIONING within one node in
+   this design (range/hash/list partitions — a table-SIZE and maintenance
+   lever) all come
    before SHARDING (distribution across nodes). Distinguish the two explicitly:
-   partitioning splits a table on one node; sharding splits data across nodes.
+   for this design, in-node table partitioning splits a table within one
+   database node, while cross-node sharding distributes data across nodes.
 3. **Select the shard key.** `tenant_id` is the natural key for multi-tenant
    SaaS — it co-locates a tenant's data and keeps most queries single-shard.
    State its limit up front: a single hot tenant then cannot be split by
@@ -83,8 +90,9 @@ production.
    hit every shard has the wrong key — say so and revisit step 3.
 6. **Design the reshard/rebalance runbook.** Splitting or moving a hot tenant:
    dual-write or backfill → verify (per-key counts/checksums) → cut over →
-   update routing, each step reversible. This reshapes production data — this
-   skill DESIGNS the runbook; it does not run it.
+   update routing. Name the rollback condition and no-return gate for each
+   stage; do not promise that every completed stage is reversible. This
+   reshapes production data. This skill DESIGNS the runbook; it does not run it.
 
 ## Output Format
 
@@ -98,7 +106,7 @@ Shard key: <chosen key; tenant_id + its hot-tenant limit; cardinality/skew>
 Partitioning scheme per table: <table → range/hash/list → why, vs query pattern>
 Cross-shard cost: <joins / transactions / uniqueness / fan-out — each named>
 Reshard / rebalance runbook: <dual-write|backfill → verify → cut over → route;
-  reversible per step — DESIGNED, not executed>
+  rollback condition/no-return gate per stage — DESIGNED, not executed>
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
 
@@ -114,8 +122,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] The partitioning scheme is chosen per table against its query pattern.
 - [ ] Cross-shard joins, transactions, uniqueness, and fan-out costs are named,
       and common queries stay single-shard.
-- [ ] The reshard/rebalance plan is reversible per step and is designed, not
-      executed; production-data moves route through human approval.
+- [ ] The reshard/rebalance plan names rollback conditions and no-return gates
+      per stage and is designed, not executed; production-data moves route
+      through human approval.
 
 ## Gotchas
 
@@ -125,9 +134,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   partition. There is no free key — every scheme trades away some access pattern.
 - `tenant_id` sharding is defeated by one giant tenant: that tenant's data
   still lands on one shard. Plan the sub-key (or a cell/silo) before it happens.
-- Cross-shard transactions silently lose atomicity — code that assumed one
-  ACID commit now spans shards and can half-apply. This is a correctness bug,
-  not a performance one.
+- Without distributed transaction coordination, code that assumes one local
+  ACID commit across shards can half-apply. Treat that as a correctness risk,
+  not merely a performance cost.
 - Resharding is a migration project, not a config change; teams routinely
   underestimate it by an order of magnitude.
 - Global uniqueness (a unique email across all tenants) stops being free once

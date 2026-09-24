@@ -5,6 +5,9 @@ description: Facilitate a technical DESIGN REVIEW — prepare it (circulate the 
 
 # Design Review Facilitator
 
+Terms: **RFC** means request for comments; **PR** means pull request;
+**HiPPO** means highest-paid person's opinion.
+
 ## Purpose
 
 A design review fails in one of four familiar ways: the rubber stamp (no
@@ -57,11 +60,13 @@ group to one and hands the record to `adr-writer`.
 
 ## Workflow
 
-1. **Prepare the review.** Circulate the design ahead with a required
+1. **Prepare the review.** With explicit communication authority, circulate
+   the design ahead with a required
    pre-read; state the review's PURPOSE and the decision it must reach;
    invite the right people — including the skeptics and the cross-cutting
-   owners, not just allies. A review with no pre-read becomes a live
-   reading, and quality collapses.
+   owners, not just allies. Without that authority, prepare the pre-read and
+   invitation for the authorized human to send. A review with no pre-read
+   becomes a live reading, and quality collapses.
 2. **Frame the decision at the start.** Name what's being decided, the
    options, and the bar for approval. The room should know from minute one
    whether it's here to approve a direction, choose between options, or
