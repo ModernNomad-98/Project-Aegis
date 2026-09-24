@@ -5,6 +5,11 @@ description: Design the analytical data estate a multi-tenant SaaS reports and l
 
 # Warehouse Lake Architect
 
+**Reading key:** BI is business intelligence; ML is machine learning; PII is
+personally identifiable information; CDC is change data capture; SQL is
+Structured Query Language; SCD is slowly changing dimension; SLA is service
+level agreement.
+
 ## Purpose
 
 Analytical estates rot in two directions: the swamp (a lake of files
@@ -209,8 +214,9 @@ Not decided here: split verdicts (splitter), transport (streaming), provider map
   `pii-lifecycle-designer`; landing raw PII "temporarily" creates the
   erasure debt this design exists to prevent.
 - Asked to design a customer-facing cross-tenant benchmark mart (tenants
-  see each other's data in comparative form) → halt for explicit human
-  approval with the anonymization/aggregation floor stated; that is a
+  see each other's data in comparative form) → check for an applicable human
+  grant with the anonymization/aggregation floor stated; obtain approval if
+  that scope is missing. This is a
   product and privacy decision, not an architecture default.
 - Asked to also decide the cloud provider or map to specific managed
   services → decline that slice; hand to `cloud-architecture-decider` /

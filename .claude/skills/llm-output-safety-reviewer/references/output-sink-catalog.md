@@ -1,6 +1,6 @@
 # LLM output sink catalog
 
-Detail for `llm-output-safety-reviewer`. OWASP LLM05 (Improper Output
+Detail for [llm-output-safety-reviewer](../SKILL.md). OWASP LLM05 (Improper Output
 Handling), 2025. Model output is untrusted; each sink below re-asks "what if
 this is adversarial?".
 
@@ -11,8 +11,9 @@ XSS is cross-site scripting; URL is uniform resource locator; SQL is
 Structured Query Language; NoSQL refers to non-relational databases; ORM is
 object-relational mapper; OS is operating system; RCE is remote code
 execution; SSRF is server-side request forgery; VM is virtual machine; and
-CPU is central processing unit. NL means natural language. ASI05 is the
-agentic framework's unexpected-code-execution category, recorded with LLM05
+CPU is central processing unit. NL means natural language; `venv` means a
+Python virtual environment; CRLF means carriage-return/line-feed. ASI05 is
+the agentic framework's unexpected-code-execution category, recorded with LLM05
 in the [source mapping](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
 The [parent review workflow](../SKILL.md) owns the verdict and routing.
 
@@ -78,8 +79,9 @@ control:
 
 - **SSRF:** server-side fetch of a model-produced URL must use an allowlist and
   block private/link-local ranges and cloud metadata endpoints
-  (169.254.169.254 and equivalents). "Follow the link the model found" is the
-  classic hole.
+  (169.254.169.254 and equivalents). Validate all resolved A/AAAA addresses
+  and revalidate every redirect hop or disable redirects; account for DNS
+  rebinding. "Follow the link the model found" is the classic hole.
 - **Path traversal:** model-chosen filenames/paths resolved without
   canonicalization + base-dir check allow `../` escapes. Resolve and verify
   containment.
@@ -105,6 +107,7 @@ control:
 
 ## Severity gating
 
-Exploit-gated: a concrete flow from adversarial model output to XSS/RCE/SSRF/
-injection/data-exposure is HIGH; a theoretical "could be unsafe" without a
-reachable sink is lower. Name the flow in every finding.
+Rank potential consequence separately from confidence in the exploit path.
+A concrete flow from adversarial model output to XSS/RCE/SSRF/injection or
+data exposure supports high confidence. An unconfirmed reachable sink is a
+hypothesis requiring investigation; uncertainty alone does not cap impact.

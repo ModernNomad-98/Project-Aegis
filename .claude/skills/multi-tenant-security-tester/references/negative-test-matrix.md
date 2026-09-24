@@ -37,6 +37,8 @@ Seed deterministically and record ids:
 For each surface: read (by id), list, create, update, delete, export.
 Expected result for a forbidden actor: **deny** — 403 or 404 (per policy),
 empty result set, or job no-op — and **no data** in body/headers/errors.
+For forbidden writes and jobs, also verify persisted state and side effects
+did not change; a quiet response alone does not prove denial.
 
 ## Surface catalog (cover each or mark not-covered)
 

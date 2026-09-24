@@ -1,19 +1,22 @@
 # Vite Build Check Recipes
 
-Detail file for `vite-build-qa-engineer`. Loaded on demand.
+Detail file for [vite-build-qa-engineer](../SKILL.md). Loaded on demand.
+Use a matcher that returns only presence and file/location; do not echo a
+secret value or matching bundle excerpt into terminals or CI artifacts.
 
 ## Bundle-grep recipe
 
 Search classes, in order:
 
-1. **Known secret VALUES:** for each server-side secret available in the
-   build environment (from CI secret names / server env inventory), search
-   `dist/` for the literal value. This catches `define` leaks and accidental
+1. **Known secret VALUES:** only when the active grant permits access and a
+   value is already available in the authorized build environment, search
+   `dist/` for its literal value without printing it. Do not acquire real
+   credentials solely for this check. This catches `define` leaks and accidental
    imports the prefix audit misses.
 2. **Patterns:** `sk_live_`, `sk_test_`, `-----BEGIN`, `AIza[0-9A-Za-z_-]{35}`,
    `eyJ[A-Za-z0-9_-]+\.eyJ` (JWTs), `postgres(ql)?://`, `AKIA[0-9A-Z]{16}`,
    generic `[A-Za-z0-9_]*(SECRET|PRIVATE|PASSWORD)[A-Za-z0-9_]*\s*[:=]`.
-3. **Each inventoried VITE_ value:** confirm what actually shipped and where.
+3. **Each inventoried configured exposed-prefix value:** confirm what actually shipped and where.
 
 File classes: `dist/**/*.{js,mjs,css,html,json,map}` — sourcemaps included;
 a secret only in the map is still shipped.

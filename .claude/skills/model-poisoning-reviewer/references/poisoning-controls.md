@@ -62,8 +62,9 @@ The high rows are the primary poisoning surface; controls scale with risk.
 
 ## Provenance & curation (backbone)
 
-- Every training/ingested item traces to a trusted source with an audit trail.
-- Data you can't trace can't be trusted to train on — quarantine or exclude.
+- Every training/ingested item has known provenance, a trust classification,
+  and an audit trail. Public or tenant content may remain untrusted input.
+- Data you cannot trace or classify is quarantined or excluded from training.
 - Curation gate: human/automated review before a dataset version is used;
   version datasets like code.
 

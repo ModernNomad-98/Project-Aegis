@@ -5,6 +5,10 @@ description: Design the metering → pricing → rollup → reconciliation DATA 
 
 # Usage Metering & Cost Attribution Pipeline Designer
 
+**Reading key:** API is application programming interface; AI is artificial
+intelligence; ETL is extract, transform, load; PII is personally identifiable
+information.
+
 ## Purpose
 
 Billing-grade numbers are an engineering problem before they are a finance
@@ -79,8 +83,11 @@ ETL/schema design) barely touch.
    metered unit: `tenant_id`, optional `user_id`/`feature`, `metric`,
    `quantity`, `occurred_at`, `source`, and a unique `event_id`. The
    discipline: METADATA ONLY — never message bodies, file contents, prompt/
-   response text, or PII. The event records THAT usage happened and how much,
-   not what was in it. State the retention and that events are immutable.
+   response text, or raw personal data. User-linked identifiers can still be
+   personal data: minimize or pseudonymize them, restrict access and retention,
+   and never treat metadata as automatically PII-free. The event records THAT
+   usage happened and how much, not what was in it. State retention and that
+   events are immutable.
 2. **Model rate cards with time boundaries.** A rate card maps
    metric → price, and every card carries an effective `[valid_from,
    valid_to)` window. Rating an event uses the card in effect at the event's
@@ -106,8 +113,10 @@ ETL/schema design) barely touch.
    `ai-cost-guardrail-designer`'s job; this pipeline provides the metered
    signal it acts on.
 6. **Design the reconciliation loop — the trust anchor.** Periodically
-   compare metered totals against the provider/source-of-truth invoice per
-   metric and tenant, compute drift, and define the tolerance beyond which
+   compare aggregate metered totals against the provider/source-of-truth
+   invoice at the granularity it actually supplies. Separately validate the
+   documented allocation of that total across metrics and tenants; compute
+   drift and define the tolerance beyond which
    the pipeline is considered broken and investigated. Metering nobody
    reconciles is a number nobody should bill on. Define what a discrepancy
    triggers (recompute, rate-card audit, missing-event hunt).
@@ -124,7 +133,8 @@ ETL/schema design) barely touch.
 
 ```
 USAGE METERING & COST PIPELINE — <system/domain>
-Usage-event table: <fields; METADATA ONLY (no content/PII); immutable; retention>
+Usage-event table: <fields; no payload or direct personal data; minimized
+  user-linked identifiers with access/retention controls; immutable>
 Rate cards:     <metric → price; [valid_from, valid_to); rate at occurred_at,
   not current; versioned, past cards immutable>
 Cost entries:   <exact/estimated/allocated labeled; idempotency key =
@@ -133,7 +143,8 @@ Rollups:        <daily/tenant/metric SUM of entries; additive; reconstructable
   projection, not source of truth; analytical placement → operational-vs-analytical-splitter>
 Budgets/alerts/forecast: <thresholds vs rollups; alert-before-gone + owners;
   forecast>; ENFORCEMENT (throttle/kill, esp. AI) → ai-cost-guardrail-designer
-Reconciliation: <metered totals vs provider invoice per metric/tenant; drift +
+Reconciliation: <aggregate totals vs invoice at available granularity;
+                 tenant allocation validation; drift +
   tolerance; discrepancy → recompute/audit/missing-event hunt>
 Late/corrections: <late events + refunds/voids as additive adjustments;
   period close/lock; post-close → next period>
@@ -144,8 +155,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
-- [ ] Usage events carry metadata only — no message/file content, prompt
-      text, or PII; events are immutable and retained.
+- [ ] Usage events carry no message/file content, prompt text or direct
+      personal data; user-linked identifiers are minimized and protected;
+      events are immutable with defined retention.
 - [ ] Rate cards are time-bounded and events are rated at their `occurred_at`
       card version; a price change never re-rates history.
 - [ ] Every cost entry carries an idempotency key; re-running the rater or

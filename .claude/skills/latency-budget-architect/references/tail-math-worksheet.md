@@ -4,6 +4,10 @@ Composition math, overhead rows, cascade checks, and the review
 template. The arithmetic here is the skill's spine — budgets that skip
 it are fiction.
 
+This is detail for the [latency-budget-architect](../SKILL.md). `p95` and
+`p99` are 95th- and 99th-percentile latencies; `N` is branch count; TLS is
+Transport Layer Security; PR is pull request; `ε` is explicit safety margin.
+
 ## Composition rules
 
 | Shape | End-to-end latency | Budgeting consequence |
@@ -50,10 +54,13 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 ## Timeout-cascade worksheet
 
+
 ```
 Per hop: timeout(hop) = budget(hop) + tolerance (state tolerance, e.g. +20%)
 Cascade check, leaf → root:
-  timeout(upstream) ≥ Σ [ timeout(downstream_i) × (1 + retries_i) ] + upstream work + ε
+  timeout(upstream) ≥ critical-path downstream time + upstream work + ε
+  critical path = sum of serial segments; max of parallel branch durations
+  at each join; include allowed retries and backoff at their owning layer
 Violations to hunt:
   - 30s defaults inside sub-second paths (bug by inheritance)
   - upstream < downstream×retries (abandons work that completes — waste + failure)

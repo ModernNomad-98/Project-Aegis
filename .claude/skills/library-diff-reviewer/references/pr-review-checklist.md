@@ -1,8 +1,10 @@
 # Library diff review — per-area criteria and procedures
 
-Companion to [../SKILL.md](../SKILL.md). Everything here operates at the PR
+Companion to [../SKILL.md](../SKILL.md). Everything here operates at the pull request (PR)
 level; single-skill judgment lives in `skill-quality-reviewer` and is
 composed, never restated.
+PR means pull request; CI means continuous integration; SHA identifies a
+specific Git commit. Post-merge instructions below assume squash merging.
 
 ## Area 1 — registration consistency: pass criteria
 

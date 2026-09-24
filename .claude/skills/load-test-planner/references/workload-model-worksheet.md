@@ -1,7 +1,10 @@
 # Workload Model Worksheet
 
-Templates and tables backing the plan. Driver-agnostic: express in
+Templates and tables backing the [load-test-planner](../SKILL.md) plan. Driver-agnostic: express in
 whatever load tool the team operates; the model is the contract.
+APM means application performance monitoring; `p95` and `p99` are the 95th
+and 99th latency percentiles. `3P` means third party; coordinated omission
+means a load generator fails to count delays while it is blocked.
 
 ## Workload-model worksheet
 
@@ -46,7 +49,7 @@ NOISY-NEIGHBOR — <system>
 Baseline: full tenant mix at observed rates
 Burst:    <tenant class> ramps to <worst observed behavior: import storm /
           export batch / API burst> over <ramp>
-PASS =    all OTHER tenants' p95 ≤ <cited bound> AND error rate ≤ <floor>
+PASS =    all OTHER tenants' p95 ≤ <cited bound> AND error rate ≤ <maximum>
           throughout burst + recovery within <t> after burst ends
 Instrument note: per-tenant series required (performance-test-harness)
 Absence rule: a multi-tenant system's plan without this scenario justifies
@@ -83,6 +86,6 @@ Coordinated omission: driver must account by arrival-time accounting —
 - [ ] Target environment named; isolation from real users stated
 - [ ] Third parties: stub-shaped | sandbox | rate-agreed (in writing)
 - [ ] Blast radius: worst case if the test misbehaves
-- [ ] Production / live-3P touches: explicit human approval recorded
+- [ ] Production / live-3P touches: applicable human grant and scope recorded
       BEFORE scheduling (the plan never self-authorizes)
 - [ ] Abort criteria + safe stop rehearsed with the operator

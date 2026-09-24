@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Builds the reconciliation loop as the trust anchor: metered totals vs the source-of-truth invoice per metric and tenant, with drift computed and a tolerance beyond which the pipeline is treated as broken.",
+          "Builds the reconciliation loop as the trust anchor: aggregate metered totals vs the source-of-truth invoice at available granularity, with separate tenant allocation validation, drift and a failure tolerance.",
           "Enumerates likely drift causes to hunt: dropped/duplicated events (missing idempotency), rate-card time-boundary errors re-rating history, and un-attributed usage.",
           "Adds late/out-of-order event handling and a period close/lock so late items don't silently mutate a finalized invoice.",
           "Does not present unreconciled metering as billing-grade."

@@ -1,15 +1,19 @@
 ---
 name: vite-build-qa-engineer
-description: MANUAL-ONLY; never auto-invoke. QA the Vite build itself — run the production build and PROVE no secret reached the client bundle (audit VITE_-prefixed env vars, grep dist output for secret values and patterns, check define/import.meta.env usage), verify build vs preview vs dev behavior parity (mode/env-file resolution, base path, asset and dynamic-import URLs), inspect bundle output (size budgets, unexpected inclusions, sourcemap policy for production), and validate preview serving of the built artifact including SPA fallback routing. Use when asked to verify a Vite build before deploy, audit VITE_ env vars or bundle contents for secret exposure, debug works-in-dev-but-not-in-build issues, or gate builds in CI with output checks. RUNS builds and preview servers. Do NOT use for moving secrets server-side and rotating leaked credentials (secrets-identity-hardener), unit/component testing (vitest-unit-component-engineer), E2E journeys (playwright-e2e-engineer), or CI pipeline design (qa-automation-architect).
+description: MANUAL-ONLY; never auto-invoke. QA the Vite build itself — run the production build and check the client bundle for known secret exposure by named, redacted checks (audit configured env prefixes, inspect dist output without printing secret values, check define/import.meta.env usage), verify build/preview parity, output size and sourcemap policy, assets and SPA fallback routing. Use when asked to verify a Vite build before deploy, audit exposed env vars or bundle contents for secret exposure, debug works-in-dev-but-not-in-build issues, or gate builds in CI with output checks. RUNS builds and preview servers. Do NOT use for moving secrets server-side and rotating leaked credentials (secrets-identity-hardener), unit/component testing (vitest-unit-component-engineer), E2E journeys (playwright-e2e-engineer), or CI pipeline design (qa-automation-architect).
 disable-model-invocation: true
 ---
 
 # Vite Build QA Engineer
 
+**Reading key:** QA is quality assurance; SPA is single-page application;
+MPA is multi-page application; env means environment; CI is continuous
+integration; E2E is end-to-end.
+
 ## Purpose
 
-Verify the artifact that actually ships: run the production build, prove the
-client bundle contains no secrets, confirm the built app behaves like the
+Verify the artifact that actually ships: run the production build, check the
+client bundle for known secret exposure by named methods, confirm it behaves like the
 dev app (modes, env files, base path, assets, routing), and inspect the
 output against size and sourcemap policy. Dev-mode green tells you nothing
 about the bundle — this skill tests the build product itself and reports
@@ -39,8 +43,8 @@ with real command output.
 1. Vite config(s): `vite.config.*` — `envPrefix`, `define`, `base`, build
    options, plugins that inject values, sourcemap settings.
 2. Env files and their mode mapping: `.env`, `.env.production`,
-   `.env.staging`, `.env.*.local` — every `VITE_`-prefixed variable is
-   PUBLIC by design; list them all.
+   `.env.staging`, `.env.*.local` — `VITE_` is exposed by default; inspect
+   configured `envPrefix` for all exposed names and list them.
 3. Where env values enter code: `import.meta.env.*` usage, `define`
    replacements, runtime config endpoints.
 4. Deployment intent: target base path/subdirectory, SPA vs MPA routing,
@@ -50,20 +54,21 @@ with real command output.
 
 ## Workflow
 
-1. **Inventory the env surface.** List every `VITE_`-prefixed variable per
+1. **Inventory the env surface.** List every configured exposed-prefix variable per
    mode and classify: safe-public (API base URLs, feature flags) vs
    secret-shaped (keys, tokens, connection strings, anything named
-   *_SECRET/*_KEY with a private value). Secret-shaped `VITE_` vars are
+   *_SECRET/*_KEY with a private value). Secret-shaped exposed vars are
    findings BEFORE the build even runs. Check `define` and plugin injection
    too — the prefix is not the only leak path.
 2. **Run the real production build** with the mode(s) CI/deploy actually
    uses; record the exact command and output (warnings included — chunk
    size warnings, mixed-import warnings are findings to triage, not noise).
-3. **Prove bundle cleanliness:** search `dist/` (JS, CSS, HTML, sourcemaps)
+3. **Check bundle cleanliness:** search `dist/` (JS, CSS, HTML, sourcemaps)
    for (a) the VALUES of known server-side secrets from the environment, (b)
-   secret-shaped patterns, (c) each inventoried `VITE_` value to confirm
-   what shipped. Absence is claimed only for what was actually searched —
-   state the method. Recipes in
+   secret-shaped patterns, (c) each inventoried exposed value to confirm
+   what shipped. Do not print secret values or matching bundle excerpts;
+   report file/location and a redacted fingerprint. Absence is claimed only
+   for what was actually searched — state the method. Recipes in
    [references/vite-build-checks.md](references/vite-build-checks.md).
 4. **Verify build/preview parity:** serve with `vite preview` (or the real
    host emulation), walk the critical routes — direct-URL deep links (SPA
@@ -83,14 +88,14 @@ with real command output.
 
 ```
 VITE BUILD QA — <app> @ <commit/build>
-Env inventory: <VITE_ vars per mode → safe-public | SECRET-SHAPED (finding)>
+Env inventory: <configured exposed-prefix vars per mode → safe-public | SECRET-SHAPED (finding)>
 Injection paths checked: <import.meta.env / define / plugins>
 Build: <exact command + mode> → <result, warnings triaged>
 Bundle cleanliness: <what was searched (values/patterns/files) → findings
                     or "none found by this method">
 Parity checks: <route/asset/deep-link/mode results under preview + base>
 Output inspection: <sizes vs budget, unexpected inclusions, sourcemap policy>
-Findings: <severity-ranked, each with evidence (file in dist, matched value)>
+Findings: <severity-ranked, each with file/location and redacted fingerprint; no secret bytes>
 CI checks wired: <scripts + placement, or handoff to automation blueprint>
 Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
           app bugs → systematic-debugger>
@@ -98,7 +103,8 @@ Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
 
 ## Validation Checklist
 
-- [ ] Every `VITE_` var per mode inventoried and classified; `define`/plugin
+- [ ] Every variable under the configured exposed prefixes inventoried and
+      classified per mode; `define`/plugin
       injection paths checked too.
 - [ ] Build run with the REAL deploy mode; command + output recorded.
 - [ ] Bundle search covered values AND patterns, across JS/CSS/HTML/maps;
@@ -112,8 +118,9 @@ Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
 
 ## Security Rules
 
-- Any `VITE_`-prefixed variable is public the moment it's built — treat
-  secret-shaped ones as exposures even if "only staging".
+- Values exposed through configured `envPrefix`, `define` or plugins may
+  ship in the client artifact; treat secret-shaped values as exposures even
+  if "only staging" and verify the actual artifact.
 - A leaked secret found in `dist/` means the value is COMPROMISED wherever
   that artifact went — removal alone is not remediation; rotation is
   (`secrets-identity-hardener` owns it).

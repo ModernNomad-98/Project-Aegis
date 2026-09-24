@@ -104,7 +104,8 @@ that makes the target achievable by design rather than by hope.
    (plus a stated tolerance), because a timeout longer than the
    budget means the caller has already failed the end-to-end promise
    while still waiting. Cascade correctly: an upstream timeout must
-   exceed the sum of its downstream's timeout × retries, or the
+   exceed the longest critical path through downstream calls, including
+   serial segments, parallel branch maximums, retries and backoff, or the
    upstream gives up while the downstream still works. The 30-second
    default is a bug in a 300ms path.
 6. **Derive retry policy from what the budget affords.** Retries

@@ -12,7 +12,7 @@ operations to plan and verify, not instructions to run from this reference.
 | --- | --- | --- | --- |
 | Isolation enforcement | Code/policy-enforced every query | Connection/search-path routing | Connection routing |
 | Migration cost | One migration | × tenant count | × tenant count |
-| Noisy neighbor | Shared everything; needs quotas | Shared instance resources | Isolated per DB |
+| Noisy neighbor | Shared everything; needs quotas | Shared instance resources | Depends on physical compute and I/O isolation; separate DB alone may still share resources |
 | Cost floor per tenant | ~zero | Low | Instance/DB minimum |
 | Tenant purge | DELETE + verify everywhere | DROP SCHEMA | DROP DATABASE |
 | Fits | Many small tenants | Mid-count, moderate isolation optics | Few large/regulated tenants |
@@ -41,15 +41,19 @@ hatches in the design.
 1. **Expand** — add nullable tenant key columns; no behavior change. Rollback:
    drop columns.
 2. **Backfill** — derive tenant ownership; write keys in batches. Rollback:
-   re-run or null out; no reads depend on it yet.
+   keep the old read path active and stop the backfill; do not promise to
+   undo writes by re-running it. Correct or quarantine bad assignments with
+   a separately verified plan before switching reads.
 3. **Verify** — per-tenant row counts vs expected ownership; spot checksums on
    the ambiguous tables; unresolved rows go to a quarantine report, not a
    default tenant.
 4. **Enforce** — scoped reads/writes behind a flag; dual-read comparison in
    shadow mode first. Rollback: flip the flag.
-5. **Contract** — make keys NOT NULL, drop legacy unscoped paths. Only after
-   enforcement has soaked. Rollback: restore the old path from the previous
-   step, which is why it isn't deleted until now.
+5. **Contract** — make keys NOT NULL only after enforcement has soaked;
+   retain the old path through the rollback window. Drop it in a later
+   irreversible cleanup after evidence and approval. Rollback before that
+   cleanup: redeploy the retained path and flip the flag; a dropped path
+   cannot be restored by a flag alone.
 
 The verification gate (step 3) is the difference between a migration and a
 mass mis-assignment of customer data.
