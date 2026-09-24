@@ -17,9 +17,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #202](#checkpoint-after-pull-request-202--2026-09-23)
+The latest [five-merge checkpoint after pull request #212](#checkpoint-after-pull-request-212--2026-09-24)
 reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-202).
+forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-212).
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -1205,3 +1205,39 @@ began after the #207 merge at approximately **23:57 UTC** in an isolated
 worktree at that exact merge. The eventual forecast pull request will record
 its final first-work-to-merge wall interval; active-only effort remains
 separate and uninstrumented.
+
+## Checkpoint after pull request #212 — 2026-09-24
+
+Five requests merged after #207 in order #208, #209, #210, #211 and #212.
+The exact #212 merge is `ba24016d209be6e49171be52332887558db16ab2`.
+Times below are first-work-to-merge wall intervals recorded with those PRs;
+they include review and GitHub waiting and are not active-work measurements.
+
+| Pull request and bounded package | Merge commit | Original ETA | Observed wall time |
+| --- | --- | ---: | ---: |
+| [#208 — preceding forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/208) | `754fc7a02f85c1f05dc32b4bbd70c1b616979b50` | 1–2 active hours | About 11m27s |
+| [#209 — 21-page acceptance batch](https://github.com/ModernNomad-98/Project-Aegis/pull/209) | `f1bfaece5b68551f75e910470becd17ed61ccb7e` | 3–6 active hours | About 19m31s |
+| [#210 — 20-page acceptance batch](https://github.com/ModernNomad-98/Project-Aegis/pull/210) | `80fbdbb4b6319dc1e7cafc9a57235a77360f9763` | 3–6 active hours | About 25m24s |
+| [#211 — retry correction](https://github.com/ModernNomad-98/Project-Aegis/pull/211) | `2efae405d555815383abc1d9f713f3e4549eef84` | 1–2 active hours | About 10m29s |
+| [#212 — 20-page acceptance batch](https://github.com/ModernNomad-98/Project-Aegis/pull/212) | `ba24016d209be6e49171be52332887558db16ab2` | 3–6 active hours | About 16m10s |
+
+All exact-head Linux, Windows and protected-file checks passed. The #212
+[exact-main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35942609209)
+passed at the merge commit. The exact tree has **558 tracked Markdown pages**,
+of which **71 existing pages** have recorded full-page acceptance and **487**
+remain. The [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-212)
+revisits all 14 selected and seven optional rows. Non-documentation remains
+**95–194 active hours** because its implementation and authority gates did not
+close. Documentation changes **55–200 → 50–175**, selected work **150–394 →
+145–369**, and selected work plus both optional issue #101 helpers **166–434
+→ 161–409 active hours**. The full all-options backlog remains unbounded.
+PR #139 and #197 guard dispositions and the separate Behavioral Eval Runner
+offline holdout implementation grant remain pending.
+
+### Preparation and editing time for this checkpoint
+
+The forecast-checkpoint item previously and currently estimates **1–2 active
+hours**. Preparation began approximately **01:27 UTC** after verification of
+the exact #212 main run. Active-only effort, review time and GitHub wait are
+not separately instrumented; the checkpoint PR records the final observed
+first-work-to-merge wall interval beside its original estimate.
