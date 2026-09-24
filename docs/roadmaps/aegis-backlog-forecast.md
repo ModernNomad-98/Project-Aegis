@@ -3,13 +3,12 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [documentation-batch estimate after #226](#documentation-batch-estimate--2026-09-24-after-pull-request-226)
-provisionally puts selected remaining work at **130–324 active hours**,
-including **35–130 active hours** for repository-wide documentation
-readability. The last complete [five-merge checkpoint after #222](#five-merge-checkpoint--2026-09-24-after-pull-request-222)
-reassessed every selected and optional row. Later work should be checked against
+to start blocked work. The [five-merge checkpoint after #227](#five-merge-checkpoint--2026-09-24-after-pull-request-227)
+puts selected remaining work at **130–324 active hours**, including
+**35–130 active hours** for repository-wide documentation readability and
+reassesses every selected and optional row. Later work should be checked against
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#documentation-batch-after-pull-request-226--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-227--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -1737,6 +1736,81 @@ other optional rows and the unbounded all-options status are unchanged.
 This checkpoint merge #223 is the first completed merge after #222; the
 next full per-item checkpoint follows four more merges unless a material
 decision changes scope sooner.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #227
+
+Five requests merged after #222, in order #223, #224, #225, #226 and #227.
+The exact base is the #227 merge
+`88cc83fc547495b4f4d10eb5af76a4879c05af15`. The
+[measurement checkpoint](aegis-execution-metrics.md#checkpoint-after-pull-request-227--2026-09-24)
+records original estimates beside observed available wall intervals. All five
+exact-head Linux, Windows and protected-file checks passed. All five
+exact-main runs passed, including [#227](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35959689686).
+Active labor, review and queue time were not
+separately instrumented.
+
+| Merged request and scope | Merge commit | Original package ETA | Observed available wall interval |
+| --- | --- | ---: | ---: |
+| [#223](https://github.com/ModernNomad-98/Project-Aegis/pull/223): previous five-merge checkpoint | `6ccf20a8d5cbcd355d27b4ebf38980d6724959ba` | 1–2 active hours | About 9m27s first work to merge |
+| [#224](https://github.com/ModernNomad-98/Project-Aegis/pull/224): 20-page acceptance batch | `cf19639335158ffa09c02247d5d7b400f14fb522` | 3–6 active hours | About 19m15s first work to merge |
+| [#225](https://github.com/ModernNomad-98/Project-Aegis/pull/225): 20-page acceptance batch | `bc9e48b070fe99085757ce1d9cb0b791640e0d42` | 3–6 active hours | About 20m20s first work to merge |
+| [#226](https://github.com/ModernNomad-98/Project-Aegis/pull/226): 20-page acceptance batch | `777f439327f6d9e3e602f1b42f25cd8a2cb7e7ac` | 3–6 active hours | 16m44s prior merge to this merge; first-work start unavailable |
+| [#227](https://github.com/ModernNomad-98/Project-Aegis/pull/227): 20-page acceptance batch | `88cc83fc547495b4f4d10eb5af76a4879c05af15` | 3–6 active hours | 17m54s prior merge to this merge; first-work start unavailable |
+
+The exact merge tree has **570 tracked Markdown pages**. Four distinct
+20-page documentation batches accepted **80 existing pages** after the
+previous checkpoint's 231, yielding **311 accepted** and **259 pending**.
+Four new dated review notes entered the inventory. Disjoint pending buckets
+are **138 skill, 48 previously corrected primary, 11 dated note/tracking,
+18 other reader and 44 synthetic fixture pages**. Earlier focused screens
+remain progress, not full-page acceptance; hash-pinned Scenario A fixtures
+remain unchanged and pending.
+
+The unchanged residual model assigns 4–12 minutes per skill page, 8–25
+per corrected primary page, 3–10 per dated note and 20–60 per other
+reader page; fixtures add 1–3 hours, corrections 8–20, integration 4–8,
+and the upper tail 0–30. Exact bucket arithmetic is
+`138×4/60 + 48×8/60 + 11×3/60 + 18×20/60 + 1 + 8 + 4` = **35.15**
+at the lower end, and
+`138×12/60 + 48×25/60 + 11×10/60 + 18×60/60 + 3 + 20 + 8 + 30`
+= **128.4333 active hours** at the upper end. Outward five-hour planning
+bounds are **35–130 documentation hours**. The four batches evidence page
+acceptance; they do not measure active-work rate or justify changing the
+per-page assumptions. No non-documentation package or owner gate closed.
+
+| Selected open work item | Previous #222 remaining active hours | Revised remaining active hours | Remaining gate after #227 |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Owner semantic and label review of private replacement inputs |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | PR #139 guard disposition; real-host enforcement later |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Separate exact offline holdout executor grant and implementation |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Reviewed inputs, source, allowance, development result and holdout freeze |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured isolation |
+| Work package 2B-4 | 12–24 | 12–24 | Calibration and host proof before limited live suite |
+| Work package 2B-5 | 8–16 | 8–16 | Package 2B-4 gate before generic corpus |
+| Work package 2B-6 | 8–16 | 8–16 | Later scheduling, cost, quarantine and dataset operations |
+| Work package 2B-7 | 4–8 | 4–8 | Later advisory continuous integration and operator workflow |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof |
+| Control-plane work package 004 | 8–16 | 8–16 | Delivery target and package-003 prerequisites |
+| Issue #101 package 4 | 8–16 | 8–16 | Pinned host, cases, budget, execution authority and comparison |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation after selected integration outcomes |
+| Repository-wide documentation readability | 40–145 | **35–130** | 259 pages lack full-page acceptance; timed stratified review remains |
+| **Selected remaining total** | **135–339** | **130–324** | Non-documentation **95–194** plus documentation **35–130** |
+
+The seven optional rows were rechecked separately. Issue #101 package 5
+remains **8–20** active hours if selected; package 6 remains **8–20**
+and needs provider authority. Behavioral Eval Runner item 010 remains
+**4–12**, item 014 **8–20 per selected host**, and item 015 **8–24
+per selected product**. Strategic skill expansion and framework coverage
+remain unbounded until a candidate batch is selected; multi-judge
+arbitration and future control-plane architecture remain unbounded
+pending adoption decisions. Both optional issue #101 helpers together
+would add **16–40**, making selected-plus-both **146–364 active hours**.
+The full all-options backlog has no finite total. PR #139 and #197 remain
+open with failed protected-file guards, requiring separate owner
+dispositions. The separate Behavioral Eval Runner holdout-executor
+implementation grant remains pending; live/provider execution has further
+gates. Restart the five-merge counter after #227 and revise sooner if a
+verified scope or owner decision materially changes remaining work.
 
 ## Five-merge checkpoint — 2026-09-24, after pull request #222
 
