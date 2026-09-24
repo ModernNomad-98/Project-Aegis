@@ -18,6 +18,11 @@ function Expect-Error($operation, $message) {
 try {
     $fresh = Read-AegisSelection $project $state
     Assert-Selection ($fresh.Status -eq 'unselected') 'missing record is unselected'
+    $specialProject = Join-Path $sandbox 'checkout $literal with space'
+    [IO.Directory]::CreateDirectory($specialProject) | Out-Null
+    $resolvedProject = (Resolve-Path -LiteralPath $specialProject).ProviderPath
+    $cliStatus = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'selection.ps1') -Action status -ProjectRoot $resolvedProject
+    Assert-Selection ($LASTEXITCODE -eq 0 -and (ConvertFrom-Json -InputObject ($cliStatus -join "`n")).Status -eq 'unselected') 'resolved path variable preserves dollar sign and space in CLI'
     $first = Save-AegisOnlySelection $project $state
     Assert-Selection ($first.Status -eq 'selected' -and $first.Record.choice -eq 'aegis-only') 'fresh selection'
     Assert-Selection ($first.Record.setup_completed_at_utc -eq $first.Record.selected_at_utc) 'completion timestamp'
