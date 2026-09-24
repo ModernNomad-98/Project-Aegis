@@ -1,5 +1,11 @@
 # Fourth 20 skill documents: bounded readability correction — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base commit, estimates, counts,
+and pending-review language describe that historical batch. For current
+acceptance totals and remaining work, use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md); follow the linked owning skill or reference for current guidance. This note does not grant implementation or merge authority.
+
 ## Scope and timing
 
 A read-only sweep of the 20 skill guides after `data-quality-monitor-designer`

@@ -82,19 +82,26 @@ the operation and obtain it before proceeding.
 4. **Classify every failure** into exactly one:
    - `PR-caused` — fails on work, passes on baseline → yours; fix before
      commit.
-   - `pre-existing-on-main` — fails on baseline too → NOT yours to absorb
-     silently; report it (and do not "fix" it inside this PR — that is
-     scope drift; route it to its own task).
+   - `pre-existing-on-main` — the same failure signature appears on the
+     baseline and work, without a new or worsened work-specific failure;
+     report it and route the baseline repair to its own task.
    - `CI-infrastructure` — env/runner/network/tooling cause, not product
      code (rate limits, missing local service); state the evidence.
    - `cannot-determine-locally` — no faithful local equivalent; named as a
      residual risk the PR carries to real CI.
+   Compare failure signatures, not just red/green status. If both trees fail
+   but work adds or worsens a failure, classify the work-specific failure as
+   `PR-caused` when evidence supports causation. If causation is unresolved,
+   block the commit until the changed signature is isolated; do not use a
+   non-blocking `cannot-determine-locally` label for an observed regression.
    A timeout is an infrastructure-class signal first — distinguish
    timed-out from failed-assertions before classifying (and never raise a
    timeout just to convert red to green).
 5. **Gate the commit:** proceed when every PR-triggered check is green
    locally or classified non-blocking (pre-existing / infra /
-   cannot-determine, each with evidence). A PR-caused failure blocks.
+   cannot-determine, each with evidence). A PR-caused failure or unresolved
+   work-specific regression blocks. `cannot-determine-locally` is
+   non-blocking only for checks without a faithful local equivalent.
 6. **Docs-only lightweight path (explicit, not silent):** when the diff
    matches the repo's docs-only definition (compose
    `risk-tiered-validation-selector`; workflow path-filters often encode
