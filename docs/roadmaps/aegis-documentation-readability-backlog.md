@@ -2,7 +2,8 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #257 on 2026-09-24, this remains the active
+As of the VirtualBox setup proposal after merged pull request (PR) #259 on
+2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,7 +11,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The current merged tree contains **587 tracked Markdown files**: **543
+The proposed tree contains **588 tracked Markdown files**: **544
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The protected
 `scripts/tests/fixtures/README.md` and its new
@@ -24,8 +25,9 @@ reviewed BER-BKL-009 scope proposal and reaccepted the corrected candidate
 summary. PRs #254 and #255 changed existing governance and tracking pages;
 the [five-merge checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-255)
 reconciles their status. PR #257 added the reviewed operator runbook and
-integration evidence record; both passed full-page review. **Zero known pages**
-remain in the bounded sweep.
+integration evidence record; both passed full-page review. The new
+[VirtualBox Stage A setup proposal](ber-virtualbox-stage-a-setup-proposal.md)
+adds one reviewed reader page. **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the

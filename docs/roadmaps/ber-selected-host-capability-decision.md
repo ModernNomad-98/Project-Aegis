@@ -15,9 +15,10 @@ an entry in the runner decision log. Stage A is the proposed offline host
 probe without model or provider calls.
 
 > **Current reading, checked 2026-09-24:** The owner selected a **new disposable
-> Linux virtual machine under their control** as the Stage A candidate. No
-> machine identity, configuration, provisioning approval or selected-host proof
-> is recorded.
+> Linux virtual machine under their control** as the Stage A candidate and
+> chose VirtualBox for its setup plan. No machine identity, installation,
+> provisioning approval or selected-host proof is recorded. See the
+> [VirtualBox setup proposal](ber-virtualbox-stage-a-setup-proposal.md).
 > This page remains a proposal; even its offline Stage A probe needs a separate
 > grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
 > for current work-package and evidence-gate status.
@@ -57,7 +58,8 @@ machine as the candidate; none has been identified or provisioned.
 | Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | Host availability, identity, isolation, permissions, secret custody and probe authority are unknown; generic Linux CI has run but selected-host proof remains absent |
 
 **Chosen candidate direction:** a new disposable Linux virtual machine under
-the owner's control. Its identity, configuration, provisioning and probe
+the owner's control, with VirtualBox as the planned platform. Its identity,
+configuration, provisioning and probe
 authority remain pending. This is a path to testing the implemented mechanisms,
 not a claim that Linux already meets R4/R5. Do not substitute an arbitrary CI
 runner for the selected deployment host.
@@ -184,7 +186,7 @@ separate model-driven Stage B authorization and proof.
 
 1. The owner selected a new disposable Linux virtual machine under their
    control as the Stage A candidate in the Project Aegis conversation on
-   2026-09-24. Specify its virtualization platform, OS/version, account,
+   2026-09-24 and chose VirtualBox for the setup plan. Specify its OS/version, account,
    isolation boundary, permitted scratch root and allowed tools; separately
    authorize any provisioning or access credential. This choice alone grants
    no host operation.

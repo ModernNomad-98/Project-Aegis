@@ -7,7 +7,8 @@ to start blocked work. The [five-merge checkpoint after #255](#five-merge-checkp
 reassesses every selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
-two more. The merged tree has **587 pages**: 543 accepted readers and 44
+two more. This proposal adds one reviewed setup page, making **588 pages**:
+544 accepted readers and 44
 classified fixtures, with zero known pending pages. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24 approval of the
 [bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
@@ -16,8 +17,8 @@ supersedes the old 8–16-hour whole-item estimate and therefore the old
 87–178-hour selected total. The current selected work has **79–162 active
 hours for the other eleven items, plus unestimated BER-BKL-009 host, runtime,
 privacy and cleanup work**. The offline package is delivered. The owner chose
-a new disposable Linux virtual machine as the R4/R5 Stage A candidate, but its
-identity and provisioning remain unset. No finite new selected or all-options
+a new disposable Linux virtual machine with VirtualBox as the R4/R5 Stage A
+candidate, but its identity and provisioning remain unset. No finite new selected or all-options
 total is defensible until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
