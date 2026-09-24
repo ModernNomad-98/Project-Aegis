@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the documentation batch after pull request (PR) #231 on 2026-09-24,
+As of the five-merge checkpoint after pull request (PR) #232 on 2026-09-24,
 this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -444,6 +444,30 @@ Outward five-hour rounding narrows documentation from **35–130** to
 **125–319 active hours**. Acceptance remains **IN PROGRESS**; the next
 full per-item checkpoint follows three more merges after this batch if it
 becomes the second completed merge after #227.
+
+## Ledger checkpoint through pull request #232 — 2026-09-24
+
+The five merges since the #227 forecast are #228, #229, #230, #231 and #232.
+Their exact merge commits, original estimates and available wall intervals
+are in the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-232--2026-09-24).
+The #232 merge `970aad27524bccc8a3f342bc990215904253be53` has **574
+tracked Markdown pages**. The recorded full-page acceptance count is **391
+distinct existing pages**; **183 remain**. The pending inventory reconciles
+as 58 skill pages, 48 previously corrected primary pages, 15 dated notes
+or tracking pages, 18 other reader pages and 44 synthetic fixtures. Four
+new dated review notes entered the inventory after #227. They were not
+accepted as existing pages by the batches they document.
+
+The [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-232)
+changes the documentation residual estimate from **35–130** at #227 to
+**30–115 active hours**, and the selected backlog from **130–324** to
+**125–309 active hours**. This checkpoint work item previously and currently
+estimates **1–2 active hours**. Acceptance remains **IN PROGRESS**; the next
+page batch needs its own page-level evidence and independent review. This
+accounting does not accept any of the 183 pending pages. The next five-merge
+counter starts after #232. The next acceptance batch targets 40 pages, with
+two read-only reviewers auditing 20 pages each and individual page outcomes
+retained; the per-page estimate remains unchanged.
 
 ## Ledger checkpoint through pull request #227 — 2026-09-24
 
