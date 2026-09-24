@@ -65,6 +65,10 @@ def _keys(value: Mapping[str, Any], expected: set[str]) -> None:
 def _string(value: Any, limit: int, pattern: re.Pattern[str] | None = None) -> str:
     if not isinstance(value, str) or not 1 <= len(value) <= limit:
         raise ContractError("invalid string")
+    try:
+        value.encode("utf-8", errors="strict")
+    except UnicodeError as exc:
+        raise ContractError("invalid Unicode") from exc
     if any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
         raise ContractError("control character")
     if pattern is not None and pattern.fullmatch(value) is None:
@@ -116,6 +120,8 @@ def parse_request(raw: bytes | str | Mapping[str, Any]) -> Request:
     if data["version"] != VERSION:
         raise ContractError("unsupported contract version")
     synopsis = _string(data["synopsis"], 512)
+    if any(ch in synopsis for ch in "\u0085\u2028\u2029"):
+        raise ContractError("synopsis must be one line")
     # A short synopsis is the only free-text task field. Refuse common structured
     # data and destination forms rather than forwarding raw content to an adapter.
     if re.search(r"https?://|(?:[A-Za-z]:\\|/[^ ]+/)|\b(?:api[_-]?key|password|secret|token)\s*[:=]",

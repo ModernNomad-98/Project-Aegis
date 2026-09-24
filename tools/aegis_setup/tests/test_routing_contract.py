@@ -1,6 +1,7 @@
 """Synthetic, offline contract tests."""
 
 import copy
+import json
 import unittest
 
 from tools.aegis_setup.routing_contract import (
@@ -90,6 +91,33 @@ class RoutingContractTests(unittest.TestCase):
         data["synopsis"] = "token: secret"
         with self.assertRaises(ContractError):
             parse_request(data)
+
+    def test_one_line_synopsis_and_utf8_text(self):
+        for separator in ("\u0085", "\u2028", "\u2029"):
+            data = request_data()
+            data["synopsis"] = "Review" + separator + "next line"
+            for raw in (data, json.dumps(data), json.dumps(data).encode("ascii")):
+                with self.subTest(separator=ord(separator), transport=type(raw).__name__):
+                    with self.assertRaises(ContractError):
+                        parse_request(raw)
+
+        for surrogate in ("\ud800", "\udc00"):
+            for field in ("synopsis", "description"):
+                data = request_data()
+                if field == "synopsis":
+                    data[field] = "Review " + surrogate
+                else:
+                    data["agents"][0][field] = "Reviews " + surrogate
+                escaped = json.dumps(data)
+                for raw in (escaped, escaped.encode("ascii")):
+                    with self.subTest(surrogate=ord(surrogate), field=field,
+                                      transport=type(raw).__name__):
+                        with self.assertRaises(ContractError):
+                            parse_request(raw)
+
+        data = request_data()
+        data["synopsis"] = "Review \U0001f600 change"
+        self.assertEqual(parse_request(json.dumps(data)).synopsis, data["synopsis"])
 
     def test_timeout_unavailable_and_no_online_fallback(self):
         for failure in ("timeout", "unavailable"):
