@@ -17,11 +17,12 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest completed [five-merge checkpoint after pull request #250](#checkpoint-after-pull-request-250--2026-09-24)
-reconsiders every open work item at that time. The later [BER-BKL-009 owner
-decision update](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
-supersedes its whole-item estimate and selected total; the next full checkpoint
-is due after the fifth merge following #250.
+The latest completed [five-merge checkpoint after pull request #255](#checkpoint-after-pull-request-255--2026-09-24)
+reconsiders every selected and optional row. The [BER-BKL-009 owner
+decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
+supersedes the old whole-item estimate and selected total; PR #255 made the
+bounded offline grant effective, while its implementation and later host work
+remain open.
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -43,6 +44,36 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #255 — 2026-09-24
+
+Five requests merged after #250: #251, #252, #253, #254 and #255. The
+intervals use GitHub `mergedAt` receipts, beginning with #250 at 17:56:33
+UTC. They include review, CI, owner waiting and overlapping work. The exact
+active-work, review, CI and owner-wait splits are unavailable; the interval
+must not be treated as a throughput or package-duration measurement.
+
+| Merged request and scope | Exact merge commit | Published package estimate or bound | Prior-merge wall interval |
+| --- | --- | --- | ---: |
+| [#251](https://github.com/ModernNomad-98/Project-Aegis/pull/251): post-#250 checkpoint and #249 guard consumption | `d40627cc751c1e77f8cd81d13b1ccf9bd0239147` | No separate active estimate published | 10m41s |
+| [#252](https://github.com/ModernNomad-98/Project-Aegis/pull/252): standing Aegis skill-use preference | `7b1cc77a7d2e4e60f7049c59f64cf063cc339bdf` | No separate active estimate published | 14m58s |
+| [#253](https://github.com/ModernNomad-98/Project-Aegis/pull/253): bounded BER-BKL-009 scope proposal | `50686578344f8f98bf333691bedeff62cbe5a1e4` | No separate active estimate published; proposal did not authorize implementation | 15m51s |
+| [#254](https://github.com/ModernNomad-98/Project-Aegis/pull/254): APR-012 consumption and post-#253 status | `0f5cffe36cd2650650a2d45d88792ee1810abbfb` | No separate active estimate published | 11m04s |
+| [#255](https://github.com/ModernNomad-98/Project-Aegis/pull/255): bounded BER evidence-policy grant | `0318b1ecde3ebf5f34bb32f8793efc37b574af39` | Offline implementation cap ≤16 active h; not a governance-work estimate | 10m34s |
+
+The intervals span **17:56:33–18:59:41 UTC** and total **1h03m08s**.
+All five requests changed governance or documentation; none delivered a
+selected implementation package. PR #255 made BER-DEC-013/APR-023 effective
+for one synthetic-only, ten-path integration starting from that exact merge.
+The **16-hour cap is a ceiling, not an estimate**. The #255 tree has **585
+tracked Markdown files**: 541 accepted reader pages and 44 classified
+fixtures, with zero known pending pages in the bounded sweep. The
+[forecast checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-255)
+reassesses the eleven other selected rows at **79–162 active hours**, plus
+the capped offline integration and an unestimated BER-BKL-009 host/runtime/
+privacy/cleanup residual. The selected and all-options totals have **no
+finite estimate**. Start the next five-merge counter after #255; revise sooner
+for a material owner or scope decision.
 
 ## Checkpoint after pull request #250 — 2026-09-24
 

@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #253 on 2026-09-24, this remains the active
+As of merged pull request (PR) #255 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -21,7 +21,9 @@ corrections passed two independent full-page reviews in this checkpoint.
 PRs #248 and #249 each added a reader page; both passed full-page review after
 the corrections recorded below and merged through #250. PR #253 added the
 reviewed BER-BKL-009 scope proposal and reaccepted the corrected candidate
-summary. **Zero known pages** remain in the bounded sweep.
+summary. PRs #254 and #255 changed existing governance and tracking pages;
+the [five-merge checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-255)
+reconciles their status. **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
@@ -31,8 +33,12 @@ gave a conditional **95–194 selected active-hour** residual after #239's
 accepted merge. The [five-merge checkpoint after #245](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-245)
 records the #245 baseline's **1–3 documentation active hours** for the two
 notes. Their acceptance closes that residual, and #249 separately delivered
-the 8–16-hour offline holdout-support item. The conditional selected residual
-is now **87–178 active hours** after #250's accepted merge.
+the 8–16-hour offline holdout-support item. The **87–178 active-hour** selected
+residual after #250 is historical. The owner's bounded BER-BKL-009 approval,
+effective on #255, leaves **79–162 active hours** for the other eleven selected
+rows, one offline implementation package capped at 16 active hours, and an
+unestimated later BER-BKL-009 residual. The selected total therefore has no
+finite current estimate.
 Future new or changed pages still need the acceptance check below. The
 [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
