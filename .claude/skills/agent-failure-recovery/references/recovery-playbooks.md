@@ -1,5 +1,7 @@
 # Recovery Playbooks
 
+Use this with the [Agent Failure Recovery skill](../SKILL.md). Diagnosis is read-only; preservation and recovery mutate state only within the task's authorization. A manual-only skill requires explicit human invocation.
+
 Supporting detail for `agent-failure-recovery`. Every playbook assumes the
 skill's fixed order: diagnose (read-only) → preserve → recover → verify.
 Preservation (rescue branch / `stash push -u` / scratch copies) has already
@@ -7,8 +9,10 @@ happened before any playbook's "recover" steps run.
 
 ## 1. Failed tests mid-change
 
-- Diagnose: which tests, since when (`git stash` the change and re-run to see
-  if main is green — using `stash push -u -m`, which is also the preservation).
+- Diagnose: inspect which tests failed and since when using status, diff and
+  logs without changing the worktree.
+- Preserve, when authorized: label and save the work (for example a rescue
+  branch or `git stash push -u -m`) before a separate clean-base rerun.
 - Recover: this is usually a DEBUGGING problem, not state recovery. If the
   change must be parked: leave it on a labeled stash or WIP branch, restore a
   clean base, and hand off to debugging with the failure output.
@@ -19,8 +23,9 @@ happened before any playbook's "recover" steps run.
 - Diagnose: `git status` — distinguish merge/rebase conflict markers from
   plain uncommitted edits; check operation markers in `.git/`.
 - Recover (conflict): resolve file-by-file only if the original operation's
-  intent is known; otherwise `--abort` the operation (rebase/merge) — additive
-  and safe because the pre-state is preserved.
+  intent is known; otherwise preserve any in-progress conflict resolutions
+  and verify the pre-operation state before an authorized `--abort`. Abort can
+  discard unpreserved resolution work; it is not automatically additive.
 - Recover (plain dirt): nothing may need recovery — confirm with the human
   whether the edits are wanted work before doing anything at all.
 - Verify: status clean or intentionally-dirty; no leftover conflict markers
@@ -31,7 +36,8 @@ happened before any playbook's "recover" steps run.
 - Diagnose: `.git/rebase-merge/`, `.git/rebase-apply/`, `MERGE_HEAD`,
   `CHERRY_PICK_HEAD`; `git status` names the operation and the stopped commit.
 - Recover: two clean exits only — `--continue` after resolving what stopped
-  it, or `--abort` to return to the pre-operation state. Never delete `.git/`
+  it, or preserve in-progress work and then `--abort` to return to the
+  pre-operation state. Never delete `.git/`
   operation directories by hand.
 - Verify: operation markers gone; log shows the expected shape; tree state
   matches the chosen exit.
@@ -79,4 +85,4 @@ happened before any playbook's "recover" steps run.
 | `git stash apply` | `git clean -f` / `-fd` |
 | `git reset --soft` | `git push --force[-with-lease]` |
 | `git restore --staged <path>` | `git branch -D` / `git stash drop|clear` |
-| `rebase/merge --abort` | rewriting pushed history |
+| `rebase/merge --abort` only after preserving in-progress work | rewriting pushed history |

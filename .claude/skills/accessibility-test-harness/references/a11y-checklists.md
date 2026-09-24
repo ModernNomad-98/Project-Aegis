@@ -1,5 +1,7 @@
 # Accessibility (a11y) Checklists & Split Table
 
+Use this with the [Accessibility Test Harness](../SKILL.md). ESC means the Escape key in the keyboard checklist.
+
 Use this `accessibility-test-harness` reference to divide automated checks from
 human judgment, then run the keyboard and screen-reader passes. In this file,
 **E2E** means end-to-end testing, **ARIA** means Accessible Rich Internet

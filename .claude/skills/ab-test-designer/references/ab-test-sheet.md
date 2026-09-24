@@ -1,5 +1,7 @@
 # A/B Test Sheet
 
+Use this [A/B Test Designer reference](../SKILL.md) to choose and record experiment sample-size and analysis inputs. Here α is the false-positive threshold, β the false-negative probability, n the sample size, a conversion proportion is a rate, a p-value is the probability measure used in a significance comparison, CI is a confidence interval, and SUTVA is the assumption that one unit's assignment does not alter another unit's outcome.
+
 Detail for `ab-test-designer`. Read on demand.
 
 ## Power / sample-size inputs
@@ -19,7 +21,8 @@ infeasible, the test can't answer the question — say so.
 
 Fixed-horizon tests assume ONE analysis at the end. Checking repeatedly
 and stopping at the first p<0.05 inflates the false-positive rate well
-beyond 5% (often 20–40% with frequent looks). Options:
+beyond 5%; the amount depends on the number and timing of looks and the
+decision rule. Options:
 - Fix the horizon; analyze once at the end. (simplest)
 - Use a sequential / always-valid method (group-sequential, alpha
   spending, Bayesian) declared IN ADVANCE with its correction.

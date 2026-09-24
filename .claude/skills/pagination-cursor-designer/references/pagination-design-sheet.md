@@ -14,7 +14,7 @@ context still supplies tenant and permission scope.
 
 | Dimension | Offset / limit | Cursor / keyset |
 |---|---|---|
-| Behavior under concurrent insert/delete | Drifts — rows duplicate/skip | Stable — resumes from a row key |
+| Behavior under concurrent insert/delete | Offset shifts can duplicate/skip | Resumes from a row key; snapshot or stability policy still needed for mutable/deleted rows |
 | Deep-page cost | O(offset) — scans skipped rows | O(page size) — seeks to key |
 | Random access to page N | Native | Not native (needs page→cursor map) |
 | Total "page X of Y" | Natural (but COUNT cost) | Awkward — usually omit total |
@@ -46,18 +46,23 @@ Descending needs `<`; ascending needs `>`. Composite/row-value comparison
 keeps it index-friendly; the tenant/auth predicate is ANDed in
 server-side, never taken from the cursor.
 
-## Versioned cursor struct (opaque)
+## Versioned cursor struct (opaque contract, not secret encoding)
 
 ```
-cursor = base64url(json({
+payload = json({
   "v": 1,                 // bump when the shape changes
   "k": [<last_created_at>, <last_id>],  // ordering tuple only
   "d": "next"             // direction
-}))
+})
+cursor = base64url(payload || integrity_tag(payload, server_key))
 ```
 
-- Opaque so the shape can evolve; clients treat it as a token.
-- Contains ordering keys + direction ONLY. No tenant id, no auth scope,
+- Opaque is a client contract: clients treat it as a token, but Base64 is
+  reversible. Verify the integrity tag and version before using its keys.
+  Encrypt the payload if ordering keys or an ID tiebreaker are confidential.
+- Contains ordering keys + direction only. A primary-key tiebreaker is valid
+  when its visibility policy allows it; otherwise choose a safe surrogate.
+  No tenant id, no auth scope,
   no raw SQL offset, no total/position.
 - On decode, validate `v`; reject unknown versions. Re-apply auth scope
   from the authenticated context, not from the cursor.

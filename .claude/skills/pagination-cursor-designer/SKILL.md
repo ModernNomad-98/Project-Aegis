@@ -1,6 +1,6 @@
 ---
 name: pagination-cursor-designer
-description: Design pagination for list endpoints and their UIs — cursor (keyset) vs offset chosen with drift and deep-page costs stated, the opaque cursor's contents defined (sort key + deterministic tiebreaker + direction) with a stability contract, a total ordering mandated so rows never repeat or vanish under concurrent writes, default and max page sizes set, end-of-results signaled honestly (null next cursor, no guessed total), the tenant/permission predicate kept INSIDE the cursor so paging cannot cross a boundary, and a surface pattern (load-more, numbered, infinite scroll) chosen with tradeoffs. Owns the pagination MECHANISM inside a contract whose routes, versioning, and rate limits are api-event-architect's. Use when designing or fixing pagination, cursors, or "load more", or when a list skips or repeats rows as data changes. Do NOT use to design the API contract itself (api-event-architect) or tune one slow query's plan (query-plan-reader).
+description: 'Design pagination for list endpoints and UIs: choose cursor/keyset or offset with drift and deep-page costs stated, define a versioned integrity-protected cursor holding sort keys and direction, require deterministic ordering and a concurrency stability policy, set page-size bounds and honest end signaling, and apply tenant/permission scope server-side from trusted context on every page. Encoded cursor keys are decodable; encrypt if confidential. Choose load-more, numbered, or infinite-scroll UI with tradeoffs. Owns pagination mechanics within the endpoint contract owned by api-event-architect. Use for pagination design or skip/repeat bugs. Do NOT design routes/rate limits (api-event-architect) or tune one query plan (query-plan-reader).'
 ---
 
 # Pagination Cursor Designer
@@ -12,11 +12,11 @@ inserted while a user reads page two, and page three now repeats a row
 or skips one; someone deep-links to `?page=900` and the database scans
 nine hundred pages to serve one; a client stores `nextCursor` and it
 silently starts returning another tenant's rows because the tenant
-filter lived outside the cursor. This skill produces the pagination
+filter was not reapplied from trusted context on every page. This skill produces the pagination
 design for a list surface — the cursor's contents and stability
 contract, the total ordering that makes "next" deterministic, page-size
 bounds, honest end-of-results signaling, and the tenant/permission
-predicate carried INSIDE the traversal — plus the surface pattern
+predicate applied server-side on every page — plus the surface pattern
 (load-more, numbered pages, infinite scroll) with its tradeoffs. It owns
 the pagination MECHANISM; the route shape, versioning, and rate limits
 of the endpoint it rides on belong to `api-event-architect`.
@@ -65,7 +65,9 @@ of the endpoint it rides on belong to `api-event-architect`.
    acceptable ONLY for small, low-churn, human-browsed lists where
    random page access matters and drift is tolerable — state that
    ceiling. Default to cursor (keyset) paging for anything large,
-   high-churn, or deep: it is drift-free and O(page size), not O(offset).
+   high-churn, or deep: it avoids offset-shift drift and can seek near
+   O(page size), but mutable sort keys and deletes still need a snapshot or
+   explicit stability policy.
    Record why, per surface.
 2. **Define the total ordering.** Keyset paging requires a strict, total
    order — pick the sort column(s) PLUS a deterministic tiebreaker
@@ -74,10 +76,12 @@ of the endpoint it rides on belong to `api-event-architect`.
    repeat/vanish. State the exact ORDER BY.
 3. **Specify the cursor contents and encoding.** The cursor carries the
    last row's ordering tuple (sort value(s) + tiebreaker) and the
-   direction — nothing the client should not depend on. Make it opaque
-   (base64 of a versioned struct) so its shape can evolve; NEVER expose a
-   raw offset or internal row id the client can forge or that leaks
-   count/position. Version the cursor payload.
+   direction and deterministic tiebreaker. Treat it as an opaque client
+   contract, not a secret: Base64 is decodable. Version and integrity-protect
+   the payload; encrypt if ordering keys are confidential. A primary key may
+   be a tiebreaker if its visibility is acceptable; otherwise use a suitable
+   surrogate. Never trust tenant scope from the cursor or expose a raw SQL
+   offset.
 4. **Bind tenant/permission scope into the query, not the cursor.** The
    authorization predicate is applied server-side on every page from
    trusted context (session/token), never trusted from cursor contents.
@@ -115,7 +119,7 @@ strategies) and a worked keyset query with a versioned cursor struct:
 PAGINATION DESIGN — <surface/endpoint>
 Model:        cursor (keyset) | offset  — rationale + access pattern
 Ordering:     ORDER BY <sort cols>, <tiebreaker> <dir>   (strict total order)
-Cursor:       opaque base64 of { v, keys[], dir }  — contents listed; what it must NOT expose
+Cursor:       versioned, integrity-protected token of { v, keys[], dir }; encrypt confidential keys
 Page size:    default=<n> max=<n>  (over-max: clamp|reject)
 Scope:        auth/tenant predicate applied server-side every page (NOT from cursor)
 End signal:   nextCursor null at end; prevCursor=<...>; total=<none|estimate|exact+cost>
@@ -129,8 +133,9 @@ Boundaries:   contract/routes/rate-limits → api-event-architect; keyset query 
 
 - [ ] The ORDER BY is a strict total order — a deterministic tiebreaker
       is present, so no two rows tie.
-- [ ] The cursor is opaque and versioned; it exposes no raw offset,
-      internal id, or position/count a client could depend on or forge.
+- [ ] The cursor is versioned and integrity-protected. Encoding is not
+      confidentiality; keys and any ID tiebreaker meet the visibility rule,
+      or the payload is encrypted. No raw offset/position is exposed.
 - [ ] The tenant/authorization predicate is applied server-side on every
       page from trusted context — a tampered cursor cannot cross scope.
 - [ ] Page size has a default AND an enforced maximum.
@@ -151,16 +156,17 @@ Boundaries:   contract/routes/rate-limits → api-event-architect; keyset query 
   bug, not a nicety.
 - A cursor without a tiebreaker breaks precisely on the rows users care
   about — the burst created at the same second, the batch imported with
-  one timestamp. Equal sort values MUST be broken by the primary key.
+  one timestamp. Equal sort values need a deterministic unique tiebreaker;
+  a primary key is suitable only when its exposure policy allows it.
 - `COUNT(*)` for "page X of Y" is often the most expensive part of a
   list endpoint and gets re-run on every page. Decide the total-count
   cost deliberately; frequently the honest answer is "no total".
 - Trusting scope from the cursor is a tenant-isolation hole: if the
   cursor says `tenant=7` and the server believes it, a forged cursor
   reads tenant 7. Scope always comes from the authenticated context.
-- Encoding a raw SQL offset or internal id in a "opaque" cursor makes it
-  a contract the moment a client decodes and depends on it — keep the
-  payload versioned and genuinely opaque.
+- Base64 encoding is reversible: signing prevents tampering, not disclosure.
+  Use encryption when cursor keys must remain confidential, and never treat
+  a decodable internal ID as hidden merely because it is encoded.
 - Infinite scroll destroys deep-linking and the back button unless the
   cursor/position is reflected in URL state — design that, or users lose
   their place.

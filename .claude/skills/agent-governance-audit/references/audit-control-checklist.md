@@ -1,5 +1,7 @@
 # Governance Audit — control catalog
 
+Use this with the [Agent Governance Audit](../SKILL.md). PR means pull request; RLS means row-level security; CI means continuous integration; SHA means Secure Hash Algorithm, and a commit SHA is the hash used to identify a revision.
+
 Audit against the policy IN FORCE at the time of the change. Every verdict
 cites primary evidence; the closeout is a claim sheet to cross-check, never an
 evidence source. Missing evidence → UNVERIFIABLE, never PASS.

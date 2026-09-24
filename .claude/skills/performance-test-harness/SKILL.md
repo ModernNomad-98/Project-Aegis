@@ -5,6 +5,10 @@ description: Design the harness that MEASURES performance as release evidence â€
 
 # Performance Test Harness
 
+Reading key: D12.3 names the roadmap's performance-design group;
+service-level objective (SLO) names an agreed service target; continuous
+integration (CI) runs automated checks on proposed and merged changes.
+
 ## Purpose
 
 Every team discovers performance regressions the same way â€” a customer

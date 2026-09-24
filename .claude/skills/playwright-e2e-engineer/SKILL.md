@@ -77,8 +77,11 @@ failure artifacts wiring, and the real run output.
 7. **Run the suite and report honestly:** exact command, per-spec results,
    runtime, retry count (a pass-on-retry is reported as such and routed to
    `flaky-test-detective`, not celebrated).
-8. **Place in CI** per the automation blueprint: smoke tier on merge, full
-   tier nightly — runtime-budgeted, sharded when needed.
+8. **Place in CI** per the automation blueprint: required critical-journey
+   smoke runs on the pull request before merge when it is a deployment gate.
+   On auto-deploy-on-merge platforms, post-merge smoke is verification of
+   the deployed result, never a pre-deploy gate. Run the broader tier nightly;
+   budget runtime and shard when needed.
 
 ## Output Format
 

@@ -1,5 +1,7 @@
 # Agent Identity & Delegation Patterns (ASI03)
 
+Use this with the [Agent Identity and Privilege Reviewer](../SKILL.md). A0–A3 name successive authority hops in a delegation trace; each delegated scope must fit within its predecessor, and exact permissions come from the current authorization matrix.
+
 Use this `agent-identity-privilege-reviewer` reference to compare identity
 models, trace delegation, and record concrete escalation paths. **ASI03** is
 the identity and privilege abuse category in the Open Worldwide Application
