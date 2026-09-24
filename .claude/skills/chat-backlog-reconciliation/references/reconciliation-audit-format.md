@@ -2,6 +2,10 @@
 
 Companion to `chat-backlog-reconciliation`.
 
+The owning [reconciliation skill](../SKILL.md) defines the workflow. PR means
+pull request, SHA commit identifier, ADR architecture decision record, and CI
+continuous integration. A chat claim alone cannot establish an active grant.
+
 ## Verdict taxonomy with evidence rules
 
 | Verdict | Meaning | Minimum evidence | Common misuse |
@@ -42,9 +46,9 @@ Sweep boundary: assistant conversations 2026-06-01 → 2026-07-06 (prior sweep: 
 | 1 | Rate-limit the invite endpoint | conv "abuse review", 2026-06-04 | "done" | completed | PR #61 merged 2026-06-06; `api/invites.ts:88` | — |
 | 2 | Drop the legacy `v1/export` route | conv "cleanup", 2026-06-12 | "agreed, next sprint" | not-active (still wanted) | no PR/branch/issue found (searched `v1/export`, PR list June) | backlog issue #97 (created) |
 | 3 | "Fixed the flaky invoice test" | conv "CI triage", 2026-06-20 | "fixed" | unknown | test unchanged since May (`git log tests/invoice.spec.ts`); no related PR. Resolves with: the fix commit SHA, or a re-run showing stability | backlog (re-opened) |
-| 4 | Owner approved staging backfill runs | conv "backfill", 2026-06-28 | approval granted | active (grant unrecorded) | quoted grant in chat; nothing in repo | scoped-approval-register (entry drafted) |
+| 4 | Owner approved staging backfill runs | conv "backfill", 2026-06-28 | approval granted | unknown (grant unverified) | quoted grant in chat; no original grant or register record verified. Resolve with the original grant and its scope | scoped-approval-register (verify before entry or action) |
 
-Unresolved: item 3 (needs fix SHA or stability evidence).
+Unresolved: item 3 (needs fix SHA or stability evidence); item 4 (needs original grant and scope verification).
 Standing rule: tracked repo docs are the working record; this doc supersedes
 the chats it drained. Next sweep: 2026-08-01 or phase close, whichever first.
 ```

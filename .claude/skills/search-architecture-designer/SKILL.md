@@ -166,8 +166,10 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   it 404s or, worse, still shows cached content.
 - Permission changes must reach the index too: a document a user lost access
   to must stop appearing in their search, not just their direct fetch.
-- `LIKE '%term%'` is not search — it is an un-indexable full scan that
-  ignores relevance and dies at scale; name it as debt, not a baseline.
+- An unindexed `LIKE '%term%'` pattern can scan the table and does not
+  rank by relevance. PostgreSQL trigram indexes can support `LIKE` and
+  `ILIKE`, including leading wildcards; assess query plans and ranking
+  needs before naming the pattern as debt.
 - Ranking by relevance and paginating by offset is unstable: as scores or
   data shift, page 2 duplicates or drops results. Paginate on a stable
   sort/tiebreak, not raw relevance offset.

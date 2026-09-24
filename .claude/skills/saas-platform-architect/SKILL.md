@@ -130,9 +130,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 ## Gotchas
 
-- Pooled-vs-siloed is not one global choice — the common shape is a pooled
-  data plane with siloed exceptions for a few large or regulated tenants, and
-  a pooled control plane always.
+- Pooled-vs-siloed is not one global choice. Evaluate each data-plane and
+  control-plane component against isolation, residency, and operations needs;
+  a pooled control plane is common but cannot be assumed for every tenant.
 - Residency requirements discovered late invert deployment models; ask about
   them in step 2, not after the design.
 - Converting a single-tenant app by "adding a tenant dropdown" scopes the UI
@@ -147,10 +147,12 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - Tenant semantics undefined or contested → stop; run `tenant-modeler` first.
 - Residency/compliance facts unknown AND they would flip the recommendation →
   ask; do not pick a default silently.
-- The design changes the isolation or security posture of a live system →
-  route through `human-approval-boundary` before recommending.
-- Asked to implement the migration in the same pass → increment 1 becomes a
-  separate, scoped task; confirm before touching code.
+- Implementing a design that changes the isolation or security posture of a
+  live system requires the applicable authorization; record or verify its
+  scope through `human-approval-boundary` before making the change.
+- Asked to implement the migration in the same pass → treat increment 1 as
+  a separately scoped task; use any applicable active authorization and seek
+  a scope decision only if it is missing.
 
 ## Supporting Files
 

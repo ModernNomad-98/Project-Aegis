@@ -2,12 +2,19 @@
 
 Detail file for `cloud-architecture-decider`. Loaded on demand.
 
+The owning [cloud architecture skill](../SKILL.md) defines the decision and
+verification boundary.
+
 **Reading key:** DPA means data processing agreement; IdP means identity
 provider; VPC means virtual private cloud; p95 is the 95th percentile;
 IaaS means infrastructure as a service; PaaS means platform as a service;
 SSR means server-side rendering; BaaS means backend as a service; IAM means
 identity and access management. The owning skill explains the remaining
 decision terms and authority boundaries.
+SLA means service-level agreement; IaC infrastructure as code; CI/CD
+continuous integration and delivery; OS operating system; VM virtual machine;
+CDN content delivery network; HA high availability; CNI container network
+interface; and CSI container storage interface.
 
 ## Nine-axis requirements record template
 

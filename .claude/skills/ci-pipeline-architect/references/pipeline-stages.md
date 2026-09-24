@@ -2,6 +2,11 @@
 
 Detail file for `ci-pipeline-architect`. Loaded on demand.
 
+The owning [CI pipeline skill](../SKILL.md) defines the gate policy. PR means
+pull request, SAST static application security testing, OIDC OpenID Connect,
+and E2E end-to-end testing. A job triggered only after merge cannot block that
+merge.
+
 ## Canonical stage catalog
 
 | Stage | Default trigger | Default blocking | Defect class caught | Notes |
@@ -12,10 +17,10 @@ Detail file for `ci-pipeline-architect`. Loaded on demand.
 | Unit/component | PR | merge-blocking | logic regressions | tier per `qa-automation-architect` |
 | Integration | PR | merge-blocking | wiring/boundary breaks | containerized deps |
 | Secret scan | PR | merge-blocking | committed credentials | block early, before human review |
-| SAST | PR or merge | merge-blocking once triaged | injection/authz classes | triage per `static-analysis-reviewer`; untriaged = advisory first |
+| SAST | PR for merge gate; optional merge rerun | merge-blocking only for the required triaged PR job; post-merge failure blocks promotion and opens a repair path | injection/authz classes | triage per `static-analysis-reviewer`; untriaged = advisory first |
 | Dependency scan | PR + scheduled | advisory → blocking by policy | vulnerable/hijacked deps | discipline per `supply-chain-security-reviewer` |
 | Build-output QA | PR or merge | per policy | secret-in-bundle, parity | `vite-build-qa-engineer` for Vite estates |
-| E2E (smoke tier) | merge | merge-blocking on main | critical-journey breaks | full E2E nightly per tier policy |
+| E2E (smoke tier) | PR for merge gate; merge for post-merge verification | merge-blocking only for the required PR job; post-merge failure blocks promotion and opens a repair path | critical-journey breaks | full E2E nightly per tier policy |
 | Artifact package + provenance | merge | blocking for deploy | untraceable deploys | commit + run id stamped |
 | Deploy to staging | merge/manual | — | — | env-scoped secrets |
 | Promote to production | manual | approval-gated | — | named human approvers |

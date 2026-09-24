@@ -80,7 +80,8 @@ changes through human approval.
    real commands and output.
 9. **Stage exactly the intended files** (`reviewable-diff-discipline`) and
    report: what moved, what rotated, residual exposure (e.g. history needing
-   BFG/rotation), and follow-ups. Never print the secret values themselves.
+   BFG Repo-Cleaner/history rewrite and rotation), and follow-ups. Never
+   print the secret values themselves.
 
 ## Output Format
 
@@ -139,8 +140,9 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
   relocates the leak; confirm the runtime read is server-side.
 - Rotating a shared credential can break other consumers — enumerate who uses
   it before rotating, and coordinate; this is why rotation is approval-gated.
-- localStorage-stored tokens are readable by any XSS; moving to HttpOnly
-  cookies changes CSRF posture — harden both together, not one in isolation.
+- localStorage-stored tokens are readable by cross-site scripting (XSS);
+  moving to HttpOnly cookies changes cross-site request forgery (CSRF)
+  posture — harden both together, not one in isolation.
 
 ## Stop Conditions
 

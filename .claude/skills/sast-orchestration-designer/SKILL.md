@@ -1,6 +1,6 @@
 ---
 name: sast-orchestration-designer
-description: 'Design HOW a SAST suite is RUN over a repository — category-level analyzer selection (not a named vendor), ruleset/config management, baseline + diff-scanning (gate NEW-since-baseline on PRs vs full scans), incremental-vs-full strategy, a GOVERNED false-positive suppression list (never silent inline muting), and CI integration. Designs the RUNNING of SAST and feeds the whole-repo aggregator (security-scan-orchestrator, in-batch); the INTERPRETATION of findings (true/false-positive, ranking, the suppression VERDICT) is static-analysis-reviewer''s (yield). Fail-closed: a scan that errors, times out, or skips a language is a REPORTED GAP, never a silent pass. Use when standing up or tuning SAST, designing baseline/diff scanning, or governing FP suppression. Do NOT use to triage findings (static-analysis-reviewer), aggregate a whole-repo scan (security-scan-orchestrator), or scan dependencies (supply-chain-security-reviewer).'
+description: 'Design HOW a SAST suite is RUN over a repository — category-level analyzer selection (not a named vendor), ruleset/config management, baseline + diff-scanning (gate NEW-since-baseline on PRs vs full scans), incremental-vs-full strategy, a GOVERNED false-positive suppression list (never silent inline muting), and CI integration. Designs the RUNNING of SAST and feeds the whole-repo aggregator (security-scan-orchestrator, shipped); the INTERPRETATION of findings (true/false-positive, ranking, the suppression VERDICT) is static-analysis-reviewer''s (yield). Fail-closed: a scan that errors, times out, or skips a language is a REPORTED GAP, never a silent pass. Use when standing up or tuning SAST, designing baseline/diff scanning, or governing FP suppression. Do NOT use to triage findings (static-analysis-reviewer), aggregate a whole-repo scan (security-scan-orchestrator), or scan dependencies (supply-chain-security-reviewer).'
 ---
 
 # SAST Orchestration Designer
@@ -52,7 +52,7 @@ false-positive, ranking, and the suppression VERDICT — belongs to
   skill designs the RUN; that skill JUDGES the output.
 - Do NOT use when: aggregating a whole-repo multi-tool scan (SAST + dependency +
   secret + IaC) into one report — that is `security-scan-orchestrator`
-  (in-batch); this SAST-run design is one input it coordinates.
+  (shipped); this SAST-run design is one input it coordinates.
 - Do NOT use when: the subject is dependency/CVE/provenance scanning — that is
   the SCA category owned by `supply-chain-security-reviewer`, not SAST.
 - Do NOT use when: designing the whole delivery pipeline — that is
@@ -180,7 +180,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - Asked to auto-fix the findings → refuse; this designs the RUN — fixes are the
   human's / `appsec-implementer`'s.
 - The ask is actually whole-repo multi-tool aggregation → hand to
-  `security-scan-orchestrator` (in-batch).
+  `security-scan-orchestrator` (shipped).
 
 ## Supporting Files
 
@@ -189,7 +189,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   should-not-trigger (→ `static-analysis-reviewer`), and the silent-mute-to-go-
   green and treat-errored-scan-as-clean refusals.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`
-  (triage vs run design), `security-scan-orchestrator` (in-batch: whole-repo
+  (triage vs run design), `security-scan-orchestrator` (shipped: whole-repo
   aggregation vs single-category run design, pinned both ways),
   `supply-chain-security-reviewer` (SCA vs SAST), and `ci-pipeline-architect`
   (pipeline vs the SAST stage contract).

@@ -3,6 +3,11 @@
 Supporting detail for `code-simplifier`. Read on demand. Every move lists its
 preconditions — a move applied without its preconditions is a rewrite.
 
+The owning [code simplifier skill](../SKILL.md) defines the behavior-preserving
+boundary. DI means dependency injection, CLI command-line interface, RPC
+remote procedure call, API application programming interface, NaN not a
+number, and `None` the Python null value.
+
 ## The catalog
 
 | Move | Preconditions | Behavior-change tells to check |

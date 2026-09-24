@@ -1,14 +1,18 @@
 # Migration Safety Checklist
 
-Progressive-disclosure detail for `secure-migration-reviewer`. Cover security,
+Progressive-disclosure detail for the owning [Secure Migration Reviewer](../SKILL.md).
+Cover security,
 destructiveness, deploy order, and locking. Deep RLS policy correctness is
 `rls-policy-auditor`'s job — flag and route it.
 
 ## Security checklist
 
-- [ ] New tenant-owned table: `ENABLE ROW LEVEL SECURITY` present AND a
-      restrictive policy exists? (RLS on with no policy = denies all; no RLS =
-      wide open). `FORCE ROW LEVEL SECURITY` if the owner role touches it.
+- [ ] New tenant-owned table: `ENABLE ROW LEVEL SECURITY` present, with an
+      effective tenant-scoped policy for the intended app role? No applicable
+      policy default-denies, an availability issue; RLS disabled or an
+      overbroad applicable grant can expose rows. A restrictive-only policy
+      cannot grant rows without a matching permissive policy. Consider
+      `FORCE ROW LEVEL SECURITY` if owner-role requests must be constrained.
 - [ ] `GRANT`/`REVOKE`: does it widen access? `GRANT ALL`, grant to
       `anon`/`public`, new role with `BYPASSRLS`, `ALTER DEFAULT PRIVILEGES`
       broadening future grants → finding.

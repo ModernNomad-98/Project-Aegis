@@ -53,7 +53,7 @@ the wrong thing confidently.
 5. Data-write surface of the change: what does the new version write that
    the old version cannot read (schema, formats, queues, caches)?
 6. Observability signals that define "rollback worked"
-   (`slo-reliability-architect` SLIs, dashboards).
+   (`slo-reliability-architect` service-level indicators (SLIs), dashboards).
 7. Who executes: on-call access/permissions reality — steps requiring
    access the executor lacks are decoration.
 
@@ -166,8 +166,9 @@ Handoffs: <release-readiness-reviewer (evidence); observability-operator
 ## Stop Conditions
 
 - Asked to execute the rollback now → stop; authoring and executing are
-  different authorities. Live execution routes through the incident
-  process and `human-approval-boundary`.
+  different authorities. Live execution follows the applicable incident
+  process and authorization, including any active grant recorded through
+  `human-approval-boundary`.
 - The change contains an irreversible migration stage
   (`secure-migration-reviewer` verdict) with no compensating path → the
   runbook cannot promise reversal; surface this as a release-blocking

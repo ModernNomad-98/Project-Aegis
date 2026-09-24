@@ -2,6 +2,10 @@
 
 Detail file for `clickthrough-test-engineer`. Loaded on demand.
 
+The owning [clickthrough test skill](../SKILL.md) defines execution scope.
+ESC means the Escape key, CTA call to action, and QA quality assurance.
+Viewport means the browser display dimensions used for the check.
+
 ## Per-route interaction checklist
 
 Apply the rows that exist on the route; mark N/A explicitly.

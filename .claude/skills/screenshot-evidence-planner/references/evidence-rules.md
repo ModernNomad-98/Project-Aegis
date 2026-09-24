@@ -63,4 +63,4 @@ supply the checkpoint/case linkage.
 | PR artifact | CI artifact store | short (e.g. 30d) | repo access |
 | Release evidence | release record/tag bundle | product policy (e.g. 1-2y) | team |
 | Compliance archive | designated archive | per obligation text | restricted |
-| Raw Playwright traces | CI artifacts only | shortest | restricted (unmasked by design) |
+| Playwright traces | Synthetic or masked data only for evidence; separately approved sensitive transient captures follow a restricted access and deletion rule, outside the evidence store | shortest approved period | evidence access or the separately approved restricted capture access |

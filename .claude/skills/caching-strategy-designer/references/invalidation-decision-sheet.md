@@ -4,6 +4,10 @@ Layer, invalidation, key, and stampede tables backing the workflow.
 Technology-agnostic — "distributed cache" is whatever fills that role in
 your stack.
 
+The owning [caching strategy skill](../SKILL.md) defines the decision and
+authorization boundary. TTL means time to live, CDN content delivery network,
+KV key-value, RPS requests per second, and GET an HTTP retrieval request.
+
 ## Layer decision table
 
 | Layer | Right for | Envelope it can honor | Hazards |
@@ -62,6 +66,9 @@ the create path (the 404-after-create window is user-visible); and never
 for authorization denials (the deny must re-evaluate — see Safety Rules).
 
 ## Serve-stale-on-error policy shape
+
+Do not serve stale authorization, access-control, or other security decisions.
+Apply this fallback only to data whose owner has accepted the stated age bound.
 
 ```
 on origin error: serve stale up to MAX-STALE=<bound>
