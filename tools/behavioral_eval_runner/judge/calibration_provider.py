@@ -6,7 +6,8 @@ permitted to name the provider. The client here is NOT a general live
 dispatch path:
 
 - it is constructible only with a gate-issued
-  ``CalibrationDispatchAuthorization`` (owner label approval verified) —
+  ``CalibrationDispatchAuthorization`` or the separate frozen
+  ``HoldoutDispatchAuthorization`` (owner approval verified) —
   ``DisabledJudgeProvider`` remains the sole generic "provider";
 - it dispatches only requests carrying the authorized candidate-dataset
   identity, over envelopes whose bytes hash-bind the request;
@@ -30,7 +31,7 @@ from datetime import datetime, timezone
 from functools import wraps
 from typing import Any, Callable, Mapping
 
-from ..canonical import canonical_bytes, sha256_hex
+from ..canonical import canonical_bytes, sha256_hex, sha256_of_obj
 from .calibration_errors import (
     CalibrationAuthorizationError,
     CalibrationLedgerError,
@@ -39,7 +40,11 @@ from .calibration_errors import (
     CalibrationStopError,
     CalibrationStopReason,
 )
-from .calibration_gates import CalibrationDispatchAuthorization, ExecutionStage
+from .calibration_gates import (
+    CalibrationDispatchAuthorization,
+    ExecutionStage,
+    HoldoutDispatchAuthorization,
+)
 from .calibration_ledger import (
     CalibrationLedger,
     ProviderUsage,
@@ -133,25 +138,14 @@ class OpenAICalibrationJudgeClient(JudgeClient):
     def __init__(
         self,
         *,
-        authorization: CalibrationDispatchAuthorization,
+        authorization: CalibrationDispatchAuthorization | HoldoutDispatchAuthorization,
         ledger: CalibrationLedger,
         sdk_client: Any,
         exception_types: TransportExceptionTypes | None = None,
         day_provider: Callable[[], str] = _utc_day,
         time_source: Callable[[], float] = time.time,
     ) -> None:
-        if not isinstance(authorization, CalibrationDispatchAuthorization):
-            raise CalibrationAuthorizationError(
-                "the calibration provider is callable only from the "
-                "authorized WP-2B-3 calibration execution surface: a "
-                "gate-issued CalibrationDispatchAuthorization is required"
-            )
-        if authorization.stage is not ExecutionStage.DEVELOPMENT:
-            raise CalibrationStopError(
-                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
-                "only the DEVELOPMENT stage is dispatchable through this "
-                "client; the sealed holdout needs the owner freeze gate",
-            )
+        self._validate_token(authorization)
         if not isinstance(ledger, CalibrationLedger):
             raise CalibrationLedgerError(
                 "a CalibrationLedger is required: unaccounted dispatch is "
@@ -174,6 +168,59 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         self._day_provider = day_provider
         self._time_source = time_source
         self._in_flight = False
+
+    @staticmethod
+    def _validate_token(
+        authorization: CalibrationDispatchAuthorization | HoldoutDispatchAuthorization,
+    ) -> None:
+        """Only the exact gate-issued class for its own stage can dispatch."""
+        if type(authorization) is CalibrationDispatchAuthorization:
+            if authorization.stage is not ExecutionStage.DEVELOPMENT:
+                raise CalibrationAuthorizationError(
+                    "a DEVELOPMENT authorization cannot dispatch holdout"
+                )
+            authorization.validate_current()
+        elif type(authorization) is HoldoutDispatchAuthorization:
+            authorization.validate_current()
+            if authorization.stage is not ExecutionStage.SEALED_HOLDOUT:
+                raise CalibrationAuthorizationError(
+                    "a holdout authorization must retain its holdout stage"
+                )
+        else:
+            raise CalibrationAuthorizationError(
+                "the calibration provider requires a gate-issued dispatch "
+                "authorization for its exact execution stage"
+            )
+
+    def _validate_authorization(self) -> None:
+        """Recheck issuance and process pins before each external attempt."""
+        self._validate_token(self._authorization)
+
+    def _require_holdout_ledger_binding(self) -> None:
+        if type(self._authorization) is HoldoutDispatchAuthorization:
+            authorization = self._authorization
+            try:
+                self._ledger.require_holdout_dispatch_binding(
+                    freeze_sha256=sha256_of_obj(
+                        authorization.freeze_authorization.artifact.to_dict()
+                    ),
+                    dataset_sha256=authorization.dataset_sha256,
+                    audited_head_sha=authorization.approved_head_sha,
+                    audited_tree_sha=authorization.approved_tree_sha,
+                    max_output_tokens=authorization.max_output_tokens,
+                )
+            except CalibrationLedgerError as exc:
+                raise CalibrationStopError(
+                    CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                    "holdout authorization differs from the durable "
+                    "freeze/source transition",
+                ) from exc
+
+    @property
+    def _max_output_tokens(self) -> int:
+        if isinstance(self._authorization, HoldoutDispatchAuthorization):
+            return self._authorization.max_output_tokens
+        return DEV_MAX_OUTPUT_TOKENS
 
     # ----------------------------------------------------------- helpers
     def _exception_types(self) -> TransportExceptionTypes:
@@ -270,6 +317,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
     def dispatch(self, request: JudgeRequest, envelope_bytes: bytes) -> JudgeResponse:
         """One logical judgment: initial attempt plus AT MOST the single
         runner-owned transport retry, every attempt reserved and recorded."""
+        self._validate_authorization()
         if self._in_flight:
             raise CalibrationStopError(
                 CalibrationStopReason.CONCURRENCY_VIOLATION,
@@ -286,6 +334,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
     def _dispatch_once_guarded(
         self, request: JudgeRequest, envelope_bytes: bytes
     ) -> JudgeResponse:
+        self._validate_authorization()
+        self._require_holdout_ledger_binding()
         if not self._ledger.metadata_success_recorded():
             raise CalibrationStopError(
                 CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
@@ -304,10 +354,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 "authorized dataset hash"
             )
         if request.request_id not in self._authorization.authorized_request_ids:
-            # B1 boundary: the gate derived the DEVELOPMENT-only request-id
-            # set from the hash-bound dataset; a sealed-holdout item's
-            # request id is never a member, so it can never be dispatched
-            # under a development authorization.
+            # The stage-specific gate derived an exact request-id set from
+            # the hash-bound dataset. The two stages' sets are disjoint.
             raise CalibrationAuthorizationError(
                 f"request {request.request_id!r} is not in the authorized "
                 "item set of this dispatch authorization (sealed-holdout "
@@ -332,7 +380,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         kwargs = build_responses_request_kwargs(
             instructions=instructions,
             input_text=input_text,
-            max_output_tokens=DEV_MAX_OUTPUT_TOKENS,
+            max_output_tokens=self._max_output_tokens,
             request=request,
             evidence_keys=tuple(sorted(envelope["untrusted_data"])),
         )
@@ -344,6 +392,8 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         previous_entry_id: str | None = None
         result: _AttemptResult | None = None
         for attempt_number in (1, 2):
+            self._validate_authorization()
+            self._require_holdout_ledger_binding()
             # Family-3 gate: the persistent stage AND whole-run deadlines
             # are checked before EVERY external attempt — including the
             # runner retry — from the durable ledger's active-time state.
@@ -355,7 +405,7 @@ class OpenAICalibrationJudgeClient(JudgeClient):
                 logical_judgment_id=request.request_id,
                 attempt_number=attempt_number,
                 estimated_input_tokens=estimated_input,
-                max_output_tokens=DEV_MAX_OUTPUT_TOKENS,
+                max_output_tokens=self._max_output_tokens,
                 day=self._day_provider(),
                 dataset_sha256=self._authorization.dataset_sha256,
                 stage=self._authorization.stage.value,
@@ -645,6 +695,13 @@ class OpenAICalibrationJudgeClient(JudgeClient):
         """The single authorized read-only availability request
         (GET /v1/models/gpt-5.5-2026-04-23). Stage A1 never calls this with
         a live client; the ledger enforces the exactly-one cap."""
+        self._validate_authorization()
+        if self._authorization.stage is ExecutionStage.SEALED_HOLDOUT:
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "the holdout reuses the durable DEVELOPMENT metadata proof; "
+                "a second metadata request is forbidden",
+            )
         self._ledger.check_deadlines(
             self._authorization.stage.value, now=self._time_source()
         )
@@ -724,6 +781,11 @@ class OpenAICalibrationJudgeClient(JudgeClient):
             usage=ProviderUsage.zero(),
             outcome_kind="METADATA_OK",
         )
+
+
+# The holdout driver imports this neutral name so provider identifiers remain
+# confined to the existing adapter allowlist in the static safety check.
+CalibrationJudgeClient = OpenAICalibrationJudgeClient
 
 
 def dispatch_calibration_judgment(

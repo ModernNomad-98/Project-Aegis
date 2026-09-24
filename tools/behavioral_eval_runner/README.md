@@ -10,7 +10,8 @@ application feature installed with the skills.
 **Current state:** General runner and Scenario A grading commands operate on
 offline or recorded synthetic data. They do not start a live assistant or
 send a model request. A separate gated calibration development driver exists,
-but measured calibration has not started: replacement labels still need owner
+and an approved synthetic offline holdout-support increment is being built.
+Measured calibration has not started: replacement labels still need owner
 review. No live Scenario A or general corpus run is available. The
 [active backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) records
 current gates; the [design](../../docs/design/behavioral-eval-runner-v1.md)
@@ -143,8 +144,8 @@ remain separate gates in the [policy backlog](../../docs/roadmaps/behavioral-eva
 quality. Decision identifiers such as `BER-DEC-008` refer to owner decisions
 in the [runner backlog and decision record](../../docs/roadmaps/behavioral-eval-runner-backlog.md).
 Offline-tested dataset, request, accounting, credential and authorization
-controls live under `judge/calibration_*.py`. The current
-`calibration_development_driver.py` is development-only. Its default
+controls live under `judge/calibration_*.py`. The existing
+`calibration_development_driver.py` remains development-only. Its default
 description command reports the contract without sending a request:
 
 ```bash
@@ -156,8 +157,19 @@ are versioned in an owner-only private repository; proposed labels still
 await human review. Hidden holdout transcripts and labels must stay out of
 this public repository and judge requests. See the
 [replacement plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
-and [offline holdout support proposal](../../docs/roadmaps/ber-wp2b3-holdout-execution-scope.md).
-That proposal does not complete a holdout driver or authorize a live run.
+and [offline holdout support scope](../../docs/roadmaps/ber-wp2b3-holdout-execution-scope.md).
+BER-DEC-012 now authorizes a bounded implementation using synthetic temporary
+fixtures only. The holdout driver uses the same durable ledger and refuses a
+second pass after its one-way transition. It can rebuild a missing result
+summary from a fully closed, verified pass without another provider request.
+The production freeze, audited source and development evidence pins remain
+unset. The [offline review record](../../docs/evidence/ber-wp2b3-holdout-offline-review.md)
+tracks focused and full Windows test results, independent review and pending
+pinned Linux checks.
+This source branch is not an approved live execution revision. The general
+runner command-line interface
+has no holdout command, and a later measured holdout still needs its separate
+gates.
 
 Before any provider request, the owner-approved dataset and exact source
 revision, historical usage and remaining allowance, evidence root, host,

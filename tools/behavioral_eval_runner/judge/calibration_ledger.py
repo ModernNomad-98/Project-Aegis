@@ -51,6 +51,7 @@ from .calibration_transport import (
     AUTHORIZED_MODEL_SNAPSHOT,
     AUTHORIZED_SDK_VERSION,
     DEV_MAX_OUTPUT_TOKENS,
+    HOLDOUT_MAX_OUTPUT_TOKENS_RANGE,
     MAX_INPUT_TOKENS_PER_JUDGMENT,
     verify_sdk_available,
 )
@@ -99,6 +100,7 @@ EVENT_KINDS = (
     "SEMANTIC_OUTCOME",
     "DEADLINE_STOP",
     "RUN_STATE_TRANSITION",
+    "HOLDOUT_TRANSITION",
 )
 
 #: Durable append-only run states (first-live audit family C).
@@ -110,6 +112,7 @@ EVENT_KINDS = (
 RUN_STATE_PAUSED = "RUN_PAUSED"
 RUN_STATE_STOPPED = "RUN_STOPPED"
 RUN_STATE_OWNER_WAIT = "OWNER_WAIT"
+RUN_STATE_HOLDOUT_ACTIVE = "HOLDOUT_ACTIVE"
 VALID_RUN_STATES = (RUN_STATE_PAUSED, RUN_STATE_STOPPED,
                     RUN_STATE_OWNER_WAIT)
 
@@ -327,6 +330,8 @@ class CalibrationLedger:
         self._segments: list[list[Any]] = []  # [stage, begin, end|None]
         self._run_state: str | None = None
         self._metadata_ok = False
+        self._holdout_transition: dict[str, Any] | None = None
+        self._holdout_reopened = False
         self.run_id = f"seg-{uuid.uuid4().hex[:12]}"
 
         if path is None:
@@ -340,6 +345,7 @@ class CalibrationLedger:
             self._event_seq = len(events)
             self._prev_hash = events[-1]["event_sha256"]
             self._rehydrate(events)
+            self._holdout_reopened = self._holdout_transition is not None
         else:
             if not declare_first_segment:
                 raise CalibrationLedgerError(
@@ -396,6 +402,24 @@ class CalibrationLedger:
                         break
             elif kind == "RUN_STATE_TRANSITION":
                 self._run_state = event.get("run_state")
+            elif kind == "HOLDOUT_TRANSITION":
+                if self._holdout_transition is not None:
+                    raise CalibrationLedgerError("duplicate holdout transition")
+                if self._run_state != RUN_STATE_OWNER_WAIT:
+                    raise CalibrationLedgerError(
+                        "holdout transition must follow durable OWNER_WAIT"
+                    )
+                if any(segment[2] is None for segment in self._segments):
+                    raise CalibrationLedgerError(
+                        "holdout transition follows an open active segment"
+                    )
+                if started:
+                    raise CalibrationLedgerError(
+                        "holdout transition follows unterminated attempts"
+                    )
+                self._validate_holdout_binding(event)
+                self._holdout_transition = event
+                self._run_state = RUN_STATE_HOLDOUT_ACTIVE
         # Durable metadata SUCCESS (family C): only a terminal METADATA
         # event whose outcome is METADATA_OK for the exact authorized
         # snapshot counts — a bare metadata attempt count never does.
@@ -407,6 +431,10 @@ class CalibrationLedger:
                 and event.get("returned_model") == AUTHORIZED_MODEL_SNAPSHOT
             ):
                 self._metadata_ok = True
+        if self._holdout_transition is not None and not self._metadata_ok:
+            raise CalibrationLedgerError(
+                "holdout transition lacks durable METADATA_OK"
+            )
         # Orphans: STARTED with no terminal — never forgotten, identity
         # never reused, conservatively charged, billing UNKNOWN.
         orphan_ids: list[str] = []
@@ -478,6 +506,24 @@ class CalibrationLedger:
         return exclusive_lock(self._path + '.transport.lock')
 
     def require_active_transport(self, stage: str) -> None:
+        if getattr(self, "_write_failed", False):
+            raise CalibrationStopError(
+                CalibrationStopReason.BUDGET_TELEMETRY_UNAVAILABLE,
+                "ledger persistence failed; transport is denied",
+            )
+        if stage == "SEALED_HOLDOUT":
+            if (self._holdout_transition is None
+                    or self._run_state != RUN_STATE_HOLDOUT_ACTIVE
+                    or self._holdout_reopened):
+                raise CalibrationStopError(
+                    CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                    "sealed holdout requires its durable one-pass transition",
+                )
+        elif self._holdout_transition is not None:
+            raise CalibrationStopError(
+                CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
+                "development transport cannot resume after holdout transition",
+            )
         if self._run_state in (RUN_STATE_STOPPED, RUN_STATE_OWNER_WAIT):
             raise CalibrationStopError(
                 CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE,
@@ -583,6 +629,33 @@ class CalibrationLedger:
             raise CalibrationLedgerError("day key required (UTC date)")
         if stage not in _VALID_STAGES:
             raise CalibrationLedgerError(f"unknown stage {stage!r}")
+        if stage == "SEALED_HOLDOUT":
+            transition = self._holdout_transition
+            if (transition is None or self._run_state != RUN_STATE_HOLDOUT_ACTIVE
+                    or self._holdout_reopened):
+                raise CalibrationReservationDenied(
+                    "sealed holdout requires its durable one-pass transition"
+                )
+            if kind is RequestKind.METADATA:
+                raise CalibrationReservationDenied(
+                    "metadata availability is development-only"
+                )
+            if dataset_sha256 != transition["dataset_sha256"]:
+                raise CalibrationReservationDenied(
+                    "holdout dataset differs from the durable transition"
+                )
+            if max_output_tokens != transition["max_output_tokens"]:
+                raise CalibrationReservationDenied(
+                    "holdout output cap differs from the durable freeze"
+                )
+            if not any(s[0] == stage and s[2] is None for s in self._segments):
+                raise CalibrationReservationDenied(
+                    "holdout reservation requires its active segment"
+                )
+        elif self._holdout_transition is not None or self._run_state == RUN_STATE_OWNER_WAIT:
+            raise CalibrationReservationDenied(
+                "development reservation cannot bypass OWNER_WAIT or holdout transition"
+            )
 
         if kind is RequestKind.JUDGMENT_ATTEMPT:
             if not logical_judgment_id:
@@ -869,6 +942,12 @@ class CalibrationLedger:
                 f"unknown run state {run_state!r}; the closed set is "
                 f"{VALID_RUN_STATES}"
             )
+        if self._run_state == RUN_STATE_OWNER_WAIT:
+            raise CalibrationLedgerError(
+                "OWNER_WAIT can only advance through the durable holdout transition"
+            )
+        if self._holdout_transition is not None and run_state == RUN_STATE_OWNER_WAIT:
+            raise CalibrationLedgerError("holdout cannot return to OWNER_WAIT")
         event = self._append_event("RUN_STATE_TRANSITION", {
             "run_state": run_state,
             "reason": reason,
@@ -886,6 +965,108 @@ class CalibrationLedger:
         """True only when a durable METADATA_OK terminal for the exact
         authorized snapshot exists (prior segments or this one)."""
         return self._metadata_ok
+
+    @staticmethod
+    def _validate_holdout_binding(binding: Mapping[str, Any]) -> None:
+        fields = {
+            "freeze_sha256": 64,
+            "dataset_sha256": 64,
+            "audited_head_sha": 40,
+            "audited_tree_sha": 40,
+            "development_manifest_sha256": 64,
+            "development_summary_sha256": 64,
+        }
+        for name, length in fields.items():
+            value = binding.get(name)
+            if (not isinstance(value, str) or len(value) != length
+                    or any(character not in "0123456789abcdef" for character in value)):
+                raise CalibrationLedgerError(
+                    f"{name} must be lowercase {length}-hex"
+                )
+        cap = binding.get("max_output_tokens")
+        low, high = HOLDOUT_MAX_OUTPUT_TOKENS_RANGE
+        if (not isinstance(cap, int) or isinstance(cap, bool)
+                or not low <= cap <= high):
+            raise CalibrationLedgerError("holdout output cap is invalid")
+
+    def authorize_holdout_transition(
+        self, *, freeze_sha256: str, dataset_sha256: str,
+        audited_head_sha: str, audited_tree_sha: str,
+        development_manifest_sha256: str,
+        development_summary_sha256: str, max_output_tokens: int,
+    ) -> dict[str, Any]:
+        """Fsync the exact one-pass freeze/source/development binding first."""
+        binding = {
+            "freeze_sha256": freeze_sha256,
+            "dataset_sha256": dataset_sha256,
+            "audited_head_sha": audited_head_sha,
+            "audited_tree_sha": audited_tree_sha,
+            "development_manifest_sha256": development_manifest_sha256,
+            "development_summary_sha256": development_summary_sha256,
+            "max_output_tokens": max_output_tokens,
+        }
+        self._validate_holdout_binding(binding)
+        if not self.is_durable or self._run_state != RUN_STATE_OWNER_WAIT:
+            raise CalibrationLedgerError(
+                "holdout transition requires durable OWNER_WAIT"
+            )
+        if self._holdout_transition is not None:
+            raise CalibrationLedgerError("holdout transition is single-use")
+        if not self._metadata_ok or self._orphans or self._pending:
+            raise CalibrationLedgerError(
+                "holdout transition requires METADATA_OK and no pending or orphaned attempts"
+            )
+        if any(segment[2] is None for segment in self._segments):
+            raise CalibrationLedgerError("active segment remains open")
+        event = self._append_event("HOLDOUT_TRANSITION", {
+            **binding, "recorded_utc": _utc_now_iso(),
+        })
+        self._holdout_transition = event
+        self._run_state = RUN_STATE_HOLDOUT_ACTIVE
+        return event
+
+    def require_holdout_binding(
+        self, *, freeze_sha256: str, dataset_sha256: str,
+        audited_head_sha: str, audited_tree_sha: str,
+        development_manifest_sha256: str,
+        development_summary_sha256: str, max_output_tokens: int,
+    ) -> None:
+        binding = {
+            "freeze_sha256": freeze_sha256,
+            "dataset_sha256": dataset_sha256,
+            "audited_head_sha": audited_head_sha,
+            "audited_tree_sha": audited_tree_sha,
+            "development_manifest_sha256": development_manifest_sha256,
+            "development_summary_sha256": development_summary_sha256,
+            "max_output_tokens": max_output_tokens,
+        }
+        self._validate_holdout_binding(binding)
+        if (self._holdout_transition is None
+                or any(self._holdout_transition.get(key) != value
+                       for key, value in binding.items())):
+            raise CalibrationLedgerError(
+                "holdout binding differs from durable transition"
+            )
+
+    def require_holdout_dispatch_binding(
+        self, *, freeze_sha256: str, dataset_sha256: str,
+        audited_head_sha: str, audited_tree_sha: str,
+        max_output_tokens: int,
+    ) -> None:
+        """Compare a gate-issued dispatch token with the durable transition."""
+        binding = {
+            "freeze_sha256": freeze_sha256,
+            "dataset_sha256": dataset_sha256,
+            "audited_head_sha": audited_head_sha,
+            "audited_tree_sha": audited_tree_sha,
+            "max_output_tokens": max_output_tokens,
+        }
+        if (self._holdout_transition is None
+                or any(self._holdout_transition.get(key) != value
+                       for key, value in binding.items())):
+            raise CalibrationLedgerError(
+                "holdout dispatch token differs from durable transition"
+            )
 
     # ------------------------------------------------- semantic outcomes
     def record_semantic_outcome(
@@ -922,10 +1103,22 @@ class CalibrationLedger:
             )
         if any(segment[2] is None for segment in self._segments):
             raise CalibrationLedgerError("an active segment is already open")
-        self._segments.append([stage, float(at), None])
+        if stage == "SEALED_HOLDOUT":
+            if (self._holdout_transition is None
+                    or self._run_state != RUN_STATE_HOLDOUT_ACTIVE
+                    or self._holdout_reopened
+                    or any(s[0] == stage for s in self._segments)):
+                raise CalibrationLedgerError(
+                    "sealed holdout requires one durable transition and one segment"
+                )
+        elif self._holdout_transition is not None or self._run_state == RUN_STATE_OWNER_WAIT:
+            raise CalibrationLedgerError(
+                "development cannot resume after OWNER_WAIT"
+            )
         if self.is_durable:
             self._append_event("ACTIVE_SEGMENT_BEGIN",
                                {"stage": stage, "at": float(at)})
+        self._segments.append([stage, float(at), None])
 
     def end_active_segment(self, at: float) -> None:
         for segment in reversed(self._segments):
@@ -934,10 +1127,10 @@ class CalibrationLedger:
                     raise CalibrationLedgerError(
                         "segment end precedes its start"
                     )
-                segment[2] = float(at)
                 if self.is_durable:
                     self._append_event("ACTIVE_SEGMENT_END",
                                        {"at": float(at)})
+                segment[2] = float(at)
                 return
         raise CalibrationLedgerError("no active segment is open")
 

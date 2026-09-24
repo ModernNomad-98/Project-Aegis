@@ -5,6 +5,9 @@ freeze gate (BER-DEC-008 decisions 16 terms, 19, 34, 35; task section 16).
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
+
+from tools.behavioral_eval_runner.canonical import sha256_of_obj
 
 from tools.behavioral_eval_runner.errors import SchemaValidationError
 from tools.behavioral_eval_runner.judge import calibration_dataset as cd
@@ -165,6 +168,23 @@ class TestOwnerApprovalGate(unittest.TestCase):
                 approval_statement="forged",
             )
 
+    def test_development_authorization_is_issued_and_immutable(self) -> None:
+        token = cg.authorize_calibration_dispatch(
+            approval=_approved(self.identity), dataset_identity=self.identity,
+            dataset=self.dataset, stage=cg.ExecutionStage.DEVELOPMENT,
+        )
+        token.validate_current()
+        with self.assertRaises(CalibrationAuthorizationError):
+            token.stage = cg.ExecutionStage.SEALED_HOLDOUT
+        with self.assertRaises(CalibrationAuthorizationError):
+            token.authorized_request_ids = frozenset({"forged"})
+        forged = object.__new__(cg.CalibrationDispatchAuthorization)
+        with self.assertRaises(CalibrationAuthorizationError):
+            forged.validate_current()
+        object.__setattr__(token, "stage", cg.ExecutionStage.SEALED_HOLDOUT)
+        with self.assertRaises(CalibrationAuthorizationError):
+            token.validate_current()
+
     def test_approval_artifact_round_trip_and_validation(self) -> None:
         approval = _approved(self.identity)
         payload = approval.to_dict()
@@ -280,6 +300,140 @@ class TestHoldoutFreezeGate(unittest.TestCase):
         with patch.object(cg, 'APPROVED_HOLDOUT_FREEZE_SHA256', sha256_of_obj(artifact.to_dict())):
             authorization = cg.authorize_holdout_access(freeze_artifact=artifact)
         self.assertIsInstance(authorization, cg.HoldoutFreezeAuthorization)
+
+
+class TestHoldoutDispatchGate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.dataset = build_conforming_dataset()
+        self.identity = _identity(self.dataset)
+        self.approval = _approved(self.identity)
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload["frozen_sha256"]["dataset"] = self.identity.dataset_sha256
+        payload["frozen_sha256"]["split_map"] = self.identity.split_map_sha256
+        payload["freeze_contract_sha256"] = cg.freeze_contract_sha256(payload)
+        self.artifact = cg.HoldoutFreezeArtifact.from_dict(payload)
+        self.head = "a" * 40
+        self.tree = "b" * 40
+
+    def _pins(self):
+        from contextlib import ExitStack
+
+        stack = ExitStack()
+        stack.enter_context(patch.object(
+            cg, "APPROVED_HOLDOUT_FREEZE_SHA256",
+            sha256_of_obj(self.artifact.to_dict()),
+        ))
+        stack.enter_context(patch.object(
+            cg, "APPROVED_HOLDOUT_EXECUTION_HEAD_SHA", self.head,
+        ))
+        stack.enter_context(patch.object(
+            cg, "APPROVED_HOLDOUT_EXECUTION_TREE_SHA", self.tree,
+        ))
+        return stack
+
+    def _issue(self, **overrides):
+        arguments = dict(
+            approval=self.approval, dataset_identity=self.identity,
+            dataset=self.dataset, freeze_artifact=self.artifact,
+            current_head_sha=self.head, current_tree_sha=self.tree,
+        )
+        arguments.update(overrides)
+        return cg.authorize_holdout_dispatch(**arguments)
+
+    def test_production_pins_remain_unset_and_block_dispatch(self) -> None:
+        self.assertIsNone(cg.APPROVED_HOLDOUT_EXECUTION_HEAD_SHA)
+        self.assertIsNone(cg.APPROVED_HOLDOUT_EXECUTION_TREE_SHA)
+        with self.assertRaises(HoldoutAccessError):
+            self._issue()
+
+    def test_gate_issues_only_closed_holdout_ids_and_frozen_cap(self) -> None:
+        with self._pins():
+            token = self._issue()
+            token.validate_current()
+            self.assertIs(token.stage, cg.ExecutionStage.SEALED_HOLDOUT)
+            self.assertEqual(token.max_output_tokens,
+                             self.artifact.holdout_max_output_tokens)
+            self.assertEqual(token.freeze_contract_sha256,
+                             self.artifact.freeze_contract_sha256)
+            self.assertEqual(len(token.authorized_request_ids), 120)
+            for item in self.dataset.items:
+                request_id = cd.calibration_request_id(
+                    item.item_id, self.identity.dataset_sha256,
+                )
+                if item.split is cd.CandidateSplit.SEALED_HOLDOUT:
+                    self.assertIn(request_id, token.authorized_request_ids)
+                else:
+                    self.assertNotIn(request_id, token.authorized_request_ids)
+
+    def test_unpinned_or_changed_source_blocks_issuance(self) -> None:
+        with self._pins():
+            with self.assertRaises(HoldoutAccessError):
+                self._issue(current_head_sha="c" * 40)
+            with self.assertRaises(HoldoutAccessError):
+                self._issue(current_tree_sha="c" * 40)
+            with patch.object(cg, "APPROVED_HOLDOUT_EXECUTION_HEAD_SHA", None):
+                with self.assertRaises(HoldoutAccessError):
+                    self._issue()
+            with patch.object(cg, "APPROVED_HOLDOUT_EXECUTION_TREE_SHA", "xyz"):
+                with self.assertRaises(HoldoutAccessError):
+                    self._issue()
+
+    def test_missing_approval_and_dataset_or_split_changes_block(self) -> None:
+        with self._pins():
+            with self.assertRaises(CalibrationStopError):
+                self._issue(approval=None)
+            with self.assertRaises(CalibrationStopError):
+                self._issue(approval=cg.OwnerLabelApproval.pending(self.identity))
+            changed = cg.DatasetIdentity(
+                dataset_id=self.identity.dataset_id,
+                dataset_version=self.identity.dataset_version,
+                dataset_sha256=self.identity.dataset_sha256,
+                split_map_sha256="d" * 64,
+                labeling_guide_sha256=self.identity.labeling_guide_sha256,
+            )
+            with self.assertRaises(CalibrationStopError):
+                self._issue(dataset_identity=changed)
+            payload = self.artifact.to_dict()
+            payload["frozen_sha256"]["split_map"] = "e" * 64
+            payload["freeze_contract_sha256"] = cg.freeze_contract_sha256(payload)
+            changed_freeze = cg.HoldoutFreezeArtifact.from_dict(payload)
+            with patch.object(cg, "APPROVED_HOLDOUT_FREEZE_SHA256",
+                              sha256_of_obj(changed_freeze.to_dict())):
+                with self.assertRaises(HoldoutAccessError):
+                    self._issue(freeze_artifact=changed_freeze)
+
+    def test_missing_or_changed_freeze_blocks(self) -> None:
+        with self._pins():
+            with self.assertRaises(HoldoutAccessError):
+                self._issue(freeze_artifact=None)
+            token = self._issue()
+            with patch.object(cg, "APPROVED_HOLDOUT_FREEZE_SHA256", None):
+                with self.assertRaises(HoldoutAccessError):
+                    token.validate_current()
+            with patch.object(cg, "APPROVED_HOLDOUT_EXECUTION_HEAD_SHA",
+                              "c" * 40):
+                with self.assertRaises(CalibrationAuthorizationError):
+                    token.validate_current()
+
+    def test_direct_or_new_forgeries_and_mutation_are_rejected(self) -> None:
+        with self.assertRaises(CalibrationAuthorizationError):
+            cg.HoldoutDispatchAuthorization(
+                dataset_sha256=self.identity.dataset_sha256,
+                approval_statement="forged", authorized_request_ids=frozenset(),
+                max_output_tokens=16384, freeze_contract_sha256="0" * 64,
+                approved_head_sha=self.head, approved_tree_sha=self.tree,
+                freeze_authorization=None,
+            )
+        with self._pins():
+            token = self._issue()
+            forged = object.__new__(cg.HoldoutDispatchAuthorization)
+            with self.assertRaises(CalibrationAuthorizationError):
+                forged.validate_current()
+            with self.assertRaises(CalibrationAuthorizationError):
+                token.max_output_tokens = 8192
+            object.__setattr__(token, "max_output_tokens", 8192)
+            with self.assertRaises(CalibrationAuthorizationError):
+                token.validate_current()
 
 
 if __name__ == "__main__":  # pragma: no cover
