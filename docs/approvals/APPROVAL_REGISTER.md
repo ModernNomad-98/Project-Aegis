@@ -511,3 +511,16 @@ generic skill guidance that would require asking for the same approval again.
 - **Reason:** The sole approved administrator merge completed.
 - **Evidence:** [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249)
   merged as `fa37c0e545dfd096e8327ca5357b0dfc6e2f8bb5`.
+
+### AEGIS-APR-022: Consumption of offline evidence-policy proof grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-012.
+- **Status at recording:** AEGIS-APR-012 has no remaining use.
+- **Effective at:** 2026-09-24 15:57:16 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The one bounded synthetic implementation package authorized by
+  AEGIS-APR-012 was delivered. This records its already exhausted use; it is
+  separate from the PR #139 guard exception consumed by AEGIS-APR-015.
+- **Evidence:** [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+  merged as `b4b1195d6162728ffc37d22d038a08e3722db7c0`.

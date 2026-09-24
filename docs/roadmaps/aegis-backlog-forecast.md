@@ -7,9 +7,9 @@ to start blocked work. The [five-merge checkpoint after #250](#five-merge-checkp
 reassessed every remaining selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. The merged #250 tree had **584 pages**: 540 accepted
-reader pages and 44 classified fixtures. This reviewed proposal branch adds
-one reader page, making **585 pages** with 541 accepted readers and zero known
-pending pages on accepted merge. Twelve
+reader pages and 44 classified fixtures. PR #253 added one reviewed reader
+page, making the merged tree **585 pages** with 541 accepted readers and zero
+known pending pages. Twelve
 selected items remain at **87–178 active hours**; both optional Issue #101
 helpers would make it **103–218**. These estimates still depend on owner
 decisions and provisional real-host scope.
