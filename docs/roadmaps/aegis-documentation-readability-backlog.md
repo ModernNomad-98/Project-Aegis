@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of 2026-09-23 after pull request (PR) #205, this remains the active
+As of 2026-09-24 after pull request (PR) #208, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,11 +10,14 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The exact #205 tree contains **553 tracked Markdown files**. Earlier screens
-of skill entrypoints and references corrected particular pages; they did not
-accept every page against the checklist below. Continue the remaining
-page-by-page review and use the [forecast's current reading](aegis-backlog-forecast.md#start-here--current-reading)
-for the latest selected-work estimate. The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+The exact #207 tree contains **554 tracked Markdown files**. Nine corrected
+pages received recorded [full-checklist acceptance](../evidence/documentation/full-page-readability-sample-2026-09-23.md),
+leaving **545 pages** without it at that checkpoint. Earlier screens of skill
+entrypoints and references corrected particular pages; they did not accept
+every page against the checklist below. Continue the remaining page-by-page
+review. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
+estimates **55–200 active hours** for documentation and **150–394 active
+hours** for the selected backlog. The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
 explain their shipped offline workflows and limits. This reading route grants
 no provider call, private-input use, real-host activation or deployment.
@@ -148,12 +151,13 @@ squash commit carrying its request number. The sorted skill screens supply
 the 342 skill paths; the 44 fixture paths are under `scripts/`, except the
 reader-facing `scripts/tests/fixtures/README.md`.
 
-The **80–200 active-hour documentation estimate** remains a broad provisional
-remaining-work range. It fell neither automatically with a request count nor
+At the #205 progress-accounting checkpoint, the **80–200 active-hour
+documentation estimate** remained a broad provisional remaining-work range.
+It fell neither automatically with a request count nor
 from a short residual-screen model: the latter could undercount full-page
-review of long records. Before revising the range, measure a representative
-batch of eight to ten pages across short skills, medium guides, large
-roadmaps/evidence and templates. Record each page's actual active review and
+review of long records. Before revising that historical range, measure a
+representative batch of eight to ten pages across short skills, medium guides,
+large roadmaps/evidence and templates. Record each page's actual active review and
 correction time when available, independent reviewer result, and source
 revision. Recalculate remaining effort by page type and include integration,
 new-page and rework allowances. Keep active time distinct from PR wall time,
@@ -194,6 +198,7 @@ authority.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Full-page batch after PR #208, started 2026-09-24 approximately 00:09 UTC | Ten agent skill pages, one startup reference and ten other reader pages; [page-level evidence](../evidence/documentation/full-page-readability-batch-after-208-2026-09-24.md) | Independent read-only reviewers accepted 21 existing pages after correction or unchanged. The evidence note records each outcome and reviewer interval. At the expected 555-page post-merge inventory, 30 existing pages have recorded full-page acceptance and 525 do not; reconcile with the exact merge tree. The selected backlog forecast at start is 150–394 active hours, with 55–200 for documentation. |
 | First component guides, started 2026-09-23 16:12 UTC | `tools/behavioral_eval_runner/README.md`, `tools/aegis_delivery_control/README.md`, `docs/README.md` | Rewritten around purpose, workflow, examples, functions and limits. Local commands and links passed; independent read-only review found no remaining blocker after corrections. Root README navigation remains a separate batch. |
 | Maintainer guide batch, PR #122 | `docs/offline-ci.md`, `docs/approval-lifecycle-grading.md`, `SECURITY.md` | Added purpose, normal use and terms to three active guides; [batch evidence](../evidence/documentation/readability-maintainer-guides-2026-09-23.md). Other documentation remains open. |
 | Technical guide batch, PR #126 | `docs/behavioral-eval-runner-schema-compatibility.md`, `docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md` | Clarified reader steps, codes and policy limits in two guides; [batch evidence](../evidence/documentation/readability-technical-guides-2026-09-23.md). No schema or authority change. |

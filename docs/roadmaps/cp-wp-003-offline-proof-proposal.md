@@ -1,5 +1,18 @@
 # CP-WP-003 offline capability-proof authorization proposal
 
+**Reading key:** Control plane (CP) names the delivery kernel; a work package
+(WP) is a bounded delivery unit, and `003A` was its synthetic first increment.
+`AEGIS-APR-006` is the matching owner approval-register entry; a pull request
+(PR) records reviewed repository delivery.
+This page is for the owner and reviewers assessing the synthetic first
+increment. SQLite is the embedded database used by the offline recovery
+kernel; the proof does not demonstrate a real external source or host.
+Developer Certificate of Origin (DCO) is the commit sign-off; quality
+assurance (QA) is independent verification; continuous integration (CI) runs
+automated repository checks. Behavioral Eval Runner (BER) is a separate
+evaluation tool; command-line interface (CLI) means a terminal command
+surface; an access control list (ACL) sets access permissions.
+
 > **Current reading, checked 2026-09-23:** The proposed grant below is the
 > historical route to the first increment. AEGIS-APR-006 authorized CP-WP-003A,
 > which [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123)
@@ -9,11 +22,6 @@
 > record that delivery. Real-source, host, evidence, and billing proofs remain
 > absent; CP-WP-003 and CP-WP-004 are still BLOCKED. The original proposal does
 > not authorize a real dispatch.
-
-**Reading key:** Control plane (CP) names the delivery kernel; a work package
-(WP) is a bounded delivery unit, and `003A` was its synthetic first increment.
-`AEGIS-APR-006` is the matching owner approval-register entry; a pull request
-(PR) records reviewed repository delivery.
 
 Prepared 2026-09-23 from public `main` at
 `32144083bc86412e30d70873f877d4e7c051b6e0`. **Proposal only.**

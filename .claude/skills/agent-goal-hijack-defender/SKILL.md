@@ -1,10 +1,15 @@
 ---
 name: agent-goal-hijack-defender
-description: 'MANUAL-ONLY; never auto-invoke. Defend an AI agent''s goal and plan integrity against goal hijack (OWASP Agentic ASI01) — pin the authorized goal at task start as a record only the authorizing principal can change, trace every step and sub-goal of a multi-step run back to the pinned goal, detect deviation (scope expansion, unrelated targets, substituted objectives) at plan checkpoints, and re-ground or halt on drift. Covers hijack via any untrusted channel: injected content, poisoned tool outputs, other agents'' messages, stored memory. Builds on prompt-injection-defender (LLM01), which owns the injection vector — this skill owns the goal/plan layer above it. Use when an agent plans and executes multi-step work and its objective must survive contact with untrusted content. Do NOT use for the injection defense itself (prompt-injection-defender), persistent memory corruption (memory-context-poisoning-reviewer), attacker-less drift (agent-containment-reviewer), or tool scope (agent-tool-safety-guard).'
+description: 'MANUAL-ONLY; never auto-invoke. Defend an artificial intelligence (AI) agent''s goal and plan against hijack, the Open Worldwide Application Security Project (OWASP) agentic identifier ASI01. Pin the authorized goal in a record only the authorizing principal can change, trace each planned step to it, detect scope or objective deviation, and re-ground or halt. Covers injected content, tool outputs, peer messages, and memory. Builds on prompt-injection-defender, which handles the prompt-injection category LLM01; this skill handles goal integrity. Use for multi-step agents exposed to untrusted content. Do NOT use for injection defense itself, memory corruption, attacker-less drift, or tool scope.'
 disable-model-invocation: true
 ---
 
 # Agent Goal Hijack Defender
+
+**Reading key:** Open Worldwide Application Security Project (OWASP) agentic
+identifier ASI01 names goal hijack here; LLM01 names prompt injection in the
+large language model (LLM) category. This page designs defenses; it does not
+run a live incident.
 
 ## Purpose
 
@@ -79,7 +84,9 @@ loop/planner code and prompts, which are behavior-steering.
 5. **Design the response to drift.** On deviation: halt-and-ask
    (`human-approval-boundary`), re-ground (rebuild plan from the pinned
    record, quarantining the suspect content), or downgrade to no-side-effect
-   mode. Confirmed hijack routes to `incident-response-runbook`.
+   mode. A confirmed live hijack routes to the human incident owner, who
+   follows the approved response runbook. The `incident-response-runbook`
+   skill can author or improve that procedure after containment.
 6. **Protect the mutation channel.** Goal changes mid-run are themselves a
    task-start event: authenticate the principal, re-pin, log the change with
    provenance. "The user seems to want X now" derived from content is not a
@@ -171,8 +178,11 @@ Files to change: <loop/planner code, goal state, checkpoint wiring>
 - The agent has no multi-step plan (single prompt→response) — goal hijack
   reduces to injection; hand to `prompt-injection-defender` and stop.
 - Evidence of an ACTIVE hijack in production (agent pursuing attacker
-  objectives now) — route to `incident-response-runbook`; containment (kill
-  switch per `agent-containment-reviewer`) is a human call.
+  objectives now) — route to the human incident owner and the approved
+  response runbook; containment (kill switch per
+  `agent-containment-reviewer`) is a human call. The
+  `incident-response-runbook` skill authors procedures; it does not run the
+  live response.
 - The mutation channel cannot authenticate the principal (no identity model)
   — hand the prerequisite to `agent-identity-privilege-reviewer` and stop.
 

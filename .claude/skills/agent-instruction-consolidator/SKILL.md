@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 # Agent Instruction Consolidator
 
+**Reading key:** Continuous integration (CI) means automated repository
+checks. This manual-only skill proposes how agent instruction files should
+agree; changing those files requires the separate approved edit step.
+
 ## Purpose
 
 Make every AI tool in the repo read the same truth. This skill inventories all
