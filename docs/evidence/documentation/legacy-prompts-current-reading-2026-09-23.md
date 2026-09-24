@@ -1,5 +1,10 @@
 # Legacy skill plans: current-reading notes
 
+**Current reading (2026-09-24):** This batch was delivered; its final
+independent-review-pending sentence is the historical draft checkpoint.
+Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for current acceptance progress. UTC below means Coordinated Universal Time.
+
 Date: 2026-09-23. Edit start: 21:23:08 UTC. Base:
 `e6148322eefd085eeba9c58ef0c89876b90c9f71` (merged pull request #173).
 The preceding 15-page audit and this seven-page correction were each forecast

@@ -1,15 +1,19 @@
 ---
 name: flaky-test-detective
-description: "MANUAL-ONLY; never auto-invoke. Drive a flaky (intermittently failing) test to its root cause and proven stability through the fixed sequence CLASSIFY (ordering, shared state, timing/race, environment, infrastructure, or real intermittent product bug) → REPRODUCE deterministically (repeat runs, order shuffling, parallel stress, seed/timezone control) → FIX ONE CAUSE → PROVE stability with repeated runs and real counts. Never fixes by adding retries, sleeps, or looser assertions; distinguishes test bugs from product bugs (a race the test exposes may ship to users). Manages quarantine only with owner, ticket, and expiry. Use when a test fails intermittently, passes on retry, fails only in CI or only in parallel, or a suite's trust is eroding from random red. Do NOT use for tests that fail consistently (systematic-debugger for the product bug, or fix the test), for setting suite-wide retry/flake policy (qa-automation-architect), or for deciding suite membership (regression-suite-curator)."
+description: "MANUAL-ONLY; never auto-invoke. Drive a flaky (intermittently failing) test to its root cause and bounded stability evidence through the fixed sequence CLASSIFY (ordering, shared state, timing/race, environment, infrastructure, or real intermittent product bug) → REPRODUCE deterministically (repeat runs, order shuffling, parallel stress, seed/timezone control) → FIX ONE CAUSE → MEASURE stability with repeated runs and real counts. Never fixes by adding retries, sleeps, or looser assertions; distinguishes test bugs from product bugs (a race the test exposes may ship to users). Manages quarantine only with owner, ticket, and expiry. Use when a test fails intermittently, passes on retry, fails only in CI or only in parallel, or a suite's trust is eroding from random red. Do NOT use for tests that fail consistently (systematic-debugger for the product bug, or fix the test), for setting suite-wide retry/flake policy (qa-automation-architect), or for deciding suite membership (regression-suite-curator)."
 disable-model-invocation: true
 ---
 
 # Flaky Test Detective
 
+Terms: **CI** means continuous integration; **TALI** means task-authorized
+local implementation under the [skill standard](../../../docs/skill-generation-standard.md);
+**TZ** means time zone; **DST** means daylight saving time.
+
 ## Purpose
 
 Convert "it fails sometimes" into a named root cause, one targeted fix, and
-statistical evidence of stability — instead of the usual retries, sleeps,
+bounded repeated-run evidence of stability — instead of the usual retries, sleeps,
 and eroding trust. The deliverable is a case report: classification with
 evidence, a deterministic reproduction (or an honest account of why not),
 the single cause fixed, before/after stability counts from real repeated
@@ -83,9 +87,11 @@ the operation and obtain it before proceeding.
    control time/seed, remove order dependence. FORBIDDEN as fixes: retries,
    sleeps, widened timeouts without a named reason, weakened assertions,
    deletion-to-green.
-6. **Prove stability with counts:** re-run the reproduction protocol —
+6. **Measure stability with counts:** re-run the reproduction protocol —
    before (fails k/N under condition X) vs after (0/N under the same X,
-   N ≥ the count that reliably reproduced). One green run proves nothing.
+   N ≥ the count that reliably reproduced). Report N and test conditions;
+   zero failures is evidence under those conditions, not proof that the
+   failure cannot recur. One green run proves nothing.
 7. **Close the case:** report; if quarantined, release or extend WITH owner/
    ticket/expiry per policy; add the prevention note (pattern to lint/avoid);
    flag chronic offenders to `regression-suite-curator`.
@@ -100,7 +106,7 @@ Reproduction: <exact commands/conditions → counts (fails k/N under X)>
 Cause: <the ONE demonstrated cause>
 Triage: <test bug | product bug (routed with evidence) | infra (routed)>
 Fix: <the one change made; forbidden-fix check passed>
-Stability proof: <before k/N vs after 0/N under identical conditions, N=<n>>
+Stability evidence: <before k/N vs after 0/N under identical conditions, N=<n>, limits>
 Quarantine action: <none | released | extended (owner, ticket, expiry)>
 Prevention: <pattern note; chronic-offender flag → regression-suite-curator>
 ```
@@ -113,8 +119,8 @@ Prevention: <pattern note; chronic-offender flag → regression-suite-curator>
 - [ ] Exactly ONE cause fixed in this case.
 - [ ] Product-side races routed as product bugs, test kept honest.
 - [ ] No retries/sleeps/loosened assertions/deletions as "fixes".
-- [ ] Stability proven by repeated runs under the reproducing condition,
-      with counts, not one green run.
+- [ ] Bounded stability evidence reports repeated runs under the reproducing
+      condition, N and limitations, not one green run or proof of absence.
 - [ ] Quarantine actions carry owner + ticket + expiry.
 
 ## Gotchas

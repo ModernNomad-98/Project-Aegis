@@ -26,7 +26,7 @@
         "triggers": true,
         "assertions": [
           "Designs anonymous-to-identified stitching (identify/alias) so top-of-funnel anonymous events join to the identified conversion.",
-          "Specifies the keys events carry (user/account/tenant) and their stability, guaranteeing tenant context for multi-tenant analytics.",
+          "Specifies stable anonymous/user/account/tenant keys, preserves tenant context when known, marks unknown tenant context explicitly, and stitches only on verified association.",
           "Explains that broken identity is why the funnel undercounts and that stitching must exist before the funnel is trusted.",
           "Keeps the fix at the schema/plan level and hands funnel definition to funnel-definition-designer."
         ]

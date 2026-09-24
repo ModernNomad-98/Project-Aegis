@@ -47,5 +47,6 @@ dishonesty this trio prevents.
 ## Output is a PROPOSAL
 
 This skill proposes; it does not apply. Edits land only via a normal PR
-approved by a human / `library-diff-reviewer`. Keep voice/structure of
+independently reviewed by `library-diff-reviewer` and approved by a human.
+Keep voice/structure of
 each skill intact — targeted refresh, not re-author.

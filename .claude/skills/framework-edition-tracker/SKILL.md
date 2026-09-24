@@ -5,6 +5,12 @@ description: 'Track the editions of external standards the library''s framework-
 
 # Framework Edition Tracker
 
+Terms: **OWASP** means Open Worldwide Application Security Project; **ISO**
+means International Organization for Standardization; **SOC 2** means System
+and Organization Controls 2; **NIST** means National Institute of Standards
+and Technology; **AI RMF** means Artificial Intelligence Risk Management
+Framework; **LLM** means large language model.
+
 ## Purpose
 
 Every framework mapping the library ships — the OWASP Top 10 maps, the

@@ -1,5 +1,12 @@
 # First full-page documentation readability sample
 
+**Current reading (2026-09-24):** The nine pages named below received
+full-page acceptance in this sample. The sample note itself was not one of
+those nine. Its future five-merge forecast wording is a dated plan; read the
+[current forecast](../../roadmaps/aegis-backlog-forecast.md) and
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for remaining work.
+
 Date: 2026-09-23. This is a representative nine-page acceptance batch for
 maintainers of the Project Aegis source library. The first read-only page
 selection began at 23:35:27 Coordinated Universal Time (UTC). The previous

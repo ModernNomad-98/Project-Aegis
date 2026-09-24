@@ -16,7 +16,7 @@
         "systematic-debugger",
         "qa-automation-architect"
       ],
-      "reason": "Intermittent test failures are flake casework: classify, reproduce with counts, fix one cause, prove stability."
+      "reason": "Intermittent test failures are flake casework: classify, reproduce with counts, fix one cause, measure bounded stability evidence."
     },
     {
       "id": "consistent-bug-goes-to-debugger",

@@ -1,5 +1,13 @@
 # Revert and live incident routing correction — 2026-09-23
 
+**Current reading (2026-09-24):** This correction was delivered. The
+“writer is correcting” language below records its original preparation
+state. Read the current
+[approval register](../../approvals/APPROVAL_REGISTER.md),
+[merge governance skill](../../../.claude/skills/merge-is-deploy-governance/SKILL.md)
+and [poisoning review skill](../../../.claude/skills/model-poisoning-reviewer/SKILL.md)
+for present instructions; retain the original findings below as evidence.
+
 ## Purpose and scope
 
 This bounded correction fixes two instructions that could mislead a human

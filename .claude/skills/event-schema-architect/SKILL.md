@@ -5,6 +5,10 @@ description: Design the ANALYTICS event schema and tracking plan for product mea
 
 # Event Schema Architect
 
+Terms: **PII** means personally identifiable information; **API** means
+application programming interface; **DLQ** means dead-letter queue; **QA**
+means quality assurance; **CDC** means change data capture.
+
 ## Purpose
 
 Analytics dies of inconsistency. One team fires `Signup Completed`,
@@ -74,14 +78,15 @@ different kinds of "event" that share a word and nothing else.
 3. **Design the property schema per event.** Typed properties, required
    vs optional, enumerated value sets for categoricals, and units stated.
    No free-text where an enum belongs; no `plan` meaning three things.
-4. **Standardize global/shared properties.** The set every event carries
-   — user/account/tenant id, session, device/platform, timestamp, app
-   version, and context — defined once so joins and segmentation work
-   across all events.
+4. **Standardize global/shared properties.** Define timestamp, session and
+   context once, and specify when user/account/tenant identifiers are
+   required, optional or unknown. Pre-identify events carry an anonymous
+   identifier; never fabricate a tenant to complete the schema.
 5. **Design the identity model.** How anonymous events (pre-identify)
    stitch to the identified user once known; the keys used
-   (user/account/tenant) and their stability; and how tenant context is
-   guaranteed present for multi-tenant analytics. Broken identity is the
+   (user/account/tenant) and their stability; preserve known tenant context,
+   mark unknown context explicitly, and stitch only after a verified
+   association. Broken identity is the
    most common reason funnels undercount.
 6. **Establish the tracking plan as source of truth.** A registry that
    defines every event and property with its type, requiredness, and
@@ -112,10 +117,10 @@ identity-stitching patterns, and the three-way "which event skill" guide:
 ANALYTICS TRACKING PLAN — <product/domain>
 Supports:      <funnels/metrics/experiments this schema serves>
 Naming:        <convention: object-action, case, tense, controlled vocab>
-Global props:  <user/account/tenant, session, device/platform, timestamp, app version, context>
+Global props:  <anonymous/user/account/tenant as known, unknown markers, session, device/platform, timestamp, app version, context>
 Events (per event):
   <Event Name>: purpose; properties [name:type req/opt enum? unit]; PII flag
-Identity:      anonymous → identified stitching; keys (user/account/tenant) + stability
+Identity:      anonymous → identified stitching only on verified association; keys and unknown context
 Registry:      tracking plan is the source of truth; new events go through it
 Versioning:    additive default; deprecation window; owner
 PII:           minimized set; sensitive props flagged → pii-lifecycle-designer
@@ -133,8 +138,8 @@ Boundaries:    external contract → api-event-architect; pipeline → streaming
       enums for categoricals.
 - [ ] Global/shared properties are standardized so cross-event joins and
       segmentation work.
-- [ ] The identity model stitches anonymous to identified and guarantees
-      tenant context.
+- [ ] The identity model carries known tenant context, marks unknown context
+      explicitly, and stitches anonymous to identified only on verified association.
 - [ ] A tracking plan/registry is the single source of truth; changes go
       through it.
 - [ ] Versioning is additive-by-default with a deprecation path; a

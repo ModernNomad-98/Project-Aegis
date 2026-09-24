@@ -5,6 +5,11 @@ description: Design the error model for an API or product surface — a finite, 
 
 # Error Taxonomy Designer
 
+Terms: **API** means application programming interface; **UI** means user
+interface; **DSN** means data source name; **PII** means personally
+identifiable information; **i18n** means internationalization; **SQL** means
+structured query language; **HTTP** means Hypertext Transfer Protocol.
+
 ## Purpose
 
 Errors are the part of an API nobody designs and everybody hits. Left

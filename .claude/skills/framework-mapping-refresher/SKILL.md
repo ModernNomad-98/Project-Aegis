@@ -1,9 +1,13 @@
 ---
 name: framework-mapping-refresher
-description: Given an edition delta (from framework-edition-tracker), propose the SPECIFIC updates to every affected skill description, reference file, and coverage map — locate each site that cites or maps the old edition, propose the concrete change per site (renamed category, added/removed control, restructured mapping, updated edition string), surface any new coverage GAP the edition introduces, and flag the whole set for HUMAN REVIEW before anything lands. Proposes; never auto-applies. Downstream of framework-edition-tracker (which detects the delta) and upstream of the human / library-diff-reviewer who approves the resulting PR. Use when a known, verified edition delta must become concrete proposed mapping updates. Do NOT use to DETECT the delta or track editions (framework-edition-tracker), audit citation age broadly (source-currency-auditor), author a mapping from scratch (the compliance/OWASP mapping skills), or review the resulting PR (library-diff-reviewer).
+description: Given an edition delta (from framework-edition-tracker), propose the SPECIFIC updates to every affected skill description, reference file, and coverage map — locate each site that cites or maps the old edition, propose the concrete change per site (renamed category, added/removed control, restructured mapping, updated edition string), surface any new coverage GAP the edition introduces, and flag the whole set for HUMAN REVIEW before anything lands. Proposes; never auto-applies. Downstream of framework-edition-tracker (which detects the delta) and upstream of library-diff-reviewer for independent review and a human for PR approval. Use when a known, verified edition delta must become concrete proposed mapping updates. Do NOT use to DETECT the delta or track editions (framework-edition-tracker), audit citation age broadly (source-currency-auditor), author a mapping from scratch (the compliance/OWASP mapping skills), or review the resulting PR (library-diff-reviewer).
 ---
 
 # Framework Mapping Refresher
+
+Terms: **OWASP** means Open Worldwide Application Security Project; **PR**
+means pull request; **ISO** means International Organization for
+Standardization; **SOC 2** means System and Organization Controls 2.
 
 ## Purpose
 
@@ -16,8 +20,9 @@ may have opened a coverage gap. This skill does that: it locates every
 affected site, proposes the concrete change per site, surfaces any new gap
 the edition introduces, and packages the whole set for human review. It
 proposes; it never applies. It sits between the tracker that DETECTS the
-delta and the human / `library-diff-reviewer` who APPROVES the resulting
-PR — the two gates that keep the library's standard citations trustworthy.
+delta and `library-diff-reviewer`, who independently reviews the proposed
+diff before a human approves the resulting PR. These gates keep the
+library's standard citations trustworthy.
 
 ## Use When
 
@@ -81,8 +86,9 @@ PR — the two gates that keep the library's standard citations trustworthy.
    look complete.
 6. **Package for human review — never apply.** Assemble the proposed edits
    per site plus the gap findings, and flag the set for human review. The
-   change lands only via a normal PR approved by a human /
-   `library-diff-reviewer`. This gate is non-negotiable for standard
+   change lands only via a normal PR independently reviewed by
+   `library-diff-reviewer` and approved by a human. This gate is
+   non-negotiable for standard
    citations.
 7. **Deliver** the proposal in the Output Format: per-site proposed edits,
    scope-change flags, new-gap findings, and the review flag.
