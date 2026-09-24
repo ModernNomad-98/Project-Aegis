@@ -1,6 +1,6 @@
 ---
 name: performance-test-harness
-description: Design the harness that MEASURES performance as release evidence — what to measure per surface (endpoint percentiles, query timings, frontend metrics on a device class, job durations), an environment contract (prod-like data volume and tenant shape, pinned hardware, declared cache state), baselines plus variance-respecting regression detection (repeat runs, noise bands — never two single runs diffed), thresholds CONSUMED from latency-budget-architect and slo-reliability-architect (the harness asserts numbers others set), CI tiers (PR smoke, nightly full, pre-release) with advisory-to-blocking promotion, and honest reporting (conditions stamped; UNRUN stated, never implied green). MEASURES what D12.3 designs for; executes nothing against production (approval-gated); load scenarios come from load-test-planner. Use when building perf measurement or regression gates, or when "did it get slower?" lacks an evidenced answer. Do NOT use to design FOR performance (D12.3) or plan traffic (load-test-planner).
+description: Design the harness that MEASURES performance as release evidence — what to measure per surface (endpoint percentiles, query timings, frontend metrics on a device class, job durations), an environment contract (prod-like data volume and tenant shape, pinned hardware, declared cache state), repeat-run baselines and noise bands, thresholds CONSUMED from latency-budget-architect and slo-reliability-architect (the harness asserts numbers others set), CI tiers (PR smoke, nightly full, pre-release) with advisory-to-blocking promotion, and honest reporting (conditions stamped; UNRUN stated, never implied green). MEASURES what D12.3 designs for; this design executes nothing against production, and later live execution needs an applicable human grant; load scenarios come from load-test-planner. Use when building perf measurement or regression gates, or when "did it get slower?" lacks an evidenced answer. Do NOT use to design FOR performance (D12.3) or plan traffic (load-test-planner).
 ---
 
 # Performance Test Harness
@@ -138,7 +138,7 @@ the traffic it drives comes from `load-test-planner` scenarios.
 8. **State the execution posture.** The harness design targets
    dedicated measurement environments. Anything touching production
    (even read-mostly probes) or shared infrastructure at load is
-   approval-gated per the repo's conventions — the design says so on
+   subject to an applicable human grant and validated safety contract — the design says so on
    its face, and running the harness is an operator/CI act, not this
    skill's.
 
@@ -163,7 +163,7 @@ CI tiers: per-PR smoke <scope, minutes> | nightly full <scope> | pre-release <lo
 Report: <conditions stamp, baseline ref, variance, PASS/FAIL/ADVISORY/UNRUN;
          regression → profiling-methodology-designer>
 Execution posture: dedicated environments; production/shared-infra touches
-                   approval-gated; this design executes nothing.
+                   check applicable grant and safety contract; this design executes nothing.
 ```
 
 ## Validation Checklist
@@ -182,7 +182,7 @@ Execution posture: dedicated environments; production/shared-infra touches
 - [ ] New gates start advisory with a stated promotion rule.
 - [ ] UNRUN is a reportable status and a skipped tier cannot read as
       green.
-- [ ] The design executes nothing against production; approval gates
+- [ ] The design executes nothing against production; applicable grant gates
       are stated in the posture section.
 
 ## Gotchas
@@ -222,7 +222,8 @@ Execution posture: dedicated environments; production/shared-infra touches
 - Asked to run the harness (or any load) against PRODUCTION or
   shared live infrastructure → stop; produce the approval-ready
   proposal (scope, load level, blast-radius statement, abort rule)
-  and require explicit human approval per the repo's conventions.
+  and check for an applicable human grant; request approval only for missing
+  scope under the repo's conventions.
   The design never self-executes there.
 - No thresholds exist and the requester wants the harness to invent
   pass/fail numbers → refuse silent invention; route target-setting

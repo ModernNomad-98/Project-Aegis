@@ -7,7 +7,10 @@ workflow](../SKILL.md), which owns resolution, transitions, and enforcement.
 API means application programming interface; UI means user interface; SSO
 means single sign-on; `gb` means gigabytes; and `T-7`/`T-1` mean seven days
 and one day before the transition. The plan names and limits below are
-template values, not a shipped product's entitlements.
+template values, not a shipped product's entitlements. Transition examples
+below (trial expiry, immediate upgrade, read-only over-limit) are illustrative
+policy choices, not defaults. Dunning means the payment-failure notice and
+collection sequence.
 
 ## Entitlement naming and typing
 

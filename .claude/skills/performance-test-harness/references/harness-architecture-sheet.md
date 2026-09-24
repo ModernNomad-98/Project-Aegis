@@ -35,9 +35,10 @@ Data:      <volume per key table; tenant shape (many-small/few-large mix);
 Compute:   <instance/hardware class, pinned; dedicated runner rule>
 Config:    <flags/limits mirroring production; deltas listed>
 Network:   <position (same-region?); third-party handling (stub w/ shaped
-            latency | sandbox | live-with-approval)>
+            latency | sandbox | live-with-applicable-grant)>
 Cache:     <cold | warm — per measurement, declared>
-Isolation: <no co-tenants during runs; runner dedicated during window>
+Isolation: <runner dedicated during window; target tenant mix representative
+            of the modeled contention scenario, including co-tenants where relevant>
 BLIND SPOTS (permanent report footnote): <fleet size, real third-party
             tails, production cache topology, ...>
 ```
@@ -91,5 +92,4 @@ Blind spots: <standing footnote>
 The UNRUN rule: a tier or measurement that did not run appears as
 UNRUN with a reason. Pipelines summarize perf evidence as
 "<passed>/<failed>/<unrun>" — a green build with unrun perf tiers
-cannot be read as perf-validated (the honesty rule this repo's D3
-eval convention applies to itself).
+cannot be read as perf-validated (the repository evaluation-evidence rule).

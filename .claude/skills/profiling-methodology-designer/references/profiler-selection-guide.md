@@ -2,6 +2,9 @@
 
 Selection tables and worksheets backing the methodology. Tool-agnostic:
 "sampling CPU profiler" means whatever fills that class on your runtime.
+Use the [profiling-methodology-designer](../SKILL.md) workflow for attribution.
+CPU is central processing unit; GC is garbage collection; OOM means out of
+memory; I/O means input/output; prod means production.
 
 ## Attribution-level decision (before any tool)
 
@@ -62,9 +65,9 @@ two consecutive no-narrowing loops ⇒ split the symptom (it is plural).
 - Artifact naming: `<surface>-<condition>-<date>-<build>` (e.g.
   `checkout-warm-p99load-<date>-<build>`), stored with the
   investigation record.
-- Differential profiling: identical conditions, before/after builds;
-  compare SHARES not absolute samples; a new bar in the flame graph
-  outranks a taller one.
+- Differential profiling: under matched conditions, compare absolute time
+  or samples and proportional shares; a new flame-graph bar is a lead, not
+  automatically a larger regression than an existing taller bar.
 - Regressions from `performance-test-harness` diff against the
   baseline captured at the harness's own conditions — one conditions
   vocabulary across both skills.

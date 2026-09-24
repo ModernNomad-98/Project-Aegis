@@ -2,6 +2,7 @@
 
 The detail behind the orchestrator's **Capability 4** (propose → approve →
 append/refresh) and its human gate. The orchestrator stays thin and CITES this;
+use the [parent project-orchestrator skill](../SKILL.md) for the full workflow;
 the schema and section mutability live in
 [project-state-template.md](project-state-template.md). Four controls: risk-tiered
 recording, authority-grant separation, idempotent-and-exact recording, and the
@@ -35,7 +36,8 @@ terminology and workflow choices:
 The pending batch is shown completely before approval and disappears after it is
 recorded or explicitly rejected.
 
-**Never batched — each takes its own explicit approval:** implementation
+**Never batched into a new low-risk approval — check for an applicable existing
+grant first; if none covers the action, each takes its own explicit approval:** implementation
 authority; scope expansion or removal after approval; security or privacy risk
 acceptance; consequential architecture; data migration; deletion; any
 irreversible action; package installation; network execution; a version-control

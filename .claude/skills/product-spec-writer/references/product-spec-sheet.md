@@ -1,6 +1,8 @@
 # Product Spec Sheet
 
-Detail for `product-spec-writer`. Read on demand.
+Detail for [product-spec-writer](../SKILL.md). Read on demand.
+ADR means architecture decision record; UI is user interface; QA is quality
+assurance; `p95` is the 95th-percentile observed value.
 
 ## Spec template
 

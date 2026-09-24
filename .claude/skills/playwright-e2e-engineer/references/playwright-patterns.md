@@ -48,7 +48,9 @@ projects: [
 
 `auth.setup.ts` logs in each persona (UI or API), saves storageState to a
 gitignored path. Personas come from seeded fixtures (`test-data-architect`).
-One login per persona per run — tests never re-login.
+Share one login/storage state per persona only when that account's use is
+parallel-safe. Stateful parallel tests need per-worker or per-test accounts
+and sessions; record the fixture and cleanup rule.
 
 ## Data determinism patterns
 

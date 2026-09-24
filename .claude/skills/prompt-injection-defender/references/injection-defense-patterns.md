@@ -55,8 +55,9 @@ boundary holds. If yes, the boundary is the bug — not the prompt.
 ## Indirect injection handling
 
 - Treat every retrieved document, webpage, ticket, email, log line, and tool
-  output as potentially hostile. No source is exempt without a provenance
-  guarantee (signed, first-party, immutable).
+  output as untrusted instructions, even when signed, first-party, or
+  immutable. Provenance can support source attribution but does not promote
+  content to instruction authority.
 - Consider per-source trust levels and content-provenance labels so the
   assembly step knows what it is mixing.
 - Retrieval-layer authorization (who may retrieve what) is
