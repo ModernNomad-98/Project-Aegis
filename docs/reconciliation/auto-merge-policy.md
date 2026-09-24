@@ -16,12 +16,6 @@ approval again. Read the full register and any later lifecycle events before use
 The grant applies to this source repository's clones and worktrees; copied
 startup files and skills do not grant authority over a consumer repository.
 
-Verify the reviewed PR revision and both offline verification jobs before merge.
-An intentional protected-file `gate-guard` failure requires explicit review of
-the affected enforcement surfaces. The owner's grant covers administrator
-merges, including the recorded guard/review bypass; do not weaken checks or
-change repository settings to make a change mergeable. Auto-merge is not armed.
-
 **Current reading, 2026-09-23:** The owner's later all-green GitHub Actions
 instruction makes a PR-specific decision necessary before merging a reviewed
 PR whose only failed check is the protected-file guard. The standing
@@ -36,6 +30,12 @@ grant [AEGIS-APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-be
 expressly does not waive a future guard failure. Keep the guard and branch
 settings intact. When all checks are green, authorized work may use the
 standing administrator grant without another merge-mechanism request.
+
+Verify the reviewed PR revision and both offline verification jobs before merge.
+An intentional protected-file `gate-guard` failure requires explicit review of
+the affected enforcement surfaces. The older recorded grant included a guard
+bypass, subject to the later all-green instruction above; do not weaken checks
+or change repository settings to make a change mergeable. Auto-merge is not armed.
 
 See [offline CI](../offline-ci.md) for current job names, protected paths and
 post-merge verification, and [CONTRIBUTING](../../CONTRIBUTING.md) for delivery rules.

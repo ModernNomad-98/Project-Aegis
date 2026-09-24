@@ -59,8 +59,15 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement by reporting
-privately to the maintainer @ModernNomad-98 via GitHub. All complaints will be
+reported to the community leaders responsible for enforcement. A confidential
+conduct-reporting channel and independent recipient have not yet been
+published. For a report that does not require confidentiality, use a
+[GitHub issue](https://github.com/ModernNomad-98/Project-Aegis/issues/new).
+Public reports may cite already-public behavior; do not place private or
+sensitive incident details, private names, or other sensitive information in
+a public issue. Until a private route and alternate recipient are published,
+this project cannot promise confidential intake, including for a complaint
+about the maintainer. Reports received through an available channel will be
 reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

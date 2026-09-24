@@ -53,9 +53,11 @@ evidence without changing it. This stream never edits the BER backlog implicitly
 
 ### 1.3 Approval sources
 
-The complete [owner register](../approvals/APPROVAL_REGISTER.md) currently contains
-active AEGIS-APR-001 (read-only agents) and AEGIS-APR-002 (administrator merges),
-with no later lifecycle entries. Neither starts unrelated implementation.
+At the CP-WP-001 design baseline, the complete
+[owner register](../approvals/APPROVAL_REGISTER.md) contained active
+AEGIS-APR-001 (read-only agents) and AEGIS-APR-002 (administrator merges),
+with no later lifecycle entries then recorded. Consult that register for
+current authority; neither entry starts unrelated implementation.
 The 2026-09-13 direct CP-WP-001 continuation approves commit, push and merge of
 this three-document PR after required review/CI; implementation remains unauthorized.
 The register remains the one documentary approval register; these documents link
@@ -896,7 +898,10 @@ external idempotency and immutable signing/storage remain open implementation ga
 
 ## 10. Future tests and acceptance
 
-These are planned assertions, not executed controller tests. Use independent
+At CP-WP-001 design time, these were planned assertions, not executed
+controller tests. Consult the [current control-plane backlog](../roadmaps/resumable-control-plane-backlog.md)
+and [package guide](../../tools/aegis_delivery_control/README.md) for shipped
+offline tests and remaining proof gates. Use independent
 synthetic fixtures and owned temporary storage outside checkout. Record source SHA,
 OS, Python/shell versions, command, exit, skips, capability outcome and evidence head.
 

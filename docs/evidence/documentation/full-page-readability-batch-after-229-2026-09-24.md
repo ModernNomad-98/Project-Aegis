@@ -1,5 +1,10 @@
 # Twenty-page full-page readability batch after pull request #229
 
+> **Current reading:** This is the dated pre-merge batch record. Its statements
+> about pending checks and future merge were accurate at preparation time.
+> Use the [current documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md#start-here--current-reading)
+> for merged status and remaining pages.
+
 This batch starts from the exact pull request (PR) #229 merge
 `b949422c1c4aca65ecf809cc48ff2d9c78aeede6`. Previous and new batch
 estimates are both **3–6 active hours**. The selected backlog at start was

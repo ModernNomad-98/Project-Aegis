@@ -1,5 +1,15 @@
 # Behavioral Eval Runner v1 — design (specification only)
 
+This archived specification is for maintainers and reviewers tracing the
+original design decisions. For present behavior, start with the
+[runner guide](../../tools/behavioral_eval_runner/README.md); for present
+scope and authority, use the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md).
+Within this design, `OS` means operating system, `MCP` means Model Context
+Protocol, `CI` means continuous integration, `SDK` means software development
+kit, and `RC` means release candidate. Use the section headings to find the
+execution model, evidence contract, phases, and decision history; the dated
+status note below explains which design text has since been superseded.
+
 > **Current reading — 2026-09-23.** This is the original version 1 (v1)
 > Behavioral Eval Runner (BER) design, not the current delivery register. A
 > work package (WP) is a numbered delivery unit; pull request (PR) records a

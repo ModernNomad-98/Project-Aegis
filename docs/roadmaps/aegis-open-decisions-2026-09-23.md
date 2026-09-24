@@ -31,10 +31,11 @@ repository checks, not a selected-host proof. A source SHA is a commit hash;
 | CP-WP-003 | [APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) and [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) delivered the synthetic CP-WP-003A proof. The [CP backlog](resumable-control-plane-backlog.md) still blocks real source authority, independent freshness, containment, evidence and billing claims. The delivered proof grants no real dispatch. |
 | CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
 | Issue #101 setup and routing | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only setup ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped within bounded scopes. The [setup plan](aegis-setup-routing-plan.md) keeps package 4 host proof and comparison pending separate authority, packages 5/6 conditional, and package 7 pending. No optional helper is selected. |
+| Confidential conduct-reporting intake | The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) now states that no confidential route or independent recipient has been published. The original [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) remains an owner decision: provide a usable private contact and alternate recipient before claiming confidential intake. Do not put sensitive incident details in a public issue. |
 
-The [latest five-merge forecast](aegis-backlog-forecast.md#start-here--current-reading)
-keeps the selected
-remaining work at **175–394 active hours**. It is a scope estimate, not
+At this page's #144 check, the [forecast](aegis-backlog-forecast.md#start-here--current-reading)
+put selected remaining work at **175–394 active hours**. Follow that link for
+the current estimate. It is a scope estimate, not
 permission to start a gated package. The independent gates in the original
 packet below still apply where the current index marks them open.
 

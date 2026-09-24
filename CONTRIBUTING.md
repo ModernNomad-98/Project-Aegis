@@ -201,7 +201,7 @@ territory mechanically, not by memory. See the **D43** entry in
 
 ## External contributions
 
-Contributions are welcome from anyone. Every pull request is reviewed by the
+Contributions are welcome from anyone. External contributions are reviewed by the
 maintainer before merge; pull requests touching a security-relevant surface
 receive an additional explicit security review. Outside contributions are never
 self-merged.

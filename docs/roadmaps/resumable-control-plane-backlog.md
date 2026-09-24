@@ -51,7 +51,9 @@ Prepared: 2026-09-12. Base: `57e6928d2849aa5377daf52c723b85736292585d`.
 This register records this delivery-control stream only. It does not alter the
 [BER backlog](behavioral-eval-runner-backlog.md), BER authority or the existing
 [owner approval register](../approvals/APPROVAL_REGISTER.md). A backlog entry or
-approved design is not implementation authority. No runtime is delivered here.
+approved design is not implementation authority. At this original CP-WP-001
+documentation checkpoint, no runtime had been delivered; the current status
+table above records the later offline kernel and capability proof.
 
 ## 1. Authority and continuation rules
 

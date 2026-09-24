@@ -218,7 +218,9 @@ does the engineering work and brings you the decisions that are genuinely yours:
    acceptable?
 9. **Decide to release** — independent reviewers check the architecture, security, testing and
    readiness, and you get a plain-language **GO / CONDITIONAL GO / NO-GO** with the evidence behind
-   it. **You** authorize the release. Aegis never merges or deploys on its own.
+   it. **You** authorize the release. Aegis merges or deploys only under
+   applicable human authorization, including a recorded standing grant when
+   its scope covers the action.
 
 **What you decide vs. what Aegis decides.** The line is bright, and it is the point of the whole
 system: you own the business decisions, Aegis owns the engineering ones — and always tells you
@@ -1295,8 +1297,8 @@ only if it is specific, testable, constrained, maintained, and validated.
 
 Project Aegis is licensed under the [Apache License 2.0](LICENSE). The **"Project
 Aegis"** and **"Zet-AI Engineering"** names are protected — see
-[TRADEMARKS.md](TRADEMARKS.md). Contributions are welcome. Every pull request is
-reviewed by the maintainer before merge; pull requests touching a security-relevant
+[TRADEMARKS.md](TRADEMARKS.md). Contributions are welcome. External contributions
+are reviewed by the maintainer before merge; pull requests touching a security-relevant
 surface receive an additional explicit security review — see
 [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities privately through GitHub
 Private Vulnerability Reporting — see [SECURITY.md](SECURITY.md).

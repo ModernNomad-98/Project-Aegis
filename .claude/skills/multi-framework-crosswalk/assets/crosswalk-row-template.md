@@ -1,5 +1,14 @@
 # Crosswalk Row Template
 
+Use this template when the [multi-framework crosswalk skill](../SKILL.md)
+asks for a control mapping. The reviewer fills one row from framework text
+actually in hand; an unchecked cell stays `unverified`. `TSC` means Trust
+Services Criteria, `PoF` means Points of Focus, and `AICPA` means American
+Institute of Certified Public Accountants. `AI RMF` means Artificial
+Intelligence Risk Management Framework; `fn` is one of its named functions.
+`CC-<dom>-<nn>` is a placeholder for a foundation control identifier,
+with a domain and number supplied by the owning control set.
+
 ## Header (mandatory)
 
 ```
