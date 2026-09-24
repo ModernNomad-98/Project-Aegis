@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #251 on 2026-09-24, this remains the active
+As of merged pull request (PR) #252 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -226,6 +226,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Current-reading follow-up after merged PR #252, 2026-09-24 | [BER-BKL-009A historical proposal](ber-bkl-009a-offline-policy-scope-proposal.md) and root `AGENTS.md` | The proposal's current-status banner was corrected from an unmerged #139 claim to its verified merge and partial BKL-009 status; the historical proposal below remains unchanged. The source-library skill-use preference added in #252 received two independent read-only reviews, preserving Role A scope, the manual-only boundary and user authority. Both existing pages retain accepted status on this branch's merge. |
 | BER evidence-policy scope and candidate-summary follow-up after #251, 2026-09-24 | [BER-BKL-009 scope proposal](ber-bkl-009-policy-scope-amendment-proposal.md) and [replacement candidate summary](../evidence/ber-replacement-candidate-1-summary.md) | Two independent full-page reviews accepted the new proposal after first-use, attribution, proposed-versus-delivered, and rollback wording corrections. They also reaccepted the corrected candidate summary after its stale holdout-support sentence was replaced with the merged #249 status and unset production pins. Links, authority limits, and exact ten-path scope were checked. The candidate has 585 tracked Markdown files: 541 accepted readers and 44 classified fixtures, with zero known pending pages on accepted merge. |
 | Reader-page follow-up after merged PRs #248 and #249, 2026-09-24 | [Multi-agent release path](../paths/release-with-agents.md) and [BER offline holdout review](../evidence/ber-wp2b3-holdout-offline-review.md) | Both new pages received full-page review and corrected-candidate acceptance in this PR. The release path's links and manual-only boundaries were checked, and first-use abbreviations were expanded. The holdout note now identifies the merged #249 source and separates historical premerge checks from the current status. On this PR's accepted merge, the candidate has 584 tracked Markdown files: 540 accepted reader pages, 44 classified fixtures and zero known pending pages. |
 | Setup skill follow-up after merged PR #246, 2026-09-24 | `.claude/skills/aegis-setup/SKILL.md` changed its Windows command example in #246 | Two read-only full-page reviews found one false cross-host key claim and first-use abbreviations. This checkpoint corrects them and obtains corrected-candidate review; prior accepted-page status remains valid on this PR's merge. The script's 44 synthetic selection assertions and #246 exact-head Actions passed. |
