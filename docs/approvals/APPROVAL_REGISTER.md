@@ -479,3 +479,35 @@ generic skill guidance that would require asking for the same approval again.
 - **Reason:** The sole approved administrator merge completed.
 - **Evidence:** [PR #239](https://github.com/ModernNomad-98/Project-Aegis/pull/239)
   merged as `66ae4deb5f5600a4ab54f0a86bee858b8b9d7c76`.
+
+### AEGIS-APR-020: PR #249 protected-file guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-021.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Permit the independently reviewed synthetic offline holdout-support
+  implementation through its documented protected-file guard failure.
+- **Scope allowed:** The owner's exact answer was "Approve this exact PR and
+  merge" to the separate one-time gate-guard question for
+  [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249) at
+  `bf72d391831c9c6c30eedd295d07a2ff32b47fe4`. The local Windows suite
+  passed 1,050 tests with 14 expected skips; Linux and Windows GitHub Actions
+  passed. `gate-guard` was the sole failing check, and BER-DEC-012 required
+  this separate owner disposition.
+- **Scope FORBIDDEN:** PR #249 only at that reviewed head; no other failed
+  check, PR, guard-policy change, branch-protection change, provider request,
+  private holdout execution, or later BER phase is covered.
+- **Evidence:** Direct owner reply to the exact-head question in the Project
+  Aegis conversation on 2026-09-24, quoted above.
+- **Expiry / use limit:** One PR #249 merge; no calendar expiry stated.
+
+### AEGIS-APR-021: Consumption of PR #249 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-020.
+- **Status at recording:** AEGIS-APR-020 has no remaining use.
+- **Effective at:** 2026-09-24 17:36:47 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249)
+  merged as `fa37c0e545dfd096e8327ca5357b0dfc6e2f8bb5`.
