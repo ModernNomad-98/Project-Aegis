@@ -31,8 +31,10 @@ Access) and **JAWS** (Job Access With Speech) are screen readers.
 
 1. Reach every interactive control by Tab/Shift+Tab (2.1.1).
 2. Focus visible at every stop (2.4.7); order follows meaning (2.4.3).
-3. No traps: can always Tab/ESC out (2.1.2); dialogs contain focus and
-   return it to the trigger on close.
+3. No unintended traps (2.1.2): a modal may intentionally contain Tab focus.
+   Confirm its supported keyboard close/exit action works, then focus returns
+   to the trigger. Do not require Tab to leave a modal or assume Escape is
+   universally required.
 4. Activate everything with Enter/Space; arrow-key conventions in menus,
    tabs, radios (per ARIA patterns).
 5. Skip link present and functional on long pages (2.4.1).
@@ -66,6 +68,8 @@ VoiceOver+Safari; add JAWS when enterprise obligations exist.
 
 ## Baseline-and-ratchet policy
 
-Existing violations: record per-rule baseline counts; CI fails on any NEW
-violation or count increase; burn-down items become tracked work. Never
+Existing violations: record stable rule-and-location finding identities and
+per-rule counts. CI fails on any new finding or count increase; diff review
+must catch a new finding replacing a resolved one at the same count.
+Burn-down items become tracked work. Never
 disable a rule to go green — exclusions need written rationale in the config.

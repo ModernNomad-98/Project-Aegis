@@ -47,12 +47,13 @@ many storage.
 | Posture | Meaning | Verdict |
 | --- | --- | --- |
 | Append-only / WORM | store forbids mutation | strong |
-| Versioned | history preserved (git, versioned bucket) | strong |
+| Versioned | Git history or bucket versions are retained and version deletion/history rewrite is access controlled | strong only after those controls are verified; otherwise flag |
 | Access-controlled mutable | few writers, no history | acceptable, flag |
 | Open mutable | shared folder, anyone edits | weak — flag, propose move |
 
-Retention floor: audit window + engagement completion; extend per contract,
-regulation, or certification-body expectation (verify with the body).
+Retention floor: preserve evidence from the start of the audit window through
+engagement completion; extend per contract, regulation, or certification-body
+expectation (verify with the body).
 
 ## Reuse map (shipped artifacts → evidence)
 

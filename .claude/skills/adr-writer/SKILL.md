@@ -16,14 +16,19 @@ date silently becomes permanent.
 
 ## Use When
 
-- Use when: a significant technical decision was just made (or formally
-  proposed) and needs recording — framework choice, boundary placement,
+- Use when: a significant technical decision was just made or a specific
+  option was formally proposed for decision and needs a clearly proposed
+  record — framework choice, boundary placement,
   datastore, build-vs-buy, deprecation.
 - Use when: `architecture-designer` hands over an ADR draft to complete.
 - Use when: an old decision is being superseded or reversed — that gets its
   own ADR linking both directions.
 - Do NOT use when: the decision has not actually been made and options are
   genuinely open — that is `architecture-designer` (or a human conversation).
+- A rejected option can be recorded under **Alternatives Considered**; it is
+  not automatically a rejected ADR. When the repository has an ADR corpus,
+  hand numbering, lifecycle status, index and bidirectional links to
+  `adr-sequencer`.
 - Do NOT use when: sources disagree about what was decided — run
   `source-of-truth-reconciler` first; an ADR must not launder a contested
   claim into official history.
@@ -68,7 +73,8 @@ not execute those changes or broaden a grant.
    trigger reversal, the steps to back out, what data or contracts make
    reversal hard, and the point of no return if one exists. "N/A" is not
    acceptable; "reversal is impractical after X because Y" is.
-8. **Set status and review date:** status (proposed | accepted | superseded)
+8. **Set status and review date:** use the repository's lifecycle vocabulary
+   (proposed, accepted, rejected, deprecated or superseded where supported)
    and a specific date to re-examine the decision against its assumptions.
    Include predecessor links in the draft; propose any old-file back-link
    change for its separately authorized route rather than editing it here.
@@ -82,7 +88,7 @@ report separately whether authorized persistence actually occurred:
 
 ```
 # ADR-NNNN: <title, imperative>
-Status: proposed | accepted | superseded by ADR-MMMM
+Status: proposed | accepted | rejected | deprecated | superseded by ADR-MMMM
 Date: <decision date>   Review by: <specific date>
 ## Context          <forces and problem, solution-free>
 ## Decision         <"We will …">

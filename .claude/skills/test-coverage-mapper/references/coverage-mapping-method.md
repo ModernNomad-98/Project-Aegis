@@ -11,19 +11,23 @@ Enumerate before judging. Typical sources:
 | Routes/pages | router config, pages/app directory |
 | API endpoints | route handlers, OpenAPI spec, controller files |
 | Commands/services | command handlers, service classes, use-case modules |
-| Schema | migrations, table definitions (RLS-bearing tables flagged) |
+| Schema | migrations, table definitions (row-level security (RLS) tables flagged) |
 | Background jobs | queue/cron definitions |
 | Integrations | webhook handlers, provider clients |
 
-Record each with an id so the map is diffable across audits.
+Record each with a stable ID so the map is diffable across audits. For
+example, `route:tenant-invoice-read` can map to
+`tests/invoices.test.ts:42`, layer `integration`, bucket `covered` only when
+that assertion verifies the authorized response and tenant boundary.
 
 ## Verifying vs theater rubric
 
 A test VERIFIES a surface when it asserts observable behavior a user or
 consumer depends on. Theater signals:
 
-- No assertion, or assertions that cannot fail (`expect(result).toBeDefined()`
-  on a constructor result).
+- No assertion, or assertions that cannot fail (`expect(true).toBe(true)`).
+  `expect(result).toBeDefined()` on a constructor result usually proves only
+  construction, not required behavior.
 - Render-only component tests (mounts, asserts nothing about behavior).
 - Snapshot-everything tests nobody reviews on update.
 - Asserting against the mock itself (mock called with X, where X is the only
@@ -43,7 +47,7 @@ For each uncovered/theater surface:
 3. Detection without a test: would anything else catch it before users?
 
 Rank = impact-first, likelihood as tiebreaker, low-detectability promotes.
-Security-relevant gaps (tenant/authz) are always reported, with specification
+Security-relevant gaps (tenant/authorization) are always reported, with specification
 delegated to `multi-tenant-security-tester`.
 
 ## Coverage statement discipline

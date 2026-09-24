@@ -16,8 +16,9 @@ Two tenants minimum keeps the catalog compatible with the A/B fixture recipe
 `multi-tenant-security-tester` requires — its negative-test assertions stay
 in that skill; this catalog just guarantees the world supports them.
 
-Reserved synthetic domains/names only (`*.test`, `*.example`), never
-real-looking customer identities.
+For synthetic defaults, use reserved domains/names (`*.test`, `*.example`),
+never real-looking customer identities. Any separately approved
+de-identification path follows the owning skill's controls.
 
 ## Factory patterns
 
@@ -35,10 +36,10 @@ real-looking customer identities.
 
 ## Namespacing schemes (parallel isolation)
 
-- Worker prefix: `w<index>-` on tenant slugs/emails/resource names
-  (`test.info().parallelIndex`, `VITEST_POOL_ID`, or equivalent).
-- Run id: `r<ci-run>-` prefix for E2E-created data on shared environments —
-  enables TTL sweeps (`delete where name like 'r123-%'`).
+- Combine run ID, worker ID and test ID in the marker for every mutable
+  tenant slug, email or resource name on shared environments, for example
+  `r123-w2-invoice-overdue-`. A worker index or run ID alone can collide
+  across tests or runs. Encode and bound each marker component before use.
 - Baseline rows are READ-ONLY by convention AND (where possible) by
   role — the test user lacks permission to mutate catalog rows.
 
@@ -54,6 +55,8 @@ real-looking customer identities.
 ## TTL & traceability
 
 Every created record carries a marker (naming prefix or metadata column
-where the schema allows): run id + test id. Orphan sweep: scheduled job or
-suite-start sweep deleting expired `r*-` data older than TTL on shared envs.
+where the schema allows): run ID + worker ID + test ID, plus its creation
+time. An orphan sweep deletes only records proven to have been created by
+that suite, after its time-to-live (TTL), within the authorized tenant and
+environment. Do not delete by name wildcard alone on shared environments.
 Local ephemeral DBs skip TTL — recreate instead.

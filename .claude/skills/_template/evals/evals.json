@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "_template",
-  "description": "TEMPLATE example eval set. Every real skill must ship evals/evals.json with a happy path, an edge case, a should-not-do case, and objective assertions. Structurally validated only (no runner yet, decision D3). Replace all cases when you copy this template.",
+  "description": "TEMPLATE example eval set. Every real skill must ship evals/evals.json with a happy path, an edge case, a should-not-do case, and objective assertions. This template is structurally validated only; the offline Behavioral Eval Runner exists but the validator does not execute these template cases. Replace all cases when you copy this template.",
   "cases": [
     {
       "id": "positive-happy-path",

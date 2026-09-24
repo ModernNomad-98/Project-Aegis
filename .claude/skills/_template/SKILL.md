@@ -5,15 +5,13 @@ description: 'TEMPLATE ONLY — not a real skill and never invoked. Copy this di
 #   description must then START with the exact 32-char sentinel (trailing space included):
 #   MANUAL-ONLY; never auto-invoke.
 #   (validator-enforced; see the Portability contract in the standard)
-#   TWO bounded exceptions (standard §5). Exception 1 — approved doc/state write: an
-#   auto-invocable skill MAY create or append to a non-executable documentation or
-#   project-state file in the working tree, but only as a second-phase action — show
-#   the exact target path and exact content or diff, receive explicit, content-
-#   specific, single-use approval in the current session, and write exactly what was
-#   approved. Overwrite/delete/rename, source code, executable/config files, agent-
-#   instruction files, security/identity/policy/CI files, secrets, network calls,
-#   external mutation, spending, and deployment are NOT covered — those stay manual-
-#   only. Exception 2 — TALI: a separately classified, separately activated execution
+#   TWO bounded exceptions (standard §5). Exception 1 permits exact authorized
+#   non-executable documentation/project-state create or append, immutable
+#   transcription of evidenced human decisions, and only six named state-
+#   projection refreshes. Show the exact path/content and honor applicable
+#   current-session authority; seek content-specific approval only when missing.
+#   The exclusions in §5 remain manual-only. Exception 2 — TALI: a separately
+#   classified, separately activated execution
 #   route confined to ordinary approved source/test files; behavior-based, no skill is
 #   permanently eligible, and NO existing skill receives TALI authority by default — a
 #   side-effecting skill still needs disable-model-invocation: true unless a specific
@@ -61,14 +59,12 @@ schema. Be specific enough that two runs produce consistent shapes.
 
 - [ ] Output matches the shape declared above.
 - [ ] No **Stop Conditions** were silently bypassed.
-- [ ] Any side-effecting step was gated behind explicit human confirmation. Under
-      standard §5, the write an auto-invocable skill may make by default (Exception 1)
-      is the approved doc/state append: create/append a non-executable documentation
-      or project-state file, AFTER showing the exact path + content and receiving
-      explicit, content-specific, single-use approval — path and content unchanged
-      between approval and write. Autonomous source/test editing is NOT implied here;
-      it exists only inside a separately classified and activated TALI route
-      (Exception 2, §5), never by default.
+- [ ] Any side-effecting step has applicable authority. Standard §5 Exception 1
+      permits only the exact bounded documentary writes it names: show the path
+      and content, use an existing current-session instruction when it covers the
+      write, or obtain content-specific approval when it does not. It does not
+      authorize source/test editing; that needs a separately classified and
+      activated TALI route (Exception 2, §5).
 - [ ] Any autonomous TALI validation command produced NO unapproved repository
       working-tree output (no cache/coverage/build/generated/ignored/temporary/report/
       snapshot files outside the approved set), and any host-managed scratch stayed
@@ -85,10 +81,10 @@ schema. Be specific enough that two runs produce consistent shapes.
 - Stop and ask if required input is missing or the request is ambiguous.
 - Stop and confirm before any irreversible or destructive action (delete, deploy,
   overwrite, spend).
-- Before a documentation/project-state append under the standard-§5 approved-write
-  exception (Exception 1): show the exact target path and exact content, wait for the
-  explicit content-specific yes, and write only what was approved. A declined,
-  ambiguous, or changed approval means NO write.
+- Before an Exception 1 documentary write: show the exact path and content or
+  diff. Use an applicable existing current-session instruction; otherwise wait
+  for content-specific approval. A changed proposal needs coverage by the actual
+  grant. Transcription cannot create authority or change a recorded grant.
 - Every side effect outside Exception 1 remains manual-only
   (`disable-model-invocation: true`) unless it is an ordinary approved source/test edit
   inside a separately classified and separately activated TALI route with every §5

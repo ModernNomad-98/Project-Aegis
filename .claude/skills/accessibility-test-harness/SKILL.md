@@ -21,9 +21,9 @@ Produce the harness that verifies accessibility instead of asserting it:
 automated scans placed at the right layers (component tests, E2E pass, CI)
 for what machines can catch, plus a manual keyboard/screen-reader checklist
 for what they cannot — with every check tied to a WCAG criterion, a severity
-rubric, and evidence conventions. Automation finds roughly a third of real
-a11y failures; the harness is honest about which third and covers the rest
-manually.
+rubric, and evidence conventions. Automation finds some failures but cannot
+judge every keyboard, focus and screen-reader experience; the harness covers
+those remaining checks manually.
 
 ## Use When
 
@@ -48,9 +48,9 @@ manually.
 
 ## Inputs to Inspect
 
-1. The target standard and obligation: WCAG version/level (2.1/2.2, AA
-   typical) from compliance requirements, contracts, or default to AA —
-   stated explicitly.
+1. The target standard and obligation: select a WCAG version and level
+   (for example, 2.2 AA) from compliance requirements or contracts. If none
+   governs, propose a version and level and confirm them before citing criteria.
 2. The surfaces in scope: routes, critical journeys, the component library
    (design-system components multiply coverage — one accessible Button fixes
    a thousand instances).
@@ -79,9 +79,11 @@ manually.
    tests (fail on new violations per component), an E2E a11y pass scanning
    each critical-journey page state, contrast checking against the token
    palette in CI, and a11y lint at the PR tier. Baseline-then-ratchet for
-   existing violations: freeze the count, forbid new ones, burn down.
+   existing violations: record stable finding identities (rule and location),
+   review the diff for new findings, and use counts only as a trend. A fixed
+   total cannot hide a new violation that replaced a resolved one.
 4. **Design the manual tier as executable checklists:** keyboard-only pass
-   (reach everything, visible focus, no traps, logical order, ESC/arrow
+   (reach everything, visible focus, no traps, logical order, Escape/arrow
    conventions), screen-reader smoke per committed combo (landmarks, form
    labels/errors announced, dialog focus containment + announcement, live
    regions for async results), zoom/reflow at 200/400%, contrast spot
@@ -135,8 +137,8 @@ Handoffs: <wiring → engineer skills; fixes → product/code-reviewer>
 
 ## Gotchas
 
-- Automated scans passing ≠ accessible: axe-style tools catch ~30-40% of
-  WCAG failures; claiming "accessible, scans green" is the classic
+- Automated scans passing ≠ accessible: tools miss checks requiring human
+  keyboard, screen-reader and context judgment; claiming "accessible, scans green" is the classic
   false-confidence failure — the manual tier is not optional.
 - ARIA is a repair tool, not a feature: scan-driven ARIA sprinkling
   (role/aria-label on everything) often makes screen-reader UX worse;

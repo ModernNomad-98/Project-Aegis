@@ -48,7 +48,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Wires the scans but refuses to equate green scans with accessibility, stating the ~third-of-failures automation limit explicitly.",
+          "Wires the scans but refuses to equate green scans with accessibility, naming keyboard, focus and screen-reader checks that still need manual judgment.",
           "Requires the manual keyboard/screen-reader tier before any conformance claim, and routes formal conformance (VPAT/legal) to a specialist engagement."
         ]
       }
