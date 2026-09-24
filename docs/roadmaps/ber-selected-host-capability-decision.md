@@ -14,8 +14,10 @@ Operating system (OS) means the selected host platform; `BER-DEC` identifies
 an entry in the runner decision log. Stage A is the proposed offline host
 probe without model or provider calls.
 
-> **Current reading, checked 2026-09-24:** The owner selected a disposable
-> Unix-like host *direction*, but no named host or selected-host proof is recorded.
+> **Current reading, checked 2026-09-24:** The owner selected a **new disposable
+> Linux virtual machine under their control** as the Stage A candidate. No
+> machine identity, configuration, provisioning approval or selected-host proof
+> is recorded.
 > This page remains a proposal; even its offline Stage A probe needs a separate
 > grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
 > for current work-package and evidence-gate status.
@@ -46,28 +48,27 @@ R5 configuration existence checks are partial; no complete profile isolation
 has been demonstrated. These limits are recorded in
 [`evidence.py`](../../tools/behavioral_eval_runner/evidence.py),
 [`process_control.py`](../../tools/behavioral_eval_runner/process_control.py),
-and the R4/R5 backlog entries. No additional host is selected or provisioned.
+and the R4/R5 backlog entries. The owner chose a new disposable Linux virtual
+machine as the candidate; none has been identified or provisioned.
 
 | Candidate | Useful next evidence | Current limit / decision |
 | --- | --- | --- |
 | Existing Windows host | Reproduce known negative path/process result, inspect profile surface and prove denial paths without network/model dispatch | Cannot claim baseline while mid-write prevention and post-leader reaping are unproven; a Windows fix needs a separately reviewed native/host mechanism and exact tests |
 | Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | Host availability, identity, isolation, permissions, secret custody and probe authority are unknown; generic Linux CI has run but selected-host proof remains absent |
 
-**Recommendation:** choose a specifically identified disposable POSIX host as
-the *candidate for offline capability proof*, if the owner can provide or
-authorize one. This is a shorter path to testing the implemented mechanisms,
-not a claim that POSIX already meets R4/R5. If only Windows is available,
-perform the Windows negative/profiling report and keep the live gate closed
-until the missing mechanisms are implemented and proven. Do not substitute
-an arbitrary CI runner for the selected deployment host.
+**Chosen candidate direction:** a new disposable Linux virtual machine under
+the owner's control. Its identity, configuration, provisioning and probe
+authority remain pending. This is a path to testing the implemented mechanisms,
+not a claim that Linux already meets R4/R5. Do not substitute an arbitrary CI
+runner for the selected deployment host.
 
 ## Proposed two-stage proof and authority
 
 ### Stage A — offline, non-model host capability probe
 
-The owner first names host/OS/version, physical or virtual boundary, permitted
-scratch root, execution account, allowed tools, and whether the existing
-machine or a new disposable host is in scope. Then a *reviewed and merged
+The owner next specifies the new Linux virtual machine's host identity,
+OS/version, virtual boundary, permitted scratch root, execution account and
+allowed tools. Then a *reviewed and merged
 BER-DEC follow-up* may authorize one bounded read-only configuration inventory
 and synthetic temporary-fixture probe. It should pin the runner source and
 test commands, run only in the named disposable root, record host/version and
@@ -181,10 +182,12 @@ separate model-driven Stage B authorization and proof.
 
 ## Exact owner decision needed next
 
-1. Select a named disposable POSIX host for Stage A, select the existing
-   Windows host for a negative-only report, or defer until a host exists.
-   Provide the OS/version, account and scratch-root boundary if selecting a
-   host. A new host or access credential needs its own authorization.
+1. The owner selected a new disposable Linux virtual machine under their
+   control as the Stage A candidate in the Project Aegis conversation on
+   2026-09-24. Specify its virtualization platform, OS/version, account,
+   isolation boundary, permitted scratch root and allowed tools; separately
+   authorize any provisioning or access credential. This choice alone grants
+   no host operation.
 2. After selection, review a BER-DEC Stage A grant with exact commands,
    source pin, root, evidence handling, time ceiling and stop conditions.
    The current proposal does not authorize even a read-only host probe on a

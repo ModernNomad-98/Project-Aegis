@@ -1,6 +1,6 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-24 after pull request #254:** This is the
+> **Current reading, checked 2026-09-24 after pull request #257:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -33,7 +33,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | Work or evidence gate | Current disposition | What remains |
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
-| WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The owner approved a further bounded synthetic integration; BER-DEC-013 and APR-023 make it effective on this separate reviewed governance PR's merge. BKL-009 remains **PARTIAL**. | Implement only from that merge commit and within the [ten-path scope](ber-bkl-009-policy-scope-amendment-proposal.md). Real-host access, encryption, privacy and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
+| WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The further bounded synthetic integration **DELIVERED** in [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257) under BER-DEC-013 and consumed APR-023. BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy, production runtime binding and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
 | WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support now delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
@@ -1706,7 +1706,9 @@ authorization decisions in §13 remain unchanged.
   on 2026-09-24. BER-DEC-013 and APR-023 authorized that one follow-up package
   when the separate governance PR #255 merged as
   `0318b1ecde3ebf5f34bb32f8793efc37b574af39`; the complete item remains
-  PARTIALLY DELIVERED.
+  PARTIALLY DELIVERED. That package was delivered by PR #257, merged as
+  `53351b3fac3d75cbbc23341cc96dbeadc1e116ee` under the owner's one-time
+  protected-guard exception; APR-027 records consumption of APR-023.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
@@ -1723,10 +1725,9 @@ authorization decisions in §13 remain unchanged.
 - **Dependencies:** The WP-2B-1 evidence writer is delivered. The selected
   production policy's enforcement and host-specific proof remain separate
   from that implementation and the temporary scoped terms in BER-DEC-006/008.
-- **Trigger to begin:** Prepare the remaining policy and operator integration under
-  BER-DEC-013/APR-023 from the exact #255 grant merge; preserve the existing
-  writer and recorded scope limitations. Later host and cleanup work needs a
-  separate grant.
+- **Trigger to begin:** The BER-DEC-013/APR-023 synthetic integration was
+  delivered in PR #257. Later host, privacy, runtime and cleanup work needs a
+  separate grant; preserve the existing writer and recorded scope limitations.
 - **Expected deliverable:** A written evidence-governance policy fixing: retention
   periods per retention class; access groups and the least-privilege read matrix;
   the encryption-at-rest mechanism and its key custody; redaction/sanitization rules
