@@ -25,6 +25,11 @@ Package 3's approved offline advisory contract is implemented in
 synthetic offers and responses but has no host hook, provider call, dispatch
 authority or real compatibility proof. Package 4 still owns host integration
 and fallback verification.
+The [package 4A preparation proposal](aegis-setup-package-4a-host-preparation-proposal.md)
+screens a TypeScript Agent SDK callback as a possible host gate and records
+the [source-based feasibility check](../evidence/setup/issue-101-package-4a-host-feasibility.md).
+It is **proposal only**: no SDK session, host-hook implementation or package-4
+comparison has been authorized or proved.
 
 ## Dated product decisions
 
