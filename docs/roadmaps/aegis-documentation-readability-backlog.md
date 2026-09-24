@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the documentation batch after pull request (PR) #226 on 2026-09-24,
+As of the five-merge forecast checkpoint after pull request (PR) #227 on 2026-09-24,
 this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -362,6 +362,27 @@ The previous and current batch ETA are both **3–6 active hours**. The
 changes documentation from **50–175** to **45–170 active hours** and selected
 backlog from **145–369** to **140–364 active hours**. Acceptance remains
 **IN PROGRESS**; the unreviewed pages retain their pending status.
+
+## Ledger checkpoint through pull request #227 — 2026-09-24
+
+The five merges since the #222 forecast are #223, #224, #225, #226 and #227.
+Their exact merge commits, original estimates and available wall intervals are
+in the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-227--2026-09-24).
+The #227 merge `88cc83fc547495b4f4d10eb5af76a4879c05af15` has **570
+tracked Markdown pages**. The recorded full-page acceptance count is **311
+distinct existing pages**; **259 remain**. The pending inventory reconciles
+as 138 skill pages, 48 previously corrected primary pages, 11 dated notes
+or tracking pages, 18 other reader pages and 44 synthetic fixtures. Four
+new dated review notes entered the inventory after #222. They were not
+accepted as existing pages by the batches they document.
+
+The [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-227)
+changes the documentation residual estimate from **40–145** at #222 to
+**35–130 active hours**, and the selected backlog from **135–339** to
+**130–324 active hours**. This checkpoint work item previously and currently
+estimates **1–2 active hours**. Acceptance remains **IN PROGRESS**; the next
+page batch needs its own page-level evidence and independent review. This
+accounting does not accept any of the 259 pending pages.
 
 ## Ledger update for the batch after pull request #226 — 2026-09-24
 
