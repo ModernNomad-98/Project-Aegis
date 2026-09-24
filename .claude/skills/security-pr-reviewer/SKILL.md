@@ -148,8 +148,9 @@ Not reviewed: <exclusions + why>
   policy/migration portion to `rls-policy-auditor` / `secure-migration-reviewer`.
 - The finding is a dependency/CI supply-chain issue rather than app code →
   hand to `supply-chain-security-reviewer`.
-- Asked to both review and silently fix in one pass → review first; fixes are
-  a separate, explicitly-approved change.
+- Asked to both review and silently fix in one pass → review first; make
+  fixes only within a separately scoped applicable authorization, seeking
+  scope if the current task or active grant does not cover them.
 
 ## Supporting Files
 

@@ -1,10 +1,12 @@
 # Security-Event Coverage Sheet
 
 Starter classes for the detection coverage map. Every event: structured, with
-actor, tenant, target, outcome, source (IP/client), correlation id, timestamp.
+actor, tenant when known or an explicit unknown/not-applicable state, target,
+outcome, source (IP/client), correlation id, timestamp.
 Postures: **log** (investigation), **ticket** (aggregated review), **alert**
 (human reacts now). Defaults below are starting points — justify against the
-system's own baseline before promoting anything to alert.
+system's own baseline for rate-based rules. High-severity single events can
+require immediate alerts without a rate baseline; justify their response route.
 
 **Use:** This starter coverage table supports the
 [security-logging-alerting-architect workflow](../SKILL.md); tune thresholds

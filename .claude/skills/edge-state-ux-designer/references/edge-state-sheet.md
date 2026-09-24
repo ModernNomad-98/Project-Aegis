@@ -2,6 +2,10 @@
 
 Detail tables for `edge-state-ux-designer`. Read on demand.
 
+The owning [edge state UX skill](../SKILL.md) defines the design workflow.
+CTA means call to action, ARIA accessible rich internet applications, and
+HTTP 403 a forbidden response. The state table applies per view.
+
 ## Full state checklist (per view)
 
 Decide each IN or OUT with a reason — never by omission.

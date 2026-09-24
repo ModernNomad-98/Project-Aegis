@@ -108,7 +108,8 @@ skill.
    definition: authorized ordinary create/append, immutable human-decision
    transcription, or exactly six named projection refreshes. Preserve existing
    grants without repeat consent; excluded files/actions remain manual-only.
-   TALI adoption alone never activates an execution route.
+   Task-Authorized Local Implementation (TALI) adoption alone never
+   activates an execution route.
    Manual-only skills must name the irreversible step in Stop Conditions.
 9. **Deliver the verdict.** Per check PASS / CONCERN / FAIL, each citing
    evidence (quoted description phrases, the named colliding skill, the

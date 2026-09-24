@@ -54,7 +54,7 @@ and that human act on.
   RUN and folds its output into the aggregate.
 - Do NOT use when: the subject is HOW the SAST run itself is designed — tool
   selection, ruleset/config, baseline + diff-scanning, governed suppression —
-  that is `sast-orchestration-designer` (in-batch); this skill aggregates what
+  that is `sast-orchestration-designer` (shipped); this skill aggregates what
   that produces alongside the other categories.
 - Do NOT use when: the testing is DYNAMIC against a running app — that is
   `dast-safety-harness-designer`, which carries a written-authorization gate;
@@ -195,7 +195,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   report-errored-scan-as-clean refusals.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`
   (triage vs orchestration), `supply-chain-security-reviewer` (dep/provenance
-  judgment vs the dep-scan run), `sast-orchestration-designer` (in-batch: SAST
+  judgment vs the dep-scan run), `sast-orchestration-designer` (shipped: SAST
   run design vs whole-repo aggregation), `dast-safety-harness-designer`
   (dynamic vs static), and `ci-pipeline-architect` (pipeline vs scan contract).
 - No `references/` — the report contract above is the complete procedure;

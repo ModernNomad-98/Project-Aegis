@@ -2,6 +2,14 @@
 
 Supporting detail for `docs-first-implementer`. Read on demand.
 
+The owning [docs-first implementation skill](../SKILL.md) defines how to
+verify current behavior. API means application programming interface,
+.NET the Microsoft development platform, npm the Node.js package manager,
+and CI continuous integration. A version range permits several releases;
+the locked or resolved version is the one selected for this environment.
+For Python, inspect the project's active interpreter and environment before
+claiming which package version is installed.
+
 ## Where the LOCKED version lives, per ecosystem
 
 | Ecosystem | Range (do not trust) | Resolved version (trust) |

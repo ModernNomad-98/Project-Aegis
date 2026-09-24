@@ -5,6 +5,11 @@ table, and the quarantine template. `SKILL.md` owns the workflow; this file
 owns the catalogs. All forms are stack-agnostic — express them in your
 pipeline's assertion tooling.
 
+The owning [data quality skill](../SKILL.md) defines the monitoring workflow.
+SLA means service-level agreement, enum an enumerated allowed-value set,
+and watermark the latest event time known to be processed. Defect-rate limits
+below are upper bounds; a minimum expected volume is a separate lower bound.
+
 ## Check forms per dimension
 
 ### Freshness
@@ -16,11 +21,13 @@ pipeline's assertion tooling.
 
 ### Completeness / volume
 - Row/event count vs expectation band (see bands below), per period.
-- Required-field null rate ≤ floor, per field that consumers key on.
+- Required-field null rate ≤ maximum tolerated defect rate, per field that
+  consumers key on.
 - Source-complete check where the producer publishes a manifest/count.
 
 ### Uniqueness
-- Duplicate rate on the declared business key ≤ floor (state the key).
+- Duplicate rate on the declared business key ≤ maximum tolerated defect
+  rate (state the key).
 - Post-join fan-out check: output rows ÷ input rows within expected ratio.
 
 ### Validity
@@ -30,7 +37,7 @@ pipeline's assertion tooling.
 - Cross-field rules (end ≥ start; refund ≤ original amount).
 
 ### Consistency / referential
-- Orphan rate: foreign keys resolving nowhere ≤ floor.
+- Orphan rate: foreign keys resolving nowhere ≤ maximum tolerated defect rate.
 - Reconciliation: aggregate here vs source-of-truth there, compared AFTER
   the stated sync lag (the lag budget is part of the check).
 - Cross-store counts for dual-written data during migrations (standing

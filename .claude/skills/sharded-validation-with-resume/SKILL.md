@@ -123,7 +123,9 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
 - [ ] Status file schema distinguishes `failed` from `interrupted` — resume
       eligibility is derivable mechanically.
 - [ ] Resume reruns only unfinished/interrupted shards; a new commit/run-id
-      invalidates prior passes; failed shards rerun fully after fixes.
+      invalidates prior passes. After fixing a failed assertion, start a
+      fresh full run (or explicitly run that shard in a new run) rather than
+      using `-Resume` to erase the failure.
 - [ ] The aggregate gate is the sole required check; skipped-shard
       semantics are explicit for docs-only tiers AND treated as failure on
       full-tier runs.

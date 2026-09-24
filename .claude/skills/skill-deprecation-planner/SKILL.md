@@ -1,6 +1,6 @@
 ---
 name: skill-deprecation-planner
-description: Plan the safe retirement of a library skill — the lifecycle end. Establishes the trigger (superseded with a coverage diff, absorbed as an extension, evidence-backed disuse, defect), runs the reverse-link sweep (every neighbor description, trigger-eval, catalog/README row, or agent definition naming the skill gets a disposition), then stages the exit — mark (successor named), redirect for a grace window, remove (registration rows moved to a retired record, never silently deleted) — each stage with rollback (a squash-merged removal reverts as one ordinary commit). Plan only; executes nothing — removal is a human-approved operation. Use when asked to deprecate, retire, remove, or sunset a skill, prune the library on evidence, or after a reject/make-it-an-extension verdict. Do NOT use for doc lifecycle/retirement (docs-retention-index — now shipped), product-feature sunset messaging, usage-evidence gathering (skill-usage-instrumenter), or reviewing the removal PR (library-diff-reviewer).
+description: Plan the safe retirement of a library skill — the lifecycle end. Establishes the trigger (superseded with a coverage diff, absorbed as an extension, evidence-backed disuse, defect), runs the reverse-link sweep (every neighbor description, trigger-eval, catalog/README row, or agent definition naming the skill gets a disposition), then stages the exit — mark (successor named), redirect for a grace window, remove (registration rows moved to a retired record, never silently deleted) — each stage with rollback (a squash-merged removal reverts as one ordinary commit). Plan only; stage execution follows applicable human authorization. Use when asked to deprecate, retire, remove, or sunset a skill, prune the library on evidence, or after a reject/make-it-an-extension verdict. Do NOT use for doc lifecycle/retirement (docs-retention-index — now shipped), product-feature sunset messaging, usage-evidence gathering (skill-usage-instrumenter), or reviewing the removal PR (library-diff-reviewer).
 ---
 
 # Skill Deprecation Planner
@@ -91,7 +91,7 @@ skill is as governed as shipping one. It plans; it never deletes.
 4. **Stage 2 — redirect window.** A stated grace period in which the
    deprecated skill redirects rather than serves. Monitor for stragglers:
    anything still firing or referencing it (instrumented signal if
-   available, else the tier-2 path). New references to a deprecated skill
+   available, else the tier-2 self-reported usage path). New references to a deprecated skill
    are review findings from this point.
 5. **Stage 3 — remove.** Directory deleted; registration rows MOVE to a
    retired record (catalog retired section + decision-log entry) rather
@@ -107,7 +107,8 @@ skill is as governed as shipping one. It plans; it never deletes.
 7. **Deliver the plan** in the Output Format: trigger + evidence,
    disposition table, per-stage checklists with dates/windows, rollback per
    stage, and the explicit statement that execution — every stage of it —
-   is a human-approved operation this skill does not perform.
+   requires applicable human authorization, including any active grant;
+   this planning skill does not perform it.
 
 Stage checklists, the disposition-table format, the reverse-link sweep
 procedure, and retired-record conventions:
@@ -124,7 +125,7 @@ Stage 1 MARK:      <description notice + successor; registration annotations; de
 Stage 2 REDIRECT:  <grace window + dates; straggler monitoring source> — rollback: <un-mark; window closes>
 Stage 3 REMOVE:    <directory deletion; rows moved to retired record; count sites decremented; neighbor evals updated; removal PR → library-diff-reviewer> — rollback: <git revert of the single (squash) removal commit>
 Point of no return: <external copies/consumers outside plan reach — stated honestly>
-Execution:    NOT performed by this plan — each stage is a human-approved operation
+Execution:    NOT performed by this plan — each stage requires applicable authorization
 Not planned:  <what this plan deliberately leaves out, and why>
 ```
 
@@ -181,7 +182,7 @@ Not planned:  <what this plan deliberately leaves out, and why>
 - Asked to delete the skill NOW, plan later ("just remove the directory,
   we'll tidy references after") → refuse; unstaged deletion is exactly the
   dangling-reference incident this skill exists to prevent. The plan comes
-  first; execution is human-approved.
+  first; execution follows the applicable human authorization or active grant.
 - No qualifying trigger — the reason offered is taste, age, or an
   unevidenced hunch → stop and route: usage questions to
   `skill-usage-instrumenter`, quality questions to

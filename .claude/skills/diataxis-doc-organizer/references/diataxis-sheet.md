@@ -2,6 +2,10 @@
 
 Detail for `diataxis-doc-organizer`. Read on demand.
 
+The owning [Diátaxis organization skill](../SKILL.md) routes a page by the
+reader's task and purpose: learning, completing a task, looking up a fact, or
+understanding a concept.
+
 ## The two axes
 
 ```

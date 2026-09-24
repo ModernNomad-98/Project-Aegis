@@ -2,6 +2,12 @@
 
 Detail for `docs-as-code-architect`. Read on demand.
 
+The owning [docs-as-code skill](../SKILL.md) defines the pipeline design.
+CI means continuous integration, API application programming interface,
+i18n internationalization, MDX Markdown with embedded JSX components, and
+PDF portable document format. Execute documentation code samples only with
+approved offline or synthetic fixtures when the task's authority requires it.
+
 ## Generator selection factors
 
 Match the tool to requirements, not fashion. Key factors:
