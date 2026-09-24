@@ -111,7 +111,10 @@ tools](#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
   then prove they hold.
 - **"It works — now I want to launch."** → tell your coding agent: *"My app is built — use
   project-orchestrator to get me ready to release."* It picks up at the deploy-prep stage
-  and ends with a plain-language GO / NO-GO that **you** authorize.
+  and ends with a plain-language GO / NO-GO that **you** authorize. The
+  [release-with-agents path](docs/paths/release-with-agents.md) explains how to
+  use independent reviewers when the host supports them, keep one release
+  candidate and deployment path, and learn what each invoked skill does.
 
 ## The discipline behind it: Zero Trust AI Engineering Discipline
 
