@@ -1,5 +1,14 @@
 # Phased Claude Skills and Agents Implementation Prompts
 
+> **Historical prompts — current reading, 2026-09-23.** These phases were
+> written for the former `nguyenpv1980-wq/Claude-Skills` foundation build.
+> Their file-creation steps are not the current Project Aegis work queue; do
+> not run them as instructions in this source checkout or a consumer product
+> repository. First read [AGENTS.md](../../AGENTS.md) for workspace role,
+> then the [current skills catalog](../skills-catalog.md) and
+> [skill authoring standard](../skill-generation-standard.md). The original
+> phase prompts remain below for provenance and grant no authority.
+
 Use these prompts one phase at a time from the root of `nguyenpv1980-wq/Claude-Skills`.
 
 Do not skip Phase 0. Do not run all phases in one pass unless explicitly instructed and unless validation remains clean after each phase.

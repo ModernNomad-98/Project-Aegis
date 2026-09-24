@@ -10,6 +10,14 @@
 > administrator-merge authority; the narrower PR #88 grant described below
 > remains its original historical grant.
 
+Reading key for this dated record: **TALI** means Task-Authorized Local
+Implementation, a conditional route that this change did not activate;
+**ADR** means architecture decision record; **ARTF-001** is the skill-contract
+audit rule that flags a durability claim without a named durability level;
+**BER** means Behavioral Eval Runner; and **CI** means continuous integration.
+The 184-skill count and the estimates below describe the September 12
+candidate, not the current repository inventory or remaining forecast.
+
 Prepared 2026-09-12 from merged main `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`.
 This records the implementation candidate; submitted-revision checks and merge
 disposition are recorded separately. The owner authorized fixes, automated tests,

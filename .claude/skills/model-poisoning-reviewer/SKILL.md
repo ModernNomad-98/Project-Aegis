@@ -82,7 +82,9 @@ you ingest and the pipelines you run.
    severity (exploit-path gated), and controls (provenance tracking, curation
    gates, feedback identity/rate limits, anomaly detection, holdout eval,
    purge/rollback). Behavior-shift monitoring routes to `observability-operator`;
-   confirmed poisoning to `incident-response-runbook`.
+   confirmed production poisoning goes to the named human incident owner and
+   the current approved incident runbook. The `incident-response-runbook`
+   skill only authors or revises that document.
 
 ## Output Format
 
@@ -155,8 +157,10 @@ Not applicable: <pipeline absent — reason> | Not reviewed: <+ why>
   state that and route any acquired-artifact concern to
   `supply-chain-security-reviewer`.
 - A poisoning path is already exploited (corrupted behavior in production, a
-  known-planted document steering answers) — route to
-  `incident-response-runbook`; containment/rollback is a human decision.
+  known-planted document steering answers) — route live response to the named
+  human incident owner using the current approved runbook. The
+  `incident-response-runbook` skill may author or update that runbook; it does
+  not run the incident. Containment and rollback are human decisions.
 - The concern is retrieval authorization, third-party artifact acquisition, or
   inference-time injection — hand to the owning skill.
 - Remediation requires retraining, purging data, or rolling back a model —

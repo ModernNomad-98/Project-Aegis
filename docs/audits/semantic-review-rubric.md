@@ -1,5 +1,13 @@
 # Semantic-review rubric — Project Aegis corpus audit
 
+> **Current reading, checked 2026-09-23:** This rubric is a static review
+> worksheet. An offline [Behavioral Eval Runner (BER)](../../tools/behavioral_eval_runner/README.md)
+> now exists, but measured calibration and live behavioral proof remain gated
+> in the [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md). The
+> original "future runner" wording below describes the rubric's preparation
+> date; a rubric PASS is not a live behavioral result. The
+> [candidate register](aegis-060-plus-register.md) keeps historical coverage.
+
 Companion to `scripts/audit-skill-contracts.py`. The mechanical audit finds
 what regexes can bind; THIS rubric is the repeatable judgment pass for what
 they cannot. It is applied per shipped skill, by inspecting the skill's

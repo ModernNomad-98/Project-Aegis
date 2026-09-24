@@ -1,7 +1,14 @@
 # Data & model poisoning controls
 
-Detail for `model-poisoning-reviewer`. OWASP LLM04 (Data and Model Poisoning),
-2025. Scope: pipelines YOU run that shape behavior. Acquired artifacts →
+Use these controls with the [model poisoning reviewer](../SKILL.md) to assess
+the integrity of behavior-shaping data and pipelines. The Open Worldwide
+Application Security Project (OWASP) calls this **LLM04**, Data and Model
+Poisoning, in its 2025 large language model (LLM) risks. **RLHF** means
+reinforcement learning from human feedback; **RAG** means retrieval-augmented
+generation. **LLM03** names the acquired-artifact supply-chain category;
+**[D6](../../../../docs/reconciliation/step-0-reconciliation-v4.md)** is the
+project's recorded reconciliation decision extending that review. Scope here
+is pipelines YOU run. Acquired artifacts →
 `supply-chain-security-reviewer`.
 
 ## Contributor-trust rubric
@@ -66,8 +73,10 @@ The high rows are the primary poisoning surface; controls scale with risk.
 - Holdout/canary evaluation gates each update; adversarial-trigger tests.
 - Behavior-drift monitoring in production → `observability-operator`; a sudden
   quality/behavior shift after an update is a poisoning signal.
-- Confirmed poisoning → `incident-response-runbook`; remediation (retrain,
-  purge, rollback) is a classified, approved step.
+- Confirmed poisoning during a live incident → notify the human incident owner
+  and follow the existing incident runbook. `incident-response-runbook` authors
+  or updates that procedure; remediation (retrain, purge, rollback) is a
+  classified, approved step.
 
 ## Boundary with supply-chain-security-reviewer
 

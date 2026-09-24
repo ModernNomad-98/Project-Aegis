@@ -1,5 +1,45 @@
 # Project Aegis — next owner decisions
 
+> **Current reading, checked 2026-09-23 after pull request #144:** The table and
+> sequence under [Original decision packet](#original-decision-packet-after-pr-107)
+> preserve the proposal prepared after #107. They are not today's queue. Use
+> the index below with the [approval register](../approvals/APPROVAL_REGISTER.md),
+> [current forecast](aegis-backlog-forecast.md#start-here--current-reading),
+> and owning backlogs before
+> acting. This page grants no implementation, host or provider authority.
+
+## Current disposition
+
+For this page, Behavioral Eval Runner (BER) names the evaluation tool and
+control plane (CP) names the delivery kernel. A backlog item (BKL), work
+package (WP), and recorded decision (DEC) have separate lifecycles. An APR
+is an entry in the owner approval register. A pull request (PR) is a proposed
+or merged repository change. Owner decision 1
+(OD-1) is the later ratification of BER's measured judge result. R4 and R5
+are BER's host confinement and execution-profile evidence gates. POSIX means
+a Unix-like operating-system interface; continuous integration (CI) runs
+repository checks, not a selected-host proof. A source SHA is a commit hash;
+`NON_BASELINE` means the result cannot qualify for the measured baseline.
+`SYSTEM` is the Windows operating-system service account.
+
+| Topic | Current status and next gate |
+| --- | --- |
+| BER evidence policy (BKL-009) | [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day complete-bundle policy. [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) authorized one synthetic offline proof; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this checkpoint. Real-host storage, access, redaction and operator cleanup controls remain incomplete. Follow the [BER backlog](behavioral-eval-runner-backlog.md); policy selection does not approve deletion or a live run. |
+| Replacement candidate labels | The public [sanitized candidate checkpoint](../evidence/ber-replacement-candidate-1-summary.md) records 160 pending candidates. Owner semantic review and exact-byte label approval remain open; this index does not inspect or approve private inputs. |
+| BER WP-2B-3 source, allowance and OD-1 | The [offline holdout execution proposal](ber-wp2b3-holdout-execution-scope.md) is a proposal, not an implementation grant or a renewed provider allowance. Historical accounting, exact reviewed execution source, labels, host proof and an explicit call/token/dollar cap remain prerequisites. No measured result or OD-1 ratification exists. |
+| BER host and R4/R5 | The owner selected a disposable POSIX **direction**, but no named host or selected-host capability proof is recorded. The [host decision proposal](ber-selected-host-capability-decision.md) distinguishes generic Linux CI from host evidence; any offline probe needs its own bounded authority. |
+| CP-WP-003 | [APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) and [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) delivered the synthetic CP-WP-003A proof. The [CP backlog](resumable-control-plane-backlog.md) still blocks real source authority, independent freshness, containment, evidence and billing claims. The delivered proof grants no real dispatch. |
+| CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
+| Issue #101 setup and routing | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only setup ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped within bounded scopes. The [setup plan](aegis-setup-routing-plan.md) keeps package 4 host proof and comparison pending separate authority, packages 5/6 conditional, and package 7 pending. No optional helper is selected. |
+
+The [latest five-merge forecast](aegis-backlog-forecast.md#start-here--current-reading)
+keeps the selected
+remaining work at **175–394 active hours**. It is a scope estimate, not
+permission to start a gated package. The independent gates in the original
+packet below still apply where the current index marks them open.
+
+## Original decision packet after PR #107
+
 Prepared 2026-09-23 after public PR #107. This is a review packet, not a
 phase authorization or a claim that a blocked gate is complete. The
 [execution handoff](aegis-efficient-execution-handoff-2026-09-23.md) groups

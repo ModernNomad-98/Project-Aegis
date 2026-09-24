@@ -29,6 +29,8 @@ The backlog links below show what remains proposed or blocked.
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
 - [Offline CI](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
+- [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
+  delivery records, with current-status boundaries.
 - [Scenario A acceptance runbook](acceptance/scenario-a-runbook.md): run and read
   synthetic evidence for the beginner product-state workflow; behavioral
   acceptance remains a separate gate.
@@ -40,6 +42,9 @@ The backlog links below show what remains proposed or blocked.
   September 23 backlog sequence, model policy, verified state and continuation task.
 - [Conversational setup and routing plan](roadmaps/aegis-setup-routing-plan.md):
   issue #101 decisions, candidate screen and proposed evaluation protocol.
+- [Offline setup routing contract](../tools/aegis_setup/README.md):
+  maintainer guide to the implemented synthetic advisory checks; there is no
+  host integration, provider connection or dispatch authority.
 - [Issue #101 package-2 scope proposal](roadmaps/aegis-setup-package-2-authorization-proposal.md):
   reviewable Aegis-only conversation and saved-state implementation boundary.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):

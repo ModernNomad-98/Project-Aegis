@@ -4,6 +4,14 @@ Decision tables backing the workflow. `SKILL.md` owns the steps; this file
 owns the comparisons. All entries are platform-agnostic — map them to your
 stream/queue technology's terms.
 
+**Use:** Choose per-flow delivery and retention guarantees through the
+[streaming-event-architect workflow](../SKILL.md). CDC means change data
+capture; DDL means data definition language (schema-changing statements);
+DLQ means dead-letter queue; SLA means service-level agreement; `ack` means
+acknowledgment; and `id` means identifier. The flow-card placeholders are
+questions to fill for a real transport, not defaults that assert a platform
+guarantee.
+
 ## Stream (durable log) vs work queue — per flow
 
 | Property | Durable log/stream | Work queue |

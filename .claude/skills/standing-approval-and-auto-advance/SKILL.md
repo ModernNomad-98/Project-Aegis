@@ -1,6 +1,6 @@
 ---
 name: standing-approval-and-auto-advance
-description: 'MANUAL-ONLY; never auto-invoke. Design the GOVERNED anti-approval-fatigue layer: a documented standing approval for the mechanical delivery loop (push, PR, monitor CI, fix red, pull) within NAMED scope; a phase-advance rule covering only already-named-and-approved phases; a prompt pattern restating the standing approval each session; an explicit opt-out phrase; and a reviewer-block path that suspends the loop. Merge-after-green is templated ONLY as an explicit opt-in deployment-profile choice — never the default — and standing approval NEVER covers protected-branch merge or arming auto-merge (human-only per agent-authorization-matrix). These elements separate this pattern from the ungoverned-auto-merge incident. Manual-only: it widens standing autonomy. Use when approval fatigue erodes real gates or every mechanical step re-asks permission. Do NOT use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval UX (human-agent-trust-reviewer).'
+description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented standing approval for named delivery steps, phase advance only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer blocks. Protected-branch merge remains approval-required; an applicable explicit, active, scoped human grant can satisfy that requirement without another request. Never infer merge authority from green checks or this skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the default template. Use when repetitive mechanical approvals erode real gates. Do not use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval experience (human-agent-trust-reviewer).'
 disable-model-invocation: true
 ---
 
@@ -40,8 +40,9 @@ opens this door.
   recorded there as an entry, with scope allowed and forbidden.
 - Do NOT use when: defining which actions agents may EVER take (the
   deny-by-default floors) — that is `agent-authorization-matrix`. This skill
-  operates strictly INSIDE that matrix's agent-allowed region; it never
-  moves a human-only floor.
+  does not grant authority by itself. An applicable, explicit human decision
+  recorded for the repository may satisfy an approval-required matrix cell;
+  this design cannot silently move the floor.
 - Do NOT use when: adversarially reviewing whether an approval flow trains
   rubber-stamping — that is `human-agent-trust-reviewer`; run it against the
   policy this skill produces.
@@ -51,8 +52,9 @@ opens this door.
 ## Inputs to Inspect
 
 1. `agent-authorization-matrix` (or the repo's equivalent policy): the
-   human-only floors this design must never cross — protected-branch merge,
-   arming auto-merge, deploys, prod data, secrets, history rewrites.
+   approval-required and forbidden actions this design cannot silently
+   authorize — protected-branch merge, arming auto-merge, deploys,
+   production data, secrets, and history rewrites.
 2. The incident record that motivates the floors — in this library, the
    ungoverned-auto-merge incident encoded in `agent-authorization-matrix`'s
    evals: a prior session armed auto-merge and a security PR merged to main
@@ -69,11 +71,12 @@ opens this door.
 
 ## Workflow
 
-1. **Fix the hard floor first.** Restate, verbatim in the policy, the
-   human-only actions from `agent-authorization-matrix`. Standing approval
-   thins approvals INSIDE the agent-allowed region; it never converts a
-   human-only action into an approved one. No design work proceeds until
-   this floor is written.
+1. **Fix the hard floor first.** Restate the approval-required and forbidden
+   actions from `agent-authorization-matrix`. A standing policy does not
+   approve an action merely by naming it. A protected-branch merge may proceed
+   only when a separate, explicit, active human grant covers the exact repo,
+   action, and constraints. Check later owner instructions before relying on a
+   grant. No design work proceeds until this floor is written.
 2. **Name the standing scope.** Enumerate the mechanical loop steps covered
    (e.g. commit to feature branch, push, open PR, monitor CI, fix red,
    re-push, pull after human merge) and the boundaries (which repo, which
@@ -95,12 +98,12 @@ opens this door.
    be said (prompt, PR comment) and that it always wins over the policy.
 6. **Template merge-after-green as OPT-IN only.** The source pattern
    includes default-on autonomous merge after green validation. This library
-   templates it as a deployment-profile choice the adopting human must
-   explicitly select, never the default profile — and even when selected it
-   must not cross the matrix floor (a protected-branch merge or arming
-   auto-merge remains a human act; an "auto-merge" profile is only lawful
-   where the matrix itself was human-amended to delegate a named,
-   non-protected surface). The default profile is open-PR-and-STOP.
+   never makes that the default profile. Without a separate applicable human
+   merge grant, the profile is open-PR-and-STOP. An explicit, recorded grant
+   may authorize a named protected-branch merge or a durable class of merges;
+   apply its actual scope, lifecycle, and later constraints. Green checks
+   alone never supply approval. Do not treat a grant to merge as permission
+   to arm GitHub auto-merge; that action needs its own explicit decision.
 7. **Write the reviewer-block exception path.** A human review request,
    requested change, failing required check, or ANY reviewer objection
    suspends auto-advance for that item: the loop stops, states what blocked,
@@ -116,12 +119,13 @@ opens this door.
 
 ```
 STANDING APPROVAL POLICY (draft for human adoption)
-Hard floor (never covered):   <verbatim human-only actions from the authorization matrix>
+Hard floor:                   <approval-required and forbidden actions from the matrix>
+Applicable grants:            <separate, active human decisions; repo, scope, limits, later instructions>
 Standing scope (named):       <loop steps + branches + change classes covered>
 Phase-advance rule:           <auto-advance only into named+approved phases; exits on drift>
 Required prompt pattern:      <the restatement each session must open with>
 Opt-out phrase:               <exact phrase; where it may be said; always wins>
-Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile, human-selected, matrix-lawful>
+Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an applicable human decision>
 Reviewer-block path:          <what suspends the loop; what the loop does when blocked>
 Rationale:                    governance elements are non-optional — cites the ungoverned
                               auto-merge incident (agent-authorization-matrix evals)
@@ -130,8 +134,9 @@ Adoption:                     pending human approval → then recorded via scope
 
 ## Validation Checklist
 
-- [ ] The hard floor is restated verbatim and nothing in the policy touches
-      it — no protected-branch merge, no arming auto-merge, under any profile.
+- [ ] Approval-required actions have an applicable explicit human decision
+      before execution; forbidden actions remain forbidden without a separate
+      recorded decision. A merge grant does not authorize arming auto-merge.
 - [ ] Every covered step is NAMED; the policy contains no "and similar
       routine steps" elasticity.
 - [ ] Merge-after-green appears only as an explicit opt-in profile with the
@@ -146,8 +151,8 @@ Adoption:                     pending human approval → then recorded via scope
 ## Gotchas
 
 - **Scope elasticity is the failure mode.** "The mechanical loop" quietly
-  grows to include tagging, releasing, merging. The named-steps list and the
-  register's FORBIDDEN field exist to kill this.
+  grows to include tagging, releasing, merging. Each action needs explicit
+  scope; a project's existing merge grant is applied only in that project.
 - **Auto-advance across a re-planned phase:** the plan changed since
   approval; advancing into the renamed phase is advancing into unapproved
   work. The rule binds to phases as approved, not positions in a list.
@@ -168,9 +173,10 @@ Adoption:                     pending human approval → then recorded via scope
 
 ## Stop Conditions
 
-- Asked to include protected-branch merge or arming auto-merge in the
-  standing scope, or to make merge-after-green the default → refuse, cite
-  the matrix floor and the incident; deliver the lawful design instead.
+- Asked to include protected-branch merge or arming auto-merge merely because
+  this skill was invoked, or to make merge-after-green the default → refuse,
+  cite the matrix and the incident. If a separate active owner grant is cited,
+  verify its repository, action, limits, and later instructions before use.
 - No `agent-authorization-matrix` (or equivalent authority policy) exists →
   stop; the floors must exist before the fatigue layer that presumes them.
   Offer to route there first.

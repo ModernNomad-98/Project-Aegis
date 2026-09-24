@@ -1,5 +1,24 @@
 # Documentation readability and component guide backlog
 
+## Start here — current reading
+
+As of 2026-09-23 after pull request (PR) #205, this remains the active
+repository-wide documentation acceptance backlog. The two component guides,
+root guide and documentation index have received bounded readability work;
+the [delivery batches](#documentation-batches) identify what was checked.
+The **491-file inventory and the ordered "start with" steps below are the
+original launch plan**, retained to show how this work began. Do not restart
+those delivered batches from that plan.
+
+The exact #205 tree contains **553 tracked Markdown files**. Earlier screens
+of skill entrypoints and references corrected particular pages; they did not
+accept every page against the checklist below. Continue the remaining
+page-by-page review and use the [forecast's current reading](aegis-backlog-forecast.md#start-here--current-reading)
+for the latest selected-work estimate. The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
+explain their shipped offline workflows and limits. This reading route grants
+no provider call, private-input use, real-host activation or deployment.
+
 Created 2026-09-23 from Peter Nguyen's request to explain what the Behavioral
 Eval Runner and delivery control plane are for, what their functions do, and
 to make **all repository documentation understandable to human developers and
@@ -84,11 +103,192 @@ This documentation work does not authorize provider calls, deployment,
 private calibration input publication, approval changes or later-phase runtime
 implementation.
 
-## Reviewed batches
+## Documentation batches
+
+### Progress accounting after pull request #205
+
+The exact #205 merge is `6051ab0ad4a3ccd1e1a67d315ba9a8b2c72cc31b`.
+Its **553 tracked Markdown files** are 62 more than the original 491-file
+inventory. The additional files are mostly dated evidence and tracking pages,
+so a count of merged documentation requests alone is not a remaining-work
+estimate. A deduplicated read of the delivered sorted skill screens and 61
+readability/correction requests through #205 gives this inventory:
+
+| Disjoint set | Pages | Evidence already recorded | Remaining acceptance work |
+| --- | ---: | --- | --- |
+| Skill entrypoints and references | 342 | Sorted screens and 83 targeted corrections | Apply the full page checklist; record each result |
+| Corrected primary pages outside those skill paths | 83 | Bounded guide, roadmap, governance and evidence corrections | Apply the full page checklist; large records may take longer |
+| Dated evidence notes and tracking pages | 55 | Written with the completed correction batches | Confirm current links, scope and readable first use |
+| Other reader-facing pages and templates | 29 | No recorded sorted screen in those batches | Read and correct each full page |
+| Synthetic fixture Markdown | 44 | Kept as test input | Classify and check that explanatory entrypoints are readable; do not rewrite fixtures merely for prose style |
+| **Tracked total** | **553** | **342 + 83 + 55 + 29 + 44** | **Full-page acceptance status still needs recording** |
+
+The 61 requests touched 221 distinct Markdown paths: 166 primary pages,
+52 dated notes and three tracking records. Of the primary paths, 83 were
+already in the 342 sorted skill paths, leaving the 83 outside-skill row above.
+The 29 other reader-facing paths include four skill asset templates; they are
+not treated as synthetic fixtures. **No per-page full-checklist acceptance
+result was recorded for these batches.** This is a measurement gap, not a
+claim that zero pages are satisfactory. The correction work is retained;
+the next review should build on it.
+
+For a reproducible count, take tracked `.md` paths from the exact #205 tree,
+then union the changed Markdown paths in these merged readability/correction
+requests. Count each path once and intersect with the current tree:
+
+```text
+119 120 122 126 127 128 133 135 138 140 141 142 144 145 146
+147 149 150 151 152 154 155 156 157 158 159 160 161 163 164
+165 166 167 168 169 171 172 173 175 176 178 179 181 182 183
+184 186 187 188 190 191 192 193 195 196 199 200 201 202 203 205
+```
+
+The source for each request is its first-parent merge diff, including any
+squash commit carrying its request number. The sorted skill screens supply
+the 342 skill paths; the 44 fixture paths are under `scripts/`, except the
+reader-facing `scripts/tests/fixtures/README.md`.
+
+The **80–200 active-hour documentation estimate** remains a broad provisional
+remaining-work range. It fell neither automatically with a request count nor
+from a short residual-screen model: the latter could undercount full-page
+review of long records. Before revising the range, measure a representative
+batch of eight to ten pages across short skills, medium guides, large
+roadmaps/evidence and templates. Record each page's actual active review and
+correction time when available, independent reviewer result, and source
+revision. Recalculate remaining effort by page type and include integration,
+new-page and rework allowances. Keep active time distinct from PR wall time,
+GitHub queue and owner wait. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
+holds the selected-backlog total until that measurement supports a change.
+
+### Remaining-page review in larger batches
+
+Use the repository's tracked Markdown inventory as the denominator. For each
+batch, record the exact source revision, assigned paths, page-level result,
+reviewer, correction pull request and observed time. A page has a **full-page
+acceptance** result only when an independent reader checked all criteria in
+[Acceptance for each page](#acceptance-for-each-page) on that revision. A
+targeted correction or a sorted terminology screen is useful progress, but
+must retain its narrower label until this check is done.
+
+To reduce repeated integration and hosted-check waits, group roughly 10–20
+related pages in one pull request when their owners and authority boundaries
+are compatible. Give up to three read-only agents disjoint page sets for
+parallel review when the estimated elapsed-time saving exceeds 20 percent,
+including coordination and final audit. One coordinator owns edits, shared
+terms, the page ledger, conflict resolution and the final pull request.
+Additional writers need separate worktrees and nonoverlapping files.
+
+For each page, the review record must say **accepted**, **corrected and
+accepted**, **needs a named follow-up**, or **classified as a synthetic
+fixture**. Record the reason and an owning follow-up for anything not accepted.
+Check local links and commands, run the skill validator and relevant offline
+checks, obtain an independent whole-batch audit, and require the applicable
+GitHub Actions before merging. Estimate the next batch from its own page mix;
+report the previous ETA, new ETA, selected-backlog total and observed
+first-work-to-merge wall time. Recalculate the remaining-page estimate after
+each batch and the whole backlog every five merged pull requests.
+
+This batching procedure is a work plan. It does not mark earlier screens as
+full-page acceptance or grant provider, private-input, real-host or deployment
+authority.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
 | First component guides, started 2026-09-23 16:12 UTC | `tools/behavioral_eval_runner/README.md`, `tools/aegis_delivery_control/README.md`, `docs/README.md` | Rewritten around purpose, workflow, examples, functions and limits. Local commands and links passed; independent read-only review found no remaining blocker after corrections. Root README navigation remains a separate batch. |
+| Maintainer guide batch, PR #122 | `docs/offline-ci.md`, `docs/approval-lifecycle-grading.md`, `SECURITY.md` | Added purpose, normal use and terms to three active guides; [batch evidence](../evidence/documentation/readability-maintainer-guides-2026-09-23.md). Other documentation remains open. |
+| Technical guide batch, PR #126 | `docs/behavioral-eval-runner-schema-compatibility.md`, `docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md` | Clarified reader steps, codes and policy limits in two guides; [batch evidence](../evidence/documentation/readability-technical-guides-2026-09-23.md). No schema or authority change. |
+| Skill authoring standard, PR #127 | `docs/skill-generation-standard.md` | Added an authoring route and terms while retaining the normative contract and action table; [batch evidence](../evidence/documentation/skill-standard-readability-2026-09-23.md). |
+| Skills catalog, PR #128 | `docs/skills-catalog.md` | Added first-screen navigation and labels; underlying entries and history were retained; [batch evidence](../evidence/documentation/2026-09-23-skills-catalog-readability-batch.md). It was not a review of every skill entry. |
+| Scenario A runbook, PR #133 | `docs/acceptance/scenario-a-runbook.md`, `docs/README.md` | Added an offline quickstart, evidence-reading route and index link. Fresh-session behavioral acceptance remains separate; the [dated review record](../evidence/documentation/scenario-a-runbook-readability-2026-09-23.md) limits the claim to the checked runbook and index entry. |
+| Root README workspace routing, started 2026-09-23 17:37:09 UTC | `README.md`, `docs/evidence/documentation/root-readme-workspace-routing-2026-09-23.md`, this backlog row | The first-screen start sequence now directs product users to copy the skills into their own repository and keeps source-library maintenance in this checkout. Component descriptions remain in place. Local checks and independent read-only review found no blocker, as recorded in the [batch note](../evidence/documentation/root-readme-workspace-routing-2026-09-23.md); the wider sweep remains open. |
+| Offline setup routing guide, started 2026-09-23 17:58:19 UTC | `tools/aegis_setup/README.md`, `docs/README.md`, `docs/evidence/documentation/aegis-setup-routing-readability-2026-09-23.md`, this backlog row | Added maintainer purpose, a tested synthetic example, function map and direct index link. The detailed contract and no-dispatch boundary remain. Focused offline checks passed; independent read-only review found two correctable issues, then cleared the revised guide. See the [batch note](../evidence/documentation/aegis-setup-routing-readability-2026-09-23.md). The wider sweep remains open. |
+| Guided user paths, started 2026-09-23 18:10:57 UTC | `docs/paths/something-is-broken.md`, `docs/paths/check-your-app.md`, `docs/paths/add-ai-safely.md`, `docs/evidence/documentation/user-paths-readability-2026-09-23.md`, this backlog row | Corrected live-incident and release-verdict routing, qualified secret/database and AI-safety claims, defined terms, and added copyable prompts. Local checks and independent review are recorded in the [batch note](../evidence/documentation/user-paths-readability-2026-09-23.md). The wider sweep remains open. |
+| Setup routing plan, started 2026-09-23 18:25:36 UTC | `docs/roadmaps/aegis-setup-routing-plan.md`, `docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md`, this backlog row | Added a current delivery map and navigation, identified the PR #108 source snapshot and broad candidate screen as historical, and aligned package 2/3 descriptions with shipped contracts while keeping package 4–7 boundaries explicit. See the [batch note](../evidence/documentation/setup-routing-plan-readability-2026-09-23.md). The wider sweep remains open. |
+| Historical skill category maps, started 2026-09-23 18:28:52 UTC | `docs/skills/08-ai-era-sdlc-agent-ops.md`, `docs/skills/09-ai-software-engineering.md`, `docs/evidence/documentation/skill-category-map-readability-2026-09-23.md`, this backlog row | Explained that the 40 numbered entries are original candidates, linked current shipped status and the authoring standard, and defined shorthand without changing any candidate row. See the [batch note](../evidence/documentation/skill-category-map-readability-2026-09-23.md). The other category maps and wider sweep remain open. |
+| Historical skill category maps 01–07, started 2026-09-23 18:38:59 UTC | `docs/skills/01-software-architecture-engineering.md` through `docs/skills/07-devops-release-reliability.md`, `docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md`, this backlog row | Explained that 260 numbered entries are historical candidates, linked current catalog and authoring guidance, and defined first-use terms while preserving every original candidate row. See the [batch note](../evidence/documentation/skill-category-01-07-readability-2026-09-23.md). The wider sweep remains open. |
+| Control-plane backlog navigation, started 2026-09-23 about 18:56 UTC | `docs/roadmaps/resumable-control-plane-backlog.md`, `docs/evidence/documentation/control-plane-backlog-readability-2026-09-23.md`, this backlog row | Added a dated current-status table, reader routes and terms so the historical CP-WP-001 opening cannot be mistaken for the shipped synthetic kernel or 003A proof. Kept the detailed package and transition contracts. See the [batch note](../evidence/documentation/control-plane-backlog-readability-2026-09-23.md). The wider sweep remains open. |
+| Open decisions index, started 2026-09-23 18:56:54 UTC | `docs/roadmaps/aegis-open-decisions-2026-09-23.md`, `docs/evidence/documentation/open-decisions-readability-2026-09-23.md`, this backlog row | Added a dated current disposition and glossary above the unchanged post-#107 owner proposal, with links to approvals and owning backlogs. The [batch note](../evidence/documentation/open-decisions-readability-2026-09-23.md) records the checks and remaining gates; the wider sweep remains open. |
+| Behavioral Eval Runner backlog navigation, started 2026-09-23 19:05:27 UTC | `docs/roadmaps/behavioral-eval-runner-backlog.md`, `docs/evidence/documentation/ber-backlog-readability-2026-09-23.md`, this backlog row | Added a dated status map, terms and reader routes above the preserved historical register. The map separates authorized synthetic policy proof from pending real-host and calibration work. See the [batch note](../evidence/documentation/ber-backlog-readability-2026-09-23.md); the wider sweep remains open. |
+| Execution handoff current-reading guide, started 2026-09-23 19:18:33 UTC | `docs/roadmaps/aegis-efficient-execution-handoff-2026-09-23.md`, `docs/evidence/documentation/execution-handoff-readability-2026-09-23.md`, this backlog row | Added a dated current-state and navigation banner above the preserved original handoff, including its now-historical first task. The [batch note](../evidence/documentation/execution-handoff-readability-2026-09-23.md) records verification and remaining gates; the wider sweep remains open. |
+| Control-plane design entry point, started 2026-09-23 about 19:18 UTC | `docs/design/resumable-control-plane-v1.md`, `docs/evidence/documentation/control-plane-design-readability-2026-09-23.md`, this backlog row | Corrected the dated current-state and reader routes within the design's first 13 physical lines, preserving all later line positions used by evidence links. The [batch note](../evidence/documentation/control-plane-design-readability-2026-09-23.md) records the line check and synthetic-only boundary; the wider sweep remains open. |
+| Backlog forecast current reading, started 2026-09-23 19:26:04 UTC | `docs/roadmaps/aegis-backlog-forecast.md`, `docs/evidence/documentation/forecast-navigation-2026-09-23.md`, this backlog row | Added a dated pointer to the latest #146 estimate and labeled the old #106 baseline as history while preserving every prior table and heading. See the [batch note](../evidence/documentation/forecast-navigation-2026-09-23.md); the wider sweep remains open. |
+| Skill documentation, first 20 sorted files, started 2026-09-23 19:31:24 UTC | `.claude/skills/ab-test-designer/SKILL.md`, `.claude/skills/accessibility-test-harness/SKILL.md`, `docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md`, this backlog row | Audited the first 20 sorted skill pages and clarified previously undefined testing and accessibility terms in the two affected skills and their output labels. See the [batch note](../evidence/documentation/skill-docs-first-20-readability-2026-09-23.md); the wider sweep remains open. |
+| Cloud architect skills in second 20-page screen, started 2026-09-23 19:34:25 UTC | `.claude/skills/aws-saas-architect/SKILL.md`, `.claude/skills/azure-saas-architect/SKILL.md`, `docs/evidence/documentation/cloud-skill-readability-2026-09-23.md`, this backlog row | Defined provider and security terms before use and clarified copyable output labels in the two affected skills, while preserving frontmatter, evaluation fixtures and architecture criteria. See the [batch note](../evidence/documentation/cloud-skill-readability-2026-09-23.md); the wider sweep remains open. |
+| Third 20 skill pages, started 2026-09-23 19:44:38 UTC | `.claude/skills/ci-pipeline-architect/SKILL.md`, `.claude/skills/compliance-gap-auditor/SKILL.md`, `.claude/skills/data-quality-monitor-designer/SKILL.md`, `docs/evidence/documentation/skill-docs-third-20-readability-2026-09-23.md`, this backlog row | Audited the next 20 sorted skill entrypoints and defined first-use terms in the three affected pages while preserving frontmatter, evaluation fixtures and technical criteria. The [batch note](../evidence/documentation/skill-docs-third-20-readability-2026-09-23.md) records checks and independent review; the wider sweep remains open. |
+| Fourth 20 skill pages, started 2026-09-23 19:52:03 UTC | `.claude/skills/docs-first-implementer/SKILL.md`, `.claude/skills/docs-retention-index/SKILL.md`, `.claude/skills/gated-deployment-prompt-template/SKILL.md`, `docs/evidence/documentation/skill-docs-fourth-20-readability-2026-09-23.md`, this backlog row | Audited the next 20 sorted skill entrypoints and explained authority terms, retention labels and execution placeholders in the three affected guides. The [batch note](../evidence/documentation/skill-docs-fourth-20-readability-2026-09-23.md) records independent review and preserved manual-only gates; the wider sweep remains open. |
+| Fifth 20 skill pages, PR #156 | Four corrected skill entrypoints in the sorted screen; [exact paths and review](../evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md) | Clarified agent communication, incident response, manual test and mobile viewport terms. The manual-test reference also received a later standalone review in PR #168; neither batch claims full skill acceptance. |
+| Sixth 20 skill pages, PR #158 | Three corrected skill entrypoints; [exact paths and review](../evidence/documentation/skill-docs-sixth-20-readability-2026-09-23.md) | Clarified manual-only authority and security, query and prioritization shorthand while preserving criteria and evaluation fixtures. |
+| Seventh 20 skill pages, PR #159 | Four corrected skill entrypoints; [exact paths and review](../evidence/documentation/skill-docs-seventh-20-readability-2026-09-23.md) | Clarified database, review, retrieval security and real-time transport terms without changing technical or invocation boundaries. |
+| Eighth 20 skill pages, PR #160 | Four corrected skill entrypoints; [exact paths and review](../evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md) | Defined scan, service-level and access terms while retaining security triage and manual-only boundaries. |
+| Final 26 skill entrypoints, PR #161 | Three corrected skill entrypoints; [exact paths and review](../evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md) | Clarified testing and static-analysis terms and verdict labels. This closes the sorted entrypoint screen, not full behavior or page acceptance. |
+| Skill references 1–20, PR #163 | Three corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-first-20-readability-2026-09-23.md) | Added purpose and first-use accessibility, identity and governance terms while preserving parent-skill authority. |
+| Skill references 21–40, PR #164 | Four corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-second-20-readability-2026-09-23.md) | Explained threat, stale-authority and cloud terms without changing control tables. |
+| Skill references 41–60, PR #166 | Three corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-third-20-readability-2026-09-23.md) | Defined migration, compliance and error-model terms and made abort-action labels traceable without changing commands or approval gates. |
+| Skill references 61–80, PR #167 | Four corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-fourth-20-readability-2026-09-23.md) | Added standalone purpose and first-use incident, management-system and output-safety terms. |
+| Skill references 81–90, PR #168 | Ten corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-fifth-a-readability-2026-09-23.md) | Added purpose, owning-skill links and terms; corrected copyable Git revert/range guidance and routed live poisoning incidents to the human incident owner. |
+| Skill references 91–100, PR #169 | Ten corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-fifth-b-readability-2026-09-23.md) | Added purpose, owning-skill links and terms; kept performance evidence thresholds and manual-only boundaries explicit. |
+| Skill references 101–120, PR #171 | Four corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-sixth-20-readability-2026-09-23.md) | Restored a safe SQL test guard, routed live prompt injection to human incident response, and clarified draft status and terms. |
+| Skill references 121–140, PR #172 | Six corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-seventh-20-readability-2026-09-23.md) | Clarified evidence, secret, alerting, reliability, trust-criteria and streaming terms while preserving the owning skills' gates. |
+| Skill references 141–156, PR #173 | Five corrected standalone reference pages; [exact paths and review](../evidence/documentation/skill-references-final-16-readability-2026-09-23.md) | Clarified leakage, tenancy, threat, observability and supply-chain guidance. This closes the sorted reference screen, not full page or runtime acceptance. |
+| Owning-skill governance and incident routing, PR #165 | Two owning skill pages and one governance evaluation; [exact paths and review](../evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md) | Corrected squash-revert wording and live poisoning-incident routing. PR #168 separately reviewed the related reference pages; neither correction grants execution authority. |
+| Scoped standing-grant clarification, [PR #175](https://github.com/ModernNomad-98/Project-Aegis/pull/175) | Two governance skill pages, their two evaluations and two references in `agent-authorization-matrix` and `standing-approval-and-auto-advance` | Explained that a still-active scoped human grant can satisfy an approval-required action while green checks and this skill grant no authority. Manual-only posture and separate auto-merge gate remain; this row records a correction, not a new approval. |
+| Changelog and startup routing, pull request (PR) #176 | `CHANGELOG.md` and `CLAUDE.md`; [exact scope and checks](../evidence/documentation/root-status-docs-readability-2026-09-23.md) | Marked old changelog highlights as historical and clarified local role checks before task work. Original history and source-library versus product-repository boundaries remain. |
+| Seven operational guides, PR #178 | Storage, selected-host and holdout proposals; control-plane proof proposal; successor design; audit rubric and register; [exact paths and checks](../evidence/documentation/operational-guides-seven-readability-2026-09-23.md) | Added dated reading notes and routes to current records. Original proposals, thresholds and decision text remain; no implementation or live-execution gate closed. |
+| Five authorization proposals, PR #179 | Setup packages 2/3, measured calibration, evidence-policy choice and offline proof scope; [exact paths and checks](../evidence/documentation/operational-proposals-five-readability-2026-09-23.md) | Distinguished delivered synthetic scopes, historical decisions and pending live work. The policy choice and offline proof grant remain separate; original decision bodies were preserved. |
+| Seven historical plans and research pages, PR #181 | Four generation-prompt pages, one reconciliation and two research reports; [exact scope and checks](../evidence/documentation/legacy-prompts-current-reading-2026-09-23.md) | Labeled the former repository and foundation-phase instructions as historical and linked current authoring routes. Original prompts and numbered decisions remain; no legacy prompt was executed. |
+| Three roadmap and audit reading keys, PR #183 | The 300-skill candidate roadmap, frozen skill-contract baseline and VolunteerFlow handoff; [exact paths and corrected review](../evidence/documentation/remaining-active-docs-readability-2026-09-23.md) | Defined terms and explained historical baseline limits. Later corrections do not establish a current disposition for every old defect; the original candidate rows and observations remain. |
+| Evidence index and seven dated status banners, PR #184 | `docs/evidence/README.md`, the documentation-index link and seven evidence pages; [reading index](../evidence/README.md) and [exact changed paths](https://github.com/ModernNomad-98/Project-Aegis/pull/184/files) | Indexed 15 selected decision/delivery records and corrected stale first-screen status readings on seven pages. This is a bounded index and correction, not review of every evidence page or a new approval. |
+| Five historical verification reading notes, PR #186 | Earlier review corrections, two calibration-closeout records, the hosted-run record and shared-contract verification; [exact scope and review](../evidence/documentation/evidence-followup-current-reading-2026-09-23.md) | Distinguished candidate-specific results and an earlier guard failure from later deliveries. All original findings, test counts, skips, candidate identities and failure evidence remain. |
+| Nine-page full-checklist sample, 2026-09-23 | Runner backlog, execution measurements, offline continuous integration guide, Scenario A runbook, two skills, two templates and one evidence note; [per-page result and review limits](../evidence/documentation/full-page-readability-sample-2026-09-23.md) | All nine required targeted corrections and then passed independent page review at the corrected candidate revision. This is the first recorded full-page acceptance batch; the other tracked pages retain their earlier screen or pending status. |
 
-This table records page review, not completion of the 491-file sweep. Add each
-later batch with its exact files, findings, verification and disposition.
+
+This table records bounded page progress, not completion of the full sweep.
+The original inventory had 491 Markdown files. The #146 five-merge forecast
+checkpoint counted 513; the later post-#151 main head counted 517. Add each later batch with its exact files, findings, verification
+and disposition.
+
+That instruction records the earlier ledger checkpoint; the rows above now
+include the delivered batches through PR #173.
+
+At the exact [PR #173 merge](https://github.com/ModernNomad-98/Project-Aegis/pull/173)
+(`e6148322eefd085eeba9c58ef0c89876b90c9f71`), the tree has **536 tracked
+Markdown files**, including **156 skill reference pages** and **185 shipped skill
+entrypoints plus one template**. The nine sorted skill-entrypoint batches
+corrected 28 skill pages, and the nine reference batches corrected 49 reference
+pages. Some references were also touched in skill-entrypoint batches. These are bounded
+readability checks, not full page, behavioral, provider or runtime acceptance.
+The remaining selected-backlog estimate at this checkpoint is provisionally
+**175–394 active hours**; see the [five-merge forecast recorded after PR #173](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-173).
+The previous integration estimate was none; this ledger update is estimated at
+1–3 active hours. Repository-wide documentation acceptance remains **IN
+PROGRESS**.
+
+## Ledger checkpoint through pull request #186 — 2026-09-23
+
+The seven rows above record documentation batches delivered after the earlier
+#173 checkpoint. Pull request #182 already integrated the skill and reference
+screen rows and the separate owning-skill corrections; those rows are not
+counted again. Pull requests #180 and #185 updated the forecast and execution
+measurements, rather than adding another readability screen.
+
+At the exact #186 merge
+`d5b007b0a3cc2bd43806a16970f19c84be9a86b0`, the repository contains
+**543 tracked Markdown files**. The older 491, 513, 517 and 536 counts above
+remain historical snapshots. The increase from 536 after #173 consists of
+six dated evidence notes and one evidence index; it is not seven more pages
+accepted against every documentation criterion.
+
+The later forecast recording this #186 tree was delivered by pull request
+#189. Its [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-186)
+and [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-186--2026-09-23)
+retain the individual package estimates, observed wall intervals and limits.
+The previous ledger-update estimate was **1–3 active hours**; this update's
+estimate is **1–3 active hours**. The selected backlog remains
+**175–394 active hours**, or **191–434** if both optional issue #101
+helpers are selected. The full all-options backlog has no finite estimate
+while optional quantities and architecture choices remain open.
+
+Documentation acceptance remains **IN PROGRESS**. These rows record bounded
+reading improvements, navigation and preservation of historical evidence.
+They do not certify full page acceptance, model behavior, a real host or
+provider readiness, and they grant no new execution authority.

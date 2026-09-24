@@ -1,3 +1,9 @@
+> **Template for decision authors:** This is an architecture decision record
+> (ADR). Follow the [ADR writer](../SKILL.md), replace `NNNN` with the new
+> decision number and `MMMM` with a superseding decision number when one
+> exists. Replace every placeholder and remove this note and the guidance
+> comments before publishing the completed record.
+
 # ADR-NNNN: <Short imperative title, e.g. "Use Postgres row-level security for tenant isolation">
 
 Status: proposed <!-- proposed | accepted | superseded by ADR-MMMM -->

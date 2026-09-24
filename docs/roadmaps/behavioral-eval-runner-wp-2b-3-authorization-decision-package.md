@@ -1,5 +1,17 @@
 # Behavioral Eval Runner — WP-2B-3 Measured Judge Calibration Authorization Decision Package
 
+> **Current status, 2026-09-23:** Behavioral Eval Runner work package 2B-3
+> (WP-2B-3) is **AUTHORIZED, not complete** under the merged
+> [BER-DEC-008 owner decision](behavioral-eval-runner-backlog.md#ber-dec-008).
+> Measured calibration, owner-approved inputs and the holdout freeze remain
+> separate gates; the [active backlog](behavioral-eval-runner-backlog.md#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate)
+> governs their current status. Sections B–E below preserve the original
+> recommendations; section F preserves the owner's approved 35 decisions.
+> Earlier prohibitions on starting an implementation branch describe the
+> pre-merge preparation period, not a new prohibition after BER-DEC-008 merged.
+
+**Historical decision preparation and owner-response record follows.**
+
 **Status (reconciled 2026-09-10):** OWNER-APPROVED DECISION RECORD (2026-08-14).
 BER-DEC-008 is effective through the manual merge of
 [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), commit

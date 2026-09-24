@@ -1,6 +1,11 @@
 # Memory & Context Poisoning Controls (ASI06)
 
-Detail file for `memory-context-poisoning-reviewer`. Read on demand.
+Use these controls with the [memory and context poisoning reviewer](../SKILL.md)
+to trace who may write persistent context and how recalled entries stay inert.
+**ASI06** is the memory and context poisoning category in the Open Worldwide
+Application Security Project (OWASP) Top 10 for Agentic Applications. **TTL**
+means time to live; **RAG** means retrieval-augmented generation; **LLM08** is
+the OWASP large language model vector and embedding weakness category.
 
 ## 1. Write-path trust rubric
 

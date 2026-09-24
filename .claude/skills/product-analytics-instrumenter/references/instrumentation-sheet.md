@@ -2,6 +2,12 @@
 
 Detail for `product-analytics-instrumenter`. Read on demand.
 
+**Use:** Apply this capture worksheet with the [product-analytics
+instrumenter workflow](../SKILL.md) for product-behavior events. UI means
+user interface; IP means Internet Protocol address; QA means quality
+assurance; and `geo` means geographic location. The first table routes
+system telemetry and skill-library usage to their separate owning skills.
+
 ## Which "instrumentation" skill? (three-way)
 
 | Job | Consumer | Owner skill |

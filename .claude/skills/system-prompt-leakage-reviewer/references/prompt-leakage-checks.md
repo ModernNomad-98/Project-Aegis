@@ -4,6 +4,14 @@ Detail for `system-prompt-leakage-reviewer`. OWASP LLM07 (System Prompt
 Leakage), 2025. Doctrine: **the system prompt is not a security control.**
 Review it as if it will be public — because it will be.
 
+## Terms used here
+
+- **OWASP / LLM07:** Open Worldwide Application Security Project and its
+  2025 large language model threat category for system-prompt leakage.
+- **API / OAuth / IP / PII:** application programming interface, Open
+  Authorization, Internet Protocol, and personally identifiable information.
+- **RBAC / UX:** role-based access control and user experience.
+
 ## Axis 1 — contents scan (secrets/sensitive)
 
 Flag any of these in the prompt; they should not be there:
@@ -17,9 +25,12 @@ Flag any of these in the prompt; they should not be there:
 - Business-sensitive thresholds presented as if secret (pricing floors,
   fraud rules, unreleased-feature flags).
 
-For each: extract the value, route custody/rotation to
-`secrets-identity-hardener`, and if it's a live credential treat as active
-exposure (`incident-response-runbook`).
+For each finding, record the prompt location and the type of sensitive value,
+with the value redacted. Do not copy a credential into a finding, log, or test
+artifact. Route custody and rotation to `secrets-identity-hardener`; if a
+credential is live, notify the authorized human incident owner under the
+current approved incident runbook (`incident-response-runbook` authors that
+runbook). Handle the value only through the approved secret-handling path.
 
 ## Axis 2 — prompt-as-control anti-patterns (the important axis)
 
@@ -59,11 +70,14 @@ defense-in-depth at best.
 
 ## Canary / leak tests (→ ai-evaluation-harness)
 
-- Plant a unique canary marker in the system prompt; assert it NEVER appears
-  in any output across the extraction techniques above.
-- Run the extraction attempts; document what leaks — but the PASS criterion is
-  "leaking it causes no security harm" (no secret, no bypassable control), not
-  "nothing leaked".
+- Plant a unique, non-secret canary marker in the system prompt. For the
+  tested extraction attempts, a canary in an output fails the leakage test;
+  record the attempt and the leaked marker without treating the marker as a
+  credential.
+- Separately assess security impact: the safety check passes only when the
+  prompt contains no sensitive secret and no security control depends on
+  prompt secrecy. A green canary test alone does not prove that an untested
+  extraction route cannot leak the prompt.
 - For each former prompt-as-control rule, assert the deterministic control
   blocks the action even when the prompt instruction is contradicted/injected.
 

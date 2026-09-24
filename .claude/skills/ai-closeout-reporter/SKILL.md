@@ -1,9 +1,9 @@
 ---
 name: ai-closeout-reporter
-description: Produce the end-of-task closeout report — what changed, what was intentionally NOT done or was omitted (always a dedicated section, "None" written explicitly when empty), files touched, tests and validation actually run with real results, evidence, risks, skipped checks, and the recommended next action. Use when finishing a task, handing off work, opening or closing a PR, or when asked what was actually done. Scope reductions must be disclosed, never silent.
+description: Produce the end-of-task closeout report — what changed, what was intentionally NOT done or was omitted (always a dedicated section, "None" written explicitly when empty), files touched, tests and validation actually run with real results, evidence, risks, skipped checks, and the recommended next action. Use when finishing a task, handing off work, opening or closing a pull request (PR), or when asked what was actually done. Scope reductions must be disclosed, never silent.
 ---
 
-# AI Closeout Reporter
+# Artificial Intelligence (AI) Closeout Reporter
 
 ## Purpose
 

@@ -9,6 +9,15 @@ this skill designs it; a skill name means compose that skill and route.
 An inventory pass walks all eleven surfaces and dispositions each one:
 holder (with evidence), ruled out (with how), or absent from this app.
 
+**Reading key:** The bound is the accepted maximum delay before an authority
+change takes effect. UI means user interface; API means application programming
+interface; JWT means JSON Web Token, whose `exp` claim gives its expiry time;
+TTL means time to live; RLS means row-level security; and DB means database.
+HTTP is Hypertext Transfer Protocol, CDN is content delivery network, SQL is
+Structured Query Language, and URL is uniform resource locator. The
+[parent workflow](../SKILL.md) sets the step-5 invalidation choices; named
+owners below retain their separate implementation duties.
+
 ---
 
 ## 1. Server session records

@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 ## Purpose
 
+Test-driven development (TDD) uses a red-green-refactor loop: confirm a test
+fails for the intended reason, make the smallest change that passes it, then
+refactor under passing tests.
+
 Deliver behavior changes where every line of production code exists to make
 a previously-failing test pass. The load-bearing step is confirming the RED:
 a test that fails for the wrong reason (import error, typo, tautological
@@ -45,10 +49,13 @@ transcript of the exact commands showing both states.
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route requiring its own classification and
+activation under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **State the contract** as concrete cases: happy path, edges, error
    behavior. Each case becomes a test; pick the smallest that forces the

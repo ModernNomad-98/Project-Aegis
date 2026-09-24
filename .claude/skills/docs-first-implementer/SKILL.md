@@ -49,10 +49,13 @@ uncertainty is stated as a first-class output, not papered over.
 ## Workflow
 
 Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
-files, environment and effects fit those grants; if authority is absent, propose
-the operation and obtain it before proceeding.
+expand the allowed target or activate Task-Authorized Local Implementation
+(TALI). TALI is a separate route that requires its own classification and
+activation under the [skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects).
+Use applicable existing user grants without repeated consent. Before a
+state-changing command, confirm its actual files, environment and effects fit
+those grants; if authority is absent, propose the operation and obtain it
+before proceeding.
 
 1. **Pin the exact version.** Read the lockfile, not the manifest range.
    Record: library, locked version, and where it is imported today.

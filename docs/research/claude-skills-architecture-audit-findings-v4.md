@@ -1,5 +1,14 @@
 # Senior Principal Claude Skills Architecture Audit and Recommendations
 
+> **Historical research — current reading, 2026-09-23.** This audit assessed
+> the former `nguyenpv1980-wq/Claude-Skills` repository around pull request #1.
+> Its "current baseline" and generation sequence below refer to that dated
+> state, not today's shipped Project Aegis library. Keep its source coverage
+> and limitations as research evidence. For current work, begin with
+> [AGENTS.md](../../AGENTS.md), the [skills catalog](../skills-catalog.md),
+> and the [skill authoring standard](../skill-generation-standard.md); this
+> report supplies no implementation grant.
+
 **Prepared for:** `nguyenpv1980-wq/Claude-Skills`  
 **Prepared on:** 2026-07-06  
 **Scope:** Prior chat requirements for `AI Skills Development List` and `Claude Skills Development`, the uploaded v3 knowledge base and prompt, the current `Claude-Skills` repo, the (now merged) PR #1, and current public guidance for Claude Code Skills, Agent Skills, QA automation, SaaS architecture, security, AI security, and supply-chain risk.

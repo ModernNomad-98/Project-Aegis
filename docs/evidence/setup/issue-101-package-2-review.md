@@ -1,5 +1,14 @@
 # Issue #101 package 2 review evidence
 
+> **Current reading, checked 2026-09-23:** Package 2 shipped in
+> [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124).
+> Its Windows-tested Aegis-only choice and saved-state contract are the
+> delivered scope. The open review and unmerged pull request (PR) directions
+> below are historical closeout steps. The
+> [setup plan](../../roadmaps/aegis-setup-routing-plan.md) and
+> [component guide](../../../tools/aegis_setup/README.md) describe current
+> behavior; neither a helper connection nor provider/host authority shipped.
+
 ## Scope and authority
 
 AEGIS-APR-007 in the merged owner approval register grants the ten exact

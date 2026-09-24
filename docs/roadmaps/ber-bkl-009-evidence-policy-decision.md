@@ -1,5 +1,20 @@
 # BER-BKL-009 — final evidence handling decision proposal
 
+> **Current status, 2026-09-23:** Behavioral Eval Runner (BER) backlog item 009
+> has an owner-selected 30-day complete-bundle policy under
+> [AEGIS-APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection).
+> [AEGIS-APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof)
+> and [BER-DEC-011](behavioral-eval-runner-backlog.md#ber-dec-011-bounded-offline-evidence-policy-proof)
+> separately authorize only a synthetic offline proof. In this checkout,
+> [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) has not
+> merged; the [backlog](behavioral-eval-runner-backlog.md#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy)
+> records it as open at its checkpoint. Recheck the live pull request before
+> using that status. Real-host access, encryption, privacy review and cleanup
+> still need separate decisions and evidence. The owner options below are the
+> historical selection record, not an invitation to choose the policy again.
+
+**Historical policy proposal follows.**
+
 Prepared 2026-09-23. **Proposal only; BER-BKL-009 remains PARTIALLY DELIVERED.**
 The owner subsequently selected the recommended 30-day complete-bundle
 policy in [approval APR-009](../approvals/APPROVAL_REGISTER.md). That is a

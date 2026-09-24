@@ -1,6 +1,11 @@
 # Mobile Viewport Sheet
 
-Detail tables for `mobile-viewport-craft`. Read on demand.
+Use these tables with [mobile viewport craft](../SKILL.md) to choose layout,
+safe-area, and touch behavior for small screens. **URL** means Uniform Resource
+Locator (web address),
+**HIG** means Human Interface Guidelines, **OS** means operating system, and
+**a11y** abbreviates accessibility. In the touch-target row, **dp** means
+density-independent pixels; the viewport-height units are defined below.
 
 ## Breakpoints — content-driven, not device-driven
 

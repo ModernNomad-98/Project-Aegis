@@ -1,7 +1,10 @@
 # Merge-Is-Deploy Governance Doc — Template & Mechanics
 
-Companion to `merge-is-deploy-governance`. Placeholders (`<owner>/<repo>`,
-`<branch>`) are filled per repo; nothing here is product-specific.
+Use this template with [merge-is-deploy governance](../SKILL.md) to document
+the human-owned release gate and revert path when a merge deploys. Placeholders
+(`<owner>/<repo>`, `<branch>`) are filled per repo; nothing here is
+product-specific. **PR** means pull request, **CI** means continuous
+integration, and **API** means application programming interface.
 
 ## Governance doc template
 
@@ -56,9 +59,17 @@ with rollback-runbook-author's artifact: <link>.
 ## 6. Revert mechanics by merge strategy
 | Strategy | Mainline commit type | Command |
 | --- | --- | --- |
-| squash | ordinary commit | `git revert <sha>` (no -m; `-m 1` here FAILS) |
-| merge commit | merge commit | `git revert -m 1 <sha>` |
-| rebase | series of ordinary commits | `git revert <newest-sha>..<oldest-sha>` range or per-commit, newest first |
+| squash | ordinary commit | `git revert <sha>`; `-m` is the mainline-parent option for a merge commit |
+| merge commit | merge commit | Inspect both parents, choose the mainline to keep, then `git revert -m <chosen-parent-number> <sha>` |
+| rebase | series of ordinary commits | Review the exact series with `git rev-list <oldest-sha>^..<newest-sha>`, then revert each ordinary commit newest first; inspect any merge commits separately |
+
+The two-dot set `<oldest-sha>..<newest-sha>` excludes the oldest commit. Use
+it only when that exclusion is intended; `<oldest-sha>^..<newest-sha>` includes
+the oldest when it has a parent. Review the `git rev-list` output and the PR's
+actual commit graph before reverting; a root commit or non-linear history needs
+an explicit per-commit plan.
+For a merge commit, inspect its parents before choosing the mainline number;
+do not assume that parent 1 is correct for every history.
 
 ## 7. Accepted-risk exposure window
 From merge to verified deploy: ≈ <duration> (deploy latency + §3 signal
@@ -67,6 +78,12 @@ exposed to any defect PR validation missed.
 Accepted by <named human> on <date>. Revisit when latency or blast radius
 changes materially.
 ```
+
+Git's official [revert documentation](https://git-scm.com/docs/git-revert)
+defines `-m` as the mainline-parent option for merge commits, while its
+[revision syntax](https://git-scm.com/docs/gitrevisions) defines which endpoint
+a two-dot range excludes. Review the exact set with
+[`git rev-list`](https://git-scm.com/docs/git-rev-list) before using a range.
 
 ## Notes on verification commands
 

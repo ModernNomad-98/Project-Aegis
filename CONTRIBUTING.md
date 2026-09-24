@@ -1,5 +1,16 @@
 # Contributing
 
+**Reading key for this guide:** AI means *artificial intelligence*; a PR is a
+*pull request*, the proposed change reviewed before merge; and CI means
+*continuous integration*, the automated checks run for that change.
+`AEGIS-APR-002` is approval entry 002 in the
+[owner approval register](docs/approvals/APPROVAL_REGISTER.md). Codes such as
+`D34` identify dated decisions in the
+[reconciliation record](docs/reconciliation/step-0-reconciliation-v4.md).
+Later, DCO means *Developer Certificate of Origin* (the commit sign-off
+requirement), CLA means *Contributor License Agreement*, and YAML is the
+structured text format used for skill metadata.
+
 Contributing to this project follows **[Zero Trust AI Engineering Discipline](docs/ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md)**
 (Zet-AI Engineering for short) —
 *"Never trust, always verify — every step of the lifecycle. Assume drift. Demand evidence.
@@ -28,8 +39,14 @@ own proven practice, including failures it absorbed during its own construction.
    read the [owner approval register](docs/approvals/APPROVAL_REGISTER.md) before
    requesting consent already granted. AEGIS-APR-002 permits administrator merges
    of authorized work without repeated case-by-case approval. Verify the reviewed
-   revision and CI results before merging; an intentional protected-file guard
-   failure must be understood and reviewed, never weakened to produce a green check.
+   revision and CI results before merging. The current default is that all
+   GitHub Actions checks pass. If `gate-guard` fails solely because a PR changes
+   a protected file, an independent review and a separate, PR-specific owner
+   exception are required before an administrator merge; the standing grant
+   alone does not waive the newer all-green instruction. Entries
+   [AEGIS-APR-005](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-005-pr-104-protected-file-guard-exception)
+   and [AEGIS-APR-010](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-010-pr-119-protected-file-guard-exception)
+   show exceptions limited to those PRs. Never weaken the guard to make it green.
    *Why:* the owner controls merge authority, including standing delegation. This
    source-specific grant overrides generic skill defaults here and does not transfer
    with copied skills. See the [merge policy](docs/reconciliation/auto-merge-policy.md).

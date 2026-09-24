@@ -3,6 +3,7 @@
 Templates backing the workflow. Purpose-first commands; exact invocations
 only where platform-stable. Placeholders (`<table>`, `<tenant-id>`)
 throughout — never live identifiers.
+Here, **p99** means the 99th-percentile response time on the primary path.
 
 ## Batching-rationale worksheet
 
@@ -41,12 +42,17 @@ check must tolerate.
 
 ## Abort triggers → safe halt states (examples)
 
+The runbook's **A1** abort uses the first row's stop-loop, old-path-serving
+halt when a dual-write, batch, or full-keyspace verification fails before the
+read switch. Its **A4** abort uses the fourth row's switch-reads-back halt
+after the read switch. Replace the example thresholds with plan-approved values.
+
 | Trigger (numeric) | Action | Safe halt state |
 |---|---|---|
-| Batch parity mismatch > 0 | stop loop immediately; do NOT revert schema | old path serving; partial new data inert; resumable after diagnosis |
+| A1 — Batch parity mismatch > 0 | stop loop immediately; do NOT revert schema | old path serving; partial new data inert; resumable after diagnosis |
 | Replication lag > <t> for > <d> | pause loop; resume when < <t/2> | mid-move pause; marker intact |
 | Primary p99 > <t> during batches | pause; halve batch size on resume (recorded deviation) | as above |
-| Serving errors > baseline post-switch | switch reads BACK (dual-writes still on) | old path serving; new store still converging |
+| A4 — Serving errors > baseline post-switch | switch reads BACK (dual-writes still on) | old path serving; new store still converging |
 | Batch duration 2× baseline trend | finish current batch; stop; investigate | clean marker boundary |
 
 Never in the abort path: dropping the new schema/store, disabling

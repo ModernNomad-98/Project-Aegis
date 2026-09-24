@@ -1,5 +1,13 @@
 # Maintainer guide readability review: 2026-09-23
 
+> **Current reading, 2026-09-23:** This batch merged in [pull request (PR)
+> #122](https://github.com/ModernNomad-98/Project-Aegis/pull/122), recorded
+> locally by merge commit `b2c6db2`. The review and PR checks described below
+> as still required were requirements at the original draft checkpoint. Use
+> the linked guides for their current instructions. API below means
+> application programming interface; the dated repository-setting observation
+> remains a point-in-time observation.
+
 This record tracks one bounded batch in the [repository-wide documentation
 backlog](../../roadmaps/aegis-documentation-readability-backlog.md). It is for
 reviewers checking what was read, what changed, and what remains open. It is

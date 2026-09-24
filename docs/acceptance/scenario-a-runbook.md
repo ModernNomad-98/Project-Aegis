@@ -27,7 +27,8 @@ parameters, failure behavior, and the negative tests, use
 [How to run the harness](#how-to-run-the-harness) below.
 
 **Scope of this result:** the harness proves fixture and evidence invariants;
-it does not prove that a fresh AI-agent conversation follows the same path.
+it does not prove that a fresh artificial intelligence (AI) agent conversation
+follows the same path.
 The separate [fresh-session behavioral acceptance](#fresh-session-behavioral-acceptance-control-i--required)
 remains required before calling the findings behaviorally resolved. This
 runbook does not grant implementation, provider, or deployment authority.
@@ -42,14 +43,31 @@ runbook does not grant implementation, provider, or deployment authority.
 | `A-001` | The separate scope-agreement approval; it does not authorize a build. |
 | `AR-A-001` through `AR-A-021` | Scenario A acceptance-review findings indexed in the matrix below. |
 | `P0`/`P1`/`P2` | Defect priority, from highest to lower; `A` through `I` name the original acceptance controls. |
-| SHA-256 | The file digest used to pin accepted content and check archived evidence. |
+| SHA-256 | Secure Hash Algorithm with a 256-bit digest; the digest pins accepted content and checks archived evidence. |
+
+Technical reading key: **AI** means artificial intelligence; **ID** means
+identifier; **LF** and **CRLF** are line-feed and carriage-return-plus-line-feed
+line endings; **BOM** means byte-order mark; and **UTF-8** means the eight-bit
+Unicode Transformation Format used for file text. `PATH` is the process
+environment variable listing executable search directories. **ISO 8601** is
+the date-and-time format used in the evidence log. **F1**, **F5**, **F6** and
+**R4-3** are identifiers for the negative test or review findings named beside
+them below; they are not additional work-package authority. `STATE-001`,
+`APPR-002` and `ROUTE-003` are audit detector identifiers, not Scenario A
+decision records: `STATE-001` flags mutable placeholders in a file declared
+append-only; `APPR-002` flags build authorization inferred from a
+requirements-stage approval; and `ROUTE-003` flags a commitments route without
+its readiness guard or independent roadmap-owner classification. The
+[audit rule definitions](../../scripts/audit-skill-contracts.py) and
+[audit register](../audits/aegis-060-plus-register.md) give their source and
+review context.
 
 The detailed sequence and matrix below retain the exact IDs so maintainers
 can compare the guide with fixtures, skill evaluations, and audit records.
 
 ## What Scenario A is
 
-Scenario A is the **clean "simple MVP" flow** through the beginner front door
+Scenario A is the **clean "simple minimum viable product (MVP)" flow** through the beginner front door
 (`project-orchestrator`): one non-developer, one small maintenance-company/clinic MVP, one
 bounded first release, **no deadline and no delivery commitment**. It exercises the
 project-state journey from cold start to the start of design:
@@ -132,7 +150,7 @@ pwsh -NoProfile -File "scripts/acceptance/Invoke-ScenarioAEvidence.ps1" -KeepEvi
 Start Desktop acceptance from a native Windows PowerShell shell. A PowerShell
 Core → Python recorder → Desktop chain can inherit Core's module search path
 and prevent Desktop from resolving `Get-FileHash`. The hosted workflow uses
-`shell: powershell` for this step; see [offline CI](../offline-ci.md).
+`shell: powershell` for this step; see [offline continuous integration (CI)](../offline-ci.md).
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "scripts\acceptance\Invoke-ScenarioAEvidence.ps1" -KeepEvidence
@@ -180,9 +198,11 @@ The harness exits **0** on all-pass and **non-zero** on any failure.
   `Open questions`, and `Next recommended action` may be refreshed. Exact headings,
   section order, preamble, unknown sections and immutable scaffolding are protected;
   immutable sections may gain only valid appended records. The parser uses the flat
-  ATX project-state format and rejects ambiguous or unsupported structures, including
-  Setext headings, raw HTML blocks and unclosed fences/comments. This is a restricted
-  document grammar, not a general Markdown parser. See the
+  ATX project-state format (Markdown headings beginning with `#`) and rejects
+  ambiguous or unsupported structures, including Setext headings (headings
+  underlined with `=` or `-`), raw HyperText Markup Language (HTML) blocks
+  and unclosed fences/comments. This is a restricted document grammar,
+  not a general Markdown parser. See the
   [approval lifecycle grading guide](../approval-lifecycle-grading.md) for the
   related trusted-plan/evidence boundary.
 - **Manifest conformance (F1)** — a per-step hash mismatch (a fixture edited without updating the

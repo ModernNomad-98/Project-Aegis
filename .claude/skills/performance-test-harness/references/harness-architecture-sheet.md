@@ -4,6 +4,13 @@ Measurement catalogs, contracts, and formats backing the design.
 Tool-agnostic: the driver/collector is whatever fills that role in your
 stack.
 
+**Use:** This catalog supports the [performance-test-harness workflow](../SKILL.md)
+for a stated measurement contract and gate. API means application programming
+interface; CI means continuous integration; PR means pull request; and
+`p50`, `p95`, and `p99` are the 50th, 95th, and 99th latency percentiles.
+`N` is the number of repeated runs; `Δ` is the measured change from baseline.
+`UNRUN` means a named measurement did not execute and carries a reason.
+
 ## Measurement catalog per surface
 
 | Surface | Measurements | Notes |
@@ -15,8 +22,9 @@ stack.
 | Edge function | duration incl. cold-start share | cold/warm measured separately by policy |
 
 Minimum sample counts: state per percentile (a p99 needs enough
-requests that the 1% tail contains real samples — hundreds at minimum;
-the sheet's rule: no percentile reported whose tail holds < 30 samples).
+requests that the 1% tail contains real samples — about 3,000 requests for
+30 observations beyond p99; the sheet's rule: no percentile reported whose
+tail holds < 30 samples).
 
 ## Environment-contract template
 

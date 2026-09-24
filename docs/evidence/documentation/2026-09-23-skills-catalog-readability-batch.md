@@ -1,5 +1,14 @@
 # Skills catalog readability batch — 2026-09-23
 
+> **Current reading, 2026-09-23:** This batch merged in [pull request (PR)
+> #128](https://github.com/ModernNomad-98/Project-Aegis/pull/128), recorded
+> locally by merge commit `ecfa411`. The pending review and checks below, and
+> the plan to record final elapsed time in the PR, describe the original draft
+> checkpoint. They do not report the later merge checks or measured completion
+> time. For current shipped skills, use the [catalog](../../skills-catalog.md).
+> In this note, AI means artificial intelligence and UTC means Coordinated
+> Universal Time.
+
 ## Scope and timing
 
 This bounded documentation batch changes only `docs/skills-catalog.md` and

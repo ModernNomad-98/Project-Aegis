@@ -5,6 +5,15 @@ description: Pick and apply the RIGHT prioritization framework for a decision in
 
 # Prioritization Frame Picker
 
+Terms used below: **RICE** scores reach, impact, confidence, and effort;
+**WSJF** means weighted shortest job first and compares cost of delay with
+job size; **ICE** scores impact, confidence, and ease; and **MoSCoW** groups
+release scope into must, should, could, and won't have. The **Kano** model
+classifies basic, performance, and delight factors; **opportunity scoring**
+compares importance with current satisfaction. For example, RICE may rank
+comparable feature requests, while WSJF addresses time-sensitive work;
+mandatory compliance work stays outside either score.
+
 ## Purpose
 
 Every team has a prioritization framework and most use the wrong one for

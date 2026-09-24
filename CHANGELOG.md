@@ -1,5 +1,13 @@
 # Changelog
 
+**Historical delivery highlights through 2026-09-13.** This page records what
+had landed by those dates; it is not the current skill count or work-status
+inventory. For the current source checkout, start with the [repository README](README.md)
+and [documentation index](docs/README.md); use the [skills catalog](docs/skills-catalog.md)
+for shipped skills and the [backlog forecast](docs/roadmaps/aegis-backlog-forecast.md)
+for remaining work and its dated checkpoints. Check the latest `main` revision
+when a current decision depends on either page.
+
 Dated changes delivered to `main`, using Australia/Sydney dates; these entries
 do not imply a tagged release.
 For current setup and remaining work, see the [documentation index](docs/README.md).

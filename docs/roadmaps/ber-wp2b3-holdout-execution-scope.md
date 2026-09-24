@@ -1,5 +1,21 @@
 # Behavioral Eval Runner holdout execution support: work package 2B-3
 
+> **Current reading, checked 2026-09-23:** This remains an offline
+> implementation proposal, not a grant to unseal private cases or call a
+> provider. Work package 2B-3 (WP-2B-3) is authorized under decision
+> BER-DEC-008 but incomplete; the
+> proposed holdout code needs its own reviewed amendment. The
+> [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> holds the current gates and the [private-input summary](../evidence/ber-replacement-candidate-1-summary.md)
+> records the candidate packet without exposing its contents.
+
+**Reading key for delivery terms:** Developer Certificate of Origin (DCO)
+sign-off applies to commits; quality assurance (QA) is independent test review;
+software development kit (SDK) identifies the pinned provider interface;
+command-line interface (CLI) is the user-facing command surface. `OWNER_WAIT`
+is the stop before a human holdout freeze; `JUDGE_ERROR` is an unsuccessful
+judge outcome, not a passing verdict.
+
 This document proposes the allowed files, behavior, tests, and decision gates
 for building an offline holdout execution path. It helps reviewers decide what
 the implementation may do. It does not approve reading private cases or calling

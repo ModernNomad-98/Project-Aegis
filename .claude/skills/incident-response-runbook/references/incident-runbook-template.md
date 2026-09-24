@@ -2,6 +2,13 @@
 
 Detail file for `incident-response-runbook`. Loaded on demand.
 
+**Reading key:** SEV means incident severity level (1 is most urgent); IC is
+the incident commander; ops means operations responders; and comms means
+communications. `p99` is the 99th-percentile observed latency, and a
+fast-burning budget is an error budget being consumed quickly. Use the
+[parent skill](../SKILL.md) for the runbook-authoring workflow and its
+authority limits; this page supplies template wording and the severity ladder.
+
 ## Severity ladder skeleton
 
 | SEV | One-minute criteria | Examples | Default response |

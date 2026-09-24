@@ -1,5 +1,15 @@
 # Skill-contract audit — baseline report
 
+> **Historical baseline reading, checked 2026-09-23:** The counts and rows
+> below freeze audit engine v1.12.0 before correction. In particular, its five
+> EVAL-004 rule findings (the rule checks named evaluation targets) were later
+> rejected: the rule confused skill names with subagent names. The resulting
+> AEGIS-060 proposed finding was a false positive, so its identifier was
+> retired. The [AEGIS-060 disposition](aegis-060-plus-register.md#aegis-060-rejected-candidate--trigger-eval-subagent-annotations-are-valid-typed-target-syntax-not-defects)
+> records the corrected v1.13.0 rule, merged in pull request #89. Keep this
+> report's 184-skill and 414-finding measurements as historical data; do not
+> read the five EVAL-004 rows as current source defects or behavioral proof.
+
 - Tool: `audit-skill-contracts` v1.12.0 (engine sha256 `c886b27aee860aed…`)
 - Repo SHA: `4f361d14930d87d689c5c7495c993a57e35f2609` (branch `work/pr77-final-correction`; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `2fe588494dba6cbe11a13739f9e88390af342b35f128642e65d7c1db2ee4cc51` (704 files, 3955703 bytes)

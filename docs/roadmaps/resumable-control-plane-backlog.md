@@ -1,5 +1,50 @@
 # Resumable Aegis delivery control plane — separate work-package register
 
+## Start here: purpose and current delivery
+
+This is the work-package and authority register for the **Aegis delivery control
+plane**, the component that records an approved delivery plan, controls one
+bounded action at a time, and preserves enough state to recover safely after an
+interruption. Maintainers and reviewing agents should use this page to find the
+current package status and the evidence for each delivery boundary. Maintainers
+looking for offline synthetic commands should start with the
+[control-plane package guide](../../tools/aegis_delivery_control/README.md).
+
+**Terms used below:** `CP` means control plane; `WP` means work package; `FUT`
+identifies future work outside the current sequence. `BER` means Behavioral
+Eval Runner. `APR` identifies an entry in the owner approval register. `T`
+followed by a number identifies a state transition; `C` identifies a crash
+boundary; `F` identifies a finding-specific negative acceptance family. The
+[design](../design/resumable-control-plane-v1.md) defines each numbered case.
+`PR` means GitHub pull request; `CI` means continuous integration checks;
+`DCO` means Developer Certificate of Origin commit sign-off. `DONE` means
+delivery and required evidence were recorded; `BLOCKED` means entry conditions
+or authority are absent. Neither status grants the next package automatically.
+
+**Current status, 2026-09-23:** the repository contains an offline, synthetic
+state and recovery kernel and an offline negative capability proof. Neither is
+a live delivery integration. A green synthetic check does not authorize a real
+provider call, deployment, source claim, or evidence operation.
+
+| Work package | Delivered or pending | Where to verify it |
+| --- | --- | --- |
+| CP-WP-001: state, authority, and recovery contract | DONE: documentation contract only, [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95) | [Design](../design/resumable-control-plane-v1.md) and [review evidence](../evidence/control-plane/cp-wp-001-review.md) |
+| CP-WP-002: offline state and recovery kernel | DONE: synthetic-only code, [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) | [Package guide](../../tools/aegis_delivery_control/README.md) and [detailed status below](#5-separate-work-packages-current-status) |
+| CP-WP-003A: first offline capability proof | DONE: synthetic failure probes, [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) | [Review evidence](../evidence/control-plane/cp-wp-003a-review.md) and [approval AEGIS-APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) |
+| CP-WP-003: real authority, evidence, and execution capability | BLOCKED: real source, freshness, selected-host containment, evidence, and billing proofs need separate scope and authority | [Detailed status below](#5-separate-work-packages-current-status) and [offline proof proposal](cp-wp-003-offline-proof-proposal.md) |
+| CP-WP-004: one bounded real integration | BLOCKED: package 003 prerequisites and an approved target are absent | [Detailed status below](#5-separate-work-packages-current-status) |
+| CP-FUT-001: distributed ownership or hosted service | BLOCKED: no demonstrated need or separate approval | [Detailed status below](#5-separate-work-packages-current-status) |
+
+**Read by task:** use the [package guide](../../tools/aegis_delivery_control/README.md)
+for the implemented interface and limits; the [design](../design/resumable-control-plane-v1.md)
+for state transitions and recovery rules; the
+[approval register](../approvals/APPROVAL_REGISTER.md) for owner authority;
+[section 5](#5-separate-work-packages-current-status) for the package ledger;
+and the later dated checkpoints for why individual requirements were accepted.
+Sections 1–4 below preserve the original CP-WP-001 scope and delivery protocol
+as historical context. Their statements about “no runtime” and CP-WP-002 being
+blocked describe that earlier package, not the current repository state.
+
 Owner: Peter Nguyen. Repository: ModernNomad-98/Project-Aegis.
 Prepared: 2026-09-12. Base: `57e6928d2849aa5377daf52c723b85736292585d`.
 
@@ -167,7 +212,7 @@ All paths are maintainer-owned. The protected-file regex additionally guards BER
 CI/scripts/requirements and parent import files; absence of a guard match is not
 permission for runtime work.
 
-## 5. Separate future work packages — all blocked
+## 5. Separate work packages: current status
 
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
