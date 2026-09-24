@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Prepares the review: circulates the design with a required pre-read, states the decision it must reach, invites skeptics and cross-cutting owners.",
+          "Prepares the review: with communication authority circulates the design and invites skeptics and cross-cutting owners; otherwise drafts the pre-read and invitations for an authorized human; states the decision it must reach.",
           "Structures discussion around assumptions, risks, and cross-cutting concerns rather than trivia.",
           "Actively elicits the strongest objection and keeps critique about the design, not the author.",
           "Drives to an explicit outcome (approved / approved-with-changes / needs-rework / blocked-on-X) and captures decisions, action items with owners, and open questions.",
@@ -26,7 +26,7 @@
         "triggers": true,
         "assertions": [
           "Counters the rubber-stamp/HiPPO pattern by deciding on reasoning ('what's the argument?') not rank.",
-          "Requires pre-reads and invites skeptics/domain owners to create real scrutiny.",
+          "Requires pre-reads and identifies skeptics/domain owners to create real scrutiny; sends invitations only with communication authority.",
           "Deliberately elicits dissent and makes disagreement safe.",
           "Forces an explicit outcome with captured decisions."
         ]

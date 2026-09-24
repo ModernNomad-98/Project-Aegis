@@ -17,7 +17,7 @@ SLO; this skill does not set that journey target.
 
 Systems monitor their services and stay blind to their data: the pipeline
 runs green while a third of yesterday's rows never arrived, a join
-silently fans out duplicates, and a upstream format change poisons every
+silently fans out duplicates, and an upstream format change poisons every
 downstream report. This skill designs the data-quality monitoring layer —
 which checks, on which datasets, at which pipeline stage, with what
 severity, owner, and failure action — so data problems surface as typed,

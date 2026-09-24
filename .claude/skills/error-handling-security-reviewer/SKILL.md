@@ -5,6 +5,13 @@ description: Review error/exception handling through a security lens — fail-cl
 
 # Error-Handling Security Reviewer
 
+Terms: **PR** means pull request; **SAST** means static application security
+testing; **authn** means authentication; **authz** means authorization;
+**ADR** means architecture decision record. **OWASP** means the Open Worldwide
+Application Security Project. **D8** names the repository's
+[OWASP Top 10:2025 coverage audit](../../../docs/reconciliation/step-0-reconciliation-v4.md)
+(section 3), which should be consulted before quoting its category mapping.
+
 ## Purpose
 
 Give the error and exception paths of a codebase a security verdict: findings

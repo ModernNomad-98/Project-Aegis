@@ -5,6 +5,10 @@ description: 'Organize a documentation SET using the Diátaxis framework — sor
 
 # Diátaxis Doc Organizer
 
+Terms: **README** is the repository's introductory document; **CI** means
+continuous integration; **ADR** means architecture decision record; **API**
+means application programming interface.
+
 ## Purpose
 
 Documentation fails not because it's missing but because it's mixed: the

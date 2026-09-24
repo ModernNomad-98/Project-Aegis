@@ -1,5 +1,10 @@
 # Full-page documentation review after pull request #211 — 2026-09-24
 
+**Current reading:** PR #212 delivered this batch. Its future wall-time
+comment and 558/71/487 figures below are pre-merge expectations, later
+verified in the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md).
+
 ## Scope and reading rule
 
 This batch reviews 20 previously unaccepted Markdown pages at the exact pull

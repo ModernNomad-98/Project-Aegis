@@ -56,7 +56,7 @@ Deleting without the sweep leaves dangling references.
 |---|---|---|
 | Mark | Set status superseded/expired; name successor | Trivially |
 | Redirect | Grace window; point readers to successor | Trivially |
-| Remove | Delete the doc — HUMAN-APPROVED | One-commit revert (squash-merge) |
+| Remove | Delete the doc — HUMAN-APPROVED | Revert only an isolated retirement commit; otherwise restore the targeted doc and references |
 
 This skill plans/recommends; it does NOT execute deletions. Removal is a
 human-approved operation.

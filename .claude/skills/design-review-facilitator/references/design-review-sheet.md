@@ -4,9 +4,9 @@ Detail for `design-review-facilitator`. Read on demand.
 
 ## Preparation checklist
 
-- [ ] Design circulated with a REQUIRED pre-read (or postpone).
+- [ ] Design circulated with a REQUIRED pre-read by an authorized sender (or postpone).
 - [ ] Purpose stated: what decision must this review reach?
-- [ ] Right people invited: domain owners, skeptics, cross-cutting owners
+- [ ] Right people invited by an authorized sender: domain owners, skeptics, cross-cutting owners
       (security, data, ops) — not just allies.
 - [ ] Reversibility/stakes assessed → sets scrutiny depth.
 - [ ] Time-box and an explicit outcome expected.

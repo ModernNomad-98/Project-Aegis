@@ -1,5 +1,12 @@
 # Historical control-plane handoff citation repair
 
+**Current reading (2026-09-24):** The prospective PR and wall-time language
+below describes this batch before delivery. The
+[pinned control-plane handoff](../control-plane/cp-wp-002-codex-handoff.md)
+and [current control-plane backlog](../../roadmaps/resumable-control-plane-backlog.md)
+carry the live route. Preserve the 19-citation, 14-repaired, five-retained
+counts and immutable source hash below as historical evidence.
+
 Date: 2026-09-23. Base: pull request (PR) #200 merge
 `cedd732df2ae9a843d2c02f213299a31b245a9c5`. This correction had no
 previous item-specific estimate; its new estimate was **2–4 active hours**.

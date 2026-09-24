@@ -1,5 +1,10 @@
 # Twenty-page full-page readability batch after pull request #213
 
+**Current reading:** PR #214 delivered this batch. The future Actions and
+candidate language below records its pre-merge state; use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for current acceptance status.
+
 This record is for maintainers reviewing the Project Aegis documentation
 sweep. It covers ten skill entrypoints and ten historical evidence pages at
 the candidate based on the exact #213 merge

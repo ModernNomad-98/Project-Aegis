@@ -90,9 +90,9 @@ pinned against each other in both directions.
    superseded-but-present, and orphaned; equally, flag "permanent" docs
    with no reason-to-keep (hoarding by default). Push both toward an
    explicit decision.
-7. **Specify rollback.** Retiring a doc must be reversible: in a
-   squash-merge repo, a removal reverts as one ordinary commit. State the
-   rollback per retirement.
+7. **Specify rollback.** State the rollback per retirement. Revert an isolated
+   retirement commit when that would affect only the retirement; otherwise
+   restore the targeted doc and references without reverting unrelated work.
 8. **Deliver** the index, the frontmatter convention, and the per-doc
    dispositions in the Output Format — with deletions flagged for human
    approval.
@@ -111,7 +111,7 @@ Index (numbered):
 Frontmatter:   per-doc retention fields (mirrors the index; drift = finding)
 Retirements (recommended):
   <doc>: reverse-ref sweep result; disposition (relink/redirect/remove);
-         stage=mark→redirect→remove; rollback=<one-commit revert>; DELETION = human-approved
+         stage=mark→redirect→remove; rollback=<isolated revert or targeted restore>; DELETION = human-approved
 Findings:      rotted (past expiry / superseded-present / orphan); hoarded (permanent, no reason)
 Boundaries:    SKILL retirement → skill-deprecation-planner; product sunset →
                sunset-deprecation-communicator; corpus-by-type → diataxis-doc-organizer
@@ -130,8 +130,8 @@ Boundaries:    SKILL retirement → skill-deprecation-planner; product sunset �
       → remove; DELETION is human-approved, not executed here.
 - [ ] Both rot (stale/superseded/orphan) and hoarding (permanent without a
       reason) are surfaced.
-- [ ] Rollback is stated per retirement (one-commit revert in a
-      squash-merge repo).
+- [ ] Rollback is stated per retirement (isolated revert or targeted restore
+      that preserves unrelated changes).
 - [ ] SKILL-retirement, product-sunset, and corpus-by-type concerns are
       handed to their owning skills.
 

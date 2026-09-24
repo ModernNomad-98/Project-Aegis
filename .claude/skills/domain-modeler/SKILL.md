@@ -5,6 +5,10 @@ description: Model the business domain before any implementation — extract ubi
 
 # Domain Modeler
 
+Terms: **PRD** means product requirements document; **DDL** means data
+definition language; **CRUD** means create, read, update, delete; **VO**
+means value object.
+
 ## Purpose
 
 Turn prose requirements and scattered code into an explicit domain model the

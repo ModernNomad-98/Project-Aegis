@@ -27,7 +27,7 @@
         "assertions": [
           "Runs the reverse-reference sweep (docs, code, README, decision logs that link to it) and dispositions each reference (relink/redirect/accept).",
           "Stages retirement mark → redirect (grace window) → remove, with a named successor.",
-          "States a one-commit rollback for the removal (squash-merge convention).",
+          "States rollback for the removal: revert an isolated retirement commit or restore targeted docs without reverting unrelated work.",
           "Flags the actual deletion as a human-approved operation rather than executing it."
         ]
       }
@@ -56,7 +56,7 @@
           "Refuses to execute deletions: this skill plans and recommends retirement; deletion is a human-approved operation.",
           "Produces the retirement recommendations with reverse-reference sweeps and staging, stopping at the approval gate.",
           "Notes that silently removing docs is exactly the behavior the governed index exists to prevent.",
-          "Provides the one-commit rollback path for whichever removals are approved."
+          "Provides an isolated-revert or targeted-restore rollback path for whichever removals are approved."
         ]
       }
     },

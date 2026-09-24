@@ -1,5 +1,12 @@
 # Control-plane guide field explanations — 2026-09-23
 
+**Current reading (2026-09-24):** The independent review pending at this
+draft-freeze snapshot was completed during the delivery of this batch. Read
+the [current control-plane package guide](../../../tools/aegis_delivery_control/README.md)
+and [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for present status. The 10-link and 185-skill receipts below remain dated
+evidence of this correction.
+
 Edit start: 22:24:45 Coordinated Universal Time (UTC). Base: exact pull
 request (PR) #191 merge `761915207f7974b3d4cab7fb099216188ef3e968`.
 The previous deep component screen was estimated at 2–4 active hours; this

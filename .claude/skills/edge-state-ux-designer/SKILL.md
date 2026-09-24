@@ -5,6 +5,10 @@ description: Design the non-happy-path UI states for a view or flow — the dist
 
 # Edge State UX Designer
 
+Terms: **UX** means user experience; **UI** means user interface; **CTA**
+means call to action; **a11y** means accessibility. HTTP **403** denotes
+forbidden access and **404** denotes a missing resource.
+
 ## Purpose
 
 Product design covers the happy path and forgets the other twelve
