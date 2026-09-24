@@ -17,12 +17,13 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest completed [five-merge checkpoint after pull request #255](#checkpoint-after-pull-request-255--2026-09-24)
+The latest completed [five-merge checkpoint after pull request #260](#checkpoint-after-pull-request-260--2026-09-24)
 reconsiders every selected and optional row. The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
-supersedes the old whole-item estimate and selected total; PR #255 made the
-bounded offline grant effective, while its implementation and later host work
-remain open.
+supersedes the old whole-item estimate and selected total. PR #257 delivered
+the bounded offline integration; host, runtime, privacy and cleanup work
+remain unestimated. A disposable VirtualBox Linux VM is the selected Stage A
+candidate, but it has not been provisioned or probed.
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -44,6 +45,38 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #260 — 2026-09-24
+
+Five requests merged after #255 in first-parent order: #256, #258, #257,
+#259 and #260. The intervals use GitHub `mergedAt` receipts, beginning with
+#255 at 18:59:41 UTC. They include review, CI, owner waiting and overlapping
+work. The active-work, review, CI and owner-wait splits are unavailable; these
+intervals are not throughput or package-duration measurements.
+
+| Merged request and scope | Exact merge commit | Published package estimate or bound | Prior-merge wall interval |
+| --- | --- | --- | ---: |
+| [#256](https://github.com/ModernNomad-98/Project-Aegis/pull/256): post-#255 checkpoint | `bcc1d49f7b30bde65fe4ebf7c9afec4f7eea610a` | No separate active estimate published | 14m00s |
+| [#258](https://github.com/ModernNomad-98/Project-Aegis/pull/258): BER Stage A source-only plan | `f961d5439225e789e92e3718d49614836f2488ba` | No separate active estimate published; plan did not authorize a host probe | 24m10s |
+| [#257](https://github.com/ModernNomad-98/Project-Aegis/pull/257): synthetic BER evidence-policy integration | `53351b3fac3d75cbbc23341cc96dbeadc1e116ee` | At most 16 active h under APR-023; actual active split unavailable | 2h26m18s |
+| [#259](https://github.com/ModernNomad-98/Project-Aegis/pull/259): BER policy closeout and approval consumption | `d7169c8909b1f1eff2ec52810e1ef890aff95aed` | No separate active estimate published | 13m07s |
+| [#260](https://github.com/ModernNomad-98/Project-Aegis/pull/260): disposable VirtualBox Stage A setup proposal | `15307d7d494e4549400cf8fedacf1c49fe05146d` | No separate active estimate published; proposal did not authorize provisioning or probing | 15m50s |
+
+The intervals span **18:59:41–22:33:06 UTC** and total **3h33m25s**.
+PR #257 delivered the bounded offline integration under BER-DEC-013/APR-023.
+Its local tests and exact-head Linux/Windows Actions passed; the protected
+`gate-guard` received a separate one-time owner exception recorded and
+consumed in APR-025–026. PR #259 recorded that closeout. PR #260 selected
+VirtualBox as a setup proposal for the disposable Linux VM; no VM creation,
+real-host probe, provider call or private-input use followed from that merge.
+The current merged tree has **588 tracked Markdown files**: 544 accepted
+reader pages and 44 classified fixtures, with zero known pending pages in
+the bounded sweep. The [forecast checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-260)
+reassesses eleven selected rows at **79–162 active hours**, plus unestimated
+BER-BKL-009 host, runtime, privacy and cleanup work. Thus the selected and
+all-options totals have **no finite estimate**. Start the next five-merge
+counter after #260; #261 is its first merge. Revise sooner for a material
+owner or scope decision.
 
 ## Checkpoint after pull request #255 — 2026-09-24
 

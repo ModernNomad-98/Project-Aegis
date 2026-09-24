@@ -3,11 +3,11 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [five-merge checkpoint after #255](#five-merge-checkpoint--2026-09-24-after-pull-request-255)
+to start blocked work. The [five-merge checkpoint after #260](#five-merge-checkpoint--2026-09-24-after-pull-request-260)
 reassesses every selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
-two more. This proposal adds one reviewed setup page, making **588 pages**:
+two more. PR #260 added one reviewed setup page, making **588 pages**:
 544 accepted readers and 44
 classified fixtures, with zero known pending pages. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24 approval of the
@@ -22,7 +22,7 @@ candidate, but its identity and provisioning remain unset. No finite new selecte
 total is defensible until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-255--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-260--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -62,6 +62,62 @@ tables below are retained as historical snapshots. Their dated estimates,
 pending decisions, and statements about what will happen next describe their
 original checkpoints. Follow the latest checkpoint and the owning records for
 current status and authorization.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #260
+
+The five merges after #255 were #256, #258, #257, #259 and #260. Their
+[exact GitHub merge receipts](aegis-execution-metrics.md#checkpoint-after-pull-request-260--2026-09-24)
+span 18:59:41–22:33:06 UTC, or **3h33m25s** of elapsed wall time. That span
+includes review, CI, owner waiting and overlapping work, so it cannot yield
+an active-work delivery rate. #256 reconciled the previous checkpoint; #258
+planned source-only BER Stage A proof; #257 delivered the synthetic-only
+BER-BKL-009 integration; #259 recorded its approval consumption and closeout;
+#260 proposed the disposable VirtualBox Linux setup. Only #257 closed a
+selected implementation package. PR #261, which taught user-facing build
+choices across Aegis skills, is the first merge in the next five-merge cycle.
+
+The merged tree after #260 has **588 tracked Markdown files**: **544 accepted
+reader pages** and **44 classified fixtures**, with **zero known pending
+pages** in the bounded readability sweep. The confidential conduct intake
+route and independent recipient remain owner decisions. The BER-BKL-009
+offline package is delivered; its later host, runtime, privacy and cleanup
+work still has no scoped estimate. The chosen VirtualBox platform is a
+candidate setup path, not a provisioned host or Stage A probe grant.
+
+| Selected remaining work item | Active-work estimate | Gate or uncertainty after #260 |
+| --- | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 h | Owner must inspect private candidate labels, guide and exact hashes. |
+| WP-2B-3 measurement and OD-1 | 4–10 h | Private labels, source/allowance, measured development result and holdout freeze remain. |
+| Selected-host R4/R5 capability proof | 12–24 h | VirtualBox Linux VM is the candidate; provisioning, identity and separate Stage A probe authority remain. |
+| WP-2B-4 | 12–24 h | Calibration, OD-1 and host proof precede a limited live suite and separate grant. |
+| WP-2B-5 | 8–16 h | WP-2B-4 and separate generic-corpus phase grant remain. |
+| WP-2B-6 | 8–16 h | WP-2B-5 plus scheduling, cost, quarantine and dataset operations grant remain. |
+| WP-2B-7 | 4–8 h | WP-2B-6 and separate advisory CI/operator grant remain. |
+| CP-WP-003 | 8–16 h | Real source, independent freshness, containment, evidence and billing proof remain. |
+| CP-WP-004 | 8–16 h | CP-WP-003 real proof, one selected target/operation and separate grant remain. |
+| Issue #101 package 4 | 8–16 h | Exact SDK-managed host, versions and Stage 4A offline then Stage 4B host authority remain. |
+| Issue #101 package 7 | 6–12 h | Release evaluation depends on selected integration outcomes and separate proof. |
+| Documentation readability | 0 known pending | 544 accepted readers; future new or changed pages require acceptance. |
+| **Other eleven selected rows** | **79–162 h** | Ranges retained after dependency review; none of the five merges closed these rows. |
+| BER-BKL-009 host, runtime, privacy and cleanup residual | TBD | Requires a named host, scoped proof and separate owner decisions. |
+| **Selected total** | **No finite estimate** | The eleven-row subtotal excludes the unestimated BER-BKL-009 residual. |
+
+All seven optional rows remain conditional. Issue #101 package 5 remains
+**8–20 h** after the package-4 comparison; package 6 remains **8–20 h**
+after host proof and separate provider authority. Together those two helpers
+would add **16–40 h** to the known eleven-row subtotal, without making the
+selected-plus-both total finite. BER-BKL-010 remains **4–12 h** after OD-4
+and BKL-009; BER-BKL-014 remains **8–20 h per additional selected host**
+after the v1 Claude Code adapter, host proof and owner adoption/budget;
+BER-BKL-015 remains **8–24 h per selected product** after stable WP-2B-5/6
+and a consumer choice. Strategic skill/framework expansion and multi-judge
+arbitration/future control-plane architecture remain unbounded until scoped.
+The full all-options backlog has no finite total.
+
+Start the next five-merge counter after #260; #261 is the first merge.
+Re-estimate sooner for a material owner or scope decision. None of these
+estimates authorizes private input, host probing, provider use, spend or
+deployment.
 
 ## Five-merge checkpoint — 2026-09-24, after pull request #255
 
