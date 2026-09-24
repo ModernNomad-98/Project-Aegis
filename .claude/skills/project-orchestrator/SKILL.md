@@ -113,15 +113,8 @@ about cost, time, risk, behavior, or customer experience. The RULE:
 
 Worked examples (encode the pattern, not these strings):
 
-- *"modular monolith vs microservices?"* → **"A handful of users to start, or
-  millions? How big is the team building this — just you, or a group?"**
-- *"pooled vs siloed multi-tenancy?"* → **"Should each customer's data sit in
-  its own separate space, or share one space with strict rules keeping them
-  apart? (Separate costs more; shared is cheaper and still safe when done
-  right.)"**
-- *"bearer-capability share link with expiry + revocation?"* → **"When you send
-  a customer a status link, should it expire after 30 days, last forever, or
-  stop working the moment the job closes?"**
+- *"modular monolith vs microservices?"* → **"How many people will use this
+  at launch?"** (ask about team size on a later turn if still needed).
 
 Ask **one** user DECISION question per turn — at most one; no hidden second
 question folded into the explanation, and never a compound question bundling
@@ -134,6 +127,11 @@ explained — and later proposed for the log (Capability 4) — with its
 rationale REQUIRED: the **"(chosen over …, because …)"** clause naming the
 main rejected alternative and the plain-language why, so the user learns the
 trade-off at every approval, not just the outcome.
+
+For a user-owned build choice, define terms; explain each viable option's reason, pros, cons, and money/setup/maintenance costs or uncertainty; recommend one with a reason tied to the user's context.
+If a sound recommendation needs a missing fact, ask one atomic discovery question first; otherwise ask ONE atomic decision question after the explanation. The user's choice remains theirs.
+The owning skill decides internal mechanics; explain its choice and trade-off. Keep factual discovery and simple approval questions concise, without an option comparison.
+A choice answer never authorizes installation, spending, provisioning, deployment, or a project-state write; apply Capability 4 and the relevant authority gate separately.
 
 **Capability 2 — Route to the owning skill(s) BY NAME along existing seams.**
 Select the owning skill for the detected stage and invoke it. Every ACTUAL
@@ -342,6 +340,7 @@ Each turn produces (never a wall of jargon):
 ```
 WHERE YOU ARE:   <plain-language stage — e.g. "You have an agreed idea but no written plan yet.">
 WHAT I CHECKED:  <state file + repo signals that put you here>
+CHOICE CONTEXT:  <only for a build choice: plain terms, each viable option's reason, costs/unknowns, pros and cons, recommendation and why; shown before ONE QUESTION> (else: —)
 ONE QUESTION:    <a single business question, if a decision is needed>   (else: —)
 WHAT HAPPENS NEXT: <one of — classification decision (no skill invoked) | owning skill named plainly → invokes `<skill-name>` | record terminal decision (preview + cite applicable existing authorization, otherwise await approval)>
 STAGE-2 OWNERS:  (shown while in Stage 2)
@@ -405,6 +404,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       implementation authority; previews byte-for-byte; no rejected/already-recorded
       proposal re-offered; projections refreshed, never contradicting evidence.
 - [ ] The next recommended action is stated in plain language.
+- [ ] Build choices define terms, reasons, costs, pros and cons, and give a context-based recommendation before ONE atomic question; the answer is not action or recording authority.
 
 ## Gotchas
 

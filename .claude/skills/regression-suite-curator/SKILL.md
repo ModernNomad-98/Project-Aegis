@@ -51,6 +51,12 @@ the team applies between curation passes.
 
 ## Workflow
 
+When runtime budget and named test protection require an owner choice,
+define the budget and coverage; explain viable budget, tier, and protection
+paths by reason, risk, benefit, and money/setup/upkeep cost or uncertainty.
+Recommend a fit from CI evidence before one decision question. Do not treat
+that answer as approval to delete tests or weaken a security regression.
+
 1. **Build the evidence table first:** per test/group — tier, runtime,
    failure history (real catches vs flake noise vs never-failed), what
    behavior it guards, duplication candidates. Curation without CI-history
@@ -98,6 +104,7 @@ Decisions:
   QUARANTINE-ACTION <test> — <diagnose|fix|retire + owner/ticket/expiry>
 Protected-class check: <security regressions touched? → human-approval path>
 Tier fit: <tier → runtime before/after vs budget>
+Owner choice (if needed): <explained budget/protection paths, costs/unknowns, pros/cons, recommendation + why>
 Standing rules: <promotion + retirement + quarantine rules going forward>
 Handoffs: <new tests → engineer skills; flake cases → flaky-test-detective;
           deletions → review via reviewable-diff-discipline>
@@ -105,6 +112,9 @@ Next curation: <cadence/trigger>
 ```
 
 ## Validation Checklist
+
+- [ ] A budget-versus-protection choice has a taught comparison and
+      recommendation before one question; test deletion keeps its review gate.
 
 - [ ] Every decision cites CI-history evidence, not intuition.
 - [ ] Every fixed bug ≥ threshold maps to a regression test or a work item.
@@ -140,7 +150,7 @@ Next curation: <cadence/trigger>
 - A retirement candidate is a security regression test or guards a
   compliance obligation → `human-approval-boundary`, always.
 - Suite runtime can't fit budgets without losing named protection →
-  escalate the tradeoff (budget vs protection) to the strategy owner
+  escalate explained budget/protection paths and a recommendation to the strategy owner
   instead of quietly cutting.
 - Asked to also delete the retired tests right now → deletions go through
   normal review as scoped diffs; hand off the decision list.

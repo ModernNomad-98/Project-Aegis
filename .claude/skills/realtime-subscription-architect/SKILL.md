@@ -79,6 +79,12 @@ question is server-to-server event flow it belongs to
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Model channels around authority, not convenience.** Define the channel
    namespace so the thing that is authorized IS the channel key — e.g.
    `tenant:<id>:resource:<id>`. The server derives tenant scope from
@@ -128,6 +134,9 @@ question is server-to-server event flow it belongs to
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 REALTIME DELIVERY DESIGN — <system/domain>
 Transport:      <WebSocket | server-sent events (SSE) |
@@ -152,6 +161,8 @@ Boundaries:     internal backbone → streaming-event-architect; API/webhooks �
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Channel keys are server-derived from trusted state; a client cannot
       subscribe to an arbitrary channel string it constructs.
 - [ ] Authorization happens at subscribe time and is re-checked as authority

@@ -84,6 +84,12 @@ reviews.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Inventory the segments.** Name every candidate segment for the window
    (instructions, user input, history, retrieved content, tool output,
    memory) with its source, trust class, and size behavior. A segment nobody
@@ -133,6 +139,9 @@ reviews.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 MODEL CONTEXT DESIGN — <feature/agent>
 Principle: the context window is a supply chain — an unverified input is an
@@ -159,6 +168,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Every segment is named with source, trust class, schema, cap,
       priority, and an explicit PERSISTED or TRANSIENT mark.
 - [ ] Assembly is server-side from vetted parts; no path gives the model

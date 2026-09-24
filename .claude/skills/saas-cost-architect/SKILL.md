@@ -61,6 +61,12 @@ biggest line item is fiction with a spreadsheet.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Inventory cost drivers from real bills.** Group by service, mark each
    driver fixed (exists at zero tenants), stepped (scales in chunks), or
    variable (scales per use). No bill available → the model is an estimate
@@ -100,6 +106,9 @@ biggest line item is fiction with a spreadsheet.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 SAAS COST MODEL — <product/scope>
 Driver inventory: <driver — service — fixed/stepped/variable — monthly $ from
@@ -122,6 +131,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Drivers come from real bills, or every affected number carries an
       ESTIMATE label — no silent list-price math.
 - [ ] Every driver has an attribution mechanism or sits visibly in

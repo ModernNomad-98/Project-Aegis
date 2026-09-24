@@ -54,6 +54,12 @@ engineer skills.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Confirm the layers to implement** from the strategy; list them with
    their risk owners. The blueprint covers exactly these — no speculative
    tooling.
@@ -84,6 +90,9 @@ engineer skills.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 AUTOMATION BLUEPRINT — <repo/product>
 Layers implemented: <layer → runner/tooling → rationale + rejected alternative>
@@ -101,6 +110,8 @@ Handoffs: <test implementation → engineer skills; data design → test-data-ar
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Every tool choice has rationale and a named rejected alternative.
 - [ ] Structure covers all strategy layers; no speculative extra tooling.
 - [ ] Isolation rules make parallel runs collision-free (data, ports, state).

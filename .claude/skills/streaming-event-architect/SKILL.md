@@ -76,6 +76,12 @@ the internal stream feeds it.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Inventory flows and classify each.** For every producer→consumer
    flow: fire-and-forget notification, state-transfer (fact/event-carried
    state), or command. Volume, peak rate, and fan-out. Misclassified
@@ -134,6 +140,9 @@ CDC mechanisms) and the per-flow guarantee card format:
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 STREAMING BACKBONE DESIGN — <system/domain>
 Flows:          <N producer→consumer flows, classified>
@@ -153,6 +162,8 @@ Explicit non-guarantees: <what this design does NOT promise (e.g., cross-key ord
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Every flow has a stated ordering guarantee in "per <key>, unordered
       across <scope>" form — no unscoped "ordered" claims.
 - [ ] No unqualified "exactly-once" anywhere; every consumer has a named

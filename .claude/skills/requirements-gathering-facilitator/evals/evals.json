@@ -158,6 +158,20 @@
       }
     },
     {
+      "id": "educational-feature-choice-reminder-channel",
+      "type": "should_trigger",
+      "prompt": "For the clinic booking app, help me decide whether appointment reminders should use email or SMS. We are small and have no messaging budget yet; patients may miss email.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines SMS in plain language and explains why email and text messages are relevant to the reminder decision.",
+          "Explains each option's case-specific benefits, drawbacks, monetary, setup-time, and ongoing-maintenance costs, marking unknown provider prices as unknown.",
+          "Offers a recommendation and why based on the small clinic's budget and missed-email concern, or asks for one essential missing constraint before recommending.",
+          "Keeps one atomic decision or discovery target, returns the user-owned product choice to the orchestrator for its pending batch, and does not treat the answer as authority to integrate a provider."
+        ]
+      }
+    },
+    {
       "id": "regression-options-for-same-target-remain-atomic",
       "type": "should_trigger",
       "prompt": "For the clinic app, is 'Who usually records an appointment: reception, the therapist, or both?' an acceptable single question, and what would make it compound?",

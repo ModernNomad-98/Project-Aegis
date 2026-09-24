@@ -66,6 +66,12 @@ skill owns keyword and faceted search.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Decide the engine against real needs.** In-database full-text
    (`tsvector` + GIN, `pg_trgm` for fuzzy/typo) when the corpus and relevance
    needs are modest and staying in the DB avoids a sync pipeline; a dedicated
@@ -112,6 +118,9 @@ skill owns keyword and faceted search.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 SEARCH ARCHITECTURE — <system/domain>
 Engine decision: <in-DB full-text (tsvector/pg_trgm) | dedicated engine> +
@@ -135,6 +144,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The engine choice is justified against corpus size, relevance need,
       and operational appetite — not a reflexive heavy-engine default.
 - [ ] The indexing pipeline states an HONEST freshness lag; deletes and

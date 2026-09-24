@@ -85,7 +85,18 @@ short option list is allowed ONLY when its choices are alternatives for the same
 target (e.g. "reception, the therapist, or both?"), and a single narrative process
 question ("what happens today when a patient books an appointment?") is atomic even
 though its answer may run to several steps — narrative depth is not multiple
-targets. Each answer updates the internal checklist. Separate facts from decisions:
+targets. Each answer updates the internal checklist.
+A factual question may use short same-target examples without a build-option
+comparison. When this skill presents viable ways to build a feature for a
+user-owned choice, define unfamiliar terms and explain why each relevant
+option is considered, its money/setup/maintenance costs or uncertainty, and
+its case-specific pros and cons. Recommend one when the known context supports
+it, with a reason tied to the user's goals; otherwise ask one atomic question
+for the missing constraint first. Then ask only one atomic decision question.
+The recommendation informs the owner and never resolves their choice or
+authorizes building. If the orchestrator owns the decision turn, return this
+comparison to it for presentation rather than showing a second question.
+Separate facts from decisions:
 a purely factual answer feeds the brief, while a user-owned scope, behaviour,
 privacy, workflow, or product trade-off is returned to the orchestrator for its
 VISIBLE pending-decision batch (it is not recorded here). The numbered steps below
@@ -144,6 +155,9 @@ brief:
 ```
 INTERACTIVE TURN — requirements discovery
 Discovery status: <one or two lines — confirmed / assumed / still unknown>
+Choice context:   <only for a build choice: terms, relevant options with reasons,
+                   money/setup/maintenance costs or unknowns, pros and cons,
+                   recommendation and why; precedes the one question>
 Next question:     <ONE plain-language question for exactly ONE atomic answer
                    target — no second requested answer anywhere else this turn>
 Stop:              wait for the answer — ask nothing else this turn
@@ -200,6 +214,9 @@ Known / assumed / unknown clearly separated
       answers feed the brief without becoming decisions; the FINAL brief appears
       only when no spec-blocking question remains and does not advance the
       recorded stage or authorize building.
+- [ ] A presented build choice explains terms, costs, reasons, pros and cons,
+      and a context-based recommendation before one atomic question; it does
+      not confuse a choice answer with authority to build.
 
 ## Gotchas
 

@@ -53,6 +53,12 @@ uncertainty is stated as a first-class output, not papered over.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 Explicit human invocation selects this execution-capable skill; it does not
 expand the allowed target or activate Task-Authorized Local Implementation
 (TALI). TALI is a separate route that requires its own classification and
@@ -84,6 +90,9 @@ before proceeding.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 DOCS-FIRST IMPLEMENTATION — <task>
 Version pin: <library>@<locked version> (source: <lockfile>)
@@ -98,6 +107,8 @@ Verification: <exact commands + actual results>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Version taken from the LOCKFILE (or equivalent resolved source).
 - [ ] Every API call in the change traces to the syntax summary; every
       summary line traces to a named doc source.

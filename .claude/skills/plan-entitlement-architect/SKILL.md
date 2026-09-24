@@ -54,6 +54,12 @@ nobody knows what the Pro plan actually is.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Inventory features and limits** actually enforced or promised today —
    from code, billing config, and the pricing page. Reconcile divergences
    before designing on top of them (route hard conflicts to
@@ -94,6 +100,9 @@ nobody knows what the Pro plan actually is.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 ENTITLEMENT DESIGN — <product/scope>
 Entitlement inventory: <key — type (boolean/limit/metered) — today's
@@ -114,6 +123,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Every entitlement typed and every matrix cell explicit — no "ask sales"
       cells without an override mechanism behind them.
 - [ ] Exactly one resolution point; all surfaces (including jobs, imports,

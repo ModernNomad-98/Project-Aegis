@@ -67,6 +67,12 @@ and the analysis. It runs experiments; it does not plan safety rollouts
 
 ## Workflow
 
+When an infeasible experiment leaves the owner choosing a larger effect,
+longer run, or another method, define those terms and explain each viable
+path's reason, benefits, drawbacks, and money/time/upkeep cost or uncertainty.
+Recommend a feasible path from traffic and business constraints before asking
+one choice question; a preference does not authorize a run or spend.
+
 1. **Write a falsifiable hypothesis.** A specific predicted change in a
    specific metric with a direction, tied to a decision — "changing X
    will increase primary metric M", not "let's see if X is better".
@@ -133,11 +139,15 @@ Guardrails:    <status>
 Validity:      sample-ratio mismatch (SRM) check; multiple-comparison handling;
                Simpson's paradox and novelty-effect checks
 Decision:      ship | kill | iterate — with residual uncertainty stated
+Choice context (if asking): <explained paths, costs/unknowns, pros/cons, recommendation + why>
 Boundaries:    safety rollout → feature-flag-rollout-strategist; metric def →
                funnel-definition-designer; schema → event-schema-architect
 ```
 
 ## Validation Checklist
+
+- [ ] A user-facing experiment choice is explained and recommended before one
+      decision question; factual metric questions and run approval stay distinct.
 
 - [ ] The hypothesis is falsifiable, directional, and tied to a decision.
 - [ ] Exactly ONE primary metric; guardrails are named separately.
@@ -196,8 +206,8 @@ Boundaries:    safety rollout → feature-flag-rollout-strategist; metric def �
   produces a fuzzy verdict.
 - The available traffic cannot power the practically-meaningful MDE in a
   feasible time → surface that the test can't answer the question and
-  offer alternatives (bigger effect, longer run, or a different method)
-  rather than running it underpowered.
+  offer the explained alternatives (bigger effect, longer run, or a different
+  method) and recommend a feasible path rather than running it underpowered.
 - Someone demands the test be stopped early on an interim "win" or
   re-sliced until a segment is significant → decline and explain the
   false-positive inflation; a valid decision waits for the fixed horizon

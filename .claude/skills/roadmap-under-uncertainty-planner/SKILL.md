@@ -58,6 +58,12 @@ TIME; it consumes the ranking of WHAT to do from
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Anchor on outcomes, not features.** Restate the roadmap's purpose as
    the outcomes it should produce. Each candidate becomes a hypothesized
    path to an outcome, not a guaranteed deliverable — this reframing is
@@ -101,6 +107,9 @@ feature reframing patterns:
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 ROADMAP (uncertainty-aware) — <product/team>, horizon model=<now/next/later | ...>
 Outcomes:      <the outcomes this roadmap serves>
@@ -118,6 +127,8 @@ Boundaries:    ranking → prioritization-frame-picker; one spec → product-spe
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The roadmap is organized by horizon, not as a dated Gantt of
       features across all quarters.
 - [ ] Items tie to outcomes; far-horizon entries are themes/directions,

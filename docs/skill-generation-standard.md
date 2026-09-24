@@ -182,6 +182,32 @@ Security, SaaS, AI-security, and tool-use skills may add optional sections such 
 or **Tool Permission Rules**. Sections may contain subsections; the nine top-level
 headers must all be present.
 
+### Explaining build choices to the user
+
+Every skill, including a manual-only skill, that presents viable build or
+deployment choices for a user's decision MUST make that choice understandable
+before asking for an answer. Define unfamiliar terms in plain language. For
+each relevant option, explain why it is being considered, its case-specific
+benefits and drawbacks, and its costs in money, setup time, and ongoing
+maintenance. Mark unknown or changing costs as such; verify current prices
+when exact prices matter. Recommend one option when the known context supports
+it, explain why it fits the user's goals and constraints, and name what missing
+fact would change the recommendation. If essential context is missing, ask one
+discovery question first rather than inventing a recommendation. Then ask one
+atomic decision question, consistent with the owning skill's interview cadence.
+Keep factual questions and simple approvals focused; they are not option
+comparisons. A user's choice is not authority for installation, spending,
+provisioning, deployment, or another side effect; section 5 still governs.
+
+Give choice-presenting skills a concise, always-applicable Workflow instruction
+or integrate the rule into their existing decision step. Adapt Output Format
+and Validation Checklist where they define a user-facing choice or could let
+one omit the explanation; avoid repeating the same boilerplate in every
+section. Add a representative decision eval when the choice behavior has a
+meaningful regression risk. The repository validator checks structure, not
+explanation quality; reviewers assess whether the choice is educational and
+tailored.
+
 ---
 
 ## 5. Least privilege & side effects

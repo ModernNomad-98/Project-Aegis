@@ -79,6 +79,12 @@ never ships in that state.
 
 ## Workflow
 
+When presenting read-path alternatives to a human after rejecting a cache,
+define query tuning and materialization; explain why each fits, its user
+benefit, drawback, and money/setup/maintenance cost or uncertainty. Recommend
+the fit from measured access patterns before one choice question. Factual
+staleness questions and any approval to add a store remain separate.
+
 1. **Qualify the candidate — or reject it.** A cache earns its place
    with: high read/write ratio, meaningful miss cost, bounded result
    cardinality, and a stated staleness tolerance. Reject candidates
@@ -149,6 +155,7 @@ conventions, and stampede-protection patterns:
 ```
 CACHING STRATEGY — <scope>
 Rejected candidates: <item — why (write-heavy | unbounded keys | zero tolerance | chatty pattern → n-plus-one-detector)>
+Read-path choice (if needed): <explained alternatives, costs/unknowns, pros/cons, recommendation + why>
 Per-item cache card:
   <item>: evidence=<read/write, miss cost, cardinality>
   ENVELOPE: "≤ <N>s stale normal / ≤ <M>s on invalidation failure; never stale for: <ops>"
@@ -179,6 +186,9 @@ Verification: <before/after latency via performance-test-harness where wired>
   variance is fully keyed and reviewed.
 
 ## Validation Checklist
+
+- [ ] Any read-path choice shown to a human explains the options and a
+      contextual recommendation before one question; no store action is inferred.
 
 - [ ] Every cached item has a written consistency envelope with an
       owner-confirmed staleness number — no "we'll tune TTL later".
@@ -238,7 +248,7 @@ Verification: <before/after latency via performance-test-harness where wired>
   revisit surviving candidates.
 - No staleness tolerance can be stated for a candidate (the owner
   says "it must always be current") → the item is not cacheable as
-  scoped; present read-path alternatives (query tuning →
+  scoped; present explained read-path alternatives (query tuning →
   `query-plan-reader`; materialization → the splitter) instead of
   inventing a tolerance.
 - The design would introduce a NEW cache store whose tenant-isolation

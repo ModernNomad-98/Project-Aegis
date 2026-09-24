@@ -50,14 +50,27 @@ Example: "Produces a normalized spreadsheet and summary tab from a messy export.
 3. Produce the deliverable exactly as specified in **Output Format**.
 4. Run the **Validation Checklist** before declaring done.
 
+When this skill asks the user to choose among viable build options, first
+define unfamiliar terms; explain each relevant option's reason, money/setup/
+maintenance costs (or uncertainty), and case-specific pros and cons; recommend
+one with a reason tied to the user's context; then ask one atomic question.
+If a sound recommendation needs a missing fact, ask for that fact first.
+Factual discovery and simple execution approval do not need an option menu.
+
 ## Output Format
 
 Describe the exact deliverable: file path(s) and naming, report structure, or data
 schema. Be specific enough that two runs produce consistent shapes.
+For a user-facing build choice, include the explained options, recommendation
+and reason before the one decision question. A preference is not authorization
+for a side effect.
 
 ## Validation Checklist
 
 - [ ] Output matches the shape declared above.
+- [ ] Any user-facing build choice explains terms, reasons, costs, pros and cons,
+      and a context-based recommendation before one atomic decision question;
+      unknown costs and missing facts are stated, not guessed.
 - [ ] No **Stop Conditions** were silently bypassed.
 - [ ] Any side-effecting step has applicable authority. Standard §5 Exception 1
       permits only the exact bounded documentary writes it names: show the path
