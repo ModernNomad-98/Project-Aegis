@@ -48,9 +48,10 @@ through the privileged operational lane (service credential / direct SQL by
 an authorized human), under the repo's approval path. Any in-product
 "promote to platform admin" button is a finding.
 
-### 1.3 Three-layer server-side re-check
+### 1.3 Two server-side checks plus a cosmetic UI guard
 
-Checked independently at every layer, so bypassing one still hits the next:
+The two server-side checks enforce access independently; the UI guard only
+guides navigation:
 
 1. **UI guard** — redirect/hide only. Cosmetic. Assume it is bypassed.
 2. **Endpoint** — every privileged endpoint re-derives the actor FROM THE
@@ -61,7 +62,7 @@ Checked independently at every layer, so bypassing one still hits the next:
    database wall.
 
 One SECURITY-DEFINER membership function (`is_platform_admin(uid)`-shaped)
-backs all three layers, so the check cannot drift between them. Prefer a
+backs both enforcement checks, so the check cannot drift between them. Prefer a
 shared server-side auth helper over per-endpoint hand-rolled preambles —
 dozens of hand-rolled copies of the same check WILL drift.
 
@@ -157,8 +158,8 @@ The most commonly missing panel — ask for it explicitly.
 
 **Surface:**
 
-- Connection-pool saturation: active vs max connections, warn ~70% / crit
-  ~85% — the leading indicator of the classic serverless-meets-Postgres
+- Connection-pool saturation: active vs max connections, example warn ~70% / crit
+  ~85%, tuned to observed platform limits — a leading indicator of serverless-meets-Postgres
   failure.
 - Cache-hit ratio (warn <95%, crit <90%), total DB size, top-N tables by
   row estimate + disk size.

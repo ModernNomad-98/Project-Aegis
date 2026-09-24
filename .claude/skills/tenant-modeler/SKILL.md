@@ -5,6 +5,9 @@ description: Define the tenant model for a SaaS product — what a tenant IS (or
 
 # Tenant Modeler
 
+**Reading key:** SSO means single sign-on, where an identity provider signs
+a user in across applications.
+
 ## Purpose
 
 Produce the tenant model every other SaaS decision hangs off: a precise
@@ -72,7 +75,9 @@ tenant semantics get rebuilt; this skill exists so they are built once.
    suspended → offboarding → purged (adapt as needed). Every state declares
    user access, data readability, billing behavior, and background-job
    behavior. Every transition names its trigger, side effects, and whether it
-   is reversible — purge is the only irreversible one, and it is gated.
+   is reversible. Purge is the intentionally irreversible tenant-data
+   transition and must be gated; offboarding, billing, and notifications may
+   also have irreversible external effects, which the model must record.
 8. **Record assumptions and open questions**, each with risk-if-wrong and who
    answers. Then stop: hand to `multi-tenant-data-architect` for schema and
    `authorization-matrix-designer` for permissions — do not design those here.

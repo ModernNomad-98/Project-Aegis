@@ -5,6 +5,10 @@ description: 'Design ongoing black-box PRODUCTION monitoring — scheduled synth
 
 # Synthetic Monitoring Architect
 
+**Reading key:** SLI is service-level indicator, SLO is service-level
+objective, RUM is real-user monitoring, E2E is end-to-end, CI is continuous
+integration, and PII is personally identifiable information.
+
 ## Purpose
 
 The gap between "all our metrics are green" and "customers can't log in" is
@@ -116,7 +120,7 @@ not execute them against production.
 ```
 SYNTHETIC MONITORING DESIGN — <system/domain>
 Posture:        DESIGN ONLY — probes are not run against production here;
-  execution requires human approval + a validated prod-safety contract.
+  execution requires an applicable human grant + a validated prod-safety contract.
 Probe catalog:  <probe — kind (journey/dependency/heartbeat) — what it verifies
   — frequency — vantage point(s)>
 Prod-safety contract (gates every probe):
@@ -151,7 +155,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       probe-broke from prod-broke, and routes to a runbook with an owner.
 - [ ] Captured artifacts are redacted of secrets/PII.
 - [ ] The design-only posture is stated: probes are not executed against
-      production without human approval.
+      production without an applicable human grant and validated safety contract.
 - [ ] Pre-release measurement, CI E2E, SLO-setting, and white-box telemetry
       are deferred to their owning skills.
 

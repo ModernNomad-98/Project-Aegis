@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # TDD Engineer
 
+**Reading key:** CI means continuous integration, the automated checks run
+for a change.
+
 ## Purpose
 
 Test-driven development (TDD) uses a red-green-refactor loop: confirm a test

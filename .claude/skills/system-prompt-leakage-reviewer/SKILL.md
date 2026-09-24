@@ -5,6 +5,10 @@ description: 'Review an LLM feature for system-prompt leakage (OWASP LLM07) on t
 
 # System Prompt Leakage Reviewer
 
+**Reading key:** LLM07 is the OWASP system-prompt-leakage risk identifier;
+LLM means large language model, RBAC is role-based access control, and UX is
+user experience.
+
 ## Purpose
 
 Review an LLM feature for the two failure modes behind LLM07. First, the
@@ -16,7 +20,8 @@ no security property may rest on the prompt staying hidden. The core doctrine
 this skill enforces: **a system prompt is not a security control** — real
 enforcement of authorization, filtering, rate limits, and tool permissions is
 deterministic and lives OUTSIDE the LLM. Findings split into secrets-in-prompt
-(extract, rotate) and prompt-as-control anti-patterns (move the control out).
+(redact evidence, route secure removal and rotation) and prompt-as-control
+anti-patterns (move the control out).
 
 ## Use When
 
@@ -56,8 +61,9 @@ deterministic and lives OUTSIDE the LLM. Findings split into secrets-in-prompt
 2. **Axis 1 — scan contents for secrets/sensitive detail** using
    [references/prompt-leakage-checks.md](references/prompt-leakage-checks.md):
    API keys, tokens, passwords, connection strings, internal URLs/hostnames,
-   architecture specifics, other customers' data. Any found = finding; extract
-   the value and route custody/rotation to `secrets-identity-hardener`.
+   architecture specifics, other customers' data. Any found = finding; record
+   location and type with a redacted fingerprint, without copying secret bytes
+   into the report. Route secure removal/rotation to `secrets-identity-hardener`.
 3. **Axis 2 — find prompt-as-control dependence (the important one).** For
    every security-relevant rule in the prompt, ask: if the user ignored this
    line entirely, is there a deterministic control OUTSIDE the model that still
@@ -77,7 +83,7 @@ deterministic and lives OUTSIDE the LLM. Findings split into secrets-in-prompt
    from output; extraction attempts (direct, roleplay, translation) documented
    with the understanding that the real assertion is "extraction causes no
    harm". Hand to `ai-evaluation-harness`.
-7. **Report both axes with routing.** Secrets → extract + rotate; prompt-as-
+7. **Report both axes with routing.** Secrets → secure removal + rotation; prompt-as-
    control → move the control out to the named owning skill. State residual
    risk with a named acceptor.
 
@@ -87,7 +93,7 @@ deterministic and lives OUTSIDE the LLM. Findings split into secrets-in-prompt
 SYSTEM-PROMPT LEAKAGE REVIEW — <feature>
 Assumption: the system prompt is treated as PUBLIC.
 Axis 1 — Contents (secrets/sensitive):
-  [SEV] <secret/detail in prompt> → extract + rotate (→ secrets-identity-hardener)
+  [SEV] <location/type/redacted fingerprint; no secret bytes> → secure removal + rotation (→ secrets-identity-hardener)
 Axis 2 — Prompt-as-control (dependence):
   <security rule in prompt> | deterministic control outside model? <yes / NO=finding>
     → move enforcement to <authorization-matrix-designer | agent-tool-safety-guard | output filter | rate limit>

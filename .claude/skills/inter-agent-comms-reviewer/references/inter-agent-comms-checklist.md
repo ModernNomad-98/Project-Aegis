@@ -1,6 +1,10 @@
 # Inter-Agent Communications Checklist (ASI07)
 
-Detail file for `inter-agent-comms-reviewer`. Read on demand.
+Detail file for [inter-agent-comms-reviewer](../SKILL.md). Read on demand.
+MCP is Model Context Protocol; SSE is server-sent events; MITM is a
+man-in-the-middle attacker; TLS is Transport Layer Security; ACL is access
+control list; RPC is remote procedure call; SPIFFE is a workload-identity
+framework. Authn means authentication, authz authorization, and DB database.
 
 ## 1. Per-transport authentication patterns
 
